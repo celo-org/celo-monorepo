@@ -19,6 +19,42 @@ OPTIONS
 
 _See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
 
+### Identifier
+
+Queries ODIS for the on-chain identifier and pepper corresponding to a given phone number.
+
+```
+USAGE
+  $ celocli identity:identifier
+
+OPTIONS
+  --env=env                                          mainnet (default), alfajores, or alfajores_staging
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address from which to perform the query
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --phoneNumber=+14152223333                         (required) The phone number for which to query the identifier (w/
+                                                     country code)
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  identifier --phoneNumber +14151231234 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --env alfajores
+```
+
+_See code: [packages/cli/src/commands/identity/identifier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/identifier.ts)_
+
 ### Test-attestation-service
 
 Tests whether the account has setup the attestation service properly by calling the test endpoint on it
