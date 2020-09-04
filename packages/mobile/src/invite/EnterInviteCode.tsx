@@ -105,8 +105,12 @@ export class EnterInviteCode extends React.Component<Props, State> {
     navigateToURI(CELO_FAUCET_LINK)
   }
 
-  onPressSkip = () => {
+  skipInvite = () => {
     this.props.skipInvite()
+  }
+
+  navigateToVerification = () => {
+    navigate(Screens.VerificationEducationScreen)
   }
 
   onInputChange = (value: string) => {
@@ -132,6 +136,40 @@ export class EnterInviteCode extends React.Component<Props, State> {
       !!extractedValues &&
       !this.state.inputValue.toLowerCase().startsWith(extractedValues.inviteCode.toLowerCase())
     )
+  }
+
+  renderFooterButton = () => {
+    const { t, isRedeemingInvite, redeemComplete } = this.props
+
+    if (SHOW_GET_INVITE_LINK) {
+      return (
+        <Text style={styles.askInviteText}>
+          <Trans i18nKey="inviteCode.nodeCodeInviteLink" ns={Namespaces.onboarding}>
+            <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink} />
+            <Text onPress={this.skipInvite} style={styles.askInviteLink} />
+          </Trans>
+        </Text>
+      )
+    }
+
+    // This only displays in edge cases where auto-navigation after redemption is unsuccessful
+    if (redeemComplete) {
+      return (
+        <TextButton style={styles.bottomButton} onPress={this.navigateToVerification}>
+          {t('global:done')}
+        </TextButton>
+      )
+    }
+
+    if (!isRedeemingInvite) {
+      return (
+        <TextButton style={styles.bottomButton} onPress={this.skipInvite}>
+          {t('inviteCode.noCode')}
+        </TextButton>
+      )
+    }
+
+    return null
   }
 
   render() {
@@ -186,24 +224,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       <ActivityIndicator size="large" color={colors.greenBrand} />
                     </View>
                   )}
-                  <View>
-                    {SHOW_GET_INVITE_LINK ? (
-                      <Text style={styles.askInviteText}>
-                        <Trans i18nKey="inviteCode.nodeCodeInviteLink" ns={Namespaces.onboarding}>
-                          <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink} />
-                          <Text onPress={this.onPressSkip} style={styles.askInviteLink} />
-                        </Trans>
-                      </Text>
-                    ) : !isRedeemingInvite ? (
-                      <TextButton
-                        style={styles.bottomButton}
-                        onPress={this.onPressSkip}
-                        disabled={isRedeemingInvite}
-                      >
-                        {t('inviteCode.noCode')}
-                      </TextButton>
-                    ) : null}
-                  </View>
+                  <View>{this.renderFooterButton()}</View>
                 </KeyboardAwareScrollView>
                 <KeyboardSpacer onToggle={this.onToggleKeyboard} />
               </View>
