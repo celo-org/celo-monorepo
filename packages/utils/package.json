@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.1.19-dev",
+  "version": "0.1.20-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -18,7 +18,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "0.0.2-dev",
+    "@celo/base": "0.0.3-dev",
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bigi": "^1.1.0",
     "bignumber.js": "^9.0.0",
