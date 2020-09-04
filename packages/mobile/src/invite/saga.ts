@@ -300,8 +300,8 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     timeout,
   }: {
     result: { success: true; newAccount: string } | { success: false } | undefined
-    cancel: TakeEffect
-    timeout: true
+    cancel: TakeEffect | undefined
+    timeout: true | undefined
   } = yield race({
     result: call(doRedeemInvite, inviteCode),
     cancel: take(Actions.CANCEL_REDEEM_INVITE),
