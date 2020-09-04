@@ -186,7 +186,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       <TextButton
                         style={styles.bottomButton}
                         onPress={this.onPressSkip}
-                        disabled={isRedeemingInvite || !!account}
+                        disabled={isRedeemingInvite}
                       >
                         {t('inviteCode.noCode')}
                       </TextButton>
