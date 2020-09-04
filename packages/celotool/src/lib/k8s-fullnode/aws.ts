@@ -35,7 +35,6 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
   async removeChart() {
     const nodePortSet = await this.getExistingNodePortSet()
     await this.setIngressRulesTCPAndUDP(Array.from(nodePortSet), false)
-    // this.printNodePortsActionRequired(Array.from(serviceNodePortsSet), true)
     await super.removeChart()
   }
 
