@@ -1,75 +1,116 @@
+import { colors } from 'src/styles'
+
 export interface MenuLink {
   name: string
   link: string
+  isDark: boolean
+  translucent?: {
+    backgroundHover: string
+  }
+  menuHidePoint?: number
+  menuHidePointMobile?: number
 }
 export const pagePaths = {
   HOME: {
     name: 'Home',
     link: '/',
+    isDark: false,
   },
   ABOUT_US: {
     name: 'About',
     link: '/about',
+    isDark: false,
+    translucent: {
+      backgroundHover: colors.darkTransparent,
+    },
   },
   ALLIANCE_COLLECTIVE: {
     name: 'Alliance',
     link: '/alliance',
+    isDark: true,
+    translucent: {
+      backgroundHover: colors.darkTransparent,
+    },
   },
   APPLICATIONS: {
     name: 'Applications',
     link: '/applications',
+    isDark: false,
   },
   BRAND: {
     name: 'BrandKit',
     link: '/experience/brand',
+    isDark: false,
   },
   BRAND_POLICY: {
     name: 'Brand Policy',
     link: '/brand-policy',
+    isDark: false,
   },
   BUILD: {
     name: 'Validators',
     link: '/validators',
+    isDark: true,
+  },
+  CBE: {
+    name: 'Coinbase',
+    link: '/coinbase-earn',
+    isDark: false,
+    translucent: {
+      backgroundHover: 'rgba(22, 82, 235, 0.6)',
+    },
+    menuHidePoint: 420,
+    menuHidePointMobile: 320,
   },
   CODE_OF_CONDUCT: {
     name: 'Code of Conduct',
     link: '/code-of-conduct',
+    isDark: false,
   },
   COMMUNITY: {
     name: 'Community',
     link: '/community',
+    isDark: false,
   },
   EVENTS_KIT: {
     name: 'EventKit',
     link: '/experience/events',
+    isDark: false,
   },
   DEVELOPERS: {
     name: 'Developers',
     link: '/developers',
+    isDark: true,
   },
   FAQ: {
     name: 'FAQ',
     link: '/faq',
+    isDark: false,
   },
   FAUCET: {
     name: 'Faucet',
     link: '/developers/faucet',
+    isDark: false,
   },
   JOBS: {
     name: 'Join',
     link: '/jobs',
+    isDark: false,
   },
   MERCHANTS: {
     name: 'MerchantKit',
     link: '/experience/merchant',
+    isDark: false,
   },
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',
+    isDark: false,
   },
   PAPERS: {
     name: 'White Papers',
     link: '/papers',
+    isDark: false,
   },
   PRESS: {
     name: 'Press',
@@ -78,22 +119,32 @@ export const pagePaths = {
   TECH: {
     name: 'Technology',
     link: '/technology',
+    isDark: false,
   },
   TERMS: {
     name: 'Terms',
     link: '/terms',
+    isDark: false,
   },
   VALIDATORS_LIST: {
     name: 'Validators List',
     link: '/validators/explore',
+    isDark: true,
   },
   VALIDATORS_LIST__BAKLAVA: {
     name: 'Validators List - Baklava',
     link: '/validators/explore/baklava',
+    isDark: true,
   },
   VALIDATORS_LIST_BAKLAVASTAGING: {
     name: 'Validators List - Baklavastaging',
     link: '/validators/explore/baklavastaging',
+    isDark: true,
+  },
+  WALLET: {
+    name: 'Test Wallet',
+    link: '/developers/wallet',
+    isDark: true,
   },
 }
 
