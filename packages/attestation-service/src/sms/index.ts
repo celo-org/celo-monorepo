@@ -17,6 +17,9 @@ import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
 
+// Maximum delivery attempts (including first) regardless of provider
+const maxDeliveryAttempts = parseInt(fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', '3'), 10)
+
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
 
@@ -58,7 +61,11 @@ export async function initializeSmsProviders(
 
 // Return all SMS providers for the given phone number, in order of preference for that region,
 // and not including any providers that has that region on its denylist.
-function smsProvidersFor(countryCode: string, phoneNumber: E164Number, logger: Logger) {
+function smsProvidersFor(
+  countryCode: string,
+  phoneNumber: E164Number,
+  logger: Logger
+): SmsProvider[] {
   const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
     .split(',')
     .filter((t) => t != null && t !== '')
@@ -84,7 +91,7 @@ function smsProvidersFor(countryCode: string, phoneNumber: E164Number, logger: L
       {
         countryCode,
         phoneNumber: obfuscateNumber(phoneNumber),
-        providers: providers.map((p) => p.type),
+        providers: providers.map((provider) => provider.type),
       },
       'Providers found'
     )
@@ -108,8 +115,26 @@ export function unsupportedRegionCodes() {
   return intersection(smsProviders.map((provider) => provider.unsupportedRegionCodes))
 }
 
-// Maximum delivery attempts (including first) regardless of provider
-const maxDeliveryAttempts = parseInt(fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', '3'), 10)
+function providersToCsv(providers: SmsProvider[]) {
+  return providers.map((provider) => provider.type).join(',')
+}
+
+// This list may be a strict subset of the valid providers (e.g. when forcing a provider for a test),
+// but cannot require providers not configured or unsupported for this country code.
+function getProvidersFor(attestation: AttestationModel, logger: Logger) {
+  const validProviders = smsProvidersFor(attestation.countryCode, attestation.phoneNumber, logger)
+  const attestationProviders = attestation.providers
+    .split(',')
+    .filter((t) => t != null && t !== '')
+    .map((name) => smsProvidersByType[name])
+
+  for (const p of attestationProviders) {
+    if (!validProviders.find((v) => p.type === v.type)) {
+      throw new Error(`Detected inconsistent provider configuration between instances`)
+    }
+  }
+  return attestationProviders
+}
 
 // Main entry point for sending SMS.
 export async function startSendSms(
@@ -127,25 +152,26 @@ export async function startSendSms(
 
   try {
     const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
-    let providers = countryCode ? smsProvidersFor(countryCode, phoneNumber, logger) : []
+    let providers: SmsProvider[] = countryCode
+      ? smsProvidersFor(countryCode, phoneNumber, logger)
+      : []
 
     if (onlyUseProvider) {
       // If onlyUseProvider is specified, filter returned list to make it only item.
-      providers = providers.find((provider) => provider.type === onlyUseProvider!)
+      providers = providers.filter((provider) => provider.type === onlyUseProvider!)
     }
 
     attestation = await findOrCreateAttestation(
       key,
       {
-        account: key.account,
-        issuer: key.issuer,
-        identifier: key.identifier,
         phoneNumber,
         countryCode,
-        status: AttestationStatus.Sent,
+        status: AttestationStatus.NotSent,
         message,
-        providers: providers.join(','),
+        providers: providersToCsv(providers),
         attempt: 0,
+        errorCode: '',
+        ongoingDeliveryId: '',
       },
       transaction
     )
@@ -155,7 +181,7 @@ export async function startSendSms(
       attestation.errorCode = `Could not parse ${phoneNumber}`
     } else if (providers.length === 0) {
       Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
-      attestation.errorCode = `No SMS providers available for ${countryCode}`
+      attestation.errorCode = `No matching SMS providers`
     } else {
       // Parsed number and found providers. Attempt delivery.
       shouldRetry = await doSendSms(attestation, providers, logger)
@@ -216,7 +242,7 @@ async function findAttestationAndSendSms(
 // Make first or next delivery attempt -- returns true if we should retry.
 async function doSendSms(
   attestation: AttestationModel,
-  providers: any[],
+  providers: SmsProvider[],
   logger: Logger
 ): Promise<boolean> {
   const provider = providers[attestation.attempt % providers.length]
@@ -274,18 +300,6 @@ async function doSendSms(
   }
 }
 
-function getProvidersFor(attestation: AttestationModel, logger: Logger) {
-  const providers = smsProvidersFor(attestation.countryCode, attestation.phoneNumber, logger)
-  const providerString = providers.join(',')
-  if (providerString !== attestation.providers) {
-    throw new Error(
-      `Detected inconsistent provider configuration between instances: ` +
-        `got ${providerString} but attestation for ${attestation.countryCode} recorded ${attestation.providers}`
-    )
-  }
-  return providers
-}
-
 // Act on a delivery report for an SMS, scheduling a resend if last one failed.
 export async function receivedDeliveryReport(
   deliveryId: string,
@@ -308,11 +322,13 @@ export async function receivedDeliveryReport(
     attestation = await findAttestationByDeliveryId(deliveryId, { transaction })
 
     if (!attestation || !attestation.countryCode) {
-      // TODO log
+      logger.debug({ deliveryId }, 'Igoring callback: no matching attestation found')
       return
     }
 
+    // First time we can associate this info with the request.
     childLogger = logger.child({
+      issuer: attestation.issuer,
       phoneNumber: obfuscateNumber(attestation.phoneNumber),
     })
 
@@ -331,10 +347,13 @@ export async function receivedDeliveryReport(
 
       attestation.status = deliveryStatus
 
-      const errors = attestation.errorCode ? JSON.parse(attestation.errorCode) : []
-      attestation.errorCode = JSON.stringify(
-        errors.append({ provider, errorCode, attempt: attestation.attempt })
-      )
+      if (errorCode) {
+        const error = { provider, errorCode, attempt: attestation.attempt }
+        const previousErrors = attestation.errorCode
+          ? (JSON.parse(attestation.errorCode) as any[])
+          : []
+        attestation.errorCode = JSON.stringify(previousErrors.push(error))
+      }
 
       Counters.attestationProviderDeliveryStatus
         .labels(provider.type, attestation.countryCode, AttestationStatus[deliveryStatus])
@@ -351,13 +370,18 @@ export async function receivedDeliveryReport(
         attestation.attempt += 1
 
         if (attestation.attempt > maxDeliveryAttempts) {
-          logger.info('Final failure to send')
+          logger.info(
+            {
+              deliveryId,
+            },
+            'Final failure to send'
+          )
         } else {
           shouldRetry = true
         }
       }
     }
-
+    await attestation.save({ transaction, logging: sequelizeLogger })
     transaction.commit()
   } catch (err) {
     childLogger.error(err)

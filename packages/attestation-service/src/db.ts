@@ -152,7 +152,7 @@ export async function findOrCreateAttestation(
   key: AttestationKey,
   defaults: object | undefined,
   transaction: Transaction
-) {
+): Promise<AttestationModel> {
   const attestationTable = await getAttestationTable()
   await attestationTable.findOrCreate({
     where: {

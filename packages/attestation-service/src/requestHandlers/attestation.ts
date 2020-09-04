@@ -30,6 +30,30 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
+export const AttestationResponseType = t.type({
+  // Always returned in 1.0.x
+  success: t.boolean,
+
+  // Returned for errors in 1.0.x
+  error: t.union([t.undefined, t.string]),
+
+  // Returned for successful send in 1.0.x
+  provider: t.union([t.undefined, t.string]),
+
+  // New fields
+  identifier: t.union([t.undefined, t.string]),
+  account: t.union([t.undefined, AddressType]),
+  issuer: t.union([t.undefined, AddressType]),
+  status: t.union([t.undefined, t.string]),
+  attempt: t.union([t.undefined, t.number]),
+  countryCode: t.union([t.undefined, t.string]),
+
+  // Only used by test endpoint to return randomly generated salt.
+  salt: t.union([t.undefined, t.string]),
+})
+
+export type AttestationResponse = t.TypeOf<typeof AttestationResponseType>
+
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }

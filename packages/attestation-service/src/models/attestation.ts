@@ -57,7 +57,7 @@ export default (sequelize: Sequelize) => {
   }
 
   model.prototype.provider = function(): string | null {
-    return this.providers ? this.providers[this.attempt % this.providers.length] : null
+    return this.providers ? this.providers.split(',')[this.attempt % this.providers.length] : null
   }
 
   return model

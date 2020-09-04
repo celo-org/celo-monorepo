@@ -5,8 +5,9 @@ import express from 'express'
 import * as t from 'io-ts'
 import { findAttestationByKey } from '../db'
 import { AttestationKey, AttestationStatus } from '../models/attestation'
-import { ErrorMessages, respondWithError } from '../request'
+import { respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
+import { AttestationResponseType } from './attestation'
 
 export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
@@ -20,15 +21,6 @@ export const GetAttestationRequestType = t.type({
 })
 
 export type GetAttestationRequest = t.TypeOf<typeof GetAttestationRequestType>
-
-export const GetAttestationResponseType = t.type({
-  status: t.string, // TODO AttestationStatusType,
-  error: t.union([t.undefined, t.string]),
-  provider: t.string,
-  attempt: t.number,
-})
-
-export type GetAttestationResponse = t.TypeOf<typeof GetAttestationResponseType>
 
 function obfuscateGetAttestationRequest(getRequest: GetAttestationRequest) {
   const obfuscatedRequest = { ...getRequest }
@@ -69,27 +61,32 @@ export async function handleGetAttestationRequest(
   res: express.Response,
   getRequest: GetAttestationRequest
 ) {
-  const handler = new GetAttestationRequestHandler(getRequest, res.locals.Logger)
-
   try {
-    const attestationRecord = await handler.getAttestationRecord()
-    if (!attestationRecord) {
+    const handler = new GetAttestationRequestHandler(getRequest, res.locals.logger)
+
+    const attestation = await handler.getAttestationRecord()
+    if (!attestation) {
       res.status(404)
       return
     }
-
     res
       .json(
-        GetAttestationResponseType.encode({
-          status: AttestationStatus[attestationRecord.status],
-          error: attestationRecord.errorCode ?? undefined,
-          provider: attestationRecord.providers,
-          attempt: attestationRecord.attempt,
+        AttestationResponseType.encode({
+          success: true,
+          identifier: attestation.identifier,
+          account: attestation.account,
+          issuer: attestation.issuer,
+          attempt: attestation.attempt,
+          countryCode: attestation.countryCode,
+          status: AttestationStatus[attestation.status],
+          provider: attestation.provider() ?? undefined,
+          error: attestation.errorCode ?? undefined,
+          salt: undefined,
         })
       )
       .status(200)
   } catch (error) {
     console.error(error)
-    respondWithError(res, 500, ErrorMessages.UNKNOWN_ERROR)
+    respondWithError(res, 500, error)
   }
 }
