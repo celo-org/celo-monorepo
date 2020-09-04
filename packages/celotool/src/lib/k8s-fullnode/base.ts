@@ -8,7 +8,6 @@ import {
 } from '../helm_deploy'
 import { scaleResource } from '../kubernetes'
 
-
 const helmChartPath = '../helm-charts/celo-fullnode'
 
 export interface BaseFullNodeDeploymentConfig {

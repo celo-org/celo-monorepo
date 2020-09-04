@@ -1,3 +1,4 @@
+import { authorizeSecurityGroupIngress, getClusterSharedNodeSecurityGroup, revokeSecurityGroupIngress } from '../aws'
 import { AWSClusterConfig } from '../k8s-cluster/aws'
 import { BaseFullNodeDeploymentConfig } from './base'
 import { BaseNodePortFullNodeDeployer } from './base-nodeport'
@@ -27,21 +28,69 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
    * Prints action required to remove the node ports, and removes the chart
    */
   async removeChart() {
-    const serviceForEachFullNode = await this.getServiceForEachFullNode()
-    const serviceNodePortsSet = serviceForEachFullNode.reduce((set: Set<number>, service: any) => {
-      // If there is no service for a full node, it is undefined. Just ignore
-      if (!service) {
-        return set
+    const nodePortSet = await this.getExistingNodePortSet()
+    await this.setIngressRulesTCPAndUDP(Array.from(nodePortSet), false)
+    // this.printNodePortsActionRequired(Array.from(serviceNodePortsSet), true)
+    await super.removeChart()
+  }
+
+  async setIngressRulesTCPAndUDP(ports: number[], authorize: boolean) {
+    const cidrRange = '0.0.0.0/0'
+    const securityGroup = await getClusterSharedNodeSecurityGroup(this.deploymentConfig.clusterConfig)
+    enum Protocols {
+      tcp = 'tcp',
+      udp = 'udp'
+    }
+    const existingRulesByPort: {
+      [port: number]: {
+        [protocol in Protocols]: boolean
       }
-      for (const portSpec of service.spec.ports) {
-        if (portSpec.nodePort) {
-          set.add(portSpec.nodePort)
+    } = {}
+    console.log('securityGroup', securityGroup)
+    for (const rule of securityGroup.IpPermissions) {
+      // We assume that all rules that have been created by previous full node
+      // deployments are for a single port, and not port ranges.
+      // Ignore rules that do not apply to node port ranges or do not have the
+      // desired cidr range
+      if (
+        rule.FromPort !== rule.ToPort ||
+        !this.isNodePort(rule.FromPort) ||
+        !rule.IpRanges.find((rangeSpec: any) => rangeSpec.CidrIp === cidrRange)
+      ) {
+        continue
+      }
+      const port = rule.FromPort
+      existingRulesByPort[port] = Object.values(Protocols).reduce((obj: any, protocol: Protocols) => ({
+        ...obj,
+        [protocol]: obj[protocol] || rule.IpProtocol === protocol
+      }), existingRulesByPort[port] || {})
+      // const tcp = existingRulesByPort[port]?.tcp || rule.IpProtocol === 'tcp'
+      // const udp = existingRulesByPort[port]?.udp || rule.IpProtocol === 'udp'
+      // existingRulesByPort[port] = {
+      //   tcp,
+      //   udp
+      // }
+    }
+    console.log('existingRulesByPort', existingRulesByPort)
+    console.log('ports', ports)
+    // const protocols = ['tcp', 'udp']
+    for (const port of ports) {
+      for (const protocol of Object.values(Protocols)) {
+        const infoStr = `${protocol}/${port}`
+        if (existingRulesByPort[port] && existingRulesByPort[port][protocol]) {
+          if (authorize) {
+            console.info(`Already authorized ${infoStr}`)
+          } else {
+            console.info(`Revoking ${infoStr} authorization`)
+            await revokeSecurityGroupIngress(securityGroup.GroupId, port, protocol, cidrRange)
+          }
+          continue
+        } else if (authorize) {
+          console.info(`Authorizing ${infoStr}`)
+          await authorizeSecurityGroupIngress(securityGroup.GroupId, port, protocol, cidrRange)
         }
       }
-      return set
-    }, new Set<number>())
-    this.printNodePortsActionRequired(Array.from(serviceNodePortsSet), true)
-    await super.removeChart()
+    }
   }
 
   /**
@@ -73,5 +122,9 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
         RESET
       )
     )
+  }
+
+  get deploymentConfig(): AWSFullNodeDeploymentConfig {
+    return this._deploymentConfig as AWSFullNodeDeploymentConfig
   }
 }

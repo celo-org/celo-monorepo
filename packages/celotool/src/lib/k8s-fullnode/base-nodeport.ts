@@ -2,11 +2,25 @@ import { range } from 'lodash'
 import { getAllUsedNodePorts, getService } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
+const NODE_PORT_MIN = 30000
+const NODE_PORT_MAX = 32767
+
 export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer {
 
   async additionalHelmParameters() {
-    const nodePortForEachFullNode = await this.getNodePortForEachFullNode()
-    const nodePortPerFullNodeStrs = nodePortForEachFullNode.map((nodePort: number, index: number) =>
+    const existingNodePortSet = await this.getExistingNodePortSet()
+    const newNodePortForEachFullNode = await this.getNodePortForEachFullNode()
+    const newNodePortSet = new Set(newNodePortForEachFullNode)
+    // Essentially existingNodePortSet \ newNodePortForEachFullNode
+    const nodePortsToRemove = new Set(
+      Array.from(existingNodePortSet).filter(existing => !newNodePortSet.has(existing))
+    )
+    console.log('existingNodePortSet', [...existingNodePortSet])
+    console.log('newNodePortSet', [...newNodePortSet])
+    console.log('nodePortsToRemove', [...nodePortsToRemove])
+    await this.setIngressRulesTCPAndUDP(newNodePortForEachFullNode, true)
+    await this.setIngressRulesTCPAndUDP(Array.from(nodePortsToRemove), false)
+    const nodePortPerFullNodeStrs = newNodePortForEachFullNode.map((nodePort: number, index: number) =>
       `--set geth.service_node_port_per_full_node[${index}]=${nodePort}`
     )
     return [
@@ -39,9 +53,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
       }, NO_NODE_PORT)
     })
 
-    const minPort = 30000
-    const maxPort = 32767
-    let potentialPort = minPort
+    let potentialPort = NODE_PORT_MIN
     let allUsedNodePortsIndex = 0
     // Assign node port to services that do not have one yet. Do so in a way to
     // not assign a node port that has been assigned to another service on the
@@ -51,7 +63,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
       const nodePort = nodePortForEachFullNode[i]
       if (nodePort === NO_NODE_PORT) {
         for (; allUsedNodePortsIndex < allUsedNodePorts.length; allUsedNodePortsIndex++) {
-          if (potentialPort > maxPort) {
+          if (potentialPort > NODE_PORT_MAX) {
             throw Error(`No available node ports`)
           }
           const usedPort = allUsedNodePorts[allUsedNodePortsIndex]
@@ -90,7 +102,34 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     )
   }
 
+  async getExistingFullNodeServices() {
+    const response = await getService(`--selector=component=celo-fullnode-protocol-traffic`, this.kubeNamespace)
+    console.log('getExistingFullNodeServices.items', response.items)
+    return response.items
+  }
+
+  async getExistingNodePortSet(): Promise<Set<number>> {
+    const serviceForEachFullNode = await this.getExistingFullNodeServices()
+    return serviceForEachFullNode.reduce((set: Set<number>, service: any) => {
+      // If there is no service for a full node, it is undefined. Just ignore
+      if (!service) {
+        return set
+      }
+      for (const portSpec of service.spec.ports) {
+        if (portSpec.nodePort) {
+          set.add(portSpec.nodePort)
+        }
+      }
+      return set
+    }, new Set<number>())
+  }
+
+  isNodePort(portNumber: number): boolean {
+    return portNumber >= NODE_PORT_MIN && portNumber <= NODE_PORT_MAX
+  }
+
   abstract printNodePortsActionRequired(nodePorts: number[]): void
+  abstract async setIngressRulesTCPAndUDP(nodePorts: number[], authorize: boolean): Promise<void>
 
   get deploymentConfig(): BaseFullNodeDeploymentConfig {
     return this._deploymentConfig

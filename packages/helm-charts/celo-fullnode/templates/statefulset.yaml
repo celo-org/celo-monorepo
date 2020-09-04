@@ -3,7 +3,8 @@ kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}
   labels:
-{{ include "celo-fullnode.labels" .  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
+  component: celo-fullnode
 spec:
 {{ if .Values.storage.enable }}
   volumeClaimTemplates:
@@ -23,11 +24,13 @@ spec:
   serviceName: {{ template "common.fullname" . }}
   selector:
     matchLabels:
-{{ include "celo-fullnode.labels" .  | indent 6 }}
+{{ include "common.standard.labels" .  | indent 6 }}
+      component: celo-fullnode
   template:
     metadata:
       labels:
-{{ include "celo-fullnode.labels" .  | indent 8 }}
+{{ include "common.standard.labels" .  | indent 8 }}
+        component: celo-fullnode
 {{ if .Values.prometheus | default true }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
