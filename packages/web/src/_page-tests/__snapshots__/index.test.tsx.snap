@@ -4076,7 +4076,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              Backers
+              Early Backers
               <div
                 className="css-view-1dbjc4n"
                 style={
