@@ -125,14 +125,14 @@ const isImplementationChanged = (contract: string, context: VerificationContext)
 }
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  const registryId = web3.utils.soliditySha3({ type: 'string', value: contract })
+  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
   return context.proposal.some((tx: ProposalTx) => {
     return tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
   })
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const registryId = web3.utils.soliditySha3({ type: 'string', value: contract })
+  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
   const tx = context.proposal.find((tx: ProposalTx) => {
     return tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
   })
