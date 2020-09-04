@@ -1,15 +1,25 @@
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import {
+  isBalanceSufficientForSigRetrieval,
+  PhoneNumberHashDetails,
+} from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
+import BigNumber from 'bignumber.js'
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
 import { VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
-import { AttestationCode, NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
+import {
+  AttestationCode,
+  ESTIMATED_COST_PER_ATTESTATION,
+  NUM_ATTESTATIONS_REQUIRED,
+} from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { timeDeltaInSeconds } from 'src/utils/time'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
@@ -54,10 +64,13 @@ export interface SecureSendDetails {
   validationSuccessful: boolean | undefined
 }
 
-export interface VerificationState {
+export interface UpdatableVerificationState {
   phoneHashDetails: PhoneNumberHashDetails
   actionableAttestations: ActionableAttestation[]
   status: AttestationsStatus
+}
+
+export type VerificationState = State['verificationState'] & {
   isBalanceSufficient: boolean
 }
 
@@ -85,7 +98,7 @@ export interface State {
   verificationState: {
     isLoading: boolean
     lastFetch: number | null
-  } & VerificationState
+  } & UpdatableVerificationState
 }
 
 const initialState: State = {
@@ -120,7 +133,6 @@ const initialState: State = {
       total: 0,
       completed: 0,
     },
-    isBalanceSufficient: true,
     lastFetch: null,
   },
 }
@@ -349,7 +361,34 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
-export const verificationStateSelector = (state: RootState) => state.identity.verificationState
+
+export const isBalanceSufficientForSigRetrievalSelector = (state: RootState) => {
+  const dollarBalance = stableTokenBalanceSelector(state) || 0
+  const celoBalance = celoTokenBalanceSelector(state) || 0
+  return isBalanceSufficientForSigRetrieval(dollarBalance, celoBalance)
+}
+
+function isBalanceSufficientForAttestations(state: RootState, attestationsRemaining: number) {
+  const userBalance = stableTokenBalanceSelector(state) || 0
+  return new BigNumber(userBalance).isGreaterThan(
+    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+  )
+}
+
+export const verificationStateSelector = (state: RootState): VerificationState => {
+  const verificationState = state.identity.verificationState
+  const { phoneHashDetails, status, actionableAttestations } = verificationState
+  const attestationsRemaining = status.numAttestationsRemaining - actionableAttestations.length
+  const isBalanceSufficient = !phoneHashDetails.phoneHash
+    ? isBalanceSufficientForSigRetrievalSelector(state)
+    : isBalanceSufficientForAttestations(state, attestationsRemaining)
+
+  return {
+    ...verificationState,
+    isBalanceSufficient,
+  }
+}
+
 export const isVerificationStateExpiredSelector = (state: RootState) => {
   return (
     !state.identity.verificationState.lastFetch ||
