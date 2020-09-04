@@ -172,6 +172,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                       inputPlaceholder={t('inviteCode.codePlaceholder')}
                       onInputChange={this.onInputChange}
                       shouldShowClipboard={this.shouldShowClipboard}
+                      testID={'inviteCodeInput'}
                     />
                     {isRedeemingInvite && (
                       <View style={styles.loadingContainer}>
