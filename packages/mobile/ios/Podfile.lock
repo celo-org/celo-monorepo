@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.8.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.315)
+  - CeloBlockchain (0.0.317)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
@@ -324,7 +324,7 @@ PODS:
     - React
   - react-native-fast-crypto (1.8.3):
     - React
-  - react-native-geth (0.1.0-development):
+  - react-native-geth (1.0.0):
     - CeloBlockchain
     - React
   - react-native-keep-awake (4.0.0):
@@ -348,7 +348,7 @@ PODS:
     - React
   - react-native-udp (2.6.1):
     - React
-  - react-native-webview (9.3.0):
+  - react-native-webview (10.8.3):
     - React
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
@@ -743,7 +743,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Analytics: fcf79ebc393a7d77befb8d43ce296353ba9ede3d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: e332160cd94e43856a198aba7aa0af567021b3bd
+  CeloBlockchain: 84bc1cf8faace08aeecdeb24a30f0492b4c266cf
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
@@ -789,7 +789,7 @@ SPEC CHECKSUMS:
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
   react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
-  react-native-geth: b643560e11512a3c0b1d78df929cb9f2409cf4a2
+  react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957
@@ -800,7 +800,7 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-webview: 60d883f994e96a560756c14592552e02a06d604d
+  react-native-webview: 598605cd213f5096e695f5b33fbee210a47e60ab
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -839,6 +839,6 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: 4420332ded564922d9eeea3416145aa39a255938
+PODFILE CHECKSUM: 470c646f25b89e063843bdec1cd889a649b38781
 
 COCOAPODS: 1.9.1

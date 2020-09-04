@@ -1,6 +1,6 @@
 {
   "name": "@celo/attestation-service",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Issues attestation messages for Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -27,8 +27,8 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.13-dev",
-    "@celo/utils": "0.1.19-dev",
+    "@celo/contractkit": "0.4.14-dev",
+    "@celo/utils": "0.1.20-dev",
     "bignumber.js": "^9.0.0",
     "body-parser": "1.19.0",
     "bunyan": "1.8.12",

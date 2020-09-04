@@ -159,6 +159,22 @@ export async function encodeTransaction(
   return result
 }
 
+export function extractSignature(rawTx: string): { v: number; r: Buffer; s: Buffer } {
+  const rawValues = RLP.decode(rawTx)
+  let r = rawValues[10]
+  let s = rawValues[11]
+  // Account.recover cannot handle canonicalized signatures
+  // A canonicalized signature may have the first byte removed if its value is 0
+  r = ensureLeading0x(trimLeading0x(r).padStart(64, '0'))
+  s = ensureLeading0x(trimLeading0x(s).padStart(64, '0'))
+
+  return {
+    v: rawValues[9],
+    r,
+    s,
+  }
+}
+
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.
 export function recoverTransaction(rawTx: string): [Tx, string] {

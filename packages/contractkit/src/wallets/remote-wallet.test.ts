@@ -5,7 +5,7 @@ import { RemoteWallet } from './remote-wallet'
 import { Signer } from './signers/signer'
 import { ACCOUNT_ADDRESS1, CHAIN_ID, TYPED_DATA } from './test-utils'
 
-class RemoteWalletImpl extends RemoteWallet {
+class RemoteWalletImpl extends RemoteWallet<Signer> {
   protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
     return new Map<Address, Signer>()
   }

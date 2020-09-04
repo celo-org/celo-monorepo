@@ -15,7 +15,6 @@ import { call, put, select } from 'redux-saga/effects'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getStoredMnemonic } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
@@ -68,32 +67,20 @@ export function* registerAccountDek(account: string) {
     if (isAlreadyRegistered) {
       return
     }
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_start)
 
     Logger.debug(
-      `${TAG}@registerAccountDEK`,
+      `${TAG}@registerAccountDek`,
       'Setting wallet address and public data encryption key'
     )
 
     yield call(getConnectedUnlockedAccount)
-    let privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked)
+
+    const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
     if (!privateDataKey) {
       throw new Error('No data key in store. Should never happen.')
     }
-
-    /**
-     * BEGIN MIGRATION HACK
-     * This code can be safely removed once existing Valora users have all run it
-     * It's needed because we need to regenerate their DEKs now that the scheme has changed
-     * If it's still here by 2020/08/23 please remove it.
-     */
-    const mnemonic = yield call(getStoredMnemonic, account)
-    privateDataKey = yield call(createAccountDek, mnemonic)
-    if (!privateDataKey) {
-      throw new Error('Failed to create new DEK in migration hack')
-    }
-    /**
-     * END MIGRATION HACK
-     */
 
     const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
 
@@ -104,9 +91,14 @@ export function* registerAccountDek(account: string) {
     ])
 
     const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
+
     if (upToDate) {
-      Logger.debug(`${TAG}@registerAccountDEK`, 'Address and DEK up to date, skipping.')
+      Logger.debug(`${TAG}@registerAccountDek`, 'Address and DEK up to date, skipping.')
       yield put(registerDataEncryptionKey())
+      ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+        newRegistration: false,
+      })
       return
     }
 
@@ -116,11 +108,13 @@ export function* registerAccountDek(account: string) {
     yield call(sendTransaction, setAccountTx.txo, account, context)
 
     yield put(registerDataEncryptionKey())
-    ValoraAnalytics.track(OnboardingEvents.account_dek_set)
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+      newRegistration: true,
+    })
   } catch (error) {
     // DEK registration failures are not considered fatal. Swallow the error and allow calling saga to proceed.
     // Registration will be re-attempted on next payment send
-    Logger.error(`${TAG}@registerAccountDEK`, 'Failure registering DEK', error)
+    Logger.error(`${TAG}@registerAccountDek`, 'Failure registering DEK', error)
   }
 }
 

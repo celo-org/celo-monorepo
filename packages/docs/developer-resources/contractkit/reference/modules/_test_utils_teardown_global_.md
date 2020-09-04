@@ -12,6 +12,6 @@
 
 ▸ **globalTeardown**(): *Promise‹void›*
 
-*Defined in [contractkit/src/test-utils/teardown.global.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/test-utils/teardown.global.ts#L5)*
+*Defined in [packages/contractkit/src/test-utils/teardown.global.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/test-utils/teardown.global.ts#L5)*
 
 **Returns:** *Promise‹void›*
