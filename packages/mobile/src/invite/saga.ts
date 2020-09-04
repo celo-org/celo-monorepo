@@ -404,7 +404,7 @@ function* addTempAccountToWallet(tempAccountPrivateKey: string) {
     const tempAccount = yield call([wallet, wallet.addAccount], tempAccountPrivateKey, password)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
-    if (e.toString().includes('account already exists')) {
+    if (e.message === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
       return
     }
@@ -459,7 +459,14 @@ export function* moveAllFundsFromAccount(
 
   const context = newTransactionContext(TAG, 'Transfer from temp wallet')
   // Temporarily hardcoding gas estimate to save time on estimation
-  yield call(sendTransaction, tx.txo, account, context, SEND_TOKEN_GAS_ESTIMATE)
+  yield call(
+    sendTransaction,
+    tx.txo,
+    account,
+    context,
+    SEND_TOKEN_GAS_ESTIMATE,
+    AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
+  )
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 
