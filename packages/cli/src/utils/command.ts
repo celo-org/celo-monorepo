@@ -70,6 +70,21 @@ const parsePhoneNumber: ParseFn<string> = (input) => {
   }
 }
 
+const parseContacts: ParseFn<string[]> = (input) => {
+  const contacts: string[] = input.split(',')
+  if (!contacts.length) {
+    throw new CLIError(
+      `Invalid contacts list format. Contacts should be comma-seperated with no spaces`
+    )
+  }
+  contacts.forEach((c) => {
+    if (!isE164NumberStrict(c)) {
+      throw new CLIError(`PhoneNumber "${c}" is not a valid E164 number`)
+    }
+  })
+  return contacts
+}
+
 const parseUrl: ParseFn<string> = (input) => {
   if (URL_REGEX.test(input)) {
     return input
@@ -114,6 +129,11 @@ export const Flags = {
     parse: parsePhoneNumber,
     description: 'Phone Number in E164 Format',
     helpValue: '+14152223333',
+  }),
+  contacts: flags.build({
+    parse: parseContacts,
+    description: 'List of phone numbers in E164 Format (comma-seperated,no spaces)',
+    helpValue: '+14152223333,+14151231234',
   }),
   proofOfPossession: flags.build({
     parse: parseProofOfPossession,
