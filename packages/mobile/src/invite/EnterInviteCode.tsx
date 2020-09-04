@@ -124,7 +124,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, isRedeemingInvite, isSkippingInvite, redeemComplete, account } = this.props
+    const { t, isRedeemingInvite, isSkippingInvite, redeemComplete } = this.props
     const { keyboardVisible, inputValue } = this.state
 
     let codeStatus = CodeInputStatus.INPUTTING
