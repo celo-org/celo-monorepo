@@ -23,7 +23,7 @@ jest.mock('react-native-blind-threshold-bls', () => ({
 
 jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
-  ...jest.requireActual('../../__mocks__/@celo/contractkit/index/'),
+  ...jest.requireActual('../../__mocks__/@celo/contractkit/index'),
   OdisUtils: jest.requireActual('@celo/contractkit').OdisUtils,
 }))
 
