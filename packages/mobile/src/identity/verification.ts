@@ -6,7 +6,7 @@ import {
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { retryAsync, sleep } from '@celo/utils/src/async'
+import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
@@ -259,9 +259,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       yield all([
         // Request codes for the attestations needed
         call(
-          // TODO (i1skn): change it back to revealNeededAttestations when
-          // https://github.com/celo-org/celo-labs/issues/578 is resolved
-          revealNeededAttestationsSequentially,
+          revealNeededAttestations,
           attestationsWrapper,
           account,
           phoneHashDetails,
@@ -549,31 +547,7 @@ function* isCodeAlreadyAccepted(code: string) {
   return existingCodes.find((c) => c.code === code)
 }
 
-// function* revealNeededAttestations(
-// attestationsWrapper: AttestationsWrapper,
-// account: string,
-// phoneHashDetails: PhoneNumberHashDetails,
-// attestations: ActionableAttestation[],
-// withoutRevealing: boolean = false
-// ) {
-// Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
-// yield all(
-// attestations.map((attestation) => {
-// return call(
-// revealAndCompleteAttestation,
-// attestationsWrapper,
-// account,
-// phoneHashDetails,
-// attestation,
-// withoutRevealing
-// )
-// })
-// )
-// }
-
-// TODO (i1skn): remove this method and uncomment revealNeededAttestations above
-// when https://github.com/celo-org/celo-labs/issues/578 is resolved
-function* revealNeededAttestationsSequentially(
+function* revealNeededAttestations(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
@@ -592,6 +566,8 @@ function* revealNeededAttestationsSequentially(
         phoneHashDetails,
         attestation,
         withoutRevealing,
+        // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
+        // when https://github.com/celo-org/celo-labs/issues/578 is resolved
         // send messages with 5000ms delay on Android
         Platform.OS === 'android' ? delayPeriod * i++ : 0
       )
@@ -611,7 +587,7 @@ function* revealAndCompleteAttestation(
   if (!withoutRevealing) {
     if (delayInMs) {
       Logger.debug(TAG + '@tryRevealPhoneNumber', `Delaying for: ${delayInMs}ms`)
-      yield call(sleep, delayInMs)
+      yield delay(delayInMs)
     }
     ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
     yield call(tryRevealPhoneNumber, attestationsWrapper, account, phoneHashDetails, attestation)

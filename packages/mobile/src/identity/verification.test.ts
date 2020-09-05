@@ -1,5 +1,4 @@
 import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
-import { sleep as realSleep } from '@celo/utils/src/async'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -325,8 +324,8 @@ describe(doVerificationFlow, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
         // https://github.com/celo-org/celo-labs/issues/578 is resolved
-        [call(realSleep, 5000), true],
-        [call(realSleep, 10000), true],
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -428,8 +427,8 @@ describe(doVerificationFlow, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
         // TODO (i1skn): remove next two lines when
         // https://github.com/celo-org/celo-labs/issues/578 is resolved
-        [call(realSleep, 5000), true],
-        [call(realSleep, 10000), true],
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperRevealFailure,
