@@ -396,7 +396,6 @@ export const v5Schema = {
         total: 0,
         completed: 0,
       },
-      isBalanceSufficient: true,
       lastFetch: null,
     },
   },
