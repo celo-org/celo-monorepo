@@ -36,13 +36,11 @@ import {
   StartVerificationAction,
   udpateVerificationState,
 } from 'src/identity/actions'
-import {
-  balanceSufficientForSigRetrieval,
-  fetchPhoneHashPrivate,
-} from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   acceptedAttestationCodesSelector,
   attestationCodesSelector,
+  isBalanceSufficientForSigRetrievalSelector,
   isVerificationStateExpiredSelector,
   VerificationState,
   verificationStateSelector,
@@ -87,15 +85,10 @@ export function* fetchVerificationState() {
 
     let phoneHash: string
     let phoneHashDetails: PhoneNumberHashDetails
-    const isBalanceSufficientForSigRetrieval = yield call(balanceSufficientForSigRetrieval)
+    const isBalanceSufficientForSigRetrieval = yield select(
+      isBalanceSufficientForSigRetrievalSelector
+    )
     if (!isBalanceSufficientForSigRetrieval) {
-      const currentState = yield select(verificationStateSelector)
-      yield put(
-        udpateVerificationState({
-          ...currentState,
-          isBalanceSufficient: false,
-        })
-      )
       return
     }
 
@@ -136,17 +129,11 @@ export function* fetchVerificationState() {
       account
     )
 
-    const isBalanceSufficient = yield call(
-      balanceSufficientForAttestations,
-      status.numAttestationsRemaining - actionableAttestations.length
-    )
-
     yield put(
       udpateVerificationState({
         phoneHashDetails,
         actionableAttestations,
         status,
-        isBalanceSufficient,
       })
     )
   } catch (error) {
