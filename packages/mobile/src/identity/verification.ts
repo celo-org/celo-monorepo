@@ -542,6 +542,8 @@ function* revealNeededAttestations(
   withoutRevealing: boolean = false
 ) {
   Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
+  const delayPeriod = 5000
+  let i = 0
   yield all(
     attestations.map((attestation) => {
       return call(
@@ -550,7 +552,11 @@ function* revealNeededAttestations(
         account,
         phoneHashDetails,
         attestation,
-        withoutRevealing
+        withoutRevealing,
+        // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
+        // when https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // send messages with 5000ms delay on Android
+        Platform.OS === 'android' ? delayPeriod * i++ : 0
       )
     })
   )
@@ -561,10 +567,15 @@ function* revealAndCompleteAttestation(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
-  withoutRevealing: boolean = false
+  withoutRevealing: boolean = false,
+  delayInMs: number = 0
 ) {
   const issuer = attestation.issuer
   if (!withoutRevealing) {
+    if (delayInMs) {
+      Logger.debug(TAG + '@tryRevealPhoneNumber', `Delaying for: ${delayInMs}ms`)
+      yield delay(delayInMs)
+    }
     ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
     yield call(tryRevealPhoneNumber, attestationsWrapper, account, phoneHashDetails, attestation)
   }
