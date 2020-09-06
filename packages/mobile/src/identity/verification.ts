@@ -36,13 +36,11 @@ import {
   StartVerificationAction,
   udpateVerificationState,
 } from 'src/identity/actions'
-import {
-  balanceSufficientForSigRetrieval,
-  fetchPhoneHashPrivate,
-} from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   acceptedAttestationCodesSelector,
   attestationCodesSelector,
+  isBalanceSufficientForSigRetrievalSelector,
   isVerificationStateExpiredSelector,
   VerificationState,
   verificationStateSelector,
@@ -87,15 +85,10 @@ export function* fetchVerificationState() {
 
     let phoneHash: string
     let phoneHashDetails: PhoneNumberHashDetails
-    const isBalanceSufficientForSigRetrieval = yield call(balanceSufficientForSigRetrieval)
+    const isBalanceSufficientForSigRetrieval = yield select(
+      isBalanceSufficientForSigRetrievalSelector
+    )
     if (!isBalanceSufficientForSigRetrieval) {
-      const currentState = yield select(verificationStateSelector)
-      yield put(
-        udpateVerificationState({
-          ...currentState,
-          isBalanceSufficient: false,
-        })
-      )
       return
     }
 
@@ -136,17 +129,11 @@ export function* fetchVerificationState() {
       account
     )
 
-    const isBalanceSufficient = yield call(
-      balanceSufficientForAttestations,
-      status.numAttestationsRemaining - actionableAttestations.length
-    )
-
     yield put(
       udpateVerificationState({
         phoneHashDetails,
         actionableAttestations,
         status,
-        isBalanceSufficient,
       })
     )
   } catch (error) {
@@ -555,6 +542,8 @@ function* revealNeededAttestations(
   withoutRevealing: boolean = false
 ) {
   Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
+  const delayPeriod = 5000
+  let i = 0
   yield all(
     attestations.map((attestation) => {
       return call(
@@ -563,7 +552,11 @@ function* revealNeededAttestations(
         account,
         phoneHashDetails,
         attestation,
-        withoutRevealing
+        withoutRevealing,
+        // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
+        // when https://github.com/celo-org/celo-labs/issues/578 is resolved
+        // send messages with 5000ms delay on Android
+        Platform.OS === 'android' ? delayPeriod * i++ : 0
       )
     })
   )
@@ -574,10 +567,15 @@ function* revealAndCompleteAttestation(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
-  withoutRevealing: boolean = false
+  withoutRevealing: boolean = false,
+  delayInMs: number = 0
 ) {
   const issuer = attestation.issuer
   if (!withoutRevealing) {
+    if (delayInMs) {
+      Logger.debug(TAG + '@tryRevealPhoneNumber', `Delaying for: ${delayInMs}ms`)
+      yield delay(delayInMs)
+    }
     ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
     yield call(tryRevealPhoneNumber, attestationsWrapper, account, phoneHashDetails, attestation)
   }
