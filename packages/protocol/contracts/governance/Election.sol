@@ -962,7 +962,7 @@ contract Election is
     FixidityLib.Fraction[] memory votesForNextMember = new FixidityLib.Fraction[](
       electionGroups.length
     );
-    for (uint256 i = 0; i < electionGroups.length; i++) {
+    for (uint256 i = 0; i < electionGroups.length; i.add(1)) {
       keys[i] = i;
       votesForNextMember[i] = FixidityLib.newFixed(
         votes.total.eligible.getValue(electionGroups[i])

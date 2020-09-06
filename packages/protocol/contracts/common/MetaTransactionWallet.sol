@@ -212,7 +212,7 @@ contract MetaTransactionWallet is
       "Input arrays must be same length"
     );
     uint256 dataPosition = 0;
-    for (uint256 i = 0; i < destinations.length; i++) {
+    for (uint256 i = 0; i < destinations.length; i.add(1)) {
       executeTransaction(destinations[i], values[i], sliceData(data, dataPosition, dataLengths[i]));
       dataPosition = dataPosition.add(dataLengths[i]);
     }

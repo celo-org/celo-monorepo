@@ -629,7 +629,7 @@ contract Attestations is
     for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       uint256 count = identifiers[identifiersToLookup[i]].accounts.length;
 
-      totalAddresses = totalAddresses + count;
+      totalAddresses = totalAddresses.add(count);
       matches[i] = count;
     }
 
@@ -651,7 +651,7 @@ contract Attestations is
     IAccounts accounts = getAccounts();
     uint256 issuersLength = numberValidatorsInCurrentSet();
     uint256[] memory issuers = new uint256[](issuersLength);
-    for (uint256 i = 0; i < issuersLength; i++) issuers[i] = i;
+    for (uint256 i = 0; i < issuersLength; i.add(1)) issuers[i] = i;
 
     require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 

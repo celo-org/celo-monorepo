@@ -93,7 +93,7 @@ contract UsingPrecompiles {
     if (blockNumber % epochSize == 0) {
       return epochNumber;
     } else {
-      return epochNumber + 1;
+      return epochNumber.add(1);
     }
   }
 
@@ -243,7 +243,7 @@ contract UsingPrecompiles {
    * @return bytes32 data
    */
   function getBytes32FromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
-    require(bs.length >= start + 32, "slicing out of range");
+    require(bs.length >= start.add(32), "slicing out of range");
     bytes32 x;
     assembly {
       x := mload(add(bs, add(start, 32)))
