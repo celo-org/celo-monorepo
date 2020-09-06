@@ -486,7 +486,7 @@ jobs:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
 
-  protocol-verify-rc1-bytecode:
+  protocol-verify-bytecodes:
     <<: *defaults
     resource_class: large
     steps:
@@ -497,10 +497,36 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Verify RC1 bytecode
+          name: Verify bytecodes between RC1 and current branch
           command: |
-            yarn --cwd packages/protocol download-artifacts -n rc1
-            yarn --cwd packages/protocol truffle exec --network rc1 scripts/truffle/verify-bytecode.js --rc1_forno --build_artifacts build/rc1/contracts
+            cd packages/protocol
+
+            # deploy RC1 contracts to ganache devchain
+            git checkout rc1
+            yarn devchain generate-tar devchain.tar.gz --migration_override <(echo '{"downtimeSlasher": { "slashableDowntime": 60 } }')
+            # store build artifacts in build/rc1
+            mv build/contracts build/rc1
+
+            # build current contracts (artifacts in build/contracts)
+            git checkout ${CIRCLE_BRANCH}
+            yarn build
+
+            # run ganache, wait for it to start
+            yarn devchain run-tar devchain.tar.gz &
+            GANACHE_PID=$!
+            sleep 10
+
+            # verify bytecodes of RC1 deployment
+            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
+            # generate report between RC1 and current branch
+            yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/rc1 -n build/contracts --output_file report.json
+            # deploy new contracts and generate Governance proposal for upgrade
+            yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data initialize-data.json
+            # verify bytecode of upgrade deployment
+            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --builde_artifacts build/rc1 --proposal ../../proposal.json
+
+            # stop ganache
+            kill $GANACHE_PID
 
   protocol-test-compatibility:
     <<: *defaults
@@ -995,7 +1021,7 @@ workflows:
       - protocol-test-common:
           requires:
             - lint-checks
-      - protocol-verify-rc1-bytecode:
+      - protocol-verify-bytecodes:
           requires:
             - lint-checks
       - protocol-test-compatibility:
