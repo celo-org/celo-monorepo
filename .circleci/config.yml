@@ -502,6 +502,7 @@ jobs:
             cd packages/protocol
 
             # deploy RC1 contracts to ganache devchain
+            git fetch origin rc1
             git checkout rc1
             yarn devchain generate-tar devchain.tar.gz --migration_override <(echo '{"downtimeSlasher": { "slashableDowntime": 60 } }')
             # store build artifacts in build/rc1
