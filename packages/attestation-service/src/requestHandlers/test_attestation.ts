@@ -75,7 +75,7 @@ export async function handleTestAttestationRequest(
           status: AttestationStatus[attestation.status],
           salt,
           provider: attestation.provider() ?? undefined,
-          error: attestation.errorCode ?? undefined,
+          errors: attestation.errors ?? undefined,
         })
       )
       .status(201)
@@ -86,7 +86,7 @@ export async function handleTestAttestationRequest(
         AttestationResponseType.encode({
           status: AttestationStatus[AttestationStatus.NotSent],
           success: false,
-          error,
+          errors: JSON.stringify([`${error.message ?? error}`]),
           salt: undefined,
           identifier: undefined,
           account: undefined,

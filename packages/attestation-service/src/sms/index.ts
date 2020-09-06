@@ -3,6 +3,7 @@ import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { PhoneNumberUtil } from 'google-libphonenumber'
+import { Transaction } from 'sequelize'
 import {
   findAttestationByDeliveryId,
   findAttestationByKey,
@@ -170,7 +171,7 @@ export async function startSendSms(
         message,
         providers: providersToCsv(providers),
         attempt: 0,
-        errorCode: '',
+        errors: '[]',
         ongoingDeliveryId: '',
       },
       transaction
@@ -178,10 +179,10 @@ export async function startSendSms(
 
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()
-      attestation.errorCode = `Could not parse ${phoneNumber}`
+      attestation.recordError(`Could not parse ${phoneNumber}`)
     } else if (providers.length === 0) {
       Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
-      attestation.errorCode = `No matching SMS providers`
+      attestation.recordError(`No matching SMS providers`)
     } else {
       // Parsed number and found providers. Attempt delivery.
       shouldRetry = await doSendSms(attestation, providers, logger)
@@ -189,34 +190,35 @@ export async function startSendSms(
 
     await attestation.save({ transaction, logging: sequelizeLogger })
     await transaction.commit()
-
-    // If there was an error sending, backoff and retry while holding open client conn.
-    if (shouldRetry) {
-      await sleep(Math.pow(2, attestation!.attempt) * 1000)
-      await findAttestationAndSendSms(key, logger, sequelizeLogger)
-    }
-
-    return attestation
   } catch (err) {
     logger.error({ err })
     await transaction.rollback()
     throw err
   }
+
+  // If there was an error sending, backoff and retry while holding open client conn.
+  if (shouldRetry && attestation) {
+    await sleep(Math.pow(2, attestation!.attempt) * 1000)
+    attestation = await findAttestationAndSendSms(key, logger, sequelizeLogger)
+  }
+
+  return attestation
 }
 
 async function findAttestationAndSendSms(
   key: AttestationKey,
   logger: Logger,
   sequelizeLogger: SequelizeLogger
-) {
+): Promise<AttestationModel> {
   let shouldRetry = false
+  let attestation: AttestationModel | null = null
 
   const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
-    const attestation = await findAttestationByKey(key, transaction)
+    attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
     if (!attestation) {
-      return
+      throw new Error('Cannot retrieve attestation')
     }
 
     const providers = getProvidersFor(attestation, logger)
@@ -226,17 +228,19 @@ async function findAttestationAndSendSms(
 
     await attestation.save({ transaction, logging: sequelizeLogger })
     await transaction.commit()
-
-    // If there was an error sending, backoff and retry while holding open client conn.
-    if (shouldRetry) {
-      await sleep(Math.pow(2, attestation.attempt) * 1000)
-      await findAttestationAndSendSms(key, logger, sequelizeLogger)
-    }
   } catch (err) {
     logger.error({ err })
     await transaction.rollback()
     throw err
   }
+
+  // If there was an error sending, backoff and retry while holding open client conn.
+  if (shouldRetry && attestation) {
+    await sleep(Math.pow(2, attestation.attempt) * 1000)
+    attestation = await findAttestationAndSendSms(key, logger, sequelizeLogger)
+  }
+
+  return attestation
 }
 
 // Make first or next delivery attempt -- returns true if we should retry.
@@ -259,7 +263,6 @@ async function doSendSms(
     const deliveryId = await provider.sendSms(attestation)
 
     attestation.status = AttestationStatus.Sent
-    attestation.errorCode = null
     attestation.ongoingDeliveryId = deliveryId
 
     logger.info(
@@ -278,7 +281,8 @@ async function doSendSms(
     return false
   } catch (error) {
     attestation.status = AttestationStatus.NotSent
-    attestation.errorCode = error
+    const errorMsg = `${error.message ?? error}`
+    attestation.recordError(errorMsg)
     attestation.ongoingDeliveryId = null
     attestation.attempt += 1
 
@@ -286,12 +290,12 @@ async function doSendSms(
       {
         provider: provider.type,
         attempt: attestation.attempt,
-        error,
+        error: errorMsg,
       },
       'SMS creation failed'
     )
 
-    if (attestation.attempt > maxDeliveryAttempts) {
+    if (attestation.attempt >= maxDeliveryAttempts) {
       logger.info('Final failure to send')
       return false
     }
@@ -319,69 +323,67 @@ export async function receivedDeliveryReport(
   const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
-    attestation = await findAttestationByDeliveryId(deliveryId, { transaction })
-
-    if (!attestation || !attestation.countryCode) {
-      logger.debug({ deliveryId }, 'Igoring callback: no matching attestation found')
-      return
-    }
-
-    // First time we can associate this info with the request.
-    childLogger = logger.child({
-      issuer: attestation.issuer,
-      phoneNumber: obfuscateNumber(attestation.phoneNumber),
+    attestation = await findAttestationByDeliveryId(deliveryId, {
+      transaction,
+      lock: Transaction.LOCK.UPDATE,
     })
 
-    if (attestation.status !== deliveryStatus) {
-      const providers = getProvidersFor(attestation, childLogger)
-      const provider = providers[attestation.attempt % providers.length]
+    if (attestation) {
+      // First time we can associate this info with the request.
+      childLogger = logger.child({
+        issuer: attestation.issuer,
+        phoneNumber: obfuscateNumber(attestation.phoneNumber),
+      })
 
-      childLogger.info(
-        {
-          provider: provider.type,
-          status: AttestationStatus[deliveryStatus],
-          errorCode,
-        },
-        'Received delivery status'
-      )
+      if (attestation.status < deliveryStatus) {
+        const providers = getProvidersFor(attestation, childLogger)
+        const provider = providers[attestation.attempt % providers.length]
 
-      attestation.status = deliveryStatus
+        childLogger.info(
+          {
+            provider: provider.type,
+            status: AttestationStatus[deliveryStatus],
+            errorCode,
+          },
+          'Received delivery status'
+        )
 
-      if (errorCode) {
-        const error = { provider, errorCode, attempt: attestation.attempt }
-        const previousErrors = attestation.errorCode
-          ? (JSON.parse(attestation.errorCode) as any[])
-          : []
-        attestation.errorCode = JSON.stringify(previousErrors.push(error))
-      }
+        attestation.status = deliveryStatus
 
-      Counters.attestationProviderDeliveryStatus
-        .labels(provider.type, attestation.countryCode, AttestationStatus[deliveryStatus])
-        .inc()
-
-      if (errorCode != null) {
-        Counters.attestationProviderDeliveryErrorCodes
-          .labels(provider.type, attestation.countryCode, errorCode)
+        Counters.attestationProviderDeliveryStatus
+          .labels(provider.type, attestation.countryCode, AttestationStatus[deliveryStatus])
           .inc()
-      }
 
-      if (deliveryStatus === AttestationStatus.Failed) {
-        attestation.ongoingDeliveryId = null
-        attestation.attempt += 1
+        if (errorCode != null) {
+          Counters.attestationProviderDeliveryErrorCodes
+            .labels(provider.type, attestation.countryCode, errorCode)
+            .inc()
+        }
 
-        if (attestation.attempt > maxDeliveryAttempts) {
-          logger.info(
-            {
-              deliveryId,
-            },
-            'Final failure to send'
-          )
-        } else {
-          shouldRetry = true
+        if (deliveryStatus === AttestationStatus.Failed) {
+          // Record the error before incrementing attempt
+          attestation.recordError(errorCode ?? 'Failed')
+
+          // Next attempt
+          attestation.ongoingDeliveryId = null
+          attestation.attempt += 1
+
+          if (attestation.attempt >= maxDeliveryAttempts) {
+            logger.info(
+              {
+                deliveryId,
+              },
+              'Final failure to send'
+            )
+          } else {
+            shouldRetry = true
+          }
+        } else if (deliveryStatus === AttestationStatus.Delivered) {
+          attestation.ongoingDeliveryId = null
         }
       }
+      await attestation.save({ transaction, logging: sequelizeLogger })
     }
-    await attestation.save({ transaction, logging: sequelizeLogger })
     transaction.commit()
   } catch (err) {
     childLogger.error(err)

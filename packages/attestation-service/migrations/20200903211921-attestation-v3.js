@@ -36,7 +36,7 @@ module.exports = {
         allowNull: true,
       })
 
-      await queryInterface.addColumn('Attestations', 'errorCode', {
+      await queryInterface.addColumn('Attestations', 'errors', {
         type: Sequelize.STRING,
         allowNull: true,
       })
@@ -76,7 +76,7 @@ module.exports = {
 
       await queryInterface.removeColumn('Attestations', 'attempt')
 
-      await queryInterface.removeColumn('Attestations', 'errorCode')
+      await queryInterface.removeColumn('Attestations', 'errors')
 
       await queryInterface.addColumn('Attestations', 'smsProvider', {
         type: Sequelize.STRING,

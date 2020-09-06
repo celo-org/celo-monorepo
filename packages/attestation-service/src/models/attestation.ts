@@ -13,9 +13,10 @@ export interface AttestationModel extends Model {
   providers: string
   attempt: number
   status: AttestationStatus
-  errorCode: string | null
+  errors: string | null
   key: () => AttestationKey
   provider: () => string | null
+  recordError: (error: string) => void
 }
 
 export interface AttestationKey {
@@ -24,14 +25,15 @@ export interface AttestationKey {
   issuer: string
 }
 
+// Attestations only transition from lower to higher
 export enum AttestationStatus {
   NotSent, // Not yet received ok by a provider
   Sent, // Received ok by provider
   Queued, // Buffered or queued, but still in flight
   Upstream, // Reached upstream carrier
   Other,
-  Delivered, // Success!
   Failed, // We will try to retransmit.
+  Delivered, // Success!
 }
 
 export type AttestationStatic = typeof Model &
@@ -49,7 +51,7 @@ export default (sequelize: Sequelize) => {
     providers: DataTypes.STRING,
     attempt: DataTypes.INTEGER,
     status: DataTypes.STRING,
-    errorCode: DataTypes.STRING,
+    errors: DataTypes.STRING,
   }) as AttestationStatic
 
   model.prototype.key = function(): AttestationKey {
@@ -57,7 +59,20 @@ export default (sequelize: Sequelize) => {
   }
 
   model.prototype.provider = function(): string | null {
-    return this.providers ? this.providers.split(',')[this.attempt % this.providers.length] : null
+    const pl = this.providers.split(',')
+    return this.providers ? pl[this.attempt % pl.length] : null
+  }
+
+  model.prototype.recordError = function(error: string) {
+    const previousErrors: any[] = this.errors ? JSON.parse(this.errors) : []
+    console.log(`before ${this.errors}`)
+    previousErrors.push({
+      provider: this.provider(),
+      attempt: this.attempt,
+      error,
+    })
+    this.errors = JSON.stringify(previousErrors)
+    console.log(`after ${this.errors}`)
   }
 
   return model

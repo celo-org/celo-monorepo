@@ -5,7 +5,6 @@ import express from 'express'
 import * as t from 'io-ts'
 import { findAttestationByKey } from '../db'
 import { AttestationKey, AttestationStatus } from '../models/attestation'
-import { respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
 import { AttestationResponseType } from './attestation'
 
@@ -80,13 +79,28 @@ export async function handleGetAttestationRequest(
           countryCode: attestation.countryCode,
           status: AttestationStatus[attestation.status],
           provider: attestation.provider() ?? undefined,
-          error: attestation.errorCode ?? undefined,
+          errors: attestation.errors ?? undefined,
           salt: undefined,
         })
       )
       .status(200)
   } catch (error) {
-    console.error(error)
-    respondWithError(res, 500, error)
+    res.locals.logger.error(error)
+    res
+      .json(
+        AttestationResponseType.encode({
+          success: false,
+          errors: JSON.stringify([`${error.message ?? error}`]),
+          status: undefined,
+          salt: undefined,
+          identifier: undefined,
+          account: undefined,
+          issuer: undefined,
+          provider: undefined,
+          attempt: undefined,
+          countryCode: undefined,
+        })
+      )
+      .status(500)
   }
 }

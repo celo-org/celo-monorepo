@@ -35,7 +35,8 @@ export const AttestationResponseType = t.type({
   success: t.boolean,
 
   // Returned for errors in 1.0.x
-  error: t.union([t.undefined, t.string]),
+  // TODO ?? error: t.union([t.undefined, t.string]),
+  errors: t.union([t.undefined, t.string]),
 
   // Returned for successful send in 1.0.x
   provider: t.union([t.undefined, t.string]),
