@@ -41,7 +41,7 @@ export default ExchangeCelo = () => {
 
     await waitFor(element(by.id('BuyCelo')))
       .toBeVisible()
-      .withTimeout(10000)
+      .withTimeout(30000)
 
     // Tap on the buy button, fill the amount, review and confirm.
     await element(by.id('BuyCelo')).tap()
@@ -69,7 +69,7 @@ export default ExchangeCelo = () => {
     // Return to the Exchange CELO screen and check balance
     await waitFor(element(by.id('BuyCelo')))
       .toBeVisible()
-      .withTimeout(10000)
+      .withTimeout(30000)
     await verifyBalance(balance)
   })
 
