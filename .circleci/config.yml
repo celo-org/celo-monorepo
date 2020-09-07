@@ -507,12 +507,14 @@ jobs:
             git remote add origin-https https://github.com/celo-org/celo-monorepo.git
             git fetch origin-https rc1
             git checkout rc1
+            rm -rf build/contracts
             yarn devchain generate-tar devchain.tar.gz --migration_override <(echo '{"downtimeSlasher": { "slashableDowntime": 60 } }')
             # store build artifacts in build/rc1
             mv build/contracts build/rc1
 
             # build current contracts (artifacts in build/contracts)
             git checkout ${CIRCLE_BRANCH}
+            rm -rf build/contracts
             yarn build
 
             # run ganache, wait for it to start
