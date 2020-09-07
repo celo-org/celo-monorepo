@@ -7,43 +7,23 @@ import HomeBackers from 'src/home/HomeBackers'
 import HomeBenefits from 'src/home/HomeBenefits'
 import ImagePanes from 'src/home/ImagePanes'
 import Involvement from 'src/home/Involvement'
-import Timeline, { MileStone } from 'src/home/roadmap/Timeline'
 import { TwoAssets } from 'src/home/TwoAssets'
 import HomeCover from 'src/home/version3/HomeCover'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
 
 interface State {
   mobile: boolean
 }
 
-interface Props {
-  milestones: MileStone[]
-}
-
 const DESCRIPTION =
   'Celo is an open platform that makes financial tools accessible to anyone with a mobile phone'
 
-export class Home extends React.Component<I18nProps & Props, State> {
-  static async getInitialProps({ req }) {
-    let milestones = []
-    try {
-      if (req) {
-        const getMilestones = await import('src/../server/fetchMilestones')
-        milestones = await getMilestones.default()
-      } else {
-        milestones = await fetch(`/api/milestones`).then((result) => result.json())
-      }
-      return { milestones }
-    } catch {
-      return { milestones }
-    }
-  }
-
+export class Home extends React.Component<I18nProps, State> {
   state: State
 
   render() {
-    const { t, milestones } = this.props
+    const { t } = this.props
     const { publicRuntimeConfig } = getConfig()
     const BASE_URL = publicRuntimeConfig.BASE_URL
     const metaImage = BASE_URL + celoHero
@@ -71,7 +51,6 @@ export class Home extends React.Component<I18nProps & Props, State> {
         <TwoAssets />
         <Press />
         <Involvement />
-        <Timeline milestones={milestones} />
         <HomeBackers />
       </View>
     )
@@ -88,4 +67,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('home')(Home)
+export default withNamespaces(NameSpaces.home)(Home)
