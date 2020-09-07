@@ -45,6 +45,8 @@ import {
   sendInviteFailure,
   sendInviteSuccess,
   SENTINEL_INVITE_COMMENT,
+  skipInviteFailure,
+  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
@@ -382,15 +384,20 @@ export function* skipInvite() {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
     yield call(getOrCreateAccount)
+    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
+    // (`setHasSeenVerificationNux` though the user hasn't seen it),
+    // we should prefer a more atomic approach with a meaningful action type
     yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
     navigateHome()
+    yield put(skipInviteSuccess())
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
+    yield put(skipInviteFailure())
   }
 }
 
