@@ -502,7 +502,10 @@ jobs:
             cd packages/protocol
 
             # deploy RC1 contracts to ganache devchain
-            git fetch origin rc1
+            # We fetch via HTTPS instead of SSH to avoid the interactive "do you
+            # trust the RSA key fingerprint" prompt.
+            git remote add origin-https https://github.com/celo-org/celo-monorepo.git
+            git fetch origin-https rc1
             git checkout rc1
             yarn devchain generate-tar devchain.tar.gz --migration_override <(echo '{"downtimeSlasher": { "slashableDowntime": 60 } }')
             # store build artifacts in build/rc1
