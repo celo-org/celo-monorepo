@@ -138,7 +138,7 @@ contract('', (accounts) => {
       })
 
       describe(`when a proposal upgrades a library's implementation`, () => {
-        let LinkedLibrary3Upgraded = makeTruffleContract(
+        const LinkedLibrary3Upgraded = makeTruffleContract(
           upgradedLibBuildArtifacts.getArtifactByName('LinkedLibrary3')
         )
         beforeEach(async () => {
@@ -198,7 +198,7 @@ contract('', (accounts) => {
       })
 
       describe(`when a proposal changes a library's proxy`, () => {
-        let LinkedLibrary3Upgraded = makeTruffleContract(
+        const LinkedLibrary3Upgraded = makeTruffleContract(
           upgradedLibBuildArtifacts.getArtifactByName('LinkedLibrary3')
         )
         let newLibrary2Implementation
@@ -261,7 +261,7 @@ contract('', (accounts) => {
       })
 
       describe(`when a proposal upgrades a contract's implementation`, () => {
-        let TestContractUpgraded = makeTruffleContract(
+        const TestContractUpgraded = makeTruffleContract(
           upgradedContractBuildArtifacts.getArtifactByName('TestContract')
         )
         beforeEach(async () => {
@@ -338,7 +338,7 @@ contract('', (accounts) => {
       })
 
       describe(`when a proposal changes a contract's proxy`, () => {
-        let TestContractUpgraded = makeTruffleContract(
+        const TestContractUpgraded = makeTruffleContract(
           upgradedContractBuildArtifacts.getArtifactByName('TestContract')
         )
         beforeEach(async () => {

@@ -133,19 +133,19 @@ const isProxyChanged = (contract: string, context: VerificationContext): boolean
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
   const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  const tx = context.proposal.find((tx: ProposalTx) => {
+  const relevantTx = context.proposal.find((tx: ProposalTx) => {
     return tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
   })
 
-  return tx.args[1]
+  return relevantTx.args[1]
 }
 
 const getProposedImplementationAddress = (contract: string, context: VerificationContext): string => {
-  const tx = context.proposal.find((tx: ProposalTx) => {
+  const relevantTx = context.proposal.find((tx: ProposalTx) => {
     return tx.contract === `${contract}Proxy`
   })
 
-  return tx.args[0]
+  return relevantTx.args[0]
 }
 
 const getSoureBytecode = (contract: string, context: VerificationContext): string => {
@@ -165,12 +165,10 @@ const getLibraryAddress = async (contract: string, context: VerificationContext)
 }
 
 const getCoreContractAddress = async (contract: string, context: VerificationContext): Promise<string> => {
-  let proxyAddress: string
-  if (isProxyChanged(contract, context)) {
-    proxyAddress = getProposedProxyAddress(contract, context)
-  } else {
-    proxyAddress = await getRegisteredProxyAddress(contract, context)
-  }
+  const proxyAddress: string = isProxyChanged(contract, context) ?
+    getProposedProxyAddress(contract, context) :
+    await getRegisteredProxyAddress(contract, context)
+
   await verifyProxy(proxyAddress, context)
 
   if (isImplementationChanged(contract, context)) {
