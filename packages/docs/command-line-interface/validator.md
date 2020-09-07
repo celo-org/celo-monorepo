@@ -18,6 +18,9 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -49,6 +52,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -77,6 +83,9 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -107,6 +116,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
+                                                          'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                       [default: 1] If --useLedger is set, this will get the first N
                                                           addresses for local signing
 
@@ -136,6 +148,10 @@ List registered Validators, their name (if provided), affiliation, uptime score,
 USAGE
   $ celocli validator:list
 
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
 EXAMPLE
   list
 ```
@@ -155,6 +171,9 @@ OPTIONS
   --blsSignature=0x                                  (required) BLS Proof-of-Possession
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -183,11 +202,15 @@ _See code: [packages/cli/src/commands/validator/register.ts](https://github.com/
 
 ### Requirements
 
-List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of Celo Gold that needs to be locked in order to register, and a duration, which is the amount of time that Gold must stay locked following the deregistration of the Validator.
+List the Locked Gold requirements for registering a Validator. This consists of a value, which is the amount of CELO that needs to be locked in order to register, and a duration, which is the amount of time that CELO must stay locked following the deregistration of the Validator.
 
 ```
 USAGE
   $ celocli validator:requirements
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   requirements
@@ -206,6 +229,10 @@ USAGE
 ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
@@ -222,8 +249,14 @@ USAGE
 
 OPTIONS
   --at-block=at-block                                  latest block to examine for signer activity
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)        Use a specific gas currency for transaction fees (defaults to
+                                                       'auto' which uses whatever feeCurrency is available)
+
   --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
+
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
+
   --width=width                                        [default: 40] line width for printing marks
 
 EXAMPLES
@@ -247,23 +280,30 @@ USAGE
 OPTIONS
   --all                                                   get the status of all registered validators
 
-  --lookback=lookback                                     [default: 100] how many blocks to look back for signer
-                                                          activity
+  --end=end                                               [default: -1] what block to end at when looking at signer
+                                                          activity. defaults to the latest block
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
+                                                          'auto' which uses whatever feeCurrency is available)
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
+
+  --start=start                                           [default: -1] what block to start at when looking at signer
+                                                          activity. defaults to the last 100 blocks
 
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  address of the validator to check if elected and validating
 
 EXAMPLES
   status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631
-  status --all --lookback 100
+  status --validator 0x5409ED021D9299bf6814279A6A1411A7e866A631 --start 1480000
+  status --all --start 1480000 --end 1490000
 ```
 
 _See code: [packages/cli/src/commands/validator/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/status.ts)_
 
 ### Update-bls-public-key
 
-Update the BLS public key for a Validator to be used in consensus. Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
+Update the BLS public key for a Validator to be used in consensus.
 
 ```
 USAGE
@@ -273,6 +313,9 @@ OPTIONS
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -285,6 +328,13 @@ OPTIONS
                                                      "[4,99]"
 
   --useLedger                                        Set it to use a ledger wallet
+
+DESCRIPTION
+  Regular (ECDSA and BLS) key rotation is recommended for Validator operational security.
+
+  WARNING: By default, the BLS key used by the validator node is derived from the ECDSA private key. As a result,
+  rotating the BLS key without rotating the ECDSA key will result in validator downtime without special configuration.
+  Use this method only if you know what you are doing.
 
 EXAMPLE
   update-bls-key --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --blsKey

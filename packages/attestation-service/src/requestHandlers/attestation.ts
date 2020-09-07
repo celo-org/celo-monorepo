@@ -12,8 +12,8 @@ import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { respondWithError, Response } from '../request'
-import { smsProviderFor } from '../sms'
-import { SmsProviderType } from '../sms/base'
+import { startSendSms } from '../sms'
+import { obfuscateNumber, SmsProviderType } from '../sms/base'
 
 const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
@@ -31,6 +31,12 @@ export const AttestationRequestType = t.type({
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
+
+function obfuscateAttestationRequest(attestationRequest: AttestationRequest) {
+  const obfuscatedRequest = { ...attestationRequest }
+  obfuscatedRequest.phoneNumber = obfuscateNumber(attestationRequest.phoneNumber)
+  return obfuscatedRequest
+}
 
 const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 1000 // 1 day
 
@@ -133,7 +139,9 @@ class AttestationRequestHandler {
   identifier: string
   sequelizeLogger: (_msg: string, sequelizeLog: any) => void
   constructor(public readonly attestationRequest: AttestationRequest, logger: Logger) {
-    this.logger = logger.child({ attestationRequest })
+    this.logger = logger.child({
+      attestationRequest: obfuscateAttestationRequest(attestationRequest),
+    })
     this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
       this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
     this.identifier = PhoneNumberUtils.getPhoneHash(
@@ -143,19 +151,22 @@ class AttestationRequestHandler {
   }
 
   async validateAttestationRequest() {
-    const { phoneNumber, account, issuer } = this.attestationRequest
+    const { account, issuer } = this.attestationRequest
 
-    const attestationRecord = await existingAttestationRequestRecord(phoneNumber, account, issuer, {
-      logging: this.sequelizeLogger,
-    })
+    const attestationRecord = await existingAttestationRequestRecord(
+      this.identifier,
+      account,
+      issuer,
+      {
+        logging: this.sequelizeLogger,
+      }
+    )
     // check if it exists in the database
     if (attestationRecord && !attestationRecord.canSendSms()) {
       Counters.attestationRequestsAlreadySent.inc()
       throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
     }
     const address = getAccountAddress()
-
-    // TODO: Check with the new Accounts.sol
     if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
       throw new Error(`Mismatching issuer, I am ${address}`)
@@ -185,12 +196,11 @@ class AttestationRequestHandler {
   }
 
   async validateAttestation(attestationCode: string) {
-    const { phoneNumber, account, salt } = this.attestationRequest
+    const { account } = this.attestationRequest
     const address = getAccountAddress()
-    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
     const attestations = await kit.contracts.getAttestations()
     const isValid = await attestations.validateAttestationCode(
-      identifier,
+      this.identifier,
       account,
       address,
       attestationCode
@@ -218,31 +228,19 @@ class AttestationRequestHandler {
         this.identifier,
         transaction
       )
-      const provider = smsProviderFor(this.attestationRequest.phoneNumber)
-
-      if (!provider) {
-        await attestationRecord.update(
-          { status: AttestationStatus.UNABLE_TO_SERVE, smsProvider: SmsProviderType.UNKNOWN },
-          { transaction, logging: this.sequelizeLogger }
-        )
-        await transaction.commit()
-        Counters.attestationRequestsUnableToServe.inc()
-        return attestationRecord
-      }
 
       try {
-        await provider.sendSms(this.attestationRequest.phoneNumber, textMessage)
-        this.logger.info('Sent sms')
+        const sentVia = await startSendSms(this.attestationRequest.phoneNumber, textMessage)
         Counters.attestationRequestsSentSms.inc()
         await attestationRecord.update(
-          { status: AttestationStatus.SENT, smsProvider: provider.type },
+          { status: AttestationStatus.SENT, smsProvider: sentVia },
           { transaction, logging: this.sequelizeLogger }
         )
       } catch (err) {
-        this.logger.error({ err })
+        this.logger.error({ err }, 'Failed sending SMS')
         Counters.attestationRequestsFailedToSendSms.inc()
         await attestationRecord.update(
-          { status: AttestationStatus.FAILED, smsProvider: provider.type },
+          { status: AttestationStatus.FAILED, smsProvider: SmsProviderType.UNKNOWN },
           { transaction, logging: this.sequelizeLogger }
         )
       }

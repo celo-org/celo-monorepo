@@ -4,20 +4,20 @@ import { Provider } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
+import { checkPin } from 'src/pincode/authentication'
 import PincodeEnter from 'src/pincode/PincodeEnter'
-import { ensureCorrectPin } from 'src/pincode/utils'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const mockScreenProps = getMockStackScreenProps(Screens.PincodeEnter, {
   withVerification: true,
   onSuccess: jest.fn(),
 })
+const store = createMockStore()
 
 const pin = '123456'
 
 describe('PincodeEnter', () => {
   it('renders correctly', () => {
-    const store = createMockStore()
     const tree = render(
       <Provider store={store}>
         <PincodeEnter {...mockScreenProps} />
@@ -27,8 +27,7 @@ describe('PincodeEnter', () => {
   })
 
   it('calls onSuccess when PIN is correct', async () => {
-    ;(ensureCorrectPin as jest.Mock).mockResolvedValueOnce(pin)
-    const store = createMockStore()
+    ;(checkPin as jest.Mock).mockResolvedValueOnce(true)
 
     const { getByTestId } = render(
       <Provider store={store}>
@@ -43,8 +42,7 @@ describe('PincodeEnter', () => {
   })
 
   it('shows wrong PIN notification', async () => {
-    ;(ensureCorrectPin as jest.Mock).mockRejectedValueOnce('')
-    const store = createMockStore()
+    ;(checkPin as jest.Mock).mockResolvedValue(false)
 
     const { getByTestId, getByText } = render(
       <Provider store={store}>

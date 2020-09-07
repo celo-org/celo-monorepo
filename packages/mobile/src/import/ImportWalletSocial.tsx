@@ -7,11 +7,9 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
@@ -77,7 +75,6 @@ export class ImportWalletSocial extends React.Component<Props, State> {
     const { phrase1, phrase2 } = this.state
     Keyboard.dismiss()
     this.props.hideAlert()
-    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
 
     const formattedPhrase1 = formatBackupPhraseOnSubmit(phrase1)
     const formattedPhrase2 = formatBackupPhraseOnSubmit(phrase2)
@@ -130,7 +127,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
 
         {isImportingWallet && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
 
@@ -155,7 +152,6 @@ export class ImportWalletSocial extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
@@ -168,7 +164,7 @@ const styles = StyleSheet.create({
   },
   tip: {
     ...fontStyles.bodySmall,
-    color: colors.darkSecondary,
+    color: colors.gray5,
     marginTop: 20,
     marginHorizontal: 2,
   },

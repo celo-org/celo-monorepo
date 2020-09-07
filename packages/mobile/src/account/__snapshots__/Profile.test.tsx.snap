@@ -4,13 +4,18 @@ exports[`Profile renders correctly 1`] = `
 <RCTScrollView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
 >
   <View>
-    <SafeAreaView>
+    <RNCSafeAreaView
+      edges={
+        Array [
+          "bottom",
+        ]
+      }
+    >
       <Text
         style={
           Object {
@@ -190,7 +195,7 @@ exports[`Profile renders correctly 1`] = `
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;

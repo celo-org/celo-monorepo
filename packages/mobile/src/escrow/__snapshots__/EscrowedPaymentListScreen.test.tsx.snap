@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -27,14 +26,13 @@ exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
   >
     global:emptyList
   </Text>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -57,5 +55,5 @@ exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
   >
     global:emptyList
   </Text>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

@@ -92,6 +92,6 @@ const styles = StyleSheet.create({
   finePrint: {
     textAlign: 'center',
     fontSize: 12,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })

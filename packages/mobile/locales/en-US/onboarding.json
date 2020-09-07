@@ -1,4 +1,14 @@
 {
+  "education": {
+    "step1": "Send and receive money instantly",
+    "step2": "Pay anyone, anywhere with very low fees",
+    "step3": "Confidently and safely use {{appName}}"
+  },
+  "welcome": {
+    "title": "Your value,\non your phone",
+    "createAccount": "Create new account",
+    "restoreAccount": "I have an account"
+  },
   "contacts": {
     "header": "Connect Contacts",
     "body": "Adding your contacts makes it easy to send and request payments with your friends. Connecting does not send invites to your contacts.",
@@ -9,7 +19,7 @@
       "loadingStatus1": "Processing {{total}} contacts",
       "loadingStatus2": "Finding friends",
       "successHeader": "Completed",
-      "successWithMatches": "{{matches}} friends on Valora",
+      "successWithMatches": "{{matches}} friends on {{appName}}",
       "successWithoutMatches": "Syncing complete"
     }
   },
@@ -19,22 +29,30 @@
   "pincodeSet": {
     "create": "Create a PIN",
     "verify": "Enter PIN again",
-    "pinsDontMatch": "The PINs didn't match"
+    "pinsDontMatch": "The PINs didn't match",
+    "invalidPin": "Please use a stronger PIN"
   },
   "inviteCode": {
     "title": "Invite Code",
-    "body": "If you were invited or received a payment, please copy and paste the invite code below.",
+    "body": "Did you receive a payment or invite? If so, please copy and paste the Invite Code below.",
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
-    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/app</0> or <1>continue without</1>"
+    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>",
+    "loadingHeader": "Creating account...",
+    "loadingBody": "This can take up to 90 seconds"
   },
   "verificationEducation": {
     "title": "Confirm",
     "header": "Confirm phone number",
-    "body": "To make sure your number is really yours, we’re going to send you three messages.\n\nConfirming your number takes about three minutes.",
+    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.05 cUSD each.\n\nConfirming your number takes about three minutes.",
     "start": "Start",
-    "learnMore": "Learn more"
+    "resume": "Resume",
+    "doINeedToConfirm": "Do I need to confirm?",
+    "skipForNow": "Skip for now",
+    "bodyInsufficientBalance": "Your current balance is not high enough to complete the verification process.\n\nPlease try again when you have added funds to your wallet.",
+    "bodyAlreadyVerified": "Your number is already confirmed!",
+    "receivedCodes": "I already received three codes"
   },
   "verificationSkipDialog": {
     "title": "Are you sure?",
@@ -83,5 +101,13 @@
     "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
     "skip": "Skip for now",
     "back": "Go Back"
+  },
+  "emptyAccount": {
+    "description": "This account doesn’t have any funds. Would you still like to use it?",
+    "useAccount": "Use Account",
+    "title": "Balance <0></0>"
+  },
+  "success": {
+    "message": "You're all set!"
   }
 }

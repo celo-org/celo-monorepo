@@ -6,21 +6,22 @@
 * @asaj @cmcewen @timmoreton
 
 # directory and file-level owners. Feel free to add to this!
+/packages/attestation-proxy/ @jmrossy 
 /packages/attestation-service/ @nambrot
 /packages/azure/ @codyborn
-/packages/blockchain-api/ @jmrossy @cmcewen
+/packages/blockchain-api/ @jmrossy @cmcewen @i1skn @jeanregisser
 /packages/celotool/ @asaj
 /packages/cli/ @mcortesi @gastonponti
 /packages/contractkit/ @mcortesi @gastonponti
 /packages/dappkit/ @cmcewen
-/packages/devutils/ @mcortesi
+/packages/dev-utils/ @mcortesi
 /packages/docs/ @timmoreton
 /packages/faucet/ @jmrossy
 /packages/helm-charts/ @nambrot @timmoreton
 /packages/metadata-crawler/ @aaitor
-/packages/mobile/ @cmcewen @jmrossy
-/packages/moonpay-auth/ @annakaz
-/packages/notification-service/ @annakaz @cmcewen
+/packages/mobile/ @jeanregisser @cmcewen @jmrossy @i1skn 
+/packages/moonpay-auth/ @annakaz @i1skn 
+/packages/notification-service/ @annakaz @cmcewen @i1skn @jeanregisser
 /packages/phone-number-privacy/ @jmrossy
 /packages/protocol/ @asaj @nategraf
 /packages/react-components/ @jmrossy @aaronmgdr
@@ -29,5 +30,6 @@
 /packages/terraform-modules/ @tkporter
 /packages/typescript/ @cmcewen
 /packages/utils/ @jmrossy
-/packages/web/ @cmcewen @aaronmgdr
 /packages/web/validator-badges @cla-bel @bohan-zhang @pranaymohan
+/packages/web/openpgpkey @nategraf
+/packages/web/ @aaronmgdr

@@ -15,6 +15,10 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the oracles for
 
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
 EXAMPLES
   list StableToken
   list
@@ -35,6 +39,9 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account removing oracle reports
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -57,7 +64,7 @@ _See code: [packages/cli/src/commands/oracle/remove-expired-reports.ts](https://
 
 ### Report
 
-Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")
+Report the price of CELO in a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE
@@ -68,6 +75,9 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle account
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -81,7 +91,7 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
-  --value=value                                      (required) Amount of the specified token equal to 1 cGLD
+  --value=value                                      (required) Amount of the specified token equal to 1 CELO
 
 EXAMPLES
   report StableToken --value 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
@@ -100,6 +110,10 @@ USAGE
 
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the reports for
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLES
   reports StableToken

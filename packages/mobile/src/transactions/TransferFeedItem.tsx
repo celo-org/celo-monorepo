@@ -1,6 +1,8 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -59,6 +61,7 @@ export function TransferFeedItem(props: Props) {
 
   const onPress = () => {
     navigateToTransactionReview(props)
+    ValoraAnalytics.track(HomeEvents.transaction_feed_item_select)
   }
 
   const {

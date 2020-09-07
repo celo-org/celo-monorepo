@@ -1,16 +1,17 @@
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
 import { call, delay, race, select, take } from 'redux-saga/effects'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { TransactionEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { getCurrencyAddress } from 'src/tokens/saga'
+import { getCurrencyAddress, getTokenContract } from 'src/tokens/saga'
 import {
   sendTransactionAsync,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
 } from 'src/transactions/contract-utils'
+import { TransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { assertNever } from 'src/utils/typescript'
 import { getGasPrice } from 'src/web3/gas'
@@ -30,59 +31,59 @@ const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
 
-const getLogger = (tag: string, txId: string) => {
-  let startTime = Date.now()
+const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
+  const txId = context.id
+  const tag = context.tag ?? TAG
   return (event: SendTransactionLogEvent) => {
     switch (event.type) {
+      case SendTransactionLogEventType.Started:
+        Logger.debug(tag, `Sending transaction with id ${txId}`)
+        ValoraAnalytics.track(TransactionEvents.transaction_start, {
+          txId,
+          description: context.description,
+          fornoMode,
+        })
+        break
+      case SendTransactionLogEventType.EstimatedGas:
+        Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
+        ValoraAnalytics.track(TransactionEvents.transaction_gas_estimated, {
+          txId,
+          estimatedGas: event.gas,
+        })
+        break
+      case SendTransactionLogEventType.TransactionHashReceived:
+        Logger.debug(tag, `Transaction id ${txId} hash received: ${event.hash}`)
+        ValoraAnalytics.track(TransactionEvents.transaction_hash_received, {
+          txId,
+          txHash: event.hash,
+        })
+        break
       case SendTransactionLogEventType.Confirmed:
         if (event.number > 0) {
           Logger.warn(tag, `Transaction id ${txId} extra confirmation received: ${event.number}`)
         }
         Logger.debug(tag, `Transaction confirmed with id: ${txId}`)
-        break
-      case SendTransactionLogEventType.EstimatedGas:
-        Logger.debug(tag, `Transaction with id ${txId} estimated gas: ${event.gas}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_estimated, {
-          txId,
-          duration: Date.now() - startTime,
-        })
+        ValoraAnalytics.track(TransactionEvents.transaction_confirmed, { txId })
         break
       case SendTransactionLogEventType.ReceiptReceived:
         Logger.debug(
           tag,
           `Transaction id ${txId} received receipt: ${JSON.stringify(event.receipt)}`
         )
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_receipt, {
-          txId,
-          duration: Date.now() - startTime,
-        })
-        break
-      case SendTransactionLogEventType.TransactionHashReceived:
-        Logger.debug(tag, `Transaction id ${txId} hash received: ${event.hash}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_gas_hash_received, {
-          txId,
-          duration: Date.now() - startTime,
-        })
-        break
-      case SendTransactionLogEventType.Started:
-        startTime = Date.now()
-        Logger.debug(tag, `Sending transaction with id ${txId}`)
-        CeloAnalytics.track(CustomEventNames.transaction_send_start, { txId })
+        ValoraAnalytics.track(TransactionEvents.transaction_receipt_received, { txId })
         break
       case SendTransactionLogEventType.Failed:
         Logger.error(tag, `Transaction failed: ${txId}`, event.error)
-        CeloAnalytics.track(CustomEventNames.transaction_error, {
+        ValoraAnalytics.track(TransactionEvents.transaction_error, {
           txId,
           error: event.error.message,
-          duration: Date.now() - startTime,
         })
         break
       case SendTransactionLogEventType.Exception:
         Logger.error(tag, `Transaction Exception caught ${txId}: `, event.error)
-        CeloAnalytics.track(CustomEventNames.transaction_exception, {
+        ValoraAnalytics.track(TransactionEvents.transaction_exception, {
           txId,
           error: event.error.message,
-          duration: Date.now() - startTime,
         })
         break
       default:
@@ -98,20 +99,24 @@ const getLogger = (tag: string, txId: string) => {
 export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
-  tag: string,
-  txId: string,
+  context: TransactionContext,
   nonce?: number,
   staticGas?: number
 ) {
-  Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
-  // Use stabletoken to pay for gas by default
-  const stableTokenAddress: string = yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+  Logger.debug(
+    `${TAG}@sendTransactionPromises`,
+    `Going to send a transaction with id ${context.id}`
+  )
+
+  const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
+  const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
+
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
 
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
-    `Sending tx ${txId} in ${fornoMode ? 'forno' : 'geth'} mode`
+    `Sending tx ${context.id} in ${fornoMode ? 'forno' : 'geth'} mode`
   )
   if (fornoMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
@@ -127,8 +132,14 @@ export function* sendTransactionPromises(
     sendTransactionAsync,
     tx,
     account,
-    stableTokenAddress,
-    getLogger(tag, txId),
+    // Use stableToken to pay fee, unless its balance is Zero
+    // then use Celo (goldToken) to pay fee (pass undefined)
+    // TODO: make it transparent for a user
+    // TODO: check for balance should be more than fee instead of zero
+    stableTokenBalance.isGreaterThan(0)
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined,
+    getLogger(context, fornoMode),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,
     nonce
@@ -141,8 +152,7 @@ export function* sendTransactionPromises(
 export function* sendTransaction(
   tx: TransactionObject<any>,
   account: string,
-  tag: string,
-  txId: string,
+  context: TransactionContext,
   staticGas?: number,
   cancelAction?: string
 ) {
@@ -151,20 +161,19 @@ export function* sendTransaction(
       sendTransactionPromises,
       tx,
       account,
-      tag,
-      txId,
+      context,
       nonce,
       staticGas
     )
     const result = yield confirmation
     return result
   }
-  yield call(wrapSendTransactionWithRetry, txId, sendTxMethod, cancelAction)
+  yield call(wrapSendTransactionWithRetry, sendTxMethod, context, cancelAction)
 }
 
 export function* wrapSendTransactionWithRetry(
-  txId: string,
   sendTxMethod: (nonce?: number) => Generator<any, any, any>,
+  context: TransactionContext,
   cancelAction?: string
 ) {
   for (let i = 1; i <= TX_NUM_TRIES; i++) {
@@ -178,20 +187,26 @@ export function* wrapSendTransactionWithRetry(
       })
 
       if (timeout) {
-        Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `tx ${txId} timeout for attempt ${i}`)
+        Logger.error(
+          `${TAG}@wrapSendTransactionWithRetry`,
+          `tx ${context.id} timeout for attempt ${i}`
+        )
         throw new Error(ErrorMessages.TRANSACTION_TIMEOUT)
       } else if (cancel) {
-        Logger.warn(`${TAG}@wrapSendTransactionWithRetry`, `tx ${txId} cancelled for attempt ${i}`)
+        Logger.warn(
+          `${TAG}@wrapSendTransactionWithRetry`,
+          `tx ${context.id} cancelled for attempt ${i}`
+        )
         return
       }
 
       Logger.debug(
         `${TAG}@wrapSendTransactionWithRetry`,
-        `tx ${txId} successful for attempt ${i} with result ${result}`
+        `tx ${context.id} successful for attempt ${i} with result ${result}`
       )
       return
     } catch (err) {
-      Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${txId} failed`, err)
+      Logger.error(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${context.id} failed`, err)
 
       if (!shouldTxFailureRetry(err)) {
         return
@@ -199,7 +214,10 @@ export function* wrapSendTransactionWithRetry(
 
       if (i + 1 <= TX_NUM_TRIES) {
         yield delay(TX_RETRY_DELAY)
-        Logger.debug(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${txId} retrying attempt ${i + 1}`)
+        Logger.debug(
+          `${TAG}@wrapSendTransactionWithRetry`,
+          `Tx ${context.id} retrying attempt ${i + 1}`
+        )
       } else {
         throw err
       }

@@ -1,10 +1,9 @@
 import SelectionOption from '@celo/react-components/components/SelectionOption'
-import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import i18n, { Namespaces } from 'src/i18n'
 import { selectPreferredCurrency } from 'src/localCurrency/actions'
@@ -49,7 +48,7 @@ function SelectLocalCurrency() {
 
   return (
     <ScrollView style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView edges={['bottom']}>
         <Text style={styles.title} testID={'ChooseLanguageTitle'}>
           {t('selectCurrency')}
         </Text>
@@ -68,7 +67,6 @@ function SelectLocalCurrency() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
   },
   title: {
     ...fontStyles.h2,

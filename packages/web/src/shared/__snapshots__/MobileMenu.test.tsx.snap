@@ -92,7 +92,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -172,7 +171,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/about"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -247,7 +245,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/jobs"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -322,7 +319,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/validators"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -397,7 +393,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/developers"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -472,7 +467,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/alliance"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -547,7 +541,6 @@ exports[`Main MobileMenu renders 1`] = `
           dir="auto"
           href="/community"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {

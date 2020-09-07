@@ -1,12 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
-import { upgradeFullNodeChart } from 'src/lib/aks-fullnode'
-import {
-  addOracleMiddleware,
-  getAzureClusterConfig,
-  getOracleAzureContext,
-  OracleArgv,
-  switchToAzureContextCluster,
-} from 'src/lib/oracle'
+import { addOracleMiddleware, OracleArgv, switchToAzureContextCluster } from 'src/lib/oracle'
+import { upgradeOracleFullNodeChart } from 'src/lib/oracle-fullnode'
 import yargs from 'yargs'
 
 export const command = 'oracle-fullnode'
@@ -24,8 +18,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleFullNodeUpgradeArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  const clusterConfig = getAzureClusterConfig(oracleAzureContext)
-  await upgradeFullNodeChart(argv.celoEnv, clusterConfig, argv.reset)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await upgradeOracleFullNodeChart(argv.celoEnv, argv.context, argv.reset)
 }

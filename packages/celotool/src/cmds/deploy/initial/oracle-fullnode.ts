@@ -1,12 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { installFullNodeChart } from 'src/lib/aks-fullnode'
-import {
-  addOracleMiddleware,
-  getAzureClusterConfig,
-  getOracleAzureContext,
-  OracleArgv,
-  switchToAzureContextCluster,
-} from 'src/lib/oracle'
+import { addOracleMiddleware, OracleArgv, switchToAzureContextCluster } from 'src/lib/oracle'
+import { installOracleFullNodeChart } from 'src/lib/oracle-fullnode'
 
 export const command = 'oracle-fullnode'
 
@@ -17,8 +11,6 @@ type OracleFullNodeInitialArgv = InitialArgv & OracleArgv
 export const builder = addOracleMiddleware
 
 export const handler = async (argv: OracleFullNodeInitialArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  const clusterConfig = getAzureClusterConfig(oracleAzureContext)
-  await installFullNodeChart(argv.celoEnv, clusterConfig)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await installOracleFullNodeChart(argv.celoEnv, argv.context)
 }

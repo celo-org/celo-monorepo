@@ -1,10 +1,8 @@
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
-
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
   SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
-  SET_COMMENT_KEY = 'WEB3/SET_COMMENT_KEY',
+  SET_DATA_ENCRYPTION_KEY = 'WEB3/SET_DATA_ENCRYPTION_KEY',
+  REGISTER_DATA_ENCRYPTION_KEY = 'WEB3/REGISTER_DATA_ENCRYPTION_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
   SET_IS_READY = 'WEB3/SET_IS_READY',
   SET_IS_FORNO = 'WEB3/SET_IS_FORNO',
@@ -12,7 +10,6 @@ export enum Actions {
   COMPLETE_WEB3_SYNC = 'WEB3/COMPLETE_WEB3_SYNC',
   REQUEST_SYNC_PROGRESS = 'WEB3/REQUEST_SYNC_PROGRESS',
   UPDATE_WEB3_SYNC_PROGRESS = 'WEB3/UPDATE_WEB3_SYNC_PROGRESS',
-  SET_CONTRACT_KIT_READY = 'WEB3/SET_CONTRACT_KIT_READY',
 }
 
 export interface SetAccountAction {
@@ -35,9 +32,13 @@ export interface ToggleIsFornoAction {
   fornoMode: boolean
 }
 
-export interface SetCommentKeyAction {
-  type: Actions.SET_COMMENT_KEY
-  commentKey: string
+export interface SetDataEncryptionKeyAction {
+  type: Actions.SET_DATA_ENCRYPTION_KEY
+  key: string
+}
+
+export interface RegisterDataEncryptionKeyAction {
+  type: Actions.REGISTER_DATA_ENCRYPTION_KEY
 }
 
 export interface CompleteWeb3SyncAction {
@@ -54,23 +55,17 @@ export interface UpdateWeb3SyncProgressAction {
   }
 }
 
-export interface SetContractKitReadyAction {
-  type: Actions.SET_CONTRACT_KIT_READY
-  ready: boolean
-}
-
 export type ActionTypes =
   | SetAccountAction
   | SetAccountInWeb3KeystoreAction
   | SetIsFornoAction
   | ToggleIsFornoAction
-  | SetCommentKeyAction
+  | SetDataEncryptionKeyAction
+  | RegisterDataEncryptionKeyAction
   | CompleteWeb3SyncAction
   | UpdateWeb3SyncProgressAction
-  | SetContractKitReadyAction
 
 export const setAccount = (address: string): SetAccountAction => {
-  CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
     address: address.toLowerCase(),
@@ -98,17 +93,16 @@ export const setFornoMode = (fornoMode: boolean): SetIsFornoAction => {
   }
 }
 
-export const setContractKitReady = (ready: boolean): SetContractKitReadyAction => {
+export const setDataEncryptionKey = (key: string): SetDataEncryptionKeyAction => {
   return {
-    type: Actions.SET_CONTRACT_KIT_READY,
-    ready,
+    type: Actions.SET_DATA_ENCRYPTION_KEY,
+    key,
   }
 }
 
-export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction => {
+export const registerDataEncryptionKey = (): RegisterDataEncryptionKeyAction => {
   return {
-    type: Actions.SET_COMMENT_KEY,
-    commentKey,
+    type: Actions.REGISTER_DATA_ENCRYPTION_KEY,
   }
 }
 

@@ -1,7 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import {
   addOracleMiddleware,
-  getOracleAzureContext,
   OracleArgv,
   switchToAzureContextCluster,
   upgradeOracleChart,
@@ -18,15 +17,14 @@ type OracleUpgradeArgv = UpgradeArgv &
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addOracleMiddleware(argv).option('useFullNodes', {
-    description: 'Uses previously deployed full nodes in the same namespace for RPCs',
+  return addOracleMiddleware(argv).option('useForno', {
+    description: 'Uses forno for RPCs from the oracle clients',
     default: false,
     type: 'boolean',
   })
 }
 
 export const handler = async (argv: OracleUpgradeArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  await upgradeOracleChart(argv.celoEnv, oracleAzureContext, argv.useForno)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await upgradeOracleChart(argv.celoEnv, argv.context, argv.useForno)
 }

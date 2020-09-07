@@ -83,7 +83,11 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_missedbyus`: Counts the blocks for which this validator was elected but not included in the child's parent seal (this block could count towards downtime if 12 successive blocks are missed).  Consider monitoring the rate.
 
-- `consensus_istanbul_blocks_proposedbyus`: (_Future release_) Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. Consider monitoring the rate.
+- `consensus_istanbul_blocks_missedbyusinarow`: (_since 1.0.2_) Counts the blocks for which this validator was elected but not included in the child's parent seal in a row.  Consider monitoring the gauge.
+
+- `consensus_istanbul_blocks_proposedbyus`: (_since 1.0.2_) Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. Consider monitoring the rate.
+
+- `consensus_istanbul_blocks_downtimeevent`: (_since 1.0.2_) Counts the blocks for which this validator was elected and for blocks where it is considered down (occurs when `missedbyusinarow` is >= 12). Consider monitoring the rate.
 
 ### Consensus metrics
 
@@ -99,7 +103,9 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_missedrounds`: Sum of the `round` included in the `parentAggregatedSeal` for the blocks seen. That is, the cumulative number of consensus round changes these blocks needed to make to get to this agreed block. This metric is only incremented when a block is succesfully produced after consensus rounds fails, indicating down validators or network issues.
 
-- `consensus_istanbul_blocks_validators`: (_Future release_) Total number of validators eligible to sign blocks.
+- `consensus_istanbul_blocks_missedroundsasproposer`: (_since 1.0.2_) A meter noting when this validator was elected and could have proposed a block with their signature but did not. In some cases this could be required by the Istanbul BFT protocol.
+
+- `consensus_istanbul_blocks_validators`: (_since 1.0.2_) Total number of validators eligible to sign blocks.
 
 - `consensus_istanbul_core_consensus_count`: Count and timer for succesful completions of consensus (Use `quantile` tag to find percentiles: `0.5`, `0.75`, `0.95`, `0.99`, `0.999`)
 
@@ -126,51 +132,15 @@ Celo adds specific functions around consensus:
 
 ## Monitoring Attestation Service
 
-### Logging
-
-The Attestation Service provides JSON-format structured logs.
-
-### Metrics
-
-It also exposes the following Prometheus format metrics at `/metrics`:
-
-- `attestation_requests_total`: Counter for the number of attestation requests.
-
-- `attestation_requests_already_sent`: Counter for the number of attestation requests that were received but dropped because the local database records that they have already been completed.
-
-- `attestationRequestsWrongIssuer`: Counter for the number of attestation requests that were received but dropped because they specified the incorrect validator.
-
-- `attestationRequestsWOIncompleteAttestation`: Counter for the number of attestation requests that were received but when querying the blockchain no matching incomplete attestation could be found.
-
-- `attestationRequestsValid`: Counter for the number of requests received that are for the correct issuer and an incomplete attestation exists.
-
-- `attestationRequestsAttestationErrors`: Counter for the number of requests for which producing the attestation failed. This could be due to phone number or salt that does not match the hash, or the attestation was recorded fewer than 4 blocks ago.
-
-- `attestationRequestsUnableToServe`: Counter for the number of requests that could not be served because no SMS provider was configured for the phone number in the request.
-
-- `attestationRequestsSentSms`: Counter for the number of SMS succesfully sent.
-
-- `attestationRequestsFailedToSendSms`: Counter for the number of SMS that failed to send.
-
-- `attestationRequestUnexpectedErrors`: Counter for the number of unexpected errors.
-
-### Test Endpoint
-
-Attestation Service provides a test endpoint.
-
-You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
-
-```bash
-celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
-```
+It is also important to [monitor Attestation Service](attestation-service.md#monitoring) and the full node that it depends on.
 
 ## Community Moniting Tools
 
-### [Pretoria Research Lab RC1 Signed Blocks Map](https://cauldron.pretoriaresearchlab.io/rc1-block-map)
+### [Pretoria Research Lab Mainnet Signed Blocks Map](https://cauldron.pretoriaresearchlab.io/rc1-block-map)
 
 Shows current and historic data on validator signatures collected in each block on Mainnet.
 
-_Please raise a Pull Request against [this page](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-gold-holder-guide/voting-validators.md) to add/amend details of any community services!_
+_Please raise a Pull Request against [this page](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-holder-guide/voting-validators.md) to add/amend details of any community services!_
 
 <!--
 ## Monitoring Network Health, Elections, and Accounts

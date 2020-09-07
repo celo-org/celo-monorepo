@@ -1,12 +1,6 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
-import { removeHelmRelease } from 'src/lib/aks-fullnode'
-import {
-  addOracleMiddleware,
-  getAzureClusterConfig,
-  getOracleAzureContext,
-  OracleArgv,
-  switchToAzureContextCluster,
-} from 'src/lib/oracle'
+import { addOracleMiddleware, OracleArgv, switchToAzureContextCluster } from 'src/lib/oracle'
+import { removeOracleFullNodeChart } from 'src/lib/oracle-fullnode'
 
 export const command = 'oracle-fullnode'
 
@@ -17,8 +11,6 @@ type OracleFullNodeDestroyArgv = DestroyArgv & OracleArgv
 export const builder = addOracleMiddleware
 
 export const handler = async (argv: OracleFullNodeDestroyArgv) => {
-  const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
-  const clusterConfig = getAzureClusterConfig(oracleAzureContext)
-  await removeHelmRelease(argv.celoEnv, clusterConfig)
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await removeOracleFullNodeChart(argv.celoEnv, argv.context)
 }

@@ -1,15 +1,13 @@
+import { URL_REGEX } from '@celo/base/lib/io'
 import { isValidPublic, toChecksumAddress } from 'ethereumjs-util'
 import { either } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { isValidAddress } from './address'
 import { isE164NumberStrict } from './phoneNumbers'
 
-// from http://urlregex.com/
-export const URL_REGEX = new RegExp(
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/
-)
-
-export const isValidUrl = (url: string) => URL_REGEX.test(url)
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export { isValidUrl, URL_REGEX } from '@celo/base/lib/io'
 
 export const UrlType = new t.Type<string, string, unknown>(
   'Url',
@@ -81,15 +79,21 @@ export const SaltType = t.string
 export const AttestationServiceStatusResponseType = t.type({
   status: t.literal('ok'),
   smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.array(t.string),
+  blacklistedRegionCodes: t.union([t.array(t.string), t.undefined]),
   accountAddress: AddressType,
   signature: t.union([SignatureType, t.undefined]),
+  version: t.string,
+  latestBlock: t.number,
+  ageOfLatestBlock: t.number,
+  isNodeSyncing: t.boolean,
+  appSignature: t.string,
 })
 
 export const AttestationServiceTestRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   message: t.string,
   signature: SignatureType,
+  provider: t.union([t.string, t.undefined]),
 })
 export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>
 

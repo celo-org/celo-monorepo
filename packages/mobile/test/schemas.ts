@@ -110,7 +110,6 @@ export const vNeg1Schema = {
     incomingPaymentRequests: [],
     outgoingPaymentRequests: [],
     dismissedGetVerified: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
     acceptedTerms: false,
@@ -120,7 +119,7 @@ export const vNeg1Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: {},
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -265,7 +264,7 @@ export const v0Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: [],
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -312,7 +311,6 @@ export const v1Schema = {
       total: 0,
     },
     matchedContacts: {},
-    isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
   transactions: {
@@ -324,8 +322,85 @@ export const v1Schema = {
     ...v0Schema.account,
     retryVerificationWithForno: true,
   },
+  app: {
+    ...v0Schema.app,
+    requirePinOnAppOpen: false,
+  },
+}
+
+export const v2Schema = {
+  ...v1Schema,
+  app: {
+    ...v1Schema.app,
+    sessionId: '',
+  },
+}
+
+export const v3Schema = {
+  ...v2Schema,
+  account: {
+    ...v2Schema.account,
+    hasMigratedToNewBip39: false,
+    choseToRestoreAccount: false,
+  },
+  identity: {
+    ...v2Schema.identity,
+    addressToDataEncryptionKey: {},
+  },
+  web3: {
+    ...v2Schema.web3,
+    isDekRegistered: false,
+  },
+  geth: {
+    ...v2Schema.geth,
+    chainHead: {
+      number: 100,
+      timestamp: 1596502618,
+      hash: '0x0000000000000000000000000000000000000000000000000000000000000F00',
+    },
+  },
+}
+
+// Skipping v4 to match the Redux store version
+// It's not critical but it's good to keep those in sync
+export const v5Schema = {
+  ...v3Schema,
+  account: {
+    ...v3Schema.account,
+    incomingPaymentRequests: undefined,
+    outgoingPaymentRequests: undefined,
+    dismissedGoldEducation: false,
+  },
+  paymentRequest: {
+    incomingPaymentRequests: [],
+    outgoingPaymentRequests: [],
+  },
+  web3: {
+    ...v3Schema.web3,
+    dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
+    commentKey: undefined,
+  },
+  identity: {
+    ...v3Schema.identity,
+    verificationState: {
+      isLoading: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: 3,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+    },
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v1Schema as Partial<RootState>
+  return v5Schema as Partial<RootState>
 }

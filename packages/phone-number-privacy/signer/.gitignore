@@ -6,3 +6,6 @@ dist/
 gcp-service-account.json
 server.cert
 server.key
+
+# Ignore updates for dev deployments
+./azure-templates/container-parameters.json

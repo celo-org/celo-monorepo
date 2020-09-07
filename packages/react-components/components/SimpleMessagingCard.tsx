@@ -21,7 +21,7 @@ export default function SimpleMessagingCard({
     iconProp
   ) : (
     // @ts-ignore isValidElement check above ensures image is an image source type
-    <Image source={iconProp} style={styles.image} resizeMode="contain" />
+    <Image source={iconProp} resizeMode="contain" />
   )
 
   return (
@@ -57,9 +57,5 @@ const styles = StyleSheet.create({
     width: 80,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  image: {
-    width: 30,
-    height: 30,
   },
 })

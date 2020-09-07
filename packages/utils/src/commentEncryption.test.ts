@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
-import { decompressPublicKey, decryptComment, deriveCEK, encryptComment } from './commentEncryption'
+import { decryptComment, encryptComment } from './commentEncryption'
 
 const ec = new EC('secp256k1')
 
@@ -116,41 +116,5 @@ describe('Comment Encryption', () => {
       expect(decrypted).toEqual(newComment)
       expect(didDecrypt).toBeTruthy()
     })
-  })
-})
-
-describe('deriveCEK', () => {
-  it('should produce 32 bytes', () => {
-    const input = randomBytes(32)
-    const derived = deriveCEK(input.toString('hex'))
-    expect(derived).toHaveLength(32)
-  })
-  it('should not regress', () => {
-    // Expected verified on a different HDKF implementation for input 0xdeadbeef
-    // f0 56 88 80 90 ec f4 4e 76 ee d2 73 bc 2e 91 94 3e 00 5b a2 48 44 7d 6f d8 9d 1e 43 d7 69 01 72
-    const expected = Buffer.from(
-      'f056888090ecf44e76eed273bc2e91943e005ba248447d6fd89d1e43d7690172',
-      'hex'
-    )
-    const derived = deriveCEK('deadbeef')
-    expect(derived.equals(expected)).toBeTruthy()
-  })
-})
-
-describe('decompressPublicKey', () => {
-  it('should work with compressed input', () => {
-    const privateKey = ec.keyFromPrivate(randomBytes(32))
-    const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
-    const publicKeyCompressed = Buffer.from(privateKey.getPublic(true, 'hex'), 'hex')
-    const decompressed = decompressPublicKey(publicKeyCompressed)
-    expect(Buffer.concat([Buffer.from('04', 'hex'), decompressed])).toEqual(publicKeyFull)
-    expect(decompressed).toHaveLength(64)
-  })
-  it('should work with long form input', () => {
-    const privateKey = ec.keyFromPrivate(randomBytes(32))
-    const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
-    const decompressed = decompressPublicKey(publicKeyFull)
-    expect(Buffer.concat([Buffer.from('04', 'hex'), decompressed])).toEqual(publicKeyFull)
-    expect(decompressed).toHaveLength(64)
   })
 })

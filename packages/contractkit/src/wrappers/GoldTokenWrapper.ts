@@ -51,16 +51,16 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
   totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
   /**
-   * Approve a user to transfer Celo Gold on behalf of another user.
-   * @param spender The address which is being approved to spend Celo Gold.
-   * @param value The amount of Celo Gold approved to the spender.
+   * Approve a user to transfer CELO on behalf of another user.
+   * @param spender The address which is being approved to spend CELO.
+   * @param value The amount of CELO approved to the spender.
    * @return True if the transaction succeeds.
    */
   approve = proxySend(this.kit, this.contract.methods.approve)
   /**
    * Increases the allowance of another user.
-   * @param spender The address which is being approved to spend Celo Gold.
-   * @param value The increment of the amount of Celo Gold approved to the spender.
+   * @param spender The address which is being approved to spend CELO.
+   * @param value The increment of the amount of CELO approved to the spender.
    * @returns true if success.
    */
   increaseAllowance = proxySend(
@@ -70,34 +70,34 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
   )
   /**
    * Decreases the allowance of another user.
-   * @param spender The address which is being approved to spend Celo Gold.
-   * @param value The decrement of the amount of Celo Gold approved to the spender.
+   * @param spender The address which is being approved to spend CELO.
+   * @param value The decrement of the amount of CELO approved to the spender.
    * @returns true if success.
    */
   decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
 
   /**
-   * Transfers Celo Gold from one address to another with a comment.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * Transfers CELO from one address to another with a comment.
+   * @param to The address to transfer CELO to.
+   * @param value The amount of CELO to transfer.
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
   transferWithComment = proxySend(this.kit, this.contract.methods.transferWithComment)
 
   /**
-   * Transfers Celo Gold from one address to another.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * Transfers CELO from one address to another.
+   * @param to The address to transfer CELO to.
+   * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
    */
   transfer = proxySend(this.kit, this.contract.methods.transfer)
 
   /**
-   * Transfers Celo Gold from one address to another on behalf of a user.
-   * @param from The address to transfer Celo Gold from.
-   * @param to The address to transfer Celo Gold to.
-   * @param value The amount of Celo Gold to transfer.
+   * Transfers CELO from one address to another on behalf of a user.
+   * @param from The address to transfer CELO from.
+   * @param to The address to transfer CELO to.
+   * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
    */
   transferFrom = proxySend(this.kit, this.contract.methods.transferFrom)

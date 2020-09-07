@@ -8,7 +8,7 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Lock extends BaseCommand {
-  static description = 'Locks Celo Gold to be used in governance and validator elections.'
+  static description = 'Locks CELO to be used in governance and validator elections.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -40,7 +40,7 @@ export default class Lock extends BaseCommand {
     const lockValue = value.minus(relockValue)
 
     await newCheckBuilder(this)
-      .hasEnoughGold(address, lockValue)
+      .hasEnoughCelo(address, lockValue)
       .runChecks()
 
     const txos = await lockedGold.relock(address, relockValue)

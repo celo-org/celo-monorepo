@@ -1,4 +1,4 @@
-import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/base/lib/address'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -6,7 +6,8 @@ import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
-const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
+const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
+const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
 const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
   if (typeof val === 'number' || val instanceof BigNumber) {
@@ -24,6 +25,7 @@ enum RpcSignerEndpoint {
   UnlockAccount = 'personal_unlockAccount',
   SignTransaction = 'eth_signTransaction',
   SignBytes = 'eth_sign',
+  Decrypt = 'personal_decrypt',
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -32,6 +34,7 @@ type RpcSignerEndpointInputs = {
   personal_unlockAccount: [string, string, number]
   eth_signTransaction: [any] // RpcTx doesn't match Tx because of nonce as string instead of number
   eth_sign: [string, string]
+  personal_decrypt: [string, string]
 }
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -40,6 +43,7 @@ type RpcSignerEndpointResult = {
   personal_unlockAccount: boolean
   eth_signTransaction: EncodedTransaction
   eth_sign: string
+  personal_decrypt: string
 }
 
 /**
@@ -61,8 +65,8 @@ export class RpcSigner implements Signer {
     protected rpc: RpcCaller,
     protected account: string,
     protected unlockBufferSeconds = 5,
-    protected unlockTime = -1,
-    protected unlockDuration = -1
+    protected unlockTime?: number,
+    protected unlockDuration?: number
   ) {}
 
   init = (privateKey: string, passphrase: string) =>
@@ -102,18 +106,32 @@ export class RpcSigner implements Signer {
 
   getNativeKey = () => this.account
 
-  async unlock(passphrase: string, duration: number) {
-    const unlocked = await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
-      this.account,
-      passphrase,
-      duration,
-    ])
+  async unlock(passphrase: string, duration: number): Promise<boolean> {
+    try {
+      await this.callAndCheckResponse(RpcSignerEndpoint.UnlockAccount, [
+        this.account,
+        passphrase,
+        duration,
+      ])
+    } catch (error) {
+      // The callAndCheckResponse will throw an error if the passphrase is incorrect
+      if (error?.message?.toLowerCase()?.includes(INCORRECT_PASSWORD_ERROR)) {
+        return false
+      }
+
+      // Re-throw otherwise
+      throw error
+    }
+
     this.unlockTime = currentTimeInSeconds()
     this.unlockDuration = duration
-    return unlocked
+    return true
   }
 
   isUnlocked() {
+    if (this.unlockDuration === undefined || this.unlockTime === undefined) {
+      return false
+    }
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 
@@ -126,5 +144,14 @@ export class RpcSigner implements Signer {
       throw new Error(`RpcSigner@${endpoint} failed with \n'${(response.error as any).message}'`)
     }
     return response.result! as RpcSignerEndpointResult[typeof endpoint]
+  }
+
+  async decrypt(ciphertext: Buffer) {
+    const resp = await this.callAndCheckResponse(RpcSignerEndpoint.Decrypt, [
+      this.account,
+      ensureLeading0x(ciphertext.toString('hex')),
+    ])
+
+    return Buffer.from(trimLeading0x(resp), 'hex')
   }
 }

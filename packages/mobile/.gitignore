@@ -66,6 +66,8 @@ coverage/
 
 android/keystore.properties
 android/app/celo-release-key.keystore
+android/app/.settings
+android/.settings
 
 .vscode/
 
@@ -76,3 +78,16 @@ e2e_pidcat_run.log
 
 # keys
 secrets.json
+
+# Branding
+# See scripts/sync_branding.sh
+branding/valora
+android/app/src/main/res/drawable*
+android/app/src/main/res/layout*
+android/app/src/main/res/mipmap*
+ios/celo/Base.lproj/
+ios/celo/Images.xcassets/
+src/brandingConfig.ts
+src/icons/Logo.v2.tsx
+src/images/*
+!src/images/Images.ts

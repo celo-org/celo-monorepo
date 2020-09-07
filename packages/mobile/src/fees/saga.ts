@@ -2,8 +2,8 @@ import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { FeeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
@@ -12,7 +12,6 @@ import { getSendTxGas } from 'src/send/saga'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { web3ForUtils } from 'src/web3/contracts'
 import { getGasPrice } from 'src/web3/gas'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -25,7 +24,7 @@ const feeGasCache = new Map<FeeType, BigNumber>()
 const placeHolderAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 const placeholderSendTx: BasicTokenTransfer = {
   recipientAddress: placeHolderAddress,
-  amount: web3ForUtils.utils.fromWei('1'),
+  amount: 1e-18, // 1 wei
   comment: 'Coffee or Tea?',
 }
 
@@ -93,7 +92,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
     }
   } catch (error) {
     Logger.error(`${TAG}/estimateFeeSaga`, 'Error estimating fee', error)
-    CeloAnalytics.track(CustomEventNames.estimate_fee_failed, { error: error.message, feeType })
+    ValoraAnalytics.track(FeeEvents.estimate_fee_failed, { error: error.message, feeType })
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
 }

@@ -14,10 +14,14 @@ import {
   StyleSheet,
 } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
+import { migrateAccount } from 'src/account/actions'
+import { needsToMigrateToNewBip39 } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { exitBackupFlow } from 'src/app/actions'
+import Dialog from 'src/components/Dialog'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
@@ -47,6 +51,7 @@ interface StateProps {
   recipientCache: NumberToRecipient
   appConnected: boolean
   numberVerified: boolean
+  needsToMigrateToNewBip39: boolean
 }
 
 interface DispatchProps {
@@ -56,6 +61,7 @@ interface DispatchProps {
   setLoading: typeof setLoading
   showMessage: typeof showMessage
   importContacts: typeof importContacts
+  migrateAccount: typeof migrateAccount
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -67,6 +73,7 @@ const mapDispatchToProps = {
   setLoading,
   showMessage,
   importContacts,
+  migrateAccount,
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -77,11 +84,16 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
   appConnected: isAppConnected(state),
   numberVerified: state.app.numberVerified,
+  needsToMigrateToNewBip39: needsToMigrateToNewBip39(state),
 })
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-export class WalletHome extends React.Component<Props> {
+interface State {
+  isMigrating: boolean
+}
+
+export class WalletHome extends React.Component<Props, State> {
   scrollPosition: Animated.Value<number>
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
@@ -90,6 +102,7 @@ export class WalletHome extends React.Component<Props> {
 
     this.scrollPosition = new Animated.Value(0)
     this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
+    this.state = { isMigrating: false }
   }
 
   onRefresh = async () => {
@@ -102,6 +115,8 @@ export class WalletHome extends React.Component<Props> {
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
     }
+
+    ValoraAnalytics.setUserAddress(this.props.address)
 
     // Waiting 1/2 sec before triggering to allow
     // rest of feed to load unencumbered
@@ -144,6 +159,11 @@ export class WalletHome extends React.Component<Props> {
     )
   }
 
+  migrateAccount = () => {
+    this.setState({ isMigrating: true })
+    this.props.migrateAccount()
+  }
+
   render() {
     const { t, activeNotificationCount, callToActNotification } = this.props
 
@@ -151,7 +171,7 @@ export class WalletHome extends React.Component<Props> {
       <RefreshControl
         refreshing={this.props.loading}
         onRefresh={this.onRefresh}
-        colors={[colors.celoGreen]}
+        colors={[colors.greenUI]}
       />
     ) as React.ReactElement<RefreshControlProps>
 
@@ -188,6 +208,15 @@ export class WalletHome extends React.Component<Props> {
           keyExtractor={this.keyExtractor}
         />
         <SendOrRequestBar />
+        <Dialog
+          title={'Migrate to new Address'}
+          children={
+            'Due to a developer configuration error, you will need to migrate your account to a new address, which will include verifying again. You can keep your seed phrase. Do not close the app during migration. Please post on slack if you have questions.'
+          }
+          actionText={'Migrate'}
+          actionPress={this.migrateAccount}
+          isVisible={this.props.needsToMigrateToNewBip39 && !this.state.isMigrating}
+        />
       </SafeAreaView>
     )
   }
@@ -196,7 +225,6 @@ export class WalletHome extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     position: 'relative',
   },
   banner: { paddingVertical: 15, marginTop: 50 },
@@ -204,7 +232,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

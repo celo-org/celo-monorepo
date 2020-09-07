@@ -79,7 +79,7 @@ We use Enzyme as an additional testing tool. It allows for shallow rendering, wh
 
 ### E2E testing
 
-We use [Detox](https://github.com/wix/Detox) for E2E testing. In order to run the tests locally, you must have the proper emulator set up. Emulator installation instructions can be [found here](https://docs.expo.io/versions/latest/workflow/android-studio-emulator/). Please make sure to set up the emulator you would like to run the tests with as a Nexus 5X API level 28 with x86 and make sure it has name `Nexus 5X API 28 x86`.
+We use [Detox](https://github.com/wix/Detox) for E2E testing. In order to run the tests locally, you must have the proper emulator set up. Emulator installation instructions can be [found here](https://docs.expo.io/versions/latest/workflow/android-studio-emulator/). Please make sure to set up the emulator you would like to run the tests with is set up properly with the name `Pixel_API_29_AOSP_x86_64`.
 
 Please set `123456` as the pin code in the emulator, since the e2e tests rely on that.
 
@@ -90,7 +90,7 @@ Next, the VM snapshot settings should be modified:
 3.  Power it back on and go to emulator settings \(... button\) -&gt; Snapshots -&gt; Settings
 4.  Set Auto-Save to No
 
-## Throubleshooting
+## Troubleshooting
 
 1.  Make sure to have watchman installed: `brew install watchman`
 2.  It's a known [detox issue](https://github.com/wix/Detox/issues/1255) that test will fail if a emulator is renamed.

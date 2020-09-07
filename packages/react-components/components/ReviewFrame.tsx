@@ -1,8 +1,10 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import CircleButton from '@celo/react-components/components/CircleButton'
-import colors from '@celo/react-components/styles/colors.v2'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import { ScrollView, StyleSheet, View, ViewProps } from 'react-native'
+import { StyleSheet, View, ViewProps } from 'react-native'
 
 interface ButtonProps {
   text: string
@@ -16,17 +18,20 @@ interface Props extends ViewProps {
   modifyButton?: ButtonProps
   HeaderComponent?: React.ComponentType<any>
   FooterComponent?: React.FunctionComponent
+  LabelAboveKeyboard?: React.FunctionComponent
   shouldReset?: boolean
   isSending?: boolean
 }
 
 interface State {
   confirmed: boolean
+  keyboardVisible: boolean
 }
 
 class ReviewFrame extends React.PureComponent<Props, State> {
-  state = {
+  state: State = {
     confirmed: false,
+    keyboardVisible: false,
   }
 
   onConfirm = () => {
@@ -34,6 +39,10 @@ class ReviewFrame extends React.PureComponent<Props, State> {
     if (this.props.confirmButton) {
       this.props.confirmButton.action()
     }
+  }
+
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -56,6 +65,7 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               accessibilityLabel={confirmButton.text}
               type={BtnTypes.PRIMARY}
               size={BtnSizes.FULL}
+              style={styles.confirmButton}
               disabled={confirmButton.disabled || this.state.confirmed}
               testID="ConfirmButton"
             />
@@ -87,16 +97,25 @@ class ReviewFrame extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { HeaderComponent, FooterComponent, style, children } = this.props
+    const { HeaderComponent, FooterComponent, LabelAboveKeyboard, style, children } = this.props
 
     return (
       <View style={[styles.body, style]}>
-        <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollViewContentContainer}
+          keyboardShouldPersistTaps={'handled'}
+        >
           {HeaderComponent && <HeaderComponent />}
           <View style={styles.confirmationContainer}>{children}</View>
-        </ScrollView>
-        {FooterComponent && <FooterComponent />}
-        {this.renderButtons()}
+        </KeyboardAwareScrollView>
+        {!this.state.keyboardVisible && (
+          <>
+            {FooterComponent && <FooterComponent />}
+            {this.renderButtons()}
+          </>
+        )}
+        {this.state.keyboardVisible && LabelAboveKeyboard && <LabelAboveKeyboard />}
+        <KeyboardSpacer onToggle={this.onToggleKeyboard} />
       </View>
     )
   }
@@ -117,10 +136,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   bottomButtonStyle: {
-    marginHorizontal: 20,
+    marginHorizontal: 16,
+    paddingVertical: 16,
   },
   modifyButton: {
     marginBottom: 10,
+  },
+  confirmButton: {
+    marginBottom: 16,
   },
 })
 

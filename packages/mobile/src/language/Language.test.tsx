@@ -23,7 +23,7 @@ describe('Language', () => {
 
     fireEvent.press(getByText('Español (América Latina)'))
     jest.runAllTimers()
-    expect(navigate).toHaveBeenCalledWith(Screens.JoinCelo)
+    expect(navigate).toHaveBeenCalledWith(Screens.OnboardingEducationScreen)
     expect(store.getActions()).toMatchInlineSnapshot(`
       Array [
         Object {

@@ -10,6 +10,7 @@ export enum Actions {
   EXCHANGE_TOKENS = 'EXCHANGE/EXCHANGE_TOKENS',
   FETCH_TOBIN_TAX = 'EXCHANGE/FETCH_TOBIN_TAX',
   SET_TOBIN_TAX = 'EXCHANGE/SET_TOBIN_TAX',
+  WITHDRAW_CELO = 'EXCHANGE/WITHDRAW_CELO',
 }
 
 export interface FetchExchangeRateAction {
@@ -44,6 +45,12 @@ export interface UpdateCeloGoldExchangeRateHistory {
   type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY
   timestamp: number
   exchangeRates: ExchangeRate[]
+}
+
+export interface WithdrawCeloAction {
+  type: Actions.WITHDRAW_CELO
+  amount: BigNumber
+  recipientAddress: string
 }
 
 export const fetchExchangeRate = (
@@ -87,6 +94,12 @@ export const exchangeTokens = (
   type: Actions.EXCHANGE_TOKENS,
   makerToken,
   makerAmount,
+})
+
+export const withdrawCelo = (amount: BigNumber, recipientAddress: string): WithdrawCeloAction => ({
+  type: Actions.WITHDRAW_CELO,
+  amount,
+  recipientAddress,
 })
 
 export type ActionTypes =

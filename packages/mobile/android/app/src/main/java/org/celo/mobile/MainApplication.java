@@ -16,10 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
-import ru.ivanarh.jndcrash.NDCrash;
-import ru.ivanarh.jndcrash.NDCrashError;
-import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
 public class MainApplication
   extends MultiDexApplication
@@ -35,12 +31,6 @@ public class MainApplication
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
-      if (android.os.Build.VERSION.SDK_INT >= 23) {
-        // Don't add this package below API 23, since it leads to
-        // ClassDefNotFoundError due to classes which are only available
-        // above API 23.
-        packages.add(new RNConfirmDeviceCredentialsPackage());
-      }
       return packages;
     }
 
@@ -60,28 +50,11 @@ public class MainApplication
     super.onCreate();
     SoLoader.init(this, /* native exopackage */false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-    initNdkCrashHandler();
   }
 
   @Override
   public String getFileProviderAuthority() {
     return BuildConfig.APPLICATION_ID + ".provider";
-  }
-
-  // Set up the NDK crash handler - this is useful for catching Geth crashes
-  private void initNdkCrashHandler() {
-    final String reportPath = NdkCrashService.getNdkCrashLogReportPath(this);
-    final NDCrashError error = NDCrash.initializeOutOfProcess(
-      this,
-      reportPath,
-      NDCrashUnwinder.libunwind,
-      NdkCrashService.class
-    );
-    if (error == NDCrashError.ok) {
-      Log.i("MainApplication@initJndcrash", "NDK crash handler init successful");
-    } else {
-      Log.e("MainApplication@initJndcrash", "NDK crash handler init failed: " + error);
-    }
   }
 
   /**

@@ -34,7 +34,7 @@ exports[`DelayButton renders button with text when backup too late and not delay
           "fontFamily": "Inter-Regular",
           "fontSize": 16,
           "lineHeight": 22,
-          "paddingHorizontal": 16,
+          "paddingHorizontal": 24,
         },
         Object {
           "color": "#9CA4A9",

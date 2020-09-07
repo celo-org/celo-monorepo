@@ -14,8 +14,6 @@
 		0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */; };
 		0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */; };
 		0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */; };
-		0F1E1EB52346439C00274556 /* rings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0F1E1EB32346439C00274556 /* rings@2x.png */; };
-		0F1E1EB62346439C00274556 /* rings@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0F1E1EB42346439C00274556 /* rings@3x.png */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -59,8 +57,6 @@
 		0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
 		0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		0602B5AFC2AE93CFF1316467 /* Pods-celo-celoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.debug.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.debug.xcconfig"; sourceTree = "<group>"; };
-		0F1E1EB32346439C00274556 /* rings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@2x.png"; sourceTree = "<group>"; };
-		0F1E1EB42346439C00274556 /* rings@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@3x.png"; sourceTree = "<group>"; };
 		0FE3DE8E2347740700EA87A0 /* celo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = celo.entitlements; path = celo/celo.entitlements; sourceTree = "<group>"; };
 		114969FB1F3AA04FFDC6831F /* Pods-celoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celoTests.debug.xcconfig"; path = "Target Support Files/Pods-celoTests/Pods-celoTests.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* celo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = celo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -161,8 +157,6 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
-				0F1E1EB32346439C00274556 /* rings@2x.png */,
-				0F1E1EB42346439C00274556 /* rings@3x.png */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				A3642B9B22B607BE0071CBC5 /* celo-Bridging-Header.h */,
 			);
@@ -390,8 +384,6 @@
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */,
 				0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */,
-				0F1E1EB62346439C00274556 /* rings@3x.png in Resources */,
-				0F1E1EB52346439C00274556 /* rings@2x.png in Resources */,
 				0317E786245B696200AAAC2E /* ../fonts/Inter-Regular.ttf in Resources */,
 				0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */,
 				2CE54C7D16D44C5380C53609 /* Hind-Regular.ttf in Resources */,
@@ -432,7 +424,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# First set the path to sentry.properties\nexport SENTRY_PROPERTIES=sentry.properties\n\n# Setup nvm and set node\n[ -z \"$NVM_DIR\" ] && export NVM_DIR=\"$HOME/.nvm\"\n\nif [[ -s \"$HOME/.nvm/nvm.sh\" ]]; then\n. \"$HOME/.nvm/nvm.sh\"\nelif [[ -x \"$(command -v brew)\" && -s \"$(brew --prefix nvm)/nvm.sh\" ]]; then\n. \"$(brew --prefix nvm)/nvm.sh\"\nfi\n\n# Set up the nodenv node version manager if present\nif [[ -x \"$HOME/.nodenv/bin/nodenv\" ]]; then\neval \"$(\"$HOME/.nodenv/bin/nodenv\" init -)\"\nfi\n\n[ -z \"$NODE_BINARY\" ] && export NODE_BINARY=\"node\"\n\n# Fixes bundling failing with our monorepo setup\nexport PROJECT_ROOT=\"$PROJECT_DIR/..\"\n\n$NODE_BINARY ../../../node_modules/@sentry/cli/bin/sentry-cli react-native xcode \\\n../../../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "# First set the path to sentry.properties\nexport SENTRY_PROPERTIES=sentry.properties\n\n# Setup nvm and set node\n[ -z \"$NVM_DIR\" ] && export NVM_DIR=\"$HOME/.nvm\"\n\nif [[ -s \"$HOME/.nvm/nvm.sh\" ]]; then\n. \"$HOME/.nvm/nvm.sh\"\nelif [[ -x \"$(command -v brew)\" && -s \"$(brew --prefix nvm)/nvm.sh\" ]]; then\n. \"$(brew --prefix nvm)/nvm.sh\"\nfi\n\n# Set up the nodenv node version manager if present\nif [[ -x \"$HOME/.nodenv/bin/nodenv\" ]]; then\neval \"$(\"$HOME/.nodenv/bin/nodenv\" init -)\"\nfi\n\n# Set up asdf version manager if present\nif [[ -s \"$HOME/.asdf/asdf.sh\" ]]; then\n. \"$HOME/.asdf/asdf.sh\"\nfi\n\n[ -z \"$NODE_BINARY\" ] && export NODE_BINARY=\"node\"\n\n# Fixes bundling failing with our monorepo setup\nexport PROJECT_ROOT=\"$PROJECT_DIR/..\"\n\n$NODE_BINARY ../../../node_modules/@sentry/cli/bin/sentry-cli react-native xcode \\\n../../../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		0FA148AE242137AC009239C6 /* Copy GoogleService-Info.plist */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -521,11 +513,11 @@
 				"${BUILT_PRODUCTS_DIR}/RNExitApp/RNExitApp.framework",
 				"${BUILT_PRODUCTS_DIR}/RNFS/RNFS.framework",
 				"${BUILT_PRODUCTS_DIR}/RNGestureHandler/RNGestureHandler.framework",
+				"${BUILT_PRODUCTS_DIR}/RNKeychain/RNKeychain.framework",
 				"${BUILT_PRODUCTS_DIR}/RNLocalize/RNLocalize.framework",
 				"${BUILT_PRODUCTS_DIR}/RNReanimated/RNReanimated.framework",
 				"${BUILT_PRODUCTS_DIR}/RNSVG/RNSVG.framework",
 				"${BUILT_PRODUCTS_DIR}/RNScreens/RNScreens.framework",
-				"${BUILT_PRODUCTS_DIR}/RNSecureKeyStore/RNSecureKeyStore.framework",
 				"${BUILT_PRODUCTS_DIR}/RNSentry/RNSentry.framework",
 				"${BUILT_PRODUCTS_DIR}/RNShare/RNShare.framework",
 				"${BUILT_PRODUCTS_DIR}/React-Core/React.framework",
@@ -587,11 +579,11 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNExitApp.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNFS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNGestureHandler.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNKeychain.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNLocalize.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNReanimated.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSVG.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNScreens.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSecureKeyStore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSentry.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNShare.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
@@ -855,7 +847,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = celo/celo.entitlements;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 17;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = HDPUB8C3KG;
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -865,6 +857,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -888,7 +881,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = celo/celo.entitlements;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = HDPUB8C3KG;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = celo/Info.plist;
@@ -897,6 +890,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

@@ -4,13 +4,18 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
 <RCTScrollView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
 >
   <View>
-    <SafeAreaView>
+    <RNCSafeAreaView
+      edges={
+        Array [
+          "bottom",
+        ]
+      }
+    >
       <Text
         style={
           Object {
@@ -63,7 +68,6 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
         stickyHeaderIndices={Array []}
         style={
           Object {
-            "backgroundColor": "#FFFFFF",
             "flex": 1,
           }
         }
@@ -801,7 +805,7 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
           />
         </View>
       </RCTScrollView>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </RCTScrollView>
 `;

@@ -293,7 +293,7 @@ exports[`ignores failed standby transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
                 }
               }
               style={
@@ -687,7 +687,7 @@ exports[`ignores pending standby transactions that are completed in the response
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
                 }
               }
               style={
@@ -1167,7 +1167,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/images/exchangeGreenGold.png",
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
                 }
               }
               style={
@@ -1292,7 +1292,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
                 }
               }
               style={
@@ -1580,7 +1580,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               resizeMode="contain"
               source={
                 Object {
-                  "testUri": "../../../packages/mobile/src/images/exchangeGoldGreen.png",
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
                 }
               }
               style={

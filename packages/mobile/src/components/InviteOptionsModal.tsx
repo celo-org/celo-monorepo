@@ -1,5 +1,5 @@
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
@@ -41,7 +41,7 @@ const InviteOptionsModal = ({ onCancel, onWhatsApp, onSMS, isVisible }: Props) =
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.light,
   },
   buttonContainer: {
     flexDirection: 'row',

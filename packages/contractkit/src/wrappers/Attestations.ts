@@ -1,8 +1,9 @@
+import { eqAddress } from '@celo/base/lib/address'
+import { concurrentMap, sleep } from '@celo/base/lib/async'
+import { notEmpty, zip3 } from '@celo/base/lib/collections'
+import { parseSolidityStringArray } from '@celo/base/lib/parsing'
+import { appendPath } from '@celo/base/lib/string'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
-import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap, sleep } from '@celo/utils/lib/async'
-import { notEmpty, zip3 } from '@celo/utils/lib/collections'
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -56,10 +57,11 @@ type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
 
-interface AttesationServiceRevealRequest {
+export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
+  // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
 }
@@ -138,6 +140,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * @notice Checks if attestation request is expired.
+   * @param attestationRequestBlockNumber Attestation Request Block Number to be checked
+   */
+  isAttestationExpired = async (attestationRequestBlockNumber: number) => {
+    // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
+    const attestationExpiryBlocks = await this.attestationExpiryBlocks()
+    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
+  }
+
+  /**
    * @notice Waits for appropriate block numbers for before issuer can be selected
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
@@ -164,6 +177,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
       await sleep(pollDurationSeconds * 1000)
     }
+    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
@@ -450,22 +464,37 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(identifier))
   }
 
+  /**
+   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
+  async selectIssuersAfterWait(
+    identifier: string,
+    account: string,
+    timeoutSeconds?: number,
+    pollDurationSeconds?: number
+  ) {
+    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
+    return this.selectIssuers(identifier)
+  }
+
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
     issuer: Address,
     serviceURL: string,
-    salt?: string,
+    pepper?: string,
     smsRetrieverAppSig?: string
   ) {
     const body: AttesationServiceRevealRequest = {
       account,
       phoneNumber,
       issuer,
-      salt,
+      salt: pepper,
       smsRetrieverAppSig,
     }
-    return fetch(serviceURL + '/attestations', {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -529,6 +558,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       rightAccount: false,
       metadataURL: null,
       state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
     }
 
     if (!hasAttestationSigner) {
@@ -553,7 +584,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
       attestationServiceURL = attestationServiceURLClaim.url
     } catch (error) {
-      ret.state = AttestationServiceStatusState.InvalidMetadata
+      ret.state =
+        error.type === 'system'
+          ? AttestationServiceStatusState.MetadataTimeout
+          : AttestationServiceStatusState.InvalidMetadata
       ret.error = error
       return ret
     }
@@ -561,7 +595,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     ret.attestationServiceURL = attestationServiceURL
 
     try {
-      const statusResponse = await fetch(attestationServiceURL + '/status')
+      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
 
       if (!statusResponse.ok) {
         ret.state = AttestationServiceStatusState.UnreachableAttestationService
@@ -571,27 +605,73 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.okStatus = true
       const statusResponseBody = await statusResponse.json()
       ret.smsProviders = statusResponseBody.smsProviders
-      ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
-      ret.state = AttestationServiceStatusState.Valid
-      return ret
+      ret.state = ret.rightAccount
+        ? AttestationServiceStatusState.Valid
+        : AttestationServiceStatusState.WrongAccount
+
+      // Healthcheck was added in 1.0.1, same time version started being reported.
+      if (statusResponseBody.version) {
+        ret.version = statusResponseBody.version
+
+        // Try healthcheck
+        try {
+          const healthzResponse = await fetch(appendPath(attestationServiceURL, 'healthz'))
+          const healthzResponseBody = await healthzResponse.json()
+          if (!healthzResponse.ok) {
+            ret.state = AttestationServiceStatusState.Unhealthy
+            if (healthzResponseBody.error) {
+              ret.error = healthzResponseBody.error
+            }
+          }
+        } catch (error) {
+          ret.state = AttestationServiceStatusState.UnreachableHealthz
+        }
+
+        // Whether or not health check is reachable, also check full node status
+        // (overrides UnreachableHealthz status)
+        if (
+          (statusResponseBody.ageOfLatestBlock !== null &&
+            statusResponseBody.ageOfLatestBlock > 10) ||
+          statusResponseBody.isNodeSyncing === true
+        ) {
+          ret.state = AttestationServiceStatusState.Unhealthy
+        }
+      } else {
+        // No version implies 1.0.0
+        ret.version = '1.0.0'
+      }
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
       ret.error = error
-      return ret
     }
+
+    return ret
+  }
+
+  async revoke(identifer: string, account: Address) {
+    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const idx = accounts.findIndex((acc) => eqAddress(acc, account))
+    if (idx < 0) {
+      throw new Error("Account not found in identifier's accounts")
+    }
+    return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
   }
 }
 
-enum AttestationServiceStatusState {
+export enum AttestationServiceStatusState {
   NoAttestationSigner = 'NoAttestationSigner',
   NoMetadataURL = 'NoMetadataURL',
   InvalidMetadata = 'InvalidMetadata',
   NoAttestationServiceURL = 'NoAttestationServiceURL',
   UnreachableAttestationService = 'UnreachableAttestationService',
   Valid = 'Valid',
+  UnreachableHealthz = 'UnreachableHealthz',
+  Unhealthy = 'Unhealthy',
+  WrongAccount = 'WrongAccount',
+  MetadataTimeout = 'MetadataTimeout',
 }
-interface AttestationServiceStatusResponse {
+export interface AttestationServiceStatusResponse {
   name: string
   address: Address
   ecdsaPublicKey: string
@@ -605,8 +685,10 @@ interface AttestationServiceStatusResponse {
   okStatus: boolean
   error: null | Error
   smsProviders: string[]
-  blacklistedRegionCodes: string[]
+  blacklistedRegionCodes: string[] | null
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
 }

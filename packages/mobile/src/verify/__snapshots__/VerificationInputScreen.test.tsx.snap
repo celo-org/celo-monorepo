@@ -25,24 +25,20 @@ exports[`VerificationInputScreen renders correctly 1`] = `
             "paddingHorizontal": 16,
             "paddingTop": 32,
           },
-          Object {
-            "marginBottom": 0,
-          },
+          null,
         ]
       }
       keyboardShouldPersistTaps="always"
     >
       <View>
-        <SafeAreaView
+        <RNCSafeAreaView
           style={
             Object {
               "height": 35,
-              "paddingRight": 10,
-              "paddingTop": 10,
               "position": "absolute",
-              "right": 0,
-              "top": 0,
-              "width": 70,
+              "right": 10,
+              "top": 10,
+              "width": 60,
               "zIndex": 100,
             }
           }
@@ -60,7 +56,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
           >
                
           </Text>
-        </SafeAreaView>
+        </RNCSafeAreaView>
         <Text
           style={
             Object {
@@ -409,6 +405,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
     scrollOffset={0}
     scrollOffsetMax={0}
     scrollTo={null}
+    statusBarTranslucent={true}
     supportedOrientations={
       Array [
         "portrait",
@@ -455,6 +452,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       scrollOffset={0}
       scrollOffsetMax={0}
       scrollTo={null}
+      statusBarTranslucent={true}
       style={
         Object {
           "flex": 1,
@@ -475,7 +473,7 @@ exports[`VerificationInputScreen renders correctly 1`] = `
       }
       swipeThreshold={100}
     >
-      <SafeAreaView>
+      <RNCSafeAreaView>
         <View
           style={
             Array [
@@ -659,8 +657,24 @@ exports[`VerificationInputScreen renders correctly 1`] = `
             </View>
           </View>
         </View>
-      </SafeAreaView>
+      </RNCSafeAreaView>
     </View>
   </Modal>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;

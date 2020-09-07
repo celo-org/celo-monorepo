@@ -1,10 +1,10 @@
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { appendPath } from '@celo/utils/lib/string'
 import { flags as oFlags } from '@oclif/command'
 import fetch from 'cross-fetch'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { Flags } from '../../utils/command'
-
 export default class TestAttestationService extends BaseCommand {
   static description =
     'Tests whether the account has setup the attestation service properly by calling the test endpoint on it'
@@ -68,11 +68,14 @@ export default class TestAttestationService extends BaseCommand {
     const signature = await this.kit.web3.eth.sign(phoneNumber + message, address)
 
     try {
-      const response = await fetch(attestationServiceUrlClaim.url + '/test_attestations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber, signature, message }),
-      })
+      const response = await fetch(
+        appendPath(attestationServiceUrlClaim.url, 'test_attestations'),
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber, signature, message }),
+        }
+      )
 
       if (!response.ok) {
         console.error('Request was not successful')

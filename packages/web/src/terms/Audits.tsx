@@ -7,7 +7,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { HelpfullLink } from './HelpfullLink'
+import { HelpfulLink } from './HelpfulLink'
 
 interface Audit {
   auditor: string
@@ -75,7 +75,7 @@ class Audits extends React.PureComponent<I18nProps> {
                     <Text style={fonts.p}>
                       {audit.title} by <Text style={textStyles.italic}>{audit.auditor}</Text>
                     </Text>
-                    {audit.link && <HelpfullLink text={t('download')} href={audit.link} />}
+                    {audit.link && <HelpfulLink text={t('download')} href={audit.link} />}
                   </View>
                 ))}
               </SideTitledSection>

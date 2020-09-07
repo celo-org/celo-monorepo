@@ -27,8 +27,8 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for `Alfajores` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:alfajores
-export NETWORK_ID=44786
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:alfajores
+export NETWORK_ID=44787
 ```
 
 ## Pull the Celo Docker image
@@ -77,7 +77,7 @@ This environment variable will only persist while you have this terminal window 
 The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for Alfajores and uses it to initialize your nodes' data directory.
 
 ```bash
-docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
+docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE --nousb init /celo/genesis.json
 ```
 
 In order to allow the node to sync with the network, get the enode URLs of the bootnodes:

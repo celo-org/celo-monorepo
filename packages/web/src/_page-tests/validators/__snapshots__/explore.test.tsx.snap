@@ -1021,6 +1021,24 @@ exports[`ValidatorsList renders 1`] = `
                   Test 1
                 </a>
               </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "start",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "start",
+                    "paddingTop": "4px",
+                  }
+                }
+              />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
                 dir="auto"
@@ -1805,6 +1823,24 @@ exports[`ValidatorsList renders 1`] = `
                   Test 2
                 </a>
               </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "start",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "start",
+                    "paddingTop": "4px",
+                  }
+                }
+              />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
                 dir="auto"
@@ -2589,6 +2625,24 @@ exports[`ValidatorsList renders 1`] = `
                   Test 3
                 </a>
               </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "start",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "start",
+                    "paddingTop": "4px",
+                  }
+                }
+              />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
                 dir="auto"
@@ -3373,6 +3427,24 @@ exports[`ValidatorsList renders 1`] = `
                   Test 4
                 </a>
               </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "start",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "start",
+                    "paddingTop": "4px",
+                  }
+                }
+              />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
                 dir="auto"
@@ -4157,6 +4229,24 @@ exports[`ValidatorsList renders 1`] = `
                   Test 5
                 </a>
               </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "start",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "start",
+                    "paddingTop": "4px",
+                  }
+                }
+              />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
                 dir="auto"
@@ -4941,6 +5031,24 @@ exports[`ValidatorsList renders 1`] = `
                   Test 6
                 </a>
               </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "start",
+                    "WebkitFlexDirection": "row",
+                    "WebkitJustifyContent": "flex-start",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-start",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "start",
+                    "paddingTop": "4px",
+                  }
+                }
+              />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
                 dir="auto"

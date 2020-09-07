@@ -123,9 +123,9 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   )
 
   /**
-   * Exchanges amount of cGLD in exchange for at least minUsdAmount of cUsd
+   * Exchanges amount of CELO in exchange for at least minUsdAmount of cUsd
    * Requires the amount to have been approved to the exchange
-   * @param amount The amount of cGLD the user is selling to the exchange
+   * @param amount The amount of CELO the user is selling to the exchange
    * @param minUsdAmount The minimum amount of cUsd the user has to receive for this
    * transaction to succeed
    */
@@ -133,41 +133,41 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     this.exchange(amount, minUSDAmount, true)
 
   /**
-   * Exchanges amount of cUsd in exchange for at least minGoldAmount of cGLD
+   * Exchanges amount of cUsd in exchange for at least minGoldAmount of CELO
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of cUsd the user is selling to the exchange
-   * @param minGoldAmount The minimum amount of cGLD the user has to receive for this
+   * @param minGoldAmount The minimum amount of CELO the user has to receive for this
    * transaction to succeed
    */
   sellDollar = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
     this.exchange(amount, minGoldAmount, false)
 
   /**
-   * Returns the amount of cGLD a user would get for sellAmount of cUsd
+   * Returns the amount of CELO a user would get for sellAmount of cUsd
    * @param sellAmount The amount of cUsd the user is selling to the exchange
-   * @return The corresponding cGLD amount.
+   * @return The corresponding CELO amount.
    */
   quoteUsdSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, false)
 
   /**
-   * Returns the amount of cUsd a user would get for sellAmount of cGLD
-   * @param sellAmount The amount of cGLD the user is selling to the exchange
+   * Returns the amount of cUsd a user would get for sellAmount of CELO
+   * @param sellAmount The amount of CELO the user is selling to the exchange
    * @return The corresponding cUsd amount.
    */
   quoteGoldSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, true)
 
   /**
-   * Returns the amount of cGLD a user would need to exchange to receive buyAmount of
+   * Returns the amount of CELO a user would need to exchange to receive buyAmount of
    * cUsd.
    * @param buyAmount The amount of cUsd the user would like to purchase.
-   * @return The corresponding cGLD amount.
+   * @return The corresponding CELO amount.
    */
   quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
 
   /**
    * Returns the amount of cUsd a user would need to exchange to receive buyAmount of
-   * cGLD.
-   * @param buyAmount The amount of cGLD the user would like to purchase.
+   * CELO.
+   * @param buyAmount The amount of CELO the user would like to purchase.
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
@@ -206,14 +206,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   /**
    * Returns the exchange rate for cUsd estimated at the buyAmount
    * @param buyAmount The amount of cUsd in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cGLD received for one cUsd)
+   * @return The exchange rate (number of CELO received for one cUsd)
    */
   getUsdExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, false)
 
   /**
-   * Returns the exchange rate for cGLD estimated at the buyAmount
-   * @param buyAmount The amount of cGLD in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cUsd received for one cGLD)
+   * Returns the exchange rate for CELO estimated at the buyAmount
+   * @param buyAmount The amount of CELO in wei to estimate the exchange rate at
+   * @return The exchange rate (number of cUsd received for one CELO)
    */
   getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }

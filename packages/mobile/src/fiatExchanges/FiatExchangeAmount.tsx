@@ -1,7 +1,7 @@
-import Button, { BtnSizes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/src/parsing'
@@ -12,13 +12,15 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
-import { CustomEventNames } from 'src/analytics/constants'
 import BackButton from 'src/components/BackButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_ADD_FUNDS_MIN_AMOUNT, DOLLAR_CASH_OUT_MIN_AMOUNT } from 'src/config'
+import { fetchExchangeRate } from 'src/exchange/actions'
+import { exchangeRatePairSelector } from 'src/exchange/reducer'
+import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import {
@@ -26,12 +28,11 @@ import {
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
-import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecentPayments } from 'src/send/selectors'
-import { isPaymentLimitReached, showLimitReachedError } from 'src/send/utils'
+import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
@@ -53,17 +54,15 @@ export const fiatExchangesAmountScreenOptions = ({
 }) => {
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerLeft: () => <BackButton />,
     headerTitle: () => (
       <HeaderTitleWithBalance
         title={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`)}
-        token={CURRENCY_ENUM.DOLLAR}
+        token={features.CUSD_MOONPAY_ENABLED ? CURRENCY_ENUM.DOLLAR : CURRENCY_ENUM.GOLD}
       />
     ),
   }
 }
-
-const safeAreaInset = { top: 'never' as 'never', bottom: 'always' as 'always' }
 
 export function ExchangeTradeScreen({ navigation, route }: Props) {
   function isNextButtonValid() {
@@ -81,29 +80,24 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
   }
 
   function goNext() {
-    const now = Date.now()
-    const isLimitReached = isPaymentLimitReached(now, recentPayments, dollarAmount.toNumber())
-    if (isLimitReached) {
-      dispatch(showLimitReachedError(now, recentPayments, localExchangeRate, localCurrencySymbol))
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
       return
     }
 
+    const amount = features.CUSD_MOONPAY_ENABLED ? dollarAmount : new BigNumber(parsedInputAmount)
     navigation.navigate(Screens.FiatExchangeOptions, {
-      amount: dollarAmount,
-      currencyCode: localCurrencyCode,
+      amount,
       isAddFunds,
     })
   }
 
   const { isAddFunds } = route.params
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
-  const dispatch = useDispatch()
   const [inputAmount, setInputAmount] = React.useState('')
   const dollarBalance = useSelector(stableTokenBalanceSelector)
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
   const localCurrencyCode = useLocalCurrencyCode()
-  const recentPayments = useSelector(getRecentPayments)
 
   const parsedInputAmount = parseInputAmount(inputAmount, decimalSeparator)
   const dollarAmount = convertDollarsToMaxSupportedPrecision(
@@ -112,13 +106,19 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
       new BigNumber('0')
   )
 
+  const dispatch = useDispatch()
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
+  React.useEffect(() => {
+    dispatch(fetchExchangeRate())
+  }, [])
+
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    features.CUSD_MOONPAY_ENABLED ? dollarAmount : parsedInputAmount,
+    features.CUSD_MOONPAY_ENABLED ? CURRENCY_ENUM.DOLLAR : CURRENCY_ENUM.GOLD
+  )
+
   return (
-    <SafeAreaView
-      // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-      // incorrect because of that
-      forceInset={safeAreaInset}
-      style={styles.container}
-    >
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <DisconnectBanner />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}
@@ -126,7 +126,9 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
       >
         <View style={styles.amountInputContainer}>
           <View>
-            <Text style={styles.exchangeBodyText}>{t('global:amount')}</Text>
+            <Text style={styles.exchangeBodyText}>
+              {features.CUSD_MOONPAY_ENABLED ? t('global:amount') : t('amountCelo')}
+            </Text>
           </View>
           <TextInput
             autoFocus={true}
@@ -135,30 +137,44 @@ export function ExchangeTradeScreen({ navigation, route }: Props) {
             value={inputAmount}
             placeholderTextColor={colors.gray3}
             placeholder={'0'}
-            style={styles.currencyInput}
+            style={[
+              styles.currencyInput,
+              features.CUSD_MOONPAY_ENABLED ? styles.dollarCurrencyColor : styles.celoCurrencyColor,
+            ]}
             testID="FiatExchangeInput"
           />
         </View>
-        <LineItemRow
-          textStyle={styles.subtotalBodyText}
-          title={
-            <Trans i18nKey="celoDollarsAt" ns={Namespaces.fiatExchangeFlow}>
-              Celo Dollars @ <CurrencyDisplay amount={oneDollarAmount} />
-            </Trans>
-          }
-          amount={
-            <CurrencyDisplay
-              amount={{ value: dollarAmount, currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code }}
-              hideSymbol={true}
-              showLocalAmount={false}
-            />
-          }
-        />
+        {features.CUSD_MOONPAY_ENABLED && (
+          <LineItemRow
+            textStyle={styles.subtotalBodyText}
+            title={
+              <Trans i18nKey="celoDollarsAt" ns={Namespaces.fiatExchangeFlow}>
+                Celo Dollars @ <CurrencyDisplay amount={oneDollarAmount} />
+              </Trans>
+            }
+            amount={
+              <CurrencyDisplay
+                amount={{
+                  value: dollarAmount,
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+                hideSymbol={true}
+                showLocalAmount={false}
+              />
+            }
+          />
+        )}
       </KeyboardAwareScrollView>
-      <Text style={styles.dislamerCeloDollars}>{t('dislamerCeloDollars')}</Text>
+      {features.CUSD_MOONPAY_ENABLED ? (
+        <Text style={styles.disclaimerCeloDollars}>{t('disclaimerCeloDollars')}</Text>
+      ) : (
+        <Text style={styles.dollarsNotYetEnabledNote}>{t('dollarsNotYetEnabledNote')}</Text>
+      )}
       <Button
         onPress={goNext}
+        showLoading={exchangeRatePair === null}
         text={t('global:next')}
+        type={BtnTypes.SECONDARY}
         accessibilityLabel={t('global:next')}
         disabled={!isNextButtonValid()}
         size={BtnSizes.FULL}
@@ -203,14 +219,25 @@ const styles = StyleSheet.create({
     fontSize: 19,
     lineHeight: Platform.select({ android: 27, ios: 23 }), // vertical align = center
     height: 48, // setting height manually b.c. of bug causing text to jump on Android
+  },
+  dollarCurrencyColor: {
     color: colors.greenUI,
+  },
+  celoCurrencyColor: {
+    color: colors.goldDark,
   },
   reviewBtn: {
     padding: variables.contentPadding,
   },
-  dislamerCeloDollars: {
+  disclaimerCeloDollars: {
     ...fontStyles.small,
     color: colors.gray4,
     textAlign: 'center',
+  },
+  dollarsNotYetEnabledNote: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    textAlign: 'center',
+    paddingHorizontal: 10,
   },
 })

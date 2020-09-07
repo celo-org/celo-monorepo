@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -27,6 +26,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -165,8 +165,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -184,8 +184,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -265,7 +265,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -307,7 +307,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -417,12 +417,212 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     style={
                       Object {
                         "height": 12,
-                        "tintColor": "#BDBDBD",
+                        "tintColor": "#B4B9BD",
                         "width": 12,
                       }
                     }
                   />
                 </View>
+                <Modal
+                  animationType="none"
+                  hardwareAccelerated={false}
+                  hideModalContentWhileAnimating={false}
+                  onModalHide={[Function]}
+                  onModalWillHide={[Function]}
+                  onModalWillShow={[Function]}
+                  onRequestClose={[Function]}
+                  scrollHorizontal={false}
+                  scrollOffset={0}
+                  scrollOffsetMax={0}
+                  scrollTo={null}
+                  statusBarTranslucent={true}
+                  supportedOrientations={
+                    Array [
+                      "portrait",
+                      "landscape",
+                    ]
+                  }
+                  swipeThreshold={100}
+                  transparent={true}
+                  visible={false}
+                >
+                  <View
+                    accessible={true}
+                    focusable={true}
+                    forwardedRef={[Function]}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "black",
+                        "bottom": 0,
+                        "height": 1334,
+                        "left": 0,
+                        "opacity": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "width": 750,
+                      }
+                    }
+                  />
+                  <View
+                    forwardedRef={[Function]}
+                    hideModalContentWhileAnimating={false}
+                    onModalHide={[Function]}
+                    onModalWillHide={[Function]}
+                    onModalWillShow={[Function]}
+                    pointerEvents="box-none"
+                    scrollHorizontal={false}
+                    scrollOffset={0}
+                    scrollOffsetMax={0}
+                    scrollTo={null}
+                    statusBarTranslucent={true}
+                    style={
+                      Object {
+                        "flex": 1,
+                        "justifyContent": "center",
+                        "margin": 37.5,
+                        "transform": Array [
+                          Object {
+                            "translateY": 0,
+                          },
+                        ],
+                      }
+                    }
+                    supportedOrientations={
+                      Array [
+                        "portrait",
+                        "landscape",
+                      ]
+                    }
+                    swipeThreshold={100}
+                  >
+                    <RNCSafeAreaView>
+                      <View
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "#FFFFFF",
+                              "padding": 16,
+                            },
+                            Object {
+                              "borderRadius": 8,
+                            },
+                            Object {
+                              "elevation": 12,
+                              "shadowColor": "rgba(156, 164, 169, 0.4)",
+                              "shadowOffset": Object {
+                                "height": 2,
+                                "width": 0,
+                              },
+                              "shadowOpacity": 1,
+                              "shadowRadius": 12,
+                            },
+                            Array [
+                              Object {
+                                "backgroundColor": "#FFFFFF",
+                                "maxHeight": "100%",
+                                "padding": 24,
+                              },
+                              undefined,
+                            ],
+                          ]
+                        }
+                      >
+                        <RCTScrollView
+                          contentContainerStyle={
+                            Object {
+                              "alignItems": "center",
+                            }
+                          }
+                        >
+                          <View>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Jost-Medium",
+                                  "fontSize": 22,
+                                  "lineHeight": 28,
+                                  "marginBottom": 12,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              securityFee
+                            </Text>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Inter-Regular",
+                                  "fontSize": 16,
+                                  "lineHeight": 22,
+                                  "marginBottom": 24,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              feeEducation
+                            </Text>
+                          </View>
+                        </RCTScrollView>
+                        <View
+                          style={
+                            Object {
+                              "flexDirection": "row",
+                              "flexWrap": "wrap",
+                              "justifyContent": "space-around",
+                              "maxWidth": "100%",
+                            }
+                          }
+                        >
+                          <View
+                            accessible={true}
+                            focusable={true}
+                            nativeBackgroundAndroid={
+                              Object {
+                                "attribute": "selectableItemBackgroundBorderless",
+                                "type": "ThemeAttrAndroid",
+                              }
+                            }
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                          >
+                            <Text
+                              style={
+                                Array [
+                                  Object {
+                                    "color": "#1AB775",
+                                    "fontFamily": "Inter-SemiBold",
+                                    "fontSize": 16,
+                                    "lineHeight": 22,
+                                  },
+                                  Object {
+                                    "paddingTop": 16,
+                                  },
+                                ]
+                              }
+                            >
+                              global:dismiss
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </RNCSafeAreaView>
+                  </View>
+                </Modal>
               </View>
               <View
                 style={
@@ -447,7 +647,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -487,9 +687,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -508,9 +708,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -628,7 +828,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -638,7 +839,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -678,7 +881,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -748,7 +951,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -770,15 +973,30 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -801,6 +1019,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -939,8 +1158,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -958,8 +1177,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -1039,7 +1258,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -1081,7 +1300,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -1191,12 +1410,212 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     style={
                       Object {
                         "height": 12,
-                        "tintColor": "#BDBDBD",
+                        "tintColor": "#B4B9BD",
                         "width": 12,
                       }
                     }
                   />
                 </View>
+                <Modal
+                  animationType="none"
+                  hardwareAccelerated={false}
+                  hideModalContentWhileAnimating={false}
+                  onModalHide={[Function]}
+                  onModalWillHide={[Function]}
+                  onModalWillShow={[Function]}
+                  onRequestClose={[Function]}
+                  scrollHorizontal={false}
+                  scrollOffset={0}
+                  scrollOffsetMax={0}
+                  scrollTo={null}
+                  statusBarTranslucent={true}
+                  supportedOrientations={
+                    Array [
+                      "portrait",
+                      "landscape",
+                    ]
+                  }
+                  swipeThreshold={100}
+                  transparent={true}
+                  visible={false}
+                >
+                  <View
+                    accessible={true}
+                    focusable={true}
+                    forwardedRef={[Function]}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "black",
+                        "bottom": 0,
+                        "height": 1334,
+                        "left": 0,
+                        "opacity": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "width": 750,
+                      }
+                    }
+                  />
+                  <View
+                    forwardedRef={[Function]}
+                    hideModalContentWhileAnimating={false}
+                    onModalHide={[Function]}
+                    onModalWillHide={[Function]}
+                    onModalWillShow={[Function]}
+                    pointerEvents="box-none"
+                    scrollHorizontal={false}
+                    scrollOffset={0}
+                    scrollOffsetMax={0}
+                    scrollTo={null}
+                    statusBarTranslucent={true}
+                    style={
+                      Object {
+                        "flex": 1,
+                        "justifyContent": "center",
+                        "margin": 37.5,
+                        "transform": Array [
+                          Object {
+                            "translateY": 0,
+                          },
+                        ],
+                      }
+                    }
+                    supportedOrientations={
+                      Array [
+                        "portrait",
+                        "landscape",
+                      ]
+                    }
+                    swipeThreshold={100}
+                  >
+                    <RNCSafeAreaView>
+                      <View
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "#FFFFFF",
+                              "padding": 16,
+                            },
+                            Object {
+                              "borderRadius": 8,
+                            },
+                            Object {
+                              "elevation": 12,
+                              "shadowColor": "rgba(156, 164, 169, 0.4)",
+                              "shadowOffset": Object {
+                                "height": 2,
+                                "width": 0,
+                              },
+                              "shadowOpacity": 1,
+                              "shadowRadius": 12,
+                            },
+                            Array [
+                              Object {
+                                "backgroundColor": "#FFFFFF",
+                                "maxHeight": "100%",
+                                "padding": 24,
+                              },
+                              undefined,
+                            ],
+                          ]
+                        }
+                      >
+                        <RCTScrollView
+                          contentContainerStyle={
+                            Object {
+                              "alignItems": "center",
+                            }
+                          }
+                        >
+                          <View>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Jost-Medium",
+                                  "fontSize": 22,
+                                  "lineHeight": 28,
+                                  "marginBottom": 12,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              securityFee
+                            </Text>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Inter-Regular",
+                                  "fontSize": 16,
+                                  "lineHeight": 22,
+                                  "marginBottom": 24,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              feeEducation
+                            </Text>
+                          </View>
+                        </RCTScrollView>
+                        <View
+                          style={
+                            Object {
+                              "flexDirection": "row",
+                              "flexWrap": "wrap",
+                              "justifyContent": "space-around",
+                              "maxWidth": "100%",
+                            }
+                          }
+                        >
+                          <View
+                            accessible={true}
+                            focusable={true}
+                            nativeBackgroundAndroid={
+                              Object {
+                                "attribute": "selectableItemBackgroundBorderless",
+                                "type": "ThemeAttrAndroid",
+                              }
+                            }
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                          >
+                            <Text
+                              style={
+                                Array [
+                                  Object {
+                                    "color": "#1AB775",
+                                    "fontFamily": "Inter-SemiBold",
+                                    "fontSize": 16,
+                                    "lineHeight": 22,
+                                  },
+                                  Object {
+                                    "paddingTop": 16,
+                                  },
+                                ]
+                              }
+                            >
+                              global:dismiss
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </RNCSafeAreaView>
+                  </View>
+                </Modal>
               </View>
               <View
                 style={
@@ -1221,7 +1640,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -1261,9 +1680,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -1282,9 +1701,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -1402,7 +1821,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -1412,7 +1832,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -1452,7 +1874,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -1522,7 +1944,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -1544,15 +1966,30 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 2`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -1575,6 +2012,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -1713,8 +2151,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -1732,8 +2170,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -1813,7 +2251,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -1855,7 +2293,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -1965,12 +2403,212 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     style={
                       Object {
                         "height": 12,
-                        "tintColor": "#BDBDBD",
+                        "tintColor": "#B4B9BD",
                         "width": 12,
                       }
                     }
                   />
                 </View>
+                <Modal
+                  animationType="none"
+                  hardwareAccelerated={false}
+                  hideModalContentWhileAnimating={false}
+                  onModalHide={[Function]}
+                  onModalWillHide={[Function]}
+                  onModalWillShow={[Function]}
+                  onRequestClose={[Function]}
+                  scrollHorizontal={false}
+                  scrollOffset={0}
+                  scrollOffsetMax={0}
+                  scrollTo={null}
+                  statusBarTranslucent={true}
+                  supportedOrientations={
+                    Array [
+                      "portrait",
+                      "landscape",
+                    ]
+                  }
+                  swipeThreshold={100}
+                  transparent={true}
+                  visible={false}
+                >
+                  <View
+                    accessible={true}
+                    focusable={true}
+                    forwardedRef={[Function]}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "black",
+                        "bottom": 0,
+                        "height": 1334,
+                        "left": 0,
+                        "opacity": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "width": 750,
+                      }
+                    }
+                  />
+                  <View
+                    forwardedRef={[Function]}
+                    hideModalContentWhileAnimating={false}
+                    onModalHide={[Function]}
+                    onModalWillHide={[Function]}
+                    onModalWillShow={[Function]}
+                    pointerEvents="box-none"
+                    scrollHorizontal={false}
+                    scrollOffset={0}
+                    scrollOffsetMax={0}
+                    scrollTo={null}
+                    statusBarTranslucent={true}
+                    style={
+                      Object {
+                        "flex": 1,
+                        "justifyContent": "center",
+                        "margin": 37.5,
+                        "transform": Array [
+                          Object {
+                            "translateY": 0,
+                          },
+                        ],
+                      }
+                    }
+                    supportedOrientations={
+                      Array [
+                        "portrait",
+                        "landscape",
+                      ]
+                    }
+                    swipeThreshold={100}
+                  >
+                    <RNCSafeAreaView>
+                      <View
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "#FFFFFF",
+                              "padding": 16,
+                            },
+                            Object {
+                              "borderRadius": 8,
+                            },
+                            Object {
+                              "elevation": 12,
+                              "shadowColor": "rgba(156, 164, 169, 0.4)",
+                              "shadowOffset": Object {
+                                "height": 2,
+                                "width": 0,
+                              },
+                              "shadowOpacity": 1,
+                              "shadowRadius": 12,
+                            },
+                            Array [
+                              Object {
+                                "backgroundColor": "#FFFFFF",
+                                "maxHeight": "100%",
+                                "padding": 24,
+                              },
+                              undefined,
+                            ],
+                          ]
+                        }
+                      >
+                        <RCTScrollView
+                          contentContainerStyle={
+                            Object {
+                              "alignItems": "center",
+                            }
+                          }
+                        >
+                          <View>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Jost-Medium",
+                                  "fontSize": 22,
+                                  "lineHeight": 28,
+                                  "marginBottom": 12,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              securityFee
+                            </Text>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Inter-Regular",
+                                  "fontSize": 16,
+                                  "lineHeight": 22,
+                                  "marginBottom": 24,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              feeEducation
+                            </Text>
+                          </View>
+                        </RCTScrollView>
+                        <View
+                          style={
+                            Object {
+                              "flexDirection": "row",
+                              "flexWrap": "wrap",
+                              "justifyContent": "space-around",
+                              "maxWidth": "100%",
+                            }
+                          }
+                        >
+                          <View
+                            accessible={true}
+                            focusable={true}
+                            nativeBackgroundAndroid={
+                              Object {
+                                "attribute": "selectableItemBackgroundBorderless",
+                                "type": "ThemeAttrAndroid",
+                              }
+                            }
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                          >
+                            <Text
+                              style={
+                                Array [
+                                  Object {
+                                    "color": "#1AB775",
+                                    "fontFamily": "Inter-SemiBold",
+                                    "fontSize": 16,
+                                    "lineHeight": 22,
+                                  },
+                                  Object {
+                                    "paddingTop": 16,
+                                  },
+                                ]
+                              }
+                            >
+                              global:dismiss
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </RNCSafeAreaView>
+                  </View>
+                </Modal>
               </View>
               <Text
                 style={
@@ -1992,7 +2630,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -2032,9 +2670,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -2053,9 +2691,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -2173,7 +2811,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -2183,7 +2822,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
@@ -2223,7 +2864,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -2293,7 +2934,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "height": 48,
                 "justifyContent": "center",
                 "opacity": undefined,
-                "paddingHorizontal": 16,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -2315,6 +2956,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
