@@ -98,6 +98,7 @@ export default ExchangeCelo = () => {
     // Return to the Exchange CELO screen after confirming.
     await waitFor(element(by.id('WithdrawCELO')))
       .toBeVisible()
-      .withTimeout(10000)
+      .whileElement(by.id('ExchangeScrollView'))
+      .scroll(50, 'down')
   })
 }
