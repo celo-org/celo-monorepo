@@ -20,6 +20,7 @@ import {
   sendInvite,
   SENTINEL_INVITE_COMMENT,
   skipInvite as skipInviteAction,
+  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import {
@@ -281,7 +282,7 @@ describe(skipInvite, () => {
     await expectSaga(skipInvite)
       .provide([[call(getOrCreateAccount), mockAccount]])
       .withState(state)
-      .put(redeemInviteSuccess())
+      .put(skipInviteSuccess())
       .put(refreshAllBalances())
       .put(setHasSeenVerificationNux(true))
       .dispatch(skipInviteAction())
