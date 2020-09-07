@@ -382,6 +382,11 @@ export function* skipInvite() {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
     yield call(getOrCreateAccount)
+    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
+    // (`redeemInviteSuccess` though we're actually skipping and `setHasSeenVerificationNux` though the user hasn't seen it),
+    // we should prefer a more atomic approach with a meaningful action type
+    // Set redeem invite complete so user isn't brought back into nux flow
+    yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
