@@ -10,7 +10,7 @@ const shouldVerifyBalance = device.getPlatform() === 'ios'
 let balance
 
 // DANGER: If fees get higher the calculation might start failing.
-// The test is assuming 0 influence from fees on hte visible number.
+// The test is assuming 0 influence from fees on the visible number.
 const verifyBalance = async (expectedBalance) => {
   if (!shouldVerifyBalance) {
     return
