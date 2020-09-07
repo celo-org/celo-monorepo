@@ -520,6 +520,7 @@ jobs:
             # run ganache, wait for it to start
             yarn devchain run-tar devchain.tar.gz &
             GANACHE_PID=$!
+            echo "Waiting for ganache to start"
             sleep 20
 
             # verify bytecodes of RC1 deployment
