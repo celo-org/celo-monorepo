@@ -119,7 +119,7 @@ export const vNeg1Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: {},
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -264,7 +264,7 @@ export const v0Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: [],
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -396,7 +396,6 @@ export const v5Schema = {
         total: 0,
         completed: 0,
       },
-      isBalanceSufficient: true,
       lastFetch: null,
     },
   },
