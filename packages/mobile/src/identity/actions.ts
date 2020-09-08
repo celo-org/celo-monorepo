@@ -4,7 +4,7 @@ import {
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
-  VerificationState,
+  UpdatableVerificationState,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -183,7 +183,7 @@ export interface FetchVerificationState {
 
 export interface UpdateVerificationState {
   type: Actions.UPDATE_VERIFICATION_STATE
-  state: VerificationState
+  state: UpdatableVerificationState
 }
 
 export type ActionTypes =
@@ -385,7 +385,9 @@ export const fetchVerificationState = (): FetchVerificationState => ({
   type: Actions.FETCH_VERIFICATION_STATE,
 })
 
-export const udpateVerificationState = (state: VerificationState): UpdateVerificationState => ({
+export const udpateVerificationState = (
+  state: UpdatableVerificationState
+): UpdateVerificationState => ({
   type: Actions.UPDATE_VERIFICATION_STATE,
   state,
 })
