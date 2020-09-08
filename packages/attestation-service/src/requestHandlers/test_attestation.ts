@@ -4,11 +4,9 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
-import { AttestationStatus } from '../models/attestation'
-import { ErrorMessages, respondWithError } from '../request'
+import { ErrorMessages, respondWithAttestation, respondWithError } from '../request'
 import { startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
-import { AttestationResponseType } from './attestation'
 
 export { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
 
@@ -63,39 +61,9 @@ export async function handleTestAttestationRequest(
       testRequest.provider
     )
 
-    res
-      .json(
-        AttestationResponseType.encode({
-          success: attestation.status === AttestationStatus.Sent,
-          identifier: attestation.identifier,
-          account: attestation.account,
-          issuer: attestation.issuer,
-          attempt: attestation.attempt,
-          countryCode: attestation.countryCode,
-          status: AttestationStatus[attestation.status],
-          salt,
-          provider: attestation.provider() ?? undefined,
-          errors: attestation.errors ?? undefined,
-        })
-      )
-      .status(201)
+    respondWithAttestation(res, attestation, false, salt)
   } catch (error) {
     logger.error(error)
-    res
-      .json(
-        AttestationResponseType.encode({
-          status: AttestationStatus[AttestationStatus.NotSent],
-          success: false,
-          errors: JSON.stringify([`${error.message ?? error}`]),
-          salt: undefined,
-          identifier: undefined,
-          account: undefined,
-          issuer: undefined,
-          provider: undefined,
-          attempt: undefined,
-          countryCode: undefined,
-        })
-      )
-      .status(500)
+    respondWithError(res, 500, `${error.message ?? error}`)
   }
 }

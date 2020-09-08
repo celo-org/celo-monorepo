@@ -6,8 +6,13 @@ import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit, verifyConfigurationAndGetURL } from './db'
 import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
 import { rootLogger } from './logger'
-import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
-import { AttestationRequestType, handleAttestationRequest } from './requestHandlers/attestation'
+import {
+  asyncHandler,
+  AttestationRequestType,
+  createValidatedHandler,
+  loggerMiddleware,
+} from './request'
+import { handleAttestationRequest } from './requestHandlers/attestation'
 import { handleAttestationDeliveryStatus } from './requestHandlers/delivery'
 import {
   GetAttestationRequestType,

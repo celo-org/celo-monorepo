@@ -4,9 +4,9 @@ import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger } from '../db'
-import { AttestationKey, AttestationStatus } from '../models/attestation'
+import { AttestationKey } from '../models/attestation'
+import { respondWithAttestation, respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
-import { AttestationResponseType } from './attestation'
 
 export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
@@ -64,42 +64,13 @@ export async function handleGetAttestationRequest(
 
     const attestation = await handler.getAttestationRecord()
     if (!attestation) {
-      res.status(404)
+      respondWithError(res, 404, `Attestation not found`)
       return
     }
-    res
-      .json(
-        AttestationResponseType.encode({
-          success: true,
-          identifier: attestation.identifier,
-          account: attestation.account,
-          issuer: attestation.issuer,
-          attempt: attestation.attempt,
-          countryCode: attestation.countryCode,
-          status: AttestationStatus[attestation.status],
-          provider: attestation.provider() ?? undefined,
-          errors: attestation.errors ?? undefined,
-          salt: undefined,
-        })
-      )
-      .status(200)
+
+    respondWithAttestation(res, attestation, true)
   } catch (error) {
     res.locals.logger.error(error)
-    res
-      .json(
-        AttestationResponseType.encode({
-          success: false,
-          errors: JSON.stringify([`${error.message ?? error}`]),
-          status: undefined,
-          salt: undefined,
-          identifier: undefined,
-          account: undefined,
-          issuer: undefined,
-          provider: undefined,
-          attempt: undefined,
-          countryCode: undefined,
-        })
-      )
-      .status(500)
+    respondWithError(res, 500, `${error.message ?? error}`)
   }
 }

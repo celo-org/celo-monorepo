@@ -1,60 +1,20 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
-import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
+import { randomBytes } from 'crypto'
 import express from 'express'
-import * as t from 'io-ts'
 import { findAttestationByKey, kit, makeSequelizeLogger, SequelizeLogger } from '../db'
-import { getAccountAddress, getAttestationSignerAddress } from '../env'
+import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { Counters } from '../metrics'
-import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
-import { respondWithError, Response } from '../request'
+import { AttestationKey, AttestationStatus } from '../models/attestation'
+import { AttestationRequest, respondWithAttestation, respondWithError, Response } from '../request'
 import { startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
 
-const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
 const ATTESTATION_ALREADY_SENT_ERROR = 'Attestation already sent'
-const COUNTRY_CODE_NOT_SERVED_ERROR = 'Your country code is not being served by this service'
-
-export const AttestationRequestType = t.type({
-  phoneNumber: E164PhoneNumberType,
-  account: AddressType,
-  issuer: AddressType,
-  // io-ts way of defining optional key-value pair
-  salt: t.union([t.undefined, SaltType]),
-  smsRetrieverAppSig: t.union([t.undefined, t.string]),
-})
-
-export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
-
-export const AttestationResponseType = t.type({
-  // Always returned in 1.0.x
-  success: t.boolean,
-
-  // Returned for errors in 1.0.x
-  // TODO ?? error: t.union([t.undefined, t.string]),
-  errors: t.union([t.undefined, t.string]),
-
-  // Returned for successful send in 1.0.x
-  provider: t.union([t.undefined, t.string]),
-
-  // New fields
-  identifier: t.union([t.undefined, t.string]),
-  account: t.union([t.undefined, AddressType]),
-  issuer: t.union([t.undefined, AddressType]),
-  status: t.union([t.undefined, t.string]),
-  attempt: t.union([t.undefined, t.number]),
-  countryCode: t.union([t.undefined, t.string]),
-
-  // Only used by test endpoint to return randomly generated salt.
-  // Never return a user-supplied salt.
-  salt: t.union([t.undefined, t.string]),
-})
-
-export type AttestationResponse = t.TypeOf<typeof AttestationResponseType>
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -103,25 +63,26 @@ class AttestationRequestHandler {
       logging: this.sequelizeLogger,
     })
 
-    // TODO what conditions should we allow retransmit under
     if (attestationRecord && attestationRecord.status !== AttestationStatus.NotSent) {
       Counters.attestationRequestsAlreadySent.inc()
       throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
     }
 
-    const attestations = await kit.contracts.getAttestations()
-    const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
+    if (!isDevMode()) {
+      const attestations = await kit.contracts.getAttestations()
+      const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
 
-    if (state.attestationState !== AttestationState.Incomplete) {
-      Counters.attestationRequestsWOIncompleteAttestation.inc()
-      throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
+      if (state.attestationState !== AttestationState.Incomplete) {
+        Counters.attestationRequestsWOIncompleteAttestation.inc()
+        throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
+      }
     }
 
     // TODO: Check expiration
     return
   }
 
-  signAttestation() {
+  async signAttestation() {
     const { phoneNumber, account, salt } = this.attestationRequest
     const message = AttestationUtils.getAttestationMessageToSignFromPhoneNumber(
       phoneNumber,
@@ -129,25 +90,34 @@ class AttestationRequestHandler {
       salt
     )
 
-    return kit.web3.eth.sign(message, getAttestationSignerAddress())
+    try {
+      return await kit.web3.eth.sign(message, getAttestationSignerAddress())
+    } catch (error) {
+      if (isDevMode()) {
+        return randomBytes(65).toString('hex')
+      } else {
+        throw error
+      }
+    }
   }
 
   async validateAttestation(attestationCode: string) {
-    const { account } = this.attestationRequest
-    const address = getAccountAddress()
-    const attestations = await kit.contracts.getAttestations()
-    const isValid = await attestations.validateAttestationCode(
-      this.key.identifier,
-      account,
-      address,
-      attestationCode
-    )
+    if (!isDevMode()) {
+      const { account } = this.attestationRequest
+      const address = getAccountAddress()
+      const attestations = await kit.contracts.getAttestations()
+      const isValid = await attestations.validateAttestationCode(
+        this.key.identifier,
+        account,
+        address,
+        attestationCode
+      )
 
-    if (!isValid) {
-      Counters.attestationRequestsAttestationErrors.inc()
-      throw new Error(ATTESTATION_ERROR)
+      if (!isValid) {
+        Counters.attestationRequestsAttestationErrors.inc()
+        throw new Error(ATTESTATION_ERROR)
+      }
     }
-    return
   }
 
   async sendSms(attestationCode: string) {
@@ -156,7 +126,6 @@ class AttestationRequestHandler {
       this.attestationRequest.smsRetrieverAppSig
     )
 
-    // TODO metrics
     return startSendSms(
       this.key,
       this.attestationRequest.phoneNumber,
@@ -164,36 +133,6 @@ class AttestationRequestHandler {
       this.logger,
       this.sequelizeLogger
     )
-  }
-
-  respondAfterSendingSms(res: express.Response, attestationRecord: AttestationModel | null) {
-    if (!attestationRecord) {
-      this.logger.error({ err: 'Attestation Record was not created' })
-      respondWithError(res, 500, SMS_SENDING_ERROR)
-      return
-    }
-
-    switch (attestationRecord.status) {
-      case AttestationStatus.Sent:
-      case AttestationStatus.Delivered:
-        res.status(201).json({ success: true, status: attestationRecord.status })
-        return
-      // TODO what conditions which reply
-      // case AttestationStatus.:
-      //   respondWithError(res, 500, SMS_SENDING_ERROR)
-      //   return
-      case AttestationStatus.NotSent: // TODO Verify what Valora is looking for here.
-        respondWithError(res, 422, COUNTRY_CODE_NOT_SERVED_ERROR)
-        return
-      default:
-        this.logger.error({
-          err:
-            'Attestation Record should either be failed or sent, but was ' +
-            attestationRecord.status,
-        })
-        respondWithError(res, 500, SMS_SENDING_ERROR)
-        return
-    }
   }
 }
 
@@ -210,19 +149,26 @@ export async function handleAttestationRequest(
     Counters.attestationRequestsValid.inc()
     attestationCode = await handler.signAttestation()
     await handler.validateAttestation(attestationCode)
-  } catch (err) {
-    handler.logger.info({ err })
-    respondWithError(res, 422, err.toString())
+  } catch (error) {
+    handler.logger.info({ error })
+    respondWithError(res, 422, `${error.message ?? error}`)
     return
   }
 
   try {
-    const attestationRecord = await handler.sendSms(attestationCode)
-    handler.respondAfterSendingSms(res, attestationRecord)
-  } catch (err) {
+    const attestation = await handler.sendSms(attestationCode)
+
+    if (attestation.failure()) {
+      Counters.attestationRequestsFailedToSendSms.inc()
+    } else {
+      Counters.attestationRequestsSentSms.inc()
+    }
+
+    respondWithAttestation(res, attestation)
+  } catch (error) {
     Counters.attestationRequestUnexpectedErrors.inc()
-    handler.logger.error({ err })
-    respondWithError(res, 500, SMS_SENDING_ERROR)
+    handler.logger.error({ error })
+    respondWithError(res, 500, `${error.message ?? error}`)
     return
   }
 }

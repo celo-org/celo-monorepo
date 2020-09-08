@@ -172,7 +172,7 @@ export async function startSendSms(
         message,
         providers: providersToCsv(providers),
         attempt: 0,
-        errors: '[]',
+        errors: undefined,
         ongoingDeliveryId: '',
       },
       transaction
@@ -298,6 +298,7 @@ async function doSendSms(
 
     if (attestation.attempt >= maxDeliveryAttempts) {
       logger.info('Final failure to send')
+      Counters.attestationRequestsFailedToDeliverSms.inc()
       return false
     }
 
@@ -374,10 +375,12 @@ export async function receivedDeliveryReport(
               },
               'Final failure to send'
             )
+            Counters.attestationRequestsFailedToDeliverSms.inc()
           } else {
             shouldRetry = true
           }
         } else if (deliveryStatus === AttestationStatus.Delivered) {
+          Counters.attestationRequestsBelievedDelivered.inc()
           attestation.ongoingDeliveryId = null
         }
       }

@@ -17,6 +17,8 @@ export interface AttestationModel extends Model {
   key: () => AttestationKey
   provider: () => string | null
   recordError: (error: string) => void
+  failure: () => boolean
+  currentError: () => string | undefined
 }
 
 export interface AttestationKey {
@@ -64,15 +66,26 @@ export default (sequelize: Sequelize) => {
   }
 
   model.prototype.recordError = function(error: string) {
-    const previousErrors: any[] = this.errors ? JSON.parse(this.errors) : []
-    console.log(`before ${this.errors}`)
-    previousErrors.push({
+    const errors = this.errors ? JSON.parse(this.errors) : {}
+
+    errors[this.attempt] = {
       provider: this.provider(),
-      attempt: this.attempt,
       error,
-    })
-    this.errors = JSON.stringify(previousErrors)
-    console.log(`after ${this.errors}`)
+    }
+    this.errors = JSON.stringify(errors)
+  }
+
+  model.prototype.currentError = function() {
+    if (this.status === AttestationStatus.NotSent || this.status === AttestationStatus.Failed) {
+      const errors = this.errors ? JSON.parse(this.errors) : {}
+      return errors[this.attempt]?.error ?? errors[this.attempt - 1]?.error ?? undefined
+    } else {
+      return undefined
+    }
+  }
+
+  model.prototype.failure = function(): boolean {
+    return this.status === AttestationStatus.NotSent || this.status === AttestationStatus.Failed
   }
 
   return model
