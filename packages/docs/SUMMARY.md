@@ -23,7 +23,7 @@
 - [Quick Start](celo-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
-- [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
+- [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
 
