@@ -3,7 +3,7 @@ import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
-import { findAttestationByKey } from '../db'
+import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger } from '../db'
 import { AttestationKey, AttestationStatus } from '../models/attestation'
 import { obfuscateNumber } from '../sms/base'
 import { AttestationResponseType } from './attestation'
@@ -38,13 +38,12 @@ function getAttestationKey(getRequest: GetAttestationRequest): AttestationKey {
 class GetAttestationRequestHandler {
   logger: Logger
   key: AttestationKey
-  sequelizeLogger: (_msg: string, sequelizeLog: any) => void
+  sequelizeLogger: SequelizeLogger
   constructor(public readonly getRequest: GetAttestationRequest, logger: Logger) {
     this.logger = logger.child({
       getRequest: obfuscateGetAttestationRequest(getRequest),
     })
-    this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
-      this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+    this.sequelizeLogger = makeSequelizeLogger(this.logger)
     this.key = getAttestationKey(getRequest)
   }
 

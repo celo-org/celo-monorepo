@@ -5,7 +5,7 @@ import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
-import { findAttestationByKey, kit, SequelizeLogger } from '../db'
+import { findAttestationByKey, kit, makeSequelizeLogger, SequelizeLogger } from '../db'
 import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
@@ -50,6 +50,7 @@ export const AttestationResponseType = t.type({
   countryCode: t.union([t.undefined, t.string]),
 
   // Only used by test endpoint to return randomly generated salt.
+  // Never return a user-supplied salt.
   salt: t.union([t.undefined, t.string]),
 })
 
@@ -85,8 +86,7 @@ class AttestationRequestHandler {
       issuer: attestationRequest.issuer,
       phoneNumber: obfuscateNumber(attestationRequest.phoneNumber),
     })
-    this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
-      this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+    this.sequelizeLogger = makeSequelizeLogger(this.logger)
     this.key = getAttestationKey(this.attestationRequest)
   }
 

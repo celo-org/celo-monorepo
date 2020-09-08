@@ -1,8 +1,10 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { eqAddress } from '@celo/utils/lib/address'
-import { FindOptions, Sequelize, Transaction } from 'sequelize'
-import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from './env'
+import Logger from 'bunyan'
+import moment from 'moment'
+import { FindOptions, Op, Sequelize, Transaction } from 'sequelize'
+import { fetchEnv, fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
 import Attestation, {
   AttestationKey,
@@ -12,18 +14,29 @@ import Attestation, {
 
 export let sequelize: Sequelize | undefined
 
+let dbRecordExpiryMins: number | null
+
 export type SequelizeLogger = boolean | ((sql: string, timing?: number) => void)
 
-export function initializeDB() {
+export function makeSequelizeLogger(logger: Logger): SequelizeLogger {
+  return (msg: string, sequelizeLogArgs: any) =>
+    logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+}
+
+export async function initializeDB() {
   if (sequelize === undefined) {
     sequelize = new Sequelize(fetchEnv('DATABASE_URL'), {
       logging: (msg: string, sequelizeLogArgs: any) =>
         rootLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg),
     })
     rootLogger.info('Initializing Database')
-    return sequelize.authenticate() as Promise<void>
+    await sequelize.authenticate()
+
+    // Check four times every `dbRecordExpiryMins` period to delete records older than dbRecordExpiryMins
+    dbRecordExpiryMins = parseInt(fetchEnvOrDefault('DB_RECORD_EXPIRY_MINS', '60'), 10)
+    const dbRecordExpiryCheckEveryMs = dbRecordExpiryMins * 15 * 1000
+    setInterval(purgeExpiredRecords, dbRecordExpiryCheckEveryMs)
   }
-  return Promise.resolve()
 }
 
 export function isDBOnline() {
@@ -175,64 +188,34 @@ export async function findOrCreateAttestation(
     throw new Error(`Somehow we did not get an attestation record`)
   }
 
-  // TODO
-  // if (!attestationRecord.canSendSms()) {
-  //   // Another transaction has locked on the record before we did
-  //   throw new Error(`Another process has already sent the sms`)
-  // }
-
   return attestationRecord
 }
 
-// const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 1000 // 1 day
-
-// interface AttestationExpiryCache {
-//   timestamp: number | null
-//   expiryInSeconds: number | null
-// }
-
-// const attestationExpiryCache: AttestationExpiryCache = {
-//   timestamp: null,
-//   expiryInSeconds: null,
-// }
-
-// async function purgeExpiredRecords(transaction: Transaction) {
-//   const expiryTimeInSeconds = await getAttestationExpiryInSeconds()
-//   const AttestationTable = await getAttestationTable()
-//   try {
-//     await AttestationTable.destroy({
-//       where: {
-//         createdAt: {
-//           [Op.lte]: moment()
-//             .subtract(expiryTimeInSeconds, 'seconds')
-//             .toDate(),
-//         },
-//       },
-//       transaction,
-//     })
-//     await transaction.commit()
-//   } catch (err) {
-//     await transaction.rollback()
-//   }
-// }
-
-// async function getAttestationExpiryInSeconds() {
-//   if (
-//     attestationExpiryCache.expiryInSeconds &&
-//     attestationExpiryCache.timestamp &&
-//     Date.now() - attestationExpiryCache.timestamp < ATTESTATION_EXPIRY_TIMEOUT_MS
-//   ) {
-//     return attestationExpiryCache.expiryInSeconds
-//   }
-//   const attestations = await kit.contracts.getAttestations()
-//   const expiryTimeInSeconds = (await attestations.attestationExpiryBlocks()) * 5
-//   attestationExpiryCache.expiryInSeconds = expiryTimeInSeconds
-//   attestationExpiryCache.timestamp = Date.now()
-//   return expiryTimeInSeconds
-// }
-
-// // TODO fix
-// async purgeExpiredAttestations() {
-//   const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
-//   return purgeExpiredRecords(transaction)
-// }
+async function purgeExpiredRecords() {
+  try {
+    const sequelizeLogger = makeSequelizeLogger(rootLogger)
+    const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
+    try {
+      const table = await getAttestationTable()
+      const rowsDeleted = await table.destroy({
+        where: {
+          createdAt: {
+            [Op.lte]: moment()
+              .subtract(dbRecordExpiryMins!, 'minutes')
+              .toDate(),
+          },
+        },
+        transaction,
+      })
+      await transaction.commit()
+      if (rowsDeleted) {
+        rootLogger.info({ rowsDeleted }, 'Purged expired records')
+      }
+    } catch (err) {
+      rootLogger.error({ err }, 'Cannot purge expired records')
+      await transaction.rollback()
+    }
+  } catch (err) {
+    rootLogger.error({ err }, 'Cannot purge expired records')
+  }
+}

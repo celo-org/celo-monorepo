@@ -8,6 +8,7 @@ import {
   findAttestationByDeliveryId,
   findAttestationByKey,
   findOrCreateAttestation,
+  makeSequelizeLogger,
   sequelize,
   SequelizeLogger,
 } from '../db'
@@ -317,9 +318,7 @@ export async function receivedDeliveryReport(
   let childLogger = logger.child({
     deliveryId,
   })
-  const sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
-    childLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
-
+  const sequelizeLogger = makeSequelizeLogger(childLogger)
   const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
