@@ -1,7 +1,6 @@
 pragma solidity ^0.5.3;
 
 interface IMetaTransactionWallet {
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256);
   function setEip712DomainSeparator() external;
   function executeMetaTransaction(address, uint256, bytes calldata, uint8, bytes32, bytes32)
     external

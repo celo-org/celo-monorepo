@@ -1,7 +1,6 @@
 pragma solidity ^0.5.3;
 
 interface IAttestations {
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256);
   function request(bytes32, uint256, address) external;
   function selectIssuers(bytes32) external;
   function complete(bytes32, uint8, bytes32, bytes32) external;
