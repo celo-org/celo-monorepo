@@ -528,7 +528,7 @@ exports[`Terms renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="https://docs.celo.org/important-information/alfajores-testnet-disclaimer"
+              href="https://docs.celo.org/important-information/mainnet-network-disclaimer"
               onClick={[Function]}
               rel=" noopener noreferrer"
               role="link"
@@ -693,7 +693,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        The Alfajores Celo Test Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
+        The Celo Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -737,7 +737,7 @@ exports[`Terms renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
-            href="https://docs.celo.org/celo-codebase/protocol/privacy"
+            href="https://docs.celo.org/celo-codebase/protocol/identity/phone-number-privacy"
             onClick={[Function]}
             rel=" noopener noreferrer"
             role="link"
