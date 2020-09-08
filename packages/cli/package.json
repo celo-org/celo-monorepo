@@ -99,7 +99,7 @@
       "governance": {
         "description": "Interact with on-chain governance proposals and hotfixes"
       },
-      "identiy": {
+      "identity": {
         "description": "Interact with ODIS and the attestations service"
       }, 
       "lockedgold": {
