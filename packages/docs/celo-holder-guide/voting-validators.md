@@ -46,7 +46,7 @@ As a CELO holder, you have the opportunity to impact the Celo network by voting 
 
 ## The Celo Foundation Voting Policy
 
-As described above, there are many criteria to consider when deciding which group to vote for. While it is highly recommended that all CELO holders do their indepedent research when deciding which group to vote for, another option is to vote for Validator Groups that have received votes from the Celo Foundation.
+As described above, there are many criteria to consider when deciding which group to vote for. While it is highly recommended that all CELO holders do their independent research when deciding which group to vote for, another option is to vote for Validator Groups that have received votes from the Celo Foundation.
 
 The Celo Foundation has a [Validator Group voting policy](../operations-manual/celo-foundation-voting-policy.md) that it follows when voting with the CELO that it holds. This policy has been developed by the Foundation board and technical advisors with the express goal of promoting the long-term security and decentralization of the network. Validator Groups have an opportunity to apply for Foundation votes every 3 months, and a new cohort is selected based on past performance and contributions. 
 
