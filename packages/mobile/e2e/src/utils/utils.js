@@ -68,6 +68,12 @@ export async function enterPinUi() {
   }
 }
 
+export async function enterPinUiIfNecessary() {
+  if (await isElementVisible('digit1')) {
+    await enterPinUi()
+  }
+}
+
 export async function inputNumberKeypad(amount) {
   const amountStr = '' + amount
   for (const digit of amountStr) {

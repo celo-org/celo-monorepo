@@ -1,4 +1,4 @@
-import { enterPinUi, inputNumberKeypad } from './utils/utils'
+import { inputNumberKeypad } from './utils/utils'
 import { DEFAULT_RECIPIENT_ADDRESS } from './utils/consts'
 
 const AMOUNT_TO_SEND = '0.1'
@@ -32,8 +32,7 @@ export default Send = () => {
 
     await element(by.id('ConfirmButton')).tap()
 
-    // Uncomment if running this file only.
-    // await enterPinUi()
+    await enterPinUiIfNecessary()
   })
 
   // TODO(erdal): implement Request path

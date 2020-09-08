@@ -1,4 +1,4 @@
-import { enterPinUi } from './utils/utils'
+import { enterPinUiIfNecessary } from './utils/utils'
 import { SAMPLE_BACKUP_KEY } from './utils/consts'
 
 export default ResetAccount = () => {
@@ -17,8 +17,7 @@ export default ResetAccount = () => {
   })
 
   it('Write down Account Key and complete quiz', async () => {
-    // Uncomment if running this file only.
-    // await enterPinUi()
+    await enterPinUiIfNecessary()
     await element(by.id('backupKeySavedSwitch')).tap()
     await element(by.id('backupKeyContinue')).tap()
     for (const word of SAMPLE_BACKUP_KEY.split(' ')) {

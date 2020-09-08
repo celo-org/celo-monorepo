@@ -1,4 +1,4 @@
-import { enterPinUi, isElementVisible, sleep } from './utils/utils'
+import { enterPinUiIfNecessary, isElementVisible } from './utils/utils'
 import { DEFAULT_RECIPIENT_ADDRESS } from './utils/consts'
 
 const CELO_TO_EXCHANGE = 1.1
@@ -18,6 +18,7 @@ const verifyBalance = async (expectedBalance) => {
   await waitFor(element(by.id('CeloBalance')))
     .toHaveText(expectedBalance.toString())
     .withTimeout(30000)
+  await expect(element(by.id('CeloBalance'))).toHaveText(expectedBalance.toString())
 }
 
 export default ExchangeCelo = () => {
@@ -42,6 +43,7 @@ export default ExchangeCelo = () => {
     await waitFor(element(by.id('BuyCelo')))
       .toBeVisible()
       .withTimeout(30000)
+    await expect(element(by.id('BuyCelo'))).toBeVisible()
 
     // Tap on the buy button, fill the amount, review and confirm.
     await element(by.id('BuyCelo')).tap()
@@ -49,13 +51,10 @@ export default ExchangeCelo = () => {
     await element(by.id('ExchangeReviewButton')).tap()
     await element(by.id('ConfirmExchange')).tap()
 
-    // Uncomment if running this file only.
-    // await enterPinUi()
+    await enterPinUiIfNecessary()
 
     // Return to the Exchange CELO screen and check balance
-    await waitFor(element(by.id('BuyCelo')))
-      .toBeVisible()
-      .withTimeout(10000)
+    await expect(element(by.id('BuyCelo'))).toBeVisible()
     await verifyBalance(balance + CELO_TO_EXCHANGE)
   })
 
@@ -66,10 +65,10 @@ export default ExchangeCelo = () => {
     await element(by.id('ExchangeReviewButton')).tap()
     await element(by.id('ConfirmExchange')).tap()
 
+    await enterPinUiIfNecessary()
+
     // Return to the Exchange CELO screen and check balance
-    await waitFor(element(by.id('BuyCelo')))
-      .toBeVisible()
-      .withTimeout(30000)
+    await expect(element(by.id('BuyCelo'))).toBeVisible()
     await verifyBalance(balance)
   })
 
@@ -92,8 +91,7 @@ export default ExchangeCelo = () => {
       .withTimeout(10000)
     await element(by.id('ConfirmWithdrawButton')).tap()
 
-    // Uncomment if running this test only.
-    // await enterPinUi()
+    await enterPinUiIfNecessary()
 
     // Return to the Exchange CELO screen after confirming.
     await waitFor(element(by.id('WithdrawCELO')))
