@@ -122,6 +122,7 @@ function getServiceAccountName(clusterConfig: BaseClusterConfig) {
   const prefixByCloudProvider: { [key in CloudProvider]: string } = {
     [CloudProvider.AWS]: 'aws',
     [CloudProvider.AZURE]: 'aks',
+    [CloudProvider.GCP]: 'gcp',
   }
   const prefix = prefixByCloudProvider[clusterConfig.cloudProvider]
   // Ensure the service account name is within the length restriction

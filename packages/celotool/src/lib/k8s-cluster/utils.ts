@@ -1,5 +1,6 @@
 import { AKSClusterConfig, AKSClusterManager } from './aks'
 import { AWSClusterConfig, AWSClusterManager } from './aws'
+import { GCPClusterConfig, GCPClusterManager } from './gcp'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
 const clusterManagerByCloudProvider: {
@@ -7,6 +8,7 @@ const clusterManagerByCloudProvider: {
 } = {
   [CloudProvider.AWS]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AWSClusterManager(clusterConfig as AWSClusterConfig, celoEnv),
   [CloudProvider.AZURE]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new AKSClusterManager(clusterConfig as AKSClusterConfig, celoEnv),
+  [CloudProvider.GCP]: (clusterConfig: BaseClusterConfig, celoEnv: string) => new GCPClusterManager(clusterConfig as GCPClusterConfig, celoEnv),
 }
 
 export function getClusterManager(cloudProvider: CloudProvider, celoEnv: string, clusterConfig: BaseClusterConfig) {

@@ -163,9 +163,21 @@ export function getServiceAccountName(prefix: string) {
   return `${prefix}-${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`.slice(0, 30)
 }
 
-export async function uploadStorageClass() {
-  // TODO: allow this to run from anywhere
-  await execCmdWithExitOnFailure(`kubectl apply -f ../helm-charts/testnet/ssdstorageclass.yaml`)
+export async function installGCPSSDStorageClass() {
+  // A previous version installed this directly with `kubectl` instead of helm.
+  // To be backward compatible, we don't install the chart if the storage class
+  // already exists.
+  const storageClassExists = await outputIncludes(
+    `kubectl get storageclass`,
+    `ssd`,
+    `SSD StorageClass exists, skipping install`
+  )
+  if (!storageClassExists) {
+    const gcpSSDHelmChartPath = '../helm-charts/gcp-ssd'
+    await execCmdWithExitOnFailure(
+      `helm upgrade -i gcp-ssd ${gcpSSDHelmChartPath}`
+    )
+  }
 }
 
 export async function redeployTiller() {

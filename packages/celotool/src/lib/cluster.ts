@@ -7,8 +7,8 @@ import {
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
+  installGCPSSDStorageClass,
   redeployTiller,
-  uploadStorageClass
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -111,7 +111,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
 
   console.info('Deploying Tiller and Cert Manager Helm chart...')
 
-  await uploadStorageClass()
+  await installGCPSSDStorageClass()
   await redeployTiller()
 
   await installCertManagerAndNginx()

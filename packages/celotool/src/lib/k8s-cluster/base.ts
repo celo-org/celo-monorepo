@@ -5,6 +5,7 @@ import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy
 export enum CloudProvider {
   AWS,
   AZURE,
+  GCP,
 }
 
 export interface BaseClusterConfig {
@@ -24,8 +25,11 @@ export abstract class BaseClusterManager {
   async switchToClusterContext() {
     const exists = await this.switchToClusterContextIfExists()
     if (!exists) {
-      return this.getAndSwitchToClusterContext()
+      await this.getAndSwitchToClusterContext()
     }
+    // Reset back to default namespace
+    await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
+    await this.setupCluster()
   }
 
   /**

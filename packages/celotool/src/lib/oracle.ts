@@ -8,6 +8,7 @@ import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChar
 import yargs from 'yargs'
 import { AKSClusterConfig } from './k8s-cluster/aks'
 import { AWSClusterConfig } from './k8s-cluster/aws'
+import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
 import { getClusterManager } from './k8s-cluster/utils'
 import { getCloudProviderFromOracleContext } from './oracle-utils'
@@ -56,12 +57,21 @@ const oracleContextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSCluster
 }
 
 /**
- * Env vars corresponding to each value for the AwslusterConfig for a particular context
+ * Env vars corresponding to each value for the AWSClusterConfig for a particular context
  */
 const oracleContextAWSClusterConfigDynamicEnvVars: { [k in keyof Omit<AWSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
   clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION,
   resourceGroupTag: DynamicEnvVar.ORACLE_AWS_RESOURCE_GROUP_TAG,
+}
+
+/**
+ * Env vars corresponding to each value for the GCPClusterConfig for a particular context
+ */
+const oracleContextGCPClusterConfigDynamicEnvVars: { [k in keyof Omit<GCPClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
+  projectName: DynamicEnvVar.ORACLE_GCP_PROJECT_NAME,
+  zone: DynamicEnvVar.ORACLE_GCP_ZONE,
 }
 
 interface OracleKeyVaultIdentityConfig {
@@ -91,6 +101,7 @@ const clusterConfigGetterByCloudProvider: {
 } = {
   [CloudProvider.AWS]: getAWSClusterConfig,
   [CloudProvider.AZURE]: getAKSClusterConfig,
+  [CloudProvider.GCP]: getGCPClusterConfig,
 }
 
 function releaseName(celoEnv: string) {
@@ -391,6 +402,20 @@ export function getAWSClusterConfig(oracleContext: string): AWSClusterConfig {
   const clusterConfig: AWSClusterConfig = {
     cloudProvider: CloudProvider.AZURE,
     ...awsDynamicEnvVars
+  }
+  return clusterConfig
+}
+
+/**
+ * Fetches the env vars for a particular context
+ * @param oracleContext the oracle context to use
+ * @return an AWSClusterConfig for the context
+ */
+export function getGCPClusterConfig(oracleContext: string): GCPClusterConfig {
+  const gcpDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextGCPClusterConfigDynamicEnvVars, oracleContext)
+  const clusterConfig: GCPClusterConfig = {
+    cloudProvider: CloudProvider.GCP,
+    ...gcpDynamicEnvVars
   }
   return clusterConfig
 }

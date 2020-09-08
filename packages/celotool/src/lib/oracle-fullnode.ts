@@ -2,9 +2,10 @@ import { DynamicEnvVar } from './env-utils'
 import { CloudProvider } from './k8s-cluster/base'
 import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
 import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
+import { GCPFullNodeDeploymentConfig } from './k8s-fullnode/gcp'
 import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
-import { getAKSClusterConfig, getAWSClusterConfig, getOracleContextDynamicEnvVarValues } from './oracle'
+import { getAKSClusterConfig, getAWSClusterConfig, getGCPClusterConfig, getOracleContextDynamicEnvVarValues } from './oracle'
 import { getCloudProviderFromOracleContext } from './oracle-utils'
 
 /**
@@ -26,6 +27,7 @@ const deploymentConfigGetterByCloudProvider: {
 } = {
   [CloudProvider.AWS]: getAWSFullNodeDeploymentConfig,
   [CloudProvider.AZURE]: getAKSFullNodeDeploymentConfig,
+  [CloudProvider.GCP]: getGCPFullNodeDeploymentConfig,
 }
 
 /**
@@ -100,5 +102,16 @@ function getAWSFullNodeDeploymentConfig(oracleContext: string): AWSFullNodeDeplo
   return {
     ...fullNodeDeploymentConfig,
     clusterConfig: getAWSClusterConfig(oracleContext),
+  }
+}
+
+/**
+ * For a given oracleContext, returns the appropriate getGCPFullNodeDeploymentConfig
+ */
+function getGCPFullNodeDeploymentConfig(oracleContext: string): GCPFullNodeDeploymentConfig {
+  const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(oracleContext)
+  return {
+    ...fullNodeDeploymentConfig,
+    clusterConfig: getGCPClusterConfig(oracleContext),
   }
 }
