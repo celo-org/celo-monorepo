@@ -339,9 +339,9 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 ensureLeading0x(
                   transactions
                     .map((t) => {
-                      const data = trimLeading0x(t.data) // @ts-ignore
-                      const lengthHex = (data.length / 2).toString(16).padStart(2, '0')
-                      return `${lengthHex}${data}`
+                      const transactionData = trimLeading0x(t.data)
+                      const lengthHex = (transactionData.length / 2).toString(16).padStart(2, '0')
+                      return `${lengthHex}${transactionData}`
                     })
                     .join('')
                 ),
@@ -372,7 +372,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         })
 
         describe('when lengths in length array do not match up with lengths in data', async () => {
-          it('reverts with correct message', async () => {
+          it('reverts', async () => {
             await assertRevert(
               wallet.executeTransactions(
                 transactions.map((t) => t.destination),
@@ -386,7 +386,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                     })
                     .join('')
                 ),
-                // take length without dividing by 2 for invalid length
+                // take length without dividing by 2 (each byte is 2 characters) for invalid length mismatch
                 transactions.map((t) => trimLeading0x(t.data).length),
                 { from: signer }
               )

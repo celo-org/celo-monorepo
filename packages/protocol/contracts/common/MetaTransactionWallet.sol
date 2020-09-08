@@ -217,6 +217,8 @@ contract MetaTransactionWallet is
         uint8(data[dataPosition]) == dataLengths[i],
         "Data length must match specified length"
       );
+
+      // dataPositions.add(1) accounts for preceding 1 byte signifying length of following data
       executeTransaction(
         destinations[i],
         values[i],
