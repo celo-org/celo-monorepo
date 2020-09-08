@@ -521,7 +521,7 @@ jobs:
             yarn devchain run-tar devchain.tar.gz &
             GANACHE_PID=$!
             echo "Waiting for ganache to start"
-            sleep 20
+            sleep 30
 
             # verify bytecodes of RC1 deployment
             yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
