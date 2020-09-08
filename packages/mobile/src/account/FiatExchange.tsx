@@ -6,11 +6,12 @@ import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { features } from 'src/flags'
+import { fiatExchange } from 'src/images/Images'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -35,7 +36,9 @@ function FiatExchange() {
   return (
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
-      <View style={styles.image} />
+      <View style={styles.image}>
+        <Image source={fiatExchange} style={styles.image} resizeMode={'contain'} />
+      </View>
       <View style={styles.balanceSheet}>
         <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
         <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
@@ -71,7 +74,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  image: { height: 200 },
+  image: {
+    height: 200,
+    alignItems: 'center',
+  },
   balanceSheet: {
     paddingVertical: variables.contentPadding,
     paddingRight: variables.contentPadding,
