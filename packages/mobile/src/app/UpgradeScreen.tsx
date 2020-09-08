@@ -2,12 +2,15 @@ import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigateToWalletPlayStorePage } from 'src/utils/linking'
+import { headerWithCloseButton } from 'src/navigator/Headers.v2'
+import { navigateToWalletStorePage } from 'src/utils/linking'
 
 type Props = WithTranslation
 
 class UpgradeScreen extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  static navigationOptions = {
+    ...headerWithCloseButton,
+  }
 
   render() {
     const { t } = this.props
@@ -16,7 +19,7 @@ class UpgradeScreen extends React.Component<Props> {
         title={t('appHasToBeUpdated')}
         subtitle={t('thisVersionIsInsecure')}
         CTAText={t('update')}
-        CTAHandler={navigateToWalletPlayStorePage}
+        CTAHandler={navigateToWalletStorePage}
       />
     )
   }
