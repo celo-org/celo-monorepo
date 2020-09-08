@@ -1,6 +1,6 @@
 {
   "learnMore": "Saber más",
-  "equalToAmount": "Igual a <1></1>",
+  "equalToAmount": "Equivale a <1></1>",
   "whatIsGold": "{{appName}} te permite comprar y vender CELO",
   "manageCelo": "Administrar {{CeloDollars}}",
   "exchangeRate": "Tasa de cambio",
@@ -37,7 +37,7 @@
   "exchangeRateChange": "El tipo de cambio ha cambiado, por favor vuelva a intentarlo",
   "feeExchangeEducation": "Cuando haces un cambio una pequeña comisión adicional se destina al mantenimiento del valor estable del Celo Dollar. Para saber más sobre las comisiones de Celo visita las FAQ.",
   "goldPrice": "Precio de CELO",
-  "yourGoldBalance": "Su saldo de CELO",
+  "yourGoldBalance": "Tu Saldo de CELO",
   "goldAmount": "Cantidad de CELO",
   "purchasedGold": "CELO comprado",
   "soldGold": "CELO vendido",
