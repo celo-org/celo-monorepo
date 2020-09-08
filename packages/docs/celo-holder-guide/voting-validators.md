@@ -2,7 +2,7 @@
 
 Validators play a critical role in the Celo protocol, determining which transactions get applied and producing new blocks. Selecting organizations that operate well-run infrastructure to perform this role effectively is essential for Celo's long-term success.
 
-The Celo community makes these decisions by locking CELO tokens and voting for [Validator Groups](../celo-codebase/protocol/proof-of-stake/validator-groups.md), intermediaries that sit between voters and Validators. Every Validator Group has an ordered list of up to 5 candidate Validators. Some organizations may operate a group with their own Validators in it; some may operate a group to which they have added Validators run by others.
+The Celo community makes these decisions by locking CELO and voting for [Validator Groups](../celo-codebase/protocol/proof-of-stake/validator-groups.md), intermediaries that sit between voters and Validators. Every Validator Group has an ordered list of up to 5 candidate Validators. Some organizations may operate a group with their own Validators in it; some may operate a group to which they have added Validators run by others.
 
 ## Validator Elections
 
