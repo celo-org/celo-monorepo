@@ -90,4 +90,17 @@ describe('Redux persist migrations', () => {
     expect(migratedSchema.web3.dataEncryptionKey).toBe('key')
     expect(migratedSchema.web3.commentKey).toBe(undefined)
   })
+
+  it('works for v5 to v6', () => {
+    const v5Stub = {
+      invite: {
+        redeemComplete: false,
+      },
+      web3: {
+        account: 'some_account',
+      },
+    }
+    const migratedSchema = migrations[6](v5Stub)
+    expect(migratedSchema.invite.redeemComplete).toBe(true)
+  })
 })
