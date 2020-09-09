@@ -145,6 +145,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
       return true;
     }
 
+    require(to != address(0), "mint attempted to reserved address 0x0");
     totalSupply_ = totalSupply_.add(value);
 
     bool success;

@@ -712,7 +712,7 @@ contract Attestations is
     if (status && transferApprovals[other][key]) {
       _transfer(identifier, index, from, to);
       transferApprovals[other][key] = false;
-    } else {
+    } else if (transferApprovals[msg.sender][key] != status) {
       transferApprovals[msg.sender][key] = status;
       emit TransferApproval(msg.sender, identifier, from, to, status);
     }

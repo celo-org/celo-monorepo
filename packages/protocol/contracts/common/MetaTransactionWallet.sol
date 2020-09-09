@@ -70,6 +70,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function setSigner(address _signer) public onlyOwner {
+    require(_signer != address(0), "cannot assign zero address as signer");
     signer = _signer;
     emit SignerSet(signer);
   }
