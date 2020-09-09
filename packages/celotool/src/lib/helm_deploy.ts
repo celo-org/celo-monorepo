@@ -328,11 +328,11 @@ export async function resetCloudSQLInstance(instanceName: string) {
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 }
 
-async function registerIPAddress(name: string) {
+export async function registerIPAddress(name: string, zone?: string) {
   console.info(`Registering IP address ${name}`)
   try {
     await execCmd(
-      `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion()}`
+      `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion(zone)}`
     )
   } catch (error) {
     if (!error.toString().includes('already exists')) {
@@ -342,11 +342,11 @@ async function registerIPAddress(name: string) {
   }
 }
 
-async function deleteIPAddress(name: string) {
+export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
     await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion()} -q`
+      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
     )
   } catch (error) {
     if (!error.toString().includes('was not found')) {
@@ -356,9 +356,9 @@ async function deleteIPAddress(name: string) {
   }
 }
 
-export async function retrieveIPAddress(name: string) {
+export async function retrieveIPAddress(name: string, zone?: string) {
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses describe ${name}  --region ${getKubernetesClusterRegion()} --format="value(address)"`
+    `gcloud compute addresses describe ${name}  --region ${getKubernetesClusterRegion(zone)} --format="value(address)"`
   )
   return address.replace(/\n*$/, '')
 }

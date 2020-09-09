@@ -1,8 +1,9 @@
 {{ range $index, $e := until (int .Values.replicaCount ) }}
+{{ range $protocolIndex, $protocol := $.Values.geth.service_protocols }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "common.fullname" $ }}-{{ $index }}
+  name: {{ template "common.fullname" $ }}-{{ $index }}-{{ lower $protocol }}
   annotations:
 {{ if $.Values.azure }}
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
@@ -14,7 +15,7 @@ spec:
   type: {{ $.Values.geth.service_type }}
   publishNotReadyAddresses: true
 {{- if (eq $.Values.geth.service_type "LoadBalancer") }}
-  loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
+  loadBalancerIP: {{ index $.Values.geth.public_ip_per_node $index -}}
 {{- end }}
   ports:
 {{- if $.Values.geth.service_node_port_per_full_node }}
@@ -33,6 +34,7 @@ spec:
     - port: 30303
       targetPort: ethereum
       name: ethereum
+      protocol: {{ $protocol }}
 {{- end }}
 {{- if $.Values.geth.expose_rpc_externally }}
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
@@ -41,14 +43,19 @@ spec:
     statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ $index }}
 ---
 {{ end }}
+{{ end }}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "common.fullname" . }}-rpc
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
-  component: celo-fullnode-rpc-traffic
+    component: celo-fullnode-rpc-traffic
+  annotations:
+    cloud.google.com/neg: '{"exposed_ports": {"8545":{}}}'
 spec:
+  # REMOVE THIS LATER!
+  publishNotReadyAddresses: true
   type: ClusterIP
   ports:
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}

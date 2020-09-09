@@ -12,5 +12,5 @@ export const builder = addOracleMiddleware
 
 export const handler = async (argv: OracleFullNodeInitialArgv) => {
   await switchToOracleContextCluster(argv.celoEnv, argv.context)
-  if (false) await installOracleFullNodeChart(argv.celoEnv, argv.context)
+  await installOracleFullNodeChart(argv.celoEnv, argv.context)
 }

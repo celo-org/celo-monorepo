@@ -1,16 +1,18 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "celo-fullnode.fullname" . -}}
+{{- $fullName := include "common.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-rpc-ing
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
-  component: celo-fullnode-rpc-traffic-ing
-{{- with .Values.ingress.annotations }}
+    component: celo-fullnode-rpc-traffic-ing
+{{- if .Values.ingress.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
+{{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+{{- end }}
 {{- end }}
 spec:
 {{- if .Values.ingress.tls }}
@@ -18,7 +20,7 @@ spec:
   {{- range .Values.ingress.tls }}
     - hosts:
       {{- range .hosts }}
-        - {{ . }}
+      - {{ . }}
       {{- end }}
       secretName: {{ .secretName }}
   {{- end }}
@@ -30,7 +32,7 @@ spec:
         paths:
           - path: {{ $ingressPath }}
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: http
+              serviceName: {{ $fullName }}-rpc
+              servicePort: rpc
   {{- end }}
 {{- end }}

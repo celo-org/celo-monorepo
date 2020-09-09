@@ -20,6 +20,9 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     return [
       `--set azure=true`,
       `--set geth.public_ip_per_node='{${staticIps}}'`,
+      // Azure has a special annotation to expose TCP and UDP on the same service.
+      // Only TCP needs to be specified in that case.
+      `--set geth.service_protocols='{TCP}'`
     ]
   }
 
