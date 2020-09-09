@@ -126,6 +126,8 @@ testWithGanache('Validators Wrapper', (web3) => {
     let groupAccount: string, validator1: string, validator2: string
 
     beforeEach(async () => {
+      jest.setTimeout(30 * 1000)
+
       groupAccount = accounts[0]
       await setupGroup(groupAccount, 2)
 
