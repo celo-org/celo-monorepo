@@ -80,7 +80,7 @@ export class App extends React.Component {
 
   getAppStartTimeFromNative(appLoadedTime: number) {
     const appStartListener = getEventEmitter().addListener('AppStartedLoading', (data) => {
-      const reactInitTime = data.appStartedMillis
+      const reactInitTime: number = +data.appStartedMillis
       const reactLoadDuration = (this.reactLoadTime - reactInitTime) / 1000
       const appLoadDuration = (appLoadedTime - reactInitTime) / 1000
       const { width, height } = Dimensions.get('window')
