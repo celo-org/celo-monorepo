@@ -28,7 +28,7 @@ e2e-defaults: &e2e-defaults
   docker:
     - image: celohq/circleci:geth1.9-2
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: cf8e4727223c0a420118c51c682c22bb13c124f1
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: trianglesphere/simple_hotswap
 general:
   artifacts:
     - 'mobile/coverage'
