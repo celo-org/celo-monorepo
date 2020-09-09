@@ -143,10 +143,10 @@ Optional environment variables:
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
-| `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `3`.  |
+| `MAX_DELIVERY_ATTEMPTS`          | Number of total delivery attempts when sending SMS. Each attempt tries the next available provider in the order specified. If omitted, the deprecated `MAX_PROVIDER_RETRIES` option will be used. Default value is `3`.  |
 | `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
-| `TIMEOUT_CLEANUP_NO_RECEIPT_MIN` | If a delivery report appears to be supported but is not received within this number of minutes, assume delivery success                                               |
 | `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
+| `DB_RECORD_EXPIRY_MINS`          | Time in minutes before a record of an attestation in the database may be deleted. Default 60 minutes. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
 | `APP_SIGNATURE`                  | A value that is shown under the key `appSignature` field in the `/status` endpoint that you can use to identify multiple instances. |
@@ -240,10 +240,12 @@ Attestation Service provides a test endpoint.
 You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
 
 ```bash
-celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
+celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE> [--provider <PROVIDER>]
 ```
 
 You need the attestation signer key available and unlocked on your local machine.
+
+You may wish to do this once for each provider you have configured (`--provider=twilio` and `--provider=nexmo`). (If this option is not recognized, try upgrading `celocli`).
 
 Note that this does not use an identical code path to real attestations (since those require specific on-chain state) so this endpoint should not be used in place of monitoring logs and metrics.
 

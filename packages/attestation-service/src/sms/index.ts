@@ -20,7 +20,10 @@ import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
 
 // Maximum delivery attempts (including first) regardless of provider
-const maxDeliveryAttempts = parseInt(fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', '3'), 10)
+const maxDeliveryAttempts = parseInt(
+  fetchEnvOrDefault('MAX_DELIVERY_ATTEMPTS', fetchEnvOrDefault('MAX_PROVIDER_RETRIES', '3')),
+  10
+)
 
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
