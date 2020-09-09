@@ -10,9 +10,9 @@ interface Tracker {
 }
 
 export async function trackDownload({ name, type }: Tracker) {
-  await analytics.track(`${name} Downloaded`, { assetType: type, scope: 'event-kit' })
+  await analytics.track(`${name} Downloaded`, `event-kit: ${type}`)
 }
 
 export async function trackOpen({ name, type }: Tracker) {
-  await analytics.track(`${name} Open`, { assetType: type, scope: 'event-kit' })
+  await analytics.track(`${name} Open`, `event-kit: ${type}`)
 }

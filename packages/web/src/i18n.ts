@@ -1,6 +1,12 @@
 import NextI18Next, { I18n, TFunction } from 'next-i18next'
+import path from 'path'
 
-const options = { defaultLanguage: 'en', otherLanguages: ['en'], saveMissing: false }
+const options = {
+  defaultLanguage: 'en',
+  otherLanguages: ['en'],
+  saveMissing: false,
+  localePath: path.resolve('./public/static/locales'),
+}
 const NextI18NextInstance = new NextI18Next(options)
 export const Trans = NextI18NextInstance.Trans
 
@@ -18,9 +24,9 @@ export const useTranslation = NextI18NextInstance.useTranslation
 export enum NameSpaces {
   common = 'common',
   about = 'about',
-  applications = 'applications',
   audits = 'audits',
   brand = 'brand',
+  cbe = 'cbe',
   community = 'community',
   alliance = 'alliance',
   download = 'download',
@@ -31,5 +37,4 @@ export enum NameSpaces {
   papers = 'papers',
   press = 'press',
   terms = 'terms',
-  technology = 'technology',
 }
