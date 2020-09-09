@@ -2,44 +2,16 @@
 // tslint:disable: no-console
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3-celo.d.ts" />
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { eqAddress, privateKeyToAddress } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { DefaultRpcCaller, RpcCaller } from '@celo/contractkit/lib/utils/rpc-caller'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
-import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import path from 'path'
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
-import {
-  AccountType,
-  generateGenesis,
-  generatePrivateKey,
-  privateKeyToPublicKey,
-  Validator,
-} from '../lib/generate_utils'
-import {
-  connectPeers,
-  connectValidatorPeers,
-  getEnodeAddress,
-  importGenesis,
-  initAndStartGeth,
-  addProxyPeer,
-} from '../lib/geth'
+import { privateKeyToPublicKey } from '../lib/generate_utils'
+import { getEnodeAddress, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import {
-  assertAlmostEqual,
-  getHooks,
-  sleep,
-  waitForBlock,
-  waitForEpochTransition,
-  waitToFinishInstanceSyncing,
-} from './utils'
-import { exit } from 'yargs'
-// import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul
+import { getHooks, sleep, waitForEpochTransition, waitToFinishInstanceSyncing } from './utils'
 
 enum IstanbulManagement {
   getSnapshot = 'istanbul_getSnapshot',
@@ -61,141 +33,8 @@ enum IstanbulManagement {
   replicaState = 'istanbul_getCurrentReplicaState',
 }
 
-interface MemberSwapper {
-  swap(): Promise<void>
-}
-
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
-const carbonOffsettingPartnerAddress = '0x1234567812345678123456781234567812345678'
-
-async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
-  let index = 0
-  const group = (await kit.web3.eth.getAccounts())[0]
-  await Promise.all(members.slice(1).map((member) => removeMember(member)))
-
-  async function removeMember(member: string) {
-    return (await kit.contracts.getValidators())
-      .removeMember(member)
-      .sendAndWaitForReceipt({ from: group })
-  }
-
-  async function addMember(member: string) {
-    return (
-      await (await kit.contracts.getValidators()).addMember(group, member)
-    ).sendAndWaitForReceipt({ from: group })
-  }
-
-  async function getGroupMembers() {
-    const groupInfo = await (await kit._web3Contracts.getValidators()).methods
-      .getValidatorGroup(group)
-      .call()
-    return groupInfo[0]
-  }
-
-  return {
-    async swap() {
-      const removedMember = members[index % members.length]
-      await removeMember(members[index % members.length])
-      index = index + 1
-      const addedMember = members[index % members.length]
-      await addMember(members[index % members.length])
-      const groupMembers = await getGroupMembers()
-      assert.include(groupMembers, addedMember)
-      assert.notInclude(groupMembers, removedMember)
-    },
-  }
-}
-
-interface KeyRotator {
-  rotate(): Promise<void>
-}
-
-async function newKeyRotator(
-  kit: ContractKit,
-  web3s: Web3[],
-  privateKeys: string[]
-): Promise<KeyRotator> {
-  let index = 0
-  const validator = (await kit.web3.eth.getAccounts())[0]
-  const accountsWrapper = await kit.contracts.getAccounts()
-
-  async function authorizeValidatorSigner(
-    signer: string,
-    signerWeb3: any,
-    signerPrivateKey: string
-  ) {
-    const signerKit = newKitFromWeb3(signerWeb3)
-    const blsPublicKey = getBlsPublicKey(signerPrivateKey)
-    const blsPop = getBlsPoP(validator, signerPrivateKey)
-    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfKeyPossession(
-      validator,
-      signer
-    )
-    return (
-      await accountsWrapper.authorizeValidatorSignerAndBls(signer, pop, blsPublicKey, blsPop)
-    ).sendAndWaitForReceipt({
-      from: validator,
-    })
-  }
-
-  return {
-    async rotate() {
-      if (index < web3s.length) {
-        const signerWeb3 = web3s[index]
-        const signer: string = (await signerWeb3.eth.getAccounts())[0]
-        const signerPrivateKey = privateKeys[index]
-        await authorizeValidatorSigner(signer, signerWeb3, signerPrivateKey)
-        index += 1
-        assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
-      }
-    },
-  }
-}
-
-async function calculateUptime(
-  kit: ContractKit,
-  validatorSetSize: number,
-  lastBlockNumberOfEpoch: number,
-  epochSize: number,
-  lookbackWindow: number
-): Promise<BigNumber[]> {
-  // The parentAggregateSeal is not counted for the first or last blocks of the epoch
-  const blocks = await concurrentMap(10, [...Array(epochSize - 2).keys()], (i) =>
-    kit.web3.eth.getBlock(lastBlockNumberOfEpoch - epochSize + 2 + i)
-  )
-  const lastSignedBlock: number[] = new Array(validatorSetSize).fill(0)
-  const tally: number[] = new Array(validatorSetSize).fill(0)
-
-  // Follows updateUptime() in core/blockchain.go
-  let windowBlocks = 1
-  for (const block of blocks) {
-    const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
-
-    for (let signerIndex = 0; signerIndex < validatorSetSize; signerIndex++) {
-      if (bitIsSet(bitmap, signerIndex)) {
-        lastSignedBlock[signerIndex] = block.number - 1
-      }
-      if (windowBlocks < lookbackWindow) {
-        continue
-      }
-      const signedBlockWindowLastBlockNum = block.number - 1
-      const signedBlockWindowFirstBlockNum = signedBlockWindowLastBlockNum - (lookbackWindow - 1)
-      if (
-        signedBlockWindowFirstBlockNum <= lastSignedBlock[signerIndex] &&
-        lastSignedBlock[signerIndex] <= signedBlockWindowLastBlockNum
-      ) {
-        tally[signerIndex]++
-      }
-    }
-
-    if (windowBlocks < lookbackWindow) {
-      windowBlocks++
-    }
-  }
-  const denominator = epochSize - lookbackWindow - 1
-  return tally.map((signerTally) => new BigNumber(signerTally / denominator))
-}
 
 describe('replica swap tests', () => {
   const gethConfig: GethRunConfig = {
@@ -205,13 +44,15 @@ describe('replica swap tests', () => {
     // migrateTo: 25,
     networkId: 1101,
     network: 'local',
+    genesisConfig: {
+      blockTime: 2,
+    },
     instances: [
       {
         name: 'validator0',
         validating: true,
         syncmode: 'full',
         port: 30303,
-        wsport: 8544,
         rpcport: 8545,
         proxy: 'validator0-proxy0',
         isProxied: true,
@@ -246,6 +87,7 @@ describe('replica swap tests', () => {
         validating: true,
         syncmode: 'full',
         port: 30311,
+        wsport: 8544,
         rpcport: 8551,
       },
       {
@@ -260,18 +102,7 @@ describe('replica swap tests', () => {
   const numValidators = gethConfig.instances.filter((x) => x.validating).length
 
   const hooks: any = getHooks(gethConfig)
-
   let web3: Web3
-  let election: any
-  let stableToken: any
-  let sortedOracles: any
-  let epochRewards: any
-  let goldToken: any
-  let registry: any
-  let reserve: any
-  let validators: any
-  let accounts: any
-  let kit: ContractKit
 
   before(async function(this: any) {
     this.timeout(0)
@@ -287,25 +118,14 @@ describe('replica swap tests', () => {
   const restart = async () => {
     await hooks.restart()
     web3 = new Web3('http://localhost:8545')
-    // kit = newKitFromWeb3(web3)
-
-    // goldToken = await kit._web3Contracts.getGoldToken()
-    // stableToken = await kit._web3Contracts.getStableToken()
-    // sortedOracles = await kit._web3Contracts.getSortedOracles()
-    // validators = await kit._web3Contracts.getValidators()
-    // registry = await kit._web3Contracts.getRegistry()
-    // reserve = await kit._web3Contracts.getReserve()
-    // election = await kit._web3Contracts.getElection()
-    // epochRewards = await kit._web3Contracts.getEpochRewards()
-    // accounts = await kit._web3Contracts.getAccounts()
   }
 
   describe('replica behind single proxy', () => {
-    const blockNumbers: number[] = []
-
     let epoch: number
-    let validatorWeb3: Web3
-    let replicaWeb3: Web3
+    let blockCount = 0
+    let proxyRPC: RpcCaller
+    let validatoRPC: RpcCaller
+    let replicaRPC: RpcCaller
     const missed: any = []
 
     before(async function(this: any) {
@@ -335,46 +155,51 @@ describe('replica swap tests', () => {
       await initAndStartGeth(gethConfig, hooks.gethBinaryPath, replica, verbose)
       console.warn('Starting sync w/ replica')
       await waitToFinishInstanceSyncing(replica)
+      console.warn('Replica synced')
 
-      epoch = 10 // new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-      assert.equal(epoch, 10)
+      epoch = 20 // new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
 
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
+      console.warn('Got epoch transition')
 
       const validatorWSWeb3Url = 'ws://localhost:8544'
       const validatorWSWeb3 = new Web3(validatorWSWeb3Url)
-      const validatorKit = newKitFromWeb3(validatorWSWeb3)
 
-      const validatorRpc = 'http://localhost:8545'
-      validatorWeb3 = new Web3(validatorRpc)
-      const repplicaRpc = 'http://localhost:8555'
-      replicaWeb3 = new Web3(repplicaRpc)
-
-      const tmp: any = replicaWeb3
-      console.info(tmp)
-      tmp.extend({
-        property: 'istanbul',
-        methods: [{ name: 'getReplicaState', call: 'istanbul_replicaState' }],
-      })
-      console.info(tmp)
-      console.info(tmp.istanbul)
-      // tmp.istanbul.getReplicaState().then(console.log)
+      validatoRPC = new DefaultRpcCaller(new Web3.providers.HttpProvider('http://localhost:8545'))
+      proxyRPC = new DefaultRpcCaller(new Web3.providers.HttpProvider('http://localhost:8546'))
+      replicaRPC = new DefaultRpcCaller(new Web3.providers.HttpProvider('http://localhost:8555'))
 
       const handled: any = {}
       let errorMsg = ''
       let setSwap = false
       const recordNewBlock = async (header: BlockHeader) => {
         try {
-          if (!setSwap) {
-            // swap
-            setSwap = true
-          }
           if (handled[header.number]) {
             return
           }
+          if (!setSwap) {
+            const swapBlock = header.number + 40
+            console.warn(`Swapping validators at block ${swapBlock}`)
+            // tslint:disable-next-line: no-shadowed-variable
+            let resp = await replicaRPC.call(IstanbulManagement.startAtBlock, [swapBlock])
+            assert.equal(resp.error, null)
+            resp = await validatoRPC.call(IstanbulManagement.stopAtBlock, [swapBlock])
+            assert.equal(resp.error, null)
+            // Logging
+            // resp = (await validatoRPC.call(IstanbulManagement.replicaState,[])).result
+            // console.warn("validator: ")
+            // console.warn(resp)
+            // resp = (await replicaRPC.call(IstanbulManagement.replicaState,[])).result
+            // console.warn("replica: ")
+            // console.warn(resp)
+            // await sleep(2)
+            // resp = ((await replicaRPC.call(IstanbulManagement.valEnodeTableInfo,[])).result) as any
+            // console.warn(resp)
+            setSwap = true
+          }
           handled[header.number] = true
-          blockNumbers.push(header.number)
+          blockCount += 1
           const bitmap = parseBlockExtraData(header.extraData).parentAggregatedSeal.bitmap
           for (let i = 0; i < numValidators; i += 1) {
             if (!bitIsSet(bitmap, i)) {
@@ -387,27 +212,57 @@ describe('replica swap tests', () => {
         }
       }
 
-      const subscription = validatorKit.web3.eth.subscribe('newBlockHeaders')
+      // Wait for nodes to reliably sign blocks
+      await sleep(2 * epoch)
+      const subscription = validatorWSWeb3.eth.subscribe('newBlockHeaders')
       subscription.on('data', recordNewBlock)
 
-      // Wait for a few epochs while changing the validator set.
-      while (blockNumbers.length < 9000000) {
-        // Prepare for member swapping.
+      // Wait for a few epochs while rotating a validator.
+      while (blockCount < 80) {
+        console.warn(`Waiting. ${blockCount}/80`)
         await sleep(epoch)
       }
       ;(subscription as any).unsubscribe()
+      console.warn('Unsubscribed from block headers')
 
       // Wait for the current epoch to complete.
       await sleep(epoch)
       assert.equal(errorMsg, '')
+
+      // Grab is validating info before shutting down the nodes
+      // let resp = await replicaRPC.call(IstanbulManagement.replicaState,[])
+      // const tmp = resp.result
+      // resp = await validatoRPC.call(IstanbulManagement.replicaState,[])
+      // const tmp2 = resp.result
+      // console.warn("Got validating info")
+    })
+
+    it('replica is validating', async () => {
+      // const resp = ((await replicaRPC.call(IstanbulManagement.replicaState,[])).result) as any
+      // assert.isFalse(resp.isReplica)
+      const validating = (await replicaRPC.call(IstanbulManagement.validating, [])).result as any
+      assert.isTrue(validating)
+    })
+
+    it('primary is not validating', async () => {
+      // const resp = ((await validatoRPC.call(IstanbulManagement.replicaState,[])).result) as any
+      // assert.isTrue(resp.isReplica)
+      const validating = (await validatoRPC.call(IstanbulManagement.validating, [])).result as any
+      assert.isFalse(validating)
     })
 
     it('replica should have good val enode table', async () => {
-      // const tmp = replicaWeb3
+      const resp = (await replicaRPC.call(IstanbulManagement.valEnodeTableInfo, [])).result as any
+      Object.keys(resp).forEach((k) => {
+        const enode = resp[k].enode
+        assert.isTrue((enode || '') !== '')
+      })
     })
 
     it('proxy should be connected', async () => {
-      //
+      const resp = (await proxyRPC.call(IstanbulManagement.proxiedValidators, []))
+        .result as string[][]
+      assert.equal(resp.length, 2)
     })
 
     it('should switch without downtime', async () => {
