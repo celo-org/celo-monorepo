@@ -1,4 +1,3 @@
-// @ts-ignore *
 // tslint:disable: no-console
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
 /// <reference path="../../../contractkit/types/web3-celo.d.ts" />
@@ -153,15 +152,17 @@ describe('replica swap tests', () => {
       }
 
       await initAndStartGeth(gethConfig, hooks.gethBinaryPath, replica, verbose)
-      console.warn('Starting sync w/ replica')
+      if (verbose) {
+        console.info('Starting sync w/ replica')
+      }
       await waitToFinishInstanceSyncing(replica)
-      console.warn('Replica synced')
+      if (verbose) {
+        console.info('Replica synced')
+      }
 
-      epoch = 20 // new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-
+      epoch = 20
       // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
-      console.warn('Got epoch transition')
 
       const validatorWSWeb3Url = 'ws://localhost:8544'
       const validatorWSWeb3 = new Web3(validatorWSWeb3Url)
@@ -180,22 +181,14 @@ describe('replica swap tests', () => {
           }
           if (!setSwap) {
             const swapBlock = header.number + 40
-            console.warn(`Swapping validators at block ${swapBlock}`)
+            if (verbose) {
+              console.info(`Swapping validators at block ${swapBlock}`)
+            }
             // tslint:disable-next-line: no-shadowed-variable
             let resp = await replicaRPC.call(IstanbulManagement.startAtBlock, [swapBlock])
             assert.equal(resp.error, null)
             resp = await validatoRPC.call(IstanbulManagement.stopAtBlock, [swapBlock])
             assert.equal(resp.error, null)
-            // Logging
-            // resp = (await validatoRPC.call(IstanbulManagement.replicaState,[])).result
-            // console.warn("validator: ")
-            // console.warn(resp)
-            // resp = (await replicaRPC.call(IstanbulManagement.replicaState,[])).result
-            // console.warn("replica: ")
-            // console.warn(resp)
-            // await sleep(2)
-            // resp = ((await replicaRPC.call(IstanbulManagement.valEnodeTableInfo,[])).result) as any
-            // console.warn(resp)
             setSwap = true
           }
           handled[header.number] = true
@@ -219,34 +212,27 @@ describe('replica swap tests', () => {
 
       // Wait for a few epochs while rotating a validator.
       while (blockCount < 80) {
-        console.warn(`Waiting. ${blockCount}/80`)
+        if (verbose) {
+          console.info(`Waiting. ${blockCount}/80`)
+        }
         await sleep(epoch)
       }
       ;(subscription as any).unsubscribe()
-      console.warn('Unsubscribed from block headers')
+      if (verbose) {
+        console.info('Unsubscribed from block headers')
+      }
 
       // Wait for the current epoch to complete.
       await sleep(epoch)
       assert.equal(errorMsg, '')
-
-      // Grab is validating info before shutting down the nodes
-      // let resp = await replicaRPC.call(IstanbulManagement.replicaState,[])
-      // const tmp = resp.result
-      // resp = await validatoRPC.call(IstanbulManagement.replicaState,[])
-      // const tmp2 = resp.result
-      // console.warn("Got validating info")
     })
 
     it('replica is validating', async () => {
-      // const resp = ((await replicaRPC.call(IstanbulManagement.replicaState,[])).result) as any
-      // assert.isFalse(resp.isReplica)
       const validating = (await replicaRPC.call(IstanbulManagement.validating, [])).result as any
       assert.isTrue(validating)
     })
 
     it('primary is not validating', async () => {
-      // const resp = ((await validatoRPC.call(IstanbulManagement.replicaState,[])).result) as any
-      // assert.isTrue(resp.isReplica)
       const validating = (await validatoRPC.call(IstanbulManagement.validating, [])).result as any
       assert.isFalse(validating)
     })
