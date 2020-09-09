@@ -1,0 +1,26 @@
+{
+  "pageTitle": "Learn about Celo on Coinbase",
+  "description": "Learn about how the Celo community is creating an open, accessible, and mobile-first financial system.",
+  "mainTitle": "Mobile-first financial solutions",
+  "subTitle": "Empowering 6B mobile phone users worldwide with",
+  "adventure1": {
+    "title": "A Mobile-First Blockchain Platform",
+    "text": "Get updates on the Celo platform: news, technology, and community.",
+    "link": "Sign up"
+  },
+  "adventure2": {
+    "title": "Join the Celo community",
+    "text": "Join the live conversation and be a part of shaping the direction of the platform.",
+    "link": "Connect"
+  },
+  "adventure3": {
+    "title": "Send, receive, store cUSD",
+    "text": "Start sending and sharing value easily around the world with Valora.",
+    "link": "Get Valora"
+  },
+  "sequenceTitle": "Celo Lessons on Coinbase Earn",
+  "lesson1": "Lesson 1: What is the Celo Platform?",
+  "lesson2": "Lesson 2: What is CELO?",
+  "lesson3": "Lesson 3: What can Celo Dollars do?",
+  "minutes": "{{count}} minutes"
+}
