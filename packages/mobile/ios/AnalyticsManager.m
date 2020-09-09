@@ -9,10 +9,14 @@
 
 RCT_EXPORT_MODULE();
 
++ (BOOL)requiresMainQueueSetup
+{
+  return YES;
+}
+
 - (instancetype)init {
     if (self = [super init]) {
-        NSTimeInterval timeStamp = [[NSDate date] timeIntervalSince1970];
-        timeStampObj = [NSNumber numberWithDouble: timeStamp];
+      timeStampObj = [NSNumber numberWithLongLong:([[NSDate date] timeIntervalSince1970] * 1000)];
     }
     return self;
 }
@@ -23,7 +27,7 @@ RCT_EXPORT_MODULE();
 
 - (void)sendEvent {
   if (hasListeners) {
-    [self sendEventWithName:@"AppStartedLoading" body:@{@"reactInitTime": timeStampObj}];
+    [self sendEventWithName:@"AppStartedLoading" body:@{@"appStartedMillis": timeStampObj}];
   }
 }
 

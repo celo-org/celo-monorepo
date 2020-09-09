@@ -46,11 +46,6 @@ BigNumber.config({
   },
 })
 
-interface State {
-  reactInitTime?: number
-  reactLoadTime?: number
-}
-
 // Enables LayoutAnimation on Android. It makes transitions between states smoother.
 // https://reactnative.dev/docs/layoutanimation
 // Disabling it for now as it seems to cause blank white screens on certain android devices
@@ -68,36 +63,13 @@ function getEventEmitter() {
 }
 
 export class App extends React.Component {
-  state: State = {
-    reactInitTime: undefined,
-    reactLoadTime: undefined,
-  }
-
-  appStartListener = null
+  reactLoadTime = Date.now()
 
   async componentDidMount() {
     await ValoraAnalytics.init()
-    const { width, height } = Dimensions.get('window')
 
-    let reactLoadDuration
-    let appLoadDuration
-
-    if (this.state.reactInitTime && this.state.reactLoadTime) {
-      const appLoadedTime = Date.now()
-      reactLoadDuration = (this.state.reactLoadTime - this.state.reactInitTime) / 1000
-      appLoadDuration = (appLoadedTime - this.state.reactInitTime) / 1000
-    }
-
-    ValoraAnalytics.startSession(AppEvents.app_launched, {
-      deviceHeight: height,
-      deviceWidth: width,
-      reactLoadDuration,
-      appLoadDuration,
-    })
-
-    if (this.appStartListener) {
-      this.appStartListener.remove()
-    }
+    const appLoadedTime = Date.now()
+    this.getAppStartTimeFromNative(appLoadedTime)
 
     Linking.addEventListener('url', this.handleOpenURL)
   }
@@ -106,13 +78,26 @@ export class App extends React.Component {
     Linking.removeEventListener('url', this.handleOpenURL)
   }
 
-  componentWillMount() {
-    this.appStartListener = getEventEmitter().addListener('AppStartedLoading', (reactInitTime) => {
-      Logger.debug('AppStartedLoading', 'event: ' + reactInitTime)
-      this.setState({
-        reactInitTime: +reactInitTime,
-        reactLoadTime: Date.now(),
+  getAppStartTimeFromNative(appLoadedTime: number) {
+    const appStartListener = getEventEmitter().addListener('AppStartedLoading', (data) => {
+      const reactInitTime = data.appStartedMillis
+      const reactLoadDuration = (this.reactLoadTime - reactInitTime) / 1000
+      const appLoadDuration = (appLoadedTime - reactInitTime) / 1000
+      const { width, height } = Dimensions.get('window')
+
+      Logger.debug(
+        'AppStartedLoading',
+        `data: ${JSON.stringify(data)} reactLoad: ${reactLoadDuration} appLoad: ${appLoadDuration}`
+      )
+
+      ValoraAnalytics.startSession(AppEvents.app_launched, {
+        deviceHeight: height,
+        deviceWidth: width,
+        reactLoadDuration,
+        appLoadDuration,
       })
+
+      appStartListener.remove()
     })
   }
 

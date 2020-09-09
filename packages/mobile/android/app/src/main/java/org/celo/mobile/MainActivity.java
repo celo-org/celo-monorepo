@@ -62,9 +62,12 @@ public class MainActivity
 
   @Override
   public void onReactContextInitialized(ReactContext context) {
+    WritableMap params = Arguments.createMap();
+    params.putString("appStartedMillis", appStartedMillis);
+
     context
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("AppStartedLoading", "" + appStartedMillis);
+      .emit("AppStartedLoading", params);
   }
 
   @Override
