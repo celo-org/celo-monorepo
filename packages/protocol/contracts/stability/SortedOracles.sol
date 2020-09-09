@@ -2,21 +2,15 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "./interfaces/ISortedOracles.sol";
-import "../common/FixidityLib.sol";
-import "../common/Initializable.sol";
-pragma solidity ^0.5.3;
-
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
