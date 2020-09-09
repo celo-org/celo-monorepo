@@ -124,6 +124,7 @@ describe('replica swap tests', () => {
     let proxyRPC: RpcCaller
     let validatoRPC: RpcCaller
     let replicaRPC: RpcCaller
+    let swapBlock: number
     const missed: any = []
 
     before(async function(this: any) {
@@ -179,7 +180,7 @@ describe('replica swap tests', () => {
             return
           }
           if (!setSwap) {
-            const swapBlock = header.number + 40
+            swapBlock = header.number + 40
             if (verbose) {
               console.info(`Swapping validators at block ${swapBlock}`)
             }
@@ -253,6 +254,7 @@ describe('replica swap tests', () => {
     it('should switch without downtime', async () => {
       if (missed.length !== 0) {
         missed.forEach((x: any) => console.warn(`Validator idx ${x.idx} missed block ${x.num}`))
+        console.warn(`Val idx 0 should have switched on block ${swapBlock}`)
       }
       assert.equal(missed.length, 0)
     })
