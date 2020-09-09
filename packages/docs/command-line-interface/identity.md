@@ -1,5 +1,5 @@
 ---
-description: Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
+description: Interact with ODIS and the attestations service
 ---
 
 ## Commands
