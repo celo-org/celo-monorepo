@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { ActivityIndicator } from 'react-native'
 import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render, RenderAPI } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
@@ -190,7 +191,7 @@ describe('SendAmount', () => {
       enterAmount(tree, AMOUNT_VALID)
       fireEvent.press(tree.getByTestId('Review'))
 
-      expect(tree.getByTestId('loading/SendAmount')).toBeTruthy()
+      expect(tree.getByType(ActivityIndicator)).toBeTruthy()
 
       store = createMockStore({
         identity: {
