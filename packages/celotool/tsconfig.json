@@ -10,11 +10,7 @@
     "esModuleInterop": true,
     "paths": {
       "@google-cloud/monitoring": ["types/monitoring"]
-    },
-    "noFallthroughCasesInSwitch": false,
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
+    }
   },
   "include": ["src", "../contractkit/types"],
   "exclude": ["node_modules/"],
