@@ -20,6 +20,10 @@ export default class TestAttestationService extends BaseCommand {
       description: 'The phone number to send the test message to',
     }),
     message: oFlags.string({ required: true, description: 'The message of the SMS' }),
+    provider: oFlags.string({
+      required: false,
+      description: 'Test a specific provider (try "twilio" or "nexmo")',
+    }),
   }
 
   static examples = ['test-attestation-service --from 0x97f7333c51897469E8D98E7af8653aAb468050a3']
@@ -28,7 +32,7 @@ export default class TestAttestationService extends BaseCommand {
   async run() {
     const { flags } = this.parse(TestAttestationService)
     const address = flags.from
-    const { phoneNumber, message } = flags
+    const { phoneNumber, message, provider } = flags
 
     await newCheckBuilder(this, flags.from)
       .isSignerOrAccount()
@@ -73,7 +77,7 @@ export default class TestAttestationService extends BaseCommand {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phoneNumber, signature, message }),
+          body: JSON.stringify({ phoneNumber, signature, message, provider }),
         }
       )
 
