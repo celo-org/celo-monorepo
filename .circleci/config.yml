@@ -1041,6 +1041,10 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - end-to-end-geth-replica-test:
+          requires:
+            - lint-checks
+            - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
             - lint-checks
@@ -1068,6 +1072,7 @@ workflows:
             - end-to-end-geth-blockchain-parameters-test
             - end-to-end-geth-slashing-test
             - end-to-end-geth-governance-test
+            - end-to-end-geth-replica-test
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - phone-number-privacy-test
