@@ -4,7 +4,7 @@ import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
-import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
+import { eqAddress, isValidAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -250,6 +250,9 @@ class CheckBuilder {
         validators.meetsValidatorGroupBalanceRequirements(account)
       )
     )
+
+  isValidAddress = (address: Address) =>
+    this.addCheck(`${address} is a valid address`, () => isValidAddress(address))
 
   isNotAccount = (address: Address) =>
     this.addCheck(
