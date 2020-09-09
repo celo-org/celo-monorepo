@@ -199,33 +199,26 @@ contract MetaTransactionWallet is
    * @param destinations The address to which each transaction is to be sent.
    * @param values The CELO value to be sent with each transaction.
    * @param data The concatenated transaction data with their respective lengths <length+data>.
-   * @param dataLengths The length of each transaction's data.
    */
   function executeTransactions(
     address[] calldata destinations,
     uint256[] calldata values,
-    bytes calldata data,
-    uint256[] calldata dataLengths
+    bytes calldata data
   ) external {
-    require(
-      destinations.length == values.length && values.length == dataLengths.length,
-      "Input arrays must be same length"
-    );
+    require(destinations.length == values.length, "Input arrays must be same length");
+
     uint256 dataPosition = 0;
     for (uint256 i = 0; i < destinations.length; i++) {
-      require(
-        uint8(data[dataPosition]) == dataLengths[i],
-        "Data length must match specified length"
-      );
-
+      uint256 dataLength = uint256(uint8(data[dataPosition]));
       // dataPositions.add(1) accounts for preceding 1 byte signifying length of following data
       executeTransaction(
         destinations[i],
         values[i],
-        sliceData(data, dataPosition.add(1), dataLengths[i])
+        sliceData(data, dataPosition.add(1), dataLength)
       );
-      dataPosition = dataPosition.add(dataLengths[i].add(1));
+      dataPosition = dataPosition.add(dataLength).add(1);
     }
+    require(dataPosition == data.length, "data parameter length too large");
   }
 
   /**

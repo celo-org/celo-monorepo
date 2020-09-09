@@ -294,7 +294,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
         await web3.eth.sendTransaction({
           from: accounts[0],
           to: wallet.address,
-          value: value * 2,
+          value: value * 4,
         })
       })
 
@@ -313,7 +313,6 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                   })
                   .join('')
               ),
-              transactions.map((t) => trimLeading0x(t.data).length / 2),
               { from: signer }
             )
           })
@@ -344,8 +343,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                       return `${lengthHex}${transactionData}`
                     })
                     .join('')
-                ),
-                transactions.map((t) => trimLeading0x(t.data).length / 2)
+                )
               )
               .encodeABI()
             const digest = constructMetaTransactionExecutionDigest(wallet.address, {
@@ -371,7 +369,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
         })
 
-        describe('when lengths in length array do not match up with lengths in data', async () => {
+        describe('when data parameter has extra unused data appened to the end', async () => {
           it('reverts', async () => {
             await assertRevert(
               wallet.executeTransactions(
@@ -385,9 +383,8 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                       return `${lengthHex}${data}`
                     })
                     .join('')
+                    .concat('abc123')
                 ),
-                // take length without dividing by 2 (each byte is 2 characters) for invalid length mismatch
-                transactions.map((t) => trimLeading0x(t.data).length),
                 { from: signer }
               )
             )
