@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.13;
 
 contract IRegistryExtended {
   /* does not extend IRegistry to avoid overriding issues */
