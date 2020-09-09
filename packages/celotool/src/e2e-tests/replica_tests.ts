@@ -40,7 +40,6 @@ describe('replica swap tests', () => {
     migrate: false,
     runPath: TMP_PATH,
     verbosity: 4,
-    // migrateTo: 25,
     networkId: 1101,
     network: 'local',
     genesisConfig: {
