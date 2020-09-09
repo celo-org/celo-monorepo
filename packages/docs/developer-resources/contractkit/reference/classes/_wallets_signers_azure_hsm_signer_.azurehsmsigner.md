@@ -29,7 +29,7 @@ Signs the EVM transaction using an HSM key in Azure Key Vault
 
 \+ **new AzureHSMSigner**(`keyVaultClient`: [AzureKeyVaultClient](_utils_azure_key_vault_client_.azurekeyvaultclient.md), `keyName`: string): *[AzureHSMSigner](_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L12)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L12)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ Name | Type |
 
 ▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L60)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L60)*
 
 **Parameters:**
 
@@ -62,7 +62,7 @@ ___
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L56)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L56)*
 
 **Returns:** *string*
 
@@ -72,7 +72,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L38)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L38)*
 
 **Parameters:**
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **signTransaction**(`addToV`: number, `encodedTx`: [RLPEncodedTx](../interfaces/_utils_signing_utils_.rlpencodedtx.md)): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L22)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L22)*
 
 **Parameters:**
 

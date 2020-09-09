@@ -165,6 +165,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                         undefined,
                       ]
                     }
+                    testID="inviteCodeInput"
                     underlineColorAndroid="transparent"
                     value=""
                   />

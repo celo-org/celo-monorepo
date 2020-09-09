@@ -2,22 +2,40 @@
 
 ## Index
 
+### Enumerations
+
+* [SchemaErrorTypes](../enums/_identity_offchain_schema_utils_.schemaerrortypes.md)
+
 ### Classes
 
+* [InvalidDataError](../classes/_identity_offchain_schema_utils_.invaliddataerror.md)
+* [OffchainError](../classes/_identity_offchain_schema_utils_.offchainerror.md)
 * [SingleSchema](../classes/_identity_offchain_schema_utils_.singleschema.md)
+
+### Variables
+
+* [readWithSchema](_identity_offchain_schema_utils_.md#const-readwithschema)
 
 ### Functions
 
-* [readWithSchema](_identity_offchain_schema_utils_.md#const-readwithschema)
+* [readWithSchemaAsResult](_identity_offchain_schema_utils_.md#const-readwithschemaasresult)
 * [writeWithSchema](_identity_offchain_schema_utils_.md#const-writewithschema)
 
-## Functions
+## Variables
 
 ### `Const` readWithSchema
 
-▸ **readWithSchema**<**T**>(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹T›, `account`: [Address](_base_.md#address), `dataPath`: string): *Promise‹undefined | T›*
+• **readWithSchema**: *Object* = makeAsyncThrowable(readWithSchemaAsResult)
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L22)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L68)*
+
+## Functions
+
+### `Const` readWithSchemaAsResult
+
+▸ **readWithSchemaAsResult**<**T**>(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹T›, `account`: [Address](_base_.md#address), `dataPath`: string): *Promise‹Result‹T, SchemaErrors››*
+
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L44)*
 
 **Type parameters:**
 
@@ -32,7 +50,7 @@ Name | Type |
 `account` | [Address](_base_.md#address) |
 `dataPath` | string |
 
-**Returns:** *Promise‹undefined | T›*
+**Returns:** *Promise‹Result‹T, SchemaErrors››*
 
 ___
 
@@ -40,7 +58,7 @@ ___
 
 ▸ **writeWithSchema**<**T**>(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹T›, `dataPath`: string, `data`: T): *Promise‹void›*
 
-*Defined in [contractkit/src/identity/offchain/schema-utils.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L41)*
+*Defined in [packages/contractkit/src/identity/offchain/schema-utils.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/schema-utils.ts#L70)*
 
 **Type parameters:**
 
