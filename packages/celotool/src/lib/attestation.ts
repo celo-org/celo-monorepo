@@ -1,7 +1,7 @@
 import { Address, CeloTransactionParams } from '@celo/contractkit'
 import {
   ActionableAttestation,
-  AttestationsWrapper,
+  AttestationsWrapper
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -25,9 +25,9 @@ export async function requestMoreAttestations(
       .request(phoneNumber, attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))
   }
-
-  await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).sendAndWaitForReceipt(txParams)
+  
+  const selectIssuers = await attestations.selectIssuersAfterWait(phoneNumber, account)
+  await selectIssuers.sendAndWaitForReceipt(txParams)
 }
 
 type RequestAttestationError =
