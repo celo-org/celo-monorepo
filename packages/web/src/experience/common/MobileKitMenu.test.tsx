@@ -1,4 +1,4 @@
-import { getByTitle, render, fireEvent } from '@testing-library/react'
+import { fireEvent, getByTitle, render } from '@testing-library/react'
 
 import * as React from 'react'
 import MobileMenu from 'src/experience/common/MobileKitMenu'

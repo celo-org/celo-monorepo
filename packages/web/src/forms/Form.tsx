@@ -122,7 +122,6 @@ export default class Form extends React.Component<Props, State> {
   }
 
   updateForm = (key, value) => {
-    debugger
     this.setState((state) => ({
       ...state,
       isComplete: false,
