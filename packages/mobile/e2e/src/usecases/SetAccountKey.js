@@ -1,4 +1,4 @@
-import { enterPinUiIfNecessary } from '../utils/utils'
+import { enterPinUi } from '../utils/utils'
 
 export default SetAccountKey = () => {
   it('Go to the Account Key tab and set it up', async () => {
@@ -9,7 +9,7 @@ export default SetAccountKey = () => {
     await element(by.id('Hamburguer')).tap()
     await element(by.id('DrawerItem/Account Key')).tap()
 
-    await enterPinUiIfNecessary()
+    await enterPinUi()
 
     await element(by.id('SetUpAccountKey')).tap()
 

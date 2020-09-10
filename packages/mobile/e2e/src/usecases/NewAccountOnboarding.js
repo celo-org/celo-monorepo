@@ -22,7 +22,6 @@ export default NewAccountOnboarding = () => {
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
-
     await element(by.id('NameAndNumberContinueButton')).tap()
 
     // Set & Verify pin
