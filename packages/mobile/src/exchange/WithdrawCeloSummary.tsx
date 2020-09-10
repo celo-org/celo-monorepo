@@ -24,6 +24,7 @@ export default function WithdrawCeloSummary({
   recipientAddress,
 }: WithdrawCeloProps) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
+  // TODO: Estimate real fee.
   const fee = new BigNumber(0)
 
   return (
