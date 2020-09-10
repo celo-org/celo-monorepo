@@ -1,5 +1,5 @@
-import { OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { OdisUtils } from '@celo/contractkit-extenders'
+import { AuthSigner } from '@celo/contractkit-extenders/lib/identity/odis/query'
 import { flags as oFlags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
