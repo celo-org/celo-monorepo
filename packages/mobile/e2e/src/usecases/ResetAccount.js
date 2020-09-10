@@ -1,5 +1,5 @@
-import { enterPinUiIfNecessary } from './utils/utils'
-import { SAMPLE_BACKUP_KEY } from './utils/consts'
+import { enterPinUiIfNecessary } from '../utils/utils'
+import { SAMPLE_BACKUP_KEY } from '../utils/consts'
 
 export default ResetAccount = () => {
   it('Go to Settings, scroll to bottom and press the Reset Account button', async () => {

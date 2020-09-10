@@ -1,5 +1,5 @@
-import { enterPinUi, sleep, waitForElementId } from './utils/utils'
-import { SAMPLE_BACKUP_KEY } from './utils/consts'
+import { enterPinUi, sleep, waitForElementId } from '../utils/utils'
+import { SAMPLE_BACKUP_KEY } from '../utils/consts'
 
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'

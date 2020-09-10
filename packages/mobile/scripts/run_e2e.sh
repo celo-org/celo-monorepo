@@ -23,7 +23,8 @@ FAST=false
 RELEASE=false
 NET_DELAY="none"
 DEV_MODE=false
-while getopts 'p:frd' flag; do
+FILE_TO_RUN=""
+while getopts 'p:t:frd' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
@@ -31,6 +32,7 @@ while getopts 'p:frd' flag; do
     r) RELEASE=true ;;
     n) NET_DELAY="$OPTARG" ;;
     d) DEV_MODE=true ;;
+    t) FILE_TO_RUN=$OPTARG ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -80,16 +82,18 @@ preloadBundle() {
 runTest() {
   reuse_param=""
   if [[ $DEV_MODE == true ]]; then
+    export NUM_RETRIES=0
     reuse_param="--reuse"
   fi
   yarn detox test \
     --configuration $CONFIG_NAME \
+    "${FILE_TO_RUN}" \
     --artifacts-location e2e/artifacts \
     --take-screenshots=all \
     --record-logs=failing \
     --detectOpenHandles \
     --loglevel verbose \
-    "${reuse_param}"
+    "${reuse_param}" 
   TEST_STATUS=$?
 }
 

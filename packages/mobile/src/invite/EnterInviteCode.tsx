@@ -149,7 +149,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             {(insets) => (
               <View style={styles.container}>
                 <UseBackToWelcomeScreen backAnalyticsEvents={backAnalyticsEvents} />
-                <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
+                <DevSkipButton onSkip={this.onPressSkip} />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
                   contentContainerStyle={[
