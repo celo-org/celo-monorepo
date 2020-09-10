@@ -161,7 +161,13 @@ exports[`FiatExchange renders correctly 1`] = `
        global:celoDollars
     </Text>
   </View>
-  <View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  >
     <View
       style={
         Object {
@@ -243,5 +249,25 @@ exports[`FiatExchange renders correctly 1`] = `
       </View>
     </View>
   </View>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 16,
+        "lineHeight": 22,
+        "margin": 16,
+      }
+    }
+  >
+    <Text
+      onPress={[Function]}
+      style={
+        Object {
+          "textDecorationLine": "underline",
+        }
+      }
+    />
+  </Text>
 </RNCSafeAreaView>
 `;
