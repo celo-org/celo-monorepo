@@ -1,5 +1,5 @@
-import { enterPinUiIfNecessary, inputNumberKeypad } from './utils/utils'
-import { DEFAULT_RECIPIENT_ADDRESS } from './utils/consts'
+import { enterPinUiIfNecessary, inputNumberKeypad } from '../utils/utils'
+import { DEFAULT_RECIPIENT_ADDRESS } from '../utils/consts'
 
 const AMOUNT_TO_SEND = '0.1'
 const RANDOM_COMMENT = 'poker night winnings'

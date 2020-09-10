@@ -1,19 +1,13 @@
-import { enterPinUiIfNecessary, isElementVisible } from './utils/utils'
-import { DEFAULT_RECIPIENT_ADDRESS } from './utils/consts'
+import { enterPinUiIfNecessary } from '../utils/utils'
+import { DEFAULT_RECIPIENT_ADDRESS } from '../utils/consts'
+import { celoOnboarding } from '../utils/celoOnboarding'
 
 const CELO_TO_EXCHANGE = 1.1
 const CELO_TO_SEND = '0.001'
 
 export default ExchangeCelo = () => {
   it('Go to CELO screen and through onboarding', async () => {
-    await element(by.id('Hamburguer')).tap()
-    await element(by.id('DrawerItem/CELO')).tap()
-
-    if (await isElementVisible('Education/progressButton')) {
-      for (let i = 0; i < 4; i++) {
-        await element(by.id('Education/progressButton')).tap()
-      }
-    }
+    await celoOnboarding()
   })
 
   it('Buy CELO', async () => {

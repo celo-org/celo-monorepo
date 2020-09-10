@@ -1,5 +1,5 @@
-import { enterPinUiIfNecessary, waitForElementId, sleep } from './utils/utils'
-import { SAMPLE_BACKUP_KEY } from './utils/consts'
+import { enterPinUiIfNecessary, waitForElementId, sleep } from '../utils/utils'
+import { SAMPLE_BACKUP_KEY } from '../utils/consts'
 
 export default ResetAccount = () => {
   it('Reset Account by doing the Account Key quiz', async () => {
