@@ -53,7 +53,7 @@ Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US numb
 
 If you want to support a single Attestation Service from this account, under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
 
-If you want to support multiple Attestation Services from this account, say in a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. Enable the `Messages` features for each and assign a number to each.
+If you want to support multiple Attestation Services from this account, for example for a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number.
 
 Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
 
