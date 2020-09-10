@@ -60,7 +60,6 @@ export default React.memo(function EmailForm({
         const borderStyle = emailErrorStyle(formState.errors)
         const hasError = !!formState.apiError || !!formState.errors.length
         const errorKey = formState.apiError || ErrorKeys.email
-        console.log(`complete: ${formState.isComplete}`)
         const onChange = (newValue: string) => {
           onInput({ name: 'email', newValue })
         }
