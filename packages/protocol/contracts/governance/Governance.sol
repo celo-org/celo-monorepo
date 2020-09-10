@@ -505,8 +505,6 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
-    // and return false?
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
