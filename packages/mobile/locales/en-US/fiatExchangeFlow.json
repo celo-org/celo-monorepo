@@ -10,5 +10,6 @@
   "explanationModal": {
     "title": "About Providers",
     "body": "Providers allow you to add funds to or cash out from your account. They determine their own rates and restrictions depending on location, amount, and other factors. Please visit the provider website for specific help. Visit the FAQ to learn more."
-  }
+  },
+  "otherFundingOptions": "For more ways to add and withdraw funds, visit <0>How to fund your account</0>"
 }
