@@ -16,6 +16,7 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 # -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
 # -d (Optional): Run in dev mode, which doesn't rebuild or reinstall the app and doesn't restart the packager.
+# -t (Optional): Run a specific test file only.
 
 PLATFORM=""
 VD_NAME="Pixel_API_29_AOSP_x86_64"
