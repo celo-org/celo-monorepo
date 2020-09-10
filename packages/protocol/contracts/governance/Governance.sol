@@ -578,7 +578,6 @@ contract Governance is
     return true;
   }
 
-  // TODO(asa): Consider allowing approval to be revoked.
   // TODO(asa): Everywhere we use an index, require it's less than the array length
   /**
    * @notice Approves a proposal in the approval stage.
