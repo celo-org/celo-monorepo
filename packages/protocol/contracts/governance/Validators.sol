@@ -508,7 +508,9 @@ contract Validators is
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      IStableToken stableToken = IStableToken(registry.getAddressForOrDie(STABLETOKEN_REGISTRY_ID));
+      IStableToken stableToken = IStableToken(
+        registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)
+      );
       require(stableToken.mint(group, groupPayment), "mint failed to validator group");
       require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
