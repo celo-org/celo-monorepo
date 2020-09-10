@@ -100,6 +100,8 @@ contract StableToken is
    * @param registryAddress Address of the Registry contract.
    * @param inflationRate weekly inflation rate.
    * @param inflationFactorUpdatePeriod how often the inflation factor is updated.
+   * @param initialBalanceAddresses array of addresses with an initial balance.
+   * @param initialBalanceValues array of balance values corresponding to initialBalanceAddresses.
    */
   function initialize(
     string calldata _name,
@@ -402,6 +404,7 @@ contract StableToken is
 
   /**
    * @notice Returns the units for a given value given the current inflation factor.
+   * @param inflationFactor the current inflation factor.
    * @param value The value to convert to units.
    * @return The units corresponding to `value` given the current inflation factor.
    * @dev we assume any function calling this will have updated the inflation factor.
