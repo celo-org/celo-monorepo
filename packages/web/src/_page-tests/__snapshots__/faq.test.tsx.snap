@@ -32,6 +32,7 @@ exports[`FAQ renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -69,6 +70,7 @@ exports[`FAQ renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -101,6 +103,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -129,6 +132,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -164,6 +168,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -183,8 +188,6 @@ exports[`FAQ renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -194,7 +197,6 @@ exports[`FAQ renders 1`] = `
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="https://celo.org/"
             onClick={[Function]}
             role="link"
@@ -231,6 +233,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -259,6 +262,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -294,6 +298,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -323,6 +328,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -351,6 +357,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -386,6 +393,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -415,6 +423,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -443,6 +452,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -478,6 +488,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -507,6 +518,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -535,6 +547,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -570,6 +583,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -599,6 +613,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -627,6 +642,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -662,6 +678,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -691,6 +708,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -719,6 +737,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -754,6 +773,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -783,6 +803,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -811,6 +832,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -846,6 +868,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -875,6 +898,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -903,6 +927,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -938,6 +963,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -967,6 +993,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -995,6 +1022,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1030,6 +1058,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1059,6 +1088,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1087,6 +1117,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1122,6 +1153,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1151,6 +1183,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1179,6 +1212,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1214,6 +1248,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1243,6 +1278,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1271,6 +1307,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1306,6 +1343,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1335,6 +1373,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1363,6 +1402,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1398,6 +1438,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1417,8 +1458,6 @@ exports[`FAQ renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -1428,7 +1467,6 @@ exports[`FAQ renders 1`] = `
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="https://celo.org/privacy"
             onClick={[Function]}
             role="link"
@@ -1465,6 +1503,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1493,6 +1532,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1528,6 +1568,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1557,6 +1598,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1585,6 +1627,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1620,6 +1663,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1649,6 +1693,7 @@ exports[`FAQ renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1677,6 +1722,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1712,6 +1758,7 @@ exports[`FAQ renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1731,8 +1778,6 @@ exports[`FAQ renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -1742,7 +1787,6 @@ exports[`FAQ renders 1`] = `
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="mailto:community@celo.org"
             onClick={[Function]}
             role="link"

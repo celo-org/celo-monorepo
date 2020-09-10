@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
-import { onPress, TestProvider } from 'src/_page-tests/test-utils'
 import PhoneInput from 'src/fauceting/PhoneInput'
+import { TestProvider } from 'src/_page-tests/test-utils'
 
 describe('PhoneInput', () => {
   describe('on initial', () => {
@@ -35,7 +35,7 @@ describe('PhoneInput', () => {
       const suggestions = getAllByText(/United/)
       expect(suggestions.length).toBeGreaterThanOrEqual(1)
 
-      onPress(getByText('United Kingdom'))
+      fireEvent.click(getByText('United Kingdom'))
       expect(getByText('+44')).toBeTruthy()
 
       const phoneInput = getByPlaceholderText('Phone Number')

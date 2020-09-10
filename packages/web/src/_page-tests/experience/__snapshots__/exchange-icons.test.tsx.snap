@@ -3,6 +3,11 @@
 exports[`Experience/ExchangeIcons renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "isolation": "isolate",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
@@ -102,14 +107,9 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -118,7 +118,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     "WebkitBoxDirection": "normal",
                     "WebkitBoxOrient": "horizontal",
                     "WebkitFlexDirection": "row",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "alignContent": "center",
@@ -129,7 +129,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -172,14 +172,9 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -188,7 +183,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     "WebkitBoxDirection": "normal",
                     "WebkitBoxOrient": "horizontal",
                     "WebkitFlexDirection": "row",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "alignContent": "center",
@@ -199,7 +194,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -209,6 +204,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -290,8 +286,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -401,8 +395,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -480,8 +472,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -548,6 +538,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -592,8 +583,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -690,8 +679,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -788,8 +775,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -886,8 +871,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -984,8 +967,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1082,8 +1063,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1163,8 +1142,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1244,8 +1221,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1394,7 +1369,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                   aria-level="1"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
-                  id="test"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -1422,6 +1397,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     aria-level="3"
                     className="css-reset-4rbku5 css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     role="heading"
                     style={
                       Object {
@@ -1445,8 +1421,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1509,6 +1483,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1528,6 +1503,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1549,8 +1525,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1560,7 +1534,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="/code-of-conduct"
                   onClick={[Function]}
                   role="link"
@@ -1585,8 +1558,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1596,7 +1567,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="/brand-policy"
                   onClick={[Function]}
                   role="link"
@@ -1730,7 +1700,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                   style={
                                     Object {
                                       "backgroundColor": "rgba(0,0,0,0.00)",
-                                      "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-color-f.svg\\")",
                                       "backgroundPosition": "center",
                                       "backgroundRepeat": "no-repeat",
                                       "backgroundSize": "contain",
@@ -1744,12 +1713,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                       "zIndex": -1,
                                     }
                                   }
-                                />
-                                <img
-                                  alt="Preview of cUSD Exchange Icon"
-                                  className="css-accessibilityImage-9pa8cd"
-                                  draggable={false}
-                                  src="/images/marketplace-icons/icon-celo-dollar-color-f.svg"
                                 />
                               </div>
                             </div>
@@ -1775,6 +1738,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -1793,6 +1757,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -1814,8 +1779,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           onMouseEnter={[Function]}
                           onMouseLeave={[Function]}
                           onMouseUp={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderRelease={[Function]}
                         >
                           <a
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1997,7 +1960,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                   style={
                                     Object {
                                       "backgroundColor": "rgba(0,0,0,0.00)",
-                                      "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-CELO-color-f.svg\\")",
                                       "backgroundPosition": "center",
                                       "backgroundRepeat": "no-repeat",
                                       "backgroundSize": "contain",
@@ -2011,12 +1973,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                       "zIndex": -1,
                                     }
                                   }
-                                />
-                                <img
-                                  alt="Preview of CELO Exchange Icon"
-                                  className="css-accessibilityImage-9pa8cd"
-                                  draggable={false}
-                                  src="/images/marketplace-icons/icon-celo-CELO-color-f.svg"
                                 />
                               </div>
                             </div>
@@ -2042,6 +1998,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2060,6 +2017,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2081,8 +2039,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           onMouseEnter={[Function]}
                           onMouseLeave={[Function]}
                           onMouseUp={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderRelease={[Function]}
                         >
                           <a
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2274,7 +2230,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                   style={
                                     Object {
                                       "backgroundColor": "rgba(0,0,0,0.00)",
-                                      "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-mono-f.svg\\")",
                                       "backgroundPosition": "center",
                                       "backgroundRepeat": "no-repeat",
                                       "backgroundSize": "contain",
@@ -2288,12 +2243,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                       "zIndex": -1,
                                     }
                                   }
-                                />
-                                <img
-                                  alt="Preview of cUSD Exchange Icon"
-                                  className="css-accessibilityImage-9pa8cd"
-                                  draggable={false}
-                                  src="/images/marketplace-icons/icon-celo-dollar-mono-f.svg"
                                 />
                               </div>
                             </div>
@@ -2319,6 +2268,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2337,6 +2287,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2358,8 +2309,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           onMouseEnter={[Function]}
                           onMouseLeave={[Function]}
                           onMouseUp={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderRelease={[Function]}
                         >
                           <a
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2542,7 +2491,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                   style={
                                     Object {
                                       "backgroundColor": "rgba(0,0,0,0.00)",
-                                      "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-CELO-mono-f.svg\\")",
                                       "backgroundPosition": "center",
                                       "backgroundRepeat": "no-repeat",
                                       "backgroundSize": "contain",
@@ -2556,12 +2504,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                       "zIndex": -1,
                                     }
                                   }
-                                />
-                                <img
-                                  alt="Preview of CELO Exchange Icon"
-                                  className="css-accessibilityImage-9pa8cd"
-                                  draggable={false}
-                                  src="/images/marketplace-icons/icon-celo-CELO-mono-f.svg"
                                 />
                               </div>
                             </div>
@@ -2587,6 +2529,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2605,6 +2548,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2626,8 +2570,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           onMouseEnter={[Function]}
                           onMouseLeave={[Function]}
                           onMouseUp={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderRelease={[Function]}
                         >
                           <a
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2810,7 +2752,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                   style={
                                     Object {
                                       "backgroundColor": "rgba(0,0,0,0.00)",
-                                      "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-reverse-f.svg\\")",
                                       "backgroundPosition": "center",
                                       "backgroundRepeat": "no-repeat",
                                       "backgroundSize": "contain",
@@ -2824,12 +2765,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                       "zIndex": -1,
                                     }
                                   }
-                                />
-                                <img
-                                  alt="Preview of cUSD Exchange Icon"
-                                  className="css-accessibilityImage-9pa8cd"
-                                  draggable={false}
-                                  src="/images/marketplace-icons/icon-celo-dollar-reverse-f.svg"
                                 />
                               </div>
                             </div>
@@ -2855,6 +2790,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2873,6 +2809,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -2894,8 +2831,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           onMouseEnter={[Function]}
                           onMouseLeave={[Function]}
                           onMouseUp={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderRelease={[Function]}
                         >
                           <a
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3078,7 +3013,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                   style={
                                     Object {
                                       "backgroundColor": "rgba(0,0,0,0.00)",
-                                      "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-CELO-reverse-f.svg\\")",
                                       "backgroundPosition": "center",
                                       "backgroundRepeat": "no-repeat",
                                       "backgroundSize": "contain",
@@ -3092,12 +3026,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                                       "zIndex": -1,
                                     }
                                   }
-                                />
-                                <img
-                                  alt="Preview of CELO Exchange Icon"
-                                  className="css-accessibilityImage-9pa8cd"
-                                  draggable={false}
-                                  src="/images/marketplace-icons/icon-celo-CELO-reverse-f.svg"
                                 />
                               </div>
                             </div>
@@ -3123,6 +3051,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -3141,6 +3070,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           <div
                             className="css-text-901oao"
                             dir="auto"
+                            onClick={[Function]}
                             style={
                               Object {
                                 "color": "rgba(46,51,56,1.00)",
@@ -3162,8 +3092,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                           onMouseEnter={[Function]}
                           onMouseLeave={[Function]}
                           onMouseUp={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderRelease={[Function]}
                         >
                           <a
                             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3286,6 +3214,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3356,6 +3285,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3374,6 +3304,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3394,8 +3325,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -3405,7 +3334,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                 data-focusable={true}
-                dir="auto"
                 href="/terms"
                 onClick={[Function]}
                 role="link"
@@ -3473,6 +3401,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3503,8 +3432,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3556,8 +3483,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3609,8 +3534,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3662,8 +3585,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3715,8 +3636,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3768,8 +3687,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3821,8 +3738,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3871,6 +3786,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3901,8 +3817,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3954,8 +3868,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4007,8 +3919,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4060,8 +3970,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4110,6 +4018,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -4140,8 +4049,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4193,8 +4100,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4246,8 +4151,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4299,8 +4202,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4352,8 +4253,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4405,8 +4304,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4458,8 +4355,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4511,8 +4406,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4561,6 +4454,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -4591,8 +4485,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4682,8 +4574,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4763,8 +4653,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4842,8 +4730,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4921,8 +4807,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -5002,8 +4886,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -5081,8 +4963,6 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -5161,6 +5041,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -5206,6 +5087,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",

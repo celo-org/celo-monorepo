@@ -91,18 +91,13 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
-          style={
-            Object {
-              "color": "rgba(255,255,255,1.00)",
-              "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            }
-          }
+          onClick={[Function]}
         >
           Pin
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -110,8 +105,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -138,9 +131,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -149,10 +143,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Name
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -179,7 +174,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -187,8 +182,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -217,9 +210,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -228,10 +222,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Elected/ Total
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -258,7 +253,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -266,8 +261,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -296,9 +289,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -307,10 +301,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Votes Available
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -337,7 +332,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -345,8 +340,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -375,9 +368,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -386,10 +380,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Votes
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -416,7 +411,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -424,8 +419,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -454,9 +447,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -465,10 +459,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Votes Available
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -495,7 +490,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -503,8 +498,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -533,9 +526,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -544,10 +538,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Locked Celo Gold
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -574,7 +569,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -582,8 +577,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -612,9 +605,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -623,10 +617,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Group Share
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -653,7 +648,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -661,8 +656,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -691,9 +684,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -702,10 +696,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Voter Rewards
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -732,7 +727,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -740,8 +735,6 @@ exports[`ValidatorsList renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -770,9 +763,10 @@ exports[`ValidatorsList renders 1`] = `
           }
         }
       >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -781,10 +775,11 @@ exports[`ValidatorsList renders 1`] = `
           }
         >
           Attestation
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
+        </div>
+        <div
+          className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(255,255,255,1.00)",
@@ -811,7 +806,7 @@ exports[`ValidatorsList renders 1`] = `
               style={Object {}}
             />
           </svg>
-        </span>
+        </div>
       </div>
     </div>
     <div
@@ -920,9 +915,10 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxFlex": 0,
@@ -960,10 +956,11 @@ exports[`ValidatorsList renders 1`] = `
                   style={Object {}}
                 />
               </svg>
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxDirection": "normal",
@@ -979,7 +976,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitAlignItems": "center",
@@ -999,8 +996,8 @@ exports[`ValidatorsList renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
                   data-focusable={true}
-                  dir="auto"
                   href="https://explorer.celo.org/address/0xbcff1270b8aa83232b6d7113144557dfac93b591/celo"
+                  onClick={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -1041,7 +1038,7 @@ exports[`ValidatorsList renders 1`] = `
               />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
@@ -1060,7 +1057,7 @@ exports[`ValidatorsList renders 1`] = `
               >
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(171,173,175,1.00)",
@@ -1084,7 +1081,7 @@ exports[`ValidatorsList renders 1`] = `
                 >
                   <span
                     className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(171,173,175,1.00)",
@@ -1112,11 +1109,12 @@ exports[`ValidatorsList renders 1`] = `
                   </span>
                 </div>
               </span>
-            </span>
+            </div>
           </div>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1139,10 +1137,11 @@ exports[`ValidatorsList renders 1`] = `
             0
             /
             5
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406"
+          </div>
+          <div
+            className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -1169,7 +1168,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1185,7 +1184,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1195,7 +1194,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(171,173,175,1.00)",
@@ -1408,10 +1407,11 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1438,10 +1438,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             0
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1468,10 +1469,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             3.8
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1492,10 +1494,11 @@ exports[`ValidatorsList renders 1`] = `
             }
           >
             92,308
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1517,10 +1520,11 @@ exports[`ValidatorsList renders 1`] = `
           >
             10
             %
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1542,7 +1546,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1554,7 +1558,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1570,7 +1574,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "backgroundColor": "rgba(251,124,109,1.00)",
@@ -1587,10 +1591,11 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1612,7 +1617,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             0.0
             %
-          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -1722,9 +1727,10 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxFlex": 0,
@@ -1762,10 +1768,11 @@ exports[`ValidatorsList renders 1`] = `
                   style={Object {}}
                 />
               </svg>
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxDirection": "normal",
@@ -1781,7 +1788,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitAlignItems": "center",
@@ -1801,8 +1808,8 @@ exports[`ValidatorsList renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
                   data-focusable={true}
-                  dir="auto"
                   href="https://explorer.celo.org/address/0x4f584db9ec38df930185df315d941d42b3186b9f/celo"
+                  onClick={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -1843,7 +1850,7 @@ exports[`ValidatorsList renders 1`] = `
               />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
@@ -1862,7 +1869,7 @@ exports[`ValidatorsList renders 1`] = `
               >
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(171,173,175,1.00)",
@@ -1886,7 +1893,7 @@ exports[`ValidatorsList renders 1`] = `
                 >
                   <span
                     className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(171,173,175,1.00)",
@@ -1914,11 +1921,12 @@ exports[`ValidatorsList renders 1`] = `
                   </span>
                 </div>
               </span>
-            </span>
+            </div>
           </div>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -1941,10 +1949,11 @@ exports[`ValidatorsList renders 1`] = `
             0
             /
             0
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406"
+          </div>
+          <div
+            className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -1971,7 +1980,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1987,7 +1996,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1997,7 +2006,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(171,173,175,1.00)",
@@ -2210,10 +2219,11 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2240,10 +2250,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             50.0
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2270,10 +2281,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             2.5
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2294,10 +2306,11 @@ exports[`ValidatorsList renders 1`] = `
             }
           >
             10,000
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2319,10 +2332,11 @@ exports[`ValidatorsList renders 1`] = `
           >
             10
             %
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2344,7 +2358,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2356,7 +2370,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2372,7 +2386,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "backgroundColor": "rgba(251,124,109,1.00)",
@@ -2389,10 +2403,11 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2414,7 +2429,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             0.0
             %
-          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -2524,9 +2539,10 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxFlex": 0,
@@ -2564,10 +2580,11 @@ exports[`ValidatorsList renders 1`] = `
                   style={Object {}}
                 />
               </svg>
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxDirection": "normal",
@@ -2583,7 +2600,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitAlignItems": "center",
@@ -2603,8 +2620,8 @@ exports[`ValidatorsList renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
                   data-focusable={true}
-                  dir="auto"
                   href="https://explorer.celo.org/address/0x57b191f75159f861bae27099391dfae88564b737/celo"
+                  onClick={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -2645,7 +2662,7 @@ exports[`ValidatorsList renders 1`] = `
               />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
@@ -2664,7 +2681,7 @@ exports[`ValidatorsList renders 1`] = `
               >
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(171,173,175,1.00)",
@@ -2688,7 +2705,7 @@ exports[`ValidatorsList renders 1`] = `
                 >
                   <span
                     className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(171,173,175,1.00)",
@@ -2716,11 +2733,12 @@ exports[`ValidatorsList renders 1`] = `
                   </span>
                 </div>
               </span>
-            </span>
+            </div>
           </div>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -2743,10 +2761,11 @@ exports[`ValidatorsList renders 1`] = `
             1
             /
             0
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406"
+          </div>
+          <div
+            className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -2773,7 +2792,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2789,7 +2808,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2799,7 +2818,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(171,173,175,1.00)",
@@ -3012,10 +3031,11 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3042,10 +3062,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             50.0
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3072,10 +3093,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             3.0
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3096,10 +3118,11 @@ exports[`ValidatorsList renders 1`] = `
             }
           >
             12,038
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3121,10 +3144,11 @@ exports[`ValidatorsList renders 1`] = `
           >
             10
             %
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3146,7 +3170,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3158,7 +3182,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3174,7 +3198,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "backgroundColor": "rgba(251,124,109,1.00)",
@@ -3191,10 +3215,11 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3216,7 +3241,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             0.0
             %
-          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -3326,9 +3351,10 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxFlex": 0,
@@ -3366,10 +3392,11 @@ exports[`ValidatorsList renders 1`] = `
                   style={Object {}}
                 />
               </svg>
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxDirection": "normal",
@@ -3385,7 +3412,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitAlignItems": "center",
@@ -3405,8 +3432,8 @@ exports[`ValidatorsList renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
                   data-focusable={true}
-                  dir="auto"
                   href="https://explorer.celo.org/address/0x7a914a1b9a025eca6a2c06936c94101184741ea2/celo"
+                  onClick={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -3447,7 +3474,7 @@ exports[`ValidatorsList renders 1`] = `
               />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
@@ -3466,7 +3493,7 @@ exports[`ValidatorsList renders 1`] = `
               >
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(171,173,175,1.00)",
@@ -3490,7 +3517,7 @@ exports[`ValidatorsList renders 1`] = `
                 >
                   <span
                     className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(171,173,175,1.00)",
@@ -3518,11 +3545,12 @@ exports[`ValidatorsList renders 1`] = `
                   </span>
                 </div>
               </span>
-            </span>
+            </div>
           </div>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3545,10 +3573,11 @@ exports[`ValidatorsList renders 1`] = `
             0
             /
             0
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406"
+          </div>
+          <div
+            className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -3575,7 +3604,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3591,7 +3620,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3601,7 +3630,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(171,173,175,1.00)",
@@ -3814,10 +3843,11 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3844,10 +3874,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             100.0
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3874,10 +3905,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             94.9
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3898,10 +3930,11 @@ exports[`ValidatorsList renders 1`] = `
             }
           >
             380,210
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3923,10 +3956,11 @@ exports[`ValidatorsList renders 1`] = `
           >
             50
             %
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -3948,7 +3982,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3960,7 +3994,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3976,7 +4010,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "backgroundColor": "rgba(251,124,109,1.00)",
@@ -3993,10 +4027,11 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4018,7 +4053,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             0.0
             %
-          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -4128,9 +4163,10 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxFlex": 0,
@@ -4168,10 +4204,11 @@ exports[`ValidatorsList renders 1`] = `
                   style={Object {}}
                 />
               </svg>
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxDirection": "normal",
@@ -4187,7 +4224,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitAlignItems": "center",
@@ -4207,8 +4244,8 @@ exports[`ValidatorsList renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
                   data-focusable={true}
-                  dir="auto"
                   href="https://explorer.celo.org/address/0x44e11b8eb591a5b8b0cf4db6b02ad60e6ed89a62/celo"
+                  onClick={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -4249,7 +4286,7 @@ exports[`ValidatorsList renders 1`] = `
               />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
@@ -4268,7 +4305,7 @@ exports[`ValidatorsList renders 1`] = `
               >
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(171,173,175,1.00)",
@@ -4292,7 +4329,7 @@ exports[`ValidatorsList renders 1`] = `
                 >
                   <span
                     className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(171,173,175,1.00)",
@@ -4320,11 +4357,12 @@ exports[`ValidatorsList renders 1`] = `
                   </span>
                 </div>
               </span>
-            </span>
+            </div>
           </div>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4347,10 +4385,11 @@ exports[`ValidatorsList renders 1`] = `
             0
             /
             0
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406"
+          </div>
+          <div
+            className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -4377,7 +4416,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -4393,7 +4432,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -4403,7 +4442,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(171,173,175,1.00)",
@@ -4616,10 +4655,11 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4646,10 +4686,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             50.0
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4676,10 +4717,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             2.5
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4700,10 +4742,11 @@ exports[`ValidatorsList renders 1`] = `
             }
           >
             9,988
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4725,10 +4768,11 @@ exports[`ValidatorsList renders 1`] = `
           >
             10
             %
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4750,7 +4794,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -4762,7 +4806,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -4778,7 +4822,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "backgroundColor": "rgba(251,124,109,1.00)",
@@ -4795,10 +4839,11 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -4820,7 +4865,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             0.0
             %
-          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -4930,9 +4975,10 @@ exports[`ValidatorsList renders 1`] = `
               }
             }
           >
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxFlex": 0,
@@ -4970,10 +5016,11 @@ exports[`ValidatorsList renders 1`] = `
                   style={Object {}}
                 />
               </svg>
-            </span>
-            <span
-              className="css-text-901oao css-textHasAncestor-16my406"
+            </div>
+            <div
+              className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitBoxDirection": "normal",
@@ -4989,7 +5036,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitAlignItems": "center",
@@ -5009,8 +5056,8 @@ exports[`ValidatorsList renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
                   data-focusable={true}
-                  dir="auto"
                   href="https://explorer.celo.org/address/0x439d4647515c2007aa916453e7c1105462e19f50/celo"
+                  onClick={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -5051,7 +5098,7 @@ exports[`ValidatorsList renders 1`] = `
               />
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
@@ -5070,7 +5117,7 @@ exports[`ValidatorsList renders 1`] = `
               >
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(171,173,175,1.00)",
@@ -5094,7 +5141,7 @@ exports[`ValidatorsList renders 1`] = `
                 >
                   <span
                     className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(171,173,175,1.00)",
@@ -5122,11 +5169,12 @@ exports[`ValidatorsList renders 1`] = `
                   </span>
                 </div>
               </span>
-            </span>
+            </div>
           </div>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5149,10 +5197,11 @@ exports[`ValidatorsList renders 1`] = `
             0
             /
             1
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406"
+          </div>
+          <div
+            className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -5179,7 +5228,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -5195,7 +5244,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -5205,7 +5254,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(171,173,175,1.00)",
@@ -5418,10 +5467,11 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5448,10 +5498,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             22.5
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+          </div>
+          <div
+            className="css-text-901oao css-textMultiLine-cens5h"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5478,10 +5529,11 @@ exports[`ValidatorsList renders 1`] = `
             (
             1.2
             %)
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5502,10 +5554,11 @@ exports[`ValidatorsList renders 1`] = `
             }
           >
             10,000
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5527,10 +5580,11 @@ exports[`ValidatorsList renders 1`] = `
           >
             10
             %
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5552,7 +5606,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -5564,7 +5618,7 @@ exports[`ValidatorsList renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -5580,7 +5634,7 @@ exports[`ValidatorsList renders 1`] = `
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "backgroundColor": "rgba(251,124,109,1.00)",
@@ -5597,10 +5651,11 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+          </div>
+          <div
+            className="css-text-901oao css-textOneLine-bfa6kz"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitBoxFlex": 0,
@@ -5622,7 +5677,7 @@ exports[`ValidatorsList renders 1`] = `
           >
             0.0
             %
-          </span>
+          </div>
         </div>
       </div>
     </div>

@@ -60,6 +60,11 @@ export default React.memo(function EmailForm({
         const borderStyle = emailErrorStyle(formState.errors)
         const hasError = !!formState.apiError || !!formState.errors.length
         const errorKey = formState.apiError || ErrorKeys.email
+        console.log(`complete: ${formState.isComplete}`)
+        const onChange = (newValue: string) => {
+          onInput({ name: 'email', newValue })
+        }
+
         return (
           <Responsive large={styles.container}>
             <View style={styles.mobileContainer}>
@@ -71,7 +76,7 @@ export default React.memo(function EmailForm({
                   focusStyle={
                     isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused
                   }
-                  onChange={onInput}
+                  onChangeText={onChange}
                   placeholder={placeholder || t('common:email') + '*'}
                   placeholderTextColor={
                     isDarkMode ? colors.placeholderDarkMode : colors.placeholderGray

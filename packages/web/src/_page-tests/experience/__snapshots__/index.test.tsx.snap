@@ -3,6 +3,11 @@
 exports[`Experience/Brandkit renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "isolation": "isolate",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
@@ -102,14 +107,9 @@ exports[`Experience/Brandkit renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -118,7 +118,7 @@ exports[`Experience/Brandkit renders 1`] = `
                     "WebkitBoxDirection": "normal",
                     "WebkitBoxOrient": "horizontal",
                     "WebkitFlexDirection": "row",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "alignContent": "center",
@@ -129,7 +129,7 @@ exports[`Experience/Brandkit renders 1`] = `
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -172,14 +172,9 @@ exports[`Experience/Brandkit renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -188,7 +183,7 @@ exports[`Experience/Brandkit renders 1`] = `
                     "WebkitBoxDirection": "normal",
                     "WebkitBoxOrient": "horizontal",
                     "WebkitFlexDirection": "row",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "alignContent": "center",
@@ -199,7 +194,7 @@ exports[`Experience/Brandkit renders 1`] = `
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -209,6 +204,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -290,8 +286,6 @@ exports[`Experience/Brandkit renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -401,8 +395,6 @@ exports[`Experience/Brandkit renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -480,8 +472,6 @@ exports[`Experience/Brandkit renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -548,6 +538,7 @@ exports[`Experience/Brandkit renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -592,8 +583,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -690,8 +679,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -788,8 +775,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -886,8 +871,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -984,8 +967,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1082,8 +1063,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1163,8 +1142,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1244,8 +1221,6 @@ exports[`Experience/Brandkit renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1384,6 +1359,7 @@ exports[`Experience/Brandkit renders 1`] = `
               aria-level="1"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1403,6 +1379,7 @@ exports[`Experience/Brandkit renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1421,6 +1398,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1438,6 +1416,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1456,8 +1435,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1467,7 +1444,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="/code-of-conduct"
                   onClick={[Function]}
                   role="link"
@@ -1489,6 +1465,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1507,6 +1484,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1532,7 +1510,7 @@ exports[`Experience/Brandkit renders 1`] = `
               >
                 <li
                   className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   role="listitem"
                   style={
                     Object {
@@ -1549,7 +1527,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 />
                 <li
                   className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   role="listitem"
                   style={
                     Object {
@@ -1595,6 +1573,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 aria-level="2"
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="heading"
                 style={
                   Object {
@@ -1613,6 +1592,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1630,8 +1610,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1641,7 +1619,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="https://docs.google.com/document/d/1Y1mfpBGad_8ZxSuIqwX52MWGEMfoWGt5HXc7sZp9h70/edit?usp=sharing"
                   onClick={[Function]}
                   rel=" noopener noreferrer"
@@ -1690,6 +1667,7 @@ exports[`Experience/Brandkit renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1760,6 +1738,7 @@ exports[`Experience/Brandkit renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -1778,6 +1757,7 @@ exports[`Experience/Brandkit renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -1798,8 +1778,6 @@ exports[`Experience/Brandkit renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1809,7 +1787,6 @@ exports[`Experience/Brandkit renders 1`] = `
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                 data-focusable={true}
-                dir="auto"
                 href="/terms"
                 onClick={[Function]}
                 role="link"
@@ -1877,6 +1854,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1907,8 +1885,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1960,8 +1936,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2013,8 +1987,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2066,8 +2038,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2119,8 +2089,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2172,8 +2140,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2225,8 +2191,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2275,6 +2239,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2305,8 +2270,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2358,8 +2321,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2411,8 +2372,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2464,8 +2423,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2514,6 +2471,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2544,8 +2502,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2597,8 +2553,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2650,8 +2604,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2703,8 +2655,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2756,8 +2706,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2809,8 +2757,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2862,8 +2808,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2915,8 +2859,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2965,6 +2907,7 @@ exports[`Experience/Brandkit renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2995,8 +2938,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3086,8 +3027,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3167,8 +3106,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3246,8 +3183,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3325,8 +3260,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3406,8 +3339,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3485,8 +3416,6 @@ exports[`Experience/Brandkit renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3565,6 +3494,7 @@ exports[`Experience/Brandkit renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3610,6 +3540,7 @@ exports[`Experience/Brandkit renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",

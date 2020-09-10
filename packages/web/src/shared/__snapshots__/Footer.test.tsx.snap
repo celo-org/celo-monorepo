@@ -24,6 +24,7 @@ Array [
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -80,7 +81,6 @@ Array [
           style={
             Object {
               "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
               "backgroundPosition": "center",
               "backgroundRepeat": "no-repeat",
               "backgroundSize": "contain",
@@ -95,16 +95,11 @@ Array [
             }
           }
         />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
       </div>
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -135,19 +130,16 @@ Array [
           autoCapitalize="sentences"
           autoComplete="on"
           autoCorrect="on"
-          className="css-textinput-1cwyjr8 r-placeholderTextColor-tf24u1"
+          className="css-textinput-11aywtz r-placeholderTextColor-tf24u1"
           data-focusable={true}
           dir="auto"
-          name="email"
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
           onKeyDown={[Function]}
-          onKeyPress={[Function]}
           onSelect={[Function]}
           placeholder="Email*"
           readOnly={false}
-          required={true}
           spellCheck={true}
           style={
             Object {
@@ -212,6 +204,7 @@ Array [
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "MozTransitionProperty": "opacity",
@@ -240,13 +233,12 @@ Array [
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
+            onClick={[Function]}
             role="link"
             style={
               Object {
@@ -333,6 +325,7 @@ Array [
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "MozTransitionProperty": "opacity",
@@ -367,7 +360,7 @@ Array [
             </svg>
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "marginLeft": "10px",
@@ -395,6 +388,7 @@ Array [
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -465,6 +459,7 @@ Array [
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -483,6 +478,7 @@ Array [
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -504,8 +500,6 @@ Array [
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "display": "inline",
@@ -515,7 +509,6 @@ Array [
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
               data-focusable={true}
-              dir="auto"
               href="/terms"
               onClick={[Function]}
               role="link"
@@ -583,6 +576,7 @@ Array [
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -613,8 +607,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -666,8 +658,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -719,8 +709,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -772,8 +760,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -825,8 +811,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -878,8 +862,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -931,8 +913,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -981,6 +961,7 @@ Array [
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -1011,8 +992,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1064,8 +1043,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1117,8 +1094,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1170,8 +1145,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1220,6 +1193,7 @@ Array [
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -1250,8 +1224,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1303,8 +1275,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1356,8 +1326,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1409,8 +1377,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1462,8 +1428,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1515,8 +1479,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1568,8 +1530,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1621,8 +1581,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1671,6 +1629,7 @@ Array [
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -1701,8 +1660,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1792,8 +1749,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1873,8 +1828,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -1952,8 +1905,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -2031,8 +1982,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -2112,8 +2061,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -2191,8 +2138,6 @@ Array [
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -2271,6 +2216,7 @@ Array [
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2316,6 +2262,7 @@ Array [
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
