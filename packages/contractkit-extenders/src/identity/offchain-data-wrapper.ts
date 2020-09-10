@@ -1,13 +1,13 @@
 import { eqAddress } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
+import { ContractKit } from '@celo/contractkit'
+import { ClaimTypes } from '@celo/contractkit/lib/identity/claims/types'
+import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity/metadata'
+import { toChecksumAddress } from '@celo/utils/lib/address'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
-import { toChecksumAddress } from 'web3-utils'
-import { ContractKit } from '../kit'
-import { ClaimTypes } from './claims/types'
-import { IdentityMetadataWrapper } from './metadata'
 import { StorageWriter } from './offchain/storage-writers'
 
 const debug = debugFactory('offchaindata')

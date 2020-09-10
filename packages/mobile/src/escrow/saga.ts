@@ -148,17 +148,24 @@ function* withdrawFromEscrow() {
       return
     }
 
-    const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
+    const msgHash = contractKit.communication.web3.utils.soliditySha3({
+      type: 'address',
+      value: account,
+    })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // use the temporary key to sign a message. The message is the current account.
-    let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey))
-      .signature
+    let signature: string = (yield contractKit.communication.web3.eth.accounts.sign(
+      msgHash,
+      tmpWalletPrivateKey
+    )).signature
     Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
     signature = trimLeading0x(signature)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
+    const v = contractKit.communication.web3.utils.hexToNumber(
+      ensureLeading0x(signature.slice(128, 130))
+    )
 
     // Generate and send the withdrawal transaction.
     const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)

@@ -1,10 +1,10 @@
 import { trimLeading0x } from '@celo/base/lib/address'
+import { zeroRange } from '@celo/base/lib/collections'
 import { AbiCoder, CeloTx } from '@celo/communication'
 import BN from 'bn.js'
 import qrcode from 'qrcode'
 import querystring from 'querystring'
 import abiWeb3 from 'web3-eth-abi'
-import { zeroRange } from '../utils/array'
 
 const abi = (abiWeb3 as unknown) as AbiCoder
 

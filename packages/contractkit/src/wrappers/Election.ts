@@ -1,10 +1,9 @@
 import { eqAddress, findAddressIndex, normalizeAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/base/lib/async'
-import { zip } from '@celo/base/lib/collections'
+import { zeroRange, zip } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/communication'
 import BigNumber from 'bignumber.js'
 import { Election } from '../generated/Election'
-import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   fixidityValueToBigNumber,

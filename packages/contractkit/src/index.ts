@@ -1,7 +1,4 @@
 export { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 export { AllContracts, CeloContract, CeloToken } from './base'
 export { IdentityMetadataWrapper } from './identity'
-export { OdisUtils } from './identity/odis'
 export * from './kit'
-export { GenesisBlockUtils } from './network-utils/genesis-block-utils'
-export { StaticNodeUtils } from './network-utils/static-node-utils'

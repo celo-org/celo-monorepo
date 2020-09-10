@@ -9,6 +9,7 @@
     "@celo/base": "0.0.3-dev",
     "@celo/communication": "0.0.1-dev",
     "@celo/contractkit": "0.4.14-dev",
+    "@celo/contractkit-extenders": "0.0.1-dev",
     "@celo/utils": "0.1.20-dev",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",

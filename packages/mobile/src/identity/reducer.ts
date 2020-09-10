@@ -1,7 +1,7 @@
 import {
   isBalanceSufficientForSigRetrieval,
   PhoneNumberHashDetails,
-} from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+} from '@celo/contractkit-extenders/lib/identity/odis/phone-number-identifier'
 import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'

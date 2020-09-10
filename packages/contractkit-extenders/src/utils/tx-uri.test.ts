@@ -1,7 +1,6 @@
 import { CeloTx } from '@celo/communication'
+import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
 import Web3 from 'web3'
-import { CeloContract } from '../base'
-import { newKitFromWeb3 } from '../kit'
 import { buildUri, parseUri } from './tx-uri'
 
 describe('URI utils', () => {

@@ -1,5 +1,5 @@
 import { CeloTransactionObject } from '@celo/communication'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { PhoneNumberHashDetails } from '@celo/contractkit-extenders/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,

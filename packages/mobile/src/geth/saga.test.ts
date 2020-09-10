@@ -1,8 +1,8 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit-extenders'
 import GethBridge from 'react-native-geth'
 import { expectSaga } from 'redux-saga-test-plan'
 import { InitializationState } from 'src/geth/reducer'
-import { _waitForGethInit, GethInitOutcomes, initGethSaga } from 'src/geth/saga'
+import { GethInitOutcomes, initGethSaga, _waitForGethInit } from 'src/geth/saga'
 import { createMockStore } from 'test/utils'
 
 describe(initGethSaga, () => {

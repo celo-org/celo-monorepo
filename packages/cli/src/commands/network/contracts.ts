@@ -1,5 +1,5 @@
+import { PROXY_ABI } from '@celo/contractkit-extenders/lib/governance/proxy'
 import { CeloContract, NULL_ADDRESS } from '@celo/contractkit/lib'
-import { PROXY_ABI } from '@celo/contractkit/lib/governance/proxy'
 import { ContractFactories } from '@celo/contractkit/lib/web3-contract-cache'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'

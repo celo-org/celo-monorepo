@@ -1,4 +1,5 @@
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
+import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import * as chai from 'chai'
 import * as chaiSubset from 'chai-subset'
@@ -6,7 +7,6 @@ import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import { ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
-const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')

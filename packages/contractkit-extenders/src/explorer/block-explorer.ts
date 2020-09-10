@@ -5,8 +5,8 @@ import {
   CeloTxPending,
   parseDecodedParams,
 } from '@celo/communication'
+import { ContractKit } from '@celo/contractkit'
 import { PROXY_ABI } from '../governance/proxy'
-import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {

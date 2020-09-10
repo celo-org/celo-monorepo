@@ -25,6 +25,10 @@
   },
   "devDependencies": {
     "web3": "1.2.11",
+    "web3-core": "1.2.11",
+    "web3-eth": "1.2.11",
+    "web3-eth-contract": "1.2.11",
+    "web3-utils": "1.2.11",
     "@celo/flake-tracker": "0.0.1-dev",
     "@types/debug": "^4.1.5",
     "@types/ethereumjs-util": "^5.2.0"

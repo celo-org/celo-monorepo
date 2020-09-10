@@ -35,6 +35,7 @@
       "@celo/base",
       "@celo/communication",
       "@celo/contractkit",
+      "@celo/contractkit-extenders",
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/protocol",
@@ -45,6 +46,7 @@
     "location": "packages/cli",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/contractkit-extenders",
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/utils",
@@ -56,6 +58,17 @@
   "@celo/communication": {
     "location": "packages/communication",
     "dependencies": [
+      "@celo/flake-tracker",
+      "@celo/utils"
+    ]
+  },
+  "@celo/contractkit-extenders": {
+    "location": "packages/contractkit-extenders",
+    "dependencies": [
+      "@celo/base",
+      "@celo/communication",
+      "@celo/contractkit",
+      "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/utils"
     ]
@@ -112,6 +125,7 @@
     "dependencies": [
       "@celo/communication",
       "@celo/contractkit",
+      "@celo/contractkit-extenders",
       "@celo/flake-tracker",
       "@celo/react-components",
       "@celo/typescript",

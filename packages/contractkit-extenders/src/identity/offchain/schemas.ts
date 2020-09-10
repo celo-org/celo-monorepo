@@ -1,8 +1,8 @@
+import { Address } from '@celo/base/lib/address'
 import { makeAsyncThrowable } from '@celo/base/lib/result'
-import { Address } from '@celo/communication'
+import { toChecksumAddress } from '@celo/utils/lib/address'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
-import { toChecksumAddress } from 'web3-utils'
 import OffchainDataWrapper from '../offchain-data-wrapper'
 import { readWithSchemaAsResult, SingleSchema, writeWithSchema } from './schema-utils'
 

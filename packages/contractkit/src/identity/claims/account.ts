@@ -1,5 +1,5 @@
+import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { AddressType, PublicKeyType } from '@celo/utils/lib/io'
-import { pubToAddress, toChecksumAddress } from 'ethereumjs-util'
 import { either, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { ClaimTypes, now, TimestampType } from './types'
@@ -21,9 +21,7 @@ export const AccountClaimType = new t.Type<AccountClaim, any, unknown>(
       if (claim.publicKey === undefined) {
         return t.success(claim)
       }
-      const derivedAddress = toChecksumAddress(
-        '0x' + pubToAddress(Buffer.from(claim.publicKey.slice(2), 'hex'), true).toString('hex')
-      )
+      const derivedAddress = publicKeyToAddress(claim.publicKey, true)
       return derivedAddress === claim.address
         ? t.success(claim)
         : t.failure(claim, context, 'public key did not match the address in the claim')

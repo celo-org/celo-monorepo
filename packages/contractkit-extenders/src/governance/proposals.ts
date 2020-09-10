@@ -5,15 +5,17 @@ import {
   CeloTxPending,
   getAbiTypes,
 } from '@celo/communication'
+import { CeloContract, ContractKit } from '@celo/contractkit'
+import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
+import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
+import {
+  hotfixToParams,
+  Proposal,
+  ProposalTransaction,
+} from '@celo/contractkit/lib/wrappers/Governance'
 import { keccak256 } from 'ethereumjs-util'
-import { Contract } from 'web3-eth-contract'
-import { CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
-import { ABI as GovernanceABI } from '../generated/Governance'
-import { ContractKit } from '../kit'
-import { valueToString } from '../wrappers/BaseWrapper'
-import { hotfixToParams, Proposal, ProposalTransaction } from '../wrappers/Governance'
 import { setImplementationOnProxy } from './proxy'
 
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
@@ -109,10 +111,13 @@ export class ProposalBuilder {
   addProxyRepointingTx = (contract: CeloContract, newImplementationAddress: string) => {
     this.builders.push(async () => {
       const proxy = await this.kit._web3Contracts.getContract(contract)
-      return this.fromWeb3tx(setImplementationOnProxy(newImplementationAddress), {
-        to: proxy.options.address,
-        value: '0',
-      })
+      return this.fromWeb3tx(
+        setImplementationOnProxy(newImplementationAddress, this.kit.communication.web3),
+        {
+          to: proxy.options.address,
+          value: '0',
+        }
+      )
     })
   }
 
@@ -147,7 +152,7 @@ export class ProposalBuilder {
     this.builders.push(async () => {
       const contract = await this.kit._web3Contracts.getContract(tx.contract)
       const methodName = tx.function
-      const method = (contract.methods as Contract['methods'])[methodName]
+      const method = (contract.methods as any)[methodName]
       if (!method) {
         throw new Error(`Method ${methodName} not found on ${tx.contract}`)
       }

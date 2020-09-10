@@ -1,5 +1,5 @@
-import { OdisUtils } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { OdisUtils } from '@celo/contractkit-extenders'
+import { PhoneNumberHashDetails } from '@celo/contractkit-extenders/lib/identity/odis/phone-number-identifier'
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
@@ -20,9 +20,9 @@ import {
   mockE164NumberPepper,
 } from 'test/values'
 
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
-  ...jest.requireActual('../../__mocks__/@celo/contractkit/index'),
+jest.mock('@celo/contractkit-extenders', () => ({
+  ...jest.requireActual('@celo/contractkit-extenders'),
+  ...jest.requireActual('../../__mocks__/@celo/contractkit-extenders/index'),
 }))
 
 describe('Fetch contact matches', () => {

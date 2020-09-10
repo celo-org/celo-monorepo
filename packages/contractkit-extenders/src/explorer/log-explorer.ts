@@ -1,5 +1,5 @@
 import { ABIDefinition, Address, CeloTxReceipt, EventLog, Log } from '@celo/communication'
-import { ContractKit } from '../kit'
+import { ContractKit } from '@celo/contractkit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 interface ContractMapping {

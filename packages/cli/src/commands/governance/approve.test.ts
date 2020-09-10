@@ -1,6 +1,6 @@
 import { Address } from '@celo/communication'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { ProposalBuilder } from '@celo/contractkit/lib/governance'
+import { ProposalBuilder } from '@celo/contractkit-extenders/lib/governance'
 import {
   GovernanceWrapper,
   Proposal,

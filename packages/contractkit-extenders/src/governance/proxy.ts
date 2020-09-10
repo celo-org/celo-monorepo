@@ -42,8 +42,7 @@ export const getImplementationOfProxy = async (
   return proxyWeb3Contract.methods._getImplementation().call()
 }
 
-export const setImplementationOnProxy = (address: string) => {
-  const web3 = new Web3()
+export const setImplementationOnProxy = (address: string, web3: Web3) => {
   const proxyWeb3Contract = new web3.eth.Contract(PROXY_ABI)
   return proxyWeb3Contract.methods._setImplementation(address)
 }

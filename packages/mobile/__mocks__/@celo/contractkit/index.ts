@@ -1,5 +1,5 @@
+import { newCommunicationWrapperFromWeb3 } from '@celo/communication'
 import BigNumber from 'bignumber.js'
-import crypto from 'crypto'
 import Web3 from 'web3'
 
 const txo = (response?: any) => ({
@@ -40,6 +40,8 @@ const Reserve = {
 
 const web3 = new Web3()
 
+const communication = newCommunicationWrapperFromWeb3(web3)
+
 const kit = {
   contracts: {
     getGasPriceMinimum: jest.fn(async () => GasPriceMinimum),
@@ -52,7 +54,7 @@ const kit = {
   registry: {
     addressFor: async (address: string) => 1000,
   },
-  web3,
+  communication,
 }
 
 export const newKitFromWeb3 = () => kit
@@ -79,34 +81,3 @@ export enum CeloContract {
   StableToken = 'StableToken',
   Validators = 'Validators',
 }
-
-const SALT = '__celo__'
-export function obfuscateNumberForMatchmaking(e164Number: string) {
-  return crypto
-    .createHash('sha256')
-    .update(e164Number + SALT)
-    .digest('base64')
-}
-
-const PEPPER_CHAR_LENGTH = 13
-export function getPepperFromThresholdSignature(sigBuf: Buffer) {
-  // Currently uses 13 chars for a 78 bit pepper
-  return crypto
-    .createHash('sha256')
-    .update(sigBuf)
-    .digest('base64')
-    .slice(0, PEPPER_CHAR_LENGTH)
-}
-
-enum AuthenticationMethod {
-  WALLET_KEY = 'wallet_key',
-  ENCRYPTION_KEY = 'encryption_key',
-}
-
-export const GenesisBlockUtils = jest.fn()
-GenesisBlockUtils.getGenesisBlockAsync = jest.fn()
-GenesisBlockUtils.getChainIdFromGenesis = jest.fn()
-
-export const StaticNodeUtils = jest.fn().mockImplementation()
-StaticNodeUtils.getStaticNodesAsync = jest.fn()
-StaticNodeUtils.getStaticNodesGoogleStorageBucketName = jest.fn()

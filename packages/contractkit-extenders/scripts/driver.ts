@@ -1,7 +1,8 @@
-import { newKit } from '../src'
+import { newKitFromWeb3 } from '@celo/contractkit'
+import Web3 from 'web3'
 import { newBlockExplorer } from '../src/explorer/block-explorer'
 
-const kit = newKit('ws://localhost:8545')
+const kit = newKitFromWeb3(new Web3('ws://localhost:8545'))
 
 export function listenFor(subscription: any, seconds: number) {
   console.log(subscription)
@@ -59,7 +60,8 @@ async function main() {
   // )
 
   // console.log(JSON.stringify(genEvents, null, 2))
-  ;(kit.web3.currentProvider as any).disconnect()
+  // ;(kit.communication.web3.currentProvider as any).disconnect()
+  kit.communication.stop()
 }
 
 main().catch((err) => {

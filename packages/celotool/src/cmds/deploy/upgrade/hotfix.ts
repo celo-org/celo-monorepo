@@ -5,7 +5,7 @@ import {
   hotfixToHash,
   ProposalBuilder,
   proposalToJSON,
-} from '@celo/contractkit/lib/governance/proposals'
+} from '@celo/contractkit-extenders/lib/governance/proposals'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { randomBytes } from 'crypto'

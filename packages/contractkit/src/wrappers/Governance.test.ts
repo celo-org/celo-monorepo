@@ -5,10 +5,9 @@ import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { CeloContract } from '..'
 import { Registry } from '../generated/Registry'
-import { ProposalBuilder } from '../governance'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
-import { GovernanceWrapper, Proposal, VoteValue } from './Governance'
+import { GovernanceWrapper, Proposal, ProposalTransaction, VoteValue } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
 import { MultiSigWrapper } from './MultiSig'
 
@@ -44,16 +43,15 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
   type Repoint = [CeloContract, Address]
 
-  const registryRepointProposal = async (repoints: Repoint[]) => {
-    const builder = new ProposalBuilder(kit)
-    repoints.forEach((repoint) =>
-      builder.addWeb3Tx(registry.methods.setAddressFor(...repoint), {
-        // TODO fix types
-        to: (registry as any)._address,
+  const registryRepointProposal = (repoints: Repoint[]) => {
+    const proposals: ProposalTransaction[] = repoints.map<ProposalTransaction>((repoint) => {
+      return {
         value: '0',
-      })
-    )
-    return builder.build()
+        to: (registry as any)._address,
+        input: registry.methods.setAddressFor(...repoint).encodeABI(),
+      }
+    })
+    return proposals as Proposal
   }
 
   // const verifyRepointResult = (repoints: Repoint[]) =>
@@ -81,7 +79,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     const proposalID = new BigNumber(1)
 
     let proposal: Proposal
-    beforeAll(async () => (proposal = await registryRepointProposal(repoints)))
+    beforeAll(() => (proposal = registryRepointProposal(repoints)))
 
     const proposeFn = async (proposer: Address) =>
       governance

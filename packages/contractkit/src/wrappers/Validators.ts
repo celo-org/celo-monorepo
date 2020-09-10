@@ -1,11 +1,10 @@
 import { eqAddress, findAddressIndex, NULL_ADDRESS } from '@celo/base/lib/address'
 import { concurrentMap } from '@celo/base/lib/async'
-import { zip } from '@celo/base/lib/collections'
+import { zeroRange, zip } from '@celo/base/lib/collections'
 import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/communication'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Validators } from '../generated/Validators'
-import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   proxyCall,

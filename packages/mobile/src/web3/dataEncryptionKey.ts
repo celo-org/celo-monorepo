@@ -4,8 +4,8 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { OdisUtils } from '@celo/contractkit-extenders'
+import { AuthSigner } from '@celo/contractkit-extenders/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'

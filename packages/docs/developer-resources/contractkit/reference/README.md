@@ -31,14 +31,15 @@ To start working with contractkit you need a `kit` instance:
 
 ```ts
 import { newKit } from '@celo/contractkit'
+import Web3 from 'web3'
 
-const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
+const kit = newKitFromWeb3(new Web3('https://alfajores-forno.celo-testnet.org:8545'))
 ```
 
 To access web3:
 
 ```ts
-await kit.web3.eth.getBalance(someAddress)
+await kit.communication.web3.eth.getBalance(someAddress)
 ```
 
 ### Setting Default Tx Options
@@ -49,7 +50,7 @@ await kit.web3.eth.getBalance(someAddress)
 import { newKit, CeloContract } from '@celo/contractkit'
 
 async function getKit(myAddress: string) {
-  const kit = newKit('https://alfajores-forno.celo-testnet.org:8545')
+  const kit = newKitFromWeb3(new Web3('https://alfajores-forno.celo-testnet.org:8545'))
 
   // default from
   kit.defaultAccount = myAddress
@@ -73,7 +74,7 @@ const balance = await goldtoken.balanceOf(someAddress)
 To send funds:
 
 ```ts
-const oneGold = kit.web3.utils.toWei('1', 'ether')
+const oneGold = kit.communication.web3.utils.toWei('1', 'ether')
 const tx = await goldtoken.transfer(someAddress, oneGold).send({
   from: myAddress,
 })
@@ -191,7 +192,7 @@ When interacting with a web3 contract object:
 
 ```ts
 const goldtoken = await kit._web3Contracts.getGoldToken()
-const oneGold = kit.web3.utils.toWei('1', 'ether')
+const oneGold = kit.communication.web3.utils.toWei('1', 'ether')
 
 const txo = await goldtoken.methods.transfer(someAddress, oneGold)
 const tx = await kit.sendTransactionObject(txo, { from: myAddress })

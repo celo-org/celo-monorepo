@@ -2,10 +2,10 @@
 
 import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
+import { ContractKit } from '@celo/contractkit'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
-import { ContractKit } from '../../kit'
 
 const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')

@@ -2,7 +2,7 @@ import {
   hotfixToHash,
   ProposalBuilder,
   ProposalTransactionJSON,
-} from '@celo/contractkit/lib/governance/proposals'
+} from '@celo/contractkit-extenders/lib/governance/proposals'
 import { hexToBuffer } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { readFileSync } from 'fs-extra'

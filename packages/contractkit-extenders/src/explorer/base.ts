@@ -1,7 +1,6 @@
 import { concurrentMap } from '@celo/base/lib/async'
 import { AbiItem, Address } from '@celo/communication'
-import { AllContracts } from '../base'
-import { ContractKit } from '../kit'
+import { AllContracts, ContractKit } from '@celo/contractkit'
 
 export interface ContractDetails {
   name: string

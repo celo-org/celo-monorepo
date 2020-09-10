@@ -1,4 +1,4 @@
-import { newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
+import { newBlockExplorer } from '@celo/contractkit-extenders/lib/explorer/block-explorer'
 import { TransactionData } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'

@@ -2,7 +2,7 @@ import {
   ProposalBuilder,
   proposalToJSON,
   ProposalTransactionJSON,
-} from '@celo/contractkit/lib/governance/proposals'
+} from '@celo/contractkit-extenders/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'

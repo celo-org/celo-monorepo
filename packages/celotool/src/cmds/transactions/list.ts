@@ -1,6 +1,9 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { BlockExplorer, newBlockExplorer } from '@celo/contractkit/lib/explorer/block-explorer'
-import { LogExplorer, newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
+import {
+  BlockExplorer,
+  newBlockExplorer,
+} from '@celo/contractkit-extenders/lib/explorer/block-explorer'
+import { LogExplorer, newLogExplorer } from '@celo/contractkit-extenders/lib/explorer/log-explorer'
 import fetch from 'node-fetch'
 import { CONTRACTS_TO_COPY, copyContractArtifacts, downloadArtifacts } from 'src/lib/artifacts'
 import { getWeb3Client } from 'src/lib/blockchain'

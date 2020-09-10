@@ -1,5 +1,5 @@
+import { Address } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
-import { Address } from '@celo/communication'
 import { isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'

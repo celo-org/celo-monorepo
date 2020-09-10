@@ -1,8 +1,8 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
+import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
-import { soliditySha3 } from 'web3-utils'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthSigner,
