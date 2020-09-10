@@ -21,11 +21,6 @@ import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
-// Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
-// setRegistry(). TypeChain currently has problems resolving overloaded functions, so this is not
-// possible right now.
-// TODO(amy): Fix this when the TypeChain issue resolves.
-
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
 
