@@ -1,4 +1,4 @@
-import { OdisUtils } from '@celo/contractkit'
+import { OdisUtils } from '@celo/contractkit-extenders'
 import {
   DEFAULT_SYNC_MODE,
   DEFAULT_TESTNET,

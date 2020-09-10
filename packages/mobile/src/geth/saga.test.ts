@@ -2,6 +2,7 @@ import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit-extenders'
 import GethBridge from 'react-native-geth'
 import { expectSaga } from 'redux-saga-test-plan'
 import { InitializationState } from 'src/geth/reducer'
+// tslint:disable-next-line: ordered-imports
 import { GethInitOutcomes, initGethSaga, _waitForGethInit } from 'src/geth/saga'
 import { createMockStore } from 'test/utils'
 
