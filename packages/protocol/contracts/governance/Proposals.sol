@@ -24,7 +24,6 @@ library Proposals {
     uint256 execution;
   }
 
-  // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 yes;
     uint256 no;
