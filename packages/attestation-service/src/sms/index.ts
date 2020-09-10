@@ -184,9 +184,11 @@ export async function startSendSms(
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()
       attestation.recordError(`Could not parse ${phoneNumber}`)
+      attestation.message = ''
     } else if (providers.length === 0) {
       Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
       attestation.recordError(`No matching SMS providers`)
+      attestation.message = ''
     } else {
       // Parsed number and found providers. Attempt delivery.
       shouldRetry = await doSendSms(attestation, providers, logger)
@@ -300,6 +302,7 @@ async function doSendSms(
     )
 
     if (attestation.attempt >= maxDeliveryAttempts) {
+      attestation.message = ''
       logger.info('Final failure to send')
       Counters.attestationRequestsFailedToDeliverSms.inc()
       return false
@@ -316,6 +319,10 @@ export async function receivedDeliveryReport(
   errorCode: string | null,
   logger: Logger
 ) {
+  if (!deliveryId) {
+    return
+  }
+
   let shouldRetry = false
   let attestation: AttestationModel | null = null
 
@@ -372,6 +379,7 @@ export async function receivedDeliveryReport(
           attestation.attempt += 1
 
           if (attestation.attempt >= maxDeliveryAttempts) {
+            attestation.message = ''
             logger.info(
               {
                 deliveryId,
@@ -383,6 +391,7 @@ export async function receivedDeliveryReport(
             shouldRetry = true
           }
         } else if (deliveryStatus === AttestationStatus.Delivered) {
+          attestation.message = ''
           Counters.attestationRequestsBelievedDelivered.inc()
           attestation.ongoingDeliveryId = null
         }
