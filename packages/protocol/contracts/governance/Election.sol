@@ -836,7 +836,6 @@ contract Election is
    * @param index The index of `element` in the list.
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
-    // TODO(asa): Move this to a library to be shared.
     require(index < list.length && list[index] == element, "Bad index");
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
