@@ -5,13 +5,20 @@ provider "google" {
   zone        = "us-west1-a"
 }
 
+provider "google-beta" {
+  credentials = file(var.gcloud_credentials_path)
+  project     = var.gcloud_project
+  region      = "us-west1"
+  zone        = "us-west1-a"
+}
+
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
     bucket = "celo_tf_state"
   }
   required_providers {
-    google = "~> 2.16.0"
+    google = "~> 3.38.0"
     google-beta = "~> 3.38.0"
   }
 }
@@ -52,25 +59,26 @@ resource "google_compute_managed_ssl_certificate" "ssl_cert" {
 
 resource "google_compute_url_map" "url_map" {
   name = "${var.celo_env}-forno-url-map"
+  default_service = module.backends.backend_service_id
 
-  path_matcher {
-    name = "all-paths"
-
-    path_rule {
-      paths = ["/"]
-
-      route_action {
-        dynamic "all_weighted_backend_services" {
-          for_each = var.context_zones
-
-          weighted_backend_services {
-            backend_service = module.backends.backend_ids[all_weighted_backend_services.key]
-            weight = 100
-          }
-        }
-      }
-    }
-  }
+  # path_matcher {
+  #   name = "all-paths"
+  #
+  #   path_rule {
+  #     paths = ["/"]
+  #
+  #     route_action {
+  #       dynamic "all_weighted_backend_services" {
+  #         for_each = var.context_zones
+  #
+  #         weighted_backend_services {
+  #           backend_service = module.backends.backend_ids[all_weighted_backend_services.key]
+  #           weight = 100
+  #         }
+  #       }
+  #     }
+  #   }
+  # }
 }
 
 # https://cloud.google.com/load-balancing/docs/https#network-service-tiers_1
@@ -89,6 +97,7 @@ resource "google_compute_global_forwarding_rule" "forwarding_rule" {
 }
 
 resource "google_compute_firewall" "allow-health-check" {
+  name = "${var.celo_env}-forno-health-check-firewall"
   direction = "INGRESS"
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]
   network = var.vpc_network_name
