@@ -103,6 +103,9 @@
       "governance": {
         "description": "Interact with on-chain governance proposals and hotfixes"
       },
+      "identity": {
+        "description": "Interact with ODIS and the attestations service"
+      }, 
       "lockedgold": {
         "description": "View and manage locked CELO"
       },

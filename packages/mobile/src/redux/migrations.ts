@@ -82,4 +82,13 @@ export const migrations = {
       },
     }
   },
+  6: (state: any) => {
+    return {
+      ...state,
+      invite: {
+        ...state.invite,
+        redeemComplete: !!state.web3.account,
+      },
+    }
+  },
 }

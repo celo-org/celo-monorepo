@@ -23,6 +23,7 @@ import {
 jest.mock('@celo/contractkit-extenders', () => ({
   ...jest.requireActual('@celo/contractkit-extenders'),
   ...jest.requireActual('../../__mocks__/@celo/contractkit-extenders/index'),
+  OdisUtils: jest.requireActual('@celo/contractkit-extenders').OdisUtils,
 }))
 
 describe('Fetch contact matches', () => {
