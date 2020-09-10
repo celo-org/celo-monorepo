@@ -42,26 +42,25 @@ async function init() {
 
   await initializeSmsProviders(deliveryStatusURLForProviderType)
 
-  const app = express()
-  app.use([requestIdMiddleware(), loggerMiddleware])
-  const port = process.env.PORT || 3000
-  app.listen(port, () => rootLogger.info({ port }, 'Attestation Service started'))
-
   const rateLimiter = rateLimit({
     windowMs: 5 * 60 * 100, // 5 minutes
     max: 50,
   })
+  const app = express()
+  app.use([requestIdMiddleware(), loggerMiddleware, rateLimiter])
+  const port = process.env.PORT || 3000
+  app.listen(port, () => rootLogger.info({ port }, 'Attestation Service started'))
+
   app.get('/metrics', (_req, res) => {
     res.send(PromClient.register.metrics())
   })
-  app.get('/status', rateLimiter, createValidatedHandler(StatusRequestType, handleStatusRequest))
-  app.get('/ready', rateLimiter, (_req, res) => {
+  app.get('/status', createValidatedHandler(StatusRequestType, handleStatusRequest))
+  app.get('/ready', (_req, res) => {
     res.send('Ready').status(200)
   })
-  app.get('/healthz', rateLimiter, asyncHandler(handleLivenessRequest))
+  app.get('/healthz', asyncHandler(handleLivenessRequest))
   app.get(
     '/get_attestations',
-    rateLimiter,
     createValidatedHandler(GetAttestationRequestType, handleGetAttestationRequest)
   )
   app.post(
