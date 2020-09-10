@@ -4,10 +4,12 @@ celo_env = "oracledev"
 
 context_rpc_service_network_endpoint_groups = {
   gcp-test = "k8s1-8d58c190-oracledev-oracledev-fullnodes-rpc-8545-4890a565"
+  gcp-test-asia = "k8s1-666b7bbf-oracledev-oracledev-fullnodes-rpc-8545-3dffc92a"
 }
 
 context_zones = {
   gcp-test = "us-west4-a"
+  gcp-test-asia = "asia-northeast2-a"
 }
 
 domains = ["trevor-forno-terraform.celo-networks-dev.org."]
