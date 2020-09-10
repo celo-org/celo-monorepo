@@ -43,20 +43,21 @@ function FiatExchange() {
   return (
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
-      <View style={styles.image}>
+      <View style={styles.container}>
         <Image source={fiatExchange} style={styles.image} resizeMode={'contain'} />
+        <View style={styles.balanceSheet}>
+          <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
+          <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
+          <CurrencyDisplay
+            style={styles.dollarBalance}
+            amount={dollarAmount}
+            showLocalAmount={false}
+            hideFullCurrencyName={false}
+            hideSymbol={true}
+          />
+        </View>
       </View>
-      <View style={styles.balanceSheet}>
-        <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
-        <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
-        <CurrencyDisplay
-          style={styles.dollarBalance}
-          amount={dollarAmount}
-          showLocalAmount={false}
-          hideFullCurrencyName={false}
-          hideSymbol={true}
-        />
-      </View>
+
       <View style={styles.optionsListContainer}>
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
@@ -85,10 +86,12 @@ function FiatExchange() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
   },
   image: {
-    height: 200,
-    alignItems: 'center',
+    // height: 200,
+    // alignItems: 'center',
+    alignSelf: 'center',
   },
   balanceSheet: {
     paddingVertical: variables.contentPadding,
