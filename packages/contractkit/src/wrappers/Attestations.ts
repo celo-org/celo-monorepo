@@ -610,7 +610,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   async hasAccountForIdentifier(identifer: string, account: Address): Promise<boolean> {
     const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
-    return accounts.findIndex((acc) => eqAddress(acc, account)) > 0
+    return accounts.findIndex((acc) => eqAddress(acc, account)) >= 0
   }
 }
 
