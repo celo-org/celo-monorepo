@@ -51,7 +51,11 @@ After signing up for [Nexmo](https://dashboard.nexmo.com/sign-up), click the bal
 
 Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS.
 
-Under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
+If you want to support a single Attestation Service from this account, under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
+
+If you want to support multiple Attestation Services from this account, for example for a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number.
+
+Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
 
 ## Installation
 
@@ -184,7 +188,7 @@ It assumes all of the configuration options needed have been added to the config
 
 ```bash
 # On the Attestation machine
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-3 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-4 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ### Registering Metadata
@@ -227,9 +231,11 @@ celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
 
 Attestation Services supports Twilio and Nexmo delivery receipts so that these services can callback to provide delivery information. This triggers retries as needed, even between providers, and enables delivery success metrics to be logged.
 
-Nexmo requires manual configuration to enable this. If your Nexmo account is used by a single Attestation Service, go to [Settings](https://dashboard.nexmo.com/settings), and under `Delivery Receipts`, enter the external URL of your Attestation Service appended by `/delivery_status_nexmo` -- for example `http://1.2.3.4:80/delivery_status_nexmo`. This should correspond to the URL printed when Attestation Service is started. In a future release, it will be possible to use a separate [Nexmo application](https://dashboard.nexmo.com/applications/) for each Attestation Service instance.
+Nexmo requires manual configuration to enable delivery receipts. If you have not configured a [Nexmo application](https://dashboard.nexmo.com/applications/), go to [Settings](https://dashboard.nexmo.com/settings), and under `Delivery Receipts`, enter the external URL of your Attestation Service appended by `/delivery_status_nexmo` -- for example `http://1.2.3.4:80/delivery_status_nexmo`. This should correspond to the URL printed when Attestation Service is started.
 
-There is no configuration necessary to enable Twilio delivery receipts. The Attestation Service uses the URL in the validator metadata (can be overridden with the `EXTERNAL_CALLBACK_HOSTPORT` configuration option) appended by `/delivery_status_twilio`, and supplies that to Twilio through its API.
+If you have configured [Nexmo applications](https://dashboard.nexmo.com/applications/), open the matching application, click `Edit`, then enter this value as the `Status URL` (you may also be required to enter an `Inbound URL`, though it will be unused).
+
+There is no configuration necessary to enable Twilio delivery receipts. The Attestation Service uses the URL in the validator metadata, provided that `VERIFY_CONFIG_ON_STARTUP` is enabled. The URL for callbacks can always be specified with the `EXTERNAL_CALLBACK_HOSTPORT` configuration option. The service appends `/delivery_status_twilio` on to the URL, and supplies that to Twilio through its API.
 
 If you are using a load balancer in front of Attestation Service with a URL based routing configuration, be careful to prevent these routes being filtered.
 
