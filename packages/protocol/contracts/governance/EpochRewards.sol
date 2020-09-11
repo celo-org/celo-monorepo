@@ -9,6 +9,7 @@ import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Contract for calculating epoch rewards.
@@ -19,7 +20,8 @@ contract EpochRewards is
   UsingPrecompiles,
   UsingRegistry,
   Freezable,
-  CalledByVm
+  CalledByVm,
+  ICeloVersionedContract
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -499,7 +501,6 @@ contract EpochRewards is
   function calculateTargetEpochRewards()
     external
     view
-    onlyWhenNotFrozen
     returns (uint256, uint256, uint256, uint256)
   {
     uint256 targetVoterReward = getTargetVoterRewards();
@@ -519,5 +520,9 @@ contract EpochRewards is
         .multiply(rewardsMultiplier)
         .fromFixed()
     );
+  }
+
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 }
