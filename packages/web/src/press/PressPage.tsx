@@ -39,7 +39,7 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
       } else {
         const res = await fetch(`/api/press`)
         press = await res.json()
-        languages = navigator.languages.map((s) => s.substr(0, 2))
+        languages = navigator.languages ? navigator.languages.map((s) => s.substr(0, 2)) : []
       }
       return { press, languages }
     } catch {
