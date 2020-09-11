@@ -156,7 +156,10 @@ export async function startSendSms(
   const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
 
   try {
-    const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
+    const parsedNumber = phoneUtil.parse(phoneNumber)
+    const numberType = parsedNumber ? phoneUtil.getNumberType(parsedNumber) : null
+    const countryCode = parsedNumber ? phoneUtil.getRegionCodeForNumber(parsedNumber) : null
+
     let providers: SmsProvider[] = countryCode
       ? smsProvidersFor(countryCode, phoneNumber, logger)
       : []
@@ -190,6 +193,10 @@ export async function startSendSms(
       attestation.recordError(`No matching SMS providers`)
       attestation.message = ''
     } else {
+      if (numberType !== null) {
+        Counters.attestationRequestsByNumberType.labels(countryCode, `${numberType}`).inc()
+      }
+
       // Parsed number and found providers. Attempt delivery.
       shouldRetry = await doSendSms(attestation, providers, logger)
     }

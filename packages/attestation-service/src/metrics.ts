@@ -61,6 +61,11 @@ export const Counters = {
     labelNames: ['provider', 'country', 'code'],
     help: 'Counter for error code of each failed delivery attempt by provider and country',
   }),
+  attestationRequestsByNumberType: new Counter({
+    name: 'attestation_requests_number_type',
+    labelNames: ['country', 'type'],
+    help: 'Counter for requests by country and type of phone number',
+  }),
 }
 
 export const Gauges = {
