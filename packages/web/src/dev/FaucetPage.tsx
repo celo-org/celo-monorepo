@@ -78,7 +78,7 @@ class FaucetPage extends React.Component<I18nProps, State> {
               emphasis={t('viewAccountInfo')}
               text={t('checkYourBalance')}
               btnText={t('BlockScout')}
-              href={CeloLinks.blockscout}
+              href={CeloLinks.alfajoresBlockscout}
             />
             <ContentWithCTA
               emphasis={t('interestedInNode')}
