@@ -16,7 +16,7 @@ export default ResetAccount = () => {
     await enterPinUiIfNecessary()
 
     // Go through the quiz.
-    await element(by.id('backupKeySavedSwitch')).tap()
+    await element(by.id('backupKeySavedSwitch')).longPress()
     await element(by.id('backupKeyContinue')).tap()
     for (const word of SAMPLE_BACKUP_KEY.split(' ')) {
       await element(by.id(`backupQuiz/${word}`)).tap()
