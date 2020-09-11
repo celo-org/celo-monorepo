@@ -1,9 +1,9 @@
 import { CeloTx } from '@celo/communication'
 import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
-import Web3 from 'web3'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { buildUri, parseUri } from './tx-uri'
 
-describe('URI utils', () => {
+testWithGanache('URI utils', (web3) => {
   const recipient = '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
   const value = '100'
 
@@ -19,7 +19,7 @@ describe('URI utils', () => {
   let lockGoldUri: string
   let lockGoldTx: CeloTx
 
-  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+  const kit = newKitFromWeb3(web3)
 
   beforeAll(async () => {
     const stableTokenAddr = await kit.registry.addressFor(CeloContract.StableToken)
