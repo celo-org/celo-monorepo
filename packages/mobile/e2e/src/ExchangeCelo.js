@@ -4,23 +4,6 @@ import { DEFAULT_RECIPIENT_ADDRESS } from './utils/consts'
 const CELO_TO_EXCHANGE = 1.1
 const CELO_TO_SEND = '0.001'
 
-// Android doesn't support the getAttributes method, so we can't get the balance.
-const shouldVerifyBalance = device.getPlatform() === 'ios'
-
-let balance
-
-// DANGER: If fees get higher the calculation might start failing.
-// The test is assuming 0 influence from fees on the visible number.
-const verifyBalance = async (expectedBalance) => {
-  if (!shouldVerifyBalance) {
-    return
-  }
-  await waitFor(element(by.id('CeloBalance')))
-    .toHaveText(expectedBalance.toString())
-    .withTimeout(30000)
-  await expect(element(by.id('CeloBalance'))).toHaveText(expectedBalance.toString())
-}
-
 export default ExchangeCelo = () => {
   it('Go to CELO screen and through onboarding', async () => {
     await element(by.id('Hamburguer')).tap()
@@ -34,12 +17,6 @@ export default ExchangeCelo = () => {
   })
 
   it('Buy CELO', async () => {
-    // First, save balance for checking later.
-    if (shouldVerifyBalance) {
-      const attributes = await element(by.id('CeloBalance')).getAttributes()
-      balance = parseFloat(attributes.text)
-    }
-
     await waitFor(element(by.id('BuyCelo')))
       .toBeVisible()
       .withTimeout(30000)
@@ -55,7 +32,6 @@ export default ExchangeCelo = () => {
 
     // Return to the Exchange CELO screen and check balance
     await expect(element(by.id('BuyCelo'))).toBeVisible()
-    await verifyBalance(balance + CELO_TO_EXCHANGE)
   })
 
   it('Sell CELO', async () => {

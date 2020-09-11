@@ -1,14 +1,16 @@
-import { enterPinUiIfNecessary, waitForElementId } from './utils/utils'
+import { enterPinUiIfNecessary, waitForElementId, sleep } from './utils/utils'
 import { SAMPLE_BACKUP_KEY } from './utils/consts'
 
 export default ResetAccount = () => {
-  it('Reset Account by doing hte Account Key quiz', async () => {
+  it('Reset Account by doing the Account Key quiz', async () => {
     // Go to Settings
     await element(by.id('Hamburguer')).tap()
     await element(by.id('DrawerItem/Settings')).tap()
 
     // Scroll to bottom and start the reset process.
-    await waitForElementId('SettingsScrollView')
+    // This sleep is to avoid flakiness on the scroll. Without it the scroll
+    // line intermittently fails event though the SettingsScrollView is visible.
+    await sleep(1000)
     await element(by.id('SettingsScrollView')).scrollTo('bottom')
     await element(by.id('ResetAccount')).tap()
     await element(by.id('RemoveAccountModal/PrimaryAction')).tap()
