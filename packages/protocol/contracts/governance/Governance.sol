@@ -559,7 +559,6 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
-    // TODO(yorke): clean up redundant computation
     require(proposalId != 0, "Account has no historical upvote");
     removeIfQueuedAndExpired(proposalId);
     if (queue.contains(proposalId)) {
@@ -995,7 +994,6 @@ contract Governance is
         if (emptyIndices.length > 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
-          // TODO(asa): We can save gas by not deleting here
           delete emptyIndices[indexOfLastEmptyIndex];
           emptyIndices.length = indexOfLastEmptyIndex;
         } else {
