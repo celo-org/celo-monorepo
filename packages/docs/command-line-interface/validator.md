@@ -158,6 +158,34 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list.ts)_
 
+### Missed-blocks
+
+Display a list of blocks that each validator missed. Can use the genesis to not rely on contracts, but contracts works better.
+
+```
+USAGE
+  $ celocli validator:missed-blocks
+
+OPTIONS
+  --at-block=at-block                            latest block to examine for signer activity
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
+  --genesis=./genesis.json                       path to the genesis block to get the initial validator set, uses
+                                                 contracts if not provided.
+
+  --lookback=lookback                            [default: 120] how many blocks to look back for signer activity
+
+EXAMPLES
+  downtime
+  downtime --genesis genesis.json
+  downtime --at-block 100000 --genesis genesis.json
+  downtime --lookback 500
+```
+
+_See code: [packages/cli/src/commands/validator/missed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/missed-blocks.ts)_
+
 ### Register
 
 Register a new Validator
