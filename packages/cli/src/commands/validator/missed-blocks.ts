@@ -56,10 +56,10 @@ export default class ValidatorSignedBlocks extends BaseCommand {
   }
 
   static examples = [
-    'downtime',
-    'downtime --genesis genesis.json',
-    'downtime --at-block 100000 --genesis genesis.json',
-    'downtime --lookback 500',
+    'missed-blocks',
+    'missed-blocks --genesis genesis.json',
+    'missed-blocks --at-block 100000 --genesis genesis.json',
+    'missed-blocks --lookback 500',
   ]
 
   async run() {
