@@ -7,3 +7,5 @@ export {
 export { toBool, toNum } from './utils/config-utils'
 export * from './utils/constants'
 export * from './utils/input-validation'
+export * from './test/utils'
+export * from './test/values'
