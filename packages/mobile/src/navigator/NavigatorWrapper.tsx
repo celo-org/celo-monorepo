@@ -1,5 +1,6 @@
+import colors from '@celo/react-components/styles/colors'
 import AsyncStorage from '@react-native-community/async-storage'
-import { NavigationContainer, NavigationState } from '@react-navigation/native'
+import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import AlertBanner from 'src/alert/AlertBanner'
@@ -19,7 +20,7 @@ import Logger from 'src/utils/Logger'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // @ts-ignore https://reactnavigation.org/docs/screen-tracking/
-const getActiveRouteName = (state: NavigationState) => {
+export const getActiveRouteName = (state: NavigationState) => {
   const route = state.routes[state.index]
 
   if (route.state) {
@@ -31,6 +32,15 @@ const getActiveRouteName = (state: NavigationState) => {
 }
 
 const RESTORE_STATE = __DEV__ && DEV_RESTORE_NAV_STATE_ON_RELOAD
+
+// Global app them used by react-navigation
+const AppTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors.light,
+  },
+}
 
 export const NavigatorWrapper = () => {
   const [isReady, setIsReady] = React.useState(RESTORE_STATE ? false : true)
@@ -107,6 +117,7 @@ export const NavigatorWrapper = () => {
       ref={navigationRef}
       onStateChange={handleStateChange}
       initialState={initialState}
+      theme={AppTheme}
     >
       <View style={styles.container}>
         <Navigator />

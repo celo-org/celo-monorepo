@@ -23,7 +23,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,

@@ -9,7 +9,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -161,7 +160,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             </Text>
             <TextInput
               allowFontScaling={true}
-              autoFocus={true}
+              autoFocus={false}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
@@ -463,6 +462,206 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                         }
                       >
                         global:cancel
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </RNCSafeAreaView>
+            </View>
+          </Modal>
+          <Modal
+            animationType="none"
+            hardwareAccelerated={false}
+            hideModalContentWhileAnimating={false}
+            onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
+            onRequestClose={[Function]}
+            scrollHorizontal={false}
+            scrollOffset={0}
+            scrollOffsetMax={0}
+            scrollTo={null}
+            statusBarTranslucent={true}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
+            swipeThreshold={100}
+            transparent={true}
+            visible={false}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              forwardedRef={[Function]}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "black",
+                  "bottom": 0,
+                  "height": 1334,
+                  "left": 0,
+                  "opacity": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "width": 750,
+                }
+              }
+            />
+            <View
+              forwardedRef={[Function]}
+              hideModalContentWhileAnimating={false}
+              onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
+              pointerEvents="box-none"
+              scrollHorizontal={false}
+              scrollOffset={0}
+              scrollOffsetMax={0}
+              scrollTo={null}
+              statusBarTranslucent={true}
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "center",
+                  "margin": 37.5,
+                  "transform": Array [
+                    Object {
+                      "translateY": 0,
+                    },
+                  ],
+                }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
+              }
+              swipeThreshold={100}
+            >
+              <RNCSafeAreaView>
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "padding": 16,
+                      },
+                      Object {
+                        "borderRadius": 8,
+                      },
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
+                      Array [
+                        Object {
+                          "backgroundColor": "#FFFFFF",
+                          "maxHeight": "100%",
+                          "padding": 24,
+                        },
+                        undefined,
+                      ],
+                    ]
+                  }
+                >
+                  <RCTScrollView
+                    contentContainerStyle={
+                      Object {
+                        "alignItems": "center",
+                      }
+                    }
+                  >
+                    <View>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Jost-Medium",
+                            "fontSize": 22,
+                            "lineHeight": 28,
+                            "marginBottom": 12,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalHeader
+                      </Text>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                            "marginBottom": 24,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalBody
+                      </Text>
+                    </View>
+                  </RCTScrollView>
+                  <View
+                    style={
+                      Object {
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "space-around",
+                        "maxWidth": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "paddingTop": 16,
+                            },
+                          ]
+                        }
+                      >
+                        global:dismiss
                       </Text>
                     </View>
                   </View>
@@ -891,7 +1090,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -1043,7 +1241,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             </Text>
             <TextInput
               allowFontScaling={true}
-              autoFocus={true}
+              autoFocus={false}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
@@ -1345,6 +1543,206 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         }
                       >
                         global:cancel
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </RNCSafeAreaView>
+            </View>
+          </Modal>
+          <Modal
+            animationType="none"
+            hardwareAccelerated={false}
+            hideModalContentWhileAnimating={false}
+            onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
+            onRequestClose={[Function]}
+            scrollHorizontal={false}
+            scrollOffset={0}
+            scrollOffsetMax={0}
+            scrollTo={null}
+            statusBarTranslucent={true}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
+            swipeThreshold={100}
+            transparent={true}
+            visible={false}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              forwardedRef={[Function]}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "black",
+                  "bottom": 0,
+                  "height": 1334,
+                  "left": 0,
+                  "opacity": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "width": 750,
+                }
+              }
+            />
+            <View
+              forwardedRef={[Function]}
+              hideModalContentWhileAnimating={false}
+              onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
+              pointerEvents="box-none"
+              scrollHorizontal={false}
+              scrollOffset={0}
+              scrollOffsetMax={0}
+              scrollTo={null}
+              statusBarTranslucent={true}
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "center",
+                  "margin": 37.5,
+                  "transform": Array [
+                    Object {
+                      "translateY": 0,
+                    },
+                  ],
+                }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
+              }
+              swipeThreshold={100}
+            >
+              <RNCSafeAreaView>
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "padding": 16,
+                      },
+                      Object {
+                        "borderRadius": 8,
+                      },
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
+                      Array [
+                        Object {
+                          "backgroundColor": "#FFFFFF",
+                          "maxHeight": "100%",
+                          "padding": 24,
+                        },
+                        undefined,
+                      ],
+                    ]
+                  }
+                >
+                  <RCTScrollView
+                    contentContainerStyle={
+                      Object {
+                        "alignItems": "center",
+                      }
+                    }
+                  >
+                    <View>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Jost-Medium",
+                            "fontSize": 22,
+                            "lineHeight": 28,
+                            "marginBottom": 12,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalHeader
+                      </Text>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                            "marginBottom": 24,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalBody
+                      </Text>
+                    </View>
+                  </RCTScrollView>
+                  <View
+                    style={
+                      Object {
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "space-around",
+                        "maxWidth": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "paddingTop": 16,
+                            },
+                          ]
+                        }
+                      >
+                        global:dismiss
                       </Text>
                     </View>
                   </View>
@@ -1773,7 +2171,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -1925,7 +2322,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             </Text>
             <TextInput
               allowFontScaling={true}
-              autoFocus={true}
+              autoFocus={false}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
@@ -2227,6 +2624,206 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         }
                       >
                         global:cancel
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </RNCSafeAreaView>
+            </View>
+          </Modal>
+          <Modal
+            animationType="none"
+            hardwareAccelerated={false}
+            hideModalContentWhileAnimating={false}
+            onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
+            onRequestClose={[Function]}
+            scrollHorizontal={false}
+            scrollOffset={0}
+            scrollOffsetMax={0}
+            scrollTo={null}
+            statusBarTranslucent={true}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
+            swipeThreshold={100}
+            transparent={true}
+            visible={false}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              forwardedRef={[Function]}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "black",
+                  "bottom": 0,
+                  "height": 1334,
+                  "left": 0,
+                  "opacity": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "width": 750,
+                }
+              }
+            />
+            <View
+              forwardedRef={[Function]}
+              hideModalContentWhileAnimating={false}
+              onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
+              pointerEvents="box-none"
+              scrollHorizontal={false}
+              scrollOffset={0}
+              scrollOffsetMax={0}
+              scrollTo={null}
+              statusBarTranslucent={true}
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "center",
+                  "margin": 37.5,
+                  "transform": Array [
+                    Object {
+                      "translateY": 0,
+                    },
+                  ],
+                }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
+              }
+              swipeThreshold={100}
+            >
+              <RNCSafeAreaView>
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "padding": 16,
+                      },
+                      Object {
+                        "borderRadius": 8,
+                      },
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
+                      Array [
+                        Object {
+                          "backgroundColor": "#FFFFFF",
+                          "maxHeight": "100%",
+                          "padding": 24,
+                        },
+                        undefined,
+                      ],
+                    ]
+                  }
+                >
+                  <RCTScrollView
+                    contentContainerStyle={
+                      Object {
+                        "alignItems": "center",
+                      }
+                    }
+                  >
+                    <View>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Jost-Medium",
+                            "fontSize": 22,
+                            "lineHeight": 28,
+                            "marginBottom": 12,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalHeader
+                      </Text>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                            "marginBottom": 24,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalBody
+                      </Text>
+                    </View>
+                  </RCTScrollView>
+                  <View
+                    style={
+                      Object {
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "space-around",
+                        "maxWidth": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "paddingTop": 16,
+                            },
+                          ]
+                        }
+                      >
+                        global:dismiss
                       </Text>
                     </View>
                   </View>
@@ -2652,7 +3249,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
   }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingHorizontal": 8,
     }
@@ -2865,7 +3461,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             </Text>
             <TextInput
               allowFontScaling={true}
-              autoFocus={true}
+              autoFocus={false}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
@@ -3167,6 +3763,206 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                         }
                       >
                         global:cancel
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </RNCSafeAreaView>
+            </View>
+          </Modal>
+          <Modal
+            animationType="none"
+            hardwareAccelerated={false}
+            hideModalContentWhileAnimating={false}
+            onModalHide={[Function]}
+            onModalWillHide={[Function]}
+            onModalWillShow={[Function]}
+            onRequestClose={[Function]}
+            scrollHorizontal={false}
+            scrollOffset={0}
+            scrollOffsetMax={0}
+            scrollTo={null}
+            statusBarTranslucent={true}
+            supportedOrientations={
+              Array [
+                "portrait",
+                "landscape",
+              ]
+            }
+            swipeThreshold={100}
+            transparent={true}
+            visible={false}
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              forwardedRef={[Function]}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "black",
+                  "bottom": 0,
+                  "height": 1334,
+                  "left": 0,
+                  "opacity": 0,
+                  "position": "absolute",
+                  "right": 0,
+                  "top": 0,
+                  "width": 750,
+                }
+              }
+            />
+            <View
+              forwardedRef={[Function]}
+              hideModalContentWhileAnimating={false}
+              onModalHide={[Function]}
+              onModalWillHide={[Function]}
+              onModalWillShow={[Function]}
+              pointerEvents="box-none"
+              scrollHorizontal={false}
+              scrollOffset={0}
+              scrollOffsetMax={0}
+              scrollTo={null}
+              statusBarTranslucent={true}
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "center",
+                  "margin": 37.5,
+                  "transform": Array [
+                    Object {
+                      "translateY": 0,
+                    },
+                  ],
+                }
+              }
+              supportedOrientations={
+                Array [
+                  "portrait",
+                  "landscape",
+                ]
+              }
+              swipeThreshold={100}
+            >
+              <RNCSafeAreaView>
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "padding": 16,
+                      },
+                      Object {
+                        "borderRadius": 8,
+                      },
+                      Object {
+                        "elevation": 12,
+                        "shadowColor": "rgba(156, 164, 169, 0.4)",
+                        "shadowOffset": Object {
+                          "height": 2,
+                          "width": 0,
+                        },
+                        "shadowOpacity": 1,
+                        "shadowRadius": 12,
+                      },
+                      Array [
+                        Object {
+                          "backgroundColor": "#FFFFFF",
+                          "maxHeight": "100%",
+                          "padding": 24,
+                        },
+                        undefined,
+                      ],
+                    ]
+                  }
+                >
+                  <RCTScrollView
+                    contentContainerStyle={
+                      Object {
+                        "alignItems": "center",
+                      }
+                    }
+                  >
+                    <View>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Jost-Medium",
+                            "fontSize": 22,
+                            "lineHeight": 28,
+                            "marginBottom": 12,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalHeader
+                      </Text>
+                      <Text
+                        style={
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                            "marginBottom": 24,
+                            "textAlign": "center",
+                          }
+                        }
+                      >
+                        encryption.warningModalBody
+                      </Text>
+                    </View>
+                  </RCTScrollView>
+                  <View
+                    style={
+                      Object {
+                        "flexDirection": "row",
+                        "flexWrap": "wrap",
+                        "justifyContent": "space-around",
+                        "maxWidth": "100%",
+                      }
+                    }
+                  >
+                    <View
+                      accessible={true}
+                      focusable={true}
+                      nativeBackgroundAndroid={
+                        Object {
+                          "attribute": "selectableItemBackgroundBorderless",
+                          "type": "ThemeAttrAndroid",
+                        }
+                      }
+                      onClick={[Function]}
+                      onResponderGrant={[Function]}
+                      onResponderMove={[Function]}
+                      onResponderRelease={[Function]}
+                      onResponderTerminate={[Function]}
+                      onResponderTerminationRequest={[Function]}
+                      onStartShouldSetResponder={[Function]}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "paddingTop": 16,
+                            },
+                          ]
+                        }
+                      >
+                        global:dismiss
                       </Text>
                     </View>
                   </View>

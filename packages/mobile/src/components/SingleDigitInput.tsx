@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     ...componentStyles.roundedBorder,
     flex: 0,
     backgroundColor: '#FFF',
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     height: 50,
     width: 50,
     marginVertical: 5,

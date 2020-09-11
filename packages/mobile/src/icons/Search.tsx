@@ -12,7 +12,7 @@ export default class Search extends React.PureComponent<Props> {
   static defaultProps = {
     width: 14,
     height: 14,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   }
 
   render() {

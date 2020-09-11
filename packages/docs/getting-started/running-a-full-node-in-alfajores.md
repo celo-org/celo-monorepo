@@ -27,7 +27,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for `Alfajores` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:alfajores
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:alfajores
 export NETWORK_ID=44787
 ```
 

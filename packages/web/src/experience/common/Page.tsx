@@ -2,7 +2,7 @@ import throttle from 'lodash.throttle'
 import { SingletonRouter, withRouter } from 'next/router'
 import * as React from 'react'
 import { findNodeHandle, ImageRequireSource, StyleSheet, View } from 'react-native'
-import MobileMenu from 'src/experience/common/MobileMenu'
+import MobileKitMenu from 'src/experience/common/MobileKitMenu'
 import scrollToHash from 'src/experience/common/scrollToHash'
 import Sidebar, { Page as Pages } from 'src/experience/common/Sidebar'
 import Topbar from 'src/experience/common/TopBar'
@@ -41,8 +41,9 @@ interface Props {
   sections: Section[]
   title: string
   path: string
+  kitName?: string
   metaDescription: string
-  ogImage: ImageRequireSource
+  ogImage: ImageRequireSource | string
 }
 
 interface State {
@@ -114,7 +115,12 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
     if (this.state.routeHash !== top.id) {
       this.setState({ routeHash: top.id })
-      window.history.replaceState({}, top.id, `${location.pathname}#${top.id}`)
+
+      window.history.replaceState(
+        {},
+        top.id,
+        `${location.pathname}${window.location.search}#${top.id}`
+      )
     }
   }
 
@@ -171,23 +177,30 @@ class Page extends React.Component<Props & ScreenProps, State> {
           image={this.props.ogImage}
         />
         <View style={styles.conatiner}>
-          <View style={[styles.topbar, (this.state.isLineVisible || isMobile) && styles.grayLine]}>
-            <Topbar current={this.props.pages[0].href} />
+          <View style={styles.topbar}>
+            <View
+              style={[
+                styles.grayLineOff,
+                (this.state.isLineVisible || isMobile) && styles.grayLine,
+              ]}
+            >
+              <Topbar current={this.props.pages[0].href} kitName={this.props.kitName} />
+            </View>
+            {isMobile && (
+              <MobileKitMenu
+                pages={this.props.pages}
+                pathname={router.asPath}
+                routeHash={this.state.routeHash}
+              />
+            )}
           </View>
-          <View style={styles.justNeedSpace} />
-          {isMobile && (
-            <MobileMenu
-              pages={this.props.pages}
-              pathname={router.pathname}
-              routeHash={this.state.routeHash}
-            />
-          )}
+
           <GridRow mobileStyle={styles.mobileMain} desktopStyle={standardStyles.sectionMarginTop}>
             <Cell span={Spans.fourth} style={styles.sidebar}>
               {!isMobile && (
                 <Sidebar
                   pages={this.props.pages}
-                  currentPathName={router.pathname}
+                  currentPathName={router.asPath}
                   routeHash={this.state.routeHash}
                   onChangeRoute={moveToHash}
                 />
@@ -211,7 +224,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
             </Cell>
           </GridRow>
           <View style={styles.footer} nativeID={FOOTER_ID} ref={this.footer}>
-            <Footer />
+            <Footer hideForm={true} />
           </View>
         </View>
       </>
@@ -221,23 +234,23 @@ class Page extends React.Component<Props & ScreenProps, State> {
 
 const styles = StyleSheet.create({
   conatiner: { isolation: 'isolate' },
-  mobileMain: { zIndex: -5, marginTop: 50 },
+  mobileMain: { zIndex: -5, marginTop: 116 },
   desktopMain: { flex: 1, flexBasis: 'calc(75% - 50px)' },
   sidebar: { minWidth: 190, paddingLeft: 0 },
-  justNeedSpace: {
-    marginTop: HEADER_HEIGHT,
+  grayLineOff: {
+    transitionProperty: 'box-shadow',
+    transitionDuration: '400ms',
+    marginBottom: 1,
+    boxShadow: `0px 0px 0px 0px rgba(0,0,0,0)`,
   },
   grayLine: {
     boxShadow: `0px 1px 1px -1px rgba(0,0,0,0.5)`,
   },
   topbar: {
-    transitionProperty: 'box-shadow',
-    transitionDuration: '400ms',
-    boxShadow: `0px 0px 0px 0px rgba(0,0,0,0)`,
+    zIndex: 10,
     position: 'fixed',
     width: '100%',
-    zIndex: 10,
-    marginBottom: HEADER_HEIGHT,
+    backgroundColor: colors.white,
   },
   footer: { zIndex: -10, backgroundColor: colors.white, marginTop: 50 },
   childrenArea: {

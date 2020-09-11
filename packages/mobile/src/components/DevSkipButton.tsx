@@ -91,10 +91,10 @@ const styles = StyleSheet.create({
     height: 25,
   },
   skipButton: {
-    backgroundColor: colors.errorRed,
+    backgroundColor: colors.warning,
   },
   debugButton: {
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
   },
   hiddenButton: {
     flex: 1,

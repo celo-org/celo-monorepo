@@ -4,7 +4,6 @@ exports[`Invite renders correctly with no recipients 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -50,6 +49,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -90,7 +90,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
   <View
     style={
       Object {
-        "borderBottomColor": "rgba(134, 138, 141, 0.15)",
+        "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
       }
@@ -310,7 +310,6 @@ exports[`Invite renders correctly with recipients 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -356,6 +355,7 @@ exports[`Invite renders correctly with recipients 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -396,7 +396,7 @@ exports[`Invite renders correctly with recipients 1`] = `
   <View
     style={
       Object {
-        "borderBottomColor": "rgba(134, 138, 141, 0.15)",
+        "borderBottomColor": "#EDEEEF",
         "borderBottomWidth": 1,
         "paddingBottom": 5,
       }
@@ -537,9 +537,9 @@ exports[`Invite renders correctly with recipients 1`] = `
             "data": Array [
               Object {
                 "contactId": "contactId",
-                "displayId": "21255550000",
+                "displayId": "442012341234",
                 "displayName": "George Bogart",
-                "e164PhoneNumber": "+21255550000",
+                "e164PhoneNumber": "+442012341234",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
@@ -736,7 +736,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                       }
                     }
                   >
-                    21255550000
+                    442012341234
                   </Text>
                 </View>
               </View>

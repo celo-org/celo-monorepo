@@ -34,11 +34,12 @@ interface Config {
     sslKeyPath?: string
     sslCertPath?: string
   }
-  salt: {
+  quota: {
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
     minDollarBalance: BigNumber
+    minCeloBalance: BigNumber
   }
   attestations: {
     numberAttestationsRequired: number
@@ -84,11 +85,14 @@ const config: Config = {
     sslKeyPath: env.SERVER_SSL_KEY_PATH,
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
-  salt: {
-    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX) || 2,
-    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
-    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION) || 2,
-    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE || 100000000000000000),
+  quota: {
+    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 2,
+    additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
+    queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
+    // Min balance is .01 cUSD
+    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    // Min balance is .005 CELO
+    minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
   },
   attestations: {
     numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,

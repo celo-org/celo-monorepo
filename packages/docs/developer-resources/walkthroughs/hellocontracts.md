@@ -104,7 +104,7 @@ truffle(test)> contract.getName()
 When you are ready to deploy your contract to Alfajores, you'll need a Celo client connected to the testnet. We'll run a node somewhat similarly to the [Instructions of running a full node on Baklava](/getting-started/baklava-testnet/running-a-full-node):
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:alfajores
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:alfajores
 export NETWORK_ID=44787
 ```
 

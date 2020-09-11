@@ -101,7 +101,7 @@ rule noChangeByOther(address a, address b, method f) {
 	uint256 ercBalance_ = sinvoke ercBalanceOf(a); 
 	uint256 accountNonVoting_ = sinvoke getAccountNonvotingLockedGold(a);
 	uint256 accountTotalPendingWithdrawals_ =  sinvoke getTotalPendingWithdrawals(a);
-	assert(_ercBalance == ercBalance_, "Unexpected change to erc tokens");
+	assert(f.selector != withdraw(uint256).selector => _ercBalance == ercBalance_, "Unexpected change to erc tokens");
 	assert(_accountTotalPendingWithdrawals == accountTotalPendingWithdrawals_, "Unexpected change to total pending");
 	assert(_accountNonVoting == accountNonVoting_, "Unexpected change to account nonvoting");
 }

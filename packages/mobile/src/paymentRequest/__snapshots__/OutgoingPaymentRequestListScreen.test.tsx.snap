@@ -4,7 +4,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with no requests 1`]
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -34,7 +33,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }

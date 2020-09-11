@@ -74,7 +74,9 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-        enableHermes: false,  // clean and rebuild if changing
+        enableHermes: true,  // clean and rebuild if changing
+        hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
+        hermesFlagsDebug: ["-w", "-O", "-output-source-map"],
         bundleInIntegration: true,
         devDisabledInIntegration: true,
         bundleInAlfajores: true,
@@ -84,6 +86,8 @@ project.ext.react = [
         bundleInMainnet: true,
         devDisabledInMainnet: true,
         cliPath: "../../node_modules/react-native/cli.js",
+        hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes",
+        composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
         entryFile: "index.js",
 ]
 
@@ -93,6 +97,10 @@ project.ext.envConfigFiles = [
     alfajores: ".env.alfajores",
     pilot: ".env.pilot",
     mainnet: ".env.mainnet",
+]
+
+project.ext.sentryCli = [
+    logLevel: "debug"
 ]
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
@@ -157,7 +165,7 @@ android {
         minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.8.2"
+        versionName "1.0.1"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "app_name", project.env.get("APP_DISPLAY_NAME")
@@ -283,7 +291,6 @@ dependencies {
         def hermesPath = "../../../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
         integrationImplementation files(hermesPath + "hermes-release.aar")
-        stagingImplementation files(hermesPath + "hermes-release.aar")
         alfajoresImplementation files(hermesPath + "hermes-release.aar")
         pilotImplementation files(hermesPath + "hermes-release.aar")
         mainnetImplementation files(hermesPath + "hermes-release.aar")
@@ -312,7 +319,7 @@ if (enableFirebase.toBoolean()){
 // https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
 configurations.all {
      resolutionStrategy {
-       force "com.facebook.soloader:soloader:0.8.1"
+       force "com.facebook.soloader:soloader:0.8.2"
      }
 }
 

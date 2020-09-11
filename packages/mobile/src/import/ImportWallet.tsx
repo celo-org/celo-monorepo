@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
@@ -25,8 +25,11 @@ import Dialog from 'src/components/Dialog'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { importBackupPhrase } from 'src/import/actions'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
+import UseBackToWelcomeScreen from 'src/onboarding/UseBackToWelcomeScreen'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 
@@ -59,6 +62,14 @@ const mapStateToProps = (state: RootState): StateProps => {
 export class ImportWallet extends React.Component<Props, State> {
   static navigationOptions = {
     ...nuxNavigationOptions,
+    headerLeft: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:cancel')}
+        // Note: redux state reset is handled by UseBackToWelcomeScreen
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigate(Screens.Welcome)}
+      />
+    ),
     headerTitle: () => (
       <HeaderTitleWithSubtitle
         title={i18n.t('nuxNamePin1:importIt')}
@@ -144,6 +155,9 @@ export class ImportWallet extends React.Component<Props, State> {
           <SafeAreaInsetsContext.Consumer>
             {(insets) => (
               <View style={styles.container}>
+                <UseBackToWelcomeScreen
+                  backAnalyticsEvents={[OnboardingEvents.restore_account_cancel]}
+                />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
                   contentContainerStyle={[

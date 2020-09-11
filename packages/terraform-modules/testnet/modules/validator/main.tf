@@ -1,10 +1,11 @@
 # This module creates var.validator_count validators. The first
-# var.proxied_validator_count validators are hidden behind externally facing
+# local.proxied_validator_count validators are hidden behind externally facing
 # proxies, and the rest are exposed to the external internet.
 
 locals {
-  attached_disk_name = "celo-data"
-  name_prefix        = "${var.celo_env}-validator"
+  attached_disk_name      = "celo-data"
+  name_prefix             = "${var.celo_env}-validator"
+  proxied_validator_count = length(var.proxies_per_validator)
 }
 
 resource "google_compute_address" "validator" {
@@ -12,7 +13,7 @@ resource "google_compute_address" "validator" {
   address_type = "EXTERNAL"
 
   # only create external addresses for validators that are not proxied
-  count = var.validator_count - var.proxied_validator_count
+  count = var.validator_count - local.proxied_validator_count
 }
 
 resource "google_compute_address" "validator_internal" {
@@ -51,9 +52,9 @@ resource "google_compute_instance" "validator" {
     subnetwork = google_compute_subnetwork.validator.name
     # We only want an access config for validators that will not be proxied
     dynamic "access_config" {
-      for_each = count.index < var.proxied_validator_count ? [] : [0]
+      for_each = count.index < local.proxied_validator_count ? [] : [0]
       content {
-        nat_ip = google_compute_address.validator[count.index - var.proxied_validator_count].address
+        nat_ip = google_compute_address.validator[count.index - local.proxied_validator_count].address
       }
     }
   }
@@ -67,20 +68,23 @@ resource "google_compute_instance" "validator" {
       gcloud_secrets_base_path : var.gcloud_secrets_base_path,
       gcloud_secrets_bucket : var.gcloud_secrets_bucket,
       genesis_content_base64 : var.genesis_content_base64,
-      geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
-      geth_exporter_docker_image_tag : var.geth_exporter_docker_image_tag,
+      geth_metrics : var.geth_metrics,
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
       geth_node_docker_image_tag : var.geth_node_docker_image_tag,
       geth_verbosity : var.geth_verbosity,
       in_memory_discovery_table : var.in_memory_discovery_table,
-      ip_address : count.index < var.proxied_validator_count ? "" : google_compute_address.validator[count.index - var.proxied_validator_count].address,
+      ip_address : count.index < local.proxied_validator_count ? "" : google_compute_address.validator[count.index - local.proxied_validator_count].address,
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
+      max_light_peers : 20,
       max_peers : 125,
       network_id : var.network_id,
-      proxied : count.index < var.proxied_validator_count,
+      proxied : count.index < length(var.proxies_per_validator),
+      # proxied : var.proxies_per_validator[count.index] > 0 ? true : false,
       rid : count.index,
-      proxy_internal_ip_address : count.index < var.proxied_validator_count ? module.proxy.internal_ip_addresses[count.index] : "",
-      proxy_external_ip_address : count.index < var.proxied_validator_count ? module.proxy.ip_addresses[count.index] : "",
+      # Searches for all proxies whose map key corresponds to this specific validator
+      # by finding keys starting with "validator-${this validator index}"
+      proxy_internal_ip_addresses : compact([for key in keys(module.proxy.internal_ip_addresses_map) : substr(key, 0, length(format("validator-%d", count.index))) == format("validator-%d", count.index) ? module.proxy.internal_ip_addresses_map[key] : ""]),
+      proxy_external_ip_addresses : compact([for key in keys(module.proxy.ip_addresses_map) : substr(key, 0, length(format("validator-%d", count.index))) == format("validator-%d", count.index) ? module.proxy.ip_addresses_map[key] : ""]),
       validator_name : "${local.name_prefix}-${count.index}",
     }
   )
@@ -102,7 +106,7 @@ resource "google_compute_disk" "validator" {
 
   type = "pd-ssd"
   # in GB
-  size                      = 15
+  size                      = var.node_disk_size_gb
   physical_block_size_bytes = 4096
 }
 
@@ -129,25 +133,24 @@ module "proxy" {
   gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
   genesis_content_base64                = var.genesis_content_base64
-  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_metrics                          = var.geth_metrics
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
   geth_node_docker_image_tag            = var.geth_node_docker_image_tag
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = ["${var.celo_env}-proxy"]
-  name                                  = "proxy"
+  max_peers                             = 200
+  names                                 = flatten([for val_index in range(length(var.proxies_per_validator)) : [for proxy_index in range(var.proxies_per_validator[val_index]) : format("validator-%d-proxy-%d", val_index, proxy_index)]])
   network_id                            = var.network_id
   network_name                          = var.network_name
-  # NOTE this assumes only one proxy will be used
-  node_count = var.proxied_validator_count
-  proxy      = true
+  node_disk_size_gb                     = var.node_disk_size_gb
+  proxy                                 = true
 }
 
 # if there are no proxied validators, we don't have to worry about
 
 resource "google_compute_firewall" "proxy_internal_ingress" {
-  count = var.proxied_validator_count > 0 ? 1 : 0
+  count = local.proxied_validator_count > 0 ? 1 : 0
 
   name    = "${local.name_prefix}-proxy-internal-ingress"
   network = var.network_name
@@ -167,7 +170,7 @@ resource "google_compute_firewall" "proxy_internal_ingress" {
 }
 
 resource "google_compute_firewall" "proxy_internal_egress" {
-  count = var.proxied_validator_count > 0 ? 1 : 0
+  count = local.proxied_validator_count > 0 ? 1 : 0
 
   name    = "${local.name_prefix}-proxy-internal-egress"
   network = var.network_name

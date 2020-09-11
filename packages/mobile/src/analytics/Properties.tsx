@@ -10,6 +10,7 @@ import {
   HomeEvents,
   IdentityEvents,
   InviteEvents,
+  NetworkEvents,
   OnboardingEvents,
   RequestEvents,
   SendEvents,
@@ -26,8 +27,11 @@ import { RecipientKind } from 'src/recipients/recipient'
 interface AppEventsProperties {
   [AppEvents.app_launched]: {
     // TODO: Figure out how to measure loadingDuration iOS and make param required
-    loadingDuration?: number
+    reactLoadDuration?: number
+    appLoadDuration?: number
     deviceInfo?: object
+    deviceHeight: number
+    deviceWidth: number
   }
   [AppEvents.app_state_error]: {
     error: string
@@ -76,6 +80,7 @@ interface SettingsEventsProperties {
   [SettingsEvents.language_select]: {
     language: string
   }
+  [SettingsEvents.settings_verify_number]: undefined
   [SettingsEvents.pin_require_on_load]: {
     enabled: boolean
   }
@@ -84,6 +89,8 @@ interface SettingsEventsProperties {
   }
   [SettingsEvents.licenses_view]: undefined
   [SettingsEvents.tos_view]: undefined
+  [SettingsEvents.start_account_removal]: undefined
+  [SettingsEvents.completed_account_removal]: undefined
 }
 
 interface OnboardingEventsProperties {
@@ -94,6 +101,12 @@ interface OnboardingEventsProperties {
   }
   [OnboardingEvents.onboarding_education_complete]: undefined
   [OnboardingEvents.onboarding_education_cancel]: undefined
+
+  [OnboardingEvents.create_account_start]: undefined
+  [OnboardingEvents.create_account_cancel]: undefined
+
+  [OnboardingEvents.restore_account_start]: undefined
+  [OnboardingEvents.restore_account_cancel]: undefined
 
   [OnboardingEvents.backup_education_start]: undefined
   [OnboardingEvents.backup_education_scroll]: {
@@ -133,6 +146,7 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.phone_number_set]: {
     countryCode: string
+    country?: string
   }
   [OnboardingEvents.phone_number_invalid]: {
     obfuscatedPhoneNumber: string
@@ -154,10 +168,13 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.invite_redeem_start]: undefined
   [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_cancel]: undefined
   [OnboardingEvents.invite_redeem_timeout]: undefined
   [OnboardingEvents.invite_redeem_error]: {
     error: string
   }
+  [OnboardingEvents.invite_redeem_move_funds_start]: undefined
+  [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
   [OnboardingEvents.invite_redeem_skip_start]: undefined
   [OnboardingEvents.invite_redeem_skip_complete]: undefined
@@ -169,6 +186,13 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.escrow_redeem_complete]: undefined
   [OnboardingEvents.escrow_redeem_error]: {
     error: string
+  }
+
+  [OnboardingEvents.account_dek_register_start]: undefined
+  [OnboardingEvents.account_dek_register_account_unlocked]: undefined
+  [OnboardingEvents.account_dek_register_account_checked]: undefined
+  [OnboardingEvents.account_dek_register_complete]: {
+    newRegistration: boolean
   }
 }
 
@@ -224,7 +248,6 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_code_validate_complete]: {
     issuer: any
   }
-  [VerificationEvents.verification_account_set]: undefined
 
   [VerificationEvents.verification_reveal_all_attestations_start]: undefined
   [VerificationEvents.verification_reveal_attestation_revealed]: {
@@ -287,9 +310,14 @@ interface IdentityEventsProperties {
 }
 
 interface InviteEventsProperties {
-  [InviteEvents.invite_tx_start]: undefined
-  [InviteEvents.invite_tx_complete]: undefined
+  [InviteEvents.invite_tx_start]: {
+    escrowIncluded: boolean
+  }
+  [InviteEvents.invite_tx_complete]: {
+    escrowIncluded: boolean
+  }
   [InviteEvents.invite_tx_error]: {
+    escrowIncluded: boolean
     error: string
   }
   [InviteEvents.invite_method_sms]: undefined
@@ -340,7 +368,7 @@ interface SendEventsProperties {
     localCurrencyAmount: string | null
   }
   [SendEvents.send_confirm_back]: undefined
-  [SendEvents.send_confim_send]: {
+  [SendEvents.send_confirm_send]: {
     isScan: boolean
     isInvite: boolean
     isRequest: boolean
@@ -378,7 +406,12 @@ interface SendEventsProperties {
   [SendEvents.send_secure_edit]: undefined
 
   [SendEvents.send_tx_start]: undefined
-  [SendEvents.send_tx_complete]: undefined
+  [SendEvents.send_tx_complete]: {
+    txId: string
+    recipientAddress: string
+    amount: string
+    currency: string
+  }
   [SendEvents.send_tx_error]: {
     error: string
   }
@@ -434,11 +467,18 @@ interface FeeEventsProperties {
 interface TransactionEventsProperties {
   [TransactionEvents.transaction_start]: {
     txId: string
+    description?: string
+    fornoMode?: boolean
   }
   [TransactionEvents.transaction_gas_estimated]: {
     txId: string
+    estimatedGas: number
   }
   [TransactionEvents.transaction_hash_received]: {
+    txId: string
+    txHash: string
+  }
+  [TransactionEvents.transaction_confirmed]: {
     txId: string
   }
   [TransactionEvents.transaction_receipt_received]: {
@@ -458,6 +498,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_home_info]: undefined
   [CeloExchangeEvents.celo_home_buy]: undefined
   [CeloExchangeEvents.celo_home_sell]: undefined
+  [CeloExchangeEvents.celo_home_withdraw]: undefined
   [CeloExchangeEvents.celo_transaction_select]: undefined
   [CeloExchangeEvents.celo_transaction_back]: undefined
 
@@ -473,6 +514,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_buy_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -490,6 +532,7 @@ interface CeloExchangeEventsProperties {
   [CeloExchangeEvents.celo_sell_confirm]: {
     localCurrencyAmount: string | null
     goldAmount: string
+    dollarAmount: string
     inputToken: CURRENCY_ENUM
     goldToDollarExchangeRate: string
   }
@@ -500,7 +543,11 @@ interface CeloExchangeEventsProperties {
   }
 
   [CeloExchangeEvents.celo_exchange_start]: undefined
-  [CeloExchangeEvents.celo_exchange_complete]: undefined
+  [CeloExchangeEvents.celo_exchange_complete]: {
+    txId: string
+    currency: string
+    amount: string
+  }
   [CeloExchangeEvents.celo_exchange_error]: {
     error: string
   }
@@ -511,6 +558,21 @@ interface CeloExchangeEventsProperties {
     exchangeRate: number
   }
   [CeloExchangeEvents.celo_fetch_exchange_rate_error]: {
+    error: string
+  }
+
+  [CeloExchangeEvents.celo_withdraw_review]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_edit]: undefined
+  [CeloExchangeEvents.celo_withdraw_cancel]: undefined
+  [CeloExchangeEvents.celo_withdraw_confirm]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_completed]: {
+    amount: string
+  }
+  [CeloExchangeEvents.celo_withdraw_error]: {
     error: string
   }
 }
@@ -524,16 +586,48 @@ interface GethEventsProperties {
   }
   [GethEvents.geth_restart_to_fix_init]: undefined
   [GethEvents.prompt_forno]: {
-    error: string
+    error?: string
     context: string
   }
   [GethEvents.geth_init_start]: {
-    sync: boolean
+    shouldStartNode: boolean
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined
+  [GethEvents.create_geth_error]: {
+    error: string
+  }
   [GethEvents.start_geth_start]: undefined
   [GethEvents.start_geth_finish]: undefined
+}
+
+interface NetworkEventsProperties {
+  [NetworkEvents.network_connected]: {
+    fornoMode: boolean
+  }
+  [NetworkEvents.network_disconnected]: {
+    fornoMode: boolean
+  }
+  [NetworkEvents.network_sync_lost]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_restored]: {
+    latestBlock: number
+    latestTimestamp: number
+  }
+  [NetworkEvents.network_sync_waiting]: undefined
+  [NetworkEvents.network_sync_start]: {
+    startingBlock: number
+    currentBlock: number
+    highestBlock: number
+  }
+  [NetworkEvents.network_sync_finish]: {
+    latestBlock: number
+  }
+  [NetworkEvents.network_sync_error]: {
+    error: string
+  }
 }
 
 interface ContractKitEventsProperties {
@@ -565,4 +659,5 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
   GethEventsProperties &
+  NetworkEventsProperties &
   ContractKitEventsProperties

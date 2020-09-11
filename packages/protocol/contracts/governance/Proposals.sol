@@ -49,6 +49,14 @@ library Proposals {
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Constructs a proposal.
    * @param proposal The proposal struct to be constructed.
    * @param values The values of Celo Gold to be sent in the proposed transactions.
@@ -346,6 +354,7 @@ library Proposals {
 
   // call has been separated into its own function in order to take advantage
   // of the Solidity's code generator to produce a loop that copies tx.data into memory.
+  // TODO: Move to Transaction.execute whenever the next change to Governance is made.
   /**
    * @notice Executes a function call.
    * @param value The value of Celo Gold to be sent with the function call.

@@ -1,9 +1,9 @@
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { StackNavigationOptions, StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
@@ -18,6 +18,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import CancelButton from 'src/components/CancelButton.v2'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers.v2'
@@ -71,10 +72,22 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export const navOptionsForQuiz: StackNavigationOptions = {
-  ...emptyHeader,
-  headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+export const navOptionsForQuiz = ({ route }: OwnProps) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  const onCancel = () => {
+    navigate(Screens.Settings)
+  }
+  return {
+    ...emptyHeader,
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton onCancel={onCancel} style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  }
 }
 
 export class BackupQuiz extends React.Component<Props, State> {
@@ -175,7 +188,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     if (lengthsMatch && contentMatches(userChosenWords, mnemonic)) {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
-      navigate(Screens.BackupComplete)
+      const navigatedFromSettings = this.props.route.params?.navigatedFromSettings ?? false
+      navigate(Screens.BackupComplete, { navigatedFromSettings })
       ValoraAnalytics.track(OnboardingEvents.backup_quiz_complete)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
@@ -276,7 +290,11 @@ const Word = React.memo(function _Word({ word, index, onPressWord }: WordProps) 
 
   return (
     <View key={'mnemonic-button-' + word} style={styles.mnemonicWordButtonOutterRim}>
-      <Touchable style={styles.mnemonicWordButton} onPress={onPressMnemonicWord}>
+      <Touchable
+        style={styles.mnemonicWordButton}
+        onPress={onPressMnemonicWord}
+        testID={`backupQuiz/${word}`}
+      >
         <Text style={styles.mnemonicWordButonText}>{word}</Text>
       </Touchable>
     </View>
@@ -320,7 +338,6 @@ function getShuffledWordSet(mnemonic: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 24,
@@ -408,6 +425,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   resetButton: { alignItems: 'center', padding: 24, marginTop: 8 },
+  cancelButton: {
+    color: colors.gray4,
+  },
 })
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {

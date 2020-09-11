@@ -520,18 +520,18 @@ const linkedLibraries = {
     'Validators',
   ],
   Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
-  LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
-  SortedLinkedList: [
-    'AddressSortedLinkedList',
-    'IntegerSortedLinkedList',
-    'SortedLinkedListWithMedian',
-  ],
-  SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
   IntegerSortedLinkedList: ['Governance', 'GovernanceTest', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
+  Signatures: [
+    'Accounts',
+    'Attestations',
+    'AttestationsTest',
+    'LockedGold',
+    'Escrow',
+    'MetaTransactionWallet',
+  ],
 }
 
 const config = lodash.cloneDeep(DefaultConfig)

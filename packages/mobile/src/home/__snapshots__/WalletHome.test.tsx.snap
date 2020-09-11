@@ -4,7 +4,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -51,6 +50,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -142,7 +142,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -155,7 +155,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -637,7 +636,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -684,6 +682,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -775,7 +774,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -788,7 +787,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }
@@ -1270,7 +1268,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "position": "relative",
     }
@@ -1317,6 +1314,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -1408,7 +1406,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       <RefreshControlMock
         colors={
           Array [
-            "#42D689",
+            "#1AB775",
           ]
         }
         onRefresh={[Function]}
@@ -1421,7 +1419,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     stickyHeaderIndices={Array []}
     style={
       Object {
-        "backgroundColor": "#FFFFFF",
         "flex": 1,
         "position": "relative",
       }

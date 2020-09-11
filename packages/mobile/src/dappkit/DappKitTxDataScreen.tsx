@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -33,23 +33,20 @@ class DappKitTxDataScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     flex: 1,
-    backgroundColor: colors.background,
     marginHorizontal: '5%',
   },
   header: {
     ...fontStyles.h1,
-    textAlign: 'center',
+    textAlign: 'left',
     paddingBottom: 15,
   },
   bodyText: {
-    ...fontStyles.paragraph,
-    fontSize: 15,
-    color: colors.darkSecondary,
+    ...fontStyles.small,
+    color: colors.gray4,
   },
 })
 

@@ -4,7 +4,6 @@ exports[`Profile renders correctly 1`] = `
 <RCTScrollView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }

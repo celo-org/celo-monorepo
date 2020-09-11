@@ -50,6 +50,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -112,7 +113,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "marginTop": 16,
               "padding": 16,
             }
@@ -237,6 +238,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"

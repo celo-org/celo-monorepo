@@ -9,9 +9,16 @@ import "./interfaces/ILockedGold.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is
+  ILockedGold,
+  ICeloVersionedContract,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
 
   struct PendingWithdrawal {
@@ -66,6 +73,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address indexed reporter,
     uint256 reward
   );
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

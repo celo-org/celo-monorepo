@@ -38,10 +38,10 @@
   "faucetDone": "Done",
   "inviteError": "Unable to complete",
   "cUSDsent": "cUSD Sent",
-  "cGLDsent": "cGLD Sent",
+  "cGLDsent": "CELO Sent",
   "walletBuilt": "Wallet Built",
   "countryPlaceholder": "Country or Territory",
   "phonePlaceholder": "Phone Number",
   "chooseMobileOS": "Choose Mobile OS",
-  "downloadDirect": "Available for Android and iOS. Units in this wallet have no real value."
+  "downloadDirect": "TEMPORARILY Unavailable. \nUnits in this wallet have no real value."
 }

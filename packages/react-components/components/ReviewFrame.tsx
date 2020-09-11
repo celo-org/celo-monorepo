@@ -2,7 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import CircleButton from '@celo/react-components/components/CircleButton'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { StyleSheet, View, ViewProps } from 'react-native'
 
@@ -18,17 +18,20 @@ interface Props extends ViewProps {
   modifyButton?: ButtonProps
   HeaderComponent?: React.ComponentType<any>
   FooterComponent?: React.FunctionComponent
+  LabelAboveKeyboard?: React.FunctionComponent
   shouldReset?: boolean
   isSending?: boolean
 }
 
 interface State {
   confirmed: boolean
+  keyboardVisible: boolean
 }
 
 class ReviewFrame extends React.PureComponent<Props, State> {
-  state = {
+  state: State = {
     confirmed: false,
+    keyboardVisible: false,
   }
 
   onConfirm = () => {
@@ -36,6 +39,10 @@ class ReviewFrame extends React.PureComponent<Props, State> {
     if (this.props.confirmButton) {
       this.props.confirmButton.action()
     }
+  }
+
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -90,17 +97,25 @@ class ReviewFrame extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { HeaderComponent, FooterComponent, style, children } = this.props
+    const { HeaderComponent, FooterComponent, LabelAboveKeyboard, style, children } = this.props
 
     return (
       <View style={[styles.body, style]}>
-        <KeyboardAwareScrollView contentContainerStyle={styles.scrollViewContentContainer}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollViewContentContainer}
+          keyboardShouldPersistTaps={'handled'}
+        >
           {HeaderComponent && <HeaderComponent />}
           <View style={styles.confirmationContainer}>{children}</View>
         </KeyboardAwareScrollView>
-        {FooterComponent && <FooterComponent />}
-        {this.renderButtons()}
-        <KeyboardSpacer />
+        {!this.state.keyboardVisible && (
+          <>
+            {FooterComponent && <FooterComponent />}
+            {this.renderButtons()}
+          </>
+        )}
+        {this.state.keyboardVisible && LabelAboveKeyboard && <LabelAboveKeyboard />}
+        <KeyboardSpacer onToggle={this.onToggleKeyboard} />
       </View>
     )
   }

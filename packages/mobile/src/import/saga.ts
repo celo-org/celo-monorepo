@@ -10,6 +10,7 @@ import { storeMnemonic } from 'src/backup/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
+import { fetchVerificationState } from 'src/identity/verification'
 import {
   Actions,
   ImportBackupPhraseAction,
@@ -36,7 +37,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       return
     }
 
-    const keys = yield call(generateKeys, phrase, undefined, undefined, bip39)
+    const keys = yield call(generateKeys, phrase, undefined, undefined, undefined, bip39)
     const privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
@@ -65,7 +66,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       }
     }
 
-    const account: string | null = yield call(assignAccountFromPrivateKey, privateKey)
+    const account: string | null = yield call(assignAccountFromPrivateKey, privateKey, phrase)
     if (!account) {
       throw new Error('Failed to assign account from private key')
     }
@@ -82,6 +83,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       yield put(setHasSeenVerificationNux(true))
       navigateHome()
     } else {
+      yield call(fetchVerificationState)
       navigate(Screens.VerificationEducationScreen)
     }
 

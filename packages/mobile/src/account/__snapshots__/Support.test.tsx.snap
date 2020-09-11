@@ -4,7 +4,6 @@ exports[`Support renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -50,6 +49,7 @@ exports[`Support renders correctly 1`] = `
           "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -177,6 +177,14 @@ exports[`Support renders correctly 1`] = `
                     faq
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -248,6 +256,14 @@ exports[`Support renders correctly 1`] = `
                     forum
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -319,6 +335,14 @@ exports[`Support renders correctly 1`] = `
                     contact
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>

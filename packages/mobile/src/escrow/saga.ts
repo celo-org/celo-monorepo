@@ -33,10 +33,14 @@ import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
-import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
+import { addStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { TransactionStatus } from 'src/transactions/types'
+import {
+  newTransactionContext,
+  TransactionContext,
+  TransactionStatus,
+} from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -48,7 +52,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   Logger.debug(TAG + '@transferToEscrow', 'Begin transfer to escrow')
   try {
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_start)
-    const { phoneHash, amount, tempWalletAddress } = action
+    const { phoneHash, amount, tempWalletAddress, context } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
     const contractKit: ContractKit = yield call(getContractKit)
@@ -62,16 +66,22 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       contractKit.contracts.getEscrow,
     ])
 
+    // Approve a transfer of funds to the Escrow contract.
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
     const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
-    yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
+    yield call(
+      sendTransaction,
+      approvalTx.txo,
+      account,
+      newTransactionContext(TAG, 'Approve transfer to Escrow')
+    )
+    ValoraAnalytics.track(EscrowEvents.escrow_transfer_approve_tx_sent)
 
-    ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
+    // Tranfser the funds to the Escrow contract.
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
-
-    yield call(registerStandbyTransaction, action.txId, amount.toString(), escrow.address)
+    yield call(registerStandbyTransaction, context, amount.toString(), escrow.address)
 
     const transferTx = escrow.transfer(
       phoneHash,
@@ -82,8 +92,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       NUM_ATTESTATIONS_REQUIRED
     )
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_transfer_tx_sent)
-    // TODO check types
-    yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
+    yield call(sendAndMonitorTransaction, transferTx, account, context)
     yield put(fetchSentEscrowPayments())
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_complete)
   } catch (e) {
@@ -93,10 +102,10 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   }
 }
 
-function* registerStandbyTransaction(id: string, value: string, address: string) {
+function* registerStandbyTransaction(context: TransactionContext, value: string, address: string) {
   yield put(
     addStandbyTransaction({
-      id,
+      context,
       type: TokenTransactionType.EscrowSent,
       status: TransactionStatus.Pending,
       value,
@@ -121,7 +130,7 @@ function* withdrawFromEscrow() {
     ])
     const account: string = yield call(getConnectedUnlockedAccount)
     const tmpWalletPrivateKey: string | null = yield select(
-      (state: RootState) => state.invite.redeemedInviteCode
+      (state: RootState) => state.invite.redeemedTempAccountPrivateKey
     )
 
     if (!tmpWalletPrivateKey || !isValidPrivateKey(tmpWalletPrivateKey)) {
@@ -151,10 +160,10 @@ function* withdrawFromEscrow() {
     const s = `0x${signature.slice(64, 128)}`
     const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
+    // Generate and send the withdrawal transaction.
     const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
-    const txID = generateStandbyTransactionId(account)
-
-    yield call(sendTransaction, withdrawTx.txo, account, TAG, txID)
+    const context = newTransactionContext(TAG, 'Withdraw from escrow')
+    yield call(sendTransaction, withdrawTx.txo, account, context)
 
     yield put(fetchDollarBalance())
     Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
@@ -202,7 +211,12 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     const account = yield call(getConnectedUnlockedAccount)
 
     const reclaimTx = yield call(createReclaimTransaction, paymentID)
-    yield call(sendTransaction, reclaimTx, account, TAG, 'escrow reclaim')
+    yield call(
+      sendTransaction,
+      reclaimTx,
+      account,
+      newTransactionContext(TAG, 'Reclaim escrowed funds')
+    )
 
     yield put(fetchDollarBalance())
     yield put(fetchSentEscrowPayments())

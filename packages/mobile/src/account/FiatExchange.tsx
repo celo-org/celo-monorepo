@@ -1,19 +1,22 @@
 import ListItem from '@celo/react-components/components/ListItem'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
-import { SHOW_CASH_OUT } from 'src/config'
+import { FUNDING_LINK } from 'src/config'
+import { features } from 'src/flags'
+import { Namespaces } from 'src/i18n'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+import { navigateToURI } from 'src/utils/linking'
 
 function FiatExchange() {
   function goToAddFunds() {
@@ -32,6 +35,10 @@ function FiatExchange() {
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
 
+  const onOpenOtherFundingOptions = () => {
+    navigateToURI(FUNDING_LINK)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
@@ -47,23 +54,33 @@ function FiatExchange() {
           hideSymbol={true}
         />
       </View>
-      <View>
+      <View style={styles.optionsListContainer}>
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
         </ListItem>
-        {SHOW_CASH_OUT && (
+        {features.SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
             <Text style={styles.optionTitle}>{t('fiatExchangeFlow:cashOut')}</Text>
           </ListItem>
+        ) : (
+          <ListItem>
+            <Text style={styles.optionTitleComingSoon}>
+              {t('fiatExchangeFlow:cashOutComingSoon')}
+            </Text>
+          </ListItem>
         )}
       </View>
+      <Text style={styles.moreWays}>
+        <Trans i18nKey="otherFundingOptions" ns={Namespaces.fiatExchangeFlow}>
+          <Text onPress={onOpenOtherFundingOptions} style={styles.fundingOptionsLink} />
+        </Trans>
+      </Text>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
     flex: 1,
   },
   image: { height: 200 },
@@ -71,8 +88,6 @@ const styles = StyleSheet.create({
     paddingVertical: variables.contentPadding,
     paddingRight: variables.contentPadding,
     marginLeft: variables.contentPadding,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray2,
     height: 112,
     justifyContent: 'flex-end',
     alignItems: 'center',
@@ -89,18 +104,26 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
     color: colors.gray4,
   },
-  option: {
-    backgroundColor: colors.background,
+  optionsListContainer: {
+    flex: 1,
   },
-
+  option: {
+    backgroundColor: colors.light,
+  },
   optionTitle: {
     ...fontStyles.regular,
-    // marginLeft: variables.contentPadding,
   },
   optionTitleComingSoon: {
     ...fontStyles.regular,
     color: colors.gray3,
-    paddingLeft: variables.contentPadding,
+  },
+  moreWays: {
+    ...fontStyles.regular,
+    color: colors.gray5,
+    margin: variables.contentPadding,
+  },
+  fundingOptionsLink: {
+    textDecorationLine: 'underline',
   },
 })
 

@@ -1,5 +1,5 @@
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import colors from 'styles/colors'
 import Svg, { Path } from 'svgs'
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 export default class CeloGold extends React.PureComponent<Props> {
   static defaultProps = {
     height: 50,
-    color: colors.celoGold,
+    color: colors.goldBrand,
   }
 
   render() {

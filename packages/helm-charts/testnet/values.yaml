@@ -41,12 +41,6 @@ gethexporter:
     repository: gcr.io/celo-testnet/geth-exporter
     tag: ed7d21bd50592709173368cd697ef73c1774a261
 
-promtosd:
-  image:
-    repository: gcr.io/google-containers/prometheus-to-sd
-    tag: v0.3.2
-  port: 6060
-
 blockscout:
   image:
     repository: gcr.io/celo-testnet/blockscout

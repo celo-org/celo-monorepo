@@ -4,7 +4,7 @@ import { sha256 } from 'ethereumjs-util'
 import DeviceInfo from 'react-native-device-info'
 import { AppEvents } from 'src/analytics/Events'
 import { AnalyticsPropertiesList } from 'src/analytics/Properties'
-import { SEGMENT_API_KEY } from 'src/config'
+import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
@@ -12,12 +12,12 @@ const TAG = 'ValoraAnalytics'
 
 async function getDeviceInfo() {
   return {
-    AppName: DeviceInfo.getApplicationName(),
-    Brand: DeviceInfo.getBrand(),
-    BuildNumber: DeviceInfo.getBuildNumber(),
-    BundleId: DeviceInfo.getBundleId(),
+    AppName: await DeviceInfo.getApplicationName(),
+    Brand: await DeviceInfo.getBrand(),
+    BuildNumber: await DeviceInfo.getBuildNumber(),
+    BundleId: await DeviceInfo.getBundleId(),
     Carrier: await DeviceInfo.getCarrier(),
-    DeviceId: DeviceInfo.getDeviceId(),
+    DeviceId: await DeviceInfo.getDeviceId(),
     FirstInstallTime: await DeviceInfo.getFirstInstallTime(),
     FontScale: await DeviceInfo.getFontScale(),
     FreeDiskStorage: await DeviceInfo.getFreeDiskStorage(),
@@ -26,18 +26,18 @@ async function getDeviceInfo() {
     LastUpdateTime: await DeviceInfo.getLastUpdateTime(),
     Manufacturer: await DeviceInfo.getManufacturer(),
     MaxMemory: await DeviceInfo.getMaxMemory(),
-    Model: DeviceInfo.getModel(),
-    ReadableVersion: DeviceInfo.getReadableVersion(),
-    SerialNumber: await DeviceInfo.getSerialNumber(),
-    SystemName: DeviceInfo.getSystemName(),
-    SystemVersion: DeviceInfo.getSystemVersion(),
+    Model: await DeviceInfo.getModel(),
+    ReadableVersion: await DeviceInfo.getReadableVersion(),
+    SystemName: await DeviceInfo.getSystemName(),
+    SystemVersion: await DeviceInfo.getSystemVersion(),
     TotalDiskCapacity: await DeviceInfo.getTotalDiskCapacity(),
     TotalMemory: await DeviceInfo.getTotalMemory(),
-    UniqueID: DeviceInfo.getUniqueId(),
+    UniqueID: await DeviceInfo.getUniqueId(),
     UserAgent: await DeviceInfo.getUserAgent(),
-    Version: DeviceInfo.getVersion(),
+    Version: await DeviceInfo.getVersion(),
     isEmulator: await DeviceInfo.isEmulator(),
-    isTablet: DeviceInfo.isTablet(),
+    isTablet: await DeviceInfo.isTablet(),
+    UsedMemory: await DeviceInfo.getUsedMemory(),
   }
 }
 
@@ -104,7 +104,7 @@ class ValoraAnalytics {
 
   setUserAddress(address?: string | null) {
     if (address) {
-      this.userAddress = address
+      this.userAddress = address.toLowerCase()
     } else if (address === null) {
       this.userAddress = 'unverified'
     } else {
@@ -133,6 +133,7 @@ class ValoraAnalytics {
       timestamp: Date.now(),
       sessionId: this.sessionId,
       userAddress: this.userAddress,
+      celoNetwork: DEFAULT_TESTNET,
       ...eventProperties,
     }
 
@@ -151,6 +152,15 @@ class ValoraAnalytics {
     Analytics.screen(page, eventProperties).catch((err) => {
       Logger.error(TAG, 'Error tracking page', err)
     })
+  }
+
+  async reset() {
+    try {
+      await Analytics.flush()
+      await Analytics.reset()
+    } catch (error) {
+      Logger.error(TAG, 'Error resetting analytics', error)
+    }
   }
 }
 

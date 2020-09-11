@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '100%',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   innerContainer: {
     flexDirection: 'row',

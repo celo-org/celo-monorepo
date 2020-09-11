@@ -195,9 +195,8 @@ exports[`FAQ renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
             dir="auto"
-            href="https://celo.org"
+            href="https://celo.org/"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1432,7 +1431,6 @@ exports[`FAQ renders 1`] = `
             dir="auto"
             href="https://celo.org/privacy"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1747,7 +1745,6 @@ exports[`FAQ renders 1`] = `
             dir="auto"
             href="mailto:community@celo.org"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
