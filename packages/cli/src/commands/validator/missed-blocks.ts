@@ -12,11 +12,13 @@ interface VerboseValidatorEntry {
   name: string
   group: string
   address: Address
+  count: number
   missedBlocks: number[]
 }
 
 interface ValidatorEntry {
   address: Address
+  count: number
   missedBlocks: number[]
 }
 
@@ -24,11 +26,13 @@ export const verboseStatusTable = {
   address: {},
   name: {},
   group: {},
+  count: {},
   missedBlocks: {},
 }
 
 export const statusTable = {
   address: {},
+  count: {},
   missedBlocks: {},
 }
 
@@ -117,8 +121,9 @@ export default class ValidatorSignedBlocks extends BaseCommand {
         }
         const bitmap = parseBlockExtraData(block.extraData).parentAggregatedSeal.bitmap
         if (!bitIsSet(bitmap, i)) {
+          // The bitmap refers to signers of the previous block
           // @ts-ignore - TS can't realize that I already initialized this validator entry.
-          missedBlocks.get(electedSigners[i]).push(block.number)
+          missedBlocks.get(electedSigners[i]).push(block.number - 1)
         }
       }
     }
@@ -134,13 +139,13 @@ export default class ValidatorSignedBlocks extends BaseCommand {
           name = (await accounts.getName(validator)) || ''
           group = validatorToGroupName.get(validator) || ''
         }
-        info.push({ address: signer, name, group, missedBlocks: missed })
+        info.push({ address: signer, name, group, count: missed.length, missedBlocks: missed })
       }
       cli.table(info, verboseStatusTable, { 'no-truncate': !res.flags.truncate })
     } else {
       const info: ValidatorEntry[] = []
       for (const [signer, missed] of missedBlocks) {
-        info.push({ address: signer, missedBlocks: missed })
+        info.push({ address: signer, missedBlocks: missed, count: missed.length })
       }
       cli.table(info, statusTable, { 'no-truncate': !res.flags.truncate })
     }
