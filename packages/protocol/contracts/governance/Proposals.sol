@@ -24,7 +24,6 @@ library Proposals {
     uint256 execution;
   }
 
-  // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 yes;
     uint256 no;
@@ -346,7 +345,6 @@ library Proposals {
 
   // call has been separated into its own function in order to take advantage
   // of the Solidity's code generator to produce a loop that copies tx.data into memory.
-  // TODO: Move to Transaction.execute whenever the next change to Governance is made.
   /**
    * @notice Executes a function call.
    * @param value The value of Celo Gold to be sent with the function call.

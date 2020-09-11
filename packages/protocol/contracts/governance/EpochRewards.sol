@@ -319,8 +319,7 @@ contract EpochRewards is
       uint256 targetRewards = linearRewards.mul(timeSinceInitialization).div(SECONDS_LINEAR);
       return targetRewards.add(GENESIS_GOLD_SUPPLY);
     } else {
-      // TODO(asa): Implement block reward calculation for years 15-30.
-      require(false, "Implement block reward calculation for years 15-30");
+      require(false, "Block reward calculation for years 15-30 unimplemented");
       return 0;
     }
   }

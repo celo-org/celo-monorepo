@@ -16,7 +16,6 @@ import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-// TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
@@ -506,8 +505,6 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
-    // and return false?
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
@@ -562,7 +559,6 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
-    // TODO(yorke): clean up redundant computation
     require(proposalId != 0, "Account has no historical upvote");
     removeIfQueuedAndExpired(proposalId);
     if (queue.contains(proposalId)) {
@@ -578,8 +574,6 @@ contract Governance is
     return true;
   }
 
-  // TODO(asa): Consider allowing approval to be revoked.
-  // TODO(asa): Everywhere we use an index, require it's less than the array length
   /**
    * @notice Approves a proposal in the approval stage.
    * @param proposalId The ID of the proposal to approve.
@@ -999,7 +993,6 @@ contract Governance is
         if (emptyIndices.length > 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
-          // TODO(asa): We can save gas by not deleting here
           delete emptyIndices[indexOfLastEmptyIndex];
           emptyIndices.length = indexOfLastEmptyIndex;
         } else {
