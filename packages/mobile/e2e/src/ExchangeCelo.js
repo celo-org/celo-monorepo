@@ -45,7 +45,6 @@ export default ExchangeCelo = () => {
 
     // Return to the Exchange CELO screen and check balance
     await expect(element(by.id('BuyCelo'))).toBeVisible()
-    await verifyBalance(balance)
   })
 
   it('Withdraw CELO', async () => {
