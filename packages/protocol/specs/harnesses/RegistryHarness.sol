@@ -132,17 +132,17 @@ contract RegistryHarness is IRegistryExtended {
   }
 
   function getRandomBool() public returns (bool) {
-    randomIndex.add(1);
+    randomIndex = randomIndex.add(1);
     return randomBoolMap[randomIndex];
   }
 
   function getRandomUInt256() public returns (uint256) {
-    randomIndex.add(1);
+    randomIndex = randomIndex.add(1);
     return randomUInt256Map[randomIndex];
   }
 
   function getRandomAddress() public returns (address) {
-    randomIndex.add(1);
+    randomIndex = randomIndex.add(1);
     return randomAddressMap[randomIndex];
   }
 

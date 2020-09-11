@@ -651,7 +651,7 @@ contract Attestations is
     IAccounts accounts = getAccounts();
     uint256 issuersLength = numberValidatorsInCurrentSet();
     uint256[] memory issuers = new uint256[](issuersLength);
-    for (uint256 i = 0; i < issuersLength; i.add(1)) issuers[i] = i;
+    for (uint256 i = 0; i < issuersLength; i = i.add(1)) issuers[i] = i;
 
     require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 

@@ -34,7 +34,7 @@ contract LockedGoldHarness is LockedGold {
     require(getAccounts().isAccount(account), "Unknown account");
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256 total = 0;
-    for (uint256 i = 0; i < length; i.add(1)) {
+    for (uint256 i = 0; i < length; i = i.add(1)) {
       uint256 pendingValue = balances[account].pendingWithdrawals[i].value;
       require(total.add(pendingValue) >= total, "Pending value must be greater than 0");
       total = total.add(pendingValue);
