@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --passWithNoTests",
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
@@ -23,12 +23,11 @@
     "bignumber.js": "^9.0.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
-    "ethereumjs-abi": "^0.6.5",
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "web3-core-helpers": "1.2.11"
   },
   "devDependencies": {
-    "@celo/communication": "0.0.1-dev",
-    "@types/ethereumjs-abi": "0.6.3"
+    "@celo/communication": "0.0.1-dev"
   },
   "engines": {
     "node": ">=8.13.0"

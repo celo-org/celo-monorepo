@@ -1,5 +1,6 @@
+import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
+import { zeroRange } from '@celo/base/lib/collections'
 import { Address, ReadOnlyWallet } from '@celo/communication'
-import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { RemoteWallet } from '@celo/wallet-remote'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
@@ -7,7 +8,7 @@ import debugFactory from 'debug'
 import { LedgerSigner } from './ledger-signer'
 import { transportErrorFriendlyMessage } from './ledger-utils'
 
-export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
+export const CELO_BASE_DERIVATION_PATH = `${CELO_DERIVATION_PATH_BASE.slice(2)}/0`
 const ADDRESS_QTY = 5
 
 // Validates an address using the Ledger
@@ -52,7 +53,7 @@ export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnly
    * @param transport Transport to connect the ledger device
    */
   constructor(
-    readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
+    readonly derivationPathIndexes: number[] = zeroRange(ADDRESS_QTY),
     readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
     readonly transport: any = {},
     readonly ledgerAddressValidation: AddressValidation = AddressValidation.firstTransactionPerAddress

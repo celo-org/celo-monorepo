@@ -1,5 +1,5 @@
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/communication'
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
@@ -8,7 +8,7 @@ import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import * as helpers from 'web3-core-helpers'
 
-const debug = debugFactory('kit:tx:sign')
+const debug = debugFactory('wallet-base:tx:sign')
 
 // Original code taken from
 // https://github.com/ethereum/web3.js/blob/1.x/packages/web3-eth-accounts/src/index.js

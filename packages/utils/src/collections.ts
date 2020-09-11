@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
-export { intersection, notEmpty, zip, zip3 } from '@celo/base/lib/collections'
+export { intersection, notEmpty, zeroRange, zip, zip3 } from '@celo/base/lib/collections'
 export type AddressListItem = base.AddressListItem<BigNumber>
 
 // BigNumber comparator

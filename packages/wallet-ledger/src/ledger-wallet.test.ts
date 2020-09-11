@@ -162,7 +162,7 @@ describe('LedgerWallet class', () => {
         // Recreation of the connection will fail, therefore we use a single object
         if (!hardwareWallet) {
           const transport: Transport = await TransportNodeHid.open('')
-          hardwareWallet = await new LedgerWallet(undefined, undefined, transport)
+          hardwareWallet = new LedgerWallet(undefined, undefined, transport)
         }
       } catch (e) {
         throw new Error(
