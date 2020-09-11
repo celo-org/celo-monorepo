@@ -11,7 +11,7 @@ import { GethEvents, NetworkEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { getWordlist, storeMnemonic } from 'src/backup/utils'
+import { getStoredMnemonic, getWordlist, storeMnemonic } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
@@ -258,11 +258,11 @@ export function* getAccount() {
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   const wallet: UnlockableWallet = yield call(getWallet)
-  if (wallet.isAccountUnlocked(account)) {
-    return true
-  }
 
   try {
+    if (wallet.isAccountUnlocked(account)) {
+      return true
+    }
     const password: string = yield call(getPasswordSaga, account)
     const result = yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
     if (!result) {
@@ -272,6 +272,46 @@ export function* unlockAccount(account: string) {
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return true
   } catch (error) {
+    // --- BEGIN MIGRATION HACK --- //
+    // This can be safely removed once all existing Valora users have run it
+    //
+    // We need this because we have a new wallet implemenation that needs to
+    // add the current address as a valid signer
+    //
+    // Remove by Nov 15
+    if (error.message.includes('Could not find address')) {
+      try {
+        const mnemonic = yield call(getStoredMnemonic, account)
+        const keys = yield call(generateKeys, mnemonic, undefined, undefined, undefined, bip39)
+
+        const privateKey = keys.privateKey
+        if (!privateKey) {
+          throw new Error('Failed to convert mnemonic to hex')
+        }
+
+        const password: string = yield call(getPasswordSaga, account, false, true)
+        yield call([wallet, wallet.addAccount], privateKey, password)
+
+        Logger.debug(TAG + '@unlockAccount', `Successfully added account as wallet signer`)
+
+        const result = yield call(
+          [wallet, wallet.unlockAccount],
+          account,
+          password,
+          UNLOCK_DURATION
+        )
+        if (!result) {
+          throw new Error('Unlock account result false')
+        }
+
+        Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
+        return true
+      } catch (error) {
+        Logger.error(TAG + '@unlockAccount', 'Error adding account as wallet signer', error)
+      }
+    }
+    // --- END MIGRATION HACK --- //
+
     Logger.error(TAG + '@unlockAccount', 'Account unlock failed, clearing password caches', error)
     clearPasswordCaches()
     return false
