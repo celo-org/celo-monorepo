@@ -74,7 +74,7 @@ export const fontStyles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     fontFamily: HindSilguri.Regular,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   bodySmall: {
     fontSize: 14,
@@ -86,7 +86,7 @@ export const fontStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 18,
     fontFamily: HindSilguri.Regular,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   bodySmallBold: {
     fontSize: 14,
@@ -113,7 +113,7 @@ export const fontStyles = StyleSheet.create({
     color: colors.dark,
   },
   sectionLabel: {
-    color: colors.darkSecondary,
+    color: colors.gray5,
     fontSize: 12,
     fontFamily: HindSilguri.Medium,
   },
@@ -126,7 +126,7 @@ export const fontStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontFamily: HindSilguri.Regular,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   activityCurrencyReceived: {
     fontSize: 15,
@@ -138,7 +138,7 @@ export const fontStyles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     fontFamily: HindSilguri.Regular,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   pCurrency: {
     fontSize: 20,
@@ -148,7 +148,7 @@ export const fontStyles = StyleSheet.create({
   iconText: {
     fontSize: 16,
     fontFamily: HindSilguri.Medium,
-    color: colors.white,
+    color: colors.light,
   },
   telephoneHeadline: {
     fontSize: 14,
@@ -165,10 +165,10 @@ export const fontStyles = StyleSheet.create({
     fontSize: 14,
     fontFamily: HindSilguri.SemiBold,
     lineHeight: 22,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   },
   notificationIcon: {
-    color: colors.errorRed,
+    color: colors.warning,
     fontSize: 16,
     fontFamily: HindSilguri.Bold,
   },
@@ -178,7 +178,7 @@ export const fontStyles = StyleSheet.create({
   },
   messageText: {
     fontSize: 12,
-    color: colors.messageBlue,
+    color: colors.onboardingBlue,
   },
   center: {
     textAlign: 'center',
@@ -201,11 +201,11 @@ export const fontStyles = StyleSheet.create({
   comment: {
     fontSize: 15,
     fontFamily: HindSilguri.Regular,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   notification: {
     fontFamily: HindSilguri.Bold,
-    color: colors.white,
+    color: colors.light,
     fontSize: 10,
     lineHeight: 18,
   },

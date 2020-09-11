@@ -3030,7 +3030,6 @@ exports[`Privacy renders 1`] = `
         <a
           href="mailto:privacy@celo.org"
           onClick={[Function]}
-          onMouseEnter={[Function]}
         >
           privacy@celo.org
         </a>

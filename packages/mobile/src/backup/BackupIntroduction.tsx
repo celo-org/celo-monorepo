@@ -1,6 +1,6 @@
 import Button from '@celo/react-components/components/Button.v2'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import { default as colors, default as colorsV2 } from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -43,7 +43,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export const navOptionsForAccount = ({ route }: NavigationProps) => {
-  if (route.params?.fromSettings) {
+  if (route.params?.navigatedFromSettings) {
     return headerWithBackButton
   }
 
@@ -70,10 +70,10 @@ class BackupIntroduction extends React.Component<Props> {
 
   render() {
     const { backupCompleted, route } = this.props
-    const fromSettings = route.params?.fromSettings
+    const navigatedFromSettings = route.params?.navigatedFromSettings
     return (
       <SafeAreaView style={styles.container}>
-        {!fromSettings && <DrawerTopBar />}
+        {!navigatedFromSettings && <DrawerTopBar />}
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   keyArea: {
     padding: Spacing.Regular16,
-    backgroundColor: colorsV2.brownFaint,
+    backgroundColor: colors.beige,
     marginTop: Spacing.Regular16,
   },
   postSetupBody: {

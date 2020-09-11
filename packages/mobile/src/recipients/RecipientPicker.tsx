@@ -1,6 +1,6 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
@@ -145,8 +145,9 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const searchedAddress = searchQuery.toLowerCase()
     const existingContact = getRecipientFromAddress(
-      searchQuery,
+      searchedAddress,
       addressToE164Number,
       recipientCache
     )
@@ -161,8 +162,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       const recipient: RecipientWithAddress = {
         kind: RecipientKind.Address,
         displayName: t('walletAddress'),
-        displayId: searchQuery.substring(2, 17) + '...',
-        address: searchQuery,
+        displayId: searchedAddress.substring(2, 17) + '...',
+        address: searchedAddress,
       }
 
       return (

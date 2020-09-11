@@ -16,6 +16,7 @@ import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
 import { localCurrencySaga } from 'src/localCurrency/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
+import { paymentRequestSaga } from 'src/paymentRequest/saga'
 import { waitForRehydrate } from 'src/redux/persist-helper'
 import { sendSaga } from 'src/send/saga'
 import { sentrySaga } from 'src/sentry/saga'
@@ -33,7 +34,7 @@ const loggerBlacklist = [
   'SEND/SET_RECIPIENT_CACHE',
   'SEND/STORE_LATEST_IN_RECENTS',
   'IMPORT/IMPORT_BACKUP_PHRASE',
-  'WEB3/SET_COMMENT_KEY',
+  'WEB3/SET_DATA_ENCRYPTION_KEY',
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
@@ -80,6 +81,7 @@ export function* rootSaga() {
   yield spawn(web3Saga)
   yield spawn(accountSaga)
   yield spawn(firebaseSaga)
+  yield spawn(transactionSaga)
   yield spawn(homeSaga)
   yield spawn(identitySaga)
   yield spawn(localCurrencySaga)
@@ -88,7 +90,7 @@ export function* rootSaga() {
   yield spawn(goldTokenSaga)
   yield spawn(sendSaga)
   yield spawn(exchangeSaga)
-  yield spawn(transactionSaga)
+  yield spawn(paymentRequestSaga)
   yield spawn(escrowSaga)
   yield spawn(inviteSaga)
   yield spawn(importSaga)

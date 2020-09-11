@@ -82,10 +82,10 @@ const styles = StyleSheet.create({
     lineHeight: undefined,
   },
   textGrey: {
-    color: colors.disconnectBannerGrey,
+    color: colors.gray4,
   },
   textRed: {
-    color: colors.disconnectBannerRed,
+    color: colors.warning,
   },
 })
 

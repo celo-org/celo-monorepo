@@ -1,11 +1,12 @@
-import { eqAddress, findAddressIndex } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import { eqAddress, findAddressIndex } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/Validators'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -576,7 +577,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentSignerSet(): Promise<Address[]> {
     const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
-    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+    return concurrentMap(5, zeroRange(n), (idx) =>
       this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
     )
   }

@@ -1,23 +1,33 @@
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
-import { onPress } from 'src/_page-tests/test-utils'
+import { onPress, TestProvider } from 'src/_page-tests/test-utils'
 import PhoneInput from 'src/fauceting/PhoneInput'
 
 describe('PhoneInput', () => {
   describe('on initial', () => {
     it('renders an input for country', () => {
-      const { getByPlaceholderText } = render(<PhoneInput onChangeNumber={jest.fn()} />)
+      const { getByPlaceholderText } = render(
+        <TestProvider>
+          <PhoneInput onChangeNumber={jest.fn()} />
+        </TestProvider>
+      )
       expect(getByPlaceholderText('Country or Territory')).toBeTruthy()
     })
     it('renders an input for phone Number', () => {
-      const { getByPlaceholderText } = render(<PhoneInput onChangeNumber={jest.fn()} />)
+      const { getByPlaceholderText } = render(
+        <TestProvider>
+          <PhoneInput onChangeNumber={jest.fn()} />
+        </TestProvider>
+      )
       expect(getByPlaceholderText('Phone Number')).toBeTruthy()
     })
   })
   describe('when user types in country box and then fills in phone number', () => {
     it('renders suggestions, sets country code when pressed, and formats phone number', async () => {
       const { getByPlaceholderText, getAllByText, getByText } = render(
-        <PhoneInput onChangeNumber={jest.fn()} />
+        <TestProvider>
+          <PhoneInput onChangeNumber={jest.fn()} />
+        </TestProvider>
       )
       const countryInput = getByPlaceholderText('Country or Territory')
 

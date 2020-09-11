@@ -6,5 +6,7 @@ export const gethInitializedSelector = (state: RootState) => state.geth.initiali
 export const isGethConnectedSelector = (state: RootState) =>
   state.geth.initialized === InitializationState.INITIALIZED && state.geth.connected
 
+export const chainHeadSelector = (state: RootState) => state.geth.chainHead
+
 export const gethStartedThisSessionSelector = (state: RootState) =>
   state.geth.gethStartedThisSession

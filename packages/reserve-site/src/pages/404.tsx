@@ -49,6 +49,6 @@ export async function getStaticProps() {
     props: {
       year: new Date().getFullYear(),
     },
-    unstable_revalidate: 86400, // day
+    revalidate: 86400, // day
   }
 }

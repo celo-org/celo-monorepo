@@ -15,6 +15,10 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the oracles for
 
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
 EXAMPLES
   list StableToken
   list
@@ -35,6 +39,9 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account removing oracle reports
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -69,6 +76,9 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle account
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -100,6 +110,10 @@ USAGE
 
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the reports for
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLES
   reports StableToken

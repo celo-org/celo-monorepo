@@ -10,7 +10,7 @@ interface Props {
 export default class QRCode extends React.PureComponent<Props> {
   static defaultProps = {
     height: 21,
-    color: colors.celoGreen,
+    color: colors.greenBrand,
   }
 
   render() {

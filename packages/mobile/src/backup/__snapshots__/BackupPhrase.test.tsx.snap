@@ -29,27 +29,48 @@ exports[`renders correctly with backup completed 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Inter-Medium",
-                "fontSize": 16,
-                "lineHeight": 22,
+                "flexDirection": "column",
               }
             }
           >
-            backupKey
-          </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                  "marginBottom": 16,
+                }
+              }
+            >
+              writeDownKey
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                }
+              }
+            >
+              yourAccountKey
+            </Text>
+          </View>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "borderRadius": 4,
               "justifyContent": "center",
-              "marginTop": 16,
+              "marginTop": 8,
               "padding": 16,
             }
           }
@@ -102,27 +123,48 @@ exports[`renders correctly with backup not completed 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Inter-Medium",
-                "fontSize": 16,
-                "lineHeight": 22,
+                "flexDirection": "column",
               }
             }
           >
-            backupKey
-          </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                  "marginBottom": 16,
+                }
+              }
+            >
+              writeDownKey
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                }
+              }
+            >
+              yourAccountKey
+            </Text>
+          </View>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "borderRadius": 4,
               "justifyContent": "center",
-              "marginTop": 16,
+              "marginTop": 8,
               "padding": 16,
             }
           }
@@ -159,6 +201,7 @@ exports[`renders correctly with backup not completed 1`] = `
       onChange={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="backupKeySavedSwitch"
       thumbTintColor="#EDEEEF"
       trackColorForFalse="#B4B9BD"
       trackColorForTrue="#1AB775"
@@ -230,6 +273,7 @@ exports[`renders correctly with backup not completed 1`] = `
             "paddingVertical": 5,
           }
         }
+        testID="backupKeyContinue"
       >
         <Text
           style={
@@ -278,27 +322,48 @@ exports[`still renders when mnemonic doesnt show up 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Inter-Medium",
-                "fontSize": 16,
-                "lineHeight": 22,
+                "flexDirection": "column",
               }
             }
           >
-            backupKey
-          </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                  "marginBottom": 16,
+                }
+              }
+            >
+              writeDownKey
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                }
+              }
+            >
+              yourAccountKey
+            </Text>
+          </View>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "borderRadius": 4,
               "justifyContent": "center",
-              "marginTop": 16,
+              "marginTop": 8,
               "padding": 16,
             }
           }

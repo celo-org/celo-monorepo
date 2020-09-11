@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "es5",
+    "types": ["@emotion/core"],
     "lib": [
       "dom",
       "dom.iterable",

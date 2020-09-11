@@ -6,16 +6,16 @@ function Switch(props: SwitchProps) {
   return (
     <RNSwitch
       trackColor={switchTrackColors}
-      thumbColor={colors.white}
-      ios_backgroundColor={colors.inactive}
+      thumbColor={colors.light}
+      ios_backgroundColor={colors.gray4}
       {...props}
     />
   )
 }
 
 const switchTrackColors = {
-  false: colors.inactive,
-  true: colors.celoGreen,
+  false: colors.gray4,
+  true: colors.greenBrand,
 }
 
 export default Switch

@@ -1,5 +1,5 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import variables from '@celo/react-components/styles/variables'
 import _ from 'lodash'
 import * as React from 'react'

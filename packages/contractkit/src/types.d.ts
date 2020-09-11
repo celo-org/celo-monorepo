@@ -21,6 +21,7 @@ declare module 'web3-eth-abi' {
     name: string
     type: string
     indexed?: boolean
+    internalType?: string
     components?: AbiInput[]
   }
 

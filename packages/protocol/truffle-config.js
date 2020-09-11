@@ -4,6 +4,7 @@ const ProviderEngine = require('web3-provider-engine')
 const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
+const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
 var Web3 = require('web3')
 var net = require('net')
 
@@ -12,7 +13,7 @@ const argv = require('minimist')(process.argv.slice(2), {
   boolean: ['reset'],
 })
 
-const SOLC_VERSION = '0.5.8'
+const SOLC_VERSION = '0.5.13'
 const ALFAJORES_NETWORKID = 44787
 const BAKLAVA_NETWORKID = 62320
 const BAKLAVASTAGING_NETWORKID = 31420
@@ -36,7 +37,7 @@ const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
 // Gas limit is doubled for initial contract deployment.
-const gasLimit = argv.reset ? 20000000 : 10000000
+const gasLimit = argv.reset ? 20000000 : 12500000
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -187,16 +188,23 @@ module.exports = {
   compilers: {
     solc: {
       version: SOLC_VERSION,
+      settings: {
+        evmVersion: 'istanbul',
+      },
     },
   },
   networks,
+  mocha: flakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {
   module.exports = {
     compilers: {
       solc: {
-        version: '0.5.8',
+        version: SOLC_VERSION,
+        settings: {
+          evmVersion: 'istanbul',
+        },
       },
     },
     plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],

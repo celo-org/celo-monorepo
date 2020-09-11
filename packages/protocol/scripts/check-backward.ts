@@ -91,10 +91,7 @@ try {
         out('Actual version numbers match expected\n')
         process.exit(0)
       } else {
-        const outFile2 = argv.output_file ? argv.output_file : tmp.tmpNameSync({})
-        console.error('Version mismatch detected...')
-        console.error(`Writing version mismatch to ${outFile2} ...`)
-        writeJsonSync(outFile2, mismatches, { spaces: 2 })
+        console.error(`Version mismatch detected:\n${JSON.stringify(mismatches, null, 4)}`)
         process.exit(1)
       }
     }

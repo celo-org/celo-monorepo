@@ -1,40 +1,23 @@
+import {
+  Bip39,
+  CELO_DERIVATION_PATH_BASE,
+  MnemonicLanguages,
+  MnemonicStrength,
+  RandomNumberGenerator,
+} from '@celo/base/lib/account'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import randomBytes from 'randombytes'
 
-export const CELO_DERIVATION_PATH_BASE = "m/44'/52752'/0'"
-
-export enum MnemonicStrength {
-  s128_12words = 128,
-  s256_24words = 256,
-}
-
-export enum MnemonicLanguages {
-  chinese_simplified,
-  chinese_traditional,
-  english,
-  french,
-  italian,
-  japanese,
-  korean,
-  spanish,
-}
-
-type RandomNumberGenerator = (
-  size: number,
-  callback: (err: Error | null, buf: Buffer) => void
-) => void
-
-export interface Bip39 {
-  mnemonicToSeedSync: (mnemonic: string, password?: string) => Buffer
-  mnemonicToSeed: (mnemonic: string, password?: string) => Promise<Buffer>
-  generateMnemonic: (
-    strength?: number,
-    rng?: RandomNumberGenerator,
-    wordlist?: string[]
-  ) => Promise<string>
-  validateMnemonic: (mnemonic: string, wordlist?: string[]) => boolean
-}
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export {
+  Bip39,
+  CELO_DERIVATION_PATH_BASE,
+  MnemonicLanguages,
+  MnemonicStrength,
+  RandomNumberGenerator,
+} from '@celo/base/lib/account'
 
 function defaultGenerateMnemonic(
   strength?: number,
@@ -86,7 +69,33 @@ export async function generateKeys(
   bip39ToUse: Bip39 = bip39Wrapper,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): Promise<{ privateKey: string; publicKey: string }> {
-  const seed = await bip39ToUse.mnemonicToSeed(mnemonic, password)
+  const seed: Buffer = await generateSeed(mnemonic, password, bip39ToUse)
+  return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
+}
+
+// keyByteLength truncates the seed. *Avoid its use*
+// It was added only because a backwards compatibility bug
+export async function generateSeed(
+  mnemonic: string,
+  password?: string,
+  bip39ToUse: Bip39 = bip39Wrapper,
+  keyByteLength: number = 64
+): Promise<Buffer> {
+  let seed: Buffer = await bip39ToUse.mnemonicToSeed(mnemonic, password)
+  if (keyByteLength > 0 && seed.byteLength > keyByteLength) {
+    const bufAux = Buffer.allocUnsafe(keyByteLength)
+    seed.copy(bufAux, 0, 0, keyByteLength)
+    seed = bufAux
+  }
+  return seed
+}
+
+export function generateKeysFromSeed(
+  seed: Buffer,
+  changeIndex: number = 0,
+  addressIndex: number = 0,
+  derivationPath: string = CELO_DERIVATION_PATH_BASE
+): { privateKey: string; publicKey: string } {
   const node = bip32.fromSeed(seed)
   const newNode = node.derivePath(`${derivationPath}/${changeIndex}/${addressIndex}`)
   if (!newNode.privateKey) {
@@ -127,4 +136,6 @@ export const AccountUtils = {
   generateMnemonic,
   validateMnemonic,
   generateKeys,
+  generateSeed,
+  generateKeysFromSeed,
 }

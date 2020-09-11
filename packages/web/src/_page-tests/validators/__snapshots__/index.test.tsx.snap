@@ -822,7 +822,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -927,7 +926,6 @@ exports[`BuildPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1157,7 +1155,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1262,7 +1259,6 @@ exports[`BuildPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1492,7 +1488,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1597,7 +1592,6 @@ exports[`BuildPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1713,7 +1707,6 @@ exports[`BuildPage renders 1`] = `
               dir="auto"
               href="https://github.com/celo-org"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -3234,7 +3227,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/getting-started/choosing-a-network"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3515,7 +3507,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/getting-started/running-a-validator-in-mainnet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3772,7 +3763,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3927,7 +3917,6 @@ exports[`BuildPage renders 1`] = `
           dir="auto"
           href="https://discord.gg/jYRrHDQ"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {

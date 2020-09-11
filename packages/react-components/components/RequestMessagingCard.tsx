@@ -1,6 +1,6 @@
 import CallToActionsBar, { CallToAction } from '@celo/react-components/components/CallToActionsBar'
 import MessagingCard from '@celo/react-components/components/MessagingCard'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fonts from '@celo/react-components/styles/fonts.v2'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'

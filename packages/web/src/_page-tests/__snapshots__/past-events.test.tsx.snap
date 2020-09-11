@@ -361,7 +361,6 @@ exports[`PastEventsPage renders 1`] = `
             dir="auto"
             href="mailto:community@celo.org"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

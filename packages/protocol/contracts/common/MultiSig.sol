@@ -2,8 +2,8 @@ pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/utils/Address.sol";
 
+import "./ExternalCall.sol";
 import "./Initializable.sol";
 
 /**
@@ -270,24 +270,8 @@ contract MultiSig is Initializable {
     require(isConfirmed(transactionId), "Transaction not confirmed.");
     Transaction storage txn = transactions[transactionId];
     txn.executed = true;
-    bool success;
-    bytes memory returnData;
-    (success, returnData) = external_call(txn.destination, txn.value, txn.data);
-    require(success, "Transaction execution failed.");
+    bytes memory returnData = ExternalCall.execute(txn.destination, txn.value, txn.data);
     emit Execution(transactionId, returnData);
-  }
-
-  // call has been separated into its own function in order to take advantage
-  // of the Solidity's code generator to produce a loop that copies tx.data into memory.
-  function external_call(address destination, uint256 value, bytes memory data)
-    private
-    returns (bool, bytes memory)
-  {
-    if (data.length > 0) require(Address.isContract(destination), "Invalid contract address");
-    bool success;
-    bytes memory returnData;
-    (success, returnData) = destination.call.value(value)(data);
-    return (success, returnData);
   }
 
   /// @dev Returns the confirmation status of a transaction.

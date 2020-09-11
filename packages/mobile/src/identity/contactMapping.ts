@@ -1,3 +1,4 @@
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   AttestationsWrapper,
   IdentifierLookupResult,
@@ -26,7 +27,7 @@ import {
   updateImportContactsProgress,
 } from 'src/identity/actions'
 import { fetchContactMatches } from 'src/identity/matchmaking'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   AddressToE164NumberType,
   AddressValidationType,

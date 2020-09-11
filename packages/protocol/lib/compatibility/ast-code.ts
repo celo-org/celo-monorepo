@@ -33,7 +33,12 @@ enum StorageLocation {
 
 const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
-const CONTRACT_METADATA_REGEXP = /^(.*)a165627a7a72305820.*0029$/i
+const CONTRACT_METADATA_REGEXPS = [
+  // 0.5.8
+  'a165627a7a72305820.*0029',
+  // 0.5.12
+  'a265627a7a72315820.*64736f6c6343.*0032'
+]
 
 // Exported classes
 
@@ -353,8 +358,9 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
  */
 const stripMetadataIfPresent = (bytecode: string): string => {
   try {
+    const regexp = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
     // TODO: use proper CBOR parser
-    const [, bytes] = bytecode.match(CONTRACT_METADATA_REGEXP)
+    const [, bytes] = bytecode.match(regexp)
     return bytes
   } catch (e) {
     return bytecode

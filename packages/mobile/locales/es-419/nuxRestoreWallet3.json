@@ -1,10 +1,10 @@
 {
   "title": "Restaurar tu cuenta {{appName}}",
   "userYourBackupKey":
-    "¿Ya tiene una cuenta {{appName}}? Ingrese su Clave de Respaldo para restaurarla en este teléfono.",
+    "¿Ya tienes una cuenta {{appName}}? Ingresa tu Clave de Cuenta para restaurarla en este teléfono.",
   "tip": "Sugerencia: ",
-  "backupKeyTip": "Las Claves de Respaldo tienen 24 palabras, separadas por un espacio.",
+  "backupKeyTip": "Las Claves de Cuenta tienen 24 palabras, separadas por un espacio.",
   "restoreSocial": "Restaurar con Salvaguardas",
-  "socialImportInfo": "Si activó las Salvaguardas, envió frases de protección a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para volver a tener acceso a sus fondos.",
+  "socialImportInfo": "Si activó las Salvaguardas, envió frases de protección a dos amigos. Recupere estas frases e ingréselas aquí (en cualquier orden) para volver a tener acceso a tus fondos.",
   "socialTip": "Las frases son listas de 13 palabras separadas por espacios."
 }

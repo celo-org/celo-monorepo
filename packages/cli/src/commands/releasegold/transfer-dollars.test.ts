@@ -1,4 +1,4 @@
-import { newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { getContractFromEvent, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import Register from '../account/register'
@@ -14,7 +14,7 @@ jest.setTimeout(15000)
 testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
   let accounts: string[] = []
   let contractAddress: any
-  let kit: any
+  let kit: ContractKit
 
   beforeEach(async () => {
     const contractCanValidate = false
@@ -43,7 +43,7 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
     ])
     // RG cUSD balance should match the amount sent
     const contractBalance = await kit.getTotalBalance(contractAddress)
-    expect(contractBalance.usd.toFixed()).toEqual(cUSDToTransfer)
+    expect(contractBalance.cUSD.toFixed()).toEqual(cUSDToTransfer)
     // Attempt to send cUSD back
     await RGTransferDollars.run([
       '--contract',
@@ -54,7 +54,7 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
       cUSDToTransfer,
     ])
     const balanceAfter = await kit.getTotalBalance(accounts[0])
-    expect(balanceBefore.usd).toEqual(balanceAfter.usd)
+    expect(balanceBefore.cUSD).toEqual(balanceAfter.cUSD)
   })
 
   test('should fail if contract has no celo dollars', async () => {

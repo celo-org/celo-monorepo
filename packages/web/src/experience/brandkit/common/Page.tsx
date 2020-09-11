@@ -107,6 +107,7 @@ export default function BrandKitPage({ sections, title, path, metaDescription }:
       sections={sections}
       title={`BrandKit / ${title}`}
       path={path}
+      kitName="BrandKit"
       metaDescription={metaDescription}
       ogImage={require('src/experience/brandkit/images/ogimage-brandkit.png')}
     />
