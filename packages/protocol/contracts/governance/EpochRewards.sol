@@ -189,7 +189,6 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
-    require(partner != address(0), "partner cannot be null address");
     require(partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap());
     require(value < FixidityLib.fixed1().unwrap());
     carbonOffsettingPartner = partner;
