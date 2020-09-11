@@ -45,7 +45,7 @@ const mockE164NumberToAddress: E164NumberToAddressType = {
 const mockTransactionData2 = {
   type: mockTransactionData.type,
   recipient: mockTransactionData.recipient,
-  amount: new BigNumber('3.70676691729323309'),
+  amount: new BigNumber('3.706766917293233083'),
   reason: '',
 }
 
