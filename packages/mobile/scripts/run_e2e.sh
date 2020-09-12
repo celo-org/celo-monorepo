@@ -82,6 +82,7 @@ runTest() {
   if [[ $DEV_MODE == true ]]; then
     reuse_param="--reuse"
   fi
+  export NUM_RETRIES=0
   yarn detox test \
     --configuration $CONFIG_NAME \
     --artifacts-location e2e/artifacts \

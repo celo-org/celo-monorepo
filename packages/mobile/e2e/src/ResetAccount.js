@@ -10,7 +10,8 @@ export default ResetAccount = () => {
     // Scroll to bottom and start the reset process.
     // This sleep is to avoid flakiness on the scroll. Without it the scroll
     // line intermittently fails event though the SettingsScrollView is visible.
-    await sleep(1000)
+    await waitForElementId('SettingsScrollView')
+    await sleep(3000)
     await element(by.id('SettingsScrollView')).scrollTo('bottom')
     await element(by.id('ResetAccount')).tap()
     await element(by.id('RemoveAccountModal/PrimaryAction')).tap()
