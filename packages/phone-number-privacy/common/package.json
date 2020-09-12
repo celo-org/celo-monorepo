@@ -17,7 +17,11 @@
   ],
   "dependencies": {
     "@celo/utils": "^0.1.20-dev",
-    "bignumber.js": "^9.0.0"
+    "bignumber.js": "^9.0.0",
+    "elliptic": "6.5.3",
+    "@types/elliptic": "^6.4.12",
+    "firebase-functions": "^3.6.0",
+    "@celo/contractkit": "0.4.12"
   },
   "devDependencies": {},
   "engines": {
