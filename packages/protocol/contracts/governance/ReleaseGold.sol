@@ -4,10 +4,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IReleaseGold.sol";
-import "./interfaces/IValidators.sol";
+
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
@@ -432,8 +431,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function getRemainingLockedBalance() public view returns (uint256) {
     if (getAccounts().isAccount(address(this))) {
-      uint256 pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
-      return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
+      ILockedGold lockedGold = getLockedGold();
+      uint256 pendingWithdrawalSum = lockedGold.getTotalPendingWithdrawals(address(this));
+      return lockedGold.getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
     }
     return 0;
   }

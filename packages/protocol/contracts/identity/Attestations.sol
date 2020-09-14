@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
-import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
