@@ -15,14 +15,13 @@ import "../common/interfaces/ICeloVersionedContract.sol";
  * @title Contract for calculating epoch rewards.
  */
 contract EpochRewards is
+  ICeloVersionedContract,
   Ownable,
   Initializable,
-  ICeloVersionedContract,
   UsingPrecompiles,
   UsingRegistry,
   Freezable,
-  CalledByVm,
-  ICeloVersionedContract
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
