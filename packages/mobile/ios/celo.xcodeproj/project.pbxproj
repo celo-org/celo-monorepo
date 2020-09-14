@@ -27,7 +27,6 @@
 		5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */; };
 		67911AC6D310414DAAC1498E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F3F5FA21E7EC46BBB744FE54 /* libz.tbd */; };
 		85E8054E767BF68843B24D43 /* Pods_celo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */; };
-		9ACB821D24FFF2E7004944F1 /* AnalyticsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9ACB821C24FFF2E7004944F1 /* AnalyticsManager.m */; };
 		EB3CF5B346854570A1EC69B3 /* Jost-Book.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F19E0D1442F8460181626D12 /* Jost-Book.ttf */; };
 		F2B1AD5485D68063EC09183F /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */; };
 /* End PBXBuildFile section */
@@ -73,7 +72,6 @@
 		6844E1A0CA2D7D32349444EC /* Pods-celo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo.debug.xcconfig"; path = "Target Support Files/Pods-celo/Pods-celo.debug.xcconfig"; sourceTree = "<group>"; };
 		691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_celo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Light.ttf"; path = "../fonts/Hind-Light.ttf"; sourceTree = "<group>"; };
-		9ACB821C24FFF2E7004944F1 /* AnalyticsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnalyticsManager.m; sourceTree = "<group>"; };
 		A100BC162FF5410CB4627D3C /* Hind-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Regular.ttf"; path = "../fonts/Hind-Regular.ttf"; sourceTree = "<group>"; };
 		A11A894B3E86661FA132FC18 /* Pods-celo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo.release.xcconfig"; path = "Target Support Files/Pods-celo/Pods-celo.release.xcconfig"; sourceTree = "<group>"; };
 		A3642B9B22B607BE0071CBC5 /* celo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "celo-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -154,7 +152,6 @@
 			children = (
 				0FE3DE8E2347740700EA87A0 /* celo.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
-				9ACB821C24FFF2E7004944F1 /* AnalyticsManager.m */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -686,7 +683,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9ACB821D24FFF2E7004944F1 /* AnalyticsManager.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
