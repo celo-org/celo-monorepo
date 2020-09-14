@@ -108,7 +108,6 @@ contract LockedGold is
    */
   function lock() external payable nonReentrant {
     require(getAccounts().isAccount(msg.sender), "not account");
-    require(msg.value > 0, "no value");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
