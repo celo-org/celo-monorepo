@@ -5,7 +5,7 @@ import { trimLeading0x } from '@celo/utils/lib/address'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { ec as EC } from 'elliptic'
-import { Request } from 'firebase-functions'
+import { Request } from 'express'
 import { RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 import logger from './logger'
 
@@ -34,7 +34,8 @@ export async function authenticateUser(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     const registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit)
     if (!registeredEncryptionKey) {
-      logger.info(`Account ${signer} does not have registered encryption key`)
+      logger.warn(`Account ${signer} does not have registered encryption key`)
+      return false
     } else {
       logger.info(`Found DEK ${registeredEncryptionKey} for ${signer}`)
       try {
@@ -46,6 +47,7 @@ export async function authenticateUser(
         }
       } catch (error) {
         logger.error(`Failed to verify auth sig ${error}`)
+        return false
       }
     }
   }
