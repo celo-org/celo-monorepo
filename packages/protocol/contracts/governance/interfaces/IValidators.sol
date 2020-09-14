@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 interface IValidators {
   function registerValidator(bytes calldata, bytes calldata, bytes calldata)

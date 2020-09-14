@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -9,7 +9,6 @@ import "./interfaces/IValidators.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../common/Freezable.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
@@ -25,7 +24,6 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
-  Freezable,
   CalledByVm
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
@@ -836,7 +834,6 @@ contract Election is
    * @param index The index of `element` in the list.
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
-    // TODO(asa): Move this to a library to be shared.
     require(index < list.length && list[index] == element, "Bad index");
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
@@ -926,7 +923,7 @@ contract Election is
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view onlyWhenNotFrozen returns (address[] memory) {
+  function electValidatorSigners() external view returns (address[] memory) {
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 

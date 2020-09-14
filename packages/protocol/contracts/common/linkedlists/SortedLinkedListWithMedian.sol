@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
@@ -121,9 +121,6 @@ library SortedLinkedListWithMedian {
     bytes32 lesserKey,
     bytes32 greaterKey
   ) public {
-    // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
-    // don't change.
-    // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
     remove(list, key);
     insert(list, key, value, lesserKey, greaterKey);
   }

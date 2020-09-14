@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
-import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
@@ -14,7 +13,6 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -182,7 +180,7 @@ contract Attestations is
    * @param attestationsRequested The number of requested attestations for this request.
    * @param attestationRequestFeeToken The address of the token with which the attestation fee will
    * be paid.
-   * @dev Note that if an attestion expires before it is completed, the fee is forfeited. This is
+   * @dev Note that if an attestation expires before it is completed, the fee is forfeited. This is
    * to prevent folks from attacking validators by requesting attestations that they do not
    * complete, and to increase the cost of validators attempting to manipulate the attestations
    * protocol.
@@ -706,7 +704,10 @@ contract Attestations is
   function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
     external
   {
-    require(msg.sender == from || msg.sender == to);
+    require(
+      msg.sender == from || msg.sender == to,
+      "Approver must be sender or recipient of transfer"
+    );
     bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
     address other = msg.sender == from ? to : from;
     if (status && transferApprovals[other][key]) {
@@ -747,7 +748,6 @@ contract Attestations is
     emit AttestationsTransferred(identifier, from, to);
   }
 
-  // TODO(@i1skn): make this method external, so we can check it from outside
   function isAttestationExpired(uint32 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }

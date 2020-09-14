@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -24,7 +24,12 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     uint256 indexed startBlock,
     uint256 indexed endBlock
   );
-  event BitmapSetForInterval(uint256 indexed startBlock, uint256 indexed endBlock, bytes32 bitmap);
+  event BitmapSetForInterval(
+    address indexed sender,
+    uint256 indexed startBlock,
+    uint256 indexed endBlock,
+    bytes32 bitmap
+  );
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -124,7 +129,7 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     bytes32 bitmap = getBitmapForInterval(startBlock, endBlock);
     bitmaps[msg.sender][startBlock][endBlock] = bitmap;
 
-    emit BitmapSetForInterval(startBlock, endBlock, bitmap);
+    emit BitmapSetForInterval(msg.sender, startBlock, endBlock, bitmap);
 
     return bitmap;
   }
