@@ -3,9 +3,9 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import {
   Dimensions,
-  EmitterSubscription,
   Linking,
   NativeEventEmitter,
+  NativeModules,
   Platform,
   StatusBar,
   YellowBox,
@@ -25,6 +25,7 @@ import i18n from 'src/i18n'
 import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
+const { AnalyticsManager } = NativeModules
 
 enableScreens()
 
@@ -45,11 +46,6 @@ BigNumber.config({
   },
 })
 
-interface State {
-  reactInitTime?: number
-  reactLoadTime?: number
-}
-
 // Enables LayoutAnimation on Android. It makes transitions between states smoother.
 // https://reactnative.dev/docs/layoutanimation
 // Disabling it for now as it seems to cause blank white screens on certain android devices
@@ -57,65 +53,50 @@ interface State {
 //   UIManager.setLayoutAnimationEnabledExperimental(true)
 // }
 
-const createEventListener: (
-  eventName: string,
-  callback: (reactInitTime: string) => void
-) => EmitterSubscription | null = (
-  eventName: string,
-  callback: (reactInitTime: string) => void
-): EmitterSubscription | null => {
-  if (Platform.OS === 'android') {
-    return new NativeEventEmitter().addListener(eventName, callback)
-  }
-  // TODO: Add listener for iOS
-  return null
+function getEventEmitter() {
+  return Platform.select({
+    ios: new NativeEventEmitter(AnalyticsManager),
+    android: new NativeEventEmitter(),
+  })
 }
 
 export class App extends React.Component {
-  state: State = {
-    reactInitTime: undefined,
-    reactLoadTime: undefined,
-  }
-
-  appStartListener: EmitterSubscription | null = createEventListener(
-    'AppStartedLoading',
-    (reactInitTime: string) => {
-      this.setState({
-        reactInitTime: +reactInitTime,
-        reactLoadTime: Date.now(),
-      })
-    }
-  )
+  reactLoadTime = Date.now()
 
   async componentDidMount() {
     await ValoraAnalytics.init()
-    const { width, height } = Dimensions.get('window')
 
-    let reactLoadDuration
-    let appLoadDuration
-
-    if (this.state.reactInitTime && this.state.reactLoadTime) {
-      const appLoadedTime = Date.now()
-      reactLoadDuration = (this.state.reactLoadTime - this.state.reactInitTime) / 1000
-      appLoadDuration = (appLoadedTime - this.state.reactInitTime) / 1000
-    }
-
-    ValoraAnalytics.startSession(AppEvents.app_launched, {
-      deviceHeight: height,
-      deviceWidth: width,
-      reactLoadDuration,
-      appLoadDuration,
-    })
-
-    if (this.appStartListener) {
-      this.appStartListener.remove()
-    }
+    this.logAppLoadDuration()
 
     Linking.addEventListener('url', this.handleOpenURL)
   }
 
   componentWillUnmount() {
     Linking.removeEventListener('url', this.handleOpenURL)
+  }
+
+  logAppLoadDuration() {
+    const appLoadedTime = Date.now()
+    const appStartListener = getEventEmitter()?.addListener('AppStartedLoading', (data) => {
+      const reactInitTime: number = +data.appStartedMillis
+      const reactLoadDuration = (this.reactLoadTime - reactInitTime) / 1000
+      const appLoadDuration = (appLoadedTime - reactInitTime) / 1000
+      const { width, height } = Dimensions.get('window')
+
+      Logger.debug(
+        'AppStartedLoading',
+        `data: ${JSON.stringify(data)} reactLoad: ${reactLoadDuration} appLoad: ${appLoadDuration}`
+      )
+
+      ValoraAnalytics.startSession(AppEvents.app_launched, {
+        deviceHeight: height,
+        deviceWidth: width,
+        reactLoadDuration,
+        appLoadDuration,
+      })
+
+      appStartListener?.remove()
+    })
   }
 
   handleOpenURL = (event: any) => {
