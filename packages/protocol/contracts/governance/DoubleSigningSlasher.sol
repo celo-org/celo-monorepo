@@ -5,7 +5,7 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
 
-contract DoubleSigningSlasher is SlasherUtil, ICeloVersionedContract {
+contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
