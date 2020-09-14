@@ -9,7 +9,9 @@ import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import java.util.Date;
@@ -62,9 +64,12 @@ public class MainActivity
 
   @Override
   public void onReactContextInitialized(ReactContext context) {
+    WritableMap params = Arguments.createMap();
+    params.putString("appStartedMillis", "" + appStartedMillis);
+
     context
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("AppStartedLoading", "" + appStartedMillis);
+      .emit("AppStartedLoading", params);
   }
 
   @Override
