@@ -351,8 +351,14 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account);
@@ -502,8 +508,9 @@ contract Validators is
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      getStableToken().mint(group, groupPayment);
-      getStableToken().mint(account, validatorPayment);
+      IStableToken stableToken = getStableToken();
+      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
+      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
