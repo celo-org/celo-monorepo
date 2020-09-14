@@ -1,15 +1,15 @@
 import { notEmpty } from '@celo/utils/lib/collections'
 import * as utf8 from 'utf8'
-import Web3 from 'web3'
+import web3Abi, { AbiCoder } from 'web3-eth-abi'
 import { hexToUtf8 } from 'web3-utils'
 import { Log, Transfer } from './blockscout'
+
+const abiCoder = (web3Abi as unknown) as AbiCoder
 
 // Note: topic0 here refers to the sha3 of an ERC20 Transfer event parameter signature
 // https://codeburst.io/deep-dive-into-ethereum-logs-a8d2047c7371
 const transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 const commentTopic0 = '0xe5d4e30fb8364e57bc4d662a07d0cf36f4c34552004c4c3624620a2c1d1c03dc'
-
-const web3 = new Web3()
 
 export function decodeLogs(logs: Log[]) {
   // tx hash -> Transfers[]
@@ -62,7 +62,7 @@ function decodeTransferLog(log: Log): Transfer | null {
    * Including this unknown param in the input list or decoding won't work
    */
   try {
-    const decodedLog = web3.eth.abi.decodeLog(
+    const decodedLog = abiCoder.decodeLog(
       [
         {
           indexed: true,

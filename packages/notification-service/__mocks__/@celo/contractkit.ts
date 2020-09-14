@@ -23,8 +23,10 @@ export enum CeloContract {
 }
 
 export const newKitFromWeb3 = jest.fn(() => ({
-  isListening() {
-    return true
+  communication: {
+    isListening() {
+      return true
+    },
   },
   registry: {
     addressFor(contract: string) {
