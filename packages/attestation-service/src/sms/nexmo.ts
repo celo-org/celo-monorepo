@@ -16,6 +16,7 @@ export class NexmoSmsProvider extends SmsProvider {
     return new NexmoSmsProvider(
       fetchEnv('NEXMO_KEY'),
       fetchEnv('NEXMO_SECRET'),
+      fetchEnvOrDefault('NEXMO_APPLICATION', ''),
       readUnsupportedRegionsFromEnv('NEXMO_UNSUPPORTED_REGIONS', 'NEXMO_BLACKLIST'),
       isYes(fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', ''))
     )
@@ -31,14 +32,23 @@ export class NexmoSmsProvider extends SmsProvider {
   constructor(
     apiKey: string,
     apiSecret: string,
+    applicationId: string,
     unsupportedRegionCodes: string[],
     balanceMetric: boolean
   ) {
     super()
-    this.client = new Nexmo({
-      apiKey,
-      apiSecret,
-    })
+    if (applicationId) {
+      this.client = new Nexmo({
+        apiKey,
+        apiSecret,
+        applicationId,
+      })
+    } else {
+      this.client = new Nexmo({
+        apiKey,
+        apiSecret,
+      })
+    }
     this.balanceMetric = balanceMetric
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
