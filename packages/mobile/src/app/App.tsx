@@ -54,12 +54,9 @@ BigNumber.config({
 // }
 
 function getEventEmitter() {
-  if (Platform.OS === 'android') {
-    return new NativeEventEmitter()
-  } else {
-    // ios
-    return new NativeEventEmitter(AnalyticsManager)
-  }
+  return Platform.OS === 'android'
+    ? new NativeEventEmitter()
+    : new NativeEventEmitter(AnalyticsManager)
 }
 
 export class App extends React.Component {
