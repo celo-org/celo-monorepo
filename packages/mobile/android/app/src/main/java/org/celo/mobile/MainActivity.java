@@ -61,6 +61,11 @@ public class MainActivity
   }
 
   @Override
+  public void onReactContextInitialized(ReactContext context) {
+    // pass
+  }
+
+  @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
     return new ReactActivityDelegate(this, getMainComponentName()) {
 
