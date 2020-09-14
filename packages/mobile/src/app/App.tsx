@@ -66,7 +66,7 @@ export class App extends React.Component {
   async componentDidMount() {
     await ValoraAnalytics.init()
 
-    this.getAppStartTimeFromNative()
+    this.logAppLoadDuration()
 
     Linking.addEventListener('url', this.handleOpenURL)
   }
@@ -75,7 +75,7 @@ export class App extends React.Component {
     Linking.removeEventListener('url', this.handleOpenURL)
   }
 
-  getAppStartTimeFromNative() {
+  logAppLoadDuration() {
     const appLoadedTime = Date.now()
     const appStartListener = getEventEmitter()?.addListener('AppStartedLoading', (data) => {
       const reactInitTime: number = +data.appStartedMillis
