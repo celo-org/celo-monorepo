@@ -61,19 +61,20 @@ public class MainActivity
   }
 
   @Override
-  public void onReactContextInitialized(ReactContext context) {
-    context
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("AppStartedLoading", "" + appStartedMillis);
-  }
-
-  @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
     return new ReactActivityDelegate(this, getMainComponentName()) {
 
       @Override
       protected ReactRootView createRootView() {
         return new RNGestureHandlerEnabledRootView(MainActivity.this);
+      }
+
+      @Override
+      protected Bundle getLaunchOptions() {
+        // this is used to pass props (in this case app start time) to react
+        Bundle props = new Bundle();
+        props.putLong("appStartedMillis", appStartedMillis)
+        return props;
       }
     };
   }
