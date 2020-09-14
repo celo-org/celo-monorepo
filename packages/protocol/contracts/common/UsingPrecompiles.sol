@@ -1,8 +1,9 @@
 pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract UsingPrecompiles {
+contract UsingPrecompiles is ICeloVersionedContract {
   using SafeMath for uint256;
 
   address constant TRANSFER = address(0xff - 2);
@@ -15,6 +16,14 @@ contract UsingPrecompiles {
   address constant HASH_HEADER = address(0xff - 9);
   address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision

@@ -9,6 +9,7 @@ import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Contract for calculating epoch rewards.
@@ -16,6 +17,7 @@ import "../common/UsingPrecompiles.sol";
 contract EpochRewards is
   Ownable,
   Initializable,
+  ICeloVersionedContract,
   UsingPrecompiles,
   UsingRegistry,
   Freezable,
@@ -81,6 +83,14 @@ contract EpochRewards is
   );
 
   event TargetVotingYieldUpdated(uint256 fraction);
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

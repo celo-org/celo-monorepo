@@ -6,8 +6,15 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
+contract SlasherUtil is
+  ICeloVersionedContract,
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  UsingPrecompiles
+{
   using SafeMath for uint256;
 
   struct SlashingIncentives {
@@ -20,6 +27,14 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
   SlashingIncentives public slashingIncentives;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Sets slashing incentives.
