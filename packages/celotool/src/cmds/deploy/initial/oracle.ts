@@ -1,6 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
-import { addOracleMiddleware, installHelmChart } from 'src/lib/oracle'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { installHelmChart } from 'src/lib/oracle'
 import yargs from 'yargs'
 
 export const command = 'oracle'
@@ -13,7 +13,7 @@ type OracleInitialArgv = InitialArgv &
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addOracleMiddleware(argv).option('useForno', {
+  return addContextMiddleware(argv).option('useForno', {
     description: 'Uses forno for RPCs from the oracle clients',
     default: false,
     type: 'boolean',

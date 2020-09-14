@@ -1,4 +1,5 @@
-import { doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { Argv } from 'yargs'
+import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
 import { AKSClusterConfig } from './k8s-cluster/aks'
 import { AWSClusterConfig } from './k8s-cluster/aws'
 import { GCPClusterConfig } from './k8s-cluster/gcp'
@@ -8,7 +9,6 @@ import { getClusterManager } from './k8s-cluster/utils'
 /**
  * Env vars corresponding to each value for the AKSClusterConfig for a particular context
  */
-
 const contextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
   subscriptionId: DynamicEnvVar.AZURE_SUBSCRIPTION_ID,
@@ -179,4 +179,18 @@ export function isValidContext(context: string) {
     .split(',')
   const validContextsCoerced = validContexts.map(coerceContext)
   return validContextsCoerced.includes(context)
+}
+
+/**
+ * Middleware for a context related command.
+ * Must be one of the contexts specified in the environment
+ * variable CONTEXTS.
+ */
+export function addContextMiddleware(argv: Argv) {
+  return addCeloEnvMiddleware(argv)
+    .option('context', {
+      description: 'Context to perform the deployment in',
+      type: 'string',
+    })
+    .coerce('context', coerceContext)
 }

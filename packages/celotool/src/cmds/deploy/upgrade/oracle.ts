@@ -1,6 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
-import { ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
-import { addOracleMiddleware, upgradeOracleChart } from 'src/lib/oracle'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { upgradeOracleChart } from 'src/lib/oracle'
 import yargs from 'yargs'
 
 export const command = 'oracle'
@@ -13,7 +13,7 @@ type OracleUpgradeArgv = UpgradeArgv &
   }
 
 export const builder = (argv: yargs.Argv) => {
-  return addOracleMiddleware(argv).option('useForno', {
+  return addContextMiddleware(argv).option('useForno', {
     description: 'Uses forno for RPCs from the oracle clients',
     default: false,
     type: 'boolean',
