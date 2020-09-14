@@ -85,6 +85,14 @@ contract EpochRewards is
   event TargetVotingYieldUpdated(uint256 fraction);
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry contract.
    * @param targetVotingYieldInitial The initial relative target block reward for voters.
@@ -160,7 +168,10 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
-    require(value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    require(
+      value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
+      "Value must be different from existing community reward fraction and less than 1"
+    );
     communityRewardFraction = FixidityLib.wrap(value);
     emit CommunityRewardFractionSet(value);
     return true;
@@ -181,8 +192,11 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
-    require(partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap());
-    require(value < FixidityLib.fixed1().unwrap());
+    require(
+      partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
+      "Partner and value must be different from existing carbon offsetting fund"
+    );
+    require(value < FixidityLib.fixed1().unwrap(), "Value must be less than 1");
     carbonOffsettingPartner = partner;
     carbonOffsettingFraction = FixidityLib.wrap(value);
     emit CarbonOffsettingFundSet(partner, value);

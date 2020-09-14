@@ -705,7 +705,10 @@ contract Attestations is
   function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
     external
   {
-    require(msg.sender == from || msg.sender == to);
+    require(
+      msg.sender == from || msg.sender == to,
+      "Approver must be sender or recipient of transfer"
+    );
     bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
     address other = msg.sender == from ? to : from;
     if (status && transferApprovals[other][key]) {
