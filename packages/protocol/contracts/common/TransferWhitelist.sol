@@ -34,7 +34,7 @@ contract TransferWhitelist is Ownable, UsingRegistry {
 
   /**
    * @notice Remove an address from the whitelist.
-   * @param removedAddress The address to add.
+   * @param removedAddress The address to remove.
    * @param index Index of address in the whitelist.
    */
   function removeAddress(address removedAddress, uint256 index) external onlyOwner {

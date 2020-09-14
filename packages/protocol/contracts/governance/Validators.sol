@@ -923,8 +923,8 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in a 1
-    // wei rounding error.
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
+    // wei rounding errors. Using 10 as an additional margin of safety.
     return balance.add(10) >= getAccountLockedGoldRequirement(account);
   }
 
