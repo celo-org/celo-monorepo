@@ -4,11 +4,11 @@ import { addOracleMiddleware } from 'src/lib/oracle'
 import { upgradeFullNodeChart } from 'src/lib/oracle-fullnode'
 import yargs from 'yargs'
 
-export const command = 'oracle-fullnode'
+export const command = 'fullnodes'
 
-export const describe = 'upgrade the oracle full-node(s) on an AKS cluster'
+export const describe = 'deploy full-nodes in a particular context'
 
-type OracleFullNodeUpgradeArgv = UpgradeArgv & ContextArgv & { reset: boolean }
+type FullNodeUpgradeArgv = UpgradeArgv & ContextArgv & { reset: boolean }
 
 export const builder = (argv: yargs.Argv) => {
   return addOracleMiddleware(argv).option('reset', {
@@ -18,7 +18,7 @@ export const builder = (argv: yargs.Argv) => {
   })
 }
 
-export const handler = async (argv: OracleFullNodeUpgradeArgv) => {
+export const handler = async (argv: FullNodeUpgradeArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
   await upgradeFullNodeChart(argv.celoEnv, argv.context, argv.reset)
 }

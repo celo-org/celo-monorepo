@@ -2,16 +2,17 @@ import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 import { AKSClusterConfig } from './k8s-cluster/aks'
-import { AWSClusterConfig } from './k8s-cluster/aws'
-import { GCPClusterConfig } from './k8s-cluster/gcp'
-import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
-import { getClusterManager } from './k8s-cluster/utils'
-import { getCloudProviderFromOracleContext } from './oracle-utils'
+import { coerceContext, getAKSClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
+// import { AWSClusterConfig } from './k8s-cluster/aws'
+// import { GCPClusterConfig } from './k8s-cluster/gcp'
+// import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
+// import { getClusterManager } from './k8s-cluster/utils'
+// import { getCloudProviderFromContext } from './oracle-utils'
 
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
@@ -44,35 +45,35 @@ interface OracleIdentity {
 interface OracleConfig {
   identities: OracleIdentity[]
 }
-
-/**
- * Env vars corresponding to each value for the AKSClusterConfig for a particular context
- */
-
-const oracleContextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
-  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-  subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
-  tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
-  resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
-}
-
-/**
- * Env vars corresponding to each value for the AWSClusterConfig for a particular context
- */
-const oracleContextAWSClusterConfigDynamicEnvVars: { [k in keyof Omit<AWSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
-  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-  clusterRegion: DynamicEnvVar.ORACLE_AWS_CLUSTER_REGION,
-  resourceGroupTag: DynamicEnvVar.ORACLE_AWS_RESOURCE_GROUP_TAG,
-}
-
-/**
- * Env vars corresponding to each value for the GCPClusterConfig for a particular context
- */
-const oracleContextGCPClusterConfigDynamicEnvVars: { [k in keyof Omit<GCPClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
-  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-  projectName: DynamicEnvVar.ORACLE_GCP_PROJECT_NAME,
-  zone: DynamicEnvVar.ORACLE_GCP_ZONE,
-}
+//
+// /**
+//  * Env vars corresponding to each value for the AKSClusterConfig for a particular context
+//  */
+//
+// const contextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+//   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+//   subscriptionId: DynamicEnvVar.AZURE_SUBSCRIPTION_ID,
+//   tenantId: DynamicEnvVar.AZURE_TENANT_ID,
+//   resourceGroup: DynamicEnvVar.AZURE_KUBERNETES_RESOURCE_GROUP,
+// }
+//
+// /**
+//  * Env vars corresponding to each value for the AWSClusterConfig for a particular context
+//  */
+// const contextAWSClusterConfigDynamicEnvVars: { [k in keyof Omit<AWSClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+//   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+//   clusterRegion: DynamicEnvVar.AWS_CLUSTER_REGION,
+//   resourceGroupTag: DynamicEnvVar.AWS_RESOURCE_GROUP_TAG,
+// }
+//
+// /**
+//  * Env vars corresponding to each value for the GCPClusterConfig for a particular context
+//  */
+// const contextGCPClusterConfigDynamicEnvVars: { [k in keyof Omit<GCPClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+//   clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+//   projectName: DynamicEnvVar.GCP_PROJECT_NAME,
+//   zone: DynamicEnvVar.GCP_ZONE,
+// }
 
 interface OracleKeyVaultIdentityConfig {
   addressAzureKeyVaults: string
@@ -85,24 +86,24 @@ interface OracleMnemonicIdentityConfig {
 /**
  * Env vars corresponding to each value for the OracleKeyVaultIdentityConfig for a particular context
  */
-const oracleContextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
+const contextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
   addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
 }
 
 /**
  * Env vars corresponding to each value for the OracleMnemonicIdentityConfig for a particular context
  */
-const oracleContextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMnemonicIdentityConfig]: DynamicEnvVar } = {
+const contextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMnemonicIdentityConfig]: DynamicEnvVar } = {
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
 }
 
-const clusterConfigGetterByCloudProvider: {
-  [key in CloudProvider]: (oracleContext: string) => BaseClusterConfig
-} = {
-  [CloudProvider.AWS]: getAWSClusterConfig,
-  [CloudProvider.AZURE]: getAKSClusterConfig,
-  [CloudProvider.GCP]: getGCPClusterConfig,
-}
+// const clusterConfigGetterByCloudProvider: {
+//   [key in CloudProvider]: (context: string) => BaseClusterConfig
+// } = {
+//   [CloudProvider.AWS]: getAWSClusterConfig,
+//   [CloudProvider.AZURE]: getAKSClusterConfig,
+//   [CloudProvider.GCP]: getGCPClusterConfig,
+// }
 
 function releaseName(celoEnv: string) {
   return `${celoEnv}-oracle`
@@ -110,50 +111,50 @@ function releaseName(celoEnv: string) {
 
 export async function installHelmChart(
   celoEnv: string,
-  oracleContext: string,
+  context: string,
   useForno: boolean
 ) {
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // oracle pods can reach the K8s API server to change their aad labels
-  await installOracleRBACHelmChart(celoEnv, oracleContext)
+  await installOracleRBACHelmChart(celoEnv, context)
   // Then install the oracle helm chart
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, oracleContext, useForno)
+    await helmParameters(celoEnv, context, useForno)
   )
 }
 
 export async function upgradeOracleChart(
   celoEnv: string,
-  oracleContext: string,
+  context: string,
   useFullNodes: boolean
 ) {
-  await upgradeOracleRBACHelmChart(celoEnv, oracleContext)
+  await upgradeOracleRBACHelmChart(celoEnv, context)
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, oracleContext, useFullNodes)
+    await helmParameters(celoEnv, context, useFullNodes)
   )
 }
 
-export async function removeHelmRelease(celoEnv: string, oracleContext: string) {
+export async function removeHelmRelease(celoEnv: string, context: string) {
   await removeGenericHelmChart(releaseName(celoEnv))
   await removeOracleRBACHelmRelease(celoEnv)
-  const oracleConfig = getOracleConfig(oracleContext)
+  const oracleConfig = getOracleConfig(context)
   for (const identity of oracleConfig.identities) {
     // If the identity is using Azure HSM signing, clean it up too
     if (identity.azureHsmIdentity) {
-      await deleteOracleAzureIdentity(oracleContext, identity)
+      await deleteOracleAzureIdentity(context, identity)
     }
   }
 }
 
-async function helmParameters(celoEnv: string, oracleContext: string, useForno: boolean) {
-  const oracleConfig = getOracleConfig(oracleContext)
+async function helmParameters(celoEnv: string, context: string, useForno: boolean) {
+  const oracleConfig = getOracleConfig(context)
 
   const replicas = oracleConfig.identities.length
   const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, replicas)
@@ -176,7 +177,7 @@ async function helmParameters(celoEnv: string, oracleContext: string, useForno: 
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
     `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
-  ].concat(await oracleIdentityHelmParameters(oracleContext, oracleConfig))
+  ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
 }
 
 /**
@@ -184,7 +185,7 @@ async function helmParameters(celoEnv: string, oracleContext: string, useForno: 
  * Supports both private key and Azure HSM signing.
  */
 async function oracleIdentityHelmParameters(
-  oracleContext: string,
+  context: string,
   oracleConfig: OracleConfig
 ) {
   const replicas = oracleConfig.identities.length
@@ -197,7 +198,7 @@ async function oracleIdentityHelmParameters(
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
     if (oracleIdentity.azureHsmIdentity) {
-      const azureIdentity = await createOracleAzureIdentityIfNotExists(oracleContext, oracleIdentity)
+      const azureIdentity = await createOracleAzureIdentityIfNotExists(context, oracleIdentity)
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
@@ -217,10 +218,10 @@ async function oracleIdentityHelmParameters(
  * called when an oracle identity is using an Azure Key Vault for HSM signing
  */
 async function createOracleAzureIdentityIfNotExists(
-  oracleContext: string,
+  context: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAKSClusterConfig(oracleContext)
+  const clusterConfig = getAKSClusterConfig(context)
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the oracle identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -265,10 +266,10 @@ async function setOracleKeyVaultPolicyIfNotSet(
  * deleteOracleAzureIdentity deletes the key vault policy and the oracle's managed identity
  */
 async function deleteOracleAzureIdentity(
-  oracleContext: string,
+  context: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAKSClusterConfig(oracleContext)
+  const clusterConfig = getAKSClusterConfig(context)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
   return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }
@@ -286,9 +287,9 @@ async function deleteOracleKeyVaultPolicy(
 /**
  * Gives a config for all oracles for a particular context
  */
-function getOracleConfig(oracleContext: string): OracleConfig {
+function getOracleConfig(context: string): OracleConfig {
   return {
-    identities: getOracleIdentities(oracleContext),
+    identities: getOracleIdentities(context),
   }
 }
 
@@ -297,10 +298,10 @@ function getOracleConfig(oracleContext: string): OracleConfig {
  * the identities are created from that. Otherwise, the identities are created
  * with private keys generated by the mnemonic.
  */
-function getOracleIdentities(oracleContext: string): OracleIdentity[] {
-  const { addressAzureKeyVaults } = getOracleContextDynamicEnvVarValues(
-    oracleContextOracleKeyVaultIdentityConfigDynamicEnvVars,
-    oracleContext,
+function getOracleIdentities(context: string): OracleIdentity[] {
+  const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
+    contextOracleKeyVaultIdentityConfigDynamicEnvVars,
+    context,
     {
       addressAzureKeyVaults: '',
     }
@@ -311,9 +312,9 @@ function getOracleIdentities(oracleContext: string): OracleIdentity[] {
   }
 
   // If key vaults are not set, try from mnemonic
-  const { addressesFromMnemonicCount } = getOracleContextDynamicEnvVarValues(
-    oracleContextOracleMnemonicIdentityConfigDynamicEnvVars,
-    oracleContext,
+  const { addressesFromMnemonicCount } = getContextDynamicEnvVarValues(
+    contextOracleMnemonicIdentityConfigDynamicEnvVars,
+    context,
     {
       addressesFromMnemonicCount: '',
     }
@@ -377,134 +378,134 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
   const maxIdentityNameLength = 128
   return `${keyVaultName}-${address}`.substring(0, maxIdentityNameLength)
 }
-
-/**
- * Fetches the env vars for a particular context
- * @param oracleContext the oracle context to use
- * @return an AKSClusterConfig for the context
- */
-export function getAKSClusterConfig(oracleContext: string): AKSClusterConfig {
-  const azureDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAKSClusterConfigDynamicEnvVars, oracleContext)
-  const clusterConfig: AKSClusterConfig = {
-    cloudProvider: CloudProvider.AZURE,
-    ...azureDynamicEnvVars
-  }
-  return clusterConfig
-}
-
-/**
- * Fetches the env vars for a particular context
- * @param oracleContext the oracle context to use
- * @return an AWSClusterConfig for the context
- */
-export function getAWSClusterConfig(oracleContext: string): AWSClusterConfig {
-  const awsDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextAWSClusterConfigDynamicEnvVars, oracleContext)
-  const clusterConfig: AWSClusterConfig = {
-    cloudProvider: CloudProvider.AZURE,
-    ...awsDynamicEnvVars
-  }
-  return clusterConfig
-}
-
-/**
- * Fetches the env vars for a particular context
- * @param oracleContext the oracle context to use
- * @return an AWSClusterConfig for the context
- */
-export function getGCPClusterConfig(oracleContext: string): GCPClusterConfig {
-  const gcpDynamicEnvVars = getOracleContextDynamicEnvVarValues(oracleContextGCPClusterConfigDynamicEnvVars, oracleContext)
-  const clusterConfig: GCPClusterConfig = {
-    cloudProvider: CloudProvider.GCP,
-    ...gcpDynamicEnvVars
-  }
-  return clusterConfig
-}
-
-/**
- * Given if the desired context is primary, gives the appropriate OracleAzureContext
- * Gives an object with the values of dynamic environment variables for an oracle context.
- * @param dynamicEnvVars an object whose values correspond to the desired
- *   dynamic env vars to fetch.
- * @param oracleContext The oracle context
- * @param defaultValues Optional default values if the dynamic env vars are not found
- * @return an object with the same keys as dynamicEnvVars, but the values are
- *   the values of the dynamic env vars for the particular oracleContext
- */
-export function getOracleContextDynamicEnvVarValues<T>(
-  dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
-  oracleContext: string,
-  defaultValues?: { [k in keyof T]: string }
-): {
-  [k in keyof T]: string
-} {
-  return Object.keys(dynamicEnvVars).reduce(
-    (values: any, k: string) => {
-      const key = k as keyof T
-      const dynamicEnvVar = dynamicEnvVars[key]
-      const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
-        oracleContext
-      })
-      const defaultValue = defaultValues ? defaultValues[key] : undefined
-      const value = defaultValue !== undefined ?
-        fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
-        fetchEnv(dynamicEnvVarName)
-      return {
-        ...values,
-        [key]: value,
-      }
-    },
-  {})
-}
-
-/**
- * Reads the context and switches to the appropriate Azure or AWS Cluster
- */
-export async function switchToOracleContextCluster(celoEnv: string, oracleContext: string, checkOrPromptIfStagingOrProduction = true) {
-  if (!isValidOracleContext(oracleContext)) {
-    throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
-  }
-  if (checkOrPromptIfStagingOrProduction) {
-    await doCheckOrPromptIfStagingOrProduction()
-  }
-  const clusterManager: BaseClusterManager = getClusterManagerForOracleContext(celoEnv, oracleContext)
-  return clusterManager.switchToClusterContext()
-}
-
-export function getClusterManagerForOracleContext(celoEnv: string, oracleContext: string) {
-  const cloudProvider: CloudProvider = getCloudProviderFromOracleContext(oracleContext)
-  const deploymentConfig = clusterConfigGetterByCloudProvider[cloudProvider](oracleContext)
-  return getClusterManager(cloudProvider, celoEnv, deploymentConfig)
-}
-
-/**
- * yargs argv type for an oracle related command.
- */
-export interface OracleArgv {
-  context: string
-}
-
-/**
- * Coerces the value of context to be all upper-case and underscore-separated
- * rather than dash-separated. If the resulting context does not match a regex
- * requiring all caps, alphanumeric, and dash-only characters
- * (must start with letter and not end with an underscore), it will throw.
- */
-function coerceOracleContext(rawContextStr: string) {
-  const context = rawContextStr
-    .toUpperCase()
-    .replace(/-/g, '_')
-  if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
-    throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
-  }
-  return context
-}
-
-function isValidOracleContext(oracleContext: string) {
-  const validOracleContexts = fetchEnv(envVar.ORACLE_CONTEXTS)
-    .split(',')
-  const validOracleContextsCoerced = validOracleContexts.map(coerceOracleContext)
-  return validOracleContextsCoerced.includes(oracleContext)
-}
+//
+// /**
+//  * Fetches the env vars for a particular context
+//  * @param context the context to use
+//  * @return an AKSClusterConfig for the context
+//  */
+// export function getAKSClusterConfig(context: string): AKSClusterConfig {
+//   const azureDynamicEnvVars = getContextDynamicEnvVarValues(contextAKSClusterConfigDynamicEnvVars, context)
+//   const clusterConfig: AKSClusterConfig = {
+//     cloudProvider: CloudProvider.AZURE,
+//     ...azureDynamicEnvVars
+//   }
+//   return clusterConfig
+// }
+//
+// /**
+//  * Fetches the env vars for a particular context
+//  * @param context the context to use
+//  * @return an AWSClusterConfig for the context
+//  */
+// export function getAWSClusterConfig(context: string): AWSClusterConfig {
+//   const awsDynamicEnvVars = getContextDynamicEnvVarValues(contextAWSClusterConfigDynamicEnvVars, context)
+//   const clusterConfig: AWSClusterConfig = {
+//     cloudProvider: CloudProvider.AZURE,
+//     ...awsDynamicEnvVars
+//   }
+//   return clusterConfig
+// }
+//
+// /**
+//  * Fetches the env vars for a particular context
+//  * @param context the context to use
+//  * @return an AWSClusterConfig for the context
+//  */
+// export function getGCPClusterConfig(context: string): GCPClusterConfig {
+//   const gcpDynamicEnvVars = getContextDynamicEnvVarValues(contextGCPClusterConfigDynamicEnvVars, context)
+//   const clusterConfig: GCPClusterConfig = {
+//     cloudProvider: CloudProvider.GCP,
+//     ...gcpDynamicEnvVars
+//   }
+//   return clusterConfig
+// }
+//
+// /**
+//  * Given if the desired context is primary, gives the appropriate OracleAzureContext
+//  * Gives an object with the values of dynamic environment variables for a context.
+//  * @param dynamicEnvVars an object whose values correspond to the desired
+//  *   dynamic env vars to fetch.
+//  * @param context The context
+//  * @param defaultValues Optional default values if the dynamic env vars are not found
+//  * @return an object with the same keys as dynamicEnvVars, but the values are
+//  *   the values of the dynamic env vars for the particular context
+//  */
+// export function getContextDynamicEnvVarValues<T>(
+//   dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
+//   context: string,
+//   defaultValues?: { [k in keyof T]: string }
+// ): {
+//   [k in keyof T]: string
+// } {
+//   return Object.keys(dynamicEnvVars).reduce(
+//     (values: any, k: string) => {
+//       const key = k as keyof T
+//       const dynamicEnvVar = dynamicEnvVars[key]
+//       const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
+//         context
+//       })
+//       const defaultValue = defaultValues ? defaultValues[key] : undefined
+//       const value = defaultValue !== undefined ?
+//         fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
+//         fetchEnv(dynamicEnvVarName)
+//       return {
+//         ...values,
+//         [key]: value,
+//       }
+//     },
+//   {})
+// }
+//
+// /**
+//  * Reads the context and switches to the appropriate Azure or AWS Cluster
+//  */
+// export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction = true) {
+//   if (!isValidContext(context)) {
+//     throw Error(`Invalid context, must be one of ${fetchEnv(envVar.CONTEXTS)}`)
+//   }
+//   if (checkOrPromptIfStagingOrProduction) {
+//     await doCheckOrPromptIfStagingOrProduction()
+//   }
+//   const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
+//   return clusterManager.switchToClusterContext()
+// }
+//
+// function getClusterManagerForContext(celoEnv: string, context: string) {
+//   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
+//   const deploymentConfig = clusterConfigGetterByCloudProvider[cloudProvider](context)
+//   return getClusterManager(cloudProvider, celoEnv, deploymentConfig)
+// }
+//
+// /**
+//  * yargs argv type for an command that requires a context
+//  */
+// export interface ContextArgv {
+//   context: string
+// }
+//
+// /**
+//  * Coerces the value of context to be all upper-case and underscore-separated
+//  * rather than dash-separated. If the resulting context does not match a regex
+//  * requiring all caps, alphanumeric, and dash-only characters
+//  * (must start with letter and not end with an underscore), it will throw.
+//  */
+// function coerceContext(rawContextStr: string) {
+//   const context = rawContextStr
+//     .toUpperCase()
+//     .replace(/-/g, '_')
+//   if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
+//     throw Error(`Invalid context. Raw ${rawContextStr}, implied ${context}`)
+//   }
+//   return context
+// }
+//
+// function isValidContext(context: string) {
+//   const validContexts = fetchEnv(envVar.CONTEXTS)
+//     .split(',')
+//   const validContextsCoerced = validContexts.map(coerceContext)
+//   return validContextsCoerced.includes(context)
+// }
 
 /**
  * Middleware for an oracle related command.
@@ -514,10 +515,10 @@ function isValidOracleContext(oracleContext: string) {
 export function addOracleMiddleware(argv: yargs.Argv) {
   return addCeloEnvMiddleware(argv)
     .option('context', {
-      description: 'Oracle context to perform the deployment in',
+      description: 'Context to perform the deployment in',
       type: 'string',
     })
-    .coerce('context', coerceOracleContext)
+    .coerce('context', coerceContext)
 }
 
 // Oracle RBAC------
@@ -525,21 +526,21 @@ export function addOracleMiddleware(argv: yargs.Argv) {
 // limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
 // To do this, we use an auth token that we get using the resources in the `oracle-rbac` chart
 
-async function installOracleRBACHelmChart(celoEnv: string, oracleContext: string) {
+async function installOracleRBACHelmChart(celoEnv: string, context: string) {
   return installGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, oracleContext)
+    rbacHelmParameters(celoEnv, context)
   )
 }
 
-async function upgradeOracleRBACHelmChart(celoEnv: string, oracleContext: string) {
+async function upgradeOracleRBACHelmChart(celoEnv: string, context: string) {
   return upgradeGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, oracleContext)
+    rbacHelmParameters(celoEnv, context)
   )
 }
 
@@ -547,8 +548,8 @@ function removeOracleRBACHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(rbacReleaseName(celoEnv))
 }
 
-function rbacHelmParameters(celoEnv: string,  oracleContext: string) {
-  const oracleConfig = getOracleConfig(oracleContext)
+function rbacHelmParameters(celoEnv: string,  context: string) {
+  const oracleConfig = getOracleConfig(context)
   const replicas = oracleConfig.identities.length
   return [`--set environment.name=${celoEnv}`,  `--set oracle.replicas=${replicas}`,]
 }
