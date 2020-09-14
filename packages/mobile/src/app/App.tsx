@@ -54,9 +54,10 @@ BigNumber.config({
 // }
 
 function getEventEmitter() {
-  return Platform.OS === 'android'
-    ? new NativeEventEmitter()
-    : new NativeEventEmitter(AnalyticsManager)
+  return Platform.select({
+    ios: new NativeEventEmitter(AnalyticsManager),
+    android: new NativeEventEmitter(),
+  })
 }
 
 export class App extends React.Component {
@@ -76,7 +77,7 @@ export class App extends React.Component {
   }
 
   getAppStartTimeFromNative(appLoadedTime: number) {
-    const appStartListener = getEventEmitter().addListener('AppStartedLoading', (data) => {
+    const appStartListener = getEventEmitter()?.addListener('AppStartedLoading', (data) => {
       const reactInitTime: number = +data.appStartedMillis
       const reactLoadDuration = (this.reactLoadTime - reactInitTime) / 1000
       const appLoadDuration = (appLoadedTime - reactInitTime) / 1000
