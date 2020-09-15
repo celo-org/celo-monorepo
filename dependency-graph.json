@@ -164,6 +164,7 @@
   "@celo/phone-number-privacy-common": {
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
+      "@celo/contractkit",
       "@celo/utils"
     ]
   },

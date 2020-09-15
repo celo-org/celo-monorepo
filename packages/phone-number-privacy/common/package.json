@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-common",
-  "version": "1.0.8-dev",
+  "version": "1.0.9-dev",
   "description": "Common library for the combiner and signer libraries",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -16,10 +16,15 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/utils": "^0.1.20-dev",
-    "bignumber.js": "^9.0.0"
+    "@celo/contractkit": "0.4.14-dev",
+    "@celo/utils": "0.1.20-dev",
+    "bignumber.js": "^9.0.0",
+    "express": "^4.17.1",
+    "elliptic": "6.5.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/elliptic": "^6.4.12"
+  },
   "engines": {
     "node": "10"
   }
