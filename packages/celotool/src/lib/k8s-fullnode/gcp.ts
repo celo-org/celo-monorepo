@@ -83,20 +83,6 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
     await this.deallocateIPsWithNames(ipNamesToDeallocate)
   }
 
-  // allocateIPAddress(index: number) {
-  //   return registerIPAddress(
-  //     this.getIPAddressName(index),
-  //     this.deploymentConfig.clusterConfig.zone
-  //   )
-  // }
-  //
-  // deallocateIPAddress(index: number) {
-  //   return registerIPAddress(
-  //     this.getIPAddressName(index),
-  //     this.deploymentConfig.clusterConfig.zone
-  //   )
-  // }
-
   getIPAddressName(index: number) {
     return `${this.ipAddressPrefix}-${index}`
   }

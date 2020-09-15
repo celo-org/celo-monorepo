@@ -23,4 +23,8 @@ export class AWSClusterManager extends BaseClusterManager {
   get clusterConfig(): AWSClusterConfig {
     return this._clusterConfig as AWSClusterConfig
   }
+
+  get kubernetesContextName(): string {
+    return this.clusterConfig.clusterName
+  }
 }

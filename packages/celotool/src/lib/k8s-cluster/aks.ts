@@ -53,4 +53,8 @@ export class AKSClusterManager extends BaseClusterManager {
   get clusterConfig(): AKSClusterConfig {
     return this._clusterConfig as AKSClusterConfig
   }
+
+  get kubernetesContextName(): string {
+    return this.clusterConfig.clusterName
+  }
 }

@@ -24,7 +24,6 @@ export class GCPClusterManager extends BaseClusterManager {
   }
 
   async setupCluster() {
-    console.log('setupCluster()')
     await super.setupCluster()
     await installGCPSSDStorageClass()
     await installCertManagerAndNginx()
@@ -75,5 +74,9 @@ export class GCPClusterManager extends BaseClusterManager {
 
   get clusterConfig(): GCPClusterConfig {
     return this._clusterConfig as GCPClusterConfig
+  }
+
+  get kubernetesContextName(): string {
+    return `gke_${this.clusterConfig.projectName}_${this.clusterConfig.zone}_${this.clusterConfig.clusterName}`
   }
 }

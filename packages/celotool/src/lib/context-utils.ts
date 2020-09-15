@@ -144,7 +144,7 @@ export async function switchToContextCluster(celoEnv: string, context: string, c
   return clusterManager.switchToClusterContext()
 }
 
-function getClusterManagerForContext(celoEnv: string, context: string) {
+export function getClusterManagerForContext(celoEnv: string, context: string) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
   const deploymentConfig = clusterConfigGetterByCloudProvider[cloudProvider](context)
   return getClusterManager(cloudProvider, celoEnv, deploymentConfig)
@@ -172,6 +172,16 @@ export function coerceContext(rawContextStr: string) {
     throw Error(`Invalid context. Raw ${rawContextStr}, implied ${context}`)
   }
   return context
+}
+
+export function readableContext(context: string) {
+  const readableContext = context
+    .toLowerCase()
+    .replace(/_/g, '-')
+  if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
+    throw Error(`Invalid context. Context ${context}, readable ${readableContext}`)
+  }
+  return readableContext
 }
 
 export function isValidContext(context: string) {

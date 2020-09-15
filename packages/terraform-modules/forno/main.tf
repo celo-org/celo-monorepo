@@ -36,8 +36,9 @@ module "backends" {
   # variables
   backend_max_requests_per_second = var.backend_max_requests_per_second
   celo_env = var.celo_env
-  context_rpc_service_network_endpoint_groups = var.context_rpc_service_network_endpoint_groups
-  context_zones = var.context_zones
+  context_info = var.context_info
+  # context_rpc_service_network_endpoint_groups = var.context_rpc_service_network_endpoint_groups
+  # context_zones = var.context_zones
 }
 
 resource "google_compute_global_address" "global_address" {

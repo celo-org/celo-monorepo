@@ -40,15 +40,15 @@ export abstract class BaseClusterManager {
   async switchToClusterContextIfExists() {
     await this.switchToSubscription()
 
-    let currentCluster = null
+    let currentContext = null
     try {
-      ;[currentCluster] = await execCmd('kubectl config current-context')
+      ;[currentContext] = await execCmd('kubectl config current-context')
     } catch (error) {
-      console.info('No cluster currently set')
+      console.info('No context currently set')
     }
 
     // We expect the context to be the cluster name.
-    if (currentCluster === null || currentCluster.trim() !== this.clusterConfig.clusterName) {
+    if (currentContext === null || currentContext.trim() !== this.kubernetesContextName) {
       const [existingContextsStr] = await execCmdWithExitOnFailure('kubectl config get-contexts -o name')
       const existingContexts = existingContextsStr.trim().split('\n')
       if (existingContexts.includes(this.clusterConfig.clusterName)) {
@@ -73,6 +73,8 @@ export abstract class BaseClusterManager {
 
   abstract switchToSubscription(): Promise<void>
   abstract getAndSwitchToClusterContext(): Promise<void>
+
+  abstract get kubernetesContextName(): string
 
   get clusterConfig(): BaseClusterConfig {
     return this._clusterConfig
