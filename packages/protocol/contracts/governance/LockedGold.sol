@@ -278,6 +278,11 @@ contract LockedGold is
     return (values, timestamps);
   }
 
+  /**
+   * @notice Returns the total amount to withdraw from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return Total amount to withdraw.
+   */
   function getTotalPendingWithdrawals(address account) external view returns (uint256) {
     uint256 pendingWithdrawalSum = 0;
     PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;

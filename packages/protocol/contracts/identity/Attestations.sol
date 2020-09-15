@@ -553,6 +553,7 @@ contract Attestations is
   /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
+   * @param account Address of the account. 
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -697,6 +698,7 @@ contract Attestations is
    * addresses must both approve.  If the other has already approved, then the transfer
    * is executed.
    * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
    * @param from The current attestation address to which the identifier is mapped.
    * @param to The new address to map to identifier.
    * @param status The approval status
