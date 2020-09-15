@@ -18,6 +18,7 @@ export interface ReadOnlyWallet {
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
+  computeSharedSecret: (address: Address, publicKey: string) => Promise<Buffer>
 }
 
 type addInMemoryAccount = (privateKey: string) => void
@@ -159,5 +160,13 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   async decrypt(address: string, ciphertext: Buffer) {
     const signer = this.getSigner(address)
     return signer.decrypt(ciphertext)
+  }
+
+  /**
+   * Computes the shared secret (an ECDH key exchange object) between two accounts
+   */
+  computeSharedSecret(address: Address, publicKey: string): Promise<Buffer> {
+    const signer = this.getSigner(address)
+    return signer.computeSharedSecret(publicKey)
   }
 }

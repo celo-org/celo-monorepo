@@ -3,6 +3,7 @@ import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/r
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
+import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'
@@ -79,8 +80,14 @@ export default class OffchainDataWrapper {
       throw new Error('no storage writer')
     }
     await this.storageWriter.write(data, dataPath)
-    // TODO: Prefix signing abstraction
-    const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(data)
+
+    const signPayload = Buffer.concat([
+      createHash('sha3-256')
+        .update(Buffer.from(dataPath))
+        .digest(),
+      Buffer.from(data),
+    ]).toString('hex')
+    const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(signPayload)
     await this.storageWriter.write(sig, dataPath + '.signature')
   }
 }
@@ -104,15 +111,21 @@ class StorageRoot {
 
     const body = await data.text()
 
-    const signature = await fetch(this.address + dataPath + '.signature')
-
-    if (!signature.ok) {
+    const signatureResponse = await fetch(this.address + dataPath + '.signature')
+    if (!signatureResponse.ok) {
       return Err(new InvalidSignature())
     }
 
-    // TODO: Compare against registered on-chain signers or off-chain signers
-    const signer = guessSigner(body, await signature.text())
+    const signature = await signatureResponse.text()
+    const signPayload = Buffer.concat([
+      createHash('sha3-256')
+        .update(Buffer.from(dataPath))
+        .digest(),
+      Buffer.from(body),
+    ]).toString('hex')
 
+    // TODO: Compare against registered on-chain signers or off-chain signers
+    const signer = guessSigner(signPayload, signature)
     if (eqAddress(signer, this.account)) {
       return Ok(body)
     }

@@ -32,7 +32,7 @@ export class LocalStorageWriter extends StorageWriter {
 export class GitStorageWriter extends LocalStorageWriter {
   async write(data: string, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    execSync(`git add ${dataPath.substr(1)}`, {
+    execSync(`git add ${dataPath}`, {
       cwd: this.root,
     })
     execSync(`git commit --message "Upload ${dataPath}"`, { cwd: this.root })

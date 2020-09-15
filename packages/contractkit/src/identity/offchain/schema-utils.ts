@@ -5,15 +5,18 @@ import {
   parseJsonAsResult,
   Result,
   RootError,
-} from '@celo/base/lib/result'
+  trimLeading0x,
+} from '@celo/base/src'
 import {
   ensureLeading0x,
+  privateKeyToAddress,
   privateKeyToPublicKey,
   publicKeyToAddress,
-  trimLeading0x,
 } from '@celo/utils/lib/address'
-import { Encrypt } from '@celo/utils/lib/ecies'
-import { randomBytes } from 'crypto'
+import { Decrypt, Encrypt } from '@celo/utils/lib/ecies'
+import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
+import { computeSharedSecret, trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
+import { createHmac } from 'crypto'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Address } from '../../base'
@@ -58,18 +61,80 @@ export class SimpleSchema<DataType> {
 
   read = makeAsyncThrowable(this.readAsResult.bind(this))
 
+  async readEncrypted(
+    recipientAddress: Address,
+    senderAddress: string
+  ): Promise<Result<DataType, SchemaErrors>> {
+    const wallet = this.wrapper.kit.getWallet()
+    const sharedSecret = await wallet.computeSharedSecret(
+      recipientAddress,
+      await addressToPublicKey(senderAddress, this.wrapper.kit.web3.eth.sign)
+    )
+
+    return readEncryptedWithSchema(
+      this.wrapper,
+      this.type,
+      this.dataPath,
+      (data) => wallet.decrypt(recipientAddress, data),
+      sharedSecret,
+      senderAddress,
+      recipientAddress
+    )
+  }
+
+  async readEncryptedWithKey(privateKey: string, senderPubKey: string) {
+    const sharedSecret = await computeSharedSecret(privateKey, senderPubKey)
+
+    return readEncryptedWithSchema(
+      this.wrapper,
+      this.type,
+      this.dataPath,
+      (data) => Promise.resolve(Decrypt(Buffer.from(trimLeading0x(privateKey), 'hex'), data)),
+      sharedSecret,
+      publicKeyToAddress(senderPubKey),
+      privateKeyToAddress(privateKey)
+    )
+  }
+
   async write(data: DataType) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)
   }
 
-  async writeEncrypted(data: DataType, pubKeys: string[], decryptionKey?: string | undefined) {
+  /**
+   * Primarily used for testing, we don't recommend keeping private keys in plaintext
+   */
+  async writeEncryptedWithKey(data: DataType, privateKey: string, recipientPubKey: string) {
+    const sharedSecret = await computeSharedSecret(privateKey, recipientPubKey)
+
     return writeEncryptedWithSchema(
       this.wrapper,
       this.type,
       this.dataPath,
       data,
-      pubKeys,
-      decryptionKey
+      sharedSecret,
+      privateKeyToPublicKey(privateKey),
+      recipientPubKey
+    )
+  }
+
+  async writeEncrypted(data: DataType, fromAddress: string, toAddress: string) {
+    const wallet = this.wrapper.kit.getWallet()
+
+    const [fromPubKey, toPubKey] = await Promise.all([
+      addressToPublicKey(fromAddress, this.wrapper.kit.web3.eth.sign),
+      addressToPublicKey(toAddress, this.wrapper.kit.web3.eth.sign),
+    ])
+
+    const sharedSecret = await wallet.computeSharedSecret(fromAddress, toPubKey)
+
+    return writeEncryptedWithSchema(
+      this.wrapper,
+      this.type,
+      this.dataPath,
+      data,
+      sharedSecret,
+      fromPubKey,
+      toPubKey
     )
   }
 }
@@ -118,21 +183,21 @@ export class EncryptionKeysAccessor {
     )
   }
 
-  async writeEncrypted(
-    other: Address,
-    keys: EncryptionKeysType,
-    pubKeys: string[],
-    decryptionKey?: string | undefined
-  ) {
-    return writeEncryptedWithSchema(
-      this.wrapper,
-      EncryptionKeysSchema,
-      this.basePath + '/' + other + '/encryptionKeys',
-      keys,
-      pubKeys,
-      decryptionKey
-    )
-  }
+  // async writeEncrypted(
+  //   other: Address,
+  //   keys: EncryptionKeysType,
+  //   decryptionKey: string,
+  //   pubKeys: string[]
+  // ) {
+  //   return writeEncryptedWithSchema(
+  //     this.wrapper,
+  //     EncryptionKeysSchema,
+  //     this.basePath + '/' + other + '/encryptionKeys',
+  //     keys,
+  //     decryptionKey,
+  //     pubKeys
+  //   )
+  // }
 }
 
 const getDecryptionKey = async (
@@ -242,49 +307,21 @@ export const readWithSchemaAsResult = async <DataType>(
   return Err(new UnknownCiphertext())
 }
 
-export const writeEncryptedWithSchema = async <T>(
-  wrapper: OffchainDataWrapper,
-  type: t.Type<T>,
-  dataPath: string,
-  data: T,
-  pubKeys: string[],
-  decryptionKey?: string | undefined
-) => {
-  if (!type.is(data)) {
-    return
-  }
+// label = PRF(ECDH(A, B), A || B || data path)
+// ciphertext path = "/cosmetic path/" || base64(label)
+export function getDataPath(
+  path: string,
+  sharedSecret: Buffer,
+  senderPublicKey: string,
+  receiverPublicKey: string
+) {
+  const senderPublicKeyBuffer = Buffer.from(trimLeading0x(senderPublicKey), 'hex')
+  const receiverPublicKeyBuffer = Buffer.from(trimLeading0x(receiverPublicKey), 'hex')
 
-  if (decryptionKey === undefined) {
-    decryptionKey = ensureLeading0x(randomBytes(32).toString('hex'))
-  }
-  const decryptionKeyPublic = privateKeyToPublicKey(decryptionKey)
-
-  const stringifiedData = JSON.stringify(data)
-
-  const encryptedKeyMapping: Record<string, string> = {}
-  pubKeys.forEach(
-    (pubKey) =>
-      (encryptedKeyMapping[pubKey] = Encrypt(
-        Buffer.from(trimLeading0x(pubKey), 'hex'),
-        Buffer.from(trimLeading0x(decryptionKey!), 'hex')
-      ).toString('hex'))
-  )
-
-  const encryptedData: EncryptionWrappedDataType = {
-    publicKey: decryptionKeyPublic,
-    ciphertext: Encrypt(
-      Buffer.from(trimLeading0x(decryptionKeyPublic), 'hex'),
-      Buffer.from(stringifiedData)
-    ).toString('hex'),
-    encryptedKey: encryptedKeyMapping,
-  }
-
-  const serializedData = JSON.stringify(encryptedData)
-  await wrapper.writeDataTo(serializedData, dataPath)
-  return
+  return createHmac('sha3-256', sharedSecret)
+    .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
+    .digest('base64')
 }
-
-export const readWithSchema = makeAsyncThrowable(readWithSchemaAsResult)
 
 export const writeWithSchema = async <DataType>(
   wrapper: OffchainDataWrapper,
@@ -299,3 +336,70 @@ export const writeWithSchema = async <DataType>(
   await wrapper.writeDataTo(serializedData, dataPath)
   return
 }
+
+export const writeEncryptedWithSchema = async <T>(
+  wrapper: OffchainDataWrapper,
+  type: t.Type<T>,
+  dataPath: string,
+  data: T,
+  sharedSecret: Buffer,
+  publisherPublicKey: string,
+  receiverPublicKey: string
+) => {
+  if (!type.is(data)) {
+    return
+  }
+
+  const computedDataPath = getDataPath(
+    dataPath,
+    sharedSecret,
+    publisherPublicKey,
+    receiverPublicKey
+  )
+  const encryptedData = Encrypt(
+    Buffer.from(trimPublicKeyPrefix(receiverPublicKey), 'hex'),
+    Buffer.from(JSON.stringify(data))
+  )
+  await wrapper.writeDataTo(encryptedData.toString('hex'), computedDataPath)
+}
+
+const readEncryptedWithSchema = async <T>(
+  wrapper: OffchainDataWrapper,
+  type: t.Type<T>,
+  dataPath: string,
+  decrypt: (data: Buffer) => Promise<Buffer>,
+  sharedSecret: Buffer,
+  senderAddress: string,
+  recipientAddress: string
+) => {
+  const senderPubKey = await addressToPublicKey(senderAddress, wrapper.kit.web3.eth.sign)
+  const recipientPubKey = await addressToPublicKey(recipientAddress, wrapper.kit.web3.eth.sign)
+
+  const computedDataPath = getDataPath(dataPath, sharedSecret, senderPubKey, recipientPubKey)
+  const rawData = await wrapper.readDataFromAsResult(senderAddress, computedDataPath)
+  if (!rawData.ok) {
+    return Err(new OffchainError(rawData.error))
+  }
+
+  const plaintext = await decrypt(Buffer.from(rawData.result, 'hex'))
+
+  const dataAsJson = parseJsonAsResult(plaintext.toString())
+  if (!dataAsJson.ok) {
+    return Err(new InvalidDataError())
+  }
+
+  const parsedDataAsType = type.decode(dataAsJson.result)
+
+  if (isRight(parsedDataAsType)) {
+    return Ok(parsedDataAsType.right)
+  }
+
+  const parseDataAsEncryptionWrapped = EncryptionWrappedData.decode(dataAsJson.result)
+  if (isLeft(parseDataAsEncryptionWrapped)) {
+    return Err(new InvalidDataError())
+  }
+
+  return Err(new InvalidDataError())
+}
+
+export const readWithSchema = makeAsyncThrowable(readWithSchemaAsResult)
