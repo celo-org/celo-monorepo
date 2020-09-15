@@ -1,6 +1,18 @@
 import { enterPinUiIfNecessary, waitForElementId, sleep } from './utils/utils'
 import { SAMPLE_BACKUP_KEY } from './utils/consts'
 
+// Yes, the try-catch looks weird. It's here to avoid flakiness on the scroll. Without it the scroll
+// line intermittently fails with a ~"Can't find view" error even though the SettingsScrollView is visible.
+// This probably doesn't reduce flakiness 100%, but in practive it reduces it from ~50% to a very
+// small % of the time.
+const scrollToBottomWithRetry = async (elementId) => {
+  try {
+    await element(by.id(elementId)).scrollTo('bottom')
+  } catch (err) {
+    await element(by.id(elementId)).scrollTo('bottom')
+  }
+}
+
 export default ResetAccount = () => {
   it('Reset Account by doing the Account Key quiz', async () => {
     // Go to Settings
@@ -8,11 +20,8 @@ export default ResetAccount = () => {
     await element(by.id('DrawerItem/Settings')).tap()
 
     // Scroll to bottom and start the reset process.
-    // This sleep is to avoid flakiness on the scroll. Without it the scroll
-    // line intermittently fails event though the SettingsScrollView is visible.
     await waitForElementId('SettingsScrollView')
-    await sleep(3000)
-    await element(by.id('SettingsScrollView')).scrollTo('bottom')
+    await scrollToBottomWithRetry('SettingsScrollView')
     await element(by.id('ResetAccount')).tap()
     await element(by.id('RemoveAccountModal/PrimaryAction')).tap()
 
