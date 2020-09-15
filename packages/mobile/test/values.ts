@@ -5,7 +5,11 @@ import { MinimalContact } from 'react-native-contacts'
 import { TokenTransactionType } from 'src/apollo/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  E164NumberToAddressType,
+  VerificationState,
+} from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
 import { StackParamList } from 'src/navigator/types'
 import { NotificationTypes } from 'src/notifications/types'
@@ -285,7 +289,9 @@ export const mockPaymentRequests: PaymentRequest[] = [
   },
 ]
 
-export const mockVerificationStateUnverified = {
+export const mockVerificationStateUnverified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
   phoneHashDetails: {
     e164Number: mockE164Number,
     phoneHash: mockE164NumberHash,
@@ -301,7 +307,9 @@ export const mockVerificationStateUnverified = {
   isBalanceSufficient: true,
 }
 
-export const mockVerificationStatePartlyVerified = {
+export const mockVerificationStatePartlyVerified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
   phoneHashDetails: {
     e164Number: mockE164Number,
     phoneHash: mockE164NumberHash,
@@ -317,7 +325,9 @@ export const mockVerificationStatePartlyVerified = {
   isBalanceSufficient: true,
 }
 
-export const mockVerificationStateVerified = {
+export const mockVerificationStateVerified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
   phoneHashDetails: {
     e164Number: mockE164Number,
     phoneHash: mockE164NumberHash,
@@ -333,7 +343,9 @@ export const mockVerificationStateVerified = {
   isBalanceSufficient: true,
 }
 
-export const mockVerificationStateInsufficientBalance = {
+export const mockVerificationStateInsufficientBalance: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
   phoneHashDetails: {
     e164Number: mockE164Number,
     phoneHash: mockE164NumberHash,

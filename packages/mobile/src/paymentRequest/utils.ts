@@ -137,7 +137,8 @@ export function* encryptPaymentRequest(paymentRequest: PaymentRequest) {
 // Decrypt sensitive data in the payment request using the user's DEK
 export function decryptPaymentRequest(
   paymentRequest: PaymentRequest,
-  dataEncryptionKey: string | null
+  dataEncryptionKey: string | null,
+  isOutgoingRequest: boolean
 ) {
   Logger.debug(`${TAG}@decryptPaymentRequest`, 'Decrypting payment request')
 
@@ -156,7 +157,7 @@ export function decryptPaymentRequest(
     const { comment: decryptedRequesterE164Number, success } = decryptComment(
       requesterE164Number,
       dekBuffer,
-      false
+      isOutgoingRequest
     )
     if (success) {
       decryptedPaymentRequest.requesterE164Number = decryptedRequesterE164Number
@@ -177,7 +178,11 @@ export function decryptPaymentRequest(
 
   const comment = paymentRequest.comment
   if (comment && features.USE_COMMENT_ENCRYPTION) {
-    const { comment: decryptedComment, success } = decryptComment(comment, dekBuffer, false)
+    const { comment: decryptedComment, success } = decryptComment(
+      comment,
+      dekBuffer,
+      isOutgoingRequest
+    )
     if (success) {
       decryptedPaymentRequest.comment = decryptedComment
     } else if (comment.length <= MAX_COMMENT_LENGTH) {

@@ -162,7 +162,7 @@ variable validators {
 variable celo_image_attestation {
   type        = string
   description = "Docker image for Celo attestation service"
-  default     = "us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava"
+  default     = "us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-3"
 }
 
 variable twilio_messaging_service_sid {
@@ -173,11 +173,23 @@ variable twilio_account_sid {
   type = string
 }
 
-variable twilio_blacklist {
+variable twilio_unsupported_regions {
   type = string
 }
 
 variable twilio_auth_token {
+  type = string
+}
+
+variable nexmo_api_key {
+  type = string
+}
+
+variable nexmo_api_secret {
+  type = string
+}
+
+variable nexmo_unsupported_regions {
   type = string
 }
 
