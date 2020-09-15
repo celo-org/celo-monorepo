@@ -12,7 +12,7 @@ export default ResetAccount = () => {
     // The sleep is here to avoid flakiness on the scroll. Without it the scroll to bottom intermittently fails
     // with a ~"Can't find view" error even though the SettingsScrollView is visible.
     // This probably doesn't reduce flakiness 100%, but in practice it reduces it significantly.
-    await sleep(5000)
+    await sleep(2000)
     await element(by.id('SettingsScrollView')).scrollTo('bottom')
     await element(by.id('ResetAccount')).tap()
     await element(by.id('RemoveAccountModal/PrimaryAction')).tap()
@@ -31,6 +31,7 @@ export default ResetAccount = () => {
     // TODO: Figure out a way to confirm and test that the app goes to the onboarding
     // screen on next open.
     // await element(by.id('ConfirmAccountRemovalModal/PrimaryAction')).tap()
+    await waitForElementId('ConfirmAccountRemovalModal/PrimaryAction')
     await expect(element(by.id('ConfirmAccountRemovalModal/PrimaryAction'))).toBeVisible()
   })
 }

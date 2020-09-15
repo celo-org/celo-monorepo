@@ -1,4 +1,4 @@
-import { enterPinUiIfNecessary, inputNumberKeypad } from '../utils/utils'
+import { enterPinUiIfNecessary, inputNumberKeypad, sleep } from '../utils/utils'
 import { DEFAULT_RECIPIENT_ADDRESS } from '../utils/consts'
 
 const AMOUNT_TO_SEND = '0.1'
@@ -27,6 +27,10 @@ export default Send = () => {
       // so we tap something else in the scrollview to hide the soft keyboard
       await element(by.id('HeaderText')).tap()
     }
+
+    // Wait for the confirm button to be clickable. If it takes too long this test
+    // will be flaky :(
+    await sleep(3000)
 
     // Confirm and input PIN if necessary.
     await element(by.id('ConfirmButton')).tap()
