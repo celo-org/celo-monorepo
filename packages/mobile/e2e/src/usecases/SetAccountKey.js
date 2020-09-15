@@ -21,7 +21,7 @@ export default SetAccountKey = () => {
     const attributes = await element(by.id('accountKeyWords')).getAttributes()
     const accountKey = attributes.text
 
-    await element(by.id('backupKeySavedSwitch')).tap()
+    await element(by.id('backupKeySavedSwitch')).longPress()
     await element(by.id('backupKeyContinue')).tap()
     for (const word of accountKey.split(' ')) {
       await element(by.id(`backupQuiz/${word}`)).tap()

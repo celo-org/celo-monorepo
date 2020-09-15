@@ -86,7 +86,6 @@ runTest() {
     export NUM_RETRIES=0
     reuse_param="--reuse"
   fi
-  export NUM_RETRIES=0
   yarn detox test \
     --configuration $CONFIG_NAME \
     "${FILE_TO_RUN}" \

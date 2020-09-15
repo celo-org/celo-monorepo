@@ -38,5 +38,5 @@ export default Send = () => {
     // make sure it was successful
   })
 
-  // TODO(erdal): implement Request path
+  // TODO: implement Request path
 }
