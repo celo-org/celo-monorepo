@@ -76,7 +76,7 @@ public class MainActivity
 
       @Override
       protected Bundle getLaunchOptions() {
-        // this is used to pass props (in this case app start time) to react
+        // This is used to pass props (in this case app start time) to React
         Bundle props = new Bundle();
         props.putLong("appStartedMillis", appStartedMillis);
         return props;
