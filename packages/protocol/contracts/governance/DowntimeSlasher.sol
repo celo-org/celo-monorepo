@@ -104,7 +104,11 @@ contract DowntimeSlasher is ICeloVersionedContract, SlasherUtil {
     );
 
     bytes32 bitmap;
-    for (uint256 blockNumber = startBlock; blockNumber <= endBlock; blockNumber++) {
+    for (
+      uint256 blockNumber = startBlock;
+      blockNumber <= endBlock;
+      blockNumber = blockNumber.add(1)
+    ) {
       // The canonical signatures for block N are stored in the parent seal bitmap for block N+1.
       bitmap |= getParentSealBitmap(blockNumber.add(1));
     }
