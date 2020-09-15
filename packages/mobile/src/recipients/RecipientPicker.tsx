@@ -145,8 +145,9 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const searchedAddress = searchQuery.toLowerCase()
     const existingContact = getRecipientFromAddress(
-      searchQuery,
+      searchedAddress,
       addressToE164Number,
       recipientCache
     )
@@ -161,8 +162,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       const recipient: RecipientWithAddress = {
         kind: RecipientKind.Address,
         displayName: t('walletAddress'),
-        displayId: searchQuery.substring(2, 17) + '...',
-        address: searchQuery,
+        displayId: searchedAddress.substring(2, 17) + '...',
+        address: searchedAddress,
       }
 
       return (

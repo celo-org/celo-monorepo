@@ -1,6 +1,701 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`VerificationEducationScreen renders correctly 1`] = `
+exports[`VerificationEducationScreen shows the \`continue\` and \`already received\` buttons when there are actionable attestations 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#F9F6F0",
+      "flex": 1,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Array [
+        Object {
+          "flexGrow": 1,
+          "paddingHorizontal": 20,
+          "paddingTop": 32,
+        },
+        Object {
+          "marginBottom": 0,
+        },
+      ]
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 16,
+          }
+        }
+        testID="VerificationEducationHeader"
+      >
+        verificationEducation.header
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginBottom": 24,
+          }
+        }
+      >
+        verificationEducation.body
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+            },
+            Object {
+              "marginBottom": 24,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#D6EAF3",
+                "height": 48,
+                "justifyContent": "center",
+                "minWidth": 120,
+                "opacity": 1,
+                "paddingHorizontal": 24,
+                "paddingVertical": 5,
+              }
+            }
+            testID="VerificationEducationContinue"
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#0768AE",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
+              }
+            >
+              verificationEducation.resume
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+            },
+            Object {
+              "marginBottom": 24,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#FFFFFF",
+                "height": 48,
+                "justifyContent": "center",
+                "minWidth": 120,
+                "opacity": 1,
+                "paddingHorizontal": 24,
+                "paddingVertical": 5,
+              }
+            }
+            testID="VerificationEducationAlready"
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#0768AE",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
+              }
+            >
+              verificationEducation.receivedCodes
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      />
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#A49B80",
+                "padding": 16,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          verificationEducation.doINeedToConfirm
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationSkipDialog.title
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationSkipDialog.body
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/SecondaryAction"
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationSkipDialog.cancel
+              </Text>
+            </View>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/PrimaryAction"
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationSkipDialog.confirm
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationLearnMoreDialog.title
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                />
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                />
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationLearnMoreDialog.dismiss
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+</View>
+`;
+
+exports[`VerificationEducationScreen shows the \`continue\` button when the user is not already verified and has enough balance 1`] = `
 <View
   style={
     Object {
@@ -161,7 +856,1259 @@ exports[`VerificationEducationScreen renders correctly 1`] = `
             ]
           }
         >
-          verificationEducation.learnMore
+          verificationEducation.doINeedToConfirm
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationSkipDialog.title
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationSkipDialog.body
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/SecondaryAction"
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationSkipDialog.cancel
+              </Text>
+            </View>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/PrimaryAction"
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationSkipDialog.confirm
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationLearnMoreDialog.title
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                />
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                />
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationLearnMoreDialog.dismiss
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+</View>
+`;
+
+exports[`VerificationEducationScreen shows the \`skip\` button when already verified 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#F9F6F0",
+      "flex": 1,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Array [
+        Object {
+          "flexGrow": 1,
+          "paddingHorizontal": 20,
+          "paddingTop": 32,
+        },
+        Object {
+          "marginBottom": 0,
+        },
+      ]
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 16,
+          }
+        }
+        testID="VerificationEducationHeader"
+      >
+        verificationEducation.header
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginBottom": 24,
+          }
+        }
+      >
+        verificationEducation.bodyAlreadyVerified
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+            },
+            Object {
+              "marginBottom": 24,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#D6EAF3",
+                "height": 48,
+                "justifyContent": "center",
+                "minWidth": 120,
+                "opacity": 1,
+                "paddingHorizontal": 24,
+                "paddingVertical": 5,
+              }
+            }
+            testID="VerificationEducationSkip"
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#0768AE",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
+              }
+            >
+              global:continue
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      />
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#A49B80",
+                "padding": 16,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          verificationEducation.doINeedToConfirm
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationSkipDialog.title
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationSkipDialog.body
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/SecondaryAction"
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "color": "#9CA4A9",
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationSkipDialog.cancel
+              </Text>
+            </View>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="VerificationSkipDialog/PrimaryAction"
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationSkipDialog.confirm
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+  <Modal
+    animationType="none"
+    hardwareAccelerated={false}
+    hideModalContentWhileAnimating={false}
+    onModalHide={[Function]}
+    onModalWillHide={[Function]}
+    onModalWillShow={[Function]}
+    onRequestClose={[Function]}
+    scrollHorizontal={false}
+    scrollOffset={0}
+    scrollOffsetMax={0}
+    scrollTo={null}
+    statusBarTranslucent={true}
+    supportedOrientations={
+      Array [
+        "portrait",
+        "landscape",
+      ]
+    }
+    swipeThreshold={100}
+    transparent={true}
+    visible={false}
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      forwardedRef={[Function]}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "backgroundColor": "black",
+          "bottom": 0,
+          "height": 1334,
+          "left": 0,
+          "opacity": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 0,
+          "width": 750,
+        }
+      }
+    />
+    <View
+      forwardedRef={[Function]}
+      hideModalContentWhileAnimating={false}
+      onModalHide={[Function]}
+      onModalWillHide={[Function]}
+      onModalWillShow={[Function]}
+      pointerEvents="box-none"
+      scrollHorizontal={false}
+      scrollOffset={0}
+      scrollOffsetMax={0}
+      scrollTo={null}
+      statusBarTranslucent={true}
+      style={
+        Object {
+          "flex": 1,
+          "justifyContent": "center",
+          "margin": 37.5,
+          "transform": Array [
+            Object {
+              "translateY": 0,
+            },
+          ],
+        }
+      }
+      supportedOrientations={
+        Array [
+          "portrait",
+          "landscape",
+        ]
+      }
+      swipeThreshold={100}
+    >
+      <RNCSafeAreaView>
+        <View
+          style={
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "padding": 16,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
+          }
+        >
+          <RCTScrollView
+            contentContainerStyle={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <View>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Jost-Medium",
+                    "fontSize": 22,
+                    "lineHeight": 28,
+                    "marginBottom": 12,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                verificationLearnMoreDialog.title
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                    "marginBottom": 24,
+                    "textAlign": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                />
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
+                  }
+                />
+              </Text>
+            </View>
+          </RCTScrollView>
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "space-around",
+                "maxWidth": "100%",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#1AB775",
+                      "fontFamily": "Inter-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    Object {
+                      "paddingTop": 16,
+                    },
+                  ]
+                }
+              >
+                verificationLearnMoreDialog.dismiss
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RNCSafeAreaView>
+    </View>
+  </Modal>
+</View>
+`;
+
+exports[`VerificationEducationScreen shows the \`skip\` button when user is not already verified and has NOT enough balance 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#F9F6F0",
+      "flex": 1,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Array [
+        Object {
+          "flexGrow": 1,
+          "paddingHorizontal": 20,
+          "paddingTop": 32,
+        },
+        Object {
+          "marginBottom": 0,
+        },
+      ]
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 16,
+          }
+        }
+        testID="VerificationEducationHeader"
+      >
+        verificationEducation.header
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginBottom": 24,
+          }
+        }
+      >
+        verificationEducation.bodyInsufficientBalance
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+            },
+            Object {
+              "marginBottom": 24,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#D6EAF3",
+                "height": 48,
+                "justifyContent": "center",
+                "minWidth": 120,
+                "opacity": 1,
+                "paddingHorizontal": 24,
+                "paddingVertical": 5,
+              }
+            }
+            testID="VerificationEducationSkip"
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#0768AE",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
+              }
+            >
+              verificationEducation.skipForNow
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      />
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#1AB775",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#A49B80",
+                "padding": 16,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          verificationEducation.doINeedToConfirm
         </Text>
       </View>
     </View>
