@@ -15,9 +15,7 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import java.util.Date;
 import org.devio.rn.splashscreen.SplashScreen;
 
-public class MainActivity
-  extends ReactActivity
-  implements ReactInstanceManager.ReactInstanceEventListener {
+public class MainActivity extends ReactActivity {
   long appStartedMillis;
 
   /**
@@ -48,21 +46,14 @@ public class MainActivity
   @Override
   public void onResume() {
     super.onResume();
-    getReactInstanceManager().addReactInstanceEventListener(this);
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
   }
 
   @Override
   public void onPause() {
     super.onPause();
-    getReactInstanceManager().removeReactInstanceEventListener(this);
     getWindow()
       .setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
-  }
-
-  @Override
-  public void onReactContextInitialized(ReactContext context) {
-    // pass
   }
 
   @Override
