@@ -5,8 +5,8 @@ import {
   createMockContractKit,
   createMockToken,
   createMockWeb3,
-} from '../../../common/test/utils'
-import { mockAccount, mockPhoneNumber } from '../../../common/test/values'
+} from '../../../common/src/test/utils'
+import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit, isVerified } from '../../src/web3/contracts'

@@ -5,7 +5,7 @@ import {
   SignMessageRequest,
 } from '@celo/contractkit/lib/identity/odis/query'
 import 'isomorphic-fetch'
-import { replenishQuota } from '../../../common/test/utils'
+import { replenishQuota } from '../../../common/src/test/utils'
 import {
   ACCOUNT_ADDRESS,
   ACCOUNT_ADDRESS_NO_QUOTA,
