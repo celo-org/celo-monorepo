@@ -38,8 +38,8 @@ const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
 // Gas limit is doubled for initial contract deployment.
 const gasLimit = argv.reset ? 20000000 : 12500000
-const hostAddress = process.env.NODE_ADDRESS || "127.0.0.1"; 
-const hostPort = parseInt(process.env.NODE_PORT || "8545");
+const hostAddress = process.env.CELO_NODE_ADDRESS || "127.0.0.1"; 
+const hostPort = parseInt(process.env.CELO_NODE_PORT || "8545");
 
 const defaultConfig = {
   host: hostAddress,
