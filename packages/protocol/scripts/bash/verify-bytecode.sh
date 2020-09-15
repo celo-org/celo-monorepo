@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Checks that the contract version numbers in a provided branch are as expected given
-# a released branch.
+# Checks that Solidity sources on a given branch correspond to bytecodes
+# deployed to a Celo system deployed to the given network.
 #
 # Flags:
 # -b: Branch containing smart contracts that currently comprise the Celo protocol
