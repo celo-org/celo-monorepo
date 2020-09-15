@@ -26,39 +26,37 @@ interface ContextInfoTerraformVars {
 
 async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promise<TerraformVars> {
   let gcloudProject: string | undefined
-  const contextInfos: { [context: string]: ContextInfoTerraformVars } = await contexts.reduce(async (aggPromise, context: string) => {
-    const agg = await aggPromise
-    const clusterManager = getClusterManagerForContext(celoEnv, context)
-    const contextGcloudProject = (clusterManager.clusterConfig as GCPClusterConfig).projectName
-    // Require all the contexts to have the same project
-    if (gcloudProject === undefined) {
-      gcloudProject = contextGcloudProject
-    } else if (gcloudProject !== contextGcloudProject) {
-      throw Error(`All contexts must be in the same Google Cloud project`)
-    }
-    // Rather than using clusterManager.kubernetesContextName we switch to the
-    // cluster to account for the case where this user has not gotten the
-    // context for the cluster yet.
-    await clusterManager.switchToClusterContext()
-    const [output] = await execCmd(
-      `kubectl get svc ${celoEnv}-fullnodes-rpc -n ${celoEnv} -o jsonpath="{.metadata.annotations.cloud\\.google\\.com/neg-status}"`
-    )
-    if (!output.trim()) {
-      throw Error(`Expected cloud.google.com/neg-status annotation for service ${celoEnv}-fullnodes-rpc`)
-    }
-    const outputParsed = JSON.parse(output)
-    // Hardcoding this, this is the default HTTP RPC port.
-    // TODO look into ws
-    const port = 8545
-    return {
-      ...agg,
-      [readableContext(context)]: {
-        rpc_service_network_endpoint_group_name: outputParsed.network_endpoint_groups[port],
-        // Only expect a single zone
-        zone: outputParsed.zones[0]
+  const getContextInfos = async (port: number): Promise<{ [context: string]: ContextInfoTerraformVars }> =>
+    contexts.reduce(async (aggPromise, context: string) => {
+      const agg = await aggPromise
+      const clusterManager = getClusterManagerForContext(celoEnv, context)
+      const contextGcloudProject = (clusterManager.clusterConfig as GCPClusterConfig).projectName
+      // Require all the contexts to have the same project
+      if (gcloudProject === undefined) {
+        gcloudProject = contextGcloudProject
+      } else if (gcloudProject !== contextGcloudProject) {
+        throw Error(`All contexts must be in the same Google Cloud project`)
       }
-    }
-  }, Promise.resolve({}))
+      // Rather than using clusterManager.kubernetesContextName we switch to the
+      // cluster to account for the case where this user has not gotten the
+      // context for the cluster yet.
+      await clusterManager.switchToClusterContext()
+      const [output] = await execCmd(
+        `kubectl get svc ${celoEnv}-fullnodes-rpc -n ${celoEnv} -o jsonpath="{.metadata.annotations.cloud\\.google\\.com/neg-status}"`
+      )
+      if (!output.trim()) {
+        throw Error(`Expected cloud.google.com/neg-status annotation for service ${celoEnv}-fullnodes-rpc`)
+      }
+      const outputParsed = JSON.parse(output)
+      return {
+        ...agg,
+        [readableContext(context)]: {
+          rpc_service_network_endpoint_group_name: outputParsed.network_endpoint_groups[port],
+          // Only expect a single zone
+          zone: outputParsed.zones[0]
+        }
+      }
+    }, Promise.resolve({}))
 
   // Make sure each domain ends with a period
   const domains = fetchEnv(envVar.FORNO_DOMAINS).split(',').map((domain: string) => {
@@ -68,10 +66,14 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
     return domain
   })
 
+  const httpContextInfos = await getContextInfos(8545)
+  const wsContextInfos = await getContextInfos(8546)
+
   return {
     backend_max_requests_per_second: '300',
     celo_env: celoEnv,
-    context_info: JSON.stringify(contextInfos),
+    http_context_info: JSON.stringify(httpContextInfos),
+    ws_context_info: JSON.stringify(wsContextInfos),
     domains: JSON.stringify(domains),
     gcloud_credentials_path: fetchEnv(envVar.GOOGLE_APPLICATION_CREDENTIALS),
     gcloud_project: gcloudProject!,

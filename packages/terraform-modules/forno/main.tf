@@ -31,14 +31,22 @@ data "terraform_remote_state" "state" {
   }
 }
 
-module "backends" {
-  source = "./modules/backend"
+module "http_backends" {
+  source = "./modules/backends"
   # variables
   backend_max_requests_per_second = var.backend_max_requests_per_second
   celo_env = var.celo_env
-  context_info = var.context_info
-  # context_rpc_service_network_endpoint_groups = var.context_rpc_service_network_endpoint_groups
-  # context_zones = var.context_zones
+  context_info = var.http_context_info
+  type = "http"
+}
+
+module "ws_backends" {
+  source = "./modules/backends"
+  # variables
+  backend_max_requests_per_second = var.backend_max_requests_per_second
+  celo_env = var.celo_env
+  context_info = var.ws_context_info
+  type = "ws"
 }
 
 resource "google_compute_global_address" "global_address" {
@@ -60,7 +68,22 @@ resource "google_compute_managed_ssl_certificate" "ssl_cert" {
 
 resource "google_compute_url_map" "url_map" {
   name = "${var.celo_env}-forno-url-map"
-  default_service = module.backends.backend_service_id
+  default_service = module.http_backends.backend_service_id
+
+  host_rule {
+    hosts        = var.domains
+    path_matcher = "${var.celo_env}-forno-path-matcher"
+  }
+
+  path_matcher {
+    name            = "${var.celo_env}-forno-path-matcher"
+    default_service = module.http_backends.backend_service_id
+
+    path_rule {
+      paths   = ["/ws"]
+      service = module.ws_backends.backend_service_id
+    }
+  }
 
   # path_matcher {
   #   name = "all-paths"

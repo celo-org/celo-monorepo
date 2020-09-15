@@ -8,7 +8,17 @@ variable celo_env {
   description = "Name of the Celo environment"
 }
 
-variable context_info {
+variable http_context_info {
+  type        = map(
+    object({
+      zone = string
+      rpc_service_network_endpoint_group_name = string
+    })
+  )
+  description = "Provides basic information on each context. Keys are contexts and values are the corresponding info"
+}
+
+variable ws_context_info {
   type        = map(
     object({
       zone = string

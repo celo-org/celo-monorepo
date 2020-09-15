@@ -52,7 +52,7 @@ metadata:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: celo-fullnode-rpc-traffic
   annotations:
-    cloud.google.com/neg: '{"exposed_ports": {"8545":{}}}'
+    cloud.google.com/neg: '{"exposed_ports": {"8545":{},"8546":{}}}'
 spec:
   # REMOVE THIS LATER!
   publishNotReadyAddresses: true

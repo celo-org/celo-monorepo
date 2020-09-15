@@ -3,10 +3,10 @@
 #   target_https_proxy_name = "${var.celo_env}-tx-node-lb-external-http-proxy"
 # }
 
-resource "google_compute_health_check" "http_health_check" {
-  name = "${var.celo_env}-forno-health-check"
+resource "google_compute_health_check" "tcp_health_check" {
+  name = "${var.celo_env}-forno-health-check-${var.type}"
 
-  http_health_check {
+  tcp_health_check {
     # For NetworkEndpointGroup, the port specified for each network endpoint is used for health checking
     port_specification = "USE_SERVING_PORT"
   }
@@ -21,9 +21,9 @@ data "google_compute_network_endpoint_group" "rpc_service_network_endpoint_group
 }
 
 resource "google_compute_backend_service" "backend_service" {
-  name = "${var.celo_env}-forno-backend-service"
+  name = "${var.celo_env}-forno-backend-service-${var.type}"
 
-  health_checks = [google_compute_health_check.http_health_check.self_link]
+  health_checks = [google_compute_health_check.tcp_health_check.self_link]
 
   dynamic "backend" {
     for_each = var.context_info

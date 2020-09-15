@@ -17,6 +17,11 @@ variable context_info {
   )
   description = "Provides basic information on each context. Keys are contexts and values are the corresponding info"
 }
+
+variable type {
+  type        = string
+  description = "Type of backends, used for names"
+}
 #
 # variable context_rpc_service_network_endpoint_groups {
 #   type        = map(string)
