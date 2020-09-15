@@ -13,7 +13,7 @@ export default ResetAccount = () => {
     // with a ~"Can't find view" error even though the SettingsScrollView is visible.
     // This probably doesn't reduce flakiness 100%, but in practice it reduces it significantly.
     await sleep(5000)
-    await element(by.id(elementId)).scrollTo('bottom')
+    await element(by.id('SettingsScrollView')).scrollTo('bottom')
     await element(by.id('ResetAccount')).tap()
     await element(by.id('RemoveAccountModal/PrimaryAction')).tap()
 
