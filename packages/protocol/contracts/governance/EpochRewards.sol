@@ -21,8 +21,7 @@ contract EpochRewards is
   UsingPrecompiles,
   UsingRegistry,
   Freezable,
-  CalledByVm,
-  ICeloVersionedContract
+  CalledByVm
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -84,14 +83,6 @@ contract EpochRewards is
   );
 
   event TargetVotingYieldUpdated(uint256 fraction);
-
-  /*
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
