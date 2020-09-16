@@ -16,7 +16,7 @@ export default function Canvas() {
   return (
     <>
       <OpenGraph
-        title="As Wealth Flowers"
+        title="For Value Flowers"
         description="A Wish for Collective Propsperity"
         path={menuItems.WISH.link}
         image={preview}

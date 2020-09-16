@@ -8,7 +8,7 @@ export default function Poem() {
   const { isDesktop } = useScreenSize()
   return (
     <View style={[styles.root, isDesktop && styles.desktopRoot]}>
-      <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>As Wealth Flowers</H4>
+      <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>For Value Flowers</H4>
       {STANZAS.map((verse) => (
         <Text key={verse.slice(0, 20)} style={fonts.p}>
           {verse}
@@ -39,7 +39,8 @@ Awakenings of purpose
 A magic within connection`,
   `
 Gathering, together
-in generous abundance,
+in generous abundance
+Our wealth
 held, by
 humbled enchantments of
 Our worth`,
@@ -49,9 +50,9 @@ in beautiful money
 Seeding, with
 others, these
 New stories
-Of change
+of change
 Redeeming systems
-of exchange`,
+beyond exchange`,
   `
 Making value beautiful
 within hands, within reach

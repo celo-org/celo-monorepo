@@ -26,12 +26,12 @@ export default function SideBar({ isOpen }) {
               isMobile && styles.mobileTitle,
             ]}
           >
-            As Wealth Flowers
+            For Value Flowers
           </H4>
           <Text style={[fonts.p, styles.aside]}>
             This art form is a testament to the creative trinity of code, poetry, and illustration.
             As a work centered around channelling the Celo story,{' '}
-            <Text style={textStyles.italic}>As Wealth Flowers</Text> is a gift of optimism. It gives
+            <Text style={textStyles.italic}>For Value Flowers</Text> is a gift of optimism. It gives
             shape to a spirit of collective prosperity, and celebrates it when brought to life.
           </Text>
           <Text style={[fonts.p, styles.aside, standardStyles.elementalMarginTop]}>
