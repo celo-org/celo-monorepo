@@ -40,7 +40,7 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
       // Rather than using clusterManager.kubernetesContextName we switch to the
       // cluster to account for the case where this user has not gotten the
       // context for the cluster yet.
-      await clusterManager.switchToClusterContext()
+      await clusterManager.switchToClusterContext(true)
       const [output] = await execCmd(
         `kubectl get svc ${celoEnv}-fullnodes-rpc -n ${celoEnv} -o jsonpath="{.metadata.annotations.cloud\\.google\\.com/neg-status}"`
       )

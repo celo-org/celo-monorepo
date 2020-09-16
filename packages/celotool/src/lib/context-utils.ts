@@ -133,7 +133,7 @@ export function getContextDynamicEnvVarValues<T>(
 /**
  * Reads the context and switches to the appropriate Azure or AWS Cluster
  */
-export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction = true) {
+export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction: boolean = true) {
   if (!isValidContext(context)) {
     throw Error(`Invalid context, must be one of ${fetchEnv(envVar.CONTEXTS)}`)
   }

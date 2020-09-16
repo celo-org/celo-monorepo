@@ -22,14 +22,16 @@ export abstract class BaseClusterManager {
     this._celoEnv = celoEnv
   }
 
-  async switchToClusterContext() {
+  async switchToClusterContext(skipSetup: boolean = false) {
     const exists = await this.switchToClusterContextIfExists()
     if (!exists) {
       await this.getAndSwitchToClusterContext()
     }
     // Reset back to default namespace
     await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
-    await this.setupCluster()
+    if (!skipSetup) {
+      await this.setupCluster()
+    }
   }
 
   /**
