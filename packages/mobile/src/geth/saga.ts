@@ -107,7 +107,7 @@ export async function waitForGethConnectivityAsync() {
   }
 
   while (true) {
-    await sleep(1000)
+    await sleep(500)
     connected = isGethConnectedSelector(store.getState())
     if (connected) {
       return
