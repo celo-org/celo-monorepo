@@ -18,9 +18,7 @@ const ignoredContracts = [
 export class LibraryPositions {
   static libraryLinkRegExpString = '__([A-Z][A-Za-z0-9]*)_{2,}'
 
-  positions: {
-    [library: string]: number[]
-  }
+  positions: { [library: string]: number[] }
 
   /*
    * Creates a LibraryPositions object, which, for each yet to be linked library,
@@ -47,33 +45,35 @@ export class LibraryPositions {
   }
 }
 
-interface LibraryAddresses {
-  [library: string]: string
-}
+export class LibraryAddresses {
+  addresses: { [library: string]: string }
 
-/*
- * Tries to add a library name -> address mapping to a LibraryAddresses object.
- * If the library has already had an address added, checks that the new address
- * matches the old one.
- */
-const addAddress = (addresses: LibraryAddresses, library: string, address: string): boolean => {
-  if (!addresses[library]) {
-    addresses[library] = address
-  } else if (addresses[library] !== address) {
-    return false
+  constructor() {
+    this.addresses = {}
   }
-  return true
-}
 
-export const collectLibraryAddresses = (bytecode: string, libraryPositions: LibraryPositions, libraryAddresses: LibraryAddresses = {}): LibraryAddresses => {
-  Object.keys(libraryPositions.positions).forEach(library => {
-    libraryPositions.positions[library].forEach(position => {
-      if (!addAddress(libraryAddresses, library, bytecode.slice(position, position + 40))) {
-        throw new Error(`Mismatched addresses for ${library} at ${position}`)
-      }
+  collect(bytecode: string, libraryPositions: LibraryPositions) {
+    Object.keys(libraryPositions.positions).forEach(library => {
+      libraryPositions.positions[library].forEach(position => {
+        if (!this.addAddress(library, bytecode.slice(position, position + 40))) {
+          throw new Error(`Mismatched addresses for ${library} at ${position}`)
+        }
+      })
     })
-  })
-  return libraryAddresses
+  }
+
+  /*
+   * Tries to add a library name -> address mapping. If the library has already
+   * had an address added, checks that the new address matches the old one.
+   */
+  private addAddress(library: string, address: string): boolean {
+    if (!this.addresses[library]) {
+      this.addresses[library] = address
+    } else if (this.addresses[library] !== address) {
+      return false
+    }
+    return true
+  }
 }
 
 // TODO: check against known Proxy bytecodes
@@ -164,7 +164,7 @@ const getSoureBytecode = (contract: string, context: VerificationContext): strin
 }
 
 const getLibraryAddress = async (contract: string, context: VerificationContext): Promise<string> => {
-  const proxyAddress = context.libraryAddresses[contract]
+  const proxyAddress = context.libraryAddresses.addresses[contract]
   await verifyProxy(proxyAddress, context)
 
   if (isImplementationChanged(contract, context)) {
@@ -196,7 +196,7 @@ const getImplementationAddress = async (contract: string, isLibrary: boolean, co
   // TODO: remove isBeforeRelease1. Before the first contracts upgrade,
   // libraries are not proxied.
   if (isLibrary && context.isBeforeRelease1) {
-    return '0x' + context.libraryAddresses[contract]
+    return '0x' + context.libraryAddresses.addresses[contract]
   } else if (isLibrary) {
     return getLibraryAddress(contract, context)
   } else {
@@ -223,9 +223,9 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const onchainBytecode = await getOnchainBytecode(contract, isLibrary, context)
 
   const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
-  collectLibraryAddresses(onchainBytecode, sourceLibraryPositions, context.libraryAddresses)
+  context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 
-  const linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses)
+  const linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses.addresses)
 
   // See comment above `verifyLibraryPrefix` for why we need to normalize bytecodes.
   let normalizedSourceBytecode
@@ -264,7 +264,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, proposal: ProposalTx[], Proxy: Truffle.Contract<ProxyInstance>, web3: Web3, isBeforeRelease1: boolean = false) => {
   const queue = [...contracts]
   const visited: Set<string> = new Set()
-  const libraryAddresses: LibraryAddresses = {}
+  const libraryAddresses: LibraryAddresses = new LibraryAddresses()
   contracts.forEach(contract => visited.add(contract))
 
   const context: VerificationContext = {

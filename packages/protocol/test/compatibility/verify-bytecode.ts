@@ -1,7 +1,7 @@
 import { LibraryLinks, linkLibraries } from '@celo/protocol/lib/bytecode'
 import { Artifact } from '@celo/protocol/lib/compatibility/internal'
 import {
-  collectLibraryAddresses,
+  LibraryAddresses,
   LibraryPositions,
   verifyBytecodesDfs,
 } from '@celo/protocol/lib/compatibility/verify-bytecode'
@@ -54,7 +54,7 @@ contract('', (accounts) => {
     })
   })
 
-  describe('#collectLibraryAddresses()', () => {
+  describe('#LibraryAddresses.collect()', () => {
     describe('when libraries are linked correctly', () => {
       it('collects the correct addresses', () => {
         const positions = new LibraryPositions(artifact.deployedBytecode)
@@ -63,10 +63,17 @@ contract('', (accounts) => {
           LinkedLibrary2: '0000000000000000000000000000000000000002',
         }
         const linkedBytecode = linkLibraries(artifact.deployedBytecode, links)
-        const addresses = collectLibraryAddresses(linkedBytecode, positions)
+        const addresses = new LibraryAddresses()
+        addresses.collect(linkedBytecode, positions)
 
-        assert.equal(addresses['LinkedLibrary1'], '0000000000000000000000000000000000000001')
-        assert.equal(addresses['LinkedLibrary2'], '0000000000000000000000000000000000000002')
+        assert.equal(
+          addresses.addresses['LinkedLibrary1'],
+          '0000000000000000000000000000000000000001'
+        )
+        assert.equal(
+          addresses.addresses['LinkedLibrary2'],
+          '0000000000000000000000000000000000000002'
+        )
       })
     })
 
@@ -87,7 +94,7 @@ contract('', (accounts) => {
           )
 
         assert.throws(() => {
-          collectLibraryAddresses(incorrectBytecode, positions)
+          new LibraryAddresses().collect(incorrectBytecode, positions)
         })
       })
     })
