@@ -95,6 +95,12 @@ exports[`ValidatorsList renders 1`] = `
           className="css-text-901oao"
           dir="auto"
           onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
         >
           Pin
         </div>
