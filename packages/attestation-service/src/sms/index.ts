@@ -2,7 +2,7 @@ import { sleep } from '@celo/utils/lib/async'
 import { intersection } from '@celo/utils/lib/collections'
 import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
-import { PhoneNumberUtil } from 'google-libphonenumber'
+import { PhoneNumberType, PhoneNumberUtil } from 'google-libphonenumber'
 import { Transaction } from 'sequelize'
 import {
   findAttestationByDeliveryId,
@@ -29,6 +29,36 @@ const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
 
 const phoneUtil = PhoneNumberUtil.getInstance()
+
+// Sadly PhoneNumberType doesn't have associated string literals
+function phoneNumberTypeToString(t: PhoneNumberType): string {
+  switch (t) {
+    case PhoneNumberType.FIXED_LINE:
+      return 'fixed_line'
+    case PhoneNumberType.MOBILE:
+      return 'mobile'
+    case PhoneNumberType.FIXED_LINE_OR_MOBILE:
+      return 'fixed_line_or_mobile'
+    case PhoneNumberType.TOLL_FREE:
+      return 'toll_free'
+    case PhoneNumberType.PREMIUM_RATE:
+      return 'premium_rate'
+    case PhoneNumberType.SHARED_COST:
+      return 'shared_cost'
+    case PhoneNumberType.VOIP:
+      return 'voip'
+    case PhoneNumberType.PERSONAL_NUMBER:
+      return 'personal_number'
+    case PhoneNumberType.PAGER:
+      return 'pager'
+    case PhoneNumberType.UAN:
+      return 'uan'
+    case PhoneNumberType.VOICEMAIL:
+      return 'voicemail'
+    case PhoneNumberType.UNKNOWN:
+      return 'unknown'
+  }
+}
 
 export async function initializeSmsProviders(
   deliveryStatusURLForProviderType: (type: string) => string
@@ -197,7 +227,9 @@ export async function startSendSms(
       attestation.message = ''
     } else {
       if (numberType !== null) {
-        Counters.attestationRequestsByNumberType.labels(countryCode, `${numberType}`).inc()
+        Counters.attestationRequestsByNumberType
+          .labels(countryCode, phoneNumberTypeToString(numberType))
+          .inc()
       }
 
       // Parsed number and found providers. Attempt delivery.
