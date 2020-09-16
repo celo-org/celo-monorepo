@@ -44,7 +44,7 @@ module.exports = {
       await queryInterface.addIndex(
         'Attestations',
         ['ongoingDeliveryId'],
-        { fields: ['ongoingDeliveryId'], unique: false },
+        { fields: ['ongoingDeliveryId'], unique: true },
         { transaction }
       )
 
@@ -60,7 +60,7 @@ module.exports = {
       await queryInterface.removeIndex(
         'Attestations',
         ['ongoingDeliveryId'],
-        { fields: ['ongoingDeliveryId'], unique: false },
+        { fields: ['ongoingDeliveryId'], unique: true },
         { transaction }
       )
 

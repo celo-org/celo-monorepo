@@ -179,7 +179,7 @@ export async function startSendSms(
         providers: providersToCsv(providers),
         attempt: 0,
         errors: undefined,
-        ongoingDeliveryId: '',
+        ongoingDeliveryId: null,
       },
       transaction
     )
