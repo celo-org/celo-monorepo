@@ -1,8 +1,8 @@
 import { CloudProvider } from '../k8s-cluster/base'
 import { AKSFullNodeDeployer, AKSFullNodeDeploymentConfig } from './aks'
 import { AWSFullNodeDeployer, AWSFullNodeDeploymentConfig } from './aws'
-import { GCPFullNodeDeployer, GCPFullNodeDeploymentConfig } from './gcp'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
+import { GCPFullNodeDeployer, GCPFullNodeDeploymentConfig } from './gcp'
 
 // @ts-ignore
 const fullNodeDeployerByCloudProvider: {

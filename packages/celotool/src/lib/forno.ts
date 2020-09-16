@@ -3,16 +3,26 @@ import { coerceContext, getClusterManagerForContext, readableContext } from './c
 import { envVar, fetchEnv } from './env-utils'
 import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { TerraformVars } from './terraform'
-import { deployModule } from './vm-testnet-utils'
+import { deployModule, destroyModule } from './vm-testnet-utils'
 
 const FORNO_TERRAFORM_MODULE_NAME = 'forno'
 
-export async function deployFornoLBs(celoEnv: string) {
+export async function deployForno(celoEnv: string) {
   const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS).split(',').map(coerceContext)
-  console.log('contexts', contexts)
+  console.info('Deploying Forno with full node contexts:', contexts)
   const terraformVars: TerraformVars = await getFornoTerraformVars(celoEnv, contexts)
-  console.log('terraformVars', terraformVars)
   await deployModule(
+    celoEnv,
+    FORNO_TERRAFORM_MODULE_NAME,
+    terraformVars
+  )
+}
+
+export async function destroyForno(celoEnv: string) {
+  const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS).split(',').map(coerceContext)
+  console.info('DESTROYING Forno')
+  const terraformVars: TerraformVars = await getFornoTerraformVars(celoEnv, contexts)
+  await destroyModule(
     celoEnv,
     FORNO_TERRAFORM_MODULE_NAME,
     terraformVars
@@ -65,18 +75,19 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
     }
     return domain
   })
-
-  const httpContextInfos = await getContextInfos(8545)
-  const wsContextInfos = await getContextInfos(8546)
+  const HTTP_RPC_PORT = 8545
+  const WS_RPC_PORT = 8546
+  const contextInfosHttp = await getContextInfos(HTTP_RPC_PORT)
+  const contextInfosWs = await getContextInfos(WS_RPC_PORT)
 
   return {
     backend_max_requests_per_second: '300',
     celo_env: celoEnv,
-    http_context_info: JSON.stringify(httpContextInfos),
-    ws_context_info: JSON.stringify(wsContextInfos),
-    domains: JSON.stringify(domains),
+    context_info_http: JSON.stringify(contextInfosHttp),
+    context_info_ws: JSON.stringify(contextInfosWs),
     gcloud_credentials_path: fetchEnv(envVar.GOOGLE_APPLICATION_CREDENTIALS),
     gcloud_project: gcloudProject!,
+    ssl_cert_domains: JSON.stringify(domains),
     vpc_network_name: fetchEnv(envVar.FORNO_VPC_NETWORK_NAME),
   }
 }

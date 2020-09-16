@@ -6,10 +6,10 @@ import { range } from 'lodash'
 //   waitForStaticIPDetachment
 // } from '../azure'
 import { execCmd } from '../cmd-utils'
+import { deleteIPAddress, registerIPAddress, retrieveIPAddress } from '../helm_deploy'
 import { GCPClusterConfig } from '../k8s-cluster/gcp'
 // import { deleteResource } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
-import { deleteIPAddress, registerIPAddress, retrieveIPAddress } from '../helm_deploy'
 //
 export interface GCPFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: GCPClusterConfig,
@@ -22,12 +22,6 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
       `--set gcp=true`,
       `--set storage.storageClass=ssd`,
       `--set geth.public_ip_per_node='{${staticIps}}'`,
-      `--set ingress.enabled=true`,
-      `--set ingress.annotations."kubernetes\\.io/tls-acme"=true`,
-      `--set ingress.annotations."nginx\\.ingress\\.kubernetes\\.io/enable-cors"=true`,
-      `--set ingress.tls[0].secretName=${this.celoEnv}-forno-web-tls`,
-      `--set ingress.tls[0].hosts[0]=${this.celoEnv}-forno-testing.celo-testnet.org`,
-      `--set ingress.hosts[0]=${this.celoEnv}-forno-testing.celo-testnet.org`,
     ]
   }
 

@@ -1,7 +1,7 @@
 import { AKSClusterConfig, AKSClusterManager } from './aks'
 import { AWSClusterConfig, AWSClusterManager } from './aws'
-import { GCPClusterConfig, GCPClusterManager } from './gcp'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
+import { GCPClusterConfig, GCPClusterManager } from './gcp'
 
 const clusterManagerByCloudProvider: {
   [key in CloudProvider]: (clusterConfig: BaseClusterConfig, celoEnv: string) => BaseClusterManager

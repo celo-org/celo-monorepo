@@ -1,6 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
-import { installFullNodeChart } from 'src/lib/oracle-fullnode'
+import { installFullNodeChart } from 'src/lib/fullnodes'
 
 export const command = 'fullnodes'
 

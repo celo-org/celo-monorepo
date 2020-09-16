@@ -5,8 +5,8 @@ import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInte
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { AKSClusterConfig } from './k8s-cluster/aks'
 import { getAKSClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
+import { AKSClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'

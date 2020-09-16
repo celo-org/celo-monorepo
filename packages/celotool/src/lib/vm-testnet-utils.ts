@@ -190,7 +190,7 @@ export async function destroy(celoEnv: string) {
   }
 }
 
-async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+export async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
   const envType = fetchEnv(envVar.ENV_TYPE)

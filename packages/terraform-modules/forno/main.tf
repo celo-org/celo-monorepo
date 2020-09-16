@@ -36,7 +36,7 @@ module "http_backends" {
   # variables
   backend_max_requests_per_second = var.backend_max_requests_per_second
   celo_env = var.celo_env
-  context_info = var.http_context_info
+  context_info = var.context_info_http
   type = "http"
 }
 
@@ -45,7 +45,7 @@ module "ws_backends" {
   # variables
   backend_max_requests_per_second = var.backend_max_requests_per_second
   celo_env = var.celo_env
-  context_info = var.ws_context_info
+  context_info = var.context_info_ws
   type = "ws"
 }
 
@@ -62,7 +62,7 @@ resource "google_compute_managed_ssl_certificate" "ssl_cert" {
   name = "${var.celo_env}-forno-ssl-cert"
 
   managed {
-    domains = var.domains
+    domains = var.ssl_cert_domains
   }
 }
 
@@ -84,28 +84,11 @@ resource "google_compute_url_map" "url_map" {
       service = module.ws_backends.backend_service_id
     }
   }
-
-  # path_matcher {
-  #   name = "all-paths"
-  #
-  #   path_rule {
-  #     paths = ["/"]
-  #
-  #     route_action {
-  #       dynamic "all_weighted_backend_services" {
-  #         for_each = var.context_zones
-  #
-  #         weighted_backend_services {
-  #           backend_service = module.backends.backend_ids[all_weighted_backend_services.key]
-  #           weight = 100
-  #         }
-  #       }
-  #     }
-  #   }
-  # }
 }
 
-# https://cloud.google.com/load-balancing/docs/https#network-service-tiers_1
+# This will route ingress traffic to the geographically closest backend
+# whose utilization is not full.
+# See https://cloud.google.com/load-balancing/docs/https#network-service-tiers_1
 resource "google_compute_target_https_proxy" "target_https_proxy" {
   name             = "${var.celo_env}-forno-target-https-proxy"
   url_map          = google_compute_url_map.url_map.id
@@ -120,6 +103,7 @@ resource "google_compute_global_forwarding_rule" "forwarding_rule" {
   port_range = "443"
 }
 
+# This allows GCP's health checks to make the required requests
 resource "google_compute_firewall" "allow-health-check" {
   name = "${var.celo_env}-forno-health-check-firewall"
   direction = "INGRESS"
@@ -131,10 +115,3 @@ resource "google_compute_firewall" "allow-health-check" {
     ports    = ["8545", "8546"]
   }
 }
-
-# https://cloud.google.com/load-balancing/docs/https#how-connections-work
-# health check
-
-# resource "google_compute_url_map" "url_map" {
-#
-# }

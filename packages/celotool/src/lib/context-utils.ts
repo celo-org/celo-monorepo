@@ -1,9 +1,9 @@
-import { Argv } from 'yargs'
 import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { Argv } from 'yargs'
 import { AKSClusterConfig } from './k8s-cluster/aks'
 import { AWSClusterConfig } from './k8s-cluster/aws'
-import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './k8s-cluster/base'
+import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { getClusterManager } from './k8s-cluster/utils'
 
 /**
@@ -50,7 +50,6 @@ export function getCloudProviderFromContext(context: string): CloudProvider {
   }
   throw Error(`Context ${context} must start with one of ${Object.values(CloudProvider)}`)
 }
-
 
 /**
  * Fetches the env vars for a particular context
@@ -175,13 +174,13 @@ export function coerceContext(rawContextStr: string) {
 }
 
 export function readableContext(context: string) {
-  const readableContext = context
+  const readable = context
     .toLowerCase()
     .replace(/_/g, '-')
   if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
-    throw Error(`Invalid context. Context ${context}, readable ${readableContext}`)
+    throw Error(`Invalid context. Context ${context}, readable ${readable}`)
   }
-  return readableContext
+  return readable
 }
 
 export function isValidContext(context: string) {

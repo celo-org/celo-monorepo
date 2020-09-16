@@ -1,8 +1,3 @@
-# locals {
-#   name_prefix             = "${var.celo_env}"
-#   target_https_proxy_name = "${var.celo_env}-tx-node-lb-external-http-proxy"
-# }
-
 resource "google_compute_health_check" "tcp_health_check" {
   name = "${var.celo_env}-forno-health-check-${var.type}"
 
@@ -12,7 +7,8 @@ resource "google_compute_health_check" "tcp_health_check" {
   }
 }
 
-# This is a reference to the ClusterIP RPC service inside this region's k8s cluster
+# This is a reference to the ClusterIP RPC service inside this region's k8s cluster.
+# We get the NEG for each context.
 data "google_compute_network_endpoint_group" "rpc_service_network_endpoint_group" {
   name = each.value.rpc_service_network_endpoint_group_name
   zone = each.value.zone
@@ -20,6 +16,7 @@ data "google_compute_network_endpoint_group" "rpc_service_network_endpoint_group
   for_each = var.context_info
 }
 
+# A backend that can route traffic to all of the context NEGs.
 resource "google_compute_backend_service" "backend_service" {
   name = "${var.celo_env}-forno-backend-service-${var.type}"
 

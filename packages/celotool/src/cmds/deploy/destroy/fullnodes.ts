@@ -1,6 +1,6 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
-import { removeFullNodeChart } from 'src/lib/oracle-fullnode'
+import { removeFullNodeChart } from 'src/lib/fullnodes'
 
 export const command = 'fullnodes'
 
