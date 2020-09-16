@@ -24,6 +24,7 @@ export const stripMetadata = (bytecode: string): string => {
   return match[1]
 }
 
+// Maps library names to addresses (formatted without "0x" prefix).
 export interface LibraryLinks {
   [name: string]: string
 }
