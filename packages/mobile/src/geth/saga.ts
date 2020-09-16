@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/src/async'
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
@@ -27,6 +28,7 @@ import {
 } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { store } from 'src/redux/store'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
@@ -93,6 +95,21 @@ export function* waitForGethConnectivity() {
   while (true) {
     const action: SetGethConnectedAction = yield take(Actions.SET_GETH_CONNECTED)
     if (action.connected) {
+      return
+    }
+  }
+}
+
+export async function waitForGethConnectivityAsync() {
+  let connected = isGethConnectedSelector(store.getState())
+  if (connected) {
+    return
+  }
+
+  while (true) {
+    await sleep(1000)
+    connected = isGethConnectedSelector(store.getState())
+    if (connected) {
       return
     }
   }
