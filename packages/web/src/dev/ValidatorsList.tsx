@@ -318,7 +318,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
             <View style={[styles.tableHeaderCell, styles.sizeXXS]}>
-              <Text>Pin</Text>
+              <Text style={styles.defaultText}>Pin</Text>
             </View>
             <HeaderCell
               onClick={this.orderByFn.name}
