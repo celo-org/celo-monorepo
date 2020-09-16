@@ -71,7 +71,7 @@ resource "google_compute_url_map" "url_map" {
   default_service = module.http_backends.backend_service_id
 
   host_rule {
-    hosts        = var.domains
+    hosts        = ["*"]
     path_matcher = "${var.celo_env}-forno-path-matcher"
   }
 
@@ -128,7 +128,7 @@ resource "google_compute_firewall" "allow-health-check" {
 
   allow {
     protocol = "tcp"
-    ports    = ["8545"]
+    ports    = ["8545", "8546"]
   }
 }
 
