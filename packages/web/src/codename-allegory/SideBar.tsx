@@ -78,7 +78,7 @@ function copyURL() {
 
 const TweetButton = React.memo(() => {
   const text = encodeURI('Blooming more beautiful money, as wealth flowers 🌺')
-  const url = 'celo.org/wealth-flowers'
+  const url = 'celo.org/flowers'
   return (
     <>
       <LightButon
