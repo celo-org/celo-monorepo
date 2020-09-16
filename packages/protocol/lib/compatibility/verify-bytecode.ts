@@ -15,16 +15,36 @@ const ignoredContracts = [
   'GovernanceApproverMultiSig'
 ]
 
-export interface LibraryPositions {
-  [library: string]: number[]
-}
+export class LibraryPositions {
+  static libraryLinkRegExpString = '__([A-Z][A-Za-z0-9]*)_{2,}'
 
-const addPosition = (positions: LibraryPositions, library: string, position: number) => {
-  if (!positions[library]) {
-    positions[library] = []
+  positions: {
+    [library: string]: number[]
   }
 
-  positions[library].push(position)
+  /*
+   * Creates a LibraryPositions object, which, for each yet to be linked library,
+   * contains the bytecode offsets of where the library address should be
+   * inserted.
+   */
+  constructor(bytecode: string) {
+    this.positions = {}
+    const libraryLinkRegExp = new RegExp(LibraryPositions.libraryLinkRegExpString, 'g')
+    let match = libraryLinkRegExp.exec(bytecode)
+    while (match != null) {
+      // The first capture group is the library's name
+      this.addPosition(match[1], match.index)
+      match = libraryLinkRegExp.exec(bytecode)
+    }
+  }
+
+  private addPosition(library: string, position: number) {
+    if (!this.positions[library]) {
+      this.positions[library] = []
+    }
+
+    this.positions[library].push(position)
+  }
 }
 
 interface LibraryAddresses {
@@ -45,29 +65,9 @@ const addAddress = (addresses: LibraryAddresses, library: string, address: strin
   return true
 }
 
-const libraryLinkRegExpString = '__([A-Z][A-Za-z0-9]*)_{2,}'
-
-/*
- * Returns a LibraryPositions object, which, for each yet to be linked library,
- * contains the bytecode offsets of where the library address should be
- * inserted.
- */
-export const collectLibraryPositions = (bytecode: string): LibraryPositions => {
-  const libraryLinkRegExp = new RegExp(libraryLinkRegExpString, 'g')
-  const libraryPositions: LibraryPositions = {}
-  let match = libraryLinkRegExp.exec(bytecode)
-  while (match != null) {
-    // The firt capture group is the library's name
-    addPosition(libraryPositions, match[1], match.index)
-    match = libraryLinkRegExp.exec(bytecode)
-  }
-
-  return libraryPositions
-}
-
 export const collectLibraryAddresses = (bytecode: string, libraryPositions: LibraryPositions, libraryAddresses: LibraryAddresses = {}): LibraryAddresses => {
-  Object.keys(libraryPositions).forEach(library => {
-    libraryPositions[library].forEach(position => {
+  Object.keys(libraryPositions.positions).forEach(library => {
+    libraryPositions.positions[library].forEach(position => {
       if (!addAddress(libraryAddresses, library, bytecode.slice(position, position + 40))) {
         throw new Error(`Mismatched addresses for ${library} at ${position}`)
       }
@@ -79,6 +79,19 @@ export const collectLibraryAddresses = (bytecode: string, libraryPositions: Libr
 // TODO: check against known Proxy bytecodes
 const isProxyBytecode = (_bytecode: string) => {
   return true
+}
+
+interface VerificationContext {
+  contracts: string[]
+  artifacts: BuildArtifacts
+  libraryAddresses: LibraryAddresses
+  registry: RegistryInstance
+  proposal: ProposalTx[]
+  Proxy: Truffle.Contract<ProxyInstance>
+  web3: Web3
+
+  // TODO: remove this after first smart contracts release
+  isBeforeRelease1: boolean
 }
 
 const verifyProxy = async (address: string, context: VerificationContext) => {
@@ -97,25 +110,22 @@ const getProxiedAddress = async (address: string, context: VerificationContext):
   return proxy._getImplementation()
 }
 
+const PUSH20_OPCODE = '73'
+// To check that a library isn't being called directly, the Solidity
+// compiler starts a library's bytecode with a comparison of the current
+// address with the address the library was deployed to (it has to differ
+// to ensure the library is being called with CALLCODE or DELEGATECALL
+// instead of a regular CALL).
+// The address is only known at contract construction time, so
+// the compiler's output contains a placeholder 0-address, while the onchain
+// bytecode has the correct address inserted.
+// Reference: https://solidity.readthedocs.io/en/v0.5.12/contracts.html#call-protection-for-libraries
 const verifyLibraryPrefix = (bytecode: string, address: string) => {
-  if (bytecode.slice(2, 4) !== '73') {
+  if (bytecode.slice(2, 4) !== PUSH20_OPCODE) {
     throw new Error(`Library bytecode doesn't start with address load`)
   } else if (bytecode.slice(4, 44) !== address) {
     throw new Error(`Library bytecode loads unexpected address at start`)
   }
-}
-
-interface VerificationContext {
-  contracts: string[]
-  artifacts: BuildArtifacts
-  libraryAddresses: LibraryAddresses
-  registry: RegistryInstance
-  proposal: ProposalTx[]
-  Proxy: Truffle.Contract<ProxyInstance>
-  web3: Web3
-
-  // TODO: remove this after first smart contracts release
-  isBeforeRelease1: boolean
 }
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean => {
@@ -212,20 +222,12 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   const sourceBytecode = getSoureBytecode(contract, context)
   const onchainBytecode = await getOnchainBytecode(contract, isLibrary, context)
 
-  const sourceLibraryPositions = collectLibraryPositions(sourceBytecode)
+  const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
   collectLibraryAddresses(onchainBytecode, sourceLibraryPositions, context.libraryAddresses)
 
   const linkedSourceBytecode = linkLibraries(sourceBytecode, context.libraryAddresses)
 
-  // To check that a library isn't being called directly, the Solidity
-  // compiler starts a library's bytecode with a comparison of the current
-  // address with the address the library was deployed to (it has to differ
-  // to ensure the library is being called with CALLCODE or DELEGATECALL
-  // instead of a regular CALL).
-  // The address is only known at contract construction time, so
-  // the compiler's output contains a placeholder 0-address, while the onchain
-  // bytecode has the correct address inserted.
-  // Reference: https://solidity.readthedocs.io/en/v0.5.12/contracts.html#call-protection-for-libraries
+  // See comment above `verifyLibraryPrefix` for why we need to normalize bytecodes.
   let normalizedSourceBytecode
   let normalizedOnchainBytecode
   if (isLibrary) {
@@ -245,7 +247,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
   }
 
-  Object.keys(sourceLibraryPositions).forEach(library => {
+  Object.keys(sourceLibraryPositions.positions).forEach(library => {
     if (!visited.has(library)) {
       queue.push(library)
       visited.add(library)
@@ -253,6 +255,12 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   })
 }
 
+/*
+ * This function will visit all contracts in `contracts` as well as any
+ * libraries that they link. In each step of this DFS, we:
+ *
+ * - 
+ */
 export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, proposal: ProposalTx[], Proxy: Truffle.Contract<ProxyInstance>, web3: Web3, isBeforeRelease1: boolean = false) => {
   const queue = [...contracts]
   const visited: Set<string> = new Set()
