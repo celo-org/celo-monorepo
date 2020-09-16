@@ -28,6 +28,7 @@ class MyApp extends App {
       checkH1Count()
     }
     await initializeAnalytics()
+    await analytics.page()
     if (await canTrack()) {
       await initSentry()
     }

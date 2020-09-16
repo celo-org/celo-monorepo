@@ -10,7 +10,7 @@ import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { estimateGas } from './utils/web3-utils'
-import { Wallet } from './wallets/wallet'
+import { ReadOnlyWallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
@@ -31,7 +31,7 @@ const debug = debugFactory('kit:kit')
  * @param url CeloBlockchain node url
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKit(url: string, wallet?: Wallet) {
+export function newKit(url: string, wallet?: ReadOnlyWallet) {
   const web3 = url.endsWith('.ipc')
     ? new Web3(new Web3.providers.IpcProvider(url, net))
     : new Web3(url)
@@ -43,7 +43,7 @@ export function newKit(url: string, wallet?: Wallet) {
  * @param web3 Web3 instance
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKitFromWeb3(web3: Web3, wallet?: Wallet) {
+export function newKitFromWeb3(web3: Web3, wallet?: ReadOnlyWallet) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
@@ -97,7 +97,7 @@ export class ContractKit {
   readonly contracts: WrapperCache
 
   private config: KitOptions
-  constructor(readonly web3: Web3, wallet?: Wallet) {
+  constructor(readonly web3: Web3, wallet?: ReadOnlyWallet) {
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own

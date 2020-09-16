@@ -5,7 +5,11 @@ import { MinimalContact } from 'react-native-contacts'
 import { TokenTransactionType } from 'src/apollo/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  E164NumberToAddressType,
+  VerificationState,
+} from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
 import { StackParamList } from 'src/navigator/types'
 import { NotificationTypes } from 'src/notifications/types'
@@ -284,3 +288,75 @@ export const mockPaymentRequests: PaymentRequest[] = [
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
 ]
+
+export const mockVerificationStateUnverified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 3,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+export const mockVerificationStatePartlyVerified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 1,
+    total: 3,
+    completed: 2,
+  },
+  isBalanceSufficient: true,
+}
+
+export const mockVerificationStateVerified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+export const mockVerificationStateInsufficientBalance: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 0,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: false,
+}

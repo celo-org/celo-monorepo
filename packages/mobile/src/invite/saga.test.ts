@@ -10,7 +10,8 @@ import { PincodeType } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
-import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { refreshAllBalances } from 'src/home/actions'
+import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
   InviteBy,
   redeemInvite,
@@ -18,14 +19,18 @@ import {
   redeemInviteSuccess,
   sendInvite,
   SENTINEL_INVITE_COMMENT,
+  skipInvite as skipInviteAction,
+  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import {
   generateInviteLink,
   moveAllFundsFromAccount,
+  skipInvite,
   watchRedeemInvite,
   watchSendInvite,
 } from 'src/invite/saga'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { getSendFee } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
@@ -88,7 +93,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -119,7 +124,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -150,7 +155,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -175,7 +180,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -265,5 +270,24 @@ describe(generateInviteLink, () => {
       appStoreId: '1482389446',
       bundleId: 'org.celo.mobile.alfajores',
     })
+  })
+})
+
+describe(skipInvite, () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('updates the state and navigates to the home screen', async () => {
+    await expectSaga(skipInvite)
+      .provide([[call(getOrCreateAccount), mockAccount]])
+      .withState(state)
+      .put(skipInviteSuccess())
+      .put(refreshAllBalances())
+      .put(setHasSeenVerificationNux(true))
+      .dispatch(skipInviteAction())
+      .run()
+
+    expect(navigateHome).toHaveBeenCalledWith()
   })
 })

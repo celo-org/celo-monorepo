@@ -9,7 +9,6 @@ NextI18NextInstance.i18n.use(initReactI18next).init({
     en: {
       [NameSpaces.about]: require('public/static/locales/en/about.json'),
       [NameSpaces.alliance]: require('public/static/locales/en/alliance.json'),
-      [NameSpaces.applications]: require('public/static/locales/en/applications.json'),
       [NameSpaces.audits]: require('public/static/locales/en/audits.json'),
       [NameSpaces.brand]: require('public/static/locales/en/brand.json'),
       [NameSpaces.community]: require('public/static/locales/en/community.json'),
@@ -19,7 +18,6 @@ NextI18NextInstance.i18n.use(initReactI18next).init({
       [NameSpaces.faucet]: require('public/static/locales/en/faucet.json'),
       [NameSpaces.home]: require('public/static/locales/en/home.json'),
       [NameSpaces.jobs]: require('public/static/locales/en/jobs.json'),
-      [NameSpaces.technology]: require('public/static/locales/en/technology.json'),
       [NameSpaces.terms]: require('public/static/locales/en/terms.json'),
       [NameSpaces.papers]: require('public/static/locales/en/papers.json'),
     },

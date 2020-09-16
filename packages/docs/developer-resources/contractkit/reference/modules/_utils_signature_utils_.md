@@ -18,7 +18,7 @@
 
 ▸ **bigNumberToBuffer**(`input`: BigNumber, `lengthInBytes`: number): *Buffer*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L27)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L27)*
 
 **Parameters:**
 
@@ -35,7 +35,7 @@ ___
 
 ▸ **bufferToBigNumber**(`input`: Buffer): *BigNumber*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L23)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L23)*
 
 **Parameters:**
 
@@ -51,7 +51,7 @@ ___
 
 ▸ **makeCanonical**(`S`: BigNumber): *BigNumber*
 
-*Defined in [contractkit/src/utils/signature-utils.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L14)*
+*Defined in [packages/contractkit/src/utils/signature-utils.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signature-utils.ts#L14)*
 
 If the signature is in the "bottom" of the curve, it is non-canonical
 Non-canonical signatures are illegal in Ethereum and therefore the S value

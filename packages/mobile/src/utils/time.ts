@@ -319,6 +319,6 @@ function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
     Math.abs(differenceInYears(timestamp, Date.now())) > 40 ? timestamp * 1000 : timestamp
 
   return format(millisecondsSinceEpoch, formatRule, {
-    locale: i18next.language.includes('es') ? es : enUS,
+    locale: i18next?.language.includes('es') ? es : enUS,
   })
 }
