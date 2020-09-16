@@ -44,7 +44,7 @@ async function init() {
 
   const rateLimiter = rateLimit({
     windowMs: 5 * 60 * 100, // 5 minutes
-    max: 50,
+    max: 100,
   })
   const app = express()
   app.use([requestIdMiddleware(), loggerMiddleware, rateLimiter])
