@@ -1,3 +1,4 @@
+// tslint:disable: max-classes-per-file
 import { linkLibraries, stripMetadata } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { ProxyInstance, RegistryInstance } from 'types'
