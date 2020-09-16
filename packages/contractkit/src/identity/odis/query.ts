@@ -2,6 +2,7 @@
 
 import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
+import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import { ContractKit } from '../../kit'
@@ -67,6 +68,35 @@ export enum ErrorMessages {
 export interface ServiceContext {
   odisUrl: string // Oblivious Decentralized Identifier Service Url
   odisPubKey: string
+}
+
+export const ODIS_ALFAJORES_CONTEXT: ServiceContext = {
+  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net',
+  odisPubKey:
+    'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
+}
+
+export const ODIS_ALFAJORESSTAGING_CONTEXT: ServiceContext = {
+  odisUrl: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
+  odisPubKey:
+    '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
+}
+
+export const ODIS_MAINNET_CONTEXT: ServiceContext = {
+  odisUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net',
+  odisPubKey:
+    'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
+}
+
+export function getServiceContext(contextName = 'mainnet') {
+  switch (contextName) {
+    case 'alfajores':
+      return ODIS_ALFAJORES_CONTEXT
+    case 'alfajoresstaging':
+      return ODIS_ALFAJORESSTAGING_CONTEXT
+    default:
+      return ODIS_MAINNET_CONTEXT
+  }
 }
 
 /**

@@ -41,7 +41,7 @@ const INIT_GETH_TIMEOUT = 15000 // ms
 const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
 
-enum GethInitOutcomes {
+export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
   NETWORK_ERROR_FETCHING_STATIC_NODES = 'NETWORK_ERROR_FETCHING_STATIC_NODES',
   IRRECOVERABLE_FAILURE = 'IRRECOVERABLE_FAILURE',
@@ -111,13 +111,12 @@ export function* waitForNextBlock() {
   }
 }
 
-function* waitForGethInstance() {
+function* waitForGethInit() {
   try {
     const fornoMode = yield select(fornoSelector)
-    // get geth without syncing if fornoMode
-    const gethInstance = yield call(initGeth, !fornoMode)
-    if (!gethInstance) {
-      throw new Error('Geth instance is null')
+    const gethInitialized = yield call(initGeth, !fornoMode)
+    if (!gethInitialized) {
+      throw new Error('Geth not initialized correctly')
     }
     return GethInitOutcomes.SUCCESS
   } catch (error) {
@@ -134,12 +133,14 @@ function* waitForGethInstance() {
   }
 }
 
+export const _waitForGethInit = waitForGethInit
+
 export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
   const { result } = yield race({
-    result: call(waitForGethInstance),
+    result: call(waitForGethInit),
     timeout: delay(INIT_GETH_TIMEOUT),
   })
 

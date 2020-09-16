@@ -15,11 +15,13 @@ USAGE
 OPTIONS
   --epochs=epochs                                         [default: 1] Show results for the last N epochs
   --estimate                                              Estimate voter rewards from current votes
-  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
-  --slashing                                              Show rewards for slashing
 
-  --usdGas                                                If --usdGas is set, the transaction is paid for with a
-                                                          feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
+                                                          'auto' which uses whatever feeCurrency is available)
+
+  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
+
+  --slashing                                              Show rewards for slashing
 
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Validator to show rewards for
 
