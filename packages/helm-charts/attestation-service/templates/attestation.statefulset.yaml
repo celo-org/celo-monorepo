@@ -148,7 +148,7 @@ spec:
         - name: CELO_PROVIDER
           value: ws://localhost:8546
         - name: SMS_PROVIDERS
-          value: nexmo
+          value: twilio,nexmo
         - name: LOG_FORMAT
           value: stackdriver
         - name: NEXMO_KEY
@@ -161,6 +161,21 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}
               key: NEXMO_SECRET
+        - name: TWILIO_ACCOUNT_SID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: TWILIO_ACCOUNT_SID
+        - name: TWILIO_MESSAGING_SERVICE_SID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: TWILIO_MESSAGING_SERVICE_SID
+        - name: TWILIO_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: TWILIO_AUTH_TOKEN
         volumeMounts:
         - name: data
           mountPath: /root/.celo
