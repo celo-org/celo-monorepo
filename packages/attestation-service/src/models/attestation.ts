@@ -75,17 +75,22 @@ export default (sequelize: Sequelize) => {
     this.errors = JSON.stringify(errors)
   }
 
+  model.prototype.failure = function(): boolean {
+    return (
+      // tslint:disable-next-line: triple-equals
+      this.status == AttestationStatus.NotSent.valueOf() ||
+      // tslint:disable-next-line: triple-equals
+      this.status == AttestationStatus.Failed.valueOf()
+    )
+  }
+
   model.prototype.currentError = function() {
-    if (this.status === AttestationStatus.NotSent || this.status === AttestationStatus.Failed) {
+    if (this.failure()) {
       const errors = this.errors ? JSON.parse(this.errors) : {}
       return errors[this.attempt]?.error ?? errors[this.attempt - 1]?.error ?? undefined
     } else {
       return undefined
     }
-  }
-
-  model.prototype.failure = function(): boolean {
-    return this.status === AttestationStatus.NotSent || this.status === AttestationStatus.Failed
   }
 
   return model
