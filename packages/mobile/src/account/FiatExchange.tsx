@@ -89,8 +89,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   image: {
-    // height: 200,
-    // alignItems: 'center',
     alignSelf: 'center',
   },
   balanceSheet: {
