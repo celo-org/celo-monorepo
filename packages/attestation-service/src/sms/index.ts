@@ -153,7 +153,10 @@ export async function startSendSms(
   let shouldRetry = false
   let attestation: AttestationModel | null = null
 
-  const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
+  const transaction = await sequelize!.transaction({
+    logging: sequelizeLogger,
+    type: Transaction.TYPES.IMMEDIATE,
+  })
 
   try {
     const parsedNumber = phoneUtil.parse(phoneNumber)
@@ -226,7 +229,10 @@ async function findAttestationAndSendSms(
   let shouldRetry = false
   let attestation: AttestationModel | null = null
 
-  const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
+  const transaction = await sequelize!.transaction({
+    logging: sequelizeLogger,
+    type: Transaction.TYPES.IMMEDIATE,
+  })
 
   try {
     attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
@@ -337,7 +343,10 @@ export async function receivedDeliveryReport(
     deliveryId,
   })
   const sequelizeLogger = makeSequelizeLogger(childLogger)
-  const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
+  const transaction = await sequelize!.transaction({
+    logging: sequelizeLogger,
+    type: Transaction.TYPES.IMMEDIATE,
+  })
 
   try {
     attestation = await findAttestationByDeliveryId(deliveryId, {
