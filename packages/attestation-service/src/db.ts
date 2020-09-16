@@ -26,8 +26,7 @@ export function makeSequelizeLogger(logger: Logger): SequelizeLogger {
 export async function initializeDB() {
   if (sequelize === undefined) {
     sequelize = new Sequelize(fetchEnv('DATABASE_URL'), {
-      logging: (msg: string, sequelizeLogArgs: any) =>
-        rootLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg),
+      logging: makeSequelizeLogger(rootLogger),
     })
     rootLogger.info('Initializing Database')
     await sequelize.authenticate()
