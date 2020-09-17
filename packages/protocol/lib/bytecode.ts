@@ -7,7 +7,7 @@
 const CONTRACT_METADATA_REGEXPS = [
   // 0.5.8
   'a165627a7a72305820.*0029',
-  // 0.5.12
+  // 0.5.13
   'a265627a7a72315820.*64736f6c6343.*0032'
 ]
 const GENERAL_METADATA_REGEXP = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
