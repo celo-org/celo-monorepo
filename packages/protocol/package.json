@@ -32,6 +32,7 @@
     "check-versions": "./scripts/bash/check-versions.sh",
     "make-release": "./scripts/bash/make-release.sh",
     "verify-deployed": "./scripts/bash/verify-deployed.sh",
+    "verify-release": "./scripts/bash/verify-release.sh",
     "invite": "./scripts/bash/invite.sh",
     "ganache-dev": "./scripts/bash/ganache.sh",
     "pretruffle:migrate": "yarn build:ts",
