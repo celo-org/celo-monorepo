@@ -20,6 +20,10 @@ const DESCRIPTION =
   'Celo is an open platform that makes financial tools accessible to anyone with a mobile phone'
 
 export class Home extends React.Component<I18nProps, State> {
+  static getInitialProps() {
+    return { namespacesRequired: [NameSpaces.home, NameSpaces.common] }
+  }
+
   state: State
 
   render() {

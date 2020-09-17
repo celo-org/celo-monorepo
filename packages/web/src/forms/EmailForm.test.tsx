@@ -1,4 +1,4 @@
-import { fireEvent, render, waitForDomChange } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
 import EmailForm from 'src/forms/EmailForm'
 
@@ -32,9 +32,9 @@ describe('EmailForm', () => {
   })
 
   describe('when filled out form is submitted', () => {
-    it('shows does not show error message and shows success message', async () => {
+    it('does not show error message and shows success message', async () => {
       const submitBTNText = 'Pres here'
-      const { getByText, queryByText, getByPlaceholderText } = render(
+      const { getByText, getByPlaceholderText, findByText } = render(
         <EmailForm submitText={submitBTNText} />
       )
 
@@ -43,10 +43,10 @@ describe('EmailForm', () => {
       })
 
       fireEvent.click(getByText(submitBTNText))
-      await waitForDomChange()
-      expect(queryByText('common:validationErrors.email')).not.toBeVisible()
-
-      expect(queryByText('common:shortSuccess')).toBeVisible()
+      const errorMessage = await findByText('common:validationErrors.email')
+      expect(errorMessage).not.toBeVisible()
+      const successMessage = await findByText('common:shortSuccess')
+      expect(successMessage).toBeVisible()
     })
   })
 })
