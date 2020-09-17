@@ -6,7 +6,7 @@ The Attestation Service is part of the [Celo identity protocol](../celo-codebase
 
 ![](https://storage.googleapis.com/celo-website/docs/attestations-flow.jpg)
 
-Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, the Attestation Service will automatically claim and withdraw this fee.
+Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, validators will be able claim and withdraw this fee.
 
 ## Outline
 
@@ -24,7 +24,7 @@ This guide steps you through setting up an Attestation Service:
 * [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4) (most recent release)
 * [Attestation Service v1.0.3](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-3)
 
-## Network configuration
+## Deployment Architecture
 
 Attestation Service needs to expose a HTTP or HTTPS endpoint to the public Internet. This means it should not be deployed on the same physical host as a Validator, which should be firewalled to allow incoming connections only from its proxy.
 
@@ -34,7 +34,11 @@ Attestation Service exposes a HTTP endpoint, but it is strongly recommended that
 
 An Attestation Service is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
 
-Attestation Service currently does not support setups where multiple instances reside behind a load balancer. This will be addressed in a future release.
+Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers: one the attestation service, a Celo Blockchain node, and a single database instance.
+
+For a high availability setup, multiple instances can be deployed behind a load balancer configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can act on it and resend if necessary.
+
+Every record in the database includes the issuer (i.e. validator) in its key, so a single setup like the above can be used to provide attestations for multiple validators.
 
 ## SMS Providers
 
@@ -296,6 +300,8 @@ Please note that monitoring endpoints including metrics are exposed as a path on
 - `attestation_requests_attestation_errors`: Counter for the number of requests for which producing the attestation failed. This could be due to phone number or salt that does not match the hash, or the attestation was recorded fewer than 4 blocks ago.
 
 - `attestation_requests_unable_to_serve`: Counters for the number of requests that could not be served because no SMS provider was configured for the phone number in the request. Label `country` breaks down the count by country code.
+
+- `attestation_requests_number_type`: Counter for attestation requests by the type of the phone number. Label `country` breaks down the counny by country code. Label `type` has values including: `fixed_line`, `mobile`, `fixed_line_or_mobile`, `toll_free`, `premium_rate`, `shared_cost`, `voip`, `personal_number`, `pager`, `uan`, `voicemail`, `unknown`.
 
 - `attestation_requests_sent_sms`: Counter for the number of SMS successfully sent.
 
