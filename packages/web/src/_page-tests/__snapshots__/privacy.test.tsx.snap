@@ -31,6 +31,7 @@ exports[`Privacy renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -79,6 +80,7 @@ exports[`Privacy renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -108,6 +110,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -136,6 +139,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -172,6 +176,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -199,6 +204,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -218,6 +224,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -238,6 +245,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -268,6 +276,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -297,6 +306,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -334,6 +344,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -347,6 +358,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -363,6 +375,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -393,6 +406,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -422,6 +436,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -459,6 +474,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -472,6 +488,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -488,6 +505,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -504,6 +522,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -520,6 +539,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -536,6 +556,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -566,6 +587,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -595,6 +617,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -632,6 +655,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -645,6 +669,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -672,6 +697,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -688,7 +714,7 @@ exports[`Privacy renders 1`] = `
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -702,6 +728,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -719,7 +746,7 @@ exports[`Privacy renders 1`] = `
           To provide 
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -733,6 +760,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -750,7 +778,7 @@ exports[`Privacy renders 1`] = `
           To
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -766,6 +794,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -786,6 +815,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -802,6 +832,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -832,6 +863,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -861,6 +893,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -898,6 +931,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -911,6 +945,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -941,6 +976,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -970,6 +1006,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -1007,6 +1044,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1031,6 +1069,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1050,6 +1089,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1069,6 +1109,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1088,6 +1129,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1107,6 +1149,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1126,6 +1169,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1160,6 +1204,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1189,6 +1234,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -1226,6 +1272,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1239,6 +1286,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1300,6 +1348,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1339,6 +1388,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1378,6 +1428,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1446,6 +1497,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1483,6 +1535,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1520,6 +1573,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1586,6 +1640,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1623,6 +1678,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1660,6 +1716,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1726,6 +1783,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1763,6 +1821,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1800,6 +1859,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1866,6 +1926,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1903,6 +1964,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -1940,6 +2002,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2006,6 +2069,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2043,6 +2107,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2080,6 +2145,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2146,6 +2212,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2183,6 +2250,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2220,6 +2288,7 @@ exports[`Privacy renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -2273,6 +2342,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2302,6 +2372,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2339,6 +2410,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2352,6 +2424,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2379,6 +2452,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -2398,6 +2472,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -2417,6 +2492,7 @@ exports[`Privacy renders 1`] = `
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -2437,6 +2513,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2467,6 +2544,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2496,6 +2574,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2533,6 +2612,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2546,6 +2626,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2576,6 +2657,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2605,6 +2687,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2642,6 +2725,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2655,6 +2739,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2685,6 +2770,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2714,6 +2800,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2751,6 +2838,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2764,6 +2852,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2794,6 +2883,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2823,6 +2913,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2860,6 +2951,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2873,6 +2965,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2903,6 +2996,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2932,6 +3026,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2969,6 +3064,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2982,6 +3078,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2998,6 +3095,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3014,6 +3112,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3052,6 +3151,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3081,6 +3181,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -3118,6 +3219,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3131,6 +3233,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3161,6 +3264,7 @@ exports[`Privacy renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3190,6 +3294,7 @@ exports[`Privacy renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -3227,6 +3332,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3240,6 +3346,7 @@ exports[`Privacy renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
