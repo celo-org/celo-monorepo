@@ -129,32 +129,34 @@ const verifyLibraryPrefix = (bytecode: string, address: string) => {
   }
 }
 
+// Checks if the given transaction is a repointing of the Proxy for the given
+// contract.
+const isProxyRepointTransaction = (tx: ProposalTx, contract: string) => 
+    tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
+
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean => {
-  return context.proposal.some((tx: ProposalTx) => {
-    return tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
-  })
+  return context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
 }
+
+// Checks if the given transaction is a repointing of the Registry entry for the
+// given registryId.
+const isRegistryRepointTransaction = (tx: ProposalTx, registryId: string) =>
+    tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
   const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  return context.proposal.some((tx: ProposalTx) => {
-    return tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
-  })
+  return context.proposal.some(tx => isRegistryRepointTransaction(tx, registryId))
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
   const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  const relevantTx = context.proposal.find((tx: ProposalTx) => {
-    return tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
-  })
+  const relevantTx = context.proposal.find(tx => isRegistryRepointTransaction(tx, registryId))
 
   return relevantTx.args[1]
 }
 
 const getProposedImplementationAddress = (contract: string, context: VerificationContext): string => {
-  const relevantTx = context.proposal.find((tx: ProposalTx) => {
-    return tx.contract === `${contract}Proxy`
-  })
+  const relevantTx = context.proposal.find((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
 
   return relevantTx.args[0]
 }
