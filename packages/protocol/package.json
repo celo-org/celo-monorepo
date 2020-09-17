@@ -31,7 +31,7 @@
     "console": "./scripts/bash/console.sh",
     "check-versions": "./scripts/bash/check-versions.sh",
     "make-release": "./scripts/bash/make-release.sh",
-    "verify-bytecode": "./scripts/bash/verify-bytecode.sh",
+    "verify-deployed": "./scripts/bash/verify-deployed.sh",
     "invite": "./scripts/bash/invite.sh",
     "ganache-dev": "./scripts/bash/ganache.sh",
     "pretruffle:migrate": "yarn build:ts",
