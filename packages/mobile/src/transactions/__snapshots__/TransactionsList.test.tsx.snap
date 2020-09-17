@@ -67,7 +67,7 @@ exports[`ignores failed standby transactions 1`] = `
             "type": "EXCHANGE",
           },
         ],
-        "daysSinceTransaction": 18504.385919814813,
+        "daysSinceTransaction": 18504.46302125,
         "title": "January",
       },
     ]
@@ -503,7 +503,7 @@ exports[`ignores pending standby transactions that are completed in the response
             "type": "EXCHANGE",
           },
         ],
-        "daysSinceTransaction": 18504.385919375,
+        "daysSinceTransaction": 18504.463020636573,
         "title": "January",
       },
     ]
@@ -939,7 +939,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
             "type": "EXCHANGE",
           },
         ],
-        "daysSinceTransaction": 18504.38591840278,
+        "daysSinceTransaction": 18504.46301920139,
         "title": "January",
       },
       Object {
@@ -1031,7 +1031,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
             "type": "EXCHANGE",
           },
         ],
-        "daysSinceTransaction": 18504.804025208334,
+        "daysSinceTransaction": 18504.881126006945,
         "title": "November 2018",
       },
     ]
