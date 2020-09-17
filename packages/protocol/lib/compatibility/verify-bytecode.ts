@@ -28,6 +28,7 @@ export class LibraryPositions {
    */
   constructor(bytecode: string) {
     this.positions = {}
+    // Use g flag to iterate through for all occurences.
     const libraryLinkRegExp = new RegExp(LibraryPositions.libraryLinkRegExpString, 'g')
     let match = libraryLinkRegExp.exec(bytecode)
     while (match != null) {

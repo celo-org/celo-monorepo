@@ -10,6 +10,7 @@ const CONTRACT_METADATA_REGEXPS = [
   // 0.5.13
   'a265627a7a72315820.*64736f6c6343.*0032'
 ]
+// Use i flag to make search case insensitive.
 const GENERAL_METADATA_REGEXP = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
 
 export const stripMetadata = (bytecode: string): string => {
@@ -41,6 +42,7 @@ const padForLink = (name: string): string => {
 export const linkLibraries = (bytecode: string, libraryLinks: LibraryLinks): string => {
   Object.keys(libraryLinks).forEach(libraryName => {
     const linkString = padForLink(libraryName)
+    // Use g flag to iterate through for all occurences.
     bytecode = bytecode.replace(RegExp(linkString, 'g'), libraryLinks[libraryName])
   })
 
