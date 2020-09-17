@@ -68,7 +68,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             "type": "EXCHANGE",
           },
         ],
-        "daysSinceTransaction": undefined,
         "title": "undefined",
       },
     ]

@@ -31,9 +31,9 @@ export const groupFeedItemsInSections = (feedItems: FeedItem[]) => {
   }, sectionsMap)
 
   return Object.entries(sectionsMap)
+    .sort((a, b) => a[1].daysSinceTransaction - b[1].daysSinceTransaction)
     .map(([key, value]) => ({
       title: key,
-      ...value,
+      data: value.data,
     }))
-    .sort((a, b) => a.daysSinceTransaction - b.daysSinceTransaction)
 }
