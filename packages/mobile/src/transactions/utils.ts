@@ -4,7 +4,7 @@ import { formatFeedSectionTitle, timeDeltaInDays } from 'src/utils/time'
 
 // Groupings:
 // Recent -> Last 7 days.
-// "July" -> Captures transactions from the current month that aren’t captured in Recent.
+// [Current month] - "July" -> Captures transactions from the current month that aren’t captured in Recent.
 // [Previous months] - "June" -> Captures transactions by month.
 // [Months over a year ago] — "July 2019" -> Same as above, but with year appended.
 // Sections are hidden if they have no items.
