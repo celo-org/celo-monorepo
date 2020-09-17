@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.red,
   },
   bar: {
-    transitionProperty: 'backgroundColor',
+    transitionProperty: 'background-color',
     transitionDuration: '1s',
     height: '100%',
     width: '100%',
