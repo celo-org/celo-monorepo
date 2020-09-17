@@ -102,6 +102,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               aria-level="1"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -122,6 +123,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -173,8 +175,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -188,6 +188,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -4012,6 +4013,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4064,6 +4066,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -4097,6 +4100,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4152,19 +4156,13 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozUserSelect": "none",
               "WebkitUserSelect": "none",
-              "backgroundColor": "rgba(0,0,0,0.00)",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
@@ -4328,6 +4326,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4357,6 +4356,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           aria-level="3"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -4375,6 +4375,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -4394,6 +4395,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -4680,6 +4682,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -4791,6 +4794,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -4892,6 +4896,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5013,6 +5018,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5052,6 +5058,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -5083,6 +5090,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           aria-level="1"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -5116,6 +5124,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -5158,6 +5167,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(46,51,56,1.00)",
@@ -5174,6 +5184,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(46,51,56,1.00)",
@@ -5203,26 +5214,21 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   <div
                     className="css-view-1dbjc4n"
                     data-focusable={true}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
                     onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
                         "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
+                        "WebkitTransitionDuration": "0s",
                         "WebkitTransitionProperty": "opacity",
                         "WebkitUserSelect": "none",
                         "cursor": "pointer",
                         "msTouchAction": "manipulation",
                         "msUserSelect": "none",
                         "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
+                        "transitionDuration": "0s",
                         "transitionProperty": "opacity",
                         "userSelect": "none",
                       }
@@ -5281,6 +5287,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -5358,10 +5365,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   >
                     <div
                       className="css-text-901oao"
-                      data-focusable={true}
                       dir="auto"
                       onClick={[Function]}
-                      onKeyDown={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(251,204,92,0.40)",
@@ -5381,7 +5386,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           "whiteSpace": "nowrap",
                         }
                       }
-                      tabIndex="0"
                     >
                       All Locations
                     </div>
@@ -5393,10 +5397,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5427,10 +5427,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5461,10 +5457,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5495,10 +5487,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5535,26 +5523,21 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   <div
                     className="css-view-1dbjc4n"
                     data-focusable={true}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
                     onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
                         "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
+                        "WebkitTransitionDuration": "0s",
                         "WebkitTransitionProperty": "opacity",
                         "WebkitUserSelect": "none",
                         "cursor": "pointer",
                         "msTouchAction": "manipulation",
                         "msUserSelect": "none",
                         "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
+                        "transitionDuration": "0s",
                         "transitionProperty": "opacity",
                         "userSelect": "none",
                       }
@@ -5613,6 +5596,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -5690,10 +5674,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   >
                     <div
                       className="css-text-901oao"
-                      data-focusable={true}
                       dir="auto"
                       onClick={[Function]}
-                      onKeyDown={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(251,204,92,0.40)",
@@ -5713,7 +5695,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           "whiteSpace": "nowrap",
                         }
                       }
-                      tabIndex="0"
                     >
                       All Departments
                     </div>
@@ -5725,10 +5706,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5759,10 +5736,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5799,26 +5772,21 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   <div
                     className="css-view-1dbjc4n"
                     data-focusable={true}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
                     onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
                         "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
+                        "WebkitTransitionDuration": "0s",
                         "WebkitTransitionProperty": "opacity",
                         "WebkitUserSelect": "none",
                         "cursor": "pointer",
                         "msTouchAction": "manipulation",
                         "msUserSelect": "none",
                         "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
+                        "transitionDuration": "0s",
                         "transitionProperty": "opacity",
                         "userSelect": "none",
                       }
@@ -5877,6 +5845,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -5954,10 +5923,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   >
                     <div
                       className="css-text-901oao"
-                      data-focusable={true}
                       dir="auto"
                       onClick={[Function]}
-                      onKeyDown={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(251,204,92,0.40)",
@@ -5977,7 +5944,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           "whiteSpace": "nowrap",
                         }
                       }
-                      tabIndex="0"
                     >
                       All Work Types
                     </div>
@@ -5989,10 +5955,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -6023,10 +5985,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -6079,17 +6037,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
       >
         <div
           className="css-view-1dbjc4n"
-          onResponderGrant={[Function]}
-          onResponderReject={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminationRequest={[Function]}
           onScroll={[Function]}
-          onScrollShouldSetResponder={[Function]}
-          onStartShouldSetResponder={[Function]}
-          onStartShouldSetResponderCapture={[Function]}
-          onTouchEnd={[Function]}
           onTouchMove={[Function]}
-          onTouchStart={[Function]}
           onWheel={[Function]}
           style={
             Object {
@@ -6145,6 +6094,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   <div
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(46,51,56,1.00)",
@@ -6244,6 +6194,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         data-focusable={true}
                         dir="auto"
                         href="example.com"
+                        onClick={[Function]}
                         role="link"
                         style={
                           Object {
@@ -6285,6 +6236,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(46,51,56,1.00)",
@@ -6322,6 +6274,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(46,51,56,1.00)",
@@ -6372,8 +6325,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -6490,6 +6441,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   <div
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(46,51,56,1.00)",
@@ -6589,6 +6541,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         data-focusable={true}
                         dir="auto"
                         href="example.com"
+                        onClick={[Function]}
                         role="link"
                         style={
                           Object {
@@ -6630,6 +6583,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(46,51,56,1.00)",
@@ -6667,6 +6621,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(46,51,56,1.00)",
@@ -6717,8 +6672,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -6830,6 +6783,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -6890,6 +6844,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 "msFlexDirection": "row",
                 "msFlexItemAlign": "center",
                 "msFlexPack": "center",
+                "msGridRowAlign": "center",
               }
             }
           >
@@ -7159,6 +7114,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -7200,6 +7156,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -7221,6 +7178,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -7244,8 +7202,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -7420,6 +7376,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               aria-level="1"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -7440,6 +7397,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -7491,8 +7449,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "center",
@@ -7506,6 +7462,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -11330,6 +11287,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -11382,6 +11340,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -11415,6 +11374,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -11470,19 +11430,13 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozUserSelect": "none",
               "WebkitUserSelect": "none",
-              "backgroundColor": "rgba(0,0,0,0.00)",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
@@ -11646,6 +11600,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -11675,6 +11630,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           aria-level="3"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -11693,6 +11649,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -11712,6 +11669,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -11998,6 +11956,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -12109,6 +12068,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -12210,6 +12170,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -12331,6 +12292,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -12370,6 +12332,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -12401,6 +12364,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           aria-level="1"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -12434,6 +12398,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -12476,6 +12441,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(46,51,56,1.00)",
@@ -12492,6 +12458,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(46,51,56,1.00)",
@@ -12521,26 +12488,21 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   <div
                     className="css-view-1dbjc4n"
                     data-focusable={true}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
                     onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
                         "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
+                        "WebkitTransitionDuration": "0s",
                         "WebkitTransitionProperty": "opacity",
                         "WebkitUserSelect": "none",
                         "cursor": "pointer",
                         "msTouchAction": "manipulation",
                         "msUserSelect": "none",
                         "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
+                        "transitionDuration": "0s",
                         "transitionProperty": "opacity",
                         "userSelect": "none",
                       }
@@ -12599,6 +12561,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -12676,10 +12639,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   >
                     <div
                       className="css-text-901oao"
-                      data-focusable={true}
                       dir="auto"
                       onClick={[Function]}
-                      onKeyDown={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(251,204,92,0.40)",
@@ -12699,7 +12660,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                           "whiteSpace": "nowrap",
                         }
                       }
-                      tabIndex="0"
                     >
                       All Locations
                     </div>
@@ -12711,10 +12671,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -12745,10 +12701,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -12779,10 +12731,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -12813,10 +12761,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onPressIn={[Function]}
-                      onPressOut={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(255,255,255,1.00)",
@@ -12853,26 +12797,21 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   <div
                     className="css-view-1dbjc4n"
                     data-focusable={true}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
                     onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
                         "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
+                        "WebkitTransitionDuration": "0s",
                         "WebkitTransitionProperty": "opacity",
                         "WebkitUserSelect": "none",
                         "cursor": "pointer",
                         "msTouchAction": "manipulation",
                         "msUserSelect": "none",
                         "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
+                        "transitionDuration": "0s",
                         "transitionProperty": "opacity",
                         "userSelect": "none",
                       }
@@ -12931,6 +12870,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -13008,10 +12948,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   >
                     <div
                       className="css-text-901oao"
-                      data-focusable={true}
                       dir="auto"
                       onClick={[Function]}
-                      onKeyDown={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(251,204,92,0.40)",
@@ -13031,7 +12969,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                           "whiteSpace": "nowrap",
                         }
                       }
-                      tabIndex="0"
                     >
                       All Departments
                     </div>
@@ -13049,26 +12986,21 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   <div
                     className="css-view-1dbjc4n"
                     data-focusable={true}
+                    onClick={[Function]}
+                    onContextMenu={[Function]}
                     onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
                         "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
+                        "WebkitTransitionDuration": "0s",
                         "WebkitTransitionProperty": "opacity",
                         "WebkitUserSelect": "none",
                         "cursor": "pointer",
                         "msTouchAction": "manipulation",
                         "msUserSelect": "none",
                         "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
+                        "transitionDuration": "0s",
                         "transitionProperty": "opacity",
                         "userSelect": "none",
                       }
@@ -13127,6 +13059,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -13204,10 +13137,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   >
                     <div
                       className="css-text-901oao"
-                      data-focusable={true}
                       dir="auto"
                       onClick={[Function]}
-                      onKeyDown={[Function]}
                       style={
                         Object {
                           "backgroundColor": "rgba(251,204,92,0.40)",
@@ -13227,7 +13158,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                           "whiteSpace": "nowrap",
                         }
                       }
-                      tabIndex="0"
                     >
                       All Work Types
                     </div>
@@ -13261,17 +13191,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
       >
         <div
           className="css-view-1dbjc4n"
-          onResponderGrant={[Function]}
-          onResponderReject={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminationRequest={[Function]}
           onScroll={[Function]}
-          onScrollShouldSetResponder={[Function]}
-          onStartShouldSetResponder={[Function]}
-          onStartShouldSetResponderCapture={[Function]}
-          onTouchEnd={[Function]}
           onTouchMove={[Function]}
-          onTouchStart={[Function]}
           onWheel={[Function]}
           style={
             Object {
@@ -13305,124 +13226,120 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           >
             <div
-              className="css-view-1dbjc4n"
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
             >
               <div
-                className="react-reveal"
+                className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "opacity": undefined,
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "center",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "height": "200px",
+                    "justifyContent": "center",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "center",
+                    "paddingBottom": "20px",
+                    "paddingLeft": "20px",
+                    "paddingRight": "20px",
+                    "paddingTop": "20px",
                   }
                 }
               >
                 <div
-                  className="css-view-1dbjc4n"
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
-                      "WebkitAlignItems": "center",
-                      "WebkitBoxAlign": "center",
-                      "WebkitBoxPack": "center",
-                      "WebkitJustifyContent": "center",
-                      "alignItems": "center",
-                      "height": "200px",
-                      "justifyContent": "center",
-                      "msFlexAlign": "center",
-                      "msFlexPack": "center",
-                      "paddingBottom": "20px",
-                      "paddingLeft": "20px",
-                      "paddingRight": "20px",
-                      "paddingTop": "20px",
+                      "color": "rgba(46,51,56,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "20px",
+                      "lineHeight": "28px",
+                      "marginBottom": "20px",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
                 >
+                  
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                >
                   <div
-                    className="css-text-901oao"
-                    dir="auto"
+                    className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "color": "rgba(46,51,56,1.00)",
-                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                        "fontSize": "20px",
-                        "lineHeight": "28px",
-                        "marginBottom": "20px",
-                        "textAlign": "center",
-                        "textRendering": "geometricPrecision",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(221,221,221,1.00)",
+                        "borderBottomLeftRadius": "3px",
+                        "borderBottomRightRadius": "3px",
+                        "borderBottomWidth": "1px",
+                        "borderLeftColor": "rgba(221,221,221,1.00)",
+                        "borderLeftWidth": "1px",
+                        "borderRightColor": "rgba(221,221,221,1.00)",
+                        "borderRightWidth": "1px",
+                        "borderTopColor": "rgba(221,221,221,1.00)",
+                        "borderTopLeftRadius": "3px",
+                        "borderTopRightRadius": "3px",
+                        "borderTopWidth": "1px",
                       }
                     }
                   >
-                    
-                  </div>
-                  <div
-                    className="css-view-1dbjc4n"
-                    onClick={[Function]}
-                    onMouseDown={[Function]}
-                    onMouseEnter={[Function]}
-                    onMouseLeave={[Function]}
-                    onMouseUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderRelease={[Function]}
-                  >
-                    <div
-                      className="css-view-1dbjc4n"
+                    <a
+                      className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                      data-focusable={true}
+                      dir="auto"
+                      onClick={[Function]}
+                      role="link"
                       style={
                         Object {
-                          "backgroundColor": "rgba(0,0,0,0.00)",
-                          "borderBottomColor": "rgba(221,221,221,1.00)",
-                          "borderBottomLeftRadius": "3px",
-                          "borderBottomRightRadius": "3px",
-                          "borderBottomWidth": "1px",
-                          "borderLeftColor": "rgba(221,221,221,1.00)",
-                          "borderLeftWidth": "1px",
-                          "borderRightColor": "rgba(221,221,221,1.00)",
-                          "borderRightWidth": "1px",
-                          "borderTopColor": "rgba(221,221,221,1.00)",
-                          "borderTopLeftRadius": "3px",
-                          "borderTopRightRadius": "3px",
-                          "borderTopWidth": "1px",
+                          "WebkitAlignItems": "center",
+                          "WebkitBoxAlign": "center",
+                          "WebkitBoxFlex": 0,
+                          "WebkitBoxPack": "center",
+                          "WebkitFlexGrow": 0,
+                          "WebkitJustifyContent": "center",
+                          "alignItems": "center",
+                          "color": "rgba(53,208,127,1.00)",
+                          "cursor": "pointer",
+                          "display": "inline-flex",
+                          "flexGrow": 0,
+                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                          "fontSize": "16px",
+                          "fontWeight": "500",
+                          "justifyContent": "center",
+                          "lineHeight": "16px",
+                          "minWidth": "150px",
+                          "msFlexAlign": "center",
+                          "msFlexPack": "center",
+                          "msFlexPositive": 0,
+                          "opacity": 1,
+                          "paddingBottom": "10px",
+                          "paddingLeft": "20px",
+                          "paddingRight": "20px",
+                          "paddingTop": "10px",
+                          "textAlign": "center",
+                          "textRendering": "geometricPrecision",
+                          "width": "fit-content",
                         }
                       }
                     >
-                      <a
-                        className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                        data-focusable={true}
-                        dir="auto"
-                        role="link"
-                        style={
-                          Object {
-                            "WebkitAlignItems": "center",
-                            "WebkitBoxAlign": "center",
-                            "WebkitBoxFlex": 0,
-                            "WebkitBoxPack": "center",
-                            "WebkitFlexGrow": 0,
-                            "WebkitJustifyContent": "center",
-                            "alignItems": "center",
-                            "color": "rgba(53,208,127,1.00)",
-                            "cursor": "pointer",
-                            "display": "inline-flex",
-                            "flexGrow": 0,
-                            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                            "fontSize": "16px",
-                            "fontWeight": "500",
-                            "justifyContent": "center",
-                            "lineHeight": "16px",
-                            "minWidth": "150px",
-                            "msFlexAlign": "center",
-                            "msFlexPack": "center",
-                            "msFlexPositive": 0,
-                            "opacity": 1,
-                            "paddingBottom": "10px",
-                            "paddingLeft": "20px",
-                            "paddingRight": "20px",
-                            "paddingTop": "10px",
-                            "textAlign": "center",
-                            "textRendering": "geometricPrecision",
-                            "width": "fit-content",
-                          }
-                        }
-                      >
-                        
-                      </a>
-                    </div>
+                      
+                    </a>
                   </div>
                 </div>
               </div>
@@ -13445,6 +13362,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -13505,6 +13423,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                 "msFlexDirection": "row",
                 "msFlexItemAlign": "center",
                 "msFlexPack": "center",
+                "msGridRowAlign": "center",
               }
             }
           >
@@ -13774,6 +13693,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -13815,6 +13735,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -13836,6 +13757,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -13859,8 +13781,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
