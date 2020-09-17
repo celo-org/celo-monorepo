@@ -214,9 +214,6 @@ const getOnchainBytecode = async (contract: string, isLibrary: boolean, context:
 
 const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
   const contract = queue.pop()
-  if (ignoredContracts.includes(contract)) {
-    return
-  }
 
   const isLibrary = !context.contracts.includes(contract)
 
@@ -263,7 +260,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
  * - 
  */
 export const verifyBytecodesDfs = async (contracts: string[], artifacts: BuildArtifacts, registry: RegistryInstance, proposal: ProposalTx[], Proxy: Truffle.Contract<ProxyInstance>, web3: Web3, isBeforeRelease1: boolean = false) => {
-  const queue = [...contracts]
+  const queue = [...contracts.filter(contract => !ignoredContracts.includes(contract))]
   const visited: Set<string> = new Set()
   const libraryAddresses: LibraryAddresses = new LibraryAddresses()
   contracts.forEach(contract => visited.add(contract))
