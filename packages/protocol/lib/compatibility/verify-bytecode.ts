@@ -159,7 +159,7 @@ const getProposedImplementationAddress = (contract: string, context: Verificatio
   return relevantTx.args[0]
 }
 
-const getSoureBytecode = (contract: string, context: VerificationContext): string => {
+const getSourceBytecode = (contract: string, context: VerificationContext): string => {
   const sourceBytecodeWithMetadata = context.artifacts.getArtifactByName(contract).deployedBytecode
   return stripMetadata(sourceBytecodeWithMetadata)
 }
@@ -220,7 +220,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   const isLibrary = !context.contracts.includes(contract)
 
-  const sourceBytecode = getSoureBytecode(contract, context)
+  const sourceBytecode = getSourceBytecode(contract, context)
   const onchainBytecode = await getOnchainBytecode(contract, isLibrary, context)
 
   const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
