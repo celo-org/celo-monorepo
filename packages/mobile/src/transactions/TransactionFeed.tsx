@@ -1,7 +1,8 @@
+import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import * as React from 'react'
-import { FlatList } from 'react-native'
+import { SectionList, SectionListData } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -18,6 +19,7 @@ import NoActivity from 'src/transactions/NoActivity'
 import { recentTxRecipientsCacheSelector } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import { TransactionStatus } from 'src/transactions/types'
+import { groupFeedItemsInSections } from 'src/transactions/utils'
 import Logger from 'src/utils/Logger'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
@@ -103,6 +105,10 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
   }
 
+  renderSectionHeader = (info: { section: SectionListData<FeedItem> }) => (
+    <SectionHeadNew text={info.section.title} />
+  )
+
   keyExtractor = (item: TransactionFeedFragment) => {
     return item.hash + item.timestamp.toString()
   }
@@ -116,7 +122,17 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
 
     if (data && data.length > 0) {
-      return <FlatList data={data} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
+      const sections = groupFeedItemsInSections(data)
+      return (
+        <SectionList
+          renderItem={this.renderItem}
+          renderSectionHeader={this.renderSectionHeader}
+          sections={sections}
+          keyExtractor={this.keyExtractor}
+          initialNumToRender={30}
+          keyboardShouldPersistTaps="always"
+        />
+      )
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }

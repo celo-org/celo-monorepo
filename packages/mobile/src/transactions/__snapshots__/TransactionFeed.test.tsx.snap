@@ -44,26 +44,32 @@ exports[`renders for gold to dollar exchange properly 1`] = `
   data={
     Array [
       Object {
-        "__typename": "TokenExchange",
-        "amount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": null,
-          "value": "-30",
-        },
-        "hash": "0x00000000000000000000",
-        "makerAmount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": null,
-          "value": "30",
-        },
-        "status": "Complete",
-        "takerAmount": Object {
-          "currencyCode": "cGLD",
-          "localAmount": null,
-          "value": "200",
-        },
-        "timestamp": 1542306118,
-        "type": "EXCHANGE",
+        "data": Array [
+          Object {
+            "__typename": "TokenExchange",
+            "amount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": null,
+              "value": "-30",
+            },
+            "hash": "0x00000000000000000000",
+            "makerAmount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": null,
+              "value": "30",
+            },
+            "status": "Complete",
+            "takerAmount": Object {
+              "currencyCode": "cGLD",
+              "localAmount": null,
+              "value": "200",
+            },
+            "timestamp": 1542306118,
+            "type": "EXCHANGE",
+          },
+        ],
+        "daysSinceTransaction": undefined,
+        "title": "undefined",
       },
     ]
   }
@@ -71,8 +77,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
   getItem={[Function]}
   getItemCount={[Function]}
   horizontal={false}
-  initialNumToRender={10}
+  initialNumToRender={30}
   keyExtractor={[Function]}
+  keyboardShouldPersistTaps="always"
   maxToRenderPerBatch={10}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
@@ -81,15 +88,46 @@ exports[`renders for gold to dollar exchange properly 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
   updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
   windowSize={21}
 >
   <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 8,
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 13,
+              "lineHeight": 16,
+            }
+          }
+        >
+          undefined
+        </Text>
+      </View>
+    </View>
     <View
       onLayout={[Function]}
       style={null}
@@ -228,6 +266,10 @@ exports[`renders for gold to dollar exchange properly 1`] = `
         </View>
       </View>
     </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    />
   </View>
 </RCTScrollView>
 `;

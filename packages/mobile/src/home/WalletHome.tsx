@@ -185,7 +185,6 @@ export class WalletHome extends React.Component<Props, State> {
     }
 
     sections.push({
-      title: t('activity'),
       data: [{}],
       renderItem: () => (
         <TransactionsList key={'TransactionList'} currency={CURRENCY_ENUM.DOLLAR} />

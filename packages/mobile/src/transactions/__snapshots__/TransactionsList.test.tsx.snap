@@ -5,64 +5,70 @@ exports[`ignores failed standby transactions 1`] = `
   data={
     Array [
       Object {
-        "__typename": "TokenTransfer",
-        "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
-        "amount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "-0.2",
+        "data": Array [
+          Object {
+            "__typename": "TokenTransfer",
+            "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
+            "amount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "-0.2",
+              },
+              "value": "-0.2",
+            },
+            "comment": "Hi",
+            "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
+            "status": "Complete",
+            "timestamp": 1578530538,
+            "type": "SENT",
           },
-          "value": "-0.2",
-        },
-        "comment": "Hi",
-        "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
-        "status": "Complete",
-        "timestamp": 1578530538,
-        "type": "SENT",
-      },
-      Object {
-        "__typename": "TokenExchange",
-        "amount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "0.994982275992944156",
+          Object {
+            "__typename": "TokenExchange",
+            "amount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "0.994982275992944156",
+              },
+              "value": "0.994982275992944156",
+            },
+            "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
+            "makerAmount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cGLD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "10.06007113270411465777",
+                "value": "1.006007113270411465777",
+              },
+              "value": "0.1",
+            },
+            "status": "Complete",
+            "takerAmount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "0.994982275992944156",
+              },
+              "value": "0.994982275992944156",
+            },
+            "timestamp": 1578530498,
+            "type": "EXCHANGE",
           },
-          "value": "0.994982275992944156",
-        },
-        "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
-        "makerAmount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cGLD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "10.06007113270411465777",
-            "value": "1.006007113270411465777",
-          },
-          "value": "0.1",
-        },
-        "status": "Complete",
-        "takerAmount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "0.994982275992944156",
-          },
-          "value": "0.994982275992944156",
-        },
-        "timestamp": 1578530498,
-        "type": "EXCHANGE",
+        ],
+        "daysSinceTransaction": 18504.385919814813,
+        "title": "January",
       },
     ]
   }
@@ -70,8 +76,9 @@ exports[`ignores failed standby transactions 1`] = `
   getItem={[Function]}
   getItemCount={[Function]}
   horizontal={false}
-  initialNumToRender={10}
+  initialNumToRender={30}
   keyExtractor={[Function]}
+  keyboardShouldPersistTaps="always"
   maxToRenderPerBatch={10}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
@@ -80,15 +87,46 @@ exports[`ignores failed standby transactions 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
   updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
   windowSize={21}
 >
   <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 8,
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 13,
+              "lineHeight": 16,
+            }
+          }
+        >
+          January
+        </Text>
+      </View>
+    </View>
     <View
       onLayout={[Function]}
       style={null}
@@ -390,6 +428,10 @@ exports[`ignores failed standby transactions 1`] = `
         </View>
       </View>
     </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    />
   </View>
 </RCTScrollView>
 `;
@@ -399,64 +441,70 @@ exports[`ignores pending standby transactions that are completed in the response
   data={
     Array [
       Object {
-        "__typename": "TokenTransfer",
-        "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
-        "amount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "-0.2",
+        "data": Array [
+          Object {
+            "__typename": "TokenTransfer",
+            "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
+            "amount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "-0.2",
+              },
+              "value": "-0.2",
+            },
+            "comment": "Hi",
+            "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
+            "status": "Complete",
+            "timestamp": 1578530538,
+            "type": "SENT",
           },
-          "value": "-0.2",
-        },
-        "comment": "Hi",
-        "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
-        "status": "Complete",
-        "timestamp": 1578530538,
-        "type": "SENT",
-      },
-      Object {
-        "__typename": "TokenExchange",
-        "amount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "0.994982275992944156",
+          Object {
+            "__typename": "TokenExchange",
+            "amount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "0.994982275992944156",
+              },
+              "value": "0.994982275992944156",
+            },
+            "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
+            "makerAmount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cGLD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "10.06007113270411465777",
+                "value": "1.006007113270411465777",
+              },
+              "value": "0.1",
+            },
+            "status": "Complete",
+            "takerAmount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "0.994982275992944156",
+              },
+              "value": "0.994982275992944156",
+            },
+            "timestamp": 1578530498,
+            "type": "EXCHANGE",
           },
-          "value": "0.994982275992944156",
-        },
-        "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
-        "makerAmount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cGLD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "10.06007113270411465777",
-            "value": "1.006007113270411465777",
-          },
-          "value": "0.1",
-        },
-        "status": "Complete",
-        "takerAmount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "0.994982275992944156",
-          },
-          "value": "0.994982275992944156",
-        },
-        "timestamp": 1578530498,
-        "type": "EXCHANGE",
+        ],
+        "daysSinceTransaction": 18504.385919375,
+        "title": "January",
       },
     ]
   }
@@ -464,8 +512,9 @@ exports[`ignores pending standby transactions that are completed in the response
   getItem={[Function]}
   getItemCount={[Function]}
   horizontal={false}
-  initialNumToRender={10}
+  initialNumToRender={30}
   keyExtractor={[Function]}
+  keyboardShouldPersistTaps="always"
   maxToRenderPerBatch={10}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
@@ -474,15 +523,46 @@ exports[`ignores pending standby transactions that are completed in the response
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
   updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
   windowSize={21}
 >
   <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 8,
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 13,
+              "lineHeight": 16,
+            }
+          }
+        >
+          January
+        </Text>
+      </View>
+    </View>
     <View
       onLayout={[Function]}
       style={null}
@@ -784,6 +864,10 @@ exports[`ignores pending standby transactions that are completed in the response
         </View>
       </View>
     </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    />
   </View>
 </RCTScrollView>
 `;
@@ -793,150 +877,162 @@ exports[`renders the received data along with the standby transactions 1`] = `
   data={
     Array [
       Object {
-        "__typename": "TokenTransfer",
-        "address": "0072bvy2o23u",
-        "amount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "1.33",
-            "value": "-133",
+        "data": Array [
+          Object {
+            "__typename": "TokenTransfer",
+            "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
+            "amount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "-0.2",
+              },
+              "value": "-0.2",
+            },
+            "comment": "Hi",
+            "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
+            "status": "Complete",
+            "timestamp": 1578530538,
+            "type": "SENT",
           },
-          "value": "-100",
-        },
-        "comment": "Eye for an Eye",
-        "hash": "",
-        "status": "Pending",
-        "timestamp": 1542406110,
-        "type": "SENT",
+          Object {
+            "__typename": "TokenExchange",
+            "amount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "0.994982275992944156",
+              },
+              "value": "0.994982275992944156",
+            },
+            "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
+            "makerAmount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cGLD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "10.06007113270411465777",
+                "value": "1.006007113270411465777",
+              },
+              "value": "0.1",
+            },
+            "status": "Complete",
+            "takerAmount": Object {
+              "__typename": "MoneyAmount",
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "__typename": "LocalMoneyAmount",
+                "currencyCode": "USD",
+                "exchangeRate": "1",
+                "value": "0.994982275992944156",
+              },
+              "value": "0.994982275992944156",
+            },
+            "timestamp": 1578530498,
+            "type": "EXCHANGE",
+          },
+        ],
+        "daysSinceTransaction": 18504.38591840278,
+        "title": "January",
       },
       Object {
-        "__typename": "TokenExchange",
-        "amount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "1.33",
-            "value": "-26.6",
+        "data": Array [
+          Object {
+            "__typename": "TokenTransfer",
+            "address": "0072bvy2o23u",
+            "amount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "1.33",
+                "value": "-133",
+              },
+              "value": "-100",
+            },
+            "comment": "Eye for an Eye",
+            "hash": "",
+            "status": "Pending",
+            "timestamp": 1542406110,
+            "type": "SENT",
           },
-          "value": "-20",
-        },
-        "hash": "",
-        "makerAmount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "1.33",
-            "value": "26.6",
+          Object {
+            "__typename": "TokenExchange",
+            "amount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "1.33",
+                "value": "-26.6",
+              },
+              "value": "-20",
+            },
+            "hash": "",
+            "makerAmount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "1.33",
+                "value": "26.6",
+              },
+              "value": "20",
+            },
+            "status": "Pending",
+            "takerAmount": Object {
+              "currencyCode": "cGLD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "0.8866666666666666666711",
+                "value": "26.600000000000000000133",
+              },
+              "value": "30",
+            },
+            "timestamp": 1542409112,
+            "type": "EXCHANGE",
           },
-          "value": "20",
-        },
-        "status": "Pending",
-        "takerAmount": Object {
-          "currencyCode": "cGLD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "0.8866666666666666666711",
-            "value": "26.600000000000000000133",
+          Object {
+            "__typename": "TokenExchange",
+            "amount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "1.33",
+                "value": "26.6",
+              },
+              "value": "20",
+            },
+            "hash": "",
+            "makerAmount": Object {
+              "currencyCode": "cGLD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "0.8866666666666666666711",
+                "value": "26.600000000000000000133",
+              },
+              "value": "30",
+            },
+            "status": "Pending",
+            "takerAmount": Object {
+              "currencyCode": "cUSD",
+              "localAmount": Object {
+                "currencyCode": "MXN",
+                "exchangeRate": "1.33",
+                "value": "26.6",
+              },
+              "value": "20",
+            },
+            "timestamp": 1542409113,
+            "type": "EXCHANGE",
           },
-          "value": "30",
-        },
-        "timestamp": 1542409112,
-        "type": "EXCHANGE",
-      },
-      Object {
-        "__typename": "TokenExchange",
-        "amount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "1.33",
-            "value": "26.6",
-          },
-          "value": "20",
-        },
-        "hash": "",
-        "makerAmount": Object {
-          "currencyCode": "cGLD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "0.8866666666666666666711",
-            "value": "26.600000000000000000133",
-          },
-          "value": "30",
-        },
-        "status": "Pending",
-        "takerAmount": Object {
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "currencyCode": "MXN",
-            "exchangeRate": "1.33",
-            "value": "26.6",
-          },
-          "value": "20",
-        },
-        "timestamp": 1542409113,
-        "type": "EXCHANGE",
-      },
-      Object {
-        "__typename": "TokenTransfer",
-        "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
-        "amount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "-0.2",
-          },
-          "value": "-0.2",
-        },
-        "comment": "Hi",
-        "hash": "0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353",
-        "status": "Complete",
-        "timestamp": 1578530538,
-        "type": "SENT",
-      },
-      Object {
-        "__typename": "TokenExchange",
-        "amount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "0.994982275992944156",
-          },
-          "value": "0.994982275992944156",
-        },
-        "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
-        "makerAmount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cGLD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "10.06007113270411465777",
-            "value": "1.006007113270411465777",
-          },
-          "value": "0.1",
-        },
-        "status": "Complete",
-        "takerAmount": Object {
-          "__typename": "MoneyAmount",
-          "currencyCode": "cUSD",
-          "localAmount": Object {
-            "__typename": "LocalMoneyAmount",
-            "currencyCode": "USD",
-            "exchangeRate": "1",
-            "value": "0.994982275992944156",
-          },
-          "value": "0.994982275992944156",
-        },
-        "timestamp": 1578530498,
-        "type": "EXCHANGE",
+        ],
+        "daysSinceTransaction": 18504.804025208334,
+        "title": "November 2018",
       },
     ]
   }
@@ -944,8 +1040,9 @@ exports[`renders the received data along with the standby transactions 1`] = `
   getItem={[Function]}
   getItemCount={[Function]}
   horizontal={false}
-  initialNumToRender={10}
+  initialNumToRender={30}
   keyExtractor={[Function]}
+  keyboardShouldPersistTaps="always"
   maxToRenderPerBatch={10}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
@@ -954,15 +1051,384 @@ exports[`renders the received data along with the standby transactions 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
   updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
   windowSize={21}
 >
   <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 8,
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 13,
+              "lineHeight": 16,
+            }
+          }
+        >
+          January
+        </Text>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": -1,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      false,
+                    ],
+                    Object {
+                      "color": "#2E3338",
+                    },
+                  ]
+                }
+              >
+                $
+                0.20
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 2,
+                }
+              }
+            >
+              feedItemSentInfo
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 40,
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": -1,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                feedItemExchangeTitle
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                        "marginLeft": "auto",
+                        "paddingLeft": 10,
+                      },
+                      Object {
+                        "color": "#1AB775",
+                      },
+                    ],
+                    Object {
+                      "color": "#1AB775",
+                    },
+                  ]
+                }
+              >
+                +
+                $
+                0.99
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 2,
+                }
+              }
+            >
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                0.100
+              </Text>
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    />
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFFF",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 16,
+              "paddingVertical": 8,
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 13,
+              "lineHeight": 16,
+            }
+          }
+        >
+          November 2018
+        </Text>
+      </View>
+    </View>
     <View
       onLayout={[Function]}
       style={null}
@@ -1379,304 +1845,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
     <View
       onLayout={[Function]}
       style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 12,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-              }
-            }
-          >
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <View
-                style={
-                  Array [
-                    Object {
-                      "alignItems": "center",
-                      "justifyContent": "center",
-                    },
-                    Object {
-                      "backgroundColor": "#7AD6FE",
-                      "borderRadius": 20,
-                      "height": 40,
-                      "width": 40,
-                    },
-                  ]
-                }
-              >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
-                    }
-                  }
-                  style={
-                    Array [
-                      Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
-                      },
-                      Object {
-                        "height": 40,
-                        "width": 40,
-                      },
-                    ]
-                  }
-                />
-              </View>
-            </View>
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "marginLeft": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "flexDirection": "row",
-                  "marginTop": -1,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Medium",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
-                }
-              >
-                feedItemSentTitle
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Inter-Medium",
-                        "fontSize": 16,
-                        "lineHeight": 22,
-                        "marginLeft": "auto",
-                        "paddingLeft": 10,
-                      },
-                      false,
-                    ],
-                    Object {
-                      "color": "#2E3338",
-                    },
-                  ]
-                }
-              >
-                $
-                0.20
-              </Text>
-            </View>
-            <Text
-              style={
-                Object {
-                  "color": "#9CA4A9",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "paddingTop": 2,
-                }
-              }
-            >
-              feedItemSentInfo
-            </Text>
-          </View>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-      >
-        <View
-          style={
-            Object {
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingHorizontal": 16,
-              "paddingVertical": 12,
-            }
-          }
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flexDirection": "column",
-              }
-            }
-          >
-            <Image
-              resizeMode="contain"
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
-                }
-              }
-              style={
-                Object {
-                  "height": 40,
-                  "width": 40,
-                }
-              }
-            />
-          </View>
-          <View
-            style={
-              Object {
-                "flex": 1,
-                "marginLeft": 16,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "flexDirection": "row",
-                  "marginTop": -1,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Medium",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
-                }
-              >
-                feedItemExchangeTitle
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Inter-Medium",
-                        "fontSize": 16,
-                        "lineHeight": 22,
-                        "marginLeft": "auto",
-                        "paddingLeft": 10,
-                      },
-                      Object {
-                        "color": "#1AB775",
-                      },
-                    ],
-                    Object {
-                      "color": "#1AB775",
-                    },
-                  ]
-                }
-              >
-                +
-                $
-                0.99
-              </Text>
-            </View>
-            <Text
-              style={
-                Object {
-                  "color": "#9CA4A9",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "paddingTop": 2,
-                }
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                0.100
-              </Text>
-            </Text>
-          </View>
-        </View>
-      </View>
-    </View>
+    />
     <View
       style={
         Object {

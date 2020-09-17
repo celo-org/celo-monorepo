@@ -258,6 +258,12 @@ export const formatFeedDate = (timestamp: number, i18next: i18nType) => {
   return quickFormat(timestamp, i18next, 'MMM d')
 }
 
+export const formatFeedSectionTitle = (timestamp: number, i18next: i18nType) => {
+  const title = quickFormat(timestamp, i18next, 'MMMM yyyy')
+  const currentYear = new Date().getFullYear().toString()
+  return title.endsWith(currentYear) ? title.substring(0, title.length - 5) : title
+}
+
 export const getDatetimeDisplayString = (timestamp: number, i18next: i18nType) => {
   const timeFormatted = formatFeedTime(timestamp, i18next)
   const dateFormatted = formatFeedDate(timestamp, i18next)
