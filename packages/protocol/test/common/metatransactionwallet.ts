@@ -148,7 +148,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           event: 'Deposit',
           args: {
             sender: accounts[0],
-            value: value,
+            value,
           },
         })
       })
@@ -349,7 +349,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
         describe('when the data parameter has extra bytes appended', () => {
           it('reverts', async () => {
-            assertRevert(
+            await assertRevert(
               wallet.executeTransactions(
                 transactions.map((t) => t.destination),
                 transactions.map((t) => t.value),
@@ -363,7 +363,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
         describe('dataLengths has erroneous lengths', () => {
           it('reverts', async () => {
-            assertRevert(
+            await assertRevert(
               wallet.executeTransactions(
                 transactions.map((t) => t.destination),
                 transactions.map((t) => t.value),

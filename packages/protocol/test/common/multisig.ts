@@ -1,8 +1,8 @@
 import {
   assertEqualBN,
+  assertLogMatches2,
   assertRevert,
   NULL_ADDRESS,
-  assertLogMatches2,
 } from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
 import * as _ from 'lodash'
@@ -56,7 +56,7 @@ contract('MultiSig', (accounts: any) => {
           event: 'Deposit',
           args: {
             sender: accounts[0],
-            value: value,
+            value,
           },
         })
       })
