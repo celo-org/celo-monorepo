@@ -165,7 +165,7 @@ export class WalletHome extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, activeNotificationCount, callToActNotification } = this.props
+    const { activeNotificationCount, callToActNotification } = this.props
 
     const refresh: React.ReactElement<RefreshControlProps> = (
       <RefreshControl
