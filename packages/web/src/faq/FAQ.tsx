@@ -1,5 +1,5 @@
 import { Document } from '@contentful/rich-text-types'
-import * as React from 'react';
+import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
@@ -24,7 +24,6 @@ export interface Props {
 }
 
 class FAQ extends React.Component<I18nProps & Props> {
-
   render() {
     const { t, list } = this.props
     return (
@@ -41,9 +40,11 @@ class FAQ extends React.Component<I18nProps & Props> {
               <H1 style={textStyles.center}>{t('title')}</H1>
             </Cell>
           </GridRow>
-          {list.map((faq) => <Section key={faq.id} title={faq.question} >
-            {documentToReactComponents(faq.answer, OPTIONS)}
-          </Section>)}
+          {list.map((faq) => (
+            <Section key={faq.id} title={faq.question}>
+              {documentToReactComponents(faq.answer, OPTIONS)}
+            </Section>
+          ))}
         </View>
       </>
     )
