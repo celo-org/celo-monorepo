@@ -16,4 +16,4 @@ next.js with [emotion](http://emotion.sh/) for styles.
 
 ## Deployment
 
-see [release.md](release.md)
+see release.md](release.md)
