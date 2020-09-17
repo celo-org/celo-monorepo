@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { call, put, select, take } from 'redux-saga/effects'
+import { call, put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -12,14 +12,9 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import {
-  Actions,
-  FetchCurrentRateFailureAction,
-  FetchCurrentRateSuccessAction,
-  selectPreferredCurrency,
-} from 'src/localCurrency/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
+import { fetchExchangeRate } from 'src/localCurrency/saga'
 import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -34,6 +29,7 @@ import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { getRateForMakerToken, goldToDollarAmount } from 'src/utils/currencyExchange'
 import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
@@ -188,34 +184,32 @@ export function* handleSendPaymentData(
   }
   yield put(storeLatestInRecents(recipient))
 
-  if (data.currencyCode) {
-    yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
-    const action: FetchCurrentRateSuccessAction | FetchCurrentRateFailureAction = yield take([
-      Actions.FETCH_CURRENT_RATE_SUCCESS,
-      Actions.FETCH_CURRENT_RATE_FAILURE,
-    ])
-    if (action.type === Actions.FETCH_CURRENT_RATE_FAILURE) {
-      yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
-      Logger.warn(TAG, '@handleSendPaymentData failed to fetch current rate')
-      return
-    }
-  }
-
-  if (data.amount) {
+  if (data.amount && data.currencyCode) {
     // TODO: integrate with SendConfirmation component
-    const exchangeRate = yield select(getLocalCurrencyExchangeRate)
-    const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
-    if (!amount) {
+    // const exchangeRate = yield select(getLocalCurrencyExchangeRate)
+    const currency = data.currencyCode as LocalCurrencyCode
+    const exchangeRate = yield call(fetchExchangeRate, currency)
+    const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
+    if (!dollarAmount) {
       Logger.warn(TAG, '@handleSendPaymentData null amount')
       return
     }
     const transactionData: TransactionDataInput = {
       recipient,
-      amount,
+      amount: dollarAmount,
       reason: data.comment,
       type: TokenTransactionType.PayPrefill,
     }
-    navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
+    const currencyInfo: CurrencyInfo = {
+      currencyCode: currency,
+      exchangeRate,
+    }
+
+    navigate(Screens.SendConfirmation, {
+      transactionData,
+      isFromScan: true,
+      currencyInfo,
+    })
   } else {
     navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
   }

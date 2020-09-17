@@ -55,6 +55,11 @@ import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector, isDekRegisteredSelector } from 'src/web3/selectors'
 
+export interface CurrencyInfo {
+  currencyCode: LocalCurrencyCode
+  exchangeRate?: string | null
+}
+
 interface StateProps {
   account: string | null
   isSending: boolean
@@ -96,7 +101,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
-  const { transactionData, addressJustValidated } = route.params
+  const { transactionData, addressJustValidated, currencyInfo } = route.params
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -108,8 +113,10 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
   // Undefined or null means no addresses ever validated through secure send
   const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
-  const localCurrencyCode = getLocalCurrencyCode(state)
-  const localCurrencyExchangeRate = getLocalCurrencyExchangeRate(state)
+  const localCurrencyCode = currencyInfo ? currencyInfo.currencyCode : getLocalCurrencyCode(state)
+  const localCurrencyExchangeRate = currencyInfo
+    ? currencyInfo.exchangeRate
+    : getLocalCurrencyExchangeRate(state)
 
   return {
     account: currentAccountSelector(state),
@@ -357,8 +364,18 @@ export class SendConfirmation extends React.Component<Props, State> {
             feeLoading={asyncFee.loading}
             feeHasError={!!asyncFee.error}
             totalFee={fee}
+            currencyInfo={{
+              currencyCode: this.props.localCurrencyCode,
+              exchangeRate: this.props.localCurrencyExchangeRate,
+            }}
           />
-          <TotalLineItem amount={totalAmount} />
+          <TotalLineItem
+            amount={totalAmount}
+            currencyInfo={{
+              currencyCode: this.props.localCurrencyCode,
+              exchangeRate: this.props.localCurrencyExchangeRate,
+            }}
+          />
         </View>
       )
     }
@@ -419,6 +436,10 @@ export class SendConfirmation extends React.Component<Props, State> {
               type={DisplayType.Default}
               style={styles.amount}
               amount={subtotalAmount}
+              currencyInfo={{
+                currencyCode: this.props.localCurrencyCode,
+                exchangeRate: this.props.localCurrencyExchangeRate,
+              }}
             />
             {type === TokenTransactionType.PayRequest ||
             type === TokenTransactionType.PayPrefill ? (

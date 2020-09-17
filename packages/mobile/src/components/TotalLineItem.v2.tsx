@@ -11,16 +11,23 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { useExchangeRate, useLocalCurrencyCode } from 'src/localCurrency/hooks'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 
 interface Props {
   title?: string
   amount: MoneyAmount
   hideSign?: boolean
+  currencyInfo?: CurrencyInfo
 }
 
-export default function TotalLineItem({ title, amount, hideSign }: Props) {
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencyExchangeRate = useExchangeRate()
+export default function TotalLineItem({ title, amount, hideSign, currencyInfo }: Props) {
+  let localCurrencyCode = useLocalCurrencyCode()
+  let localCurrencyExchangeRate = useExchangeRate()
+  if (currencyInfo) {
+    localCurrencyCode = currencyInfo.currencyCode
+    localCurrencyExchangeRate = currencyInfo.exchangeRate
+  }
+
   const { t } = useTranslation(Namespaces.global)
 
   const exchangeRate = amount.localAmount?.exchangeRate || localCurrencyExchangeRate
@@ -30,7 +37,7 @@ export default function TotalLineItem({ title, amount, hideSign }: Props) {
       <LineItemRow
         title={title || t('total')}
         textStyle={fontStyles.regular600}
-        amount={<CurrencyDisplay amount={amount} hideSign={hideSign} />}
+        amount={<CurrencyDisplay amount={amount} hideSign={hideSign} currencyInfo={currencyInfo} />}
       />
       {localCurrencyCode !== LocalCurrencyCode.USD && exchangeRate && (
         <LineItemRow
@@ -43,6 +50,7 @@ export default function TotalLineItem({ title, amount, hideSign }: Props) {
                   currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                 }}
                 showLocalAmount={false}
+                currencyInfo={currencyInfo}
               />
             </Trans>
           }
@@ -52,6 +60,7 @@ export default function TotalLineItem({ title, amount, hideSign }: Props) {
               showLocalAmount={false}
               hideSymbol={true}
               hideSign={hideSign}
+              currencyInfo={currencyInfo}
             />
           }
           style={styles.dollars}

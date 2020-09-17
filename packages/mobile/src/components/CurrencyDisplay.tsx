@@ -13,6 +13,7 @@ import {
   useExchangeRate as useDollarToLocalRate,
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
   getCentAwareMoneyDisplay,
@@ -49,6 +50,7 @@ interface Props {
   formatType: FormatType
   hideFullCurrencyName: boolean
   style?: StyleProp<TextStyle>
+  currencyInfo?: CurrencyInfo
 }
 
 const BIG_SIGN_RATIO = 34 / 48
@@ -131,9 +133,14 @@ export default function CurrencyDisplay({
   formatType,
   hideFullCurrencyName,
   style,
+  currencyInfo,
 }: Props) {
-  const localCurrencyCode = useLocalCurrencyCode()
-  const dollarToLocalRate = useDollarToLocalRate()
+  let localCurrencyCode = useLocalCurrencyCode()
+  let dollarToLocalRate = useDollarToLocalRate()
+  if (currencyInfo) {
+    localCurrencyCode = currencyInfo.currencyCode
+    dollarToLocalRate = currencyInfo.exchangeRate
+  }
   const goldToDollarRate = useGoldToDollarRate()
 
   const currency =
