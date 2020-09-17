@@ -65,7 +65,6 @@ export async function deleteResource(
  */
 export async function getAllUsedNodePorts(namespace?: string, cmdFlags?: { [key: string]: string }) {
   const namespaceFlag = namespace ? `--namespace ${namespace}` : `--all-namespaces`
-  // const selectorFlag = selector ? `--selector ${selector}` : ''
   const cmdFlagStrs = cmdFlags ? Object.entries(cmdFlags).map(([flag, value]) =>
     `--${flag} ${value}`
   ) : []

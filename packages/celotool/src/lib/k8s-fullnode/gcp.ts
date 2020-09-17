@@ -1,16 +1,9 @@
 import { range } from 'lodash'
-// import {
-//   deallocateStaticIP,
-//   getAKSNodeResourceGroup,
-//   registerStaticIPIfNotRegistered,
-//   waitForStaticIPDetachment
-// } from '../azure'
 import { execCmd } from '../cmd-utils'
 import { deleteIPAddress, registerIPAddress, retrieveIPAddress } from '../helm_deploy'
 import { GCPClusterConfig } from '../k8s-cluster/gcp'
-// import { deleteResource } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
-//
+
 export interface GCPFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: GCPClusterConfig,
 }
@@ -38,10 +31,14 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
     ])
     return Promise.all(
       range(this.deploymentConfig.replicas).
-        map((index: number) => retrieveIPAddress(
-          this.getIPAddressName(index),
-          this.deploymentConfig.clusterConfig.zone
-        ))
+        map((index: number) => this.getFullNodeIP(index))
+    )
+  }
+
+  async getFullNodeIP(index: number): Promise<string> {
+    return retrieveIPAddress(
+      this.getIPAddressName(index),
+      this.deploymentConfig.clusterConfig.zone
     )
   }
 

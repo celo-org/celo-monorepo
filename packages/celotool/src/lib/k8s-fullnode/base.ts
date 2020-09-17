@@ -1,5 +1,7 @@
+import { range } from 'lodash'
 import { createNamespaceIfNotExists } from '../cluster'
 import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
+import { generatePrivateKeyWithDerivations, privateKeyToPublicKey } from '../generate_utils'
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
@@ -10,9 +12,18 @@ import { scaleResource } from '../kubernetes'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
 
+export interface NodeKeyGenerationInfo {
+  mnemonic: string
+  // A derivation index to apply to the mnemonic.
+  // Each full node will then have its node key derived like:
+  // mnemonic.derive(derivationIndex).derive(fullNodeIndex)
+  derivationIndex: number
+}
+
 export interface BaseFullNodeDeploymentConfig {
   diskSizeGb: number
   replicas: number
+  nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
 
 export abstract class BaseFullNodeDeployer {
@@ -27,12 +38,16 @@ export abstract class BaseFullNodeDeployer {
   async installChart() {
     await createNamespaceIfNotExists(this.kubeNamespace)
 
-    return installGenericHelmChart(
+    await installGenericHelmChart(
       this.kubeNamespace,
       this.releaseName,
       helmChartPath,
       await this.helmParameters()
     )
+
+    if (this._deploymentConfig.nodeKeyGenerationInfo) {
+      return this.getEnodes()
+    }
   }
 
   async upgradeChart(reset: boolean) {
@@ -48,7 +63,10 @@ export abstract class BaseFullNodeDeployer {
       await this.helmParameters()
     )
 
-    return scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, this._deploymentConfig.replicas)
+    await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, this._deploymentConfig.replicas)
+    if (this._deploymentConfig.nodeKeyGenerationInfo) {
+      return this.getEnodes()
+    }
   }
 
   async removeChart() {
@@ -58,6 +76,21 @@ export abstract class BaseFullNodeDeployer {
   }
 
   async helmParameters() {
+    let nodeKeys: string[] | undefined
+    console.log('this._deploymentConfig.nodeKeyGenerationInfo', this._deploymentConfig.nodeKeyGenerationInfo)
+    if (this._deploymentConfig.nodeKeyGenerationInfo) {
+      nodeKeys = range(this._deploymentConfig.replicas)
+        .map((index: number) => {
+          return generatePrivateKeyWithDerivations(
+            this._deploymentConfig.nodeKeyGenerationInfo!.mnemonic,
+            [
+              this._deploymentConfig.nodeKeyGenerationInfo!.derivationIndex,
+              index
+            ]
+          )
+        })
+    }
+
     const rpcApis = 'eth,net,rpc,web3'
     return [
       `--set namespace=${this.kubeNamespace}`,
@@ -70,13 +103,39 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
-      ...(await this.additionalHelmParameters())
+      ...(await this.additionalHelmParameters()),
+      (nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '')
     ]
   }
 
-  abstract async additionalHelmParameters(): Promise<string[]>
+  async getEnodes() {
+    return Promise.all(
+      range(this._deploymentConfig.replicas)
+        .map(async (index: number) => {
+          const publicKey = privateKeyToPublicKey(this.getPrivateKey(index))
+          const ip = await this.getFullNodeIP(index)
+          // Assumes 30303 is the port
+          return `enode://${publicKey}@${ip}:30303`
+        })
+    )
+  }
 
+  getPrivateKey(index: number) {
+    if (!this._deploymentConfig.nodeKeyGenerationInfo) {
+      throw Error('The deployment config property nodeKeyGenerationInfo must be defined to get a full node private key')
+    }
+    return generatePrivateKeyWithDerivations(
+      this._deploymentConfig.nodeKeyGenerationInfo!.mnemonic,
+      [
+        this._deploymentConfig.nodeKeyGenerationInfo!.derivationIndex,
+        index
+      ]
+    )
+  }
+
+  abstract async additionalHelmParameters(): Promise<string[]>
   abstract async deallocateAllIPs(): Promise<void>
+  abstract async getFullNodeIP(index: number): Promise<string>
 
   get releaseName() {
     return `${this.celoEnv}-fullnodes`

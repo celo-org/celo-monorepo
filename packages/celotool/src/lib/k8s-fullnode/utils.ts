@@ -4,7 +4,6 @@ import { AWSFullNodeDeployer, AWSFullNodeDeploymentConfig } from './aws'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 import { GCPFullNodeDeployer, GCPFullNodeDeploymentConfig } from './gcp'
 
-// @ts-ignore
 const fullNodeDeployerByCloudProvider: {
   [key in CloudProvider]: (deploymentConfig: BaseFullNodeDeploymentConfig, celoEnv: string) => BaseFullNodeDeployer
 } = {

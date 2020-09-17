@@ -11,11 +11,13 @@ export async function deployForno(celoEnv: string) {
   const contexts: string[] = fetchEnv(envVar.FORNO_FULL_NODE_CONTEXTS).split(',').map(coerceContext)
   console.info('Deploying Forno with full node contexts:', contexts)
   const terraformVars: TerraformVars = await getFornoTerraformVars(celoEnv, contexts)
+  // This prints the global IP address for forno
   await deployModule(
     celoEnv,
     FORNO_TERRAFORM_MODULE_NAME,
     terraformVars
   )
+  console.info('Note: in order to have an SSL certificate be properly provisioned, DNS entries for the relevant domains must point to the printed IP above.')
 }
 
 export async function destroyForno(celoEnv: string) {
@@ -58,6 +60,9 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
         throw Error(`Expected cloud.google.com/neg-status annotation for service ${celoEnv}-fullnodes-rpc`)
       }
       const outputParsed = JSON.parse(output)
+      if (!outputParsed.network_endpoint_groups[port] || !outputParsed.zones.length) {
+        throw Error(`Expected NEG for ${port} and > 0 zones, instead got NEG: ${outputParsed.network_endpoint_groups[port]} and zones ${outputParsed.zones}`)
+      }
       return {
         ...agg,
         [readableContext(context)]: {

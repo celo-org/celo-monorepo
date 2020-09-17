@@ -38,13 +38,11 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
       await deallocateStaticIP(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
     }
 
-    const staticIps = await Promise.all(
+    const addresses = await Promise.all(
       range(replicas).map((i) =>
         registerStaticIPIfNotRegistered(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
       )
     )
-
-    const addresses = staticIps.map((address, _) => address)
 
     return addresses
   }
@@ -79,6 +77,11 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
         waitForStaticIPDetachment(`${this.staticIPNamePrefix}-${i}`, resourceGroup)
       )
     )
+  }
+
+  async getFullNodeIP(index: number, resourceGroup?: string): Promise<string> {
+    resourceGroup = resourceGroup || await getAKSNodeResourceGroup(this.deploymentConfig.clusterConfig)
+    return registerStaticIPIfNotRegistered(`${this.staticIPNamePrefix}-${index}`, resourceGroup)
   }
 
   get deploymentConfig(): AKSFullNodeDeploymentConfig {

@@ -133,6 +133,10 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     }, new Set<number>())
   }
 
+  async getFullNodeIP(_index: number): Promise<string> {
+    throw Error('Not supported for NodePort full nodes')
+  }
+
   /**
    * Determines if a given port number is a valid node port.
    */

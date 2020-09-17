@@ -1,11 +1,13 @@
-import { getAKSClusterConfig, getAWSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig } from './context-utils'
-import { DynamicEnvVar } from './env-utils'
+import stringHash from 'string-hash'
+import { getAKSClusterConfig, getAWSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext } from './context-utils'
+import { DynamicEnvVar, envVar, fetchEnv } from './env-utils'
 import { CloudProvider } from './k8s-cluster/base'
 import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
 import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
 import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { GCPFullNodeDeploymentConfig } from './k8s-fullnode/gcp'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
+import { uploadStaticNodesToGoogleStorage } from './testnet-utils'
 
 /**
  * Env vars corresponding to values required for a BaseFullNodeDeploymentConfig
@@ -33,9 +35,18 @@ const deploymentConfigGetterByCloudProvider: {
  * Gets the appropriate cloud platform's full node deployer given the celoEnv
  * and context.
  */
-export function getFullNodeDeployerForContext(celoEnv: string, context: string) {
+export function getFullNodeDeployerForContext(celoEnv: string, context: string, generateNodeKeys: boolean) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
-  const deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](context)
+  let deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](context)
+  if (generateNodeKeys) {
+    deploymentConfig = {
+      ...deploymentConfig,
+      nodeKeyGenerationInfo: {
+        mnemonic: fetchEnv(envVar.MNEMONIC),
+        derivationIndex: stringHash(context),
+      }
+    }
+  }
   return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
 }
 
@@ -43,27 +54,42 @@ export function getFullNodeDeployerForContext(celoEnv: string, context: string) 
  * Uses the appropriate cloud platform's full node deployer to install the full
  * node chart.
  */
-export function installFullNodeChart(celoEnv: string, context: string) {
-  const deployer = getFullNodeDeployerForContext(celoEnv, context)
-  return deployer.installChart()
+export async function installFullNodeChart(celoEnv: string, context: string, staticNodes: boolean = false) {
+  const deployer = getFullNodeDeployerForContext(celoEnv, context, staticNodes)
+  const enodes = await deployer.installChart()
+  if (enodes) {
+    await uploadStaticNodeEnodes(celoEnv, context, enodes)
+  }
 }
 
 /**
  * Uses the appropriate cloud platform's full node deployer to upgrade the full
  * node chart.
  */
-export function upgradeFullNodeChart(celoEnv: string, context: string, reset: boolean) {
-  const deployer = getFullNodeDeployerForContext(celoEnv, context)
-  return deployer.upgradeChart(reset)
+export async function upgradeFullNodeChart(celoEnv: string, context: string, reset: boolean, generateNodeKeys: boolean = false) {
+  const deployer = getFullNodeDeployerForContext(celoEnv, context, generateNodeKeys)
+  const enodes = await deployer.upgradeChart(reset)
+  if (enodes) {
+    await uploadStaticNodeEnodes(celoEnv, context, enodes)
+  }
 }
 
 /**
  * Uses the appropriate cloud platform's full node deployer to remove the full
  * node chart.
  */
-export function removeFullNodeChart(celoEnv: string, context: string) {
-  const deployer = getFullNodeDeployerForContext(celoEnv, context)
-  return deployer.removeChart()
+export async function removeFullNodeChart(celoEnv: string, context: string) {
+  const deployer = getFullNodeDeployerForContext(celoEnv, context, false)
+  await deployer.removeChart()
+  // Remove any previous static nodes
+  await uploadStaticNodeEnodes(celoEnv, context, [])
+}
+
+function uploadStaticNodeEnodes(celoEnv: string, context: string, enodes: string[]) {
+  return uploadStaticNodesToGoogleStorage(
+    `${celoEnv}.${readableContext(context)}`,
+    enodes
+  )
 }
 
 /**

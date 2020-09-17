@@ -54,8 +54,6 @@ metadata:
   annotations:
     cloud.google.com/neg: '{"exposed_ports": {"8545":{},"8546":{}}}'
 spec:
-  # REMOVE THIS LATER!
-  publishNotReadyAddresses: true
   type: ClusterIP
   ports:
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
