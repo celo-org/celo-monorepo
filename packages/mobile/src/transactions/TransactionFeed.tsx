@@ -2,7 +2,7 @@ import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import * as React from 'react'
-import { SectionList, SectionListData } from 'react-native'
+import { FlatList, SectionList, SectionListData } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -122,17 +122,23 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
 
     if (data && data.length > 0) {
-      const sections = groupFeedItemsInSections(data)
-      return (
-        <SectionList
-          renderItem={this.renderItem}
-          renderSectionHeader={this.renderSectionHeader}
-          sections={sections}
-          keyExtractor={this.keyExtractor}
-          initialNumToRender={30}
-          keyboardShouldPersistTaps="always"
-        />
-      )
+      if (kind === FeedType.HOME) {
+        const sections = groupFeedItemsInSections(data)
+        return (
+          <SectionList
+            renderItem={this.renderItem}
+            renderSectionHeader={this.renderSectionHeader}
+            sections={sections}
+            keyExtractor={this.keyExtractor}
+            initialNumToRender={30}
+            keyboardShouldPersistTaps="always"
+          />
+        )
+      } else {
+        return (
+          <FlatList data={data} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
+        )
+      }
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }
