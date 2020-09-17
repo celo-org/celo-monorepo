@@ -36,7 +36,9 @@ export abstract class BaseFullNodeDeployer {
     this._celoEnv = celoEnv
   }
 
-  async installChart() {
+  // If the node key is generated, then a promise containing the enodes is returned.
+  // Otherwise, the enode cannot be calculated deterministically so a Promise<void> is returned.
+  async installChart(): Promise<string[] | void> {
     await createNamespaceIfNotExists(this.kubeNamespace)
 
     await installGenericHelmChart(
@@ -51,7 +53,9 @@ export abstract class BaseFullNodeDeployer {
     }
   }
 
-  async upgradeChart(reset: boolean) {
+  // If the node key is generated, then a promise containing the enodes is returned.
+  // Otherwise, the enode cannot be calculated deterministically so a Promise<void> is returned.
+  async upgradeChart(reset: boolean): Promise<string[] | void> {
     if (reset) {
       await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
       await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
@@ -80,15 +84,9 @@ export abstract class BaseFullNodeDeployer {
     let nodeKeys: string[] | undefined
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       nodeKeys = range(this._deploymentConfig.replicas)
-        .map((index: number) => {
-          return generatePrivateKeyWithDerivations(
-            this._deploymentConfig.nodeKeyGenerationInfo!.mnemonic,
-            [
-              this._deploymentConfig.nodeKeyGenerationInfo!.derivationIndex,
-              index
-            ]
-          )
-        })
+        .map((index: number) =>
+          this.getPrivateKey(index)
+        )
     }
 
     const rpcApis = 'eth,net,rpc,web3'
