@@ -43,7 +43,7 @@ The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/
 
 ## Testing
 
-see [release.md])(release.md)
+see [release.md](release.md)
 
 #### Testing Strategy
 
@@ -51,4 +51,4 @@ Each page should have a snapshot test found in `src/_page-tests`. More interacti
 
 ## Deployment
 
-see [release.md])(release.md)
+see [release.md](release.md)

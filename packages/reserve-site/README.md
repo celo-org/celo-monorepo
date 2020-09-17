@@ -5,7 +5,7 @@ code for [celoreserve.org](https://celoreserve.org)
 
 
 ## Updating Content
-To update Content edit the Markdown files in [src/client/content](src/client/content)
+To update Content edit the Markdown files in [src/content](src/content)
 
 
 ## Development
