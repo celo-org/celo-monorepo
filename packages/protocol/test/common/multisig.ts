@@ -1,4 +1,9 @@
-import { assertEqualBN, assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertRevert,
+  NULL_ADDRESS,
+  assertLogMatches2,
+} from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
 import * as _ from 'lodash'
 import { MultiSigContract, MultiSigInstance } from 'types'
@@ -37,6 +42,32 @@ contract('MultiSig', (accounts: any) => {
       await assertRevert(
         multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
       )
+    })
+  })
+
+  describe('fallback function', () => {
+    const value = 100
+
+    describe('when receiving celo', () => {
+      it('emits Deposit event with correct parameters', async () => {
+        // @ts-ignore
+        const res = await multiSig.send(value)
+        assertLogMatches2(res.logs[0], {
+          event: 'Deposit',
+          args: {
+            sender: accounts[0],
+            value: value,
+          },
+        })
+      })
+    })
+
+    describe('when receiving 0 value', () => {
+      it('does not emit an event', async () => {
+        // @ts-ignore
+        const res = await multiSig.send(0)
+        assert.equal(res.logs, 0)
+      })
     })
   })
 

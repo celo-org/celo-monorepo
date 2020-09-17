@@ -27,11 +27,17 @@ contract MetaTransactionWallet is
   uint256 public nonce;
   address public signer;
 
-  event SignerSet(address signer);
+  event SignerSet(address indexed signer);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
-  event TransactionExecution(address destination, uint256 value, bytes data, bytes returnData);
+  event Deposit(address indexed sender, uint256 value);
+  event TransactionExecution(
+    address indexed destination,
+    uint256 value,
+    bytes data,
+    bytes returnData
+  );
   event MetaTransactionExecution(
-    address destination,
+    address indexed destination,
     uint256 value,
     bytes data,
     uint256 nonce,
@@ -41,7 +47,11 @@ contract MetaTransactionWallet is
   /**
    * @dev Fallback function allows to deposit ether.
    */
-  function() external payable {}
+  function() external payable {
+    if (msg.value > 0) {
+      emit Deposit(msg.sender, msg.value);
+    }
+  }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -217,6 +227,7 @@ contract MetaTransactionWallet is
       executeTransaction(destinations[i], values[i], sliceData(data, dataPosition, dataLengths[i]));
       dataPosition = dataPosition.add(dataLengths[i]);
     }
+    require(dataPosition == data.length, "data cannot have extra bytes appended");
   }
 
   /**

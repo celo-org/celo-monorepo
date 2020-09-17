@@ -137,6 +137,32 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
+  describe('fallback function', () => {
+    const value = 100
+
+    describe('when receiving celo', () => {
+      it('emits Deposit event with correct parameters', async () => {
+        // @ts-ignore
+        const res = await wallet.send(value)
+        assertLogMatches2(res.logs[0], {
+          event: 'Deposit',
+          args: {
+            sender: accounts[0],
+            value: value,
+          },
+        })
+      })
+    })
+
+    describe('when receiving 0 value', () => {
+      it('does not emit an event', async () => {
+        // @ts-ignore
+        const res = await wallet.send(0)
+        assert.equal(res.logs, 0)
+      })
+    })
+  })
+
   describe('#setSigner()', () => {
     const newSigner = accounts[3]
 
@@ -318,6 +344,34 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
           it('should not increment the nonce', async () => {
             assertEqualBN(await wallet.nonce(), 0)
+          })
+        })
+
+        describe('when the data parameter has extra bytes appended', () => {
+          it('reverts', async () => {
+            assertRevert(
+              wallet.executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('deadbeef')),
+                transactions.map((t) => trimLeading0x(t.data).length / 2),
+                { from: signer }
+              )
+            )
+          })
+        })
+
+        describe('dataLengths has erroneous lengths', () => {
+          it('reverts', async () => {
+            assertRevert(
+              wallet.executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('deadbeef')),
+                transactions.map((t) => trimLeading0x(t.data).length), // invalid lengths without /2
+                { from: signer }
+              )
+            )
           })
         })
 
