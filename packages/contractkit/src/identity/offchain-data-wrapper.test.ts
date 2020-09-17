@@ -5,7 +5,7 @@ import {
   publicKeyToAddress,
   toChecksumAddress,
 } from '@celo/utils/lib/address'
-import { NativeSigner } from '@celo/utils/lib/signatureUtils'
+import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
@@ -128,47 +128,44 @@ testWithGanache('Offchain Data', (web3) => {
     expect(authorization.ok).toEqual(false)
   })
 
-  // })
-  // })
+  describe('with a different key being authorized to sign off-chain', () => {
+    beforeEach(async () => {
+      wrapper = new OffchainDataWrapper(writerAddress, kit)
+      wrapper.storageWriter = new MockStorageWriter(
+        WRITER_LOCAL_STORAGE_ROOT,
+        WRITER_STORAGE_ROOT,
+        fetchMock
+      )
 
-  // describe('with a different key being authorized to sign off-chain', () => {
-  //   beforeEach(async () => {
-  //     wrapper = new OffchainDataWrapper(writer, kit)
-  //     wrapper.storageWriter = new MockStorageWriter(
-  //       WRITER_LOCAL_STORAGE_ROOT,
-  //       WRITER_STORAGE_ROOT,
-  //       fetchMock
-  //     )
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
+      const pop = await accounts.generateProofOfKeyPossession(writerAddress, signer)
+      await authorizedSignerAccessor.write(signer, serializeSignature(pop), '.*')
+    })
 
-  //     const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-  //     const pop = await accounts.generateProofOfKeyPossession(writer, signer)
-  //     await authorizedSignerAccessor.write(signer, serializeSignature(pop), '.*')
-  //   })
+    wrapper = new OffchainDataWrapper(signer, kit)
+    wrapper.storageWriter = new MockStorageWriter(
+      WRITER_LOCAL_STORAGE_ROOT,
+      WRITER_STORAGE_ROOT,
+      fetchMock
+    )
 
-  //   wrapper = new OffchainDataWrapper(signer, kit)
-  //   wrapper.storageWriter = new MockStorageWriter(
-  //     WRITER_LOCAL_STORAGE_ROOT,
-  //     WRITER_STORAGE_ROOT,
-  //     fetchMock
-  //   )
+    it('can read the authorization', async () => {
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
+      const authorization = await authorizedSignerAccessor.readAsResult(writerAddress, signer)
+      expect(authorization).toBeDefined()
+    })
 
-  //   it('can read the authorization', async () => {
-  //     const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-  //     const authorization = await authorizedSignerAccessor.readAsResult(writer, signer)
-  //     expect(authorization).toBeDefined()
-  //   })
+    it('can write a name', async () => {
+      const testname = 'test'
+      const nameAccessor = new NameAccessor(wrapper)
+      await nameAccessor.write({ name: testname })
 
-  //   it('can write a name', async () => {
-  //     const testname = 'test'
-  //     const nameAccessor = new NameAccessor(wrapper)
-  //     await nameAccessor.write({ name: testname })
-
-  //     const resp = await nameAccessor.readAsResult(writer)
-  //     if (resp.ok) {
-  //       expect(resp.result.name).toEqual(testname)
-  //     }
-  //   })
-  // })
+      const resp = await nameAccessor.readAsResult(writerAddress)
+      if (resp.ok) {
+        expect(resp.result.name).toEqual(testname)
+      }
+    })
+  })
 
   describe('encryption', () => {
     describe('when no keys are loaded in the wallet', () => {
