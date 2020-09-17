@@ -6416,13 +6416,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6469,13 +6473,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6522,13 +6530,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6575,13 +6587,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6628,13 +6644,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6681,13 +6701,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6734,13 +6758,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6814,13 +6842,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6867,13 +6899,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6920,13 +6956,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -6973,13 +7013,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7053,13 +7097,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7106,13 +7154,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7159,13 +7211,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7212,13 +7268,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7265,13 +7325,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7318,13 +7382,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7371,13 +7439,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7424,13 +7496,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7504,13 +7580,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7595,13 +7675,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7676,13 +7760,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7755,13 +7843,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7834,13 +7926,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7915,13 +8011,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -7994,13 +8094,17 @@ exports[`Experience/Logo renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
