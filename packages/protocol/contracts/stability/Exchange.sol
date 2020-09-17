@@ -294,10 +294,10 @@ contract Exchange is
   }
 
   /**
-   * @notice Returns the sell token and buy token bucket sizes, in order. The ratio of
+   * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
    * @param sellGold `true` if gold is the sell token.
-   * @return (sellTokenBucket, buyTokenBucket)
+   * @return (buyTokenBucket, sellTokenBucket)
    */
   function _getBuyAndSellBuckets(bool sellGold) private view returns (uint256, uint256) {
     if (sellGold) {
