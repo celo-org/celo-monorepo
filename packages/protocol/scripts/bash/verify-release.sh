@@ -39,4 +39,4 @@ mv build/contracts $BUILD_DIR
 git checkout -
 
 yarn build
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal $PROPOSAL
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal "../../$PROPOSAL"
