@@ -1,5 +1,6 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { installGCPSSDStorageClass } from '../helm_deploy'
+import { switchToGCPProject } from '../utils'
 import { BaseClusterConfig, BaseClusterManager } from './base'
 
 export interface GCPClusterConfig extends BaseClusterConfig {
@@ -9,7 +10,7 @@ export interface GCPClusterConfig extends BaseClusterConfig {
 
 export class GCPClusterManager extends BaseClusterManager {
   async switchToSubscription() {
-    console.info('you need to add this trevor')
+    await switchToGCPProject(this.clusterConfig.projectName)
   }
 
   async getAndSwitchToClusterContext() {

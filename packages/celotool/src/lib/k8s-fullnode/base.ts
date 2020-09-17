@@ -23,6 +23,7 @@ export interface NodeKeyGenerationInfo {
 export interface BaseFullNodeDeploymentConfig {
   diskSizeGb: number
   replicas: number
+  // If undefined, node keys will not be predetermined and will be random
   nodeKeyGenerationInfo?: NodeKeyGenerationInfo
 }
 
@@ -77,7 +78,6 @@ export abstract class BaseFullNodeDeployer {
 
   async helmParameters() {
     let nodeKeys: string[] | undefined
-    console.log('this._deploymentConfig.nodeKeyGenerationInfo', this._deploymentConfig.nodeKeyGenerationInfo)
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       nodeKeys = range(this._deploymentConfig.replicas)
         .map((index: number) => {
