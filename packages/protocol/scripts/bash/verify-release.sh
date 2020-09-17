@@ -6,7 +6,7 @@ set -euo pipefail
 # Governance proposal.
 #
 # Flags:
-# -b: Branch containing smart contracts that currently comprise the Celo protocol
+# -b: Branch containing smart contracts that are proposed to be deployed.
 # -n: The network to check
 # -p: The proposal JSON file
 # libraries were proxied. TODO: remove this in the future.
