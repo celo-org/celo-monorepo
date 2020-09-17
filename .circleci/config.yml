@@ -530,7 +530,7 @@ jobs:
             # deploy new contracts and generate Governance proposal for upgrade
             yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data initialize-data.json
             # verify bytecode of upgrade deployment
-            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --builde_artifacts build/rc1 --proposal ../../proposal.json
+            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
 
             # stop ganache
             kill $GANACHE_PID
