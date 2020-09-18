@@ -7,10 +7,21 @@ export enum EventTypes {
   RECEIVED = 'RECEIVED',
   SENT = 'SENT',
   FAUCET = 'FAUCET',
-  VERIFICATION_REWARD = 'VERIFICATION_REWARD',
   VERIFICATION_FEE = 'VERIFICATION_FEE',
   ESCROW_SENT = 'ESCROW_SENT',
   ESCROW_RECEIVED = 'ESCROW_RECEIVED',
+}
+
+export enum FeeType {
+  SECURITY_FEE = 'SECURITY_FEE',
+  GATEWAY_FEE = 'GATEWAY_FEE',
+  ONE_TIME_ENCRYPTION_FEE = 'ONE_TIME_ENCRYPTION_FEE',
+  INVITATION_FEE = 'INVITATION_FEE',
+}
+
+export interface Fee {
+  type: FeeType
+  amount: MoneyAmount
 }
 
 export interface ExchangeEvent {
@@ -22,6 +33,7 @@ export interface ExchangeEvent {
   inValue: number
   inSymbol: string
   hash: string
+  fees: Fee[]
 }
 
 export interface TransferEvent {
@@ -33,6 +45,7 @@ export interface TransferEvent {
   comment: string
   symbol: string
   hash: string
+  fees: Fee[]
 }
 
 export type EventInterface = ExchangeEvent | TransferEvent
@@ -47,9 +60,11 @@ export interface EventArgs {
   offset?: number
 }
 
+export type Token = 'cUSD' | 'cGLD'
+
 export interface TokenTransactionArgs {
   address: string
-  token: 'cUSD' | 'cGLD'
+  token: Token
   localCurrencyCode: string
 }
 
@@ -74,32 +89,6 @@ export interface MoneyAmount {
 }
 
 export const typeDefs = gql`
-  union Event = Exchange | Transfer
-
-  type Exchange {
-    type: String!
-    # TODO(kamyar): Graphql currently does not support 64-bit int
-    timestamp: Float!
-    block: Int!
-    outValue: Float!
-    outSymbol: String!
-    inValue: Float!
-    inSymbol: String!
-    hash: String!
-  }
-
-  type Transfer {
-    type: String!
-    # TODO(kamyar): Graphql currently does not support 64-bit int
-    timestamp: Float!
-    block: Int!
-    value: Float!
-    address: String!
-    comment: String
-    symbol: String!
-    hash: String!
-  }
-
   type ExchangeRate {
     rate: Decimal!
   }
@@ -126,6 +115,13 @@ export const typeDefs = gql`
     cGLD
   }
 
+  enum FeeType {
+    SECURITY_FEE
+    GATEWAY_FEE
+    ONE_TIME_ENCRYPTION_FEE
+    INVITATION_FEE
+  }
+
   type MoneyAmount {
     value: Decimal!
     currencyCode: String!
@@ -138,6 +134,11 @@ export const typeDefs = gql`
     exchangeRate: Decimal!
   }
 
+  type Fee {
+    type: FeeType!
+    amount: MoneyAmount!
+  }
+
   enum TokenTransactionType {
     EXCHANGE
     RECEIVED
@@ -145,7 +146,6 @@ export const typeDefs = gql`
     ESCROW_SENT
     ESCROW_RECEIVED
     FAUCET
-    VERIFICATION_REWARD
     VERIFICATION_FEE
     INVITE_SENT
     INVITE_RECEIVED
@@ -160,6 +160,7 @@ export const typeDefs = gql`
     # signed amount (+/-)
     amount: MoneyAmount!
     hash: String!
+    fees: [Fee]
   }
 
   type TokenTransfer implements TokenTransaction {
@@ -172,6 +173,7 @@ export const typeDefs = gql`
     comment: String
     token: Token!
     hash: String!
+    fees: [Fee]
   }
 
   type TokenExchange implements TokenTransaction {
@@ -183,6 +185,7 @@ export const typeDefs = gql`
     takerAmount: MoneyAmount!
     makerAmount: MoneyAmount!
     hash: String!
+    fees: [Fee]
   }
 
   type TokenTransactionConnection {
@@ -203,15 +206,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    rewards(
-      address: String!
-      sort: String
-      startblock: Int
-      endblock: Int
-      page: Int
-      offset: Int
-    ): [Transfer]
-
     tokenTransactions(
       address: Address!
       token: Token!
@@ -238,9 +232,6 @@ interface Context {
 
 export const resolvers = {
   Query: {
-    rewards: async (_source: any, args: EventArgs, { dataSources }: Context) => {
-      return dataSources.blockscoutAPI.getFeedRewards(args)
-    },
     tokenTransactions: async (_source: any, args: TokenTransactionArgs, context: Context) => {
       const { dataSources } = context
       context.localCurrencyCode = args.localCurrencyCode
@@ -268,26 +259,6 @@ export const resolvers = {
       return { rate: rate.toNumber() }
     },
   },
-  // TODO(kamyar):  see the comment about union causing problems
-  Event: {
-    __resolveType(obj: EventInterface, context: any, info: any) {
-      if (obj.type === EventTypes.EXCHANGE) {
-        return 'Exchange'
-      }
-      if (
-        obj.type === EventTypes.RECEIVED ||
-        obj.type === EventTypes.ESCROW_RECEIVED ||
-        obj.type === EventTypes.ESCROW_SENT ||
-        obj.type === EventTypes.SENT ||
-        obj.type === EventTypes.FAUCET ||
-        obj.type === EventTypes.VERIFICATION_FEE ||
-        obj.type === EventTypes.VERIFICATION_REWARD
-      ) {
-        return 'Transfer'
-      }
-      return null
-    },
-  },
   TokenTransaction: {
     __resolveType(obj: EventInterface, context: any, info: any) {
       if (obj.type === EventTypes.EXCHANGE) {
@@ -299,8 +270,7 @@ export const resolvers = {
         obj.type === EventTypes.ESCROW_SENT ||
         obj.type === EventTypes.SENT ||
         obj.type === EventTypes.FAUCET ||
-        obj.type === EventTypes.VERIFICATION_FEE ||
-        obj.type === EventTypes.VERIFICATION_REWARD
+        obj.type === EventTypes.VERIFICATION_FEE
       ) {
         return 'TokenTransfer'
       }
