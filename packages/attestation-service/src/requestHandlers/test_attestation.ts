@@ -8,8 +8,6 @@ import { ErrorMessages, respondWithAttestation, respondWithError } from '../requ
 import { startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
 
-export { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
-
 export async function handleTestAttestationRequest(
   _req: express.Request,
   res: express.Response,

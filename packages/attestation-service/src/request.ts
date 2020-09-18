@@ -1,4 +1,4 @@
-import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
+import { AttestationResponseType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
@@ -15,43 +15,6 @@ export enum ErrorMessages {
   NODE_IS_SYNCING = 'Full node is not synced',
   NODE_IS_STUCK = 'Full node is not up to date',
 }
-
-export const AttestationRequestType = t.type({
-  phoneNumber: E164PhoneNumberType,
-  account: AddressType,
-  issuer: AddressType,
-  // io-ts way of defining optional key-value pair
-  salt: t.union([t.undefined, SaltType]),
-  smsRetrieverAppSig: t.union([t.undefined, t.string]),
-})
-
-export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
-
-export const AttestationResponseType = t.type({
-  // Always returned in 1.0.x
-  success: t.boolean,
-
-  // Returned for errors in 1.0.x
-  error: t.union([t.undefined, t.string]),
-  errors: t.union([t.undefined, t.string]),
-
-  // Returned for successful send in 1.0.x
-  provider: t.union([t.undefined, t.string]),
-
-  // New fields
-  identifier: t.union([t.undefined, t.string]),
-  account: t.union([t.undefined, AddressType]),
-  issuer: t.union([t.undefined, AddressType]),
-  status: t.union([t.undefined, t.string]),
-  attempt: t.union([t.undefined, t.number]),
-  countryCode: t.union([t.undefined, t.string]),
-
-  // Only used by test endpoint to return randomly generated salt.
-  // Never return a user-supplied salt.
-  salt: t.union([t.undefined, t.string]),
-})
-
-export type AttestationResponse = t.TypeOf<typeof AttestationResponseType>
 
 export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {
   return (req: express.Request, res: Response) => {

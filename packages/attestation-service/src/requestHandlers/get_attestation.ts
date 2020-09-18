@@ -1,8 +1,7 @@
 import { PhoneNumberUtils } from '@celo/utils'
-import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
+import { GetAttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
-import * as t from 'io-ts'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger } from '../db'
 import { AttestationKey } from '../models/attestation'
 import { respondWithAttestation, respondWithError } from '../request'
@@ -10,16 +9,6 @@ import { obfuscateNumber } from '../sms/base'
 
 export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
-
-export const GetAttestationRequestType = t.type({
-  phoneNumber: E164PhoneNumberType,
-  account: AddressType,
-  issuer: AddressType,
-  // io-ts way of defining optional key-value pair
-  salt: t.union([t.undefined, SaltType]),
-})
-
-export type GetAttestationRequest = t.TypeOf<typeof GetAttestationRequestType>
 
 function obfuscateGetAttestationRequest(getRequest: GetAttestationRequest) {
   const obfuscatedRequest = { ...getRequest }

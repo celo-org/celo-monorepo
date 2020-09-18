@@ -1,4 +1,8 @@
-import { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
+import {
+  AttestationRequestType,
+  AttestationServiceTestRequestType,
+  GetAttestationRequestType,
+} from '@celo/utils/lib/io'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
@@ -6,18 +10,10 @@ import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit, verifyConfigurationAndGetURL } from './db'
 import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
 import { rootLogger } from './logger'
-import {
-  asyncHandler,
-  AttestationRequestType,
-  createValidatedHandler,
-  loggerMiddleware,
-} from './request'
+import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
 import { handleAttestationRequest } from './requestHandlers/attestation'
 import { handleAttestationDeliveryStatus } from './requestHandlers/delivery'
-import {
-  GetAttestationRequestType,
-  handleGetAttestationRequest,
-} from './requestHandlers/get_attestation'
+import { handleGetAttestationRequest } from './requestHandlers/get_attestation'
 import { handleLivenessRequest } from './requestHandlers/liveness'
 import { handleStatusRequest, StatusRequestType } from './requestHandlers/status'
 import { handleTestAttestationRequest } from './requestHandlers/test_attestation'

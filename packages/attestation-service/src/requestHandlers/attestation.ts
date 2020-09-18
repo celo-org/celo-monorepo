@@ -1,6 +1,7 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
+import { AttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
@@ -8,7 +9,7 @@ import { findAttestationByKey, kit, makeSequelizeLogger, SequelizeLogger } from 
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationStatus } from '../models/attestation'
-import { AttestationRequest, respondWithAttestation, respondWithError, Response } from '../request'
+import { respondWithAttestation, respondWithError, Response } from '../request'
 import { startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
 
