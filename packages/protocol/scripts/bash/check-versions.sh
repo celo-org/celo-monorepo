@@ -7,19 +7,16 @@ set -euo pipefail
 # Flags:
 # -a: Old branch containing smart contracts, which has likely been released.
 # -b: New branch containing smart contracts, on which version numbers may be updated.
-# -n: The network to deploy to.
 # -r: Path that the contract compatibility report should be written to.
 
 BRANCH_1=""
 BRANCH_2=""
-NETWORK=""
 REPORT=""
 
-while getopts 'a:b:n:r:' flag; do
+while getopts 'a:b:r:' flag; do
   case "${flag}" in
     a) BRANCH_1="${OPTARG}" ;;
     b) BRANCH_2="${OPTARG}" ;;
-    n) NETWORK="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
