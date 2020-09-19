@@ -9,17 +9,21 @@ set -euo pipefail
 # -b: Branch containing smart contracts that are proposed to be deployed.
 # -n: The network to check
 # -p: The proposal JSON file
+# -f: Boolean flag to indicate if the Forno service should be used to connect to
+# the network
 # libraries were proxied. TODO: remove this in the future.
 
 BRANCH=""
 NETWORK=""
 PROPOSAL=""
+FORNO=""
 
-while getopts 'b:n:p:' flag; do
+while getopts 'b:n:p:f' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     p) PROPOSAL="${OPTARG}" ;;
+    f) FORNO="--forno" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -39,4 +43,4 @@ mv build/contracts $BUILD_DIR
 git checkout -
 
 yarn build
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal "../../$PROPOSAL"
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal "../../$PROPOSAL" $FORNO
