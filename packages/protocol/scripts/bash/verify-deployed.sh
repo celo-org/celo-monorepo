@@ -8,9 +8,10 @@ set -euo pipefail
 # -b: Branch containing smart contracts that currently comprise the Celo protocol
 # -n: The network to check
 # -r: Boolean flag to indicate if this is the first release (before linked
+#     libraries were proxied)
+#     TODO: remove -r in the future.
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 # the network
-# libraries were proxied. TODO: remove this in the future.
 
 BRANCH=""
 NETWORK=""

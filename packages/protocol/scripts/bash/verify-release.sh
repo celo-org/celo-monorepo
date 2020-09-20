@@ -11,7 +11,6 @@ set -euo pipefail
 # -p: The proposal JSON file
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 # the network
-# libraries were proxied. TODO: remove this in the future.
 
 BRANCH=""
 NETWORK=""
