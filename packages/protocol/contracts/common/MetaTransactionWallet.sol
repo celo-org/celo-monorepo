@@ -40,7 +40,7 @@ contract MetaTransactionWallet is
     address indexed destination,
     uint256 value,
     bytes data,
-    uint256 nonce,
+    uint256 indexed nonce,
     bytes returnData
   );
 
