@@ -69,7 +69,7 @@ function useAsyncShowError<R, Args extends any[]>(
     // Generic error banner
     if (asyncResult.error) {
       Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-      const errMsg = asyncResult.error.message.includes('insufficientBalance')
+      const errMsg = asyncResult.error.message?.includes('insufficientBalance')
         ? ErrorMessages.INSUFFICIENT_BALANCE
         : ErrorMessages.CALCULATE_FEE_FAILED
       dispatch(showError(errMsg))

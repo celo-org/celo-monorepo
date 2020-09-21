@@ -8,7 +8,7 @@ import {
   e164NumberToAddressSelector,
   E164NumberToAddressType,
 } from 'src/identity/reducer'
-import { navigate, replace } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { urlFromUriData } from 'src/qrcode/schema'
 import { BarcodeTypes } from 'src/qrcode/utils'
@@ -188,7 +188,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch(qrAction)
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
       .silentRun()
-    expect(replace).toHaveBeenCalledWith(Screens.SendConfirmation, {
+    expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })
@@ -212,7 +212,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch(qrAction)
       .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
       .silentRun()
-    expect(replace).toHaveBeenCalledWith(Screens.PaymentRequestConfirmation, {
+    expect(navigate).toHaveBeenCalledWith(Screens.PaymentRequestConfirmation, {
       transactionData: mockTransactionData,
       addressJustValidated: true,
     })
@@ -235,6 +235,6 @@ describe(watchQrCodeDetections, () => {
       .dispatch(qrAction)
       .put(showMessage(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
       .silentRun()
-    expect(replace).not.toHaveBeenCalled()
+    expect(navigate).not.toHaveBeenCalled()
   })
 })
