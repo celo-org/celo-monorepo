@@ -50,7 +50,7 @@ export default function CodeInput({
   testID,
   style,
 }: Props) {
-  const clipboardContent = useClipboard()
+  const [shouldShowPasteForced, clipboardContent] = useClipboard()
 
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
@@ -58,6 +58,9 @@ export default function CodeInput({
   }, [status === CodeInputStatus.INPUTTING])
 
   function shouldShowClipboardInternal(clipboard: string) {
+    if (shouldShowPasteForced) {
+      return true
+    }
     return (
       !inputValue.toLowerCase().startsWith(clipboard.toLowerCase()) &&
       shouldShowClipboard(clipboard)

@@ -1,4 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Clipboard from '@react-native-community/clipboard'
 import React, { useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation } from 'react-native'
@@ -22,8 +23,8 @@ export default function ClipboardAwarePasteButton({
     LayoutAnimation.easeInEaseOut()
   }, [isVisible])
 
-  function onPressInternal() {
-    onPress(clipboardContent)
+  async function onPressInternal() {
+    onPress(clipboardContent || (await Clipboard.getString()))
   }
 
   if (!isVisible) {
