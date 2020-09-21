@@ -45,7 +45,7 @@ const SOCIAL_MENU = [
   {
     name: 'Blog',
     link: CeloLinks.mediumPublication,
-    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} />,
+    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} wrapWithLink={false} />,
   },
   {
     name: 'GitHub',
