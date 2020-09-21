@@ -46,10 +46,9 @@ contract('MultiSig', (accounts: any) => {
   })
 
   describe('fallback function', () => {
-    const value = 100
-
     describe('when receiving celo', () => {
       it('emits Deposit event with correct parameters', async () => {
+        const value = 100
         // @ts-ignore
         const res = await multiSig.send(value)
         assertLogMatches2(res.logs[0], {
