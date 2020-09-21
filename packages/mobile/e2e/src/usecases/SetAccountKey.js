@@ -18,7 +18,7 @@ export default SetAccountKey = () => {
       await element(by.id('Education/progressButton')).tap()
     }
 
-    const attributes = await element(by.id('accountKeyWords')).getAttributes()
+    const attributes = await element(by.id('AccountKeyWords')).getAttributes()
     const accountKey = attributes.text
 
     await element(by.id('backupKeySavedSwitch')).longPress()

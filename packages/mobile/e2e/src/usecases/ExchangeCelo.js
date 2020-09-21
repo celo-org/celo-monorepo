@@ -1,13 +1,13 @@
 import { enterPinUiIfNecessary } from '../utils/utils'
 import { DEFAULT_RECIPIENT_ADDRESS } from '../utils/consts'
-import { celoOnboarding } from '../utils/celoOnboarding'
+import { celoEducation } from '../utils/celoEducation'
 
 const CELO_TO_EXCHANGE = 1.1
 const CELO_TO_SEND = '0.001'
 
 export default ExchangeCelo = () => {
-  it('Go to CELO screen and through onboarding', async () => {
-    await celoOnboarding()
+  it('Go to CELO screen and through education flow', async () => {
+    await celoEducation()
   })
 
   it('Buy CELO', async () => {

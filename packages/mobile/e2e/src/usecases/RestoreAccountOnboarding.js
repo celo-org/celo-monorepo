@@ -5,7 +5,7 @@ const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
 
-export default Onboarding = () => {
+export default RestoreAccountOnboarding = () => {
   // Language is auto selected if it matches one of the available locale
   // it('Language', async () => {
   //   await element(by.id('ChooseLanguage/en-US')).tap()

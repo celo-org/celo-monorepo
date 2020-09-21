@@ -1,9 +1,9 @@
 import { sleep } from '../utils/utils'
-import { celoOnboarding } from '../utils/celoOnboarding'
+import { celoEducation } from '../utils/celoEducation'
 
 export default NewAccountCeloScreen = () => {
-  it('Go to CELO screen and through onboarding', async () => {
-    await celoOnboarding()
+  it('Go to CELO screen and through education flow', async () => {
+    await celoEducation()
   })
 
   it('Buy CELO button not visible', async () => {

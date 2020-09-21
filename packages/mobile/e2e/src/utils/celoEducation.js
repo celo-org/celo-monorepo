@@ -1,6 +1,6 @@
 import { isElementVisible } from './utils'
 
-export const celoOnboarding = async () => {
+export const celoEducation = async () => {
   await element(by.id('Hamburguer')).tap()
   await element(by.id('DrawerItem/CELO')).tap()
 
