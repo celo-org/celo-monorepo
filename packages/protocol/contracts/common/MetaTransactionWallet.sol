@@ -146,7 +146,7 @@ contract MetaTransactionWallet is
     bytes32 s
   ) public view returns (address) {
     bytes32 digest = getMetaTransactionDigest(destination, value, data, _nonce);
-    return Signatures.getSignerOfMessageHash(digest, v, r, s);
+    return Signatures.getSignerOfTypedDataHash(digest, v, r, s);
   }
 
   /**

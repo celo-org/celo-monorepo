@@ -49,4 +49,26 @@ library Signatures {
     bytes32 prefixedHash = ECDSA.toEthSignedMessageHash(messageHash);
     return ECDSA.recover(prefixedHash, signature);
   }
+
+  /**
+  * @notice Given a message hash, returns the signer of the address.
+  * @param typedDataHash The digest of the type data
+  * @param v The recovery id of the incoming ECDSA signature.
+  * @param r Output value r of the ECDSA signature.
+  * @param s Output value s of the ECDSA signature.
+  */
+  function getSignerOfTypedDataHash(bytes32 typedDataHash, uint8 v, bytes32 r, bytes32 s)
+    public
+    pure
+    returns (address)
+  {
+    bytes memory signature = new bytes(65);
+    // Concatenate (r, s, v) into signature.
+    assembly {
+      mstore(add(signature, 32), r)
+      mstore(add(signature, 64), s)
+      mstore8(add(signature, 96), v)
+    }
+    return ECDSA.recover(typedDataHash, signature);
+  }
 }
