@@ -22,12 +22,12 @@ export function configPath(configDir: string) {
 
 export function readConfig(configDir: string): CeloConfig {
   if (fs.pathExistsSync(configPath(configDir))) {
-    var existingJSON = fs.readJSONSync(configPath(configDir))
-    var jsonCombined = Object.assign({}, existingJSON, defaultConfig)
-    if (jsonCombined.hasOwnProperty('nodeUrl')) {
-      jsonCombined['node'] = jsonCombined['nodeUrl']
+    var existingConfig = fs.readJSONSync(configPath(configDir))
+    var combinedConfig = Object.assign({}, existingConfig, defaultConfig)
+    if (combinedConfig.hasOwnProperty('nodeUrl')) {
+      combinedConfig['node'] = combinedConfig['nodeUrl']
     }
-    return jsonCombined
+    return combinedConfig
   } else {
     return defaultConfig
   }
