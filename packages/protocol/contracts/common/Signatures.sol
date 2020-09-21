@@ -51,17 +51,34 @@ library Signatures {
   }
 
   /**
-  * @notice Given a message hash, returns the signer of the address.
-  * @param typedDataHash The digest of the type data
+  * @notice Given a domain separator and a structHash, construct the typed data hash
+  * @param eip712DomainSeparator Context specific domain separator
+  * @param structHash hash of the typed data struct
+  * @return The EIP712 singed typed data hash
+  */
+  function toEthSignedTypedDataHash(bytes32 eip712DomainSeparator, bytes32 structHash)
+    public
+    pure
+    returns (bytes32)
+  {
+    return keccak256(abi.encodePacked("\x19\x01", eip712DomainSeparator, structHash));
+  }
+
+  /**
+  * @notice Given a domain separator and a structHash and a signature return the signer
+  * @param eip712DomainSeparator Context specific domain separator
+  * @param structHash hash of the typed data struct
   * @param v The recovery id of the incoming ECDSA signature.
   * @param r Output value r of the ECDSA signature.
   * @param s Output value s of the ECDSA signature.
   */
-  function getSignerOfTypedDataHash(bytes32 typedDataHash, uint8 v, bytes32 r, bytes32 s)
-    public
-    pure
-    returns (address)
-  {
+  function getSignerOfTypedDataHash(
+    bytes32 eip712DomainSeparator,
+    bytes32 structHash,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public pure returns (address) {
     bytes memory signature = new bytes(65);
     // Concatenate (r, s, v) into signature.
     assembly {
@@ -69,6 +86,7 @@ library Signatures {
       mstore(add(signature, 64), s)
       mstore8(add(signature, 96), v)
     }
-    return ECDSA.recover(typedDataHash, signature);
+    bytes32 prefixedHash = toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
+    return ECDSA.recover(prefixedHash, signature);
   }
 }
