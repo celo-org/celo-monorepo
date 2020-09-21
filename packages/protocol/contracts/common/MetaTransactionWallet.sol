@@ -56,6 +56,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function initialize(address _signer) external initializer {
+    _transferOwnership(msg.sender);
     setSigner(_signer);
     setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
