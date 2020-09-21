@@ -289,47 +289,54 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       const value = 100
       let transactions: any[]
       beforeEach(async () => {
-        transactions = []
-        // CELO transfer
-        transactions.push({
-          destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
-          value,
-          data: '0x',
-        })
-        // No-op transfer ownership
-        transactions.push({
-          destination: wallet.address,
-          value: 0,
-          // @ts-ignore
-          data: wallet.contract.methods.transferOwnership(wallet.address).encodeABI(),
-        })
-        // CELO transfer
-        transactions.push({
-          destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
-          value,
-          data: '0x',
-        })
-        // view signer (to test return values)
-        transactions.push({
-          destination: wallet.address,
-          value: 0,
-          // @ts-ignore
-          data: wallet.contract.methods.signer().encodeABI(),
-        })
-        // view isOwner (to test return values)
-        transactions.push({
-          destination: wallet.address,
-          value: 0,
-          // @ts-ignore
-          data: wallet.contract.methods.isOwner().encodeABI(),
-        })
-        // Change signer
-        transactions.push({
-          destination: wallet.address,
-          value: 0,
-          // @ts-ignore
-          data: wallet.contract.methods.setSigner(nonSigner).encodeABI(),
-        })
+        transactions = [
+          // CELO transfer
+          {
+            destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
+            value,
+            data: '0x',
+          },
+
+          // No-op transfer ownership
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.transferOwnership(wallet.address).encodeABI(),
+          },
+
+          // CELO transfer
+          {
+            destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
+            value,
+            data: '0x',
+          },
+
+          // view signer (to test return values)
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.signer().encodeABI(),
+          },
+
+          // view isOwner (to test return values)
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.isOwner().encodeABI(),
+          },
+
+          // Change signer
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.setSigner(nonSigner).encodeABI(),
+          },
+        ]
+
         await web3.eth.sendTransaction({
           from: accounts[0],
           to: wallet.address,
@@ -364,6 +371,8 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           it('returns the proper values', async () => {
             const boolTrue: string = '01'
             const signerAddrReturned: string = trimLeading0x(signer).toLowerCase()
+            const viewSignerTxIndex: number = 3
+            const isSignerTxIndex: number = 4
             const returnValues = await wallet.executeTransactions.call(
               transactions.map((t) => t.destination),
               transactions.map((t) => t.value),
@@ -378,8 +387,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
               `0x${signerAddrReturned.padStart(64, '0')}${boolTrue.padStart(64, '0')}`
             )
             for (let i in returnValues[1]) {
-              // tx's with index 3 and 4 have return values
-              if (parseInt(i) == 3 || parseInt(i) == 4) {
+              if (parseInt(i) == viewSignerTxIndex || parseInt(i) == isSignerTxIndex) {
                 assert.equal(web3.utils.hexToNumber(returnValues[1][i]), 32)
               } else {
                 assert.equal(web3.utils.hexToNumber(returnValues[1][i]), 0)
