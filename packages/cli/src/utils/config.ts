@@ -22,9 +22,10 @@ export function configPath(configDir: string) {
 
 export function readConfig(configDir: string): CeloConfig {
   if (fs.pathExistsSync(configPath(configDir))) {
-    var existingConfig = fs.readJSONSync(configPath(configDir))
-    var combinedConfig = Object.assign({}, existingConfig, defaultConfig)
+    const existingConfig = fs.readJSONSync(configPath(configDir))
+    const combinedConfig = { ...existingConfig, ...defaultConfig }
     if (combinedConfig.hasOwnProperty('nodeUrl')) {
+      /* tslint:disable:no-string-literal */
       combinedConfig['node'] = combinedConfig['nodeUrl']
     }
     return combinedConfig
