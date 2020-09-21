@@ -6,26 +6,28 @@ import { GasOptions } from '../base'
 
 export interface CeloConfig {
   node: string
-  // nodeUrl: string
   gasCurrency: GasOptions
 }
 
 export const defaultConfig: CeloConfig = {
   node: 'http://localhost:8545',
-  // nodeUrl: 'http://localhost:8545',
   gasCurrency: 'auto' as GasOptions,
 }
 
 const configFile = 'config.json'
 
 export function configPath(configDir: string) {
-  console.log('testing: ', configDir, configFile)
   return path.join(configDir, configFile)
 }
 
 export function readConfig(configDir: string): CeloConfig {
   if (fs.pathExistsSync(configPath(configDir))) {
-    return fs.readJSONSync(configPath(configDir))
+    var existingJSON = fs.readJSONSync(configPath(configDir))
+    var jsonCombined = Object.assign({}, existingJSON, defaultConfig)
+    if (jsonCombined.hasOwnProperty('nodeUrl')) {
+      jsonCombined['node'] = jsonCombined['nodeUrl']
+    }
+    return jsonCombined
   } else {
     return defaultConfig
   }
@@ -33,7 +35,6 @@ export function readConfig(configDir: string): CeloConfig {
 
 export function getNodeUrl(configDir: string): string {
   return readConfig(configDir).node
-  // return readConfig(configDir).nodeUrl
 }
 
 export function getGasCurrency(configDir: string): GasOptions {
