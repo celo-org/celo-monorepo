@@ -18,15 +18,17 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
-type Props = (
+type OwnProps =
   | {
       nextScreen: keyof StackParamList
       onSkip?: () => void
     }
-  | { onSkip: () => void }
-) &
-  StateProps &
-  DispatchProps
+  | {
+      nextScreen?: keyof StackParamList
+      onSkip: () => void
+    }
+
+type Props = OwnProps & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
