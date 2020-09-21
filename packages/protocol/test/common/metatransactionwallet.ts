@@ -369,10 +369,11 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
 
           it('returns the proper values', async () => {
-            const boolTrue: string = '01'
+            const boolTrueReturned: string = '01'
             const signerAddrReturned: string = trimLeading0x(signer).toLowerCase()
             const viewSignerTxIndex: number = 3
-            const isSignerTxIndex: number = 4
+            const isOwnerTxIndex: number = 4
+
             const returnValues = await wallet.executeTransactions.call(
               transactions.map((t) => t.destination),
               transactions.map((t) => t.value),
@@ -383,11 +384,11 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
             assert.equal(
               returnValues[0],
-              // return values are padded to equal 32 bytes
-              `0x${signerAddrReturned.padStart(64, '0')}${boolTrue.padStart(64, '0')}`
+              // return values are padded to have a length of 32 bytes
+              `0x${signerAddrReturned.padStart(64, '0')}${boolTrueReturned.padStart(64, '0')}`
             )
-            for (let i in returnValues[1]) {
-              if (parseInt(i) == viewSignerTxIndex || parseInt(i) == isSignerTxIndex) {
+            for (const i of returnValues[1].keys()) {
+              if (i === viewSignerTxIndex || i === isOwnerTxIndex) {
                 assert.equal(web3.utils.hexToNumber(returnValues[1][i]), 32)
               } else {
                 assert.equal(web3.utils.hexToNumber(returnValues[1][i]), 0)
@@ -410,7 +411,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
         })
 
-        describe('dataLengths has erroneous lengths', () => {
+        describe('when dataLengths has erroneous lengths', () => {
           it('reverts', async () => {
             await assertRevert(
               wallet.executeTransactions(
