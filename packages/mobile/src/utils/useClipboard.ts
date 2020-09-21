@@ -6,7 +6,7 @@ import Logger from 'src/utils/Logger'
 const CLIPBOARD_CHECK_INTERVAL = 1000 // 1sec
 
 export function useClipboard(): [boolean, string] {
-  const [shouldShowPasteForced, setShouldShowPasteForced] = useState(false)
+  const [forceShowingPasteIcon, setForceShowingPasteIcon] = useState(false)
   const [clipboardContent, setClipboardContent] = useState('')
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export function useClipboard(): [boolean, string] {
       try {
         const majorVersionIOS = parseInt(Platform.Version.toString(), 10)
         if (Platform.OS === 'ios' && majorVersionIOS >= 14) {
-          setShouldShowPasteForced(await Clipboard.hasString())
+          setForceShowingPasteIcon(await Clipboard.hasString())
           return
         }
 
@@ -46,5 +46,5 @@ export function useClipboard(): [boolean, string] {
     }
   }, [])
 
-  return [shouldShowPasteForced, clipboardContent]
+  return [forceShowingPasteIcon, clipboardContent]
 }
