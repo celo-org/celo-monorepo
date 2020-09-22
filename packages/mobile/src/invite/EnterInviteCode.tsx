@@ -20,7 +20,7 @@ import {
   extractInviteCodeAndPrivateKey,
   extractValuesFromDeepLink,
 } from 'src/invite/utils'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'

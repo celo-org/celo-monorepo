@@ -14,7 +14,7 @@ import { connect, useDispatch } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
@@ -24,7 +24,7 @@ import {
   CodeInputType,
   NUM_ATTESTATIONS_REQUIRED,
 } from 'src/identity/verification'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'

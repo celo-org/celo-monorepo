@@ -15,7 +15,7 @@ import { Animated, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
-import CancelButton from 'src/components/CancelButton.v2'
+import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import { Namespaces } from 'src/i18n'
 import { cancelVerification, startVerification } from 'src/identity/actions'
@@ -26,7 +26,7 @@ import {
   verificationEducation3,
   verificationEducation4,
 } from 'src/images/Images'
-import { noHeaderGestureDisabled } from 'src/navigator/Headers.v2'
+import { noHeaderGestureDisabled } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'

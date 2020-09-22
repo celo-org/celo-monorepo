@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { EncryptionFeeIcon, ExchangeFeeIcon, SecurityFeeIcon } from 'src/components/FeeIcon'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import LineItemRow from 'src/components/LineItemRow'
 import { Namespaces } from 'src/i18n'
 
 interface Props {
