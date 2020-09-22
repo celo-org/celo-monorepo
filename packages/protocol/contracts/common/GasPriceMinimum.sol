@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./CalledByVm.sol";
 import "./Initializable.sol";
+import "./interfaces/ICeloVersionedContract.sol";
 import "./FixidityLib.sol";
 import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
@@ -12,7 +13,13 @@ import "../stability/interfaces/ISortedOracles.sol";
 /**
  * @title Stores and provides gas price minimum for various currencies.
  */
-contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
+contract GasPriceMinimum is
+  ICeloVersionedContract,
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  CalledByVm
+{
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -29,6 +36,14 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
 
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
