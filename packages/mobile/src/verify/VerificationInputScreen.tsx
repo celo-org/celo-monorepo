@@ -1,5 +1,6 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
@@ -17,7 +18,11 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import {
+  cancelVerification,
+  receiveAttestationMessage,
+  reRevealActionableAttestations,
+} from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
@@ -49,6 +54,7 @@ interface StateProps {
 interface DispatchProps {
   cancelVerification: typeof cancelVerification
   receiveAttestationMessage: typeof receiveAttestationMessage
+  reRevealActionableAttestations: typeof reRevealActionableAttestations
   hideAlert: typeof hideAlert
 }
 
@@ -65,6 +71,7 @@ interface State {
 const mapDispatchToProps = {
   cancelVerification,
   receiveAttestationMessage,
+  reRevealActionableAttestations,
   hideAlert,
 }
 
@@ -206,6 +213,10 @@ class VerificationInputScreen extends React.Component<Props, State> {
     navigateHome()
   }
 
+  onPressResend = () => {
+    this.props.reRevealActionableAttestations()
+  }
+
   render() {
     const {
       codeInputValues,
@@ -257,6 +268,13 @@ class VerificationInputScreen extends React.Component<Props, State> {
                         />
                       </View>
                     ))}
+                    <View style={styles.spacer} />
+                    <TextButton style={styles.resendButton} onPress={this.onPressResend}>
+                      {t(
+                        `verificationInput.resendMessages${numCompleteAttestations ? '' : '_all'}`,
+                        { count: NUM_ATTESTATIONS_REQUIRED - numCompleteAttestations }
+                      )}
+                    </TextButton>
                   </KeyboardAwareScrollView>
                   <View style={styles.tipContainer} pointerEvents="none">
                     <View
@@ -324,6 +342,14 @@ const styles = StyleSheet.create({
     color: colors.light,
     paddingVertical: Spacing.Smallest8,
     paddingHorizontal: Spacing.Regular16,
+  },
+  resendButton: {
+    textAlign: 'center',
+    color: colors.onboardingBrownLight,
+    padding: Spacing.Regular16,
+  },
+  spacer: {
+    flex: 1,
   },
 })
 

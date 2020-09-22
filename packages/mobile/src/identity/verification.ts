@@ -243,16 +243,12 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
 
       yield put(setVerificationStatus(VerificationStatus.RevealingNumber))
       ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
-      yield all([
+      if (!withoutRevealing) {
         // Request codes for the attestations needed
-        call(
-          revealNeededAttestations,
-          attestationsWrapper,
-          account,
-          phoneHashDetails,
-          attestations,
-          withoutRevealing
-        ),
+        yield call(revealAttestations, attestationsWrapper, account, phoneHashDetails, attestations)
+      }
+      yield all([
+        call(completeAttestations, attestationsWrapper, account, phoneHashDetails, attestations),
         // Set acccount and data encryption key in Accounts contract
         // This is done in other places too, intentionally keeping it for more coverage
         call(registerAccountDek, account),
@@ -534,52 +530,100 @@ function* isCodeAlreadyAccepted(code: string) {
   return existingCodes.find((c) => c.code === code)
 }
 
-function* revealNeededAttestations(
+function* revealAttestations(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestations: ActionableAttestation[],
-  withoutRevealing: boolean = false
+  attestations: ActionableAttestation[]
 ) {
-  Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
-  const delayPeriod = 5000
+  Logger.debug(TAG + '@revealAttestations', `Revealing ${attestations.length} attestations`)
   let i = 0
+  const delayPeriod = 5000
+  for (const attestation of attestations) {
+    yield call(
+      revealAttestation,
+      attestationsWrapper,
+      account,
+      phoneHashDetails,
+      attestation,
+      // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
+      // when https://github.com/celo-org/celo-labs/issues/578 is resolved
+      // send messages with 5000ms delay on Android
+      Platform.OS === 'android' ? delayPeriod * i++ : 0
+    )
+  }
+}
+function* completeAttestations(
+  attestationsWrapper: AttestationsWrapper,
+  account: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  attestations: ActionableAttestation[]
+) {
+  Logger.debug(
+    TAG + '@completeNeededAttestations',
+    `Completing ${attestations.length} attestations`
+  )
   yield all(
     attestations.map((attestation) => {
-      return call(
-        revealAndCompleteAttestation,
-        attestationsWrapper,
-        account,
-        phoneHashDetails,
-        attestation,
-        withoutRevealing,
-        // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
-        // when https://github.com/celo-org/celo-labs/issues/578 is resolved
-        // send messages with 5000ms delay on Android
-        Platform.OS === 'android' ? delayPeriod * i++ : 0
-      )
+      return call(completeAttestation, attestationsWrapper, account, phoneHashDetails, attestation)
     })
   )
 }
 
-function* revealAndCompleteAttestation(
+export function* reRevealActionableAttestations() {
+  const contractKit = yield call(getContractKit)
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  const e164Number: string = yield select(e164NumberSelector)
+
+  const { phoneHashDetails }: VerificationState = yield select(verificationStateSelector)
+  const phoneHash = features.USE_PHONE_NUMBER_PRIVACY
+    ? phoneHashDetails.phoneHash
+    : getPhoneHash(e164Number)
+  const account: string = yield call(getConnectedUnlockedAccount)
+
+  const actionableAttestations: ActionableAttestation[] = yield call(
+    getActionableAttestations,
+    attestationsWrapper,
+    phoneHash,
+    account
+  )
+
+  yield call(
+    revealAttestations,
+    attestationsWrapper,
+    account,
+    phoneHashDetails,
+    actionableAttestations
+  )
+}
+
+function* revealAttestation(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
-  withoutRevealing: boolean = false,
   delayInMs: number = 0
 ) {
   const issuer = attestation.issuer
-  if (!withoutRevealing) {
-    if (delayInMs) {
-      Logger.debug(TAG + '@tryRevealPhoneNumber', `Delaying for: ${delayInMs}ms`)
-      yield delay(delayInMs)
-    }
-    ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
-    yield call(tryRevealPhoneNumber, attestationsWrapper, account, phoneHashDetails, attestation)
+  if (delayInMs) {
+    Logger.debug(TAG + '@tryRevealPhoneNumber', `Delaying for: ${delayInMs}ms`)
+    yield delay(delayInMs)
   }
+  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
+  yield call(tryRevealPhoneNumber, attestationsWrapper, account, phoneHashDetails, attestation)
+}
 
+function* completeAttestation(
+  attestationsWrapper: AttestationsWrapper,
+  account: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  attestation: ActionableAttestation
+) {
+  const issuer = attestation.issuer
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_start, {
     issuer,
   })

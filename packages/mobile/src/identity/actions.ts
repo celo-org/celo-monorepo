@@ -39,6 +39,7 @@ export enum Actions {
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
   FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
+  RE_REVEAL_ACTIONABLE_ATTESTATIONS = 'IDENTITY/RE_REVEAL_ACTIONABLE_ATTESTATIONS',
 }
 
 export interface StartVerificationAction {
@@ -186,6 +187,10 @@ export interface UpdateVerificationState {
   state: UpdatableVerificationState
 }
 
+export interface ReRevealActionableAttestations {
+  type: Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -213,6 +218,7 @@ export type ActionTypes =
   | UpdateAddressDekMapAction
   | FetchVerificationState
   | UpdateVerificationState
+  | ReRevealActionableAttestations
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -390,4 +396,8 @@ export const udpateVerificationState = (
 ): UpdateVerificationState => ({
   type: Actions.UPDATE_VERIFICATION_STATE,
   state,
+})
+
+export const reRevealActionableAttestations = (): ReRevealActionableAttestations => ({
+  type: Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS,
 })

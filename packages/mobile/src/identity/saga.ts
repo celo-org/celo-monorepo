@@ -21,7 +21,11 @@ import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/iden
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { fetchVerificationState, startVerification } from 'src/identity/verification'
+import {
+  fetchVerificationState,
+  reRevealActionableAttestations,
+  startVerification,
+} from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
@@ -92,6 +96,7 @@ function* watchVerification() {
   yield takeLatest(Actions.FETCH_VERIFICATION_STATE, fetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
   yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
+  yield takeLeading(Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS, reRevealActionableAttestations)
 }
 
 function* watchContactMapping() {

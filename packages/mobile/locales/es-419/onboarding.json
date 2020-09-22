@@ -51,8 +51,7 @@
     "doINeedToConfirm": "¿Necesito confirmar?",
     "skipForNow": "Saltar por ahora",
     "bodyInsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de verificación.\n\nIntenta nuevamente cuando hayas agregado fondos a tu app.",
-    "bodyAlreadyVerified": "¡Tu número ya está confirmado!",
-    "receivedCodes": "Ya recibí tres códigos"
+    "bodyAlreadyVerified": "¡Tu número ya está confirmado!"
   },
   "verificationSkipDialog": {
     "title": "Estas seguro",
@@ -83,7 +82,10 @@
     "codePlaceholder3": "Copia el tercer mensaje",
     "codePlaceholder3_ios": "Toca o copia el tercer mensaje",
     "codePlaceholderWithCodeInClipboard": "¡Excelente! Péguelo aquí",
-    "typingTip": "¿Mecanografía? Intenta copiar y pegar"
+    "typingTip": "¿Mecanografía? Intenta copiar y pegar",
+    "resendMessages": "Reenviar el último mensaje",
+    "resendMessages_plural": "Reenviar {{count}} mensajes",
+    "resendMessages_all": "Reenviar todos los mensajes"
   },
   "verificationInputHelpDialog": {
     "title": "Ayuda",
