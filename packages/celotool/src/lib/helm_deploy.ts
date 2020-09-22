@@ -857,7 +857,7 @@ export function makeHelmParameters(map: { [key: string]: string }) {
   return entries(map).map(([key, value]) => `--set ${key}=${value}`)
 }
 
-function setHelmArray(paramName: string, arr: any[]) {
+export function setHelmArray(paramName: string, arr: any[]) {
   return arr.map((value, i) => `--set ${paramName}[${i}]="${value}"`)
 }
 
