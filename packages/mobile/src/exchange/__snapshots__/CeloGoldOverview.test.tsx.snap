@@ -33,6 +33,7 @@ exports[`renders correctly when not ready 1`] = `
         "marginBottom": 8,
       }
     }
+    testID="CeloBalance"
   >
     <Text
       numberOfLines={1}
@@ -112,6 +113,7 @@ exports[`renders correctly when ready 1`] = `
         "marginBottom": 8,
       }
     }
+    testID="CeloBalance"
   >
     <Text
       numberOfLines={1}

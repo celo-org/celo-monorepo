@@ -16,6 +16,7 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 # -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
 # -d (Optional): Run in dev mode, which doesn't rebuild or reinstall the app and doesn't restart the packager.
+# -t (Optional): Run a specific test file only.
 
 PLATFORM=""
 VD_NAME="Pixel_API_29_AOSP_x86_64"
@@ -23,7 +24,8 @@ FAST=false
 RELEASE=false
 NET_DELAY="none"
 DEV_MODE=false
-while getopts 'p:frd' flag; do
+FILE_TO_RUN=""
+while getopts 'p:t:frd' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
@@ -31,6 +33,7 @@ while getopts 'p:frd' flag; do
     r) RELEASE=true ;;
     n) NET_DELAY="$OPTARG" ;;
     d) DEV_MODE=true ;;
+    t) FILE_TO_RUN=$OPTARG ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -80,16 +83,18 @@ preloadBundle() {
 runTest() {
   reuse_param=""
   if [[ $DEV_MODE == true ]]; then
+    export NUM_RETRIES=0
     reuse_param="--reuse"
   fi
   yarn detox test \
     --configuration $CONFIG_NAME \
+    "${FILE_TO_RUN}" \
     --artifacts-location e2e/artifacts \
     --take-screenshots=all \
     --record-logs=failing \
     --detectOpenHandles \
     --loglevel verbose \
-    "${reuse_param}"
+    "${reuse_param}" 
   TEST_STATUS=$?
 }
 
@@ -137,34 +142,36 @@ if [ $PLATFORM = "android" ]; then
     yarn detox build -c $CONFIG_NAME
 
     startPackager
-  fi
-  
-  NUM_DEVICES=`adb devices -l | wc -l`
-  if [ $NUM_DEVICES -gt 2 ]; then
-    echo "Emulator already running or device attached. Please shutdown / remove first"
-    exit 1
-  fi
 
-  echo "Starting the emulator"
-  $ANDROID_SDK_ROOT/emulator/emulator \
-    -avd $VD_NAME \
-    -no-boot-anim \
-    -noaudio \
-    -no-snapshot \
-    -netdelay $NET_DELAY \
-    ${CI:+-gpu swiftshader_indirect -no-window} \
-    &
+    NUM_DEVICES=`adb devices -l | wc -l`
+    if [ $NUM_DEVICES -gt 2 ]; then
+      echo "Emulator already running or device attached. Please shutdown / remove first"
+      exit 1
+    fi
 
-  echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
-  until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
-  do
-    sleep 3
-  done
+    echo "Starting the emulator"
+    $ANDROID_SDK_ROOT/emulator/emulator \
+      -avd $VD_NAME \
+      -no-boot-anim \
+      -noaudio \
+      -no-snapshot \
+      -netdelay $NET_DELAY \
+      ${CI:+-gpu swiftshader_indirect -no-window} \
+      &
+
+    echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
+    until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
+    do
+      sleep 3
+    done
+  fi
 
   runTest
 
-  echo "Closing emulator (if active)"
-  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+  if [ $DEV_MODE = false ]; then
+    echo "Closing emulator (if active)"
+    adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+  fi
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
