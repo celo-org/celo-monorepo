@@ -37,6 +37,7 @@ module "http_backends" {
   backend_max_requests_per_second = var.backend_max_requests_per_second
   celo_env = var.celo_env
   context_info = var.context_info_http
+  health_check_destination_port = 6000
   type = "http"
 }
 
@@ -46,6 +47,7 @@ module "ws_backends" {
   backend_max_requests_per_second = var.backend_max_requests_per_second
   celo_env = var.celo_env
   context_info = var.context_info_ws
+  health_check_destination_port = 6001
   type = "ws"
 }
 
@@ -112,6 +114,6 @@ resource "google_compute_firewall" "allow-health-check" {
 
   allow {
     protocol = "tcp"
-    ports    = ["8545", "8546"]
+    ports    = ["6000", "6001"]
   }
 }

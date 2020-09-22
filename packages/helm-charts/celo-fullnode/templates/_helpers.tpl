@@ -53,3 +53,20 @@ PUBLIC_IP=$(wget https://ipinfo.io/ip -O - -q)
 NAT_FLAG="--nat=extip:${PUBLIC_IP}"
 {{- end -}}
 {{- end -}}
+
+{{- define "celo-fullnode.health-checker-server" -}}
+- name: health-checker-server-{{ .protocol_name }}
+  image: tkporter/health-checker:test1
+  imagePullPolicy: IfNotPresent
+  args:
+  - --script=/health-check.sh
+  - --listener=0.0.0.0:{{ .server_port }}
+  - --port={{ .tcp_check_port }}
+  ports:
+  - name: health-check
+    containerPort: {{ .server_port }}
+  volumeMounts:
+  - name: health-check
+    mountPath: /health-check.sh
+    subPath: health-check.sh
+{{- end -}}

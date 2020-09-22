@@ -9,12 +9,19 @@ export const describe = 'deploy full nodes in a particular context'
 
 type FullNodeUpgradeArgv = UpgradeArgv &
   ContextArgv & {
+    createNeg: boolean
     reset: boolean
     staticNodes: boolean
   }
 
 export const builder = (argv: yargs.Argv) => {
   return addContextMiddleware(argv)
+    .option('createNeg', {
+      type: 'boolean',
+      description:
+        'When enabled, will create a network endpoint group for the full node http & ws ports. Only works for GCP.',
+      default: false,
+    })
     .option('reset', {
       type: 'boolean',
       description: 'when enabled, deletes the data volumes and redeploys the helm chart.',
@@ -30,5 +37,11 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: FullNodeUpgradeArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
-  await upgradeFullNodeChart(argv.celoEnv, argv.context, argv.reset, argv.staticNodes)
+  await upgradeFullNodeChart(
+    argv.celoEnv,
+    argv.context,
+    argv.reset,
+    argv.staticNodes,
+    argv.createNeg
+  )
 }

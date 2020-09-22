@@ -6,6 +6,7 @@ import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
 export interface GCPFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: GCPClusterConfig,
+  createNeg: boolean,
 }
 
 export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
@@ -15,6 +16,7 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
       `--set gcp=true`,
       `--set storage.storageClass=ssd`,
       `--set geth.public_ip_per_node='{${staticIps}}'`,
+      `--set geth.create_network_endpoint_group=${this.deploymentConfig.createNeg}`
     ]
   }
 

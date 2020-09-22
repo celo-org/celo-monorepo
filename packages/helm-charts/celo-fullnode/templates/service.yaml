@@ -52,7 +52,9 @@ metadata:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: celo-fullnode-rpc-traffic
   annotations:
+{{ if .Values.geth.create_network_endpoint_group }}
     cloud.google.com/neg: '{"exposed_ports": {"8545":{},"8546":{}}}'
+{{ end }}
 spec:
   type: ClusterIP
   ports:

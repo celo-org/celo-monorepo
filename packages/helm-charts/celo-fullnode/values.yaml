@@ -80,6 +80,7 @@ geth:
   use_static_ips: true
   readiness_probe_max_block_age_seconds: 30
   rpc_apis: eth,net,rpc,web3
+  create_network_endpoint_group: false
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:

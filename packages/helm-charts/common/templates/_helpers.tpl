@@ -193,30 +193,7 @@ release: {{ .Release.Name }}
       - /bin/sh
       - "-c"
       - |
-        # fail if any wgets fail
-        set -euo pipefail
-        RPC_URL=http://localhost:8545
-        # first check if it's syncing
-        SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
-        NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-        if [ ! $NOT_SYNCING ]; then
-          echo "Node is syncing: $SYNCING"
-          exit 1
-        fi
-
-        # then make sure that the latest block is new
-        MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
-        LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
-        BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-        BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
-        CURRENT_TIMESTAMP=$(date +%s)
-        BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
-        # if the most recent block is too old, then indicate the node is not ready
-        if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
-          echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
-          exit 1
-        fi
-        exit 0
+{{ include "common.node-health-check" . | indent 8 }}
     initialDelaySeconds: 20
     periodSeconds: 10
 {{- end }}
@@ -351,6 +328,33 @@ data:
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+{{- end -}}
+
+{{- define "common.node-health-check" -}}
+# fail if any wgets fail
+set -euo pipefail
+RPC_URL=http://localhost:8545
+# first check if it's syncing
+SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
+NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
+if [ ! $NOT_SYNCING ]; then
+  echo "Node is syncing: $SYNCING"
+  exit 1
+fi
+
+# then make sure that the latest block is new
+MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
+LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
+BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
+BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
+CURRENT_TIMESTAMP=$(date +%s)
+BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
+# if the most recent block is too old, then indicate the node is not ready
+if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
+  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
+  exit 1
+fi
+exit 0
 {{- end -}}
 
 {{- define "common.geth-exporter-container" -}}

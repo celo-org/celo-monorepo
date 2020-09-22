@@ -18,6 +18,11 @@ variable context_info {
   description = "Provides basic information on each context. Keys are contexts and values are the corresponding info"
 }
 
+variable health_check_destination_port {
+  type        = number
+  description = "The destination port the health check will test"
+}
+
 variable type {
   type        = string
   description = "Type of backends, only used for names"
