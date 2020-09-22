@@ -43,7 +43,12 @@ The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/
 
 ## Testing
 
-see [release.md](release.md)
+🧰 tools: `jest`, `@testing-library/react`
+
+✅ run tests with `yarn test`
+
+📸 update snapshots with `yarn test -u`
+
 
 #### Testing Strategy
 

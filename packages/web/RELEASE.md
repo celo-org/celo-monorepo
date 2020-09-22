@@ -1,10 +1,12 @@
+# Celo.org Releases
+
 ## Versioning
 
 n/a
 
 ## Identifying releases
 
-n/a
+identity by commit hash
 
 ## Build & Promotion process
 
@@ -26,7 +28,7 @@ Now from web package directory deploy to dev.celo.org with:
 
 `yarn run deploy:dev`
 
-to deploy to the `dev` environment, with similar commands for `staging` and `prod`
+to deploy to the `dev` environment, with similar commands for `stage` and `prod`
 
 #### dev vs staging
 
@@ -39,20 +41,15 @@ Use Dev for sending previews to stakeholders while developing new features.
 
 ## Testing
 
-🧰 tools: `jest`, `@testing-library/react`
-
-✅ run tests with `yarn test`
-
-📸 update snapshots with `yarn test -u`
-
+After Release please manually check the website doesnt have have any unexpected weirdness. 
 
 ## Vulnerability Disclosure
 
-n/a
 
 ## Dependencies
 
 @celo/utils
 
 ## Dependents
-What other releases depend on this one?
+
+n/a

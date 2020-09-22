@@ -1,3 +1,5 @@
+# Release Process for CeloReserve.org
+
 ## Versioning
 
 n/a
@@ -22,9 +24,9 @@ You may need to log in and be granted additional permissions.
 
 > Deploying will upload files on local machine to gcloud, make sure you are on the intended branch and it is up to date
 
-Now from web package directory deploy to dev with: 
+Now from web package directory deploy to stage with
 
-`yarn deploy:dev`
+`yarn deploy:stage`
 
 do a sanity check and the deploy to prodution with
 
@@ -33,7 +35,7 @@ do a sanity check and the deploy to prodution with
 
 ## Testing
 
-todo
+After Deployment please manually double check the website functions right
 
 
 ## Vulnerability Disclosure
