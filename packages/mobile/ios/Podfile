@@ -1,6 +1,6 @@
 # TODO: Revert this change and leave the official source url.
 # source 'https://cdn.cocoapods.org/'
-source 'https://cocoapods-cdn.netlify.app/'
+source 'https://github.com/CocoaPods/Specs.git'
 
 platform :ios, "12.4"
 
