@@ -20,7 +20,7 @@ export default ExchangeCelo = () => {
     await element(by.id('BuyCelo')).tap()
     await element(by.id('ExchangeInput')).replaceText(CELO_TO_EXCHANGE.toString())
     await element(by.id('ExchangeReviewButton')).tap()
-    await element(by.id('ConfirmExchange')).tap()
+    await element(by.id('ConfirmExchange-ForceFailure')).tap()
 
     await enterPinUiIfNecessary()
 
