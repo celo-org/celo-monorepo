@@ -54,9 +54,17 @@ NAT_FLAG="--nat=extip:${PUBLIC_IP}"
 {{- end -}}
 {{- end -}}
 
+{{/*
+ * This will create an HTTP server at .server_port
+ * that is intended for GCP NEG health checks. It will
+ * ensure that TCP at port .tcp_check_port works and
+ * that the /health-check.sh script passes. This script
+ * ensures that the node is not syncing and its most recent
+ * block is at most 30 seconds old.
+*/}}
 {{- define "celo-fullnode.health-checker-server" -}}
 - name: health-checker-server-{{ .protocol_name }}
-  image: tkporter/health-checker:test1
+  image: gcr.io/celo-testnet/health-checker:0.0.5
   imagePullPolicy: IfNotPresent
   args:
   - --script=/health-check.sh
