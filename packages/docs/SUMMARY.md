@@ -61,7 +61,6 @@
       - [Development Differences]()
     - [dApps on Celo]()
       - [What is a dApp?]() -->
-  - [Forno](developer-resources/forno/README.md)
   - [The Celo SDK](developer-resources/introduction.md)
     <!-- - [Architecture]() -->
     - [ContractKit](developer-resources/contractkit/README.md)
@@ -82,6 +81,7 @@
         - [Expo]() -->
       - [Usage](developer-resources/dappkit/usage.md)
     <!-- - [Guide to Asset Custody]() -->
+  - [Forno](developer-resources/forno/README.md)
   - [Celo for Ethereum Developers](developer-resources/celo-for-eth-devs.md)
   - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
   - [Integrations](developer-resources/integrations/integrations.md)
