@@ -1,6 +1,6 @@
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -12,6 +12,7 @@ import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -23,7 +24,10 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.BackupComplete>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -39,7 +43,10 @@ class BackupComplete extends React.Component<Props> {
     // Show success check for a while before leaving screen
     const { backupCompleted, socialBackupCompleted } = this.props
     setTimeout(() => {
-      if (socialBackupCompleted) {
+      const navigatedFromSettings = this.props.route.params?.navigatedFromSettings ?? false
+      if (navigatedFromSettings) {
+        navigate(Screens.Settings, { promptConfirmRemovalModal: true })
+      } else if (socialBackupCompleted) {
         this.props.exitBackupFlow()
         navigateHome()
       } else if (backupCompleted) {
@@ -69,7 +76,6 @@ class BackupComplete extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   innerContainer: {
     flex: 1,

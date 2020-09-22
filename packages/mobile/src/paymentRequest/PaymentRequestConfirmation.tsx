@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -9,7 +9,6 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import { RequestEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -17,12 +16,13 @@ import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
-import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { writePaymentRequest } from 'src/paymentRequest/actions'
+import { PaymentRequestStatus } from 'src/paymentRequest/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
@@ -82,7 +82,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
   componentDidMount() {
     const { addressJustValidated, t } = this.props
     if (addressJustValidated) {
-      Logger.showMessage(t('addressConfirmed'))
+      Logger.showMessage(t('sendFlow7:addressConfirmed'))
     }
   }
 
@@ -113,14 +113,12 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
     const paymentInfo = {
       amount: amount.toString(),
-      // TODO: discuss if sending address would be better
-      // Would help with protection of PII but would possibly make the UX worst?
+      comment: this.state.comment || undefined,
       timestamp: new Date(),
       requesterAddress: address,
-      requesterE164Number: this.props.e164PhoneNumber ? this.props.e164PhoneNumber : undefined,
-      requesteeAddress,
+      requesterE164Number: this.props.e164PhoneNumber ?? undefined,
+      requesteeAddress: requesteeAddress.toLowerCase(),
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
-      comment: this.state.comment,
       status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
@@ -152,7 +150,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     }
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <ReviewFrame
           FooterComponent={this.renderFooter}
@@ -193,7 +191,6 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     padding: 8,
   },
   feeContainer: {

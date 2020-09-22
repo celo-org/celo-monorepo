@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { DAYS_TO_BACKUP } from 'src/backup/utils'
 import NotificationBox from 'src/home/NotificationBox'
 import { createMockStore, getElementText } from 'test/utils'
-import { mockPaymentRequests } from 'test/values'
+import { mockE164Number, mockE164NumberPepper, mockPaymentRequests } from 'test/values'
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
 const RECENT_BACKUP_TIME = new Date().getTime() - TWO_DAYS_MS
@@ -14,10 +14,11 @@ const storeDataNotificationsEnabled = {
   goldToken: { educationCompleted: false },
   account: {
     backupCompleted: false,
-    dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: mockPaymentRequests.slice(0, 2),
   },
 }
@@ -26,10 +27,11 @@ const storeDataNotificationsDisabled = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     dismissedGetVerified: true,
     accountCreationTime: RECENT_BACKUP_TIME,
+  },
+  paymentRequest: {
     incomingPaymentRequests: [],
   },
 }
@@ -38,6 +40,13 @@ describe('NotificationBox', () => {
   it('renders correctly for with all notifications', () => {
     const store = createMockStore({
       ...storeDataNotificationsEnabled,
+      account: {
+        ...storeDataNotificationsEnabled.account,
+        e164PhoneNumber: mockE164Number,
+      },
+      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
+      stableToken: { balance: '0.00' },
+      goldToken: { balance: '0.00' },
     })
     const tree = render(
       <Provider store={store}>
@@ -69,7 +78,6 @@ describe('NotificationBox', () => {
       goldToken: { educationCompleted: false },
       account: {
         ...storeDataNotificationsDisabled.account,
-        dismissedEarnRewards: false,
         dismissedInviteFriends: false,
       },
     })
@@ -88,6 +96,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
@@ -110,6 +120,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         incomingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -126,6 +138,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: mockPaymentRequests,
       },
     })
@@ -142,6 +156,8 @@ describe('NotificationBox', () => {
       ...storeDataNotificationsDisabled,
       account: {
         ...storeDataNotificationsDisabled.account,
+      },
+      paymentRequest: {
         outgoingPaymentRequests: [mockPaymentRequests[0]],
       },
     })
@@ -165,7 +181,10 @@ describe('NotificationBox', () => {
       account: {
         ...storeDataNotificationsDisabled.account,
         dismissedGetVerified: false,
+        e164PhoneNumber: mockE164Number,
       },
+      identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberPepper } },
+      stableToken: { balance: '0.00' },
     })
     const { getByText } = render(
       <Provider store={store}>
@@ -173,5 +192,17 @@ describe('NotificationBox', () => {
       </Provider>
     )
     expect(getByText('nuxVerification2:notification.body')).toBeTruthy()
+  })
+
+  it('does not render verification reminder when insufficient balance', () => {
+    const store = createMockStore({
+      ...storeDataNotificationsDisabled,
+    })
+    const { queryByText } = render(
+      <Provider store={store}>
+        <NotificationBox />
+      </Provider>
+    )
+    expect(queryByText('nuxVerification2:notification.body')).toBeFalsy()
   })
 })

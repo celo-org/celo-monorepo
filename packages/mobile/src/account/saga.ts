@@ -2,10 +2,12 @@ import { ContractKit } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { CURRENCY_ENUM } from '@celo/utils'
+import firebase from '@react-native-firebase/app'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
+  ClearStoredAccountAction,
   SetPincodeAction,
   setPincodeFailure,
   setPincodeSuccess,
@@ -15,11 +17,17 @@ import { showError } from 'src/alert/actions'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getStoredMnemonic } from 'src/backup/utils'
-import { revokePhoneMapping } from 'src/identity/revoke'
+import { clearStoredMnemonic, getStoredMnemonic } from 'src/backup/utils'
+import { FIREBASE_ENABLED } from 'src/config'
+import { firebaseSignOut } from 'src/firebase/firebase'
+import { deleteNodeData } from 'src/geth/geth'
+import { revokeVerificationSaga } from 'src/identity/revoke'
 import { Actions as ImportActions } from 'src/import/actions'
 import { importBackupPhraseSaga } from 'src/import/saga'
 import { moveAllFundsFromAccount } from 'src/invite/saga'
+import { removeAccountLocally } from 'src/pincode/authentication'
+import { persistor } from 'src/redux/store'
+import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -54,7 +62,7 @@ function* migrateAccountToProperBip39() {
   }
 
   yield call(getConnectedUnlockedAccount)
-  yield call(revokePhoneMapping, e164Number, account)
+  yield call(revokeVerificationSaga)
 
   const mnemonic = yield call(getStoredMnemonic, account)
   yield call(importBackupPhraseSaga, {
@@ -97,6 +105,30 @@ function* migrateAccountToProperBip39() {
   }
 }
 
+function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
+  try {
+    yield call(removeAccountLocally, account)
+    yield call(clearStoredMnemonic)
+    yield call(ValoraAnalytics.reset)
+    yield call(deleteNodeData)
+
+    // Ignore error if it was caused by Firebase.
+    try {
+      yield call(firebaseSignOut, firebase.app())
+    } catch (error) {
+      if (FIREBASE_ENABLED) {
+        Logger.error(TAG + '@clearStoredAccount', 'Failed to sign out from Firebase', error)
+      }
+    }
+
+    yield call(persistor.flush)
+    yield call(restartApp)
+  } catch (error) {
+    Logger.error(TAG + '@clearStoredAccount', 'Error while removing account', error)
+    yield put(showError(ErrorMessages.ACCOUNT_CLEAR_FAILED))
+  }
+}
+
 export function* watchMigrateAccountToProperBip39() {
   yield take(Actions.MIGRATE_ACCOUNT_BIP39)
   yield call(migrateAccountToProperBip39)
@@ -106,7 +138,13 @@ export function* watchSetPincode() {
   yield takeLeading(Actions.SET_PINCODE, setPincode)
 }
 
+export function* watchClearStoredAccount() {
+  const action = yield take(Actions.CLEAR_STORED_ACCOUNT)
+  yield call(clearStoredAccountSaga, action)
+}
+
 export function* accountSaga() {
   yield spawn(watchMigrateAccountToProperBip39)
   yield spawn(watchSetPincode)
+  yield spawn(watchClearStoredAccount)
 }

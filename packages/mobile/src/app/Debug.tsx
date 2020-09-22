@@ -115,7 +115,6 @@ const style = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
   },
   singleLine: {
     marginTop: 5,

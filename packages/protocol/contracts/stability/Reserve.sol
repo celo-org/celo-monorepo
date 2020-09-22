@@ -9,12 +9,20 @@ import "./interfaces/ISortedOracles.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Ensures price stability of StableTokens with respect to their pegs
  */
-contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
+contract Reserve is
+  IReserve,
+  ICeloVersionedContract,
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ReentrancyGuard
+{
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -61,6 +69,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
     _;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks

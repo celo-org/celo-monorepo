@@ -201,8 +201,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -239,8 +241,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -455,8 +459,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -493,8 +499,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -635,8 +643,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }

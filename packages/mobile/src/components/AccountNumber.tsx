@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getAddressChunks } from '@celo/utils/src/address'
 import React from 'react'
@@ -47,7 +47,11 @@ export default function AccountNumber({ address, touchDisabled, location }: Prop
   return touchDisabled ? (
     <View style={styles.container}>{formattedAddress}</View>
   ) : (
-    <TouchableOpacity style={styles.container} onPress={onPressAddress}>
+    <TouchableOpacity
+      style={styles.container}
+      onLongPress={onPressAddress}
+      onPress={onPressAddress}
+    >
       {formattedAddress}
     </TouchableOpacity>
   )

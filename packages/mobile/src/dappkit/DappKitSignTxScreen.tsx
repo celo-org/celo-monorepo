@@ -1,7 +1,6 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
-import { SignTxRequest } from '@celo/utils/src/dappkit'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -10,17 +9,15 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
-import DappkitExchangeIcon from 'src/icons/DappkitExchange'
+import { noHeader } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'dappkit/DappKitSignTxScreen'
 
-interface State {
-  request: SignTxRequest | null
-}
 interface DispatchProps {
   requestTxSignature: typeof requestTxSignature
 }
@@ -33,11 +30,8 @@ const mapDispatchToProps = {
   requestTxSignature,
 }
 
-class DappKitSignTxScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-  state = {
-    request: null,
-  }
+class DappKitSignTxScreen extends React.Component<Props> {
+  static navigationOptions = noHeader
 
   componentDidMount() {
     const request = this.props.route.params.dappKitRequest
@@ -50,22 +44,22 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
     this.setState({ request })
   }
 
-  linkBack = () => {
-    if (!this.state.request) {
-      return
-    }
+  getRequest = () => {
+    return this.props.route.params.dappKitRequest
+  }
 
-    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request!) })
+  linkBack = () => {
+    const request = this.getRequest()
+
+    navigateHome({ onAfterNavigate: () => this.props.requestTxSignature(request) })
   }
 
   showDetails = () => {
-    if (!this.state.request) {
-      return
-    }
+    const request = this.getRequest()
 
     // TODO(sallyjyl): figure out which data to pass in for multitx
     navigate(Screens.DappKitTxDataScreen, {
-      dappKitData: (this.state.request! as SignTxRequest).txs[0].txData,
+      dappKitData: request.txs[0].txData,
     })
   }
 
@@ -75,17 +69,19 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
 
   render() {
     const { t } = this.props
+    const request = this.getRequest()
+    const { dappName } = request
+
     return (
       <SafeAreaView style={styles.container}>
+        <TopBarTextButton
+          title={t('cancel')}
+          onPress={this.cancel}
+          titleStyle={styles.cancelButton}
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.logo}>
-            <DappkitExchangeIcon />
-          </View>
-          <Text style={styles.header}>
-            {t('connectToWallet', {
-              dappname: this.state.request && (this.state.request! as SignTxRequest).dappName,
-            })}
-          </Text>
+          {!!dappName && <Text style={styles.header}>{t('connectToWallet', { dappName })}</Text>}
 
           <Text style={styles.share}> {t('shareInfo')} </Text>
 
@@ -97,22 +93,15 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
               <Text style={[styles.bodyText, styles.underLine]}>{t('transaction.details')}</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
 
-        <View style={styles.footer}>
           <Button
+            style={styles.button}
+            type={BtnTypes.PRIMARY}
+            size={BtnSizes.MEDIUM}
             text={t('allow')}
             onPress={this.linkBack}
-            standard={false}
-            type={BtnTypes.PRIMARY}
           />
-          <Button
-            text={t('cancel')}
-            onPress={this.cancel}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-          />
-        </View>
+        </ScrollView>
       </SafeAreaView>
     )
   }
@@ -121,12 +110,9 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
   },
   scrollContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: '15%',
@@ -134,20 +120,12 @@ const styles = StyleSheet.create({
   header: {
     ...fontStyles.h1,
     alignItems: 'center',
-    paddingBottom: 30,
-  },
-  footer: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    textAlign: 'center',
-  },
-  logo: {
-    marginBottom: 20,
+    paddingBottom: 16,
   },
   share: {
-    ...fontStyles.bodySecondary,
-    fontSize: 13,
-    alignSelf: 'center',
+    ...fontStyles.regular,
+    color: colors.gray4,
+    textAlign: 'center',
   },
   space: {
     paddingHorizontal: 5,
@@ -156,21 +134,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionHeaderText: {
-    ...fontStyles.sectionLabel,
-    ...fontStyles.semiBold,
-    color: colors.dark,
-    textTransform: 'uppercase',
-    marginTop: 20,
-    marginBottom: 5,
+    ...fontStyles.label,
+    marginTop: 16,
   },
   bodyText: {
-    ...fontStyles.paragraph,
-    fontSize: 15,
-    color: colors.darkSecondary,
+    ...fontStyles.regular,
+    color: colors.gray4,
     textAlign: 'center',
   },
   underLine: {
     textDecorationLine: 'underline',
+  },
+  button: {
+    marginTop: 24,
+  },
+  cancelButton: {
+    color: colors.dark,
   },
 })
 

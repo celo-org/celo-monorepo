@@ -72,7 +72,7 @@ const style = StyleSheet.create({
   container: {
     paddingTop: 20,
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 })
 

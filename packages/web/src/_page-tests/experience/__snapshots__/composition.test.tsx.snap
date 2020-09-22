@@ -3,19 +3,18 @@
 exports[`Experience/Composition renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "isolation": "isolate",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
     style={
       Object {
-        "MozTransitionProperty": "box-shadow",
-        "WebkitTransitionDuration": "400ms",
-        "WebkitTransitionProperty": "box-shadow",
-        "boxShadow": "0px 0px 0px 0px rgba(0,0,0,0)",
-        "marginBottom": "75px",
+        "backgroundColor": "rgba(255,255,255,1.00)",
         "position": "fixed",
-        "transitionDuration": "400ms",
-        "transitionProperty": "box-shadow",
         "width": "100%",
         "zIndex": 10,
       }
@@ -25,14 +24,13 @@ exports[`Experience/Composition renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
-          "WebkitBoxPack": "center",
-          "WebkitJustifyContent": "center",
-          "alignItems": "center",
-          "justifyContent": "center",
-          "msFlexAlign": "center",
-          "msFlexPack": "center",
+          "MozTransitionProperty": "box-shadow",
+          "WebkitTransitionDuration": "400ms",
+          "WebkitTransitionProperty": "box-shadow",
+          "boxShadow": "0px 0px 0px 0px rgba(0,0,0,0)",
+          "marginBottom": "1px",
+          "transitionDuration": "400ms",
+          "transitionProperty": "box-shadow",
         }
       }
     >
@@ -42,34 +40,12 @@ exports[`Experience/Composition renders 1`] = `
           Object {
             "WebkitAlignItems": "center",
             "WebkitBoxAlign": "center",
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
-            "WebkitBoxOrient": "horizontal",
-            "WebkitBoxPack": "justify",
-            "WebkitFlexBasis": "0%",
-            "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "WebkitJustifyContent": "space-between",
+            "WebkitBoxPack": "center",
+            "WebkitJustifyContent": "center",
             "alignItems": "center",
-            "backgroundColor": "rgba(255,255,255,1.00)",
-            "flexBasis": "0%",
-            "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
-            "justifyContent": "space-between",
-            "maxWidth": "1600px",
+            "justifyContent": "center",
             "msFlexAlign": "center",
-            "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPack": "justify",
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
-            "paddingBottom": "20px",
-            "paddingLeft": "20px",
-            "paddingRight": "20px",
-            "paddingTop": "20px",
-            "width": "100%",
+            "msFlexPack": "center",
           }
         }
       >
@@ -77,159 +53,36 @@ exports[`Experience/Composition renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "WebkitAlignContent": "center",
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
               "WebkitBoxDirection": "normal",
+              "WebkitBoxFlex": 1,
               "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexBasis": "0%",
               "WebkitFlexDirection": "row",
-              "alignContent": "center",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "backgroundColor": "rgba(255,255,255,1.00)",
+              "flexBasis": "0%",
               "flexDirection": "row",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "justifyContent": "space-between",
+              "maxWidth": "1600px",
+              "msFlexAlign": "center",
               "msFlexDirection": "row",
-              "msFlexLinePack": "center",
-            }
-          }
-        >
-          <a
-            href="/"
-          >
-            <div
-              className="css-view-1dbjc4n"
-              data-focusable={true}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                Object {
-                  "MozTransitionProperty": "opacity",
-                  "MozUserSelect": "none",
-                  "WebkitAlignContent": "center",
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitFlexDirection": "row",
-                  "WebkitTransitionDuration": "0.15s",
-                  "WebkitTransitionProperty": "opacity",
-                  "WebkitUserSelect": "none",
-                  "alignContent": "center",
-                  "cursor": "pointer",
-                  "flexDirection": "row",
-                  "msFlexDirection": "row",
-                  "msFlexLinePack": "center",
-                  "msTouchAction": "manipulation",
-                  "msUserSelect": "none",
-                  "touchAction": "manipulation",
-                  "transitionDuration": "0.15s",
-                  "transitionProperty": "opacity",
-                  "userSelect": "none",
-                }
-              }
-              tabIndex="0"
-            >
-              <svg
-                fill="none"
-                height={30}
-                style={Object {}}
-                viewBox="0 0 85 25"
-                width={102}
-              >
-                <path
-                  d="M64.2368 22.079L66.5 21.3684V2.63159L64.2368 3.34212V22.079ZM38.1316 10.7105C39.5526 10.7105 40.8684 11.3421 41.7105 12.3947L42.6316 10.2632C41.421 9.10528 39.8158 8.55264 38.1316 8.55264C34.2368 8.55264 31.5526 11.6316 31.5789 15.0263C31.6052 18.7105 34.5 21.7105 38.1316 21.7105C39.9737 21.7105 41.3684 21.1579 42.421 20.3947V17.7895C41.3158 18.8947 39.7105 19.5526 38.3158 19.5526C36.2105 19.5526 33.8421 17.8421 33.8421 15.0263C33.8421 12.4211 35.8947 10.7105 38.1316 10.7105ZM53.1842 8.55264C49.2895 8.55264 47.0263 11.6316 47.0263 15.0263C47.0263 18.7105 49.9473 21.7105 53.5789 21.7105C55.421 21.7105 56.8158 21.1579 57.8684 20.3947V17.7895C56.7631 18.8947 55.1579 19.5526 53.7631 19.5526C51.8947 19.5526 49.8421 18.3947 49.421 15.9474H59.3421V15.079C59.3421 11.4474 56.9473 8.55264 53.1842 8.55264ZM77.6316 8.55264C74 8.55264 71.0526 11.5 71.0526 15.1316C71.0526 18.7632 74 21.7105 77.6316 21.7105C81.2631 21.7105 84.2105 18.7632 84.2105 15.1316C84.2105 11.5 81.2631 8.55264 77.6316 8.55264ZM53.2105 10.7105C54.9737 10.7105 56.8421 11.8158 57 13.9474H49.421C49.5789 11.8158 51.4473 10.7105 53.2105 10.7105ZM77.6316 19.5526C75.1842 19.5526 73.2105 17.579 73.2105 15.1316C73.2105 12.6842 75.1842 10.7105 77.6316 10.7105C80.0789 10.7105 82.0526 12.6842 82.0526 15.1316C82.0526 17.579 80.0789 19.5526 77.6316 19.5526Z"
-                  fill="#2E3338"
-                  style={Object {}}
-                />
-                <path
-                  d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
-                  fill="#35D07F"
-                  style={Object {}}
-                />
-                <path
-                  d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
-                  fill="#FBCC5C"
-                  style={Object {}}
-                />
-                <path
-                  d="M15.4553 19.7315C16.1392 18.903 16.6292 17.932 16.89 16.8899C17.9321 16.6294 18.9029 16.1391 19.7316 15.4554C19.6937 16.6623 19.4339 17.852 18.9647 18.9646C17.8521 19.4338 16.6624 19.6936 15.4553 19.7315ZM8.11026 8.10989C7.06815 8.37042 6.09736 8.86068 5.26868 9.54436C5.30657 8.33752 5.56631 7.14778 6.03552 6.03515C7.14815 5.56594 8.33789 5.30621 9.54473 5.26831C8.86105 6.09699 8.37078 7.06778 8.11026 8.10989Z"
-                  fill="#5EA33B"
-                  style={Object {}}
-                />
-              </svg>
-            </div>
-          </a>
-          <a
-            href="/experience/brand"
-          >
-            <div
-              className="css-view-1dbjc4n"
-              data-focusable={true}
-              onKeyDown={[Function]}
-              onKeyUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderMove={[Function]}
-              onResponderRelease={[Function]}
-              onResponderTerminate={[Function]}
-              onResponderTerminationRequest={[Function]}
-              onStartShouldSetResponder={[Function]}
-              style={
-                Object {
-                  "MozTransitionProperty": "opacity",
-                  "MozUserSelect": "none",
-                  "WebkitAlignContent": "center",
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitFlexDirection": "row",
-                  "WebkitTransitionDuration": "0.15s",
-                  "WebkitTransitionProperty": "opacity",
-                  "WebkitUserSelect": "none",
-                  "alignContent": "center",
-                  "cursor": "pointer",
-                  "flexDirection": "row",
-                  "msFlexDirection": "row",
-                  "msFlexLinePack": "center",
-                  "msTouchAction": "manipulation",
-                  "msUserSelect": "none",
-                  "touchAction": "manipulation",
-                  "transitionDuration": "0.15s",
-                  "transitionProperty": "opacity",
-                  "userSelect": "none",
-                }
-              }
-              tabIndex="0"
-            >
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(46,51,56,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "24px",
-                    "fontWeight": "400",
-                    "lineHeight": "initial",
-                    "marginLeft": "15px",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                BrandKit
-              </div>
-            </div>
-          </a>
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitAlignContent": "center",
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "alignContent": "center",
-              "flexDirection": "row",
-              "msFlexDirection": "row",
-              "msFlexLinePack": "center",
+              "msFlexNegative": 1,
+              "msFlexPack": "justify",
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "20px",
+              "paddingLeft": "20px",
+              "paddingRight": "20px",
+              "paddingTop": "20px",
+              "width": "100%",
             }
           }
         >
@@ -237,17 +90,150 @@ exports[`Experience/Composition renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "WebkitAlignItems": "center",
-                "WebkitBoxAlign": "center",
+                "WebkitAlignContent": "center",
                 "WebkitBoxDirection": "normal",
                 "WebkitBoxOrient": "horizontal",
                 "WebkitFlexDirection": "row",
-                "alignItems": "center",
+                "alignContent": "center",
                 "flexDirection": "row",
-                "marginLeft": "30px",
-                "marginRight": "30px",
-                "msFlexAlign": "center",
                 "msFlexDirection": "row",
+                "msFlexLinePack": "center",
+              }
+            }
+          >
+            <a
+              href="/"
+            >
+              <div
+                className="css-view-1dbjc4n"
+                data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onKeyDown={[Function]}
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "MozUserSelect": "none",
+                    "WebkitAlignContent": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "WebkitTransitionDuration": "0s",
+                    "WebkitTransitionProperty": "opacity",
+                    "WebkitUserSelect": "none",
+                    "alignContent": "center",
+                    "cursor": "pointer",
+                    "flexDirection": "row",
+                    "msFlexDirection": "row",
+                    "msFlexLinePack": "center",
+                    "msTouchAction": "manipulation",
+                    "msUserSelect": "none",
+                    "touchAction": "manipulation",
+                    "transitionDuration": "0s",
+                    "transitionProperty": "opacity",
+                    "userSelect": "none",
+                  }
+                }
+                tabIndex="0"
+              >
+                <svg
+                  fill="none"
+                  height={30}
+                  style={Object {}}
+                  viewBox="0 0 85 25"
+                  width={102}
+                >
+                  <path
+                    d="M64.2368 22.079L66.5 21.3684V2.63159L64.2368 3.34212V22.079ZM38.1316 10.7105C39.5526 10.7105 40.8684 11.3421 41.7105 12.3947L42.6316 10.2632C41.421 9.10528 39.8158 8.55264 38.1316 8.55264C34.2368 8.55264 31.5526 11.6316 31.5789 15.0263C31.6052 18.7105 34.5 21.7105 38.1316 21.7105C39.9737 21.7105 41.3684 21.1579 42.421 20.3947V17.7895C41.3158 18.8947 39.7105 19.5526 38.3158 19.5526C36.2105 19.5526 33.8421 17.8421 33.8421 15.0263C33.8421 12.4211 35.8947 10.7105 38.1316 10.7105ZM53.1842 8.55264C49.2895 8.55264 47.0263 11.6316 47.0263 15.0263C47.0263 18.7105 49.9473 21.7105 53.5789 21.7105C55.421 21.7105 56.8158 21.1579 57.8684 20.3947V17.7895C56.7631 18.8947 55.1579 19.5526 53.7631 19.5526C51.8947 19.5526 49.8421 18.3947 49.421 15.9474H59.3421V15.079C59.3421 11.4474 56.9473 8.55264 53.1842 8.55264ZM77.6316 8.55264C74 8.55264 71.0526 11.5 71.0526 15.1316C71.0526 18.7632 74 21.7105 77.6316 21.7105C81.2631 21.7105 84.2105 18.7632 84.2105 15.1316C84.2105 11.5 81.2631 8.55264 77.6316 8.55264ZM53.2105 10.7105C54.9737 10.7105 56.8421 11.8158 57 13.9474H49.421C49.5789 11.8158 51.4473 10.7105 53.2105 10.7105ZM77.6316 19.5526C75.1842 19.5526 73.2105 17.579 73.2105 15.1316C73.2105 12.6842 75.1842 10.7105 77.6316 10.7105C80.0789 10.7105 82.0526 12.6842 82.0526 15.1316C82.0526 17.579 80.0789 19.5526 77.6316 19.5526Z"
+                    fill="#2E3338"
+                    style={Object {}}
+                  />
+                  <path
+                    d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+                    fill="#35D07F"
+                    style={Object {}}
+                  />
+                  <path
+                    d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+                    fill="#FBCC5C"
+                    style={Object {}}
+                  />
+                  <path
+                    d="M15.4553 19.7315C16.1392 18.903 16.6292 17.932 16.89 16.8899C17.9321 16.6294 18.9029 16.1391 19.7316 15.4554C19.6937 16.6623 19.4339 17.852 18.9647 18.9646C17.8521 19.4338 16.6624 19.6936 15.4553 19.7315ZM8.11026 8.10989C7.06815 8.37042 6.09736 8.86068 5.26868 9.54436C5.30657 8.33752 5.56631 7.14778 6.03552 6.03515C7.14815 5.56594 8.33789 5.30621 9.54473 5.26831C8.86105 6.09699 8.37078 7.06778 8.11026 8.10989Z"
+                    fill="#5EA33B"
+                    style={Object {}}
+                  />
+                </svg>
+              </div>
+            </a>
+            <a
+              href="/experience/brand"
+            >
+              <div
+                className="css-view-1dbjc4n"
+                data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onKeyDown={[Function]}
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "MozUserSelect": "none",
+                    "WebkitAlignContent": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "WebkitTransitionDuration": "0s",
+                    "WebkitTransitionProperty": "opacity",
+                    "WebkitUserSelect": "none",
+                    "alignContent": "center",
+                    "cursor": "pointer",
+                    "flexDirection": "row",
+                    "msFlexDirection": "row",
+                    "msFlexLinePack": "center",
+                    "msTouchAction": "manipulation",
+                    "msUserSelect": "none",
+                    "touchAction": "manipulation",
+                    "transitionDuration": "0s",
+                    "transitionProperty": "opacity",
+                    "userSelect": "none",
+                  }
+                }
+                tabIndex="0"
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "24px",
+                      "fontWeight": "400",
+                      "lineHeight": "initial",
+                      "marginLeft": "15px",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                >
+                  BrandKit
+                </div>
+              </div>
+            </a>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignContent": "center",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "alignContent": "center",
+                "flexDirection": "row",
+                "msFlexDirection": "row",
+                "msFlexLinePack": "center",
               }
             }
           >
@@ -258,289 +244,286 @@ exports[`Experience/Composition renders 1`] = `
                   "WebkitAlignItems": "center",
                   "WebkitBoxAlign": "center",
                   "WebkitBoxDirection": "normal",
-                  "WebkitBoxOrient": "vertical",
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexDirection": "column",
-                  "WebkitJustifyContent": "center",
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexDirection": "row",
                   "alignItems": "center",
-                  "flexDirection": "column",
-                  "justifyContent": "center",
-                  "marginBottom": "0px",
-                  "marginLeft": "15px",
-                  "marginRight": "15px",
+                  "flexDirection": "row",
+                  "marginLeft": "30px",
+                  "marginRight": "30px",
                   "msFlexAlign": "center",
-                  "msFlexDirection": "column",
-                  "msFlexPack": "center",
-                  "position": "relative",
+                  "msFlexDirection": "row",
                 }
               }
             >
-              <div
-                className="css-view-1dbjc4n"
-                onClick={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
-              >
-                <a
-                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                  data-focusable={true}
-                  dir="auto"
-                  href="/experience/events"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
-                  role="link"
-                  style={
-                    Object {
-                      "WebkitAlignItems": "center",
-                      "WebkitBoxAlign": "center",
-                      "WebkitBoxFlex": 0,
-                      "WebkitBoxPack": "center",
-                      "WebkitFlexGrow": 0,
-                      "WebkitJustifyContent": "center",
-                      "alignItems": "center",
-                      "backgroundColor": "rgba(0,0,0,0.00)",
-                      "borderBottomColor": "rgba(0,0,0,0.00)",
-                      "borderLeftColor": "rgba(0,0,0,0.00)",
-                      "borderRightColor": "rgba(0,0,0,0.00)",
-                      "borderTopColor": "rgba(0,0,0,0.00)",
-                      "color": "rgba(129,134,139,1.00)",
-                      "cursor": "pointer",
-                      "display": "inline-flex",
-                      "flexGrow": 0,
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "16px",
-                      "fontWeight": "500",
-                      "justifyContent": "center",
-                      "lineHeight": "16px",
-                      "msFlexAlign": "center",
-                      "msFlexPack": "center",
-                      "msFlexPositive": 0,
-                      "opacity": 1,
-                      "outlineColor": "transparent",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "width": "fit-content",
-                    }
-                  }
-                >
-                  EventKit
-                </a>
-              </div>
-            </div>
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxOrient": "vertical",
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexDirection": "column",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "justifyContent": "center",
-                  "marginBottom": "0px",
-                  "marginLeft": "15px",
-                  "marginRight": "15px",
-                  "msFlexAlign": "center",
-                  "msFlexDirection": "column",
-                  "msFlexPack": "center",
-                  "position": "relative",
-                }
-              }
-            >
-              <div
-                className="css-view-1dbjc4n"
-                onClick={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
-              >
-                <a
-                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                  data-focusable={true}
-                  dir="auto"
-                  href="/experience/brand"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
-                  role="link"
-                  style={
-                    Object {
-                      "WebkitAlignItems": "center",
-                      "WebkitBoxAlign": "center",
-                      "WebkitBoxFlex": 0,
-                      "WebkitBoxPack": "center",
-                      "WebkitFlexGrow": 0,
-                      "WebkitJustifyContent": "center",
-                      "alignItems": "center",
-                      "backgroundColor": "rgba(0,0,0,0.00)",
-                      "borderBottomColor": "rgba(0,0,0,0.00)",
-                      "borderLeftColor": "rgba(0,0,0,0.00)",
-                      "borderRightColor": "rgba(0,0,0,0.00)",
-                      "borderTopColor": "rgba(0,0,0,0.00)",
-                      "color": "rgba(46,51,56,1.00)",
-                      "cursor": "pointer",
-                      "display": "inline-flex",
-                      "flexGrow": 0,
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "16px",
-                      "fontWeight": "500",
-                      "justifyContent": "center",
-                      "lineHeight": "16px",
-                      "msFlexAlign": "center",
-                      "msFlexPack": "center",
-                      "msFlexPositive": 0,
-                      "opacity": 1,
-                      "outlineColor": "transparent",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "width": "fit-content",
-                    }
-                  }
-                >
-                  BrandKit
-                </a>
-              </div>
               <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "bottom": "-16px",
-                    "height": "8px",
-                    "position": "absolute",
-                    "width": "7px",
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
                   }
                 }
               >
-                <svg
-                  fill="none"
-                  height={10}
-                  style={Object {}}
-                  viewBox="0 0 83 98"
-                  width={10}
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
                 >
-                  <g
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
+                    href="/experience/brand"
+                    onClick={[Function]}
+                    role="link"
                     style={
                       Object {
-                        "mixBlendMode": "normal",
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(46,51,56,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
                       }
                     }
                   >
-                    <path
-                      d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                      fill="#35D07F"
-                    />
-                  </g>
-                </svg>
+                    BrandKit
+                  </a>
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "bottom": "-16px",
+                      "height": "8px",
+                      "position": "absolute",
+                      "width": "7px",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={10}
+                    style={Object {}}
+                    viewBox="0 0 83 98"
+                    width={10}
+                  >
+                    <g
+                      style={
+                        Object {
+                          "mixBlendMode": "normal",
+                        }
+                      }
+                    >
+                      <path
+                        d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                        fill="#35D07F"
+                      />
+                    </g>
+                  </svg>
+                </div>
               </div>
-            </div>
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            onClick={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
-          >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="https://github.com/celo-org"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              rel=" noopener noreferrer"
-              role="link"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 0,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 0,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(0,0,0,0.00)",
-                  "borderBottomColor": "rgba(0,0,0,0.00)",
-                  "borderLeftColor": "rgba(0,0,0,0.00)",
-                  "borderRightColor": "rgba(0,0,0,0.00)",
-                  "borderTopColor": "rgba(0,0,0,0.00)",
-                  "color": "rgba(46,51,56,1.00)",
-                  "cursor": "pointer",
-                  "display": "inline-flex",
-                  "flexGrow": 0,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "500",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 0,
-                  "opacity": 1,
-                  "outlineColor": "transparent",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "fit-content",
-                }
-              }
-              target="_blank"
-            >
-              github
               <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "display": "inline-flex",
-                    "paddingLeft": "8px",
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
                   }
                 }
               >
-                <svg
-                  fill="none"
-                  height={22}
-                  style={Object {}}
-                  viewBox="0 0 25 24"
-                  width={22}
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
                 >
-                  <title>
-                    Github
-                  </title>
-                  <path
-                    clipRule="evenodd"
-                    d="M12.3019 0C5.50526 0 0 5.50526 0 12.3019C0 17.7392 3.52669 22.3458 8.4127 23.977C9.0244 24.0902 9.25095 23.7126 9.25095 23.3804C9.25095 23.0858 9.2434 22.3156 9.23585 21.2885C5.81488 22.0286 5.08991 19.6422 5.08991 19.6422C4.53108 18.2225 3.72304 17.8373 3.72304 17.8373C2.60537 17.0746 3.80611 17.0897 3.80611 17.0897C5.03705 17.1803 5.69405 18.3584 5.69405 18.3584C6.78906 20.2388 8.57129 19.6951 9.27361 19.3779C9.38688 18.585 9.70406 18.0412 10.0514 17.7316C7.32524 17.4295 4.45556 16.3723 4.45556 11.66C4.45556 10.3158 4.93132 9.22074 5.72426 8.35984C5.59588 8.04266 5.17298 6.79662 5.83754 5.10501C5.83754 5.10501 6.87213 4.77274 9.22074 6.36616C10.2025 6.0943 11.2522 5.95837 12.3019 5.95082C13.344 5.95837 14.4013 6.0943 15.383 6.36616C17.7316 4.77274 18.7662 5.10501 18.7662 5.10501C19.4383 6.79662 19.0154 8.05021 18.887 8.35984C19.6724 9.22074 20.1482 10.3158 20.1482 11.66C20.1482 16.3874 17.271 17.422 14.5297 17.7316C14.9677 18.1092 15.3679 18.8644 15.3679 20.0123C15.3679 21.6586 15.3528 22.9801 15.3528 23.3879C15.3528 23.7202 15.5718 24.0978 16.1986 23.977C21.0846 22.3458 24.6038 17.7392 24.6038 12.3094C24.6038 5.50526 19.0985 0 12.3019 0Z"
-                    fill="#2E3338"
-                    fillRule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
+                    href="/experience/events"
+                    onClick={[Function]}
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(129,134,139,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    EventKit
+                  </a>
+                </div>
               </div>
-            </a>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
+                    href="/experience/merchant"
+                    onClick={[Function]}
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(129,134,139,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    MerchantKit
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "marginTop": "75px",
-      }
-    }
-  />
   <div
     className="css-view-1dbjc4n"
     style={
@@ -551,10 +534,11 @@ exports[`Experience/Composition renders 1`] = `
         "WebkitFlexDirection": "column",
         "alignSelf": "center",
         "flexDirection": "column",
-        "marginTop": "50px",
+        "marginTop": "116px",
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -599,8 +583,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -608,7 +590,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -698,8 +679,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -707,7 +686,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/logo"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -797,8 +775,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -806,7 +782,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/color"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -896,8 +871,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -905,7 +878,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/typography"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -995,8 +967,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1004,7 +974,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/composition"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1094,8 +1063,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1103,7 +1070,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/exchange-icons"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1176,8 +1142,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1185,7 +1149,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/icons"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1258,8 +1221,6 @@ exports[`Experience/Composition renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1267,7 +1228,6 @@ exports[`Experience/Composition renders 1`] = `
             dir="auto"
             href="/experience/brand/key-imagery"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1400,6 +1360,7 @@ exports[`Experience/Composition renders 1`] = `
               aria-level="1"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1419,6 +1380,7 @@ exports[`Experience/Composition renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1446,6 +1408,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1463,6 +1426,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1494,9 +1458,7 @@ exports[`Experience/Composition renders 1`] = `
                   "marginTop": "40px",
                   "msFlexDirection": "row",
                   "msFlexWrap": "wrap",
-                  "msGridColumnGap": "20px",
-                  "msGridRowGap": "15px",
-                  "msGridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))",
+                  "msGridColumns": "repeat(auto-fit, minmax(280px, 1fr))",
                 }
               }
             >
@@ -1524,6 +1486,7 @@ exports[`Experience/Composition renders 1`] = `
                   aria-level="4"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -1559,7 +1522,6 @@ exports[`Experience/Composition renders 1`] = `
                     style={
                       Object {
                         "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
                         "backgroundPosition": "center",
                         "backgroundRepeat": "no-repeat",
                         "backgroundSize": "cover",
@@ -1574,16 +1536,11 @@ exports[`Experience/Composition renders 1`] = `
                       }
                     }
                   />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
-                  />
                 </div>
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -1600,6 +1557,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -1641,6 +1599,7 @@ exports[`Experience/Composition renders 1`] = `
                   aria-level="4"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -1677,7 +1636,6 @@ exports[`Experience/Composition renders 1`] = `
                     style={
                       Object {
                         "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
                         "backgroundPosition": "center",
                         "backgroundRepeat": "no-repeat",
                         "backgroundSize": "cover",
@@ -1692,16 +1650,11 @@ exports[`Experience/Composition renders 1`] = `
                       }
                     }
                   />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
-                  />
                 </div>
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -1719,6 +1672,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -1757,6 +1711,7 @@ exports[`Experience/Composition renders 1`] = `
                   aria-level="4"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -1806,7 +1761,6 @@ exports[`Experience/Composition renders 1`] = `
                       style={
                         Object {
                           "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
                           "backgroundPosition": "center",
                           "backgroundRepeat": "no-repeat",
                           "backgroundSize": "cover",
@@ -1820,12 +1774,6 @@ exports[`Experience/Composition renders 1`] = `
                           "zIndex": -1,
                         }
                       }
-                    />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
                     />
                   </div>
                   <div
@@ -1849,6 +1797,7 @@ exports[`Experience/Composition renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(46,51,56,1.00)",
@@ -1864,6 +1813,7 @@ exports[`Experience/Composition renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(46,51,56,1.00)",
@@ -1903,6 +1853,7 @@ exports[`Experience/Composition renders 1`] = `
                   aria-level="4"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -1929,16 +1880,15 @@ exports[`Experience/Composition renders 1`] = `
                       "gridTemplateColumns": "repeat(3, 1fr)",
                       "gridTemplateRows": "repeat(2, 1fr)",
                       "marginTop": "5px",
-                      "msGridColumnGap": "10px",
-                      "msGridTemplateAreas": "\\". image image\\" \\"subtitle text text\\"",
-                      "msGridTemplateColumns": "repeat(3, 1fr)",
-                      "msGridTemplateRows": "repeat(2, 1fr)",
+                      "msGridColumns": "repeat(3, 1fr)",
+                      "msGridRows": "repeat(2, 1fr)",
                     }
                   }
                 >
                   <div
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(46,51,56,1.00)",
@@ -1946,7 +1896,6 @@ exports[`Experience/Composition renders 1`] = `
                         "fontSize": "18px",
                         "gridArea": "subtitle",
                         "marginBottom": "5px",
-                        "msGridArea": "subtitle",
                         "textRendering": "geometricPrecision",
                       }
                     }
@@ -1962,7 +1911,6 @@ exports[`Experience/Composition renders 1`] = `
                         "gridArea": "image",
                         "height": "63px",
                         "msFlexPreferredSize": "auto",
-                        "msGridArea": "image",
                         "overflowX": "hidden",
                         "overflowY": "hidden",
                         "width": "98px",
@@ -1975,7 +1923,6 @@ exports[`Experience/Composition renders 1`] = `
                       style={
                         Object {
                           "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
                           "backgroundPosition": "center",
                           "backgroundRepeat": "no-repeat",
                           "backgroundSize": "cover",
@@ -1990,16 +1937,11 @@ exports[`Experience/Composition renders 1`] = `
                         }
                       }
                     />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
-                    />
                   </div>
                   <div
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(46,51,56,1.00)",
@@ -2007,7 +1949,6 @@ exports[`Experience/Composition renders 1`] = `
                         "fontSize": "16px",
                         "gridArea": "text",
                         "lineHeight": "20px",
-                        "msGridArea": "text",
                         "textRendering": "geometricPrecision",
                       }
                     }
@@ -2036,6 +1977,7 @@ exports[`Experience/Composition renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2054,6 +1996,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2072,10 +2015,9 @@ exports[`Experience/Composition renders 1`] = `
                 Object {
                   "display": "grid",
                   "gridColumnGap": "15px",
+                  "gridColumns": "12px",
                   "gridRowGap": "15px",
                   "marginTop": "40px",
-                  "msGridColumnGap": "15px",
-                  "msGridRowGap": "15px",
                 }
               }
             >
@@ -2095,7 +2037,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "1 / 1 / 1 / 12 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2106,6 +2047,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2153,7 +2095,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "2 / 1 / 2 / 6 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2164,6 +2105,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2211,7 +2153,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "2 / 6 / 2 / 12 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2222,6 +2163,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2269,7 +2211,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "3 / 1 / 3 / 4 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2280,6 +2221,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2327,7 +2269,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "3 / 4 / 3 / 8 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2338,6 +2279,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2385,7 +2327,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "3 / 8 / 3 / 12 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2396,6 +2337,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2443,7 +2385,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 1 / 4 / 3 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2454,6 +2395,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2501,7 +2443,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 3 / 4 / 6 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2512,6 +2453,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2559,7 +2501,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 6 / 4 / 9 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2570,6 +2511,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2617,7 +2559,6 @@ exports[`Experience/Composition renders 1`] = `
                     "msFlexNegative": 1,
                     "msFlexPositive": 1,
                     "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 9 / 4 / 12 ",
                     "paddingBottom": "15px",
                     "paddingLeft": "15px",
                     "paddingRight": "15px",
@@ -2628,6 +2569,7 @@ exports[`Experience/Composition renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "borderBottomColor": "rgba(191,151,255,1.00)",
@@ -2680,395 +2622,17 @@ exports[`Experience/Composition renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitAlignItems": "center",
           "WebkitAlignSelf": "center",
-          "WebkitBoxAlign": "center",
           "WebkitBoxDirection": "normal",
           "WebkitBoxOrient": "vertical",
-          "WebkitBoxPack": "center",
           "WebkitFlexDirection": "column",
-          "WebkitJustifyContent": "center",
-          "alignItems": "center",
           "alignSelf": "center",
           "flexDirection": "column",
-          "justifyContent": "center",
-          "marginBottom": "30px",
           "marginTop": "30px",
           "maxWidth": "100vw",
-          "msFlexAlign": "center",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
-          "msFlexPack": "center",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitAlignItems": "center",
-            "WebkitBoxAlign": "center",
-            "WebkitBoxFlex": 0,
-            "WebkitBoxPack": "center",
-            "WebkitFlexGrow": 0,
-            "WebkitFlexShrink": 0,
-            "WebkitJustifyContent": "center",
-            "alignItems": "center",
-            "flexGrow": 0,
-            "flexShrink": 0,
-            "justifyContent": "center",
-            "maxWidth": "550px",
-            "msFlexAlign": "center",
-            "msFlexNegative": 0,
-            "msFlexPack": "center",
-            "msFlexPositive": 0,
-            "paddingBottom": "10px",
-            "paddingLeft": "10px",
-            "paddingRight": "10px",
-            "paddingTop": "10px",
-            "width": "100%",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitFlexBasis": "auto",
-              "flexBasis": "auto",
-              "height": "50px",
-              "marginBottom": "10px",
-              "marginTop": "10px",
-              "msFlexPreferredSize": "auto",
-              "overflowX": "hidden",
-              "overflowY": "hidden",
-              "width": "50px",
-              "zIndex": 0,
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "backgroundColor": "rgba(0,0,0,0.00)",
-                "backgroundImage": "url(\\"image.png\\")",
-                "backgroundPosition": "center",
-                "backgroundRepeat": "no-repeat",
-                "backgroundSize": "contain",
-                "bottom": "0px",
-                "height": "100%",
-                "left": "0px",
-                "position": "absolute",
-                "right": "0px",
-                "top": "0px",
-                "width": "100%",
-                "zIndex": -1,
-              }
-            }
-          />
-          <img
-            alt=""
-            className="css-accessibilityImage-9pa8cd"
-            draggable={false}
-            src="image.png"
-          />
-        </div>
-        <div
-          className="css-text-901oao"
-          dir="auto"
-          style={
-            Object {
-              "color": "rgba(46,51,56,1.00)",
-              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-              "fontSize": "20px",
-              "lineHeight": "28px",
-              "marginBottom": "10px",
-              "marginTop": "20px",
-              "textAlign": "center",
-              "textRendering": "geometricPrecision",
-            }
-          }
-        >
-          receiveUpdates
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "marginBottom": "5px",
-              "marginTop": "5px",
-              "paddingBottom": "15px",
-              "width": "100%",
-            }
-          }
-        >
-          <input
-            autoCapitalize="sentences"
-            autoComplete="on"
-            autoCorrect="on"
-            className="css-textinput-1cwyjr8 r-placeholderTextColor-tf24u1"
-            data-focusable={true}
-            dir="auto"
-            name="email"
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            onKeyDown={[Function]}
-            onKeyPress={[Function]}
-            onSelect={[Function]}
-            placeholder="common:email*"
-            readOnly={false}
-            required={true}
-            spellCheck={true}
-            style={
-              Object {
-                "WebkitBoxFlex": 1,
-                "WebkitFlexBasis": "0%",
-                "WebkitFlexGrow": 1,
-                "WebkitFlexShrink": 1,
-                "borderBottomColor": "rgba(221,221,221,1.00)",
-                "borderBottomLeftRadius": "3px",
-                "borderBottomRightRadius": "3px",
-                "borderBottomWidth": "1px",
-                "borderLeftColor": "rgba(221,221,221,1.00)",
-                "borderLeftWidth": "1px",
-                "borderRightColor": "rgba(221,221,221,1.00)",
-                "borderRightWidth": "1px",
-                "borderTopColor": "rgba(221,221,221,1.00)",
-                "borderTopLeftRadius": "3px",
-                "borderTopRightRadius": "3px",
-                "borderTopWidth": "1px",
-                "color": "rgba(46,51,56,1.00)",
-                "flexBasis": "0%",
-                "flexGrow": 1,
-                "flexShrink": 1,
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
-                "marginBottom": "5px",
-                "marginTop": "5px",
-                "msFlexNegative": 1,
-                "msFlexPositive": 1,
-                "msFlexPreferredSize": "0%",
-                "outlineStyle": "none",
-                "paddingBottom": "15px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "13px",
-                "textRendering": "geometricPrecision",
-              }
-            }
-            type="text"
-            value=""
-          />
-          <div
-            className="css-view-1dbjc4n"
-          >
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "MozTransitionProperty": "max-height",
-                  "WebkitTransitionDuration": "600ms",
-                  "WebkitTransitionProperty": "max-height",
-                  "height": "auto",
-                  "marginBottom": "5px",
-                  "marginTop": "5px",
-                  "maxHeight": "0px",
-                  "transitionDuration": "600ms",
-                  "transitionProperty": "max-height",
-                }
-              }
-            >
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "MozTransitionProperty": "opacity",
-                    "WebkitTransitionDuration": "700ms",
-                    "WebkitTransitionProperty": "opacity",
-                    "color": "rgba(255,127,109,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "opacity": 0,
-                    "textRendering": "geometricPrecision",
-                    "transitionDuration": "700ms",
-                    "transitionProperty": "opacity",
-                  }
-                }
-              >
-                common:validationErrors.email
-              </div>
-            </div>
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            onClick={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
-          >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              role="link"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxFlex": 1,
-                  "WebkitBoxPack": "center",
-                  "WebkitFlexGrow": 1,
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "backgroundColor": "rgba(53,208,127,1.00)",
-                  "borderBottomColor": "rgba(53,208,127,1.00)",
-                  "borderBottomLeftRadius": "3px",
-                  "borderBottomRightRadius": "3px",
-                  "borderBottomWidth": "1px",
-                  "borderLeftColor": "rgba(53,208,127,1.00)",
-                  "borderLeftWidth": "1px",
-                  "borderRightColor": "rgba(53,208,127,1.00)",
-                  "borderRightWidth": "1px",
-                  "borderTopColor": "rgba(53,208,127,1.00)",
-                  "borderTopLeftRadius": "3px",
-                  "borderTopRightRadius": "3px",
-                  "borderTopWidth": "1px",
-                  "color": "rgba(255,255,255,1.00)",
-                  "cursor": "pointer",
-                  "display": "inline-flex",
-                  "flexGrow": 1,
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "500",
-                  "justifyContent": "center",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "msFlexPositive": 1,
-                  "opacity": 1,
-                  "paddingBottom": "15px",
-                  "paddingLeft": "20px",
-                  "paddingRight": "20px",
-                  "paddingTop": "15px",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "width": "100%",
-                }
-              }
-            >
-              signUp
-            </a>
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "position": "absolute",
-                "top": "65px",
-              }
-            }
-          />
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "marginTop": "10px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "MozTransitionProperty": "max-height",
-                "WebkitTransitionDuration": "600ms",
-                "WebkitTransitionProperty": "max-height",
-                "height": "auto",
-                "marginBottom": "5px",
-                "marginTop": "5px",
-                "maxHeight": "0px",
-                "transitionDuration": "600ms",
-                "transitionProperty": "max-height",
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "MozTransitionProperty": "opacity",
-                  "WebkitTransitionDuration": "700ms",
-                  "WebkitTransitionProperty": "opacity",
-                  "color": "rgba(53,208,127,1.00)",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "500",
-                  "lineHeight": "18px",
-                  "opacity": 0,
-                  "textRendering": "geometricPrecision",
-                  "transitionDuration": "700ms",
-                  "transitionProperty": "opacity",
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={16}
-                style={Object {}}
-                viewBox="0 0 11 9"
-                width={16}
-              >
-                <path
-                  clipRule="evenodd"
-                  d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
-                  fill="#35D07F"
-                  fillRule="evenodd"
-                  style={Object {}}
-                />
-              </svg>
-              <span
-                className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
-                style={
-                  Object {
-                    "marginLeft": "10px",
-                  }
-                }
-              >
-                common:shortSuccess
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitAlignSelf": "center",
-          "WebkitBoxDirection": "normal",
-          "WebkitBoxOrient": "vertical",
-          "WebkitFlexDirection": "column",
-          "alignSelf": "center",
-          "flexDirection": "column",
-          "maxWidth": "100vw",
-          "msFlexDirection": "column",
-          "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3139,6 +2703,7 @@ exports[`Experience/Composition renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3157,6 +2722,7 @@ exports[`Experience/Composition renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3177,8 +2743,6 @@ exports[`Experience/Composition renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -3188,10 +2752,8 @@ exports[`Experience/Composition renders 1`] = `
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                 data-focusable={true}
-                dir="auto"
                 href="/terms"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3257,6 +2819,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3287,8 +2850,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3301,18 +2862,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3341,8 +2905,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3355,18 +2917,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/about"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3395,8 +2960,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3409,18 +2972,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/jobs"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3449,8 +3015,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3463,18 +3027,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/validators"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3503,8 +3070,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3517,18 +3082,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/developers"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3557,8 +3125,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3571,18 +3137,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/alliance"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3611,8 +3180,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3625,18 +3192,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/community"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3662,6 +3232,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3692,8 +3263,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3706,18 +3275,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://docs.celo.org/"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3746,8 +3318,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3760,18 +3330,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/audits"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3800,8 +3373,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3812,20 +3383,23 @@ exports[`Experience/Composition renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="https://www.celoreserve.org"
+                  href="https://www.celoreserve.org/"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3854,8 +3428,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3868,18 +3440,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/papers"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3905,6 +3480,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3935,8 +3511,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3949,18 +3523,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/code-of-conduct"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3989,8 +3566,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4003,18 +3578,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/brand-policy"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4043,8 +3621,61 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/press"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  Press
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4057,18 +3688,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/community#events"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4097,8 +3731,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4111,18 +3743,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/experience/events"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4151,8 +3786,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4165,18 +3798,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/experience/brand"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4205,8 +3841,61 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/experience/merchant"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  MerchantKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4219,18 +3908,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="/community#fund"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4256,6 +3948,7 @@ exports[`Experience/Composition renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -4286,8 +3979,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4300,18 +3991,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://medium.com/celoOrg"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4329,34 +4023,22 @@ exports[`Experience/Composition renders 1`] = `
                       }
                     }
                   >
-                    <a
-                      href="https://medium.com/celoOrg"
-                      rel="noopener"
-                      style={
-                        Object {
-                          "height": "13px",
-                          "lineHeight": "13px",
-                        }
-                      }
-                      target="_blank"
+                    <svg
+                      fill="none"
+                      height={13}
+                      style={Object {}}
+                      viewBox="0 0 24 24"
+                      width={13}
                     >
-                      <svg
-                        fill="none"
-                        height={13}
+                      <title>
+                        Medium
+                      </title>
+                      <path
+                        d="M0 0V24H24V0H0ZM19.9385 5.68615L18.6511 6.92062C18.5403 7.00554 18.4849 7.14462 18.5083 7.28246V16.3495C18.4849 16.4874 18.5403 16.6265 18.6511 16.7114L19.9089 17.9446V18.2154H13.5852V17.9446L14.8874 16.6806C15.0154 16.5526 15.0154 16.5157 15.0154 16.32V8.99077L11.3957 18.1858H10.9058L6.69046 8.99077V15.1532C6.656 15.4117 6.74215 15.6726 6.92431 15.8609L8.61785 17.9151V18.1858H3.81538V17.9151L5.50892 15.8609C5.68985 15.6726 5.77108 15.4105 5.72677 15.1532V8.02708C5.74769 7.82892 5.67138 7.63323 5.52369 7.50031L4.01846 5.68615V5.41538H8.69292L12.3065 13.3391L15.4818 5.41538H19.9385V5.68615Z"
+                        fill="#2E3338"
                         style={Object {}}
-                        viewBox="0 0 24 24"
-                        width={13}
-                      >
-                        <title>
-                          Medium
-                        </title>
-                        <path
-                          d="M0 0V24H24V0H0ZM19.9385 5.68615L18.6511 6.92062C18.5403 7.00554 18.4849 7.14462 18.5083 7.28246V16.3495C18.4849 16.4874 18.5403 16.6265 18.6511 16.7114L19.9089 17.9446V18.2154H13.5852V17.9446L14.8874 16.6806C15.0154 16.5526 15.0154 16.5157 15.0154 16.32V8.99077L11.3957 18.1858H10.9058L6.69046 8.99077V15.1532C6.656 15.4117 6.74215 15.6726 6.92431 15.8609L8.61785 17.9151V18.1858H3.81538V17.9151L5.50892 15.8609C5.68985 15.6726 5.77108 15.4105 5.72677 15.1532V8.02708C5.74769 7.82892 5.67138 7.63323 5.52369 7.50031L4.01846 5.68615V5.41538H8.69292L12.3065 13.3391L15.4818 5.41538H19.9385V5.68615Z"
-                          fill="#2E3338"
-                          style={Object {}}
-                        />
-                      </svg>
-                    </a>
+                      />
+                    </svg>
                   </div>
                   Blog
                 </a>
@@ -4378,8 +4060,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4392,18 +4072,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4460,8 +4143,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4474,18 +4155,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://twitter.com/CeloOrg"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4540,8 +4224,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4554,18 +4236,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://forum.celo.org/"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4620,8 +4305,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4634,18 +4317,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://discord.gg/6yWMkgM"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4702,8 +4388,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4716,18 +4400,21 @@ exports[`Experience/Composition renders 1`] = `
                   dir="auto"
                   href="https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4782,8 +4469,6 @@ exports[`Experience/Composition renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -4794,20 +4479,23 @@ exports[`Experience/Composition renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="https://www.instagram.com/celoorg/"
+                  href="https://www.instagram.com/celoorg"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4863,6 +4551,7 @@ exports[`Experience/Composition renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4908,6 +4597,7 @@ exports[`Experience/Composition renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",

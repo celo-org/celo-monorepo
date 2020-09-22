@@ -7,8 +7,8 @@ import { Trans, useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MoneyAmount } from 'src/apollo/types'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import FeeDrawer from 'src/components/FeeDrawer'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -30,8 +30,9 @@ export default function ExchangeConfirmationCard(props: Props) {
     : [takerAmount.value, makerAmount.value]
 
   // TODO: show real fees
-  const tobinTax = 0
-  const fee = 0
+  const tobinTax = new BigNumber('0')
+  const fee = new BigNumber('0')
+  const totalFee = new BigNumber(tobinTax).plus(fee)
 
   const localAmount = (isSellGoldTx ? makerAmount : takerAmount).localAmount!
   // TODO: find a way on how to show local exchangeRate without this hack
@@ -55,17 +56,8 @@ export default function ExchangeConfirmationCard(props: Props) {
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
 
-  const exchangeFeeAmount = {
-    value: tobinTax,
-    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-  }
-  const securityFeeAmount = {
-    value: fee,
-    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-  }
-
   const totalAmount = {
-    value: new BigNumber(dollars).plus(tobinTax).plus(fee),
+    value: new BigNumber(dollars).plus(totalFee),
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
 
@@ -87,15 +79,13 @@ export default function ExchangeConfirmationCard(props: Props) {
               }
               amount={<CurrencyDisplay amount={subtotalAmount} />}
             />
-            <LineItemRow
-              title={t('exchangeFee')}
-              titleIcon={<FeeIcon />}
-              amount={<CurrencyDisplay amount={exchangeFeeAmount} formatType={FormatType.Fee} />}
-            />
-            <LineItemRow
-              title={t('securityFee')}
-              titleIcon={<FeeIcon isExchange={true} />}
-              amount={<CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />}
+            <FeeDrawer
+              testID={'feeDrawer/ExchangeConfirmationCard'}
+              currency={CURRENCY_ENUM.DOLLAR}
+              securityFee={fee}
+              exchangeFee={tobinTax}
+              isExchange={true}
+              totalFee={totalFee}
             />
             <HorizontalLine />
             <TotalLineItem amount={totalAmount} />

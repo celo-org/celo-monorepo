@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors, { Colors } from '@celo/react-components/styles/colors.v2'
+import colors, { Colors } from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 import React, { ReactNode, useCallback } from 'react'
@@ -30,6 +30,7 @@ export interface ButtonProps {
   style?: StyleProp<ViewStyle>
   text: string | ReactNode
   showLoading?: boolean
+  loadingColor?: string
   accessibilityLabel?: string
   type?: BtnTypes
   rounded?: boolean
@@ -49,6 +50,7 @@ export default React.memo(function Button(props: ButtonProps) {
     rounded = true,
     style,
     showLoading,
+    loadingColor = colors.greenBrand,
   } = props
 
   // Debounce onPress event so that it is called once on trigger and
@@ -71,7 +73,7 @@ export default React.memo(function Button(props: ButtonProps) {
           testID={testID}
         >
           {showLoading ? (
-            <ActivityIndicator size="small" color={colors.celoGreen} />
+            <ActivityIndicator size="small" color={loadingColor} />
           ) : (
             <Text
               accessibilityLabel={accessibilityLabel}
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 5,
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
   },
   small: {
     height: 40,

@@ -25,7 +25,7 @@ export async function scaleResource(
 }
 
 export async function getStatefulSetReplicas(namespace: string, resourceName: string) {
-  const [replicas] = await execCmdWithExitOnFailure(
+  const [replicas] = await execCmd(
     `kubectl get statefulset ${resourceName} --namespace ${namespace} -o jsonpath={.status.replicas}`
   )
   return parseInt(replicas, 10)

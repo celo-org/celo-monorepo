@@ -3,19 +3,19 @@ import { StyleSheet, View } from 'react-native'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN } from 'src/shared/Button.3'
-import menu, { MAIN_MENU } from 'src/shared/menu-items'
+import { MenuLink } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
-const MENU = [menu.HOME, ...MAIN_MENU]
 interface Props {
   currentPage: string
+  menu: MenuLink[]
 }
 
-export default function MobileMenu({ currentPage }: Props) {
+export default function MobileMenu({ currentPage, menu }: Props) {
   const { t } = useTranslation(NameSpaces.common)
   return (
     <View style={styles.root}>
       <View style={styles.menu}>
-        {MENU.map((item) => {
+        {menu.map((item) => {
           const linkIsToCurrentPage = currentPage === item.link
           const btnKind = linkIsToCurrentPage ? BTN.TERTIARY : BTN.NAV
 

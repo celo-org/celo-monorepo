@@ -12,7 +12,7 @@ const MOCK = [
   },
 ]
 
-import KeyImagery from 'src/../pages/experience/brand/key-imagery'
+import KeyImagery from 'pages/experience/brand/key-imagery'
 
 describe('Experience/KeyImagery', () => {
   it('renders', () => {

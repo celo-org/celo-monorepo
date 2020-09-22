@@ -1,12 +1,14 @@
-import { Request, Response } from 'firebase-functions'
-import { ErrorMessage, respondWithError, WarningMessage } from '../common/error-utils'
-import { authenticateUser, isVerified } from '../common/identity'
 import {
+  ErrorMessage,
   hasValidAccountParam,
   hasValidContractPhoneNumbersParam,
   hasValidPhoneNumberHash,
   hasValidUserPhoneNumberParam,
-} from '../common/input-validation'
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
+import { Request, Response } from 'firebase-functions'
+import { respondWithError } from '../common/error-utils'
+import { authenticateUser, isVerified } from '../common/identity'
 import logger from '../common/logger'
 import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
@@ -33,7 +35,7 @@ export async function handleGetContactMatches(
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!authenticateUser(request)) {
+    if (!(await authenticateUser(request))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }

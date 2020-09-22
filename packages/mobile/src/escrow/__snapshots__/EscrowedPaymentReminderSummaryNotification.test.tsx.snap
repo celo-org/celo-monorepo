@@ -127,8 +127,10 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -343,8 +345,10 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -381,8 +385,10 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -523,8 +529,10 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }

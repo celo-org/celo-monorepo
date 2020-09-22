@@ -158,6 +158,7 @@ export enum TokenTransactionType {
   InviteSent = 'INVITE_SENT',
   InviteReceived = 'INVITE_RECEIVED',
   PayRequest = 'PAY_REQUEST',
+  PayPrefill = 'PAY_PREFILL',
   NetworkFee = 'NETWORK_FEE',
 }
 

@@ -1,17 +1,17 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { binaryPrompt, displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class LockedGold extends ReleaseGoldCommand {
+export default class LockedGold extends ReleaseGoldBaseCommand {
   static description =
     'Perform actions [lock, unlock, withdraw] on CELO that has been locked via the provided ReleaseGold contract.'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     action: flags.string({
       char: 'a',
       options: ['lock', 'unlock', 'withdraw'],
@@ -48,7 +48,7 @@ export default class LockedGold extends ReleaseGoldCommand {
       const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
       const lockValue = value.minus(relockValue)
       await newCheckBuilder(this, this.contractAddress)
-        .hasEnoughGold(this.contractAddress, lockValue)
+        .hasEnoughCelo(this.contractAddress, lockValue)
         .runChecks()
       const txos = await this.releaseGoldWrapper.relockGold(relockValue)
       for (const txo of txos) {

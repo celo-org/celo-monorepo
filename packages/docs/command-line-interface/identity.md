@@ -1,5 +1,5 @@
 ---
-description: Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
+description: Interact with ODIS and the attestations service
 ---
 
 ## Commands
@@ -11,9 +11,49 @@ Outputs the set of validators currently participating in BFT and which ones are 
 ```
 USAGE
   $ celocli identity:current-attestation-services
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 ```
 
 _See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
+
+### Identifier
+
+Queries ODIS for the on-chain identifier and pepper corresponding to a given phone number.
+
+```
+USAGE
+  $ celocli identity:identifier
+
+OPTIONS
+  --context=context                                  mainnet (default), alfajores, or alfajoresstaging
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address from which to perform the query
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --phoneNumber=+14152223333                         (required) The phone number for which to query the identifier.
+                                                     Should be in e164 format with country code.
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  identifier --phoneNumber +14151231234 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --context alfajores
+```
+
+_See code: [packages/cli/src/commands/identity/identifier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/identifier.ts)_
 
 ### Test-attestation-service
 
@@ -25,6 +65,9 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer or account address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing

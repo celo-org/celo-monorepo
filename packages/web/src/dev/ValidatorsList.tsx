@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
-import { Text as RNText, View } from 'react-native'
+import { Text, View } from 'react-native'
 import ValidatorsListRow, { CeloGroup, localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -9,12 +9,6 @@ import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
-
-class Text extends RNText {
-  render() {
-    return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
-  }
-}
 
 interface HeaderCellProps {
   style: any[]
@@ -38,9 +32,10 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
     return (
       <Hoverable onHoverIn={this.onHoverIn} onHoverOut={this.onHoverOut}>
         <View onClick={onClick} style={[styles.tableHeaderCell, ...((style || []) as any)]}>
-          <Text>{name}</Text>
+          <Text style={styles.defaultText}>{name}</Text>
           <Text
             style={[
+              styles.defaultText,
               styles.tableHeaderCellArrow,
               ...(order !== null ? [styles.tableHeaderCellArrowVisible] : []),
             ]}
@@ -53,7 +48,9 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
           </Text>
 
           {tooltip && hover && (
-            <Text style={[styles.tooltip, styles.tooltipHeader]}>{tooltip}</Text>
+            <Text style={[styles.defaultText, styles.tooltip, styles.tooltipHeader]}>
+              {tooltip}
+            </Text>
           )}
         </View>
       </Hoverable>
@@ -207,7 +204,14 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             .multipliedBy(100)
           const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
           const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
+          const totalFulfilled = affiliates.edges.reduce((acc, obj) => {
+            return acc + (obj.node.attestationsFulfilled || 0)
+          }, 0)
+          const totalRequested = affiliates.edges.reduce((acc, obj) => {
+            return acc + (obj.node.attestationsRequested || 0)
+          }, 0)
           return {
+            attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
             order: Math.random(),
             pinned: this.isPinned(group.address),
             name: group.name,
@@ -254,17 +258,15 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       )
       .map((group, id) => {
         const data = group.validators.reduce(
-          ({ elected, online, total, uptime, attestation }, validator) => ({
+          ({ elected, online, total, uptime }, validator) => ({
             elected: elected + +validator.elected,
             online: online + +validator.online,
             total: total + 1,
             uptime: uptime + validator.uptime,
-            attestation: attestation + validator.attestation,
           }),
-          { elected: 0, online: 0, total: 0, uptime: 0, attestation: 0 }
+          { elected: 0, online: 0, total: 0, uptime: 0 }
         )
         data.uptime = data.uptime / group.validators.length
-        data.attestation = data.attestation / group.validators.length
         return {
           id,
           ...group,
@@ -316,7 +318,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
             <View style={[styles.tableHeaderCell, styles.sizeXXS]}>
-              <Text>Pin</Text>
+              <Text style={styles.defaultText}>Pin</Text>
             </View>
             <HeaderCell
               onClick={this.orderByFn.name}

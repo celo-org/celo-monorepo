@@ -158,7 +158,7 @@ Then, in the `networks` object, we can add the initialized `kit`provider to an `
     },
     alfajores: {
       provider: kit.web3.currentProvider, // CeloProvider
-      network_id: 44786                   // Alfajores network id
+      network_id: 44787                   // Alfajores network id
     }
   }
 ```

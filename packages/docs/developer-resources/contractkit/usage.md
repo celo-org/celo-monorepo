@@ -44,7 +44,7 @@ console.log(receipt)
 
 ```ts
 // This is at lower price I will accept in cUSD for every CELO
-const favorableAmout = 100
+const favorableAmount = 100
 const amountToExchange = kit.web3.utils.toWei('10', 'ether')
 const oneGold = kit.web3.utils.toWei('1', 'ether')
 const exchange = await kit.contracts.getExchange()

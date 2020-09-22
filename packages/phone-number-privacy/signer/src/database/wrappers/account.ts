@@ -1,5 +1,4 @@
-import { DB_TIMEOUT } from '../../common/constants'
-import { ErrorMessage } from '../../common/error-utils'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
@@ -42,6 +41,7 @@ export async function incrementQueryCount(account: string) {
       await accounts()
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
+      return true
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1

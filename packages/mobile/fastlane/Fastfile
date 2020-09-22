@@ -20,7 +20,11 @@ def fastlane_supply(env, track)
     track_promote_to: track,
     package_name: get_app_bundle_id(env),
     mapping: get_mapping_path(env),
-    skip_upload_apk: true
+    skip_upload_apk: true,
+    skip_upload_metadata: true,
+    skip_upload_changelogs: true,
+    skip_upload_images: true,
+    skip_upload_screenshots: true
   )
 end
 
@@ -42,9 +46,7 @@ platform :android do
       gradle(task: 'assemble', build_type: environment, project_dir: 'android/')
     else
       ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
-      gradle(task: 'bundle' + environment + 'JsAndAssets', project_dir: 'android/')
-      ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
-      gradle(task: 'bundle', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
+      gradle(task: 'bundle', build_type: environment, project_dir: 'android/')
     end
   end
 

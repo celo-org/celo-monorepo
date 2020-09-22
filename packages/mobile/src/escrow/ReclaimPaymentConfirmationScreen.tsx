@@ -104,7 +104,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   renderFooter = () => {
     return this.props.isReclaiming ? (
-      <ActivityIndicator size="large" color={colors.celoGreen} />
+      <ActivityIndicator size="large" color={colors.greenBrand} />
     ) : null
   }
 
@@ -174,7 +174,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     paddingTop: 20,
   },
 })

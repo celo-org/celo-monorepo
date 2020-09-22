@@ -24,10 +24,10 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 ## Celo Networks
 
-First we are going to setup the environment variables required for the `RC1` network. Run:
+First we are going to setup the environment variables required for the `mainnet` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
+export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
 export NETWORK_ID=42220
 ```
 
@@ -74,7 +74,7 @@ This environment variable will only persist while you have this terminal window 
 
 ## Configure the node
 
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for RC1 and uses it to initialize your nodes' data directory.
+The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for mainnet and uses it to initialize your nodes' data directory.
 
 ```bash
 docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json

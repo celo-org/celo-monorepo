@@ -1,13 +1,13 @@
-import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as bip39 from 'react-native-bip39'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import { GethEvents, SettingsEvents } from 'src/analytics/Events'
+import { GethEvents, NetworkEvents, SettingsEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -26,16 +26,17 @@ import {
   Actions,
   completeWeb3Sync,
   setAccount,
+  SetAccountAction,
   setFornoMode,
   SetIsFornoAction,
-  setPrivateCommentKey,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
+import { createAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
-import { getLatestBlock } from 'src/web3/utils'
-import { Block } from 'web3-eth'
+import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
+import { BlockHeader } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
@@ -45,11 +46,18 @@ export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
 
+enum SyncStatus {
+  UNKNOWN,
+  WAITING,
+  SYNCING,
+}
+
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
 
   let syncLoops = 0
+  let status = SyncStatus.UNKNOWN
   while (true) {
     try {
       let syncProgress: boolean | Web3SyncProgress
@@ -61,29 +69,44 @@ export function* checkWeb3SyncProgress() {
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
 
-        const latestBlock: Block = yield call(getLatestBlock)
-        if (latestBlock && latestBlock.number > 0) {
+        const latestBlock: BlockHeader = yield call(getLatestBlock)
+        if (latestBlock && blockIsFresh(latestBlock)) {
           yield put(completeWeb3Sync(latestBlock.number))
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')
+          ValoraAnalytics.track(NetworkEvents.network_sync_finish, {
+            latestBlock: latestBlock.number,
+          })
           return true
         } else {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
+          if (status !== SyncStatus.WAITING) {
+            status = SyncStatus.WAITING
+            ValoraAnalytics.track(NetworkEvents.network_sync_waiting)
+          }
         }
       } else if (typeof syncProgress === 'object') {
         yield put(updateWeb3SyncProgress(syncProgress))
+        if (status !== SyncStatus.SYNCING) {
+          status = SyncStatus.SYNCING
+          ValoraAnalytics.track(NetworkEvents.network_sync_start, syncProgress)
+        }
       } else {
         throw new Error('Invalid syncProgress type')
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
+
+      // If sync has been in progrees for too long, prompt the user to try forno instead.
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
         if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
+          ValoraAnalytics.track(NetworkEvents.network_sync_error, { error: 'sync timeout' })
           yield put(setPromptForno(false))
           navigate(Screens.Settings, { promptFornoModal: true })
           return true
         }
       }
     } catch (error) {
+      ValoraAnalytics.track(NetworkEvents.network_sync_error, { error: error.message })
       if (isProviderConnectionError(error)) {
         ValoraAnalytics.track(GethEvents.blockchain_corruption)
         const deleted = yield call(deleteChainData)
@@ -164,13 +187,13 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, undefined, bip39)
     privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
 
-    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey)
+    const accountAddress: string = yield call(assignAccountFromPrivateKey, privateKey, mnemonic)
     if (!accountAddress) {
       throw new Error('Failed to assign account from private key')
     }
@@ -185,10 +208,10 @@ export function* getOrCreateAccount() {
   }
 }
 
-export function* assignAccountFromPrivateKey(privateKey: string) {
+export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: string) {
   try {
     const account = privateKeyToAddress(privateKey)
-    const wallet: RpcWallet = yield call(getWallet)
+    const wallet: UnlockableWallet = yield call(getWallet)
     const password: string = yield call(getPasswordSaga, account, false, true)
 
     try {
@@ -207,17 +230,13 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
     yield put(setAccount(account))
     yield put(setAccountCreationTime())
-    yield call(assignDataKeyFromPrivateKey, privateKey)
+    yield call(createAccountDek, mnemonic)
+    ValoraAnalytics.setUserAddress(account)
     return account
   } catch (e) {
     Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
     throw e
   }
-}
-
-function* assignDataKeyFromPrivateKey(privateKey: string) {
-  const privateCEK = deriveCEK(privateKey).toString('hex')
-  yield put(setPrivateCommentKey(privateCEK))
 }
 
 // Wait for account to exist and then return it
@@ -228,7 +247,7 @@ export function* getAccount() {
       return account
     }
 
-    const action = yield take(Actions.SET_ACCOUNT)
+    const action: SetAccountAction = yield take(Actions.SET_ACCOUNT)
     if (action.address) {
       // account exists
       return action.address
@@ -238,7 +257,7 @@ export function* getAccount() {
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  const wallet: RpcWallet = yield call(getWallet)
+  const wallet: UnlockableWallet = yield call(getWallet)
   if (wallet.isAccountUnlocked(account)) {
     return true
   }

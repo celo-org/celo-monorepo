@@ -1,7 +1,7 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
-import { CURRENCY_ENUM } from '@celo/utils/src'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -171,10 +171,12 @@ function PaymentSentContent({
   const totalAmount = amount
   const totalFee = securityFee
 
+  const isCeloWithdrawal = amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+
   return (
     <>
       <UserSection
-        type="sent"
+        type={isCeloWithdrawal ? 'withdrawn' : 'sent'}
         address={address}
         addressHasChanged={addressHasChanged}
         recipient={recipient}
@@ -184,10 +186,14 @@ function PaymentSentContent({
       <CommentSection comment={comment} />
       <HorizontalLine />
       <LineItemRow
-        title={t('amountSent')}
+        title={t(isCeloWithdrawal ? 'amountCeloWithdrawn' : 'amountSent')}
         amount={<CurrencyDisplay amount={sentAmount} hideSign={true} />}
       />
-      <FeeDrawer currency={CURRENCY_ENUM.DOLLAR} securityFee={securityFee} totalFee={totalFee} />
+      <FeeDrawer
+        currency={isCeloWithdrawal ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR}
+        securityFee={securityFee}
+        totalFee={totalFee}
+      />
       <TotalLineItem amount={totalAmount} hideSign={true} />
     </>
   )

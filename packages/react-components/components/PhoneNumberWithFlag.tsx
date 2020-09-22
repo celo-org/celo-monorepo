@@ -1,4 +1,4 @@
-import colorsV2 from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getCountryEmoji, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
@@ -14,7 +14,7 @@ export class PhoneNumberWithFlag extends React.PureComponent<Props> {
     const parsedNumber = parsePhoneNumber(this.props.e164PhoneNumber, this.props.defaultCountryCode)
     return (
       <View style={style.container}>
-        <Text style={[fontStyles.regular, style.countryCodeContainer]}>
+        <Text style={[fontStyles.small, style.countryCodeContainer]}>
           {parsedNumber
             ? getCountryEmoji(
                 this.props.e164PhoneNumber,
@@ -23,7 +23,7 @@ export class PhoneNumberWithFlag extends React.PureComponent<Props> {
               )
             : getCountryEmoji(this.props.e164PhoneNumber)}
         </Text>
-        <Text style={[fontStyles.regular, style.phoneNumber]}>
+        <Text style={[fontStyles.small, style.phoneNumber]}>
           {parsedNumber ? `+${parsedNumber.countryCode} ${parsedNumber.displayNumber}` : ''}
         </Text>
       </View>
@@ -41,7 +41,7 @@ const style = StyleSheet.create({
     marginRight: 4,
   },
   phoneNumber: {
-    color: colorsV2.gray4,
+    color: colors.gray4,
   },
 })
 

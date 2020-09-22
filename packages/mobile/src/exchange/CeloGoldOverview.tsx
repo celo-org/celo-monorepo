@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
@@ -27,7 +27,7 @@ export function CeloGoldOverview({ t, testID }: Props) {
   return (
     <View style={styles.container} testID={testID}>
       <Text style={styles.title}>{t('yourGoldBalance')}</Text>
-      <Text style={styles.balance}>
+      <Text style={styles.balance} testID="CeloBalance">
         {goldBalanceAmount && <CurrencyDisplay amount={goldBalanceAmount} />}
       </Text>
       <Text style={styles.localBalance}>
