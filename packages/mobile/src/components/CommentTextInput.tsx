@@ -1,13 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
-import {
-  Keyboard,
-  NativeSyntheticEvent,
-  StyleSheet,
-  TextInput,
-  TextInputKeyPressEventData,
-} from 'react-native'
+import { StyleSheet, TextInput } from 'react-native'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 
@@ -19,12 +13,6 @@ interface Props {
 }
 
 export default function CommentTextInput({ testID, onCommentChange, comment, onBlur }: Props) {
-  const onKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    if (e.nativeEvent.key === 'Enter') {
-      Keyboard.dismiss()
-    }
-  }
-
   return (
     <TextInput
       testID={`commentInput/${testID}`}
@@ -38,8 +26,8 @@ export default function CommentTextInput({ testID, onCommentChange, comment, onB
       placeholder={i18n.t('addDescription', { ns: Namespaces.sendFlow7 })}
       placeholderTextColor={colors.greenUI}
       returnKeyType={'done'}
-      onKeyPress={onKeyPress}
       onBlur={onBlur}
+      blurOnSubmit={true}
     />
   )
 }

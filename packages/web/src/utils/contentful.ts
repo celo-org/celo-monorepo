@@ -90,3 +90,24 @@ export function addLocale(locale) {
     return `?locale=${locale}`
   }
 }
+
+interface FAQItem {
+  question: string
+  answer: Document
+}
+
+interface FAQcollection {
+  title: string
+  list: Array<Entry<FAQItem>>
+}
+
+export async function getFAQ({ preview = true, locale }) {
+  const result = await intialize(preview).getEntries<FAQcollection>({
+    locale,
+    content_type: 'faq',
+    include: 3,
+    'fields.key': 'celoFAQ',
+  })
+  const faqPage = result.items[0]
+  return faqPage
+}
