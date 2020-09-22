@@ -6,13 +6,14 @@ import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { FUNDING_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces } from 'src/i18n'
+import { fiatExchange } from 'src/images/Images'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -42,18 +43,21 @@ function FiatExchange() {
   return (
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
-      <View style={styles.image} />
-      <View style={styles.balanceSheet}>
-        <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
-        <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
-        <CurrencyDisplay
-          style={styles.dollarBalance}
-          amount={dollarAmount}
-          showLocalAmount={false}
-          hideFullCurrencyName={false}
-          hideSymbol={true}
-        />
+      <View style={styles.container}>
+        <Image source={fiatExchange} style={styles.image} resizeMode={'contain'} />
+        <View style={styles.balanceSheet}>
+          <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
+          <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
+          <CurrencyDisplay
+            style={styles.dollarBalance}
+            amount={dollarAmount}
+            showLocalAmount={false}
+            hideFullCurrencyName={false}
+            hideSymbol={true}
+          />
+        </View>
       </View>
+
       <View style={styles.optionsListContainer}>
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
@@ -82,8 +86,11 @@ function FiatExchange() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
   },
-  image: { height: 200 },
+  image: {
+    alignSelf: 'center',
+  },
   balanceSheet: {
     paddingVertical: variables.contentPadding,
     paddingRight: variables.contentPadding,
