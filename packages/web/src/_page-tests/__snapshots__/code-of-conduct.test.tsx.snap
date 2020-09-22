@@ -32,6 +32,7 @@ exports[`CodeOfConduct renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -188,6 +189,7 @@ exports[`CodeOfConduct renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -225,6 +227,7 @@ exports[`CodeOfConduct renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -255,7 +258,7 @@ exports[`CodeOfConduct renders 1`] = `
           aria-level="1"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
-          id="test"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -283,6 +286,7 @@ exports[`CodeOfConduct renders 1`] = `
             aria-level="3"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {

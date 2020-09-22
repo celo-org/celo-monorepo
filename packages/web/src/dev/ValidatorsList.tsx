@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
-import { Text as RNText, View } from 'react-native'
+import { Text, View } from 'react-native'
 import ValidatorsListRow, { CeloGroup, localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -9,12 +9,6 @@ import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
-
-class Text extends RNText {
-  render() {
-    return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
-  }
-}
 
 interface HeaderCellProps {
   style: any[]
@@ -38,9 +32,10 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
     return (
       <Hoverable onHoverIn={this.onHoverIn} onHoverOut={this.onHoverOut}>
         <View onClick={onClick} style={[styles.tableHeaderCell, ...((style || []) as any)]}>
-          <Text>{name}</Text>
+          <Text style={styles.defaultText}>{name}</Text>
           <Text
             style={[
+              styles.defaultText,
               styles.tableHeaderCellArrow,
               ...(order !== null ? [styles.tableHeaderCellArrowVisible] : []),
             ]}
@@ -53,7 +48,9 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
           </Text>
 
           {tooltip && hover && (
-            <Text style={[styles.tooltip, styles.tooltipHeader]}>{tooltip}</Text>
+            <Text style={[styles.defaultText, styles.tooltip, styles.tooltipHeader]}>
+              {tooltip}
+            </Text>
           )}
         </View>
       </Hoverable>
@@ -321,7 +318,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
             <View style={[styles.tableHeaderCell, styles.sizeXXS]}>
-              <Text>Pin</Text>
+              <Text style={styles.defaultText}>Pin</Text>
             </View>
             <HeaderCell
               onClick={this.orderByFn.name}
