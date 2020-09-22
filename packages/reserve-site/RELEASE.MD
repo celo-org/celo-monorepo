@@ -18,7 +18,7 @@ You may need to log in and be granted additional permissions.
 
 `gcloud auth login`
 
- Make sure your dependencies are up to date. root of monorepo, run:
+ Make sure your dependencies are up to date. From the root of monorepo, run:
 
 `yarn`
 
@@ -28,7 +28,7 @@ Now from web package directory deploy to stage with
 
 `yarn deploy:stage`
 
-do a sanity check and the deploy to prodution with
+Do a sanity check and then deploy to production with
 
 `yarn deploy:prod`
 

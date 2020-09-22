@@ -6,7 +6,7 @@ n/a
 
 ## Identifying releases
 
-identity by commit hash
+Identify by commit hash
 
 ## Build & Promotion process
 
@@ -18,7 +18,7 @@ You may need to log in and be granted additional permissions.
 
 `gcloud auth login`
 
- Make sure your dependencies are up to date. root of monorepo, run:
+ Make sure your dependencies are up to date. From the root of monorepo, run
 
 `yarn`
 
@@ -30,11 +30,11 @@ Now from web package directory deploy to dev.celo.org with:
 
 to deploy to the `dev` environment, with similar commands for `stage` and `prod`
 
-#### dev vs staging
+#### dev vs stage
 
 While not enforced, the norms for using the different non-production environments are like so: 
 
-Use Staging for checking a commit works as expected before deploying to production 
+Use Stage for checking a commit works as expected before deploying to production 
 
 Use Dev for sending previews to stakeholders while developing new features. 
 
