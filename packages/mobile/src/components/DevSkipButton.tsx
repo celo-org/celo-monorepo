@@ -18,7 +18,17 @@ interface DispatchProps {
   devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
-type Props = { nextScreen: keyof StackParamList; onSkip?: () => void } & StateProps & DispatchProps
+type OwnProps =
+  | {
+      nextScreen: keyof StackParamList
+      onSkip?: () => void
+    }
+  | {
+      nextScreen?: keyof StackParamList
+      onSkip: () => void
+    }
+
+type Props = OwnProps & StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -31,7 +41,9 @@ class DevSkipButton extends React.Component<Props> {
     if (this.props.onSkip) {
       this.props.onSkip()
     }
-    navigate(this.props.nextScreen)
+    if (this.props.nextScreen) {
+      navigate(this.props.nextScreen)
+    }
   }
 
   showDebug = () => {
@@ -55,7 +67,7 @@ class DevSkipButton extends React.Component<Props> {
             <TouchableOpacity
               style={[styles.devButton, styles.skipButton]}
               onPress={this.skip}
-              testID={`ButtonSkipTo${this.props.nextScreen}`}
+              testID={this.props.nextScreen ? `ButtonSkipTo${this.props.nextScreen}` : 'ButtonSkip'}
             />
           </View>
         )}
