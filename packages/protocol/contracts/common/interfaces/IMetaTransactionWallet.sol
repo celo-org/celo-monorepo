@@ -11,7 +11,7 @@ interface IMetaTransactionWallet {
     uint256[] calldata,
     bytes calldata,
     uint256[] calldata
-  ) external;
+  ) external returns (bytes memory, uint256[] memory);
 
   // view functions
   function getMetaTransactionDigest(address, uint256, bytes calldata, uint256)
