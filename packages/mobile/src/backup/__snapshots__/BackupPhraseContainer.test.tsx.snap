@@ -224,6 +224,7 @@ exports[` renders correctly for readonly backup phrase 1`] = `
           "lineHeight": 22,
         }
       }
+      testID="AccountKeyWords"
     >
       prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake
     </Text>
@@ -277,6 +278,7 @@ exports[` renders correctly for readonly social backup phrase 1`] = `
           "lineHeight": 22,
         }
       }
+      testID="AccountKeyWords"
     >
       prosper winner find donate tape history measure umbrella agent patrol want rhythm celo
     </Text>

@@ -1,11 +1,11 @@
-import { enterPinUi, sleep } from './utils/utils'
-import { SAMPLE_BACKUP_KEY } from './utils/consts'
+import { enterPinUi, sleep, waitForElementId } from '../utils/utils'
+import { SAMPLE_BACKUP_KEY } from '../utils/consts'
 
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
 
-export default Onboarding = () => {
+export default RestoreAccountOnboarding = () => {
   // Language is auto selected if it matches one of the available locale
   // it('Language', async () => {
   //   await element(by.id('ChooseLanguage/en-US')).tap()
@@ -24,15 +24,11 @@ export default Onboarding = () => {
 
   it('Terms', async () => {
     await element(by.id('scrollView')).scrollTo('bottom')
-    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
+    await expect(element(by.id('AcceptTermsButton'))).toBeVisible()
     await element(by.id('AcceptTermsButton')).tap()
   })
 
   it('Name and Number', async () => {
-    await waitFor(element(by.id('NameAndNumberContinueButton')))
-      .toBeVisible()
-      .withTimeout(2000)
-
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
 
     await element(by.id('CountrySelectionButton')).tap()
@@ -57,12 +53,6 @@ export default Onboarding = () => {
 
   // Restore existing wallet
   it('Restore Wallet Backup', async () => {
-    await waitFor(element(by.id('ImportWalletBackupKeyInputField')))
-      .toBeVisible()
-      .withTimeout(2000)
-
-    await sleep(1000)
-
     // wait for connecting banner to go away
     // TODO measure how long this take
     await waitFor(element(by.id('connectingToCelo')))
@@ -89,12 +79,10 @@ export default Onboarding = () => {
   })
 
   it('VerifyEducation', async () => {
-    await waitFor(element(by.id('VerificationEducationContinue')))
-      .toBeVisible()
-      .withTimeout(30000)
+    await waitForElementId('VerificationEducationSkipHeader')
 
     // skip
-    await element(by.id('VerificationEducationSkip')).tap()
+    await element(by.id('VerificationEducationSkipHeader')).tap()
     // confirmation popup skip
     await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
   })
@@ -105,9 +93,7 @@ export default Onboarding = () => {
   })
 
   it('Wallet Home', async () => {
-    await waitFor(element(by.id('SendOrRequestBar')))
-      .toBeVisible()
-      .withTimeout(10000)
+    await expect(element(by.id('SendOrRequestBar'))).toBeVisible()
   })
 
   // TODO(erdal): generate a new invite
