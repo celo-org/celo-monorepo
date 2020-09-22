@@ -225,18 +225,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 16,
   },
-  logo: {
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  loadingSpinnerContainer: {
-    marginVertical: 20,
-  },
   button: {
     paddingVertical: 16,
-  },
-  wordsInput: {
-    minHeight: 80,
   },
   explanation: {
     ...fontStyles.regular,
