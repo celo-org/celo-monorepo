@@ -21,7 +21,7 @@
 
 \+ **new InteractiveProposalBuilder**(`builder`: [ProposalBuilder](_governance_proposals_.proposalbuilder.md)): *[InteractiveProposalBuilder](_governance_proposals_.interactiveproposalbuilder.md)*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L155)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:158](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L158)*
 
 **Parameters:**
 
@@ -37,7 +37,7 @@ Name | Type |
 
 ▸ **outputTransactions**(): *Promise‹void›*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:158](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L158)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:161](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L161)*
 
 **Returns:** *Promise‹void›*
 
@@ -45,14 +45,8 @@ ___
 
 ###  promptTransactions
 
-▸ **promptTransactions**(`num`: number): *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
+▸ **promptTransactions**(): *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:163](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L163)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`num` | number |
+*Defined in [packages/contractkit/src/governance/proposals.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L166)*
 
 **Returns:** *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*

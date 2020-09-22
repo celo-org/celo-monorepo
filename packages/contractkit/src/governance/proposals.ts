@@ -1,5 +1,5 @@
 import { concurrentMap } from '@celo/base/lib/async'
-import { isHexString } from '@celo/utils/src/address'
+import { isHexString } from '@celo/utils/lib/address'
 import { isValidAddress, keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'

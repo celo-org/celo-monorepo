@@ -228,9 +228,6 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --number=number                                    [default: 1] Number of transactions to prompt for in interactive
-                                                     mode
-
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
