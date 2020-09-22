@@ -35,7 +35,7 @@ export async function addressToPublicKey(
   signer: string,
   signFn: (message: string, signer: string) => Promise<string>
 ) {
-  const msg = new Buffer('dummy_msg_data')
+  const msg = Buffer.from('dummy_msg_data')
   const data = '0x' + msg.toString('hex')
   // Note: Eth.sign typing displays incorrect parameter order
   const sig = await signFn(data, signer)

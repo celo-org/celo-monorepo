@@ -3,18 +3,18 @@ import { mkdirSync, writeFile } from 'fs'
 import { parse } from 'path'
 
 export abstract class StorageWriter {
-  abstract write(_data: string, _dataPath: string): Promise<void>
+  abstract write(_data: Buffer, _dataPath: string): Promise<void>
 }
 
 export class LocalStorageWriter extends StorageWriter {
   constructor(readonly root: string) {
     super()
   }
-  async write(data: string, dataPath: string): Promise<void> {
+  async write(data: Buffer, dataPath: string): Promise<void> {
     return this.writeToFs(data, dataPath)
   }
 
-  protected async writeToFs(data: string, dataPath: string): Promise<void> {
+  protected async writeToFs(data: string | Buffer, dataPath: string): Promise<void> {
     await new Promise((resolve, reject) => {
       const directory = parse(dataPath).dir
       mkdirSync(this.root + directory, { recursive: true })
@@ -30,7 +30,7 @@ export class LocalStorageWriter extends StorageWriter {
 }
 
 export class GitStorageWriter extends LocalStorageWriter {
-  async write(data: string, dataPath: string): Promise<void> {
+  async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
     execSync(`git add ${dataPath}`, {
       cwd: this.root,
@@ -45,8 +45,10 @@ export class MockStorageWriter extends LocalStorageWriter {
   constructor(readonly root: string, readonly mockedStorageRoot: string, readonly fetchMock: any) {
     super(root)
   }
-  async write(data: string, dataPath: string): Promise<void> {
+  async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    this.fetchMock.mock(this.mockedStorageRoot + dataPath, data)
+    this.fetchMock.mock(this.mockedStorageRoot + dataPath, data, {
+      sendAsJson: false,
+    })
   }
 }

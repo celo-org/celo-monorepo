@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/base/lib/address'
+import { ensureLeading0x, eqAddress, trimLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { NativeSigner } from '@celo/base/lib/signatureUtils'
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
@@ -47,7 +47,7 @@ export default class OffchainDataWrapper {
   async readDataFromAsResult(
     account: string,
     dataPath: string
-  ): Promise<Result<string, OffchainErrors>> {
+  ): Promise<Result<Buffer, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -75,7 +75,7 @@ export default class OffchainDataWrapper {
 
   readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
-  async writeDataTo(data: string, dataPath: string) {
+  async writeDataTo(data: Buffer, dataPath: string) {
     if (this.storageWriter === undefined) {
       throw new Error('no storage writer')
     }
@@ -85,10 +85,11 @@ export default class OffchainDataWrapper {
       createHash('sha3-256')
         .update(Buffer.from(dataPath))
         .digest(),
-      Buffer.from(data),
+      data,
     ]).toString('hex')
+
     const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(signPayload)
-    await this.storageWriter.write(sig, dataPath + '.signature')
+    await this.storageWriter.write(Buffer.from(trimLeading0x(sig), 'hex'), dataPath + '.signature')
   }
 }
 
@@ -96,32 +97,32 @@ class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
   // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async readAsResult(dataPath: string): Promise<Result<string, OffchainErrors>> {
-    let data
+  async readAsResult(dataPath: string): Promise<Result<Buffer, OffchainErrors>> {
+    let dataResponse, signatureResponse
 
     try {
-      data = await fetch(this.address + dataPath)
+      ;[dataResponse, signatureResponse] = await Promise.all([
+        fetch(this.address + dataPath),
+        fetch(this.address + dataPath + '.signature'),
+      ])
     } catch (error) {
       return Err(new FetchError())
     }
 
-    if (!data.ok) {
+    if (!dataResponse.ok) {
       return Err(new FetchError())
     }
-
-    const body = await data.text()
-
-    const signatureResponse = await fetch(this.address + dataPath + '.signature')
     if (!signatureResponse.ok) {
       return Err(new InvalidSignature())
     }
 
-    const signature = await signatureResponse.text()
+    const body = Buffer.from(dataResponse.body || [])
+    const signature = ensureLeading0x(Buffer.from(signatureResponse.body || []).toString('hex'))
     const signPayload = Buffer.concat([
       createHash('sha3-256')
         .update(Buffer.from(dataPath))
         .digest(),
-      Buffer.from(body),
+      body,
     ]).toString('hex')
 
     // TODO: Compare against registered on-chain signers or off-chain signers
