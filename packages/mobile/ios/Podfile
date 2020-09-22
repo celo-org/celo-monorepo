@@ -1,4 +1,6 @@
-source 'https://cdn.cocoapods.org/'
+# TODO: Revert this change and leave the official source url.
+# source 'https://cdn.cocoapods.org/'
+source 'https://cocoapods-cdn.netlify.app/'
 
 platform :ios, "12.4"
 
