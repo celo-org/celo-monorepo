@@ -2,14 +2,12 @@ import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import * as React from 'react'
+import { memo, useMemo } from 'react'
 import { FlatList, SectionList, SectionListData } from 'react-native'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { AddressToE164NumberType } from 'src/identity/reducer'
-import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
-import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import CeloTransferFeedItem from 'src/transactions/CeloTransferFeedItem'
@@ -30,56 +28,25 @@ export enum FeedType {
   EXCHANGE = 'exchange',
 }
 
-interface StateProps {
-  commentKey: string | null
-  addressToE164Number: AddressToE164NumberType
-  recipientCache: NumberToRecipient
-  recentTxRecipientsCache: NumberToRecipient
-  invitees: InviteDetails[]
-}
-
 export type FeedItem = TransactionFeedFragment & {
   status: TransactionStatus // for standby transactions
 }
 
-type Props = {
+interface Props {
   kind: FeedType
   loading: boolean
   error: ApolloError | undefined
   data: FeedItem[] | undefined
-} & StateProps
+}
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  commentKey: dataEncryptionKeySelector(state),
-  addressToE164Number: state.identity.addressToE164Number,
-  recipientCache: recipientCacheSelector(state),
-  recentTxRecipientsCache: recentTxRecipientsCacheSelector(state),
-  invitees: inviteesSelector(state),
-})
+function TransactionFeed({ kind, loading, error, data }: Props) {
+  const commentKey = useSelector(dataEncryptionKeySelector)
+  const addressToE164Number = useSelector((state: RootState) => state.identity.addressToE164Number)
+  const recipientCache = useSelector(recipientCacheSelector)
+  const recentTxRecipientsCache = useSelector(recentTxRecipientsCacheSelector)
+  const invitees = useSelector(inviteesSelector)
 
-export class TransactionFeed extends React.PureComponent<Props> {
-  static fragments = {
-    transaction: gql`
-      fragment TransactionFeed on TokenTransaction {
-        ...ExchangeItem
-        ...TransferItem
-      }
-
-      ${ExchangeFeedItem.fragments.exchange}
-      ${TransferFeedItem.fragments.transfer}
-    `,
-  }
-
-  renderItem = ({ item: tx }: { item: FeedItem; index: number }) => {
-    const {
-      addressToE164Number,
-      recipientCache,
-      recentTxRecipientsCache,
-      invitees,
-      commentKey,
-      kind,
-    } = this.props
-
+  const renderItem = ({ item: tx }: { item: FeedItem; index: number }) => {
     switch (tx.__typename) {
       case 'TokenTransfer':
         if (tx.amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code) {
@@ -105,44 +72,58 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
   }
 
-  renderSectionHeader = (info: { section: SectionListData<FeedItem> }) => (
+  const renderSectionHeader = (info: { section: SectionListData<FeedItem> }) => (
     <SectionHeadNew text={info.section.title} />
   )
 
-  keyExtractor = (item: TransactionFeedFragment) => {
+  const keyExtractor = (item: TransactionFeedFragment) => {
     return item.hash + item.timestamp.toString()
   }
 
-  render() {
-    const { kind, loading, error, data } = this.props
-
-    if (error) {
-      Logger.error(TAG, 'Failure while loading transaction feed', error)
-      return <NoActivity kind={kind} loading={loading} error={error} />
+  const sections = useMemo(() => {
+    // Only compute sections for home screen.
+    if (!data || data.length === 0 || kind !== FeedType.HOME) {
+      return []
     }
+    return groupFeedItemsInSections(data)
+  }, [kind, data])
 
-    if (data && data.length > 0) {
-      if (kind === FeedType.HOME) {
-        const sections = groupFeedItemsInSections(data)
-        return (
-          <SectionList
-            renderItem={this.renderItem}
-            renderSectionHeader={this.renderSectionHeader}
-            sections={sections}
-            keyExtractor={this.keyExtractor}
-            initialNumToRender={30}
-            keyboardShouldPersistTaps="always"
-          />
-        )
-      } else {
-        return (
-          <FlatList data={data} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
-        )
-      }
-    } else {
-      return <NoActivity kind={kind} loading={loading} error={error} />
-    }
+  if (error) {
+    Logger.error(TAG, 'Failure while loading transaction feed', error)
+    return <NoActivity kind={kind} loading={loading} error={error} />
+  }
+
+  if (!data || data.length === 0) {
+    return <NoActivity kind={kind} loading={loading} error={error} />
+  }
+
+  if (kind === FeedType.HOME) {
+    return (
+      <SectionList
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        sections={sections}
+        keyExtractor={keyExtractor}
+        keyboardShouldPersistTaps="always"
+      />
+    )
+  } else {
+    return <FlatList data={data} keyExtractor={keyExtractor} renderItem={renderItem} />
   }
 }
 
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(TransactionFeed)
+export const TransactionFeedFragments = {
+  transaction: gql`
+    fragment TransactionFeed on TokenTransaction {
+      ...ExchangeItem
+      ...TransferItem
+    }
+
+    ${ExchangeFeedItem.fragments.exchange}
+    ${TransferFeedItem.fragments.transfer}
+  `,
+}
+
+// TODO: We should do a better comparison of the |data| prop to decide when to re-render.
+// Right now |data| always changes (returns a different ref) which causes many extra renders.
+export default memo(TransactionFeed)

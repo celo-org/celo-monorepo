@@ -1,5 +1,6 @@
 const momentTimezone = require('moment-timezone')
 
+import { getYear } from 'date-fns'
 import differenceInYears from 'date-fns/esm/differenceInYears'
 import format from 'date-fns/esm/format'
 import { enUS, es } from 'date-fns/locale'
@@ -259,9 +260,11 @@ export const formatFeedDate = (timestamp: number, i18next: i18nType) => {
 }
 
 export const formatFeedSectionTitle = (timestamp: number, i18next: i18nType) => {
-  const title = quickFormat(timestamp, i18next, 'MMMM yyyy')
-  const currentYear = new Date().getFullYear().toString()
-  return title.endsWith(currentYear) ? title.substring(0, title.length - 5) : title
+  const currentYear = new Date().getFullYear()
+  const timestampYear = getYear(millisecondsSinceEpoch(timestamp))
+  const dateFormat = currentYear === timestampYear ? 'MMMM' : 'MMMM yyyy'
+  const title = quickFormat(timestamp, i18next, dateFormat)
+  return title
 }
 
 export const getDatetimeDisplayString = (timestamp: number, i18next: i18nType) => {
@@ -306,25 +309,35 @@ export const getLocalTimezone = () => {
   return timezoneGuess.format('zz')
 }
 
+const oneSecondInMillis = 1000
+const oneMinuteInMillis = 60 * oneSecondInMillis
+const oneHourInMillis = 60 * oneMinuteInMillis
+const oneDayInMillis = 24 * oneHourInMillis
+
 export const timeDeltaInDays = (currTime: number, prevTime: number) => {
-  return (1.0 * (currTime - prevTime)) / 1000 / 60 / 60 / 24
+  return timeDifference(currTime, prevTime) / oneDayInMillis
 }
 
 export const timeDeltaInHours = (currTime: number, prevTime: number) => {
-  return (1.0 * (currTime - prevTime)) / 1000 / 60 / 60
+  return timeDifference(currTime, prevTime) / oneHourInMillis
 }
 
 export const timeDeltaInSeconds = (currTime: number, prevTime: number) => {
-  return (1.0 * (currTime - prevTime)) / 1000
+  return timeDifference(currTime, prevTime) / oneSecondInMillis
+}
+
+function timeDifference(currTime: number, prevTime: number) {
+  return 1.0 * (millisecondsSinceEpoch(currTime) - millisecondsSinceEpoch(prevTime))
+}
+
+// some timestamps are in seconds, some are in miliseconds
+// assume dates will be within a few decades of now and multiple accordingly
+function millisecondsSinceEpoch(timestamp: number) {
+  return Math.abs(differenceInYears(timestamp, Date.now())) > 40 ? timestamp * 1000 : timestamp
 }
 
 function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
-  // some timestamps are in seconds, some are in miliseconds
-  // assume dates will be within a few decades of now and multiple accordingly
-  const millisecondsSinceEpoch =
-    Math.abs(differenceInYears(timestamp, Date.now())) > 40 ? timestamp * 1000 : timestamp
-
-  return format(millisecondsSinceEpoch, formatRule, {
+  return format(millisecondsSinceEpoch(timestamp), formatRule, {
     locale: i18next?.language.includes('es') ? es : enUS,
   })
 }
