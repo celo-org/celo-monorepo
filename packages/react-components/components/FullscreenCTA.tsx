@@ -49,7 +49,7 @@ const style = StyleSheet.create({
   header: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 72,
+    height: 120,
   },
   button: { alignItems: 'center' },
 })

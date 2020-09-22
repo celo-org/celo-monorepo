@@ -16,8 +16,8 @@ class UpgradeScreen extends React.Component<Props> {
     const { t } = this.props
     return (
       <FullscreenCTA
-        title={t('appHasToBeUpdated')}
-        subtitle={t('thisVersionIsInsecure')}
+        title={t('appUpdateAvailable')}
+        subtitle={t('appIsOutdated')}
         CTAText={t('update')}
         CTAHandler={navigateToWalletStorePage}
       />
