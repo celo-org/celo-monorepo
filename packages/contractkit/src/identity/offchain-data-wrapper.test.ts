@@ -26,7 +26,12 @@ testWithGanache('Offchain Data', (web3) => {
   const readerPublic = privateKeyToPublicKey(readerPrivate)
   const readerAddress = publicKeyToAddress(readerPublic)
 
-  const signer = ACCOUNT_ADDRESSES[2]
+  const reader2Private = ACCOUNT_PRIVATE_KEYS[2]
+  const reader2Public = privateKeyToPublicKey(reader2Private)
+  // @ts-ignore
+  const reader2Address = publicKeyToAddress(reader2Public)
+
+  const signer = ACCOUNT_ADDRESSES[3]
   // const reader = ACCOUNT_ADDRESSES[2]
 
   // const readerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
@@ -52,9 +57,7 @@ testWithGanache('Offchain Data', (web3) => {
     await accounts
       .setMetadataURL(WRITER_METADATA_URL)
       .sendAndWaitForReceipt({ from: writerAddress })
-  })
 
-  beforeEach(() => {
     wrapper = new OffchainDataWrapper(writerAddress, kit)
     wrapper.storageWriter = new MockStorageWriter(
       WRITER_LOCAL_STORAGE_ROOT,
@@ -63,7 +66,7 @@ testWithGanache('Offchain Data', (web3) => {
     )
   })
 
-  afterEach(async () => {
+  afterEach(() => {
     fetchMock.reset()
   })
 
@@ -214,17 +217,11 @@ testWithGanache('Offchain Data', (web3) => {
     })
 
     describe('using keys in the wallet', () => {
-      beforeEach(() => {
+      it('reads and writes metadata', async () => {
         kit.addAccount(writerPrivate)
         kit.addAccount(readerPrivate)
-      })
+        kit.addAccount(reader2Private)
 
-      afterEach(() => {
-        kit.removeAccount(writerPrivate)
-        kit.removeAccount(readerPrivate)
-      })
-
-      it('reads and writes metadata', async () => {
         const testname = 'test'
         const payload = { name: testname }
 
@@ -236,6 +233,39 @@ testWithGanache('Offchain Data', (web3) => {
         expect(receivedName?.ok).toBeTruthy()
         // @ts-ignore
         expect(receivedName?.result).toEqual(payload)
+
+        kit.removeAccount(writerAddress)
+        kit.removeAccount(readerAddress)
+        kit.removeAccount(reader2Address)
+      })
+
+      it('distributes a symmetric key', async () => {
+        kit.addAccount(writerPrivate)
+        kit.addAccount(readerPrivate)
+        kit.addAccount(reader2Private)
+
+        const testname = 'test'
+        const payload = { name: testname }
+
+        const nameAccessor = new NameAccessor(wrapper)
+        await nameAccessor.writeWithSymmetric(payload, writerAddress, [
+          readerAddress,
+          reader2Address,
+        ])
+
+        const result1 = await nameAccessor.readWithSymmetric(readerAddress, writerAddress)
+        const result2 = await nameAccessor.readWithSymmetric(reader2Address, writerAddress)
+
+        if (!result1.ok || !result2.ok) {
+          throw new Error("Shouldn't get here")
+        }
+
+        expect(JSON.parse(result1.result.toString()).name).toEqual(testname)
+        expect(JSON.parse(result2.result.toString()).name).toEqual(testname)
+
+        kit.removeAccount(writerAddress)
+        kit.removeAccount(readerAddress)
+        kit.removeAccount(reader2Address)
       })
     })
   })
