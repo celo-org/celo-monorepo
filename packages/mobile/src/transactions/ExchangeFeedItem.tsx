@@ -91,6 +91,13 @@ ExchangeFeedItem.fragments = {
 }
 
 const styles = StyleSheet.create({
+  imageContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    width: 40,
+  },
   image: {
     height: 40,
     width: 40,

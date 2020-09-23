@@ -55,6 +55,10 @@ const styles = StyleSheet.create({
   containerList: {
     flex: 1,
   },
+  contactUs: {
+    marginTop: 30,
+    paddingLeft: 30,
+  },
   title: {
     ...fontStyles.h1,
     margin: 16,

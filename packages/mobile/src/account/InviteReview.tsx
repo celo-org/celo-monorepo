@@ -250,6 +250,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingBottom: 25,
   },
+  editContainer: {
+    flexDirection: 'row',
+  },
   bottomContainer: {
     marginTop: 5,
     flexDirection: 'column',

@@ -175,6 +175,10 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: variables.contentPadding,
   },
+  optionTitle: {
+    ...fontStyles.regular,
+    paddingLeft: variables.contentPadding,
+  },
   pleaseSelectProvider: {
     ...fontStyles.regular,
     paddingHorizontal: variables.contentPadding,

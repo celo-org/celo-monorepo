@@ -189,6 +189,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
   },
+  containerList: {
+    paddingLeft: 20,
+    borderTopWidth: 1,
+    borderColor: '#EEEEEE',
+  },
+  contactUs: {
+    marginTop: 30,
+    alignItems: 'center',
+  },
   attachLogs: {
     flexShrink: 0,
     flexDirection: 'row',

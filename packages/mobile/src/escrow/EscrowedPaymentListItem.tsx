@@ -124,6 +124,17 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
+  body: {
+    marginTop: 5,
+    flexDirection: 'row',
+  },
+  image: {
+    width: 30,
+    height: 30,
+  },
+  payment: {
+    flex: 1,
+  },
 })
 
 export default withTranslation<Props>(Namespaces.inviteFlow11)(EscrowedPaymentListItem)

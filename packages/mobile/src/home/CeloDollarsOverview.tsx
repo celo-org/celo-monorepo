@@ -52,6 +52,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: variables.contentPadding,
     paddingVertical: 20,
   },
+  label: {
+    fontSize: 18,
+    color: colors.dark,
+  },
   balance: {
     fontSize: 44,
     // TODO: figure out why specifying the lineHeight with the font we're using

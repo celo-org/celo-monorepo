@@ -87,6 +87,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 40,
   },
+  h2: {
+    ...fontStyles.h2,
+    paddingHorizontal: 40,
+  },
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {

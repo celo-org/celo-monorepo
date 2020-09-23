@@ -175,6 +175,12 @@ const styles = StyleSheet.create({
   socialPhraseInputText: {
     minHeight: 90,
   },
+  button: {
+    alignSelf: 'center',
+    flex: 1,
+    paddingBottom: 0,
+    marginBottom: 0,
+  },
 })
 
 export default withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhraseContainer)

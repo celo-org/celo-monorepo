@@ -52,6 +52,9 @@ const styles = StyleSheet.create({
     ...fontStyles.h2,
     marginBottom: 8,
   },
+  label: {
+    color: colors.dark,
+  },
   balance: {
     ...fontStyles.mediumNumber,
     color: colors.dark,
@@ -61,6 +64,7 @@ const styles = StyleSheet.create({
     ...fontStyles.regular,
     color: colors.gray4,
   },
+  code: {},
 })
 
 export default withTranslation<Props>(Namespaces.exchangeFlow9)(CeloGoldOverview)

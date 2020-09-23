@@ -73,7 +73,7 @@ function ChartAwareSvgText({
   )
   return (
     <SvgText
-      /*
+      /* 
       // @ts-ignore */
       onLayout={onLayout}
       fill={colors.gray4}
@@ -239,7 +239,7 @@ function CeloGoldHistoryChart({ testID, i18n }: Props) {
         data={chartData.map((el) => el.amount)}
         domain={domain}
       >
-        {/*
+        {/* 
         // @ts-ignore */}
         <VictoryScatter dataComponent={<RenderPoint />} />
         <VictoryLine
@@ -272,6 +272,12 @@ const styles = StyleSheet.create({
   timeframe: {
     color: colors.gray3,
     fontSize: 16,
+  },
+  chartStyle: {
+    paddingRight: 0,
+    paddingTop: 32,
+    marginTop: -32,
+    paddingBottom: 16,
   },
   range: {
     paddingHorizontal: variables.contentPadding,

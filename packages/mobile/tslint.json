@@ -1,5 +1,5 @@
 {
-  "extends": ["@celo/typescript/tslint.json", "tslint-react-native"],
+  "extends": ["@celo/typescript/tslint.json"],
   "linterOptions": {
     "exclude": ["**/__mocks__/**", "**/lcov-report/**", "vendor", ".bundle"]
   },
@@ -7,7 +7,6 @@
     "no-relative-imports": true,
     "max-classes-per-file": [true, 2],
     "no-global-arrow-functions": false,
-    "react-hooks-nesting": "error",
-    "no-unused-styles": true
+    "react-hooks-nesting": "error"
   }
 }

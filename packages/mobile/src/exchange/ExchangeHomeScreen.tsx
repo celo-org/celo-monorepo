@@ -188,15 +188,33 @@ function ExchangeHomeScreen({ navigation }: Props) {
 export default ExchangeHomeScreen
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   contentContainer: {
     flexGrow: 1,
   },
   header: {
     alignItems: 'center',
   },
+  exchangeEvent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   background: {
     flex: 1,
     justifyContent: 'space-between',
+  },
+  head: {
+    backgroundColor: colors.light,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 62,
+  },
+  hamburger: {
+    position: 'absolute',
+    left: 0,
   },
   goldPrice: {
     padding: variables.contentPadding,

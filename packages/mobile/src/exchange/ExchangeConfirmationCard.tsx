@@ -119,4 +119,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
   },
+  buyBtn: {
+    padding: variables.contentPadding,
+  },
 })

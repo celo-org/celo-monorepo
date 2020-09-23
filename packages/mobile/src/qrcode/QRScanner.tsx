@@ -74,6 +74,14 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
   },
+  infoBox: {
+    paddingVertical: 9,
+    paddingHorizontal: 5,
+    backgroundColor: colors.dark,
+    opacity: 1,
+    marginTop: 15,
+    borderRadius: 3,
+  },
   infoText: {
     position: 'absolute',
     left: 9,

@@ -105,6 +105,11 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: MARGIN,
   },
+  terms: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+  },
   title: {
     ...fontStyles.h1,
     marginTop: 30,
