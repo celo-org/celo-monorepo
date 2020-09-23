@@ -15,9 +15,7 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import java.util.Date;
 import org.devio.rn.splashscreen.SplashScreen;
 
-public class MainActivity
-  extends ReactActivity
-  implements ReactInstanceManager.ReactInstanceEventListener {
+public class MainActivity extends ReactActivity {
   long appStartedMillis;
 
   /**
@@ -48,23 +46,14 @@ public class MainActivity
   @Override
   public void onResume() {
     super.onResume();
-    getReactInstanceManager().addReactInstanceEventListener(this);
     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
   }
 
   @Override
   public void onPause() {
     super.onPause();
-    getReactInstanceManager().removeReactInstanceEventListener(this);
     getWindow()
       .setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
-  }
-
-  @Override
-  public void onReactContextInitialized(ReactContext context) {
-    context
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("AppStartedLoading", "" + appStartedMillis);
   }
 
   @Override
@@ -74,6 +63,14 @@ public class MainActivity
       @Override
       protected ReactRootView createRootView() {
         return new RNGestureHandlerEnabledRootView(MainActivity.this);
+      }
+
+      @Override
+      protected Bundle getLaunchOptions() {
+        // This is used to pass props (in this case app start time) to React
+        Bundle props = new Bundle();
+        props.putLong("appStartedMillis", appStartedMillis);
+        return props;
       }
     };
   }

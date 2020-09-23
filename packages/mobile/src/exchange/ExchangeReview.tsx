@@ -247,6 +247,7 @@ export class ExchangeReview extends React.Component<Props, State> {
           style={styles.buyBtn}
           disabled={!appConnected || exchangeRate.isZero()}
           type={BtnTypes.TERTIARY}
+          testID="ConfirmExchange"
         />
       </SafeAreaView>
     )

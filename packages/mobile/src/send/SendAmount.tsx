@@ -9,7 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
@@ -314,13 +314,9 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={
-          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN &&
-          reviewButtonPressed ? (
-            <ActivityIndicator testID={'loading/SendAmount'} />
-          ) : (
-            t('global:review')
-          )
+        text={t('global:review')}
+        showLoading={
+          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN && reviewButtonPressed
         }
         type={BtnTypes.SECONDARY}
         onPress={onReviewButtonPressed}
