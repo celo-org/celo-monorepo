@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
   "include": ["src", "types/"],
   "references": [{ "path": "../utils" }]

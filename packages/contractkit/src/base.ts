@@ -25,6 +25,7 @@ export enum CeloContract {
   StableToken = 'StableToken',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
+  MetaTransactionWallet = 'MetaTransactionWallet',
 }
 
 export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)

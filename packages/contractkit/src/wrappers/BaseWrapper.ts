@@ -17,7 +17,7 @@ export interface Filter {
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
-  constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
+  constructor(protected readonly kit: ContractKit, public readonly contract: T) {}
 
   /** Contract address */
   get address(): string {
@@ -31,6 +31,20 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   events = this.contract.events
+}
+
+export const numericToHex = (input?: BigNumber.Value) => {
+  if (input === undefined) {
+    return '0x0'
+  } else if (!isNaN(input as number)) {
+    return ensureLeading0x(new BigNumber(input as number).toString(16))
+  } else if (typeof input === 'string') {
+    return ensureLeading0x(input)
+  } else if (input instanceof BigNumber) {
+    return ensureLeading0x(input.toString(16))
+  } else {
+    throw Error(`could not parse ${input} as a numeric`)
+  }
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
