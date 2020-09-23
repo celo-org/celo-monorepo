@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Animated, Image, StyleSheet } from 'react-native'
-import Cambio from 'src/codename-allegory/full-color-flower.png'
+import Cambio from 'src/codename-allegory/color-flower.png'
 import Outline from 'src/codename-allegory/outline-flower.png'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
