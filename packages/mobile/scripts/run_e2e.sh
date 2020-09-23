@@ -87,8 +87,6 @@ runTest() {
   extra_param=""
   if [[ $DEV_MODE == true ]]; then
     extra_param="--reuse"
-  else
-    extra_param="--cleanup"
   fi
   yarn detox test \
     --configuration $CONFIG_NAME \
