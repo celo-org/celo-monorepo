@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     zIndex: -5,
   },
   desktopRoot: {
-    marginTop: '25vh',
+    marginTop: '20vh',
   },
 })
 

@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.lightGray,
     color: colors.dark,
-    paddingHorizontal: 7,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: colors.lightGray,
     paddingVertical: 9,
@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
     transitionDuration: '300ms',
   },
   hover: {
-    backgroundColor: colors.white,
-    borderColor: colors.dark,
+    backgroundColor: colors.gray,
+    borderColor: colors.gray,
   },
   pressing: {
     borderColor: colors.white,

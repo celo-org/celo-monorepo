@@ -17,7 +17,7 @@ export default function Canvas() {
     <>
       <OpenGraph
         title="For Value Flowers"
-        description="A Wish for Collective Propsperity"
+        description="This art form is a testament to the creative trinity of code, poetry, and illustration. As a work centered around channelling the Celo story, For Value Flowers is a gift of optimism. It gives shape to a spirit of collective prosperity, and celebrates it when brought to life."
         path={menuItems.WISH.link}
         image={preview}
       />

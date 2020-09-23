@@ -16,7 +16,7 @@ export default React.memo(function Body({ isOpen }: Props) {
 
   return (
     <View style={[styles.root, isMobile && styles.mobile, isMobile && isOpen && styles.open]}>
-      <Fade duration={2500} rootMargin={'-15%'} fraction={1}>
+      <Fade duration={1500} rootMargin={'-15%'} fraction={1}>
         <RingsGlyph color={colors.dark} height={30} />
       </Fade>
       <Flower />
@@ -30,7 +30,6 @@ export default React.memo(function Body({ isOpen }: Props) {
             {'  '}
             Imagined with Celo
           </Text>
-          <Text style={[fonts.legal, textStyles.center]}>Design & Built by cLabs, © Celo 2020</Text>
         </Fade>
       </View>
     </View>
@@ -63,7 +62,7 @@ const styles = StyleSheet.create({
   mist: {
     zIndex: -2,
     position: 'fixed',
-    boxShadow: 'inset 0px -50px 8vh 15vh rgba(255,255,255,1)',
+    boxShadow: 'inset 0px 0px 8vh 15vh rgba(255,255,255,1)',
     width: '100%',
     transform: [{ scaleX: 2 }],
     bottom: 0,

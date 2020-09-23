@@ -9,7 +9,7 @@ import { colors, fonts, standardStyles, textStyles, typeFaces } from 'src/styles
 import { copyToClipboad } from 'src/utils/utils'
 import LightButon from './LightButton'
 
-const WIDTH = 300
+const WIDTH = 340
 
 export default function SideBar({ isOpen }) {
   const { isMobile } = useScreenSize()
@@ -40,21 +40,23 @@ export default function SideBar({ isOpen }) {
             heart of communal interdependence, dedicated to making the conditions for prosperity to
             flower throughout the world.
           </Text>
-          <Button
-            style={styles.chevronButton}
-            kind={BTN.DARKNAKED}
-            text="Read about the poem"
-            href="#poemlink"
-            size={SIZE.normal}
-          />
-          <Button
-            kind={BTN.DARKNAKED}
-            text="Read about the art"
-            href="#artlink"
-            style={styles.chevronButton}
-            size={SIZE.normal}
-          />
-          <View style={[standardStyles.row, standardStyles.blockMarginMobile]}>
+          <View style={standardStyles.elementalMarginTop}>
+            <Button
+              style={styles.chevronButton}
+              kind={BTN.DARKNAKED}
+              text="Read about the poem"
+              href="#poemlink"
+              size={SIZE.normal}
+            />
+            <Button
+              kind={BTN.DARKNAKED}
+              text="Read about the art"
+              href="#artlink"
+              style={styles.chevronButton}
+              size={SIZE.normal}
+            />
+          </View>
+          <View style={[standardStyles.row, standardStyles.elementalMargin]}>
             <TweetButton />
             <LightButon onPress={copyURL} style={styles.copyButton}>
               <Chainlink size={16} color={colors.dark} /> Copy
@@ -63,9 +65,9 @@ export default function SideBar({ isOpen }) {
         </View>
         <View style={standardStyles.blockMarginBottomMobile}>
           <View style={[styles.line, standardStyles.elementalMarginBottom]} />
-          <Contributor role="Poetry" name="Gabrielle Micheletti, cLabs" />
-          <Contributor role="Code & Animation" name="Aaron DeRuvo, cLabs" />
-          <Contributor role="Art & Design" name="Taylor Lahey, cLabs" />
+          <Contributor role="Poetry" name="Gabrielle Micheletti" />
+          <Contributor role="Code & Animation" name="Aaron DeRuvo" />
+          <Contributor role="Art & Design" name="Taylor Lahey" />
         </View>
       </View>
     </>
@@ -129,11 +131,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   showSide: {
-    marginHorizontal: 24,
+    paddingHorizontal: 16,
     opacity: 1,
   },
   hideSide: {
-    transform: [{ translateX: 310 }],
+    transform: [{ translateX: WIDTH + 10 }],
   },
   role: {
     textTransform: 'uppercase',
