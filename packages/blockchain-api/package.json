@@ -31,7 +31,6 @@
     "web3": "1.2.4"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
     "@google-cloud/nodejs-repo-tools": "^3.3.0",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.6",
@@ -39,6 +38,9 @@
     "jest-fetch-mock": "^2.1.2",
     "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
+  },
+  "peerDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev"
   },
   "resolutions": {
     "**/cross-fetch": "3.0.4"
