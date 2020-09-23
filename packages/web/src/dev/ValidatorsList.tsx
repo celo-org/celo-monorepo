@@ -339,7 +339,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeXL]}
               name="Votes Available"
               order={orderBy === 'votes' ? orderAsc : null}
-              tooltip="% of total locked gold votes received"
+              tooltip="% of total locked CELO votes received"
             />
             <HeaderCell
               onClick={this.orderByFn.rawVotes}
@@ -353,12 +353,12 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Votes Available"
               order={orderBy === 'votesAvailables' ? orderAsc : null}
-              tooltip="Vote capacity as a percentage of total locked gold"
+              tooltip="Vote capacity as a percentage of total locked CELO"
             />
             <HeaderCell
               onClick={this.orderByFn.gold}
               style={[styles.sizeM]}
-              name="Locked Celo Gold"
+              name="Locked CELO"
               order={orderBy === 'gold' ? orderAsc : null}
             />
             <HeaderCell
@@ -366,7 +366,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Group Share"
               order={orderBy === 'commision' ? orderAsc : null}
-              tooltip="Amount of Celo Gold locked by group/validator"
+              tooltip="Amount of CELO locked by group/validator"
             />
             <HeaderCell
               onClick={this.orderByFn.rewards}
