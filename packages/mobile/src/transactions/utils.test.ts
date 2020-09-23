@@ -50,7 +50,6 @@ describe('groupFeedItemsInSections', () => {
       mockFeedItem(daysAgo(400), 'august 2018'),
     ]
     const sections = groupFeedItemsInSections(feedItems)
-    console.log(sections)
     expect(sections.length).toEqual(6)
 
     expect(sections[0].title).toEqual('walletFlow5:feedSectionHeaderRecent')
