@@ -31,7 +31,7 @@ export default ResetAccount = () => {
     await element(by.id('backupKeyContinue')).tap()
     const mnemonic = SAMPLE_BACKUP_KEY.split(' ')
     await waitForElementId(`backupQuiz/${mnemonic[0]}`)
-    for (const word of mnemonix) {
+    for (const word of mnemonic) {
       await element(by.id(`backupQuiz/${word}`)).tap()
     }
     await element(by.id('QuizSubmit')).tap()
