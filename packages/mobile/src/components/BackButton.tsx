@@ -1,4 +1,4 @@
-import BackChevron, { Props as BackChevronProps } from '@celo/react-components/icons/BackChevron.v2'
+import BackChevron, { Props as BackChevronProps } from '@celo/react-components/icons/BackChevron'
 import variables from '@celo/react-components/styles/variables'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
