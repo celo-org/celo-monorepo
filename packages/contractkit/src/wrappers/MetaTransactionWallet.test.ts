@@ -5,7 +5,7 @@ import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import BigNumber from 'bignumber.js'
 import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
-import { buildMetaTxTypedData, MetaTransactionWalletWrapper } from './MetaTransactionWallet'
+import { MetaTransactionWalletWrapper } from './MetaTransactionWallet'
 
 const contract = require('@truffle/contract')
 const MetaTransactionWallet = contract(MTWContract)
@@ -166,15 +166,15 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
         value: new BigNumber(1e10),
         nonce: 0,
       }
-      const digest = await wallet.getMetaTransactionDigest(metaTransfer)
-      const chainId = await wallet._getChainId()
-      expect(digest).toEqual(
-        ensureLeading0x(
-          generateTypedDataHash(
-            buildMetaTxTypedData(wallet.address, metaTransfer, chainId)
-          ).toString('hex')
+
+      const onChainDigest = await wallet.getMetaTransactionDigest(metaTransfer)
+      const offChainDigest = ensureLeading0x(
+        generateTypedDataHash(await wallet.getMetaTransactionTypedData(metaTransfer)).toString(
+          'hex'
         )
       )
+
+      expect(onChainDigest).toEqual(offChainDigest)
     })
   })
 

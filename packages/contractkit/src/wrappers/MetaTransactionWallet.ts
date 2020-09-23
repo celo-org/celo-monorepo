@@ -33,7 +33,7 @@ export interface MTWSignedMetaTransaction extends MTWTransaction {
 }
 
 /**
- * Calls that wraps the MetaTransactionWallet
+ * Class that wraps the MetaTransactionWallet
  */
 export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWallet> {
   /**
