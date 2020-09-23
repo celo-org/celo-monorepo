@@ -1,5 +1,6 @@
 import App from 'next/app'
 import getConfig from 'next/config'
+import Head from 'next/head'
 import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
@@ -62,16 +63,21 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <ScreenSizeProvider>
-        <Progress />
-        {this.skipHeader() || <Header />}
-        <Component {...pageProps} />
-        {this.skipHeader() || (
-          <View>
-            <Footer />
-          </View>
-        )}
-      </ScreenSizeProvider>
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </Head>
+        <ScreenSizeProvider>
+          <Progress />
+          {this.skipHeader() || <Header />}
+          <Component {...pageProps} />
+          {this.skipHeader() || (
+            <View>
+              <Footer />
+            </View>
+          )}
+        </ScreenSizeProvider>
+      </>
     )
   }
 }

@@ -127,9 +127,6 @@ const styles = StyleSheet.create({
     color: colors.gray4,
     textAlign: 'center',
   },
-  space: {
-    paddingHorizontal: 5,
-  },
   sectionDivider: {
     alignItems: 'center',
   },

@@ -161,12 +161,12 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             <TextInput
               allowFontScaling={true}
               autoFocus={false}
+              blurOnSubmit={true}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
               onBlur={[Function]}
               onChangeText={[Function]}
-              onKeyPress={[Function]}
               placeholder="addDescription"
               placeholderTextColor="#1AB775"
               rejectResponderTermination={true}
@@ -1242,12 +1242,12 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <TextInput
               allowFontScaling={true}
               autoFocus={false}
+              blurOnSubmit={true}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
               onBlur={[Function]}
               onChangeText={[Function]}
-              onKeyPress={[Function]}
               placeholder="addDescription"
               placeholderTextColor="#1AB775"
               rejectResponderTermination={true}
@@ -2323,12 +2323,12 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <TextInput
               allowFontScaling={true}
               autoFocus={false}
+              blurOnSubmit={true}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
               onBlur={[Function]}
               onChangeText={[Function]}
-              onKeyPress={[Function]}
               placeholder="addDescription"
               placeholderTextColor="#1AB775"
               rejectResponderTermination={true}
@@ -3462,12 +3462,12 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             <TextInput
               allowFontScaling={true}
               autoFocus={false}
+              blurOnSubmit={true}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
               onBlur={[Function]}
               onChangeText={[Function]}
-              onKeyPress={[Function]}
               placeholder="addDescription"
               placeholderTextColor="#1AB775"
               rejectResponderTermination={true}
