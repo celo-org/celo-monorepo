@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createElement, ViewProps, ViewStyle } from 'react-native'
+import { unstable_createElement as createElement, ViewProps, ViewStyle } from 'react-native-web'
 
 export function Form(props: ViewProps & { children: React.ReactNode }) {
   return createElement('form', props)
