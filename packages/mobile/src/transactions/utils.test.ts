@@ -21,14 +21,14 @@ const mockFeedItem = (timestamp: number, comment: string): FeedItem => {
   }
 }
 
-const daysAgo = (days: number) => Date.now() - days * 24 * 60 * 60 * 1000
+const sept172019Timestamp = 1568735100000
+const daysAgo = (days: number) => sept172019Timestamp - days * 24 * 60 * 60 * 1000
 
 describe('groupFeedItemsInSections', () => {
   // Lock the time on Sept 17 2019.
   let dateNowSpy: any
   beforeAll(() => {
-    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => 1568735100000)
-    jest.spyOn(Date.prototype, 'getFullYear').mockImplementation(() => 2019)
+    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => sept172019Timestamp)
     // set the offset to ALWAYS be Pacific for these tests regardless of where they are run
     // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
     jest.spyOn(Date.prototype, 'getTimezoneOffset').mockImplementation(() => 420)
@@ -50,6 +50,7 @@ describe('groupFeedItemsInSections', () => {
       mockFeedItem(daysAgo(400), 'august 2018'),
     ]
     const sections = groupFeedItemsInSections(feedItems)
+    console.log(sections)
     expect(sections.length).toEqual(6)
 
     expect(sections[0].title).toEqual('walletFlow5:feedSectionHeaderRecent')

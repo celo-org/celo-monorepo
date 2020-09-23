@@ -193,7 +193,7 @@ it('renders the received data along with the standby transactions', async () => 
     </Provider>
   )
 
-  const feed = await waitForElement(() => getByType(TransactionFeed))
+  const feed = await waitForElement(() => getByType(TransactionFeed.type))
   const { data } = feed.props
   expect(data.length).toEqual(5)
 
@@ -291,7 +291,7 @@ it('ignores pending standby transactions that are completed in the response', as
     </Provider>
   )
 
-  const feed = await waitForElement(() => getByType(TransactionFeed))
+  const feed = await waitForElement(() => getByType(TransactionFeed.type))
   expect(feed.props.data.length).toEqual(2)
   expect(toJSON()).toMatchSnapshot()
 })
@@ -309,7 +309,7 @@ it('ignores failed standby transactions', async () => {
     </Provider>
   )
 
-  const feed = await waitForElement(() => getByType(TransactionFeed))
+  const feed = await waitForElement(() => getByType(TransactionFeed.type))
   expect(feed.props.data.length).toEqual(2)
   expect(toJSON()).toMatchSnapshot()
 })

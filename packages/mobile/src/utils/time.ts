@@ -1,8 +1,8 @@
 const momentTimezone = require('moment-timezone')
 
-import { getYear } from 'date-fns'
 import differenceInYears from 'date-fns/esm/differenceInYears'
 import format from 'date-fns/esm/format'
+import getYear from 'date-fns/esm/getYear'
 import { enUS, es } from 'date-fns/locale'
 import { i18n as i18nType } from 'i18next'
 import _ from 'lodash'
@@ -260,7 +260,7 @@ export const formatFeedDate = (timestamp: number, i18next: i18nType) => {
 }
 
 export const formatFeedSectionTitle = (timestamp: number, i18next: i18nType) => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = getYear(Date.now())
   const timestampYear = getYear(millisecondsSinceEpoch(timestamp))
   const dateFormat = currentYear === timestampYear ? 'MMMM' : 'MMMM yyyy'
   const title = quickFormat(timestamp, i18next, dateFormat)
