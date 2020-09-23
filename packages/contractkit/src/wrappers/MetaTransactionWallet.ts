@@ -127,7 +127,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   ): Promise<MTWSignedMetaTransaction> {
     const metaTx: MTWMetaTransaction = {
       ...tx,
-      nonce: nonce === undefined ? (await this.nonce()) + 1 : nonce,
+      nonce: nonce === undefined ? await this.nonce() : nonce,
     }
 
     const typedData = await this.getMetaTransactionTypedData(metaTx)
@@ -170,63 +170,43 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     return buildMetaTxTypedData(this.address, mtx, await this._getChainId())
   }
 
-  /**
-   * Get the struct hash of a MetaTransaction from on-chain
-   * @param mtx MTWMetaTransaction
-   * @returns string
-   */
-  getMetaTransactionStructHash(mtx: MTWMetaTransaction) {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.getMetaTransactionStructHash(
-        mtx.destination,
-        numericToHex(mtx.value),
-        mtx.data || '0x',
-        mtx.nonce
-      )
-    )
-  }
+  _spreadMetaTx = (mtx: MTWMetaTransaction): [string, string, string, number] => [
+    mtx.destination,
+    numericToHex(mtx.value),
+    mtx.data || '0x',
+    mtx.nonce,
+  ]
 
-  /**
-   * Get the EIP712 compliant digest of a MetaTransaction
-   * @param mtx MTWMetaTransaction
-   * @returns string
-   */
-  async getMetaTransactionDigest(mtx: MTWMetaTransaction) {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.getMetaTransactionDigest(
-        mtx.destination,
-        numericToHex(mtx.value),
-        mtx.data || '0x',
-        mtx.nonce
-      )
-    )
-  }
+  _spreadSignedMetaTx = (
+    mtx: MTWSignedMetaTransaction
+  ): [string, string, string, number, number, string, string] => [
+    mtx.destination,
+    numericToHex(mtx.value),
+    mtx.data || '0x',
+    mtx.nonce,
+    mtx.signature.v,
+    mtx.signature.r,
+    mtx.signature.s,
+  ]
+
+  getMetaTransactionDigest = proxyCall(
+    this.contract.methods.getMetaTransactionDigest,
+    this._spreadMetaTx,
+    stringIdentity
+  )
+
+  getMetaTransactionStructHash = proxyCall(
+    this.contract.methods.getMetaTransactionStructHash,
+    this._spreadMetaTx,
+    stringIdentity
+  )
 
   getMetaTransactionSigner = proxyCall(
     this.contract.methods.getMetaTransactionSigner,
-    (
-      mtx: MTWSignedMetaTransaction
-    ): [
-      string,
-      string | number,
-      string | number[],
-      string | number,
-      string | number,
-      string | number[],
-      string | number[]
-    ] => [
-      mtx.destination,
-      numericToHex(mtx.value),
-      mtx.data || '0x',
-      mtx.nonce,
-      mtx.signature.v,
-      mtx.signature.r,
-      mtx.signature.s,
-    ],
+    this._spreadSignedMetaTx,
     stringIdentity
   )
+
   eip712DomainSeparator = proxyCall(this.contract.methods.eip712DomainSeparator)
   isOwner = proxyCall(this.contract.methods.isOwner)
   nonce = proxyCall(this.contract.methods.nonce, undefined, valueToInt)
