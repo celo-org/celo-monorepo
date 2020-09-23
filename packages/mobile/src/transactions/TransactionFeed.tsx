@@ -1,7 +1,7 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
-import React, { memo, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { FlatList, SectionList, SectionListData } from 'react-native'
 import { useSelector } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
@@ -123,6 +123,6 @@ export const TransactionFeedFragments = {
   `,
 }
 
-// TODO: We should do a better comparison of the |data| prop to decide when to re-render.
+// TODO: Meassure performance of this screen and decide if we need to optimize the number of renders.
 // Right now |data| always changes (returns a different ref) which causes many extra renders.
-export default memo(TransactionFeed)
+export default TransactionFeed

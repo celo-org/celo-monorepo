@@ -309,21 +309,21 @@ export const getLocalTimezone = () => {
   return timezoneGuess.format('zz')
 }
 
-const oneSecondInMillis = 1000
-const oneMinuteInMillis = 60 * oneSecondInMillis
-const oneHourInMillis = 60 * oneMinuteInMillis
-const oneDayInMillis = 24 * oneHourInMillis
+const ONE_SECOND_IN_MILLIS = 1000
+const ONE_MINUTE_IN_MILLIS = 60 * ONE_SECOND_IN_MILLIS
+const ONE_HOUR_IN_MILLIS = 60 * ONE_MINUTE_IN_MILLIS
+const ONE_DAY_IN_MILLIS = 24 * ONE_HOUR_IN_MILLIS
 
 export const timeDeltaInDays = (currTime: number, prevTime: number) => {
-  return timeDifference(currTime, prevTime) / oneDayInMillis
+  return timeDifference(currTime, prevTime) / ONE_DAY_IN_MILLIS
 }
 
 export const timeDeltaInHours = (currTime: number, prevTime: number) => {
-  return timeDifference(currTime, prevTime) / oneHourInMillis
+  return timeDifference(currTime, prevTime) / ONE_HOUR_IN_MILLIS
 }
 
 export const timeDeltaInSeconds = (currTime: number, prevTime: number) => {
-  return timeDifference(currTime, prevTime) / oneSecondInMillis
+  return timeDifference(currTime, prevTime) / ONE_SECOND_IN_MILLIS
 }
 
 function timeDifference(currTime: number, prevTime: number) {
