@@ -1,6 +1,5 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
@@ -119,8 +118,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 30,
-  },
-  buyBtn: {
-    padding: variables.contentPadding,
   },
 })
