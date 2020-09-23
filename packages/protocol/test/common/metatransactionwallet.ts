@@ -129,7 +129,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should emit the SignerSet event', () => {
-      assertLogMatches2(initializeRes.logs[0], {
+      assertLogMatches2(initializeRes.logs[1], {
         event: 'SignerSet',
         args: {
           signer,
@@ -138,7 +138,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should emit the EIP712DomainSeparatorSet event', () => {
-      assertLogMatches2(initializeRes.logs[1], {
+      assertLogMatches2(initializeRes.logs[2], {
         event: 'EIP712DomainSeparatorSet',
         args: {
           eip712DomainSeparator: getDomainDigest(wallet.address),
@@ -147,7 +147,7 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
 
     it('should emit the OwnershipTransferred event', () => {
-      assertLogMatches2(initializeRes.logs[2], {
+      assertLogMatches2(initializeRes.logs[3], {
         event: 'OwnershipTransferred',
         args: {
           previousOwner: accounts[0],
