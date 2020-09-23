@@ -138,7 +138,6 @@ export class ImportWalletSocial extends React.Component<Props, State> {
           }
           onPress={this.onPressRestore}
           text={t('restoreWallet')}
-          standard={false}
           type={BtnTypes.PRIMARY}
           testID="ImportWalletSocialButton"
         />

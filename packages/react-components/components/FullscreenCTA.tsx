@@ -27,7 +27,6 @@ class FullscreenCTA extends React.PureComponent<Props> {
           <Button
             onPress={CTAHandler}
             text={CTAText}
-            standard={true}
             type={BtnTypes.PRIMARY}
             testID="ErrorContinueButton"
           />

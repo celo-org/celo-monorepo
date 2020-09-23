@@ -136,7 +136,6 @@ class BackupSocial extends React.Component<Props, State> {
             disabled={!isConfirmChecked}
             onPress={this.onPressDone}
             text={t('global:done')}
-            standard={false}
             type={BtnTypes.PRIMARY}
           />
         )}

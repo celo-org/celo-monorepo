@@ -1,4 +1,4 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import UpHandle from '@celo/react-components/icons/UpHandle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'

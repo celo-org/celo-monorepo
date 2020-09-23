@@ -1,4 +1,4 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHeadNew from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import _ from 'lodash'
 import * as React from 'react'

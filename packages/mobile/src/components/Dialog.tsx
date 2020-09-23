@@ -1,4 +1,4 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'

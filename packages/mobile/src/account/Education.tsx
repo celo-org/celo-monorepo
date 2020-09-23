@@ -1,4 +1,4 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import BackChevron from '@celo/react-components/icons/BackChevron.v2'
 import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors'

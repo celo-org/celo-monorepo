@@ -1,4 +1,4 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors'

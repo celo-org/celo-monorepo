@@ -55,14 +55,12 @@ class BackupSocialIntro extends React.Component<Props> {
           <Button
             onPress={this.onPressContinue}
             text={t('setUpSocialBackup')}
-            standard={false}
             type={BtnTypes.PRIMARY}
           />
           {this.isIncomingFromBackupFlow() && (
             <Button
               onPress={this.onPressSkip}
               text={t('socialBackupIntro.skip')}
-              standard={false}
               type={BtnTypes.SECONDARY}
             />
           )}

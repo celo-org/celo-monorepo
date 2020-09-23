@@ -137,28 +137,23 @@ export class InviteReview extends React.Component<Props, State> {
           onPress={this.onInviteSMS}
           text={t('inviteWithSMS')}
           accessibilityLabel={t('inviteWithSMS')}
-          standard={false}
           type={BtnTypes.TERTIARY}
           disabled={inviteInProgress}
-        >
-          <SMSLogo />
-        </GethAwareButton>
+        />
+        <SMSLogo />
         <GethAwareButton
           testID={'inviteWhatsApp'}
           onPress={this.onInviteWhatsApp}
           text={t('inviteWithWhatsapp')}
           accessibilityLabel={t('inviteWithWhatsapp')}
-          standard={false}
           type={BtnTypes.TERTIARY}
           disabled={inviteInProgress}
-        >
-          <WhatsAppLogo />
-        </GethAwareButton>
+        />
+        <WhatsAppLogo />
         <Button
           onPress={this.onEdit}
           text={t('cancel')}
           accessibilityLabel={t('cancel')}
-          standard={false}
           type={BtnTypes.SECONDARY}
           disabled={inviteInProgress}
         />

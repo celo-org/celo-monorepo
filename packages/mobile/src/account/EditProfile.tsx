@@ -50,7 +50,7 @@ export class EditProfile extends React.Component<Props, State> {
     return (
       <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
         <TextInput
-          style={[styles.input, fontStyles.regular]}
+          style={styles.input}
           underlineColorAndroid={'transparent'}
           autoFocus={true}
           autoCorrect={false}
@@ -66,6 +66,7 @@ export class EditProfile extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   input: {
+    ...fontStyles.regular,
     borderWidth: 1,
     borderRadius: 3,
     borderColor: '#EEEEEE',

@@ -1,4 +1,4 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'

@@ -1,5 +1,5 @@
 import Card from '@celo/react-components/components/Card'
-import TextInput from '@celo/react-components/components/TextInput.v2'
+import TextInput from '@celo/react-components/components/TextInput'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'

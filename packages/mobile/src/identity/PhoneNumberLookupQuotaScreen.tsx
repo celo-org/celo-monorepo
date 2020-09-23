@@ -65,7 +65,6 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
           onPress={onBuy}
           disabled={!userBalanceIsSufficient || isSending}
           text={t('quotaLookup.cta')}
-          standard={false}
           type={BtnTypes.PRIMARY}
           testID="QuotaBuyButton"
         />
@@ -73,7 +72,6 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
           onPress={onSkip}
           disabled={isSending}
           text={t('global:skip')}
-          standard={false}
           type={BtnTypes.SECONDARY}
           testID="QuotaSkipButton"
         />

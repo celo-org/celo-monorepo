@@ -1,4 +1,4 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHeadNew from '@celo/react-components/components/SectionHead'
 import {
   SettingsExpandedItem,
   SettingsItemSwitch,

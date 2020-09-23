@@ -1,7 +1,7 @@
 // SCREEN where users can review the data about the witdrawal of CELO they are about to make
 // and confirm.
 
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'

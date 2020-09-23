@@ -1,4 +1,4 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'

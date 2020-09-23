@@ -47,12 +47,7 @@ export class SetClock extends React.Component<WithTranslation> {
         </View>
         <View>
           <Text style={[fontStyles.small, styles.instructions]}>{t('adjustYourClock')}</Text>
-          <Button
-            onPress={this.goToSettings}
-            text={t('adjustDate')}
-            standard={true}
-            type={BtnTypes.PRIMARY}
-          />
+          <Button onPress={this.goToSettings} text={t('adjustDate')} type={BtnTypes.PRIMARY} />
         </View>
       </View>
     )

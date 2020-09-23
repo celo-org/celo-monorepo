@@ -1,4 +1,4 @@
-import { BtnTypes } from '@celo/react-components/components/Button.v2'
+import { BtnTypes } from '@celo/react-components/components/Button'
 import { TransitionPresets } from '@react-navigation/stack'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'

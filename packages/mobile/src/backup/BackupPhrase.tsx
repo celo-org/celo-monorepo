@@ -1,5 +1,5 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import Switch from '@celo/react-components/components/Switch.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import Switch from '@celo/react-components/components/Switch'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'

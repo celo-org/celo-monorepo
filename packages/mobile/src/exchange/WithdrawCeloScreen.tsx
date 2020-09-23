@@ -1,7 +1,7 @@
 // SCREEN First step on the "Withdraw CELO" flow where user provides an address to withdraw to
 // and an amount.
 
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'

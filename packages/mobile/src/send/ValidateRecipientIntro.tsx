@@ -1,5 +1,5 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'

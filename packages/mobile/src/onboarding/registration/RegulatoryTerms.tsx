@@ -1,4 +1,4 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'

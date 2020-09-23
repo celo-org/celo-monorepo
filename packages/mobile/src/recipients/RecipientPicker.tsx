@@ -1,5 +1,5 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHeadNew from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'

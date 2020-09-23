@@ -100,7 +100,6 @@ export class Debug extends React.Component<RootState, State> {
         <Button
           onPress={this.onClickEmailLogs}
           text={'Email logs to support'}
-          standard={true}
           type={BtnTypes.PRIMARY}
           style={styles.button}
         />
