@@ -59,10 +59,6 @@ const styles = StyleSheet.create({
     ...fontStyles.large,
     color: colors.gray3,
   },
-  button: {
-    marginTop: 20,
-    alignSelf: 'center',
-  },
 })
 
 export default withTranslation<Props>(Namespaces.walletFlow5)(NoActivity)

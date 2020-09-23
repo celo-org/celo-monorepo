@@ -93,9 +93,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 15,
   },
-  loader: {
-    marginBottom: 20,
-  },
 })
 
 export default connect<{}, DispatchProps, OwnProps, RootState>(null, {

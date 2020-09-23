@@ -114,9 +114,6 @@ const styles = StyleSheet.create({
   optionsListContainer: {
     flex: 1,
   },
-  option: {
-    backgroundColor: colors.light,
-  },
   optionTitle: {
     ...fontStyles.regular,
   },
