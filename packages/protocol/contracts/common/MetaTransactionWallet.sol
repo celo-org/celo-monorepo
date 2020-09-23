@@ -107,12 +107,12 @@ contract MetaTransactionWallet is
    * @param _nonce The nonce for this meta-transaction local to this wallet.
    * @return The digest of the provided meta-transaction.
    */
-  function getMetaTransactionStructHash(
+  function _getMetaTransactionStructHash(
     address destination,
     uint256 value,
     bytes memory data,
     uint256 _nonce
-  ) public view returns (bytes32) {
+  ) internal view returns (bytes32) {
     return
       keccak256(
         abi.encode(
@@ -139,7 +139,7 @@ contract MetaTransactionWallet is
     bytes memory data,
     uint256 _nonce
   ) public view returns (bytes32) {
-    bytes32 structHash = getMetaTransactionStructHash(destination, value, data, _nonce);
+    bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
     return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
   }
 
@@ -163,7 +163,7 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    bytes32 structHash = getMetaTransactionStructHash(destination, value, data, _nonce);
+    bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
     return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
   }
 

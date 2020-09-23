@@ -54,7 +54,7 @@ library Signatures {
   * @notice Given a domain separator and a structHash, construct the typed data hash
   * @param eip712DomainSeparator Context specific domain separator
   * @param structHash hash of the typed data struct
-  * @return The EIP712 singed typed data hash
+  * @return The EIP712 typed data hash
   */
   function toEthSignedTypedDataHash(bytes32 eip712DomainSeparator, bytes32 structHash)
     public
