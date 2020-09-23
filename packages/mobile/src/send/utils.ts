@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { call, put, select, take } from 'redux-saga/effects'
+import { all, call, put, select, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -9,8 +9,14 @@ import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { FeeType } from 'src/fees/actions'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
-import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
+import {
+  addressToE164NumberSelector,
+  AddressToE164NumberType,
+  E164NumberToAddressType,
+  SecureSendPhoneNumberMapping,
+} from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
 import {
   Actions,
@@ -24,12 +30,15 @@ import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localC
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
+import { setRecipientCache } from 'src/recipients/actions'
 import {
+  NumberToRecipient,
   Recipient,
   RecipientKind,
   RecipientWithContact,
   RecipientWithQrCode,
 } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
@@ -171,6 +180,27 @@ export function showLimitReachedError(
   return showError(ErrorMessages.PAYMENT_LIMIT_REACHED, ALERT_BANNER_DURATION, translationParams)
 }
 
+// exported for testing
+export function* _updateRecipientCache(recipient: RecipientWithQrCode) {
+  if (!recipient.e164PhoneNumber) {
+    return
+  }
+  const addressToE164Number: AddressToE164NumberType = yield select(addressToE164NumberSelector)
+  const recipientCache: NumberToRecipient = yield select(recipientCacheSelector)
+
+  recipientCache[recipient.e164PhoneNumber] = {
+    contactId: '',
+    ...recipient,
+    kind: RecipientKind.Contact,
+  }
+  addressToE164Number[recipient.address] = recipient.e164PhoneNumber
+
+  yield all([
+    put(setRecipientCache(recipientCache)),
+    put(updateE164PhoneNumberAddresses({}, addressToE164Number)),
+  ])
+}
+
 export function* handleSendPaymentData(
   data: UriData,
   cachedRecipient?: RecipientWithContact,
@@ -178,7 +208,7 @@ export function* handleSendPaymentData(
 ) {
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
-    address: data.address,
+    address: data.address.toLowerCase(),
     displayId: data.e164PhoneNumber,
     displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
     e164PhoneNumber: data.e164PhoneNumber,
@@ -186,6 +216,8 @@ export function* handleSendPaymentData(
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
   }
+
+  yield call(_updateRecipientCache, recipient)
   yield put(storeLatestInRecents(recipient))
 
   if (data.currencyCode) {
