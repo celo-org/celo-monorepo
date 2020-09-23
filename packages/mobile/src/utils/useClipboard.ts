@@ -6,6 +6,12 @@ import Logger from 'src/utils/Logger'
 
 const CLIPBOARD_CHECK_INTERVAL = 1000 // 1sec
 
+// Return values:
+// - forceShowingPasteIcon: boolean -> true if we can't read the clipboard continuously so we should show
+//      any pasting indicators without checking the string content.
+// - clipboardContent: string -> Latest read from the clipboard we have. Will be empty on iOS 14 and above.
+// - getFreshClipboardContent: () => Promise<string> -> Fetches the content from the clipboard. It will show
+//      a notification to the user on iOS 14 and above.
 export function useClipboard(): [boolean, string, () => Promise<string>] {
   const [forceShowingPasteIcon, setForceShowingPasteIcon] = useState(false)
   const [clipboardContent, setClipboardContent] = useState('')
