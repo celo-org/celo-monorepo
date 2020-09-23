@@ -91,7 +91,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
         </View>
         {mode === BackupPhraseContainerMode.READONLY && (
           <View style={styles.phraseContainer}>
-            {!!words && <Text style={styles.phraseText}>{words}</Text>}
+            {!!words && (
+              <Text style={styles.phraseText} testID="AccountKeyWords">
+                {words}
+              </Text>
+            )}
           </View>
         )}
         {mode === BackupPhraseContainerMode.INPUT && (

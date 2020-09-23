@@ -543,6 +543,7 @@ exports[`ExchangeReview renders correctly 1`] = `
             "paddingVertical": 5,
           }
         }
+        testID="ConfirmExchange"
       >
         <Text
           style={

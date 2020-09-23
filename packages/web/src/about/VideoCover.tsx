@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { createElement, Image, StyleSheet, View, ViewStyle } from 'react-native'
+import {
+  Image,
+  StyleSheet,
+  unstable_createElement as createElement,
+  View,
+  ViewStyle,
+} from 'react-native-web'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'

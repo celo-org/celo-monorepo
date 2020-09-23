@@ -493,7 +493,6 @@ export function MainStackScreen() {
       acceptedTerms,
       pincodeType,
       redeemComplete,
-      account,
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
@@ -504,7 +503,7 @@ export function MainStackScreen() {
     } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
-    } else if (!redeemComplete && !account) {
+    } else if (!redeemComplete) {
       initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
