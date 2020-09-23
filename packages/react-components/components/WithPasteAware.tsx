@@ -21,6 +21,11 @@ interface PasteAwareState {
   clipboardContent: string | null
 }
 
+export function deviceIsIos14OrNewer() {
+  const majorVersionIOS = parseInt(Platform.Version.toString(), 10)
+  return Platform.OS === 'ios' && majorVersionIOS >= 14
+}
+
 export function withPasteAware<P extends ViewProps>(
   WrappedView: React.ComponentType<P & PasteAwareWrappedElementProps>
 ) {
@@ -56,8 +61,7 @@ export function withPasteAware<P extends ViewProps>(
           return
         }
 
-        const majorVersionIOS = parseInt(Platform.Version.toString(), 10)
-        if (Platform.OS === 'ios' && majorVersionIOS >= 14) {
+        if (deviceIsIos14OrNewer()) {
           const clipboardHasContent = await Clipboard.hasString()
           this.setState({ isPasteIconVisible: clipboardHasContent, clipboardContent: null })
           return

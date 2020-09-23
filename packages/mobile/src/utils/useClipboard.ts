@@ -1,11 +1,12 @@
+import { deviceIsIos14OrNewer } from '@celo/react-components/components/WithPasteAware'
 import Clipboard from '@react-native-community/clipboard'
 import { useEffect, useState } from 'react'
-import { AppState, Platform } from 'react-native'
+import { AppState } from 'react-native'
 import Logger from 'src/utils/Logger'
 
 const CLIPBOARD_CHECK_INTERVAL = 1000 // 1sec
 
-export function useClipboard(): [boolean, string] {
+export function useClipboard(): [boolean, string, () => Promise<string>] {
   const [forceShowingPasteIcon, setForceShowingPasteIcon] = useState(false)
   const [clipboardContent, setClipboardContent] = useState('')
 
@@ -14,8 +15,7 @@ export function useClipboard(): [boolean, string] {
 
     async function checkClipboardContent() {
       try {
-        const majorVersionIOS = parseInt(Platform.Version.toString(), 10)
-        if (Platform.OS === 'ios' && majorVersionIOS >= 14) {
+        if (deviceIsIos14OrNewer()) {
           setForceShowingPasteIcon(await Clipboard.hasString())
           return
         }
@@ -46,5 +46,5 @@ export function useClipboard(): [boolean, string] {
     }
   }, [])
 
-  return [forceShowingPasteIcon, clipboardContent]
+  return [forceShowingPasteIcon, clipboardContent, Clipboard.getString]
 }

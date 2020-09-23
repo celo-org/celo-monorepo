@@ -50,20 +50,20 @@ export default function CodeInput({
   testID,
   style,
 }: Props) {
-  const [forceShowingPasteIcon, clipboardContent] = useClipboard()
+  const [forceShowingPasteIcon, clipboardContent, getFreshClipboardContent] = useClipboard()
 
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
     LayoutAnimation.easeInEaseOut()
   }, [status === CodeInputStatus.INPUTTING])
 
-  function shouldShowClipboardInternal(clipboard: string) {
+  function shouldShowClipboardInternal() {
     if (forceShowingPasteIcon) {
       return true
     }
     return (
-      !inputValue.toLowerCase().startsWith(clipboard.toLowerCase()) &&
-      shouldShowClipboard(clipboard)
+      !inputValue.toLowerCase().startsWith(clipboardContent.toLowerCase()) &&
+      shouldShowClipboard(clipboardContent)
     )
   }
 
@@ -87,8 +87,7 @@ export default function CodeInput({
               <TextInput
                 value={inputValue}
                 placeholder={
-                  inputPlaceholderWithClipboardContent &&
-                  shouldShowClipboardInternal(clipboardContent)
+                  inputPlaceholderWithClipboardContent && shouldShowClipboardInternal()
                     ? inputPlaceholderWithClipboardContent
                     : inputPlaceholder
                 }
@@ -111,8 +110,8 @@ export default function CodeInput({
         </View>
         {showInput && (
           <ClipboardAwarePasteButton
-            clipboardContent={clipboardContent}
-            shouldShow={shouldShowClipboardInternal}
+            getClipboardContent={getFreshClipboardContent}
+            shouldShow={shouldShowClipboardInternal()}
             onPress={onInputChange}
           />
         )}

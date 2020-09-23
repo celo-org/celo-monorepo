@@ -39,7 +39,6 @@ SendIntentAndroid.openSMSApp = jest.fn()
 
 const clipboardGetStringMock = (Clipboard.getString = jest.fn())
 const clipboardHasStringMock = (Clipboard.hasString = jest.fn())
-Platform.OS = 'ios'
 const mockPlatformVersion = (version: string) => {
   Object.defineProperty(Platform, 'Version', {
     get: () => version,
@@ -185,6 +184,7 @@ describe('EnterInviteCode Screen', () => {
     clipboardGetStringMock.mockResolvedValue(VALID_INVITE)
     clipboardHasStringMock.mockResolvedValue(false)
     mockPlatformVersion('14.0')
+    Platform.OS = 'ios'
     const wrapper = render(
       <Provider store={createMockStore()}>
         <EnterInviteCodeClass
@@ -208,6 +208,7 @@ describe('EnterInviteCode Screen', () => {
     clipboardGetStringMock.mockResolvedValue(VALID_INVITE)
     clipboardHasStringMock.mockResolvedValue(true)
     mockPlatformVersion('14.0')
+    Platform.OS = 'ios'
     const wrapper = render(
       <Provider store={createMockStore()}>
         <EnterInviteCodeClass
