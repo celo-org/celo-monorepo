@@ -57,24 +57,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
-  nameContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingRight: 5,
-  },
   name: { ...fontStyles.regular500, color: colors.dark },
-  invite: {
-    color: colors.greenBrand,
-    lineHeight: 41,
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-  },
-  image: {
-    height: 40,
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   phone: {
     ...fontStyles.small,
     color: colors.gray4,
