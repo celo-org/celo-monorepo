@@ -12,7 +12,7 @@ const MetaTransactionWallet = contract(MTWContract)
 
 testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   MetaTransactionWallet.setProvider(web3.currentProvider)
-  // const walletProxy = new web3.eth.Contract(MTWContract.abi as any)
+
   const deployWallet = async (deployer: Address, signer: Address): Promise<Address> => {
     const instance = await MetaTransactionWallet.new({ from: deployer })
     await instance.initialize(signer, { from: deployer })
@@ -29,8 +29,8 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
-    kit.defaultAccount = accounts[0]
     walletSigner = accounts[0]
+    kit.defaultAccount = walletSigner
     rando = accounts[1]
     gold = await kit.contracts.getGoldToken()
   })
@@ -42,10 +42,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     wallet._getChainId = () => Promise.resolve(1)
 
     // Give the wallet some funds
-    await gold.transfer(wallet.address, new BigNumber(20e18).toFixed()).sendAndWaitForReceipt({
-      from: accounts[0],
-    })
-
+    await gold.transfer(wallet.address, new BigNumber(20e18).toFixed()).sendAndWaitForReceipt()
     emptyAccounts = [0, 0, 0, 0, 0].map(() => web3.utils.randomHex(20))
   })
 
