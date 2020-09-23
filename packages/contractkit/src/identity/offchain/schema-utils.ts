@@ -7,15 +7,10 @@ import {
   RootError,
   trimLeading0x,
 } from '@celo/base/src'
-import {
-  ensureLeading0x,
-  privateKeyToAddress,
-  privateKeyToPublicKey,
-  publicKeyToAddress,
-} from '@celo/utils/lib/address'
-import { Decrypt, Encrypt } from '@celo/utils/lib/ecies'
+import { ensureLeading0x, publicKeyToAddress } from '@celo/utils/lib/address'
+import { Encrypt } from '@celo/utils/lib/ecies'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
-import { computeSharedSecret, trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
+import { trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
@@ -86,43 +81,8 @@ export class SimpleSchema<DataType> {
     return verifySchema(this.type, response.result)
   }
 
-  async readEncryptedWithKey(privateKey: string, senderPubKey: string) {
-    const sharedSecret = await computeSharedSecret(privateKey, senderPubKey)
-
-    const response = await readEncrypted(
-      this.wrapper,
-      this.dataPath,
-      (data) => Promise.resolve(Decrypt(Buffer.from(trimLeading0x(privateKey), 'hex'), data)),
-      sharedSecret,
-      publicKeyToAddress(senderPubKey),
-      privateKeyToAddress(privateKey)
-    )
-    if (!response.ok) {
-      return Err(new InvalidDataError())
-    }
-
-    return verifySchema(this.type, response.result)
-  }
-
   async write(data: DataType) {
     return writeWithSchema(this.wrapper, this.type, this.dataPath, data)
-  }
-
-  /**
-   * Primarily used for testing, we don't recommend keeping private keys in plaintext
-   */
-  async writeEncryptedWithKey(data: DataType, privateKey: string, recipientPubKey: string) {
-    const sharedSecret = await computeSharedSecret(privateKey, recipientPubKey)
-
-    return writeEncryptedWithSchema(
-      this.wrapper,
-      this.type,
-      this.dataPath,
-      data,
-      sharedSecret,
-      privateKeyToPublicKey(privateKey),
-      recipientPubKey
-    )
   }
 
   async writeEncrypted(data: DataType, fromAddress: string, toAddress: string) {
@@ -258,6 +218,7 @@ export class EncryptionKeysAccessor {
   // ) {
   //   return writeEncryptedWithSchema(
   //     this.wrapper,
+  //     this.t
   //     EncryptionKeysSchema,
   //     this.basePath + '/' + other + '/encryptionKeys',
   //     keys,

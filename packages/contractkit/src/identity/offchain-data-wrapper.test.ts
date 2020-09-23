@@ -172,20 +172,6 @@ testWithGanache('Offchain Data', (web3) => {
 
   describe('encryption', () => {
     describe('when no keys are loaded in the wallet', () => {
-      it('can read and write when passing keys in directly', async () => {
-        const testname = 'test'
-        const payload = { name: testname }
-
-        const nameAccessor = new NameAccessor(wrapper)
-
-        await nameAccessor.writeEncryptedWithKey(payload, writerPrivate, readerPublic)
-        const receivedName = await nameAccessor.readEncryptedWithKey(readerPrivate, writerPublic)
-        expect(receivedName).toBeDefined()
-        expect(receivedName?.ok).toBeTruthy()
-        // @ts-ignore
-        expect(receivedName?.result).toEqual(payload)
-      })
-
       it('cannot write encrypted data', async () => {
         const testname = 'test'
         const payload = { name: testname }
@@ -205,7 +191,8 @@ testWithGanache('Offchain Data', (web3) => {
         const payload = { name: testname }
 
         const nameAccessor = new NameAccessor(wrapper)
-        await nameAccessor.writeEncryptedWithKey(payload, writerPrivate, readerPublic)
+        kit.addAccount(writerPrivate)
+        await nameAccessor.writeEncrypted(payload, writerAddress, readerAddress)
 
         try {
           await nameAccessor.readEncrypted(readerAddress, writerAddress)
@@ -213,6 +200,8 @@ testWithGanache('Offchain Data', (web3) => {
         } catch (e) {
           expect(e.message).toEqual(`Could not find address ${readerAddress.toLowerCase()}`)
         }
+
+        kit.removeAccount(writerAddress)
       })
     })
 
