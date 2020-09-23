@@ -36,16 +36,15 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   })
 
   beforeEach(async () => {
-    const walletAddress = await deployWallet(accounts[0], walletSigner)
+    const walletAddress = await deployWallet(walletSigner, walletSigner)
     wallet = await kit.contracts.getMetaTransactionWallet(walletAddress)
     // Ganache returns 1 in chainId assembly code
     wallet._getChainId = () => Promise.resolve(1)
 
-    await gold
-      .transfer(wallet.address, '0x' + new BigNumber(1e18).times(100).toString(16))
-      .sendAndWaitForReceipt({
-        from: accounts[0],
-      })
+    // Give the wallet some funds
+    await gold.transfer(wallet.address, new BigNumber(20e18).toFixed()).sendAndWaitForReceipt({
+      from: accounts[0],
+    })
 
     emptyAccounts = [0, 0, 0, 0, 0].map(() => web3.utils.randomHex(20))
   })
@@ -86,9 +85,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
         const result = await wallet
           .executeTransaction({
             destination: gold.address,
-            data: gold.contract.methods
-              .transfer(emptyAccounts[0], '0x' + value.toString(16))
-              .encodeABI(),
+            data: gold.contract.methods.transfer(emptyAccounts[0], value.toFixed()).encodeABI(),
           })
           .sendAndWaitForReceipt()
         expect(result.status).toBe(true)
