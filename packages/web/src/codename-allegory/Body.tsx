@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import Abundance from 'src/codename-allegory/community-abundance.png'
 import Flower from 'src/codename-allegory/Flower'
 import Poem from 'src/codename-allegory/Poem'
 import { useScreenSize } from 'src/layout/ScreenSize'
@@ -24,7 +25,10 @@ export default React.memo(function Body({ isOpen }: Props) {
       <Poem />
 
       <View style={styles.footer}>
-        <Fade duration={2100} rootMargin={'-35% 0% -45% 0%'} fraction={1} style={styles.imagine}>
+        <Fade duration={2000} fraction={1} rootMargin={'-5% 0% -25%'} style={styles.imagine}>
+          <Image source={Abundance} style={styles.abundance} />
+        </Fade>
+        <Fade duration={5000} fraction={1} rootMargin={'-20% 0% -40%'}>
           <Text style={[fonts.legal, textStyles.center]}>
             <RingsGlyph height={15} color={colors.dark} />
             {'  '}
@@ -39,12 +43,14 @@ export default React.memo(function Body({ isOpen }: Props) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 32,
     alignItems: 'center',
     paddingTop: '15vh',
-    marginBottom: '45vh',
+    marginBottom: '40vh',
   },
+  abundance: { width: 196, height: 200 },
   footer: {
+    marginTop: '45vh',
     marginVertical: 30,
   },
   open: {
@@ -58,7 +64,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: '10vh',
   },
-  imagine: { marginTop: '45vh' },
+  imagine: { marginBottom: 15 },
   mist: {
     zIndex: -2,
     position: 'fixed',
