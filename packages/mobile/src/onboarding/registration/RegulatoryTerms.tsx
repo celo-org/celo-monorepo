@@ -1,5 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'

@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
   },
   codeValue: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     fontSize: 15,
     color: colors.gray5,
   },

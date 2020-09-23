@@ -108,7 +108,7 @@ export default function Button(props: ButtonProps) {
           {children}
           <Text
             accessibilityLabel={accessibilityLabel}
-            style={[fontStyles.buttonText, { color: textColor }, styles.text]}
+            style={[fontStyles.regular, { color: textColor }, styles.text]}
           >
             {text}
           </Text>

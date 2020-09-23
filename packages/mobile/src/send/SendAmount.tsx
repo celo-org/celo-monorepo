@@ -1,6 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { parseInputAmount } from '@celo/utils/src/parsing'

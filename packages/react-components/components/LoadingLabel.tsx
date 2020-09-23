@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, Text, TextStyle, View } from 'react-native'
 
@@ -27,14 +27,14 @@ export default class LoadingLabel extends React.PureComponent<Props> {
       <View style={style.container}>
         {isLoading && (
           <>
-            <Text style={[fontStyles.bodySmall, labelTextStyle]}>{loadingLabelText}</Text>
+            <Text style={[fontStyles.small, labelTextStyle]}>{loadingLabelText}</Text>
             <ActivityIndicator style={style.loadingIcon} size="small" color={colors.greenBrand} />
           </>
         )}
         {!isLoading && labelText && (
           <>
-            <Text style={[fontStyles.bodySmall, labelTextStyle]}>{labelText}</Text>
-            {valueText && <Text style={[fontStyles.bodySmall, valueTextStyle]}>{valueText}</Text>}
+            <Text style={[fontStyles.small, labelTextStyle]}>{labelText}</Text>
+            {valueText && <Text style={[fontStyles.small, valueTextStyle]}>{valueText}</Text>}
           </>
         )}
       </View>

@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'

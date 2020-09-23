@@ -1,6 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { format } from 'date-fns'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -36,7 +36,7 @@ export class SetClock extends React.Component<WithTranslation> {
           <Text style={[fontStyles.h1, style.time]} testID="SetClockTitle">
             {format(getRemoteTime(), 'Pp')}
           </Text>
-          <Text style={fontStyles.body} testID="SetClockTitle">
+          <Text style={fontStyles.regular} testID="SetClockTitle">
             ({getLocalTimezone()})
           </Text>
         </View>
@@ -46,7 +46,7 @@ export class SetClock extends React.Component<WithTranslation> {
           </Text>
         </View>
         <View>
-          <Text style={[fontStyles.bodySmall, style.instructions]}>{t('adjustYourClock')}</Text>
+          <Text style={[fontStyles.small, style.instructions]}>{t('adjustYourClock')}</Text>
           <Button
             onPress={this.goToSettings}
             text={t('adjustDate')}

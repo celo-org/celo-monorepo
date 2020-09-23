@@ -4,7 +4,7 @@
 
 import Touchable, { Props as TouchableProps } from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
 
@@ -23,8 +23,7 @@ export default function TextButton(props: Props) {
 
 const styles = StyleSheet.create({
   text: {
-    ...fontStyles.bodySmall,
-    ...fontStyles.semiBold,
+    ...fontStyles.small500,
     color: colors.greenBrand,
   },
 })

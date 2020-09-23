@@ -1,7 +1,7 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'

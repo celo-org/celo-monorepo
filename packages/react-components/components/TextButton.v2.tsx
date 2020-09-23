@@ -4,7 +4,7 @@
 
 import BorderlessButton, { Props } from '@celo/react-components/components/BorderlessButton.v2'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
 

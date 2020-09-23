@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors, { Colors } from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { debounce } from 'lodash'
 import React, { ReactNode, useCallback } from 'react'
 import { ActivityIndicator, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'

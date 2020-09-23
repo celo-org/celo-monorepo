@@ -1,7 +1,7 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'

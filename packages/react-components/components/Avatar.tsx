@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
@@ -39,7 +39,7 @@ export class Avatar extends React.PureComponent<Props> {
           size={iconSize}
         />
         <Text
-          style={[displayNameStyle || fontStyles.bodySmallSemiBold, style.contactName]}
+          style={[displayNameStyle || fontStyles.small500, style.contactName]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
@@ -54,7 +54,7 @@ export class Avatar extends React.PureComponent<Props> {
 
         {!e164Number && address ? (
           <Text
-            style={[fontStyles.bodySmall, fontStyles.light, style.contactName]}
+            style={[fontStyles.small, style.contactName]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >

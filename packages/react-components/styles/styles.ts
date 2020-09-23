@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontFamily } from '@celo/react-components/styles/fonts'
+import fontFamily from '@celo/react-components/styles/fonts'
 import { StyleSheet } from 'react-native'
 
 export const TOP_BAR_HEIGHT = 56
@@ -38,11 +38,11 @@ export const componentStyles = StyleSheet.create({
     height: 60,
   },
   input: {
+    ...fontFamily.regular,
     marginLeft: 10,
     flex: 1,
     color: '#555',
     fontSize: 16,
-    fontFamily,
   },
   inputRow: {
     alignItems: 'center',
@@ -76,7 +76,7 @@ export const componentStyles = StyleSheet.create({
     fontWeight: undefined,
   },
   errorMessage: {
-    fontFamily,
+    ...fontFamily.regular,
     fontSize: 12,
     borderRadius: 25,
     backgroundColor: 'rgba(238, 238, 238, 0.75)',

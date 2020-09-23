@@ -1,5 +1,5 @@
 import SelectionOption from '@celo/react-components/components/SelectionOption'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import React from 'react'
 import { useTranslation } from 'react-i18next'

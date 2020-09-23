@@ -1,6 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Switch from '@celo/react-components/components/Switch'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   bodyText: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     marginBottom: 20,
   },
   confirmationSwitchContainer: {
@@ -165,8 +165,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   confirmationSwitchLabel: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.regular500,
     paddingTop: 5,
     paddingLeft: 8,
     paddingRight: 5,

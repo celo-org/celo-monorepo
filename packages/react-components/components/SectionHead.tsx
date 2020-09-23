@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -12,9 +12,9 @@ export default class SectionHead extends React.PureComponent<Props> {
   render() {
     return (
       <View style={style.sectionHead}>
-        <Text style={fontStyles.sectionLabel}>{this.props.text}</Text>
+        <Text style={fontStyles.label}>{this.props.text}</Text>
         {this.props.bubbleText && (
-          <Text style={[fontStyles.notification, style.bubble]}>{this.props.bubbleText}</Text>
+          <Text style={[fontStyles.sectionHeader, style.bubble]}>{this.props.bubbleText}</Text>
         )}
       </View>
     )

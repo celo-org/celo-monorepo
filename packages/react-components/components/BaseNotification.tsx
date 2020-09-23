@@ -40,7 +40,7 @@ export default function BaseNotification({ icon, title, children, ctas, onPress,
         <View style={styles.innerContainer}>
           {icon && <View style={styles.iconArea}>{icon}</View>}
           <View style={styles.contentArea}>
-            <Text style={fontStyles.bodySmallSemiBold} testID={testID && `${testID}/Title`}>
+            <Text style={fontStyles.small500} testID={testID && `${testID}/Title`}>
               {title}
             </Text>
             <View style={styles.body}>

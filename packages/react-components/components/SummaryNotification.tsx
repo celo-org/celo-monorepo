@@ -35,7 +35,7 @@ export default function SummaryNotification({ icon, title, children, reviewCTA, 
       <View style={[styles.container, elevationShadowStyle(2)]}>
         {icon && <View style={styles.iconArea}>{icon}</View>}
         <View style={styles.contentArea}>
-          <Text style={fontStyles.bodySmallBold}>{title}</Text>
+          <Text style={fontStyles.small600}>{title}</Text>
           <View style={styles.body}>
             {children}
             <View style={styles.ctas}>
