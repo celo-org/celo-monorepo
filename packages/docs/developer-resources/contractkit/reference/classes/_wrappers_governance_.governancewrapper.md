@@ -18,6 +18,7 @@ Contract managing voting for governance proposals.
 
 * [approveHotfix](_wrappers_governance_.governancewrapper.md#approvehotfix)
 * [concurrentProposals](_wrappers_governance_.governancewrapper.md#concurrentproposals)
+* [contract](_wrappers_governance_.governancewrapper.md#contract)
 * [dequeueFrequency](_wrappers_governance_.governancewrapper.md#dequeuefrequency)
 * [dequeueProposalsIfReady](_wrappers_governance_.governancewrapper.md#dequeueproposalsifready)
 * [events](_wrappers_governance_.governancewrapper.md#events)
@@ -147,6 +148,16 @@ Querying number of possible concurrent proposals.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  contract
+
+• **contract**: *Governance*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

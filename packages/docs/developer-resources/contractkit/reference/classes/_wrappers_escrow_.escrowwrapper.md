@@ -16,6 +16,7 @@ Contract for handling reserve for stable currencies
 
 ### Properties
 
+* [contract](_wrappers_escrow_.escrowwrapper.md#contract)
 * [escrowedPayments](_wrappers_escrow_.escrowwrapper.md#escrowedpayments)
 * [events](_wrappers_escrow_.escrowwrapper.md#events)
 * [getReceivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#getreceivedpaymentids)
@@ -54,6 +55,16 @@ Name | Type |
 **Returns:** *[EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)*
 
 ## Properties
+
+###  contract
+
+• **contract**: *Escrow*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
+
+___
 
 ###  escrowedPayments
 

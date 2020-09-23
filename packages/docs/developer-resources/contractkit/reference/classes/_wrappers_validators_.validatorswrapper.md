@@ -17,6 +17,7 @@ Contract for voting for validators and managing validator groups.
 ### Properties
 
 * [affiliate](_wrappers_validators_.validatorswrapper.md#affiliate)
+* [contract](_wrappers_validators_.validatorswrapper.md#contract)
 * [deaffiliate](_wrappers_validators_.validatorswrapper.md#deaffiliate)
 * [events](_wrappers_validators_.validatorswrapper.md#events)
 * [forceDeaffiliateIfValidator](_wrappers_validators_.validatorswrapper.md#forcedeaffiliateifvalidator)
@@ -113,6 +114,16 @@ De-affiliates with the previously affiliated group if present.
 Name | Type |
 ------ | ------ |
 `group` | [Address](../modules/_base_.md#address) |
+
+___
+
+###  contract
+
+• **contract**: *Validators*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

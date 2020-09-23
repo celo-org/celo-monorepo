@@ -14,6 +14,7 @@
 
 ### Properties
 
+* [contract](_wrappers_freezer_.freezerwrapper.md#contract)
 * [events](_wrappers_freezer_.freezerwrapper.md#events)
 * [freeze](_wrappers_freezer_.freezerwrapper.md#freeze)
 * [isFrozen](_wrappers_freezer_.freezerwrapper.md#isfrozen)
@@ -47,6 +48,16 @@ Name | Type |
 **Returns:** *[FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)*
 
 ## Properties
+
+###  contract
+
+• **contract**: *Freezer*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
+
+___
 
 ###  events
 

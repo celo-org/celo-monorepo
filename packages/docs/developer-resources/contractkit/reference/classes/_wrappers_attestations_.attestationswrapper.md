@@ -16,6 +16,7 @@
 
 * [attestationExpiryBlocks](_wrappers_attestations_.attestationswrapper.md#attestationexpiryblocks)
 * [attestationRequestFees](_wrappers_attestations_.attestationswrapper.md#attestationrequestfees)
+* [contract](_wrappers_attestations_.attestationswrapper.md#contract)
 * [events](_wrappers_attestations_.attestationswrapper.md#events)
 * [getAttestationIssuers](_wrappers_attestations_.attestationswrapper.md#getattestationissuers)
 * [getAttestationStat](_wrappers_attestations_.attestationswrapper.md#getattestationstat)
@@ -119,6 +120,16 @@ Returns the attestation request fee in a given currency.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  contract
+
+• **contract**: *Attestations*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

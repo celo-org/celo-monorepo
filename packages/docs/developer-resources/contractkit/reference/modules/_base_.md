@@ -31,7 +31,7 @@ ___
 
 Ƭ **CeloToken**: *[GoldToken](../enums/_base_.celocontract.md#goldtoken) | [StableToken](../enums/_base_.celocontract.md#stabletoken)*
 
-*Defined in [packages/contractkit/src/base.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L32)*
+*Defined in [packages/contractkit/src/base.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L33)*
 
 ## Variables
 
@@ -41,7 +41,7 @@ ___
   (k) => (CeloContract as any)[k as any]
 ) as CeloContract[]
 
-*Defined in [packages/contractkit/src/base.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L34)*
+*Defined in [packages/contractkit/src/base.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L35)*
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 • **NULL_ADDRESS**: *string* = '0x0000000000000000000000000000000000000000' as Address
 
-*Defined in [packages/contractkit/src/base.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L38)*
+*Defined in [packages/contractkit/src/base.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L39)*
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 • **ProxyContracts**: *string[]* = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
-*Defined in [packages/contractkit/src/base.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L30)*
+*Defined in [packages/contractkit/src/base.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L31)*

@@ -16,6 +16,7 @@ Contract handling slashing for Validator downtime using intervals.
 
 ### Properties
 
+* [contract](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#contract)
 * [events](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#events)
 * [getBitmapForInterval](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#getbitmapforinterval)
 * [isBitmapSetForInterval](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#isbitmapsetforinterval)
@@ -59,6 +60,16 @@ Name | Type |
 **Returns:** *[DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)*
 
 ## Properties
+
+###  contract
+
+• **contract**: *DowntimeSlasher*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
+
+___
 
 ###  events
 

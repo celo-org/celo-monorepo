@@ -17,6 +17,7 @@ Contract for handling an instance of a ReleaseGold contract.
 ### Properties
 
 * [_relockGold](_wrappers_releasegold_.releasegoldwrapper.md#_relockgold)
+* [contract](_wrappers_releasegold_.releasegoldwrapper.md#contract)
 * [createAccount](_wrappers_releasegold_.releasegoldwrapper.md#createaccount)
 * [events](_wrappers_releasegold_.releasegoldwrapper.md#events)
 * [getBeneficiary](_wrappers_releasegold_.releasegoldwrapper.md#getbeneficiary)
@@ -119,6 +120,16 @@ Name | Type |
 ------ | ------ |
 `index` | number |
 `value` | BigNumber.Value |
+
+___
+
+###  contract
+
+• **contract**: *ReleaseGold*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 
