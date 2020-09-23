@@ -145,7 +145,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
 
     describe('executed by a malicious deployer', async () => {
       it('is caught by the guard', async () => {
-        assertRevert(
+        await assertRevert(
           deployer.deploy(
             valoraAccount,
             implementation.address,
@@ -171,7 +171,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
       })
 
       it('does not redeploy', async () => {
-        assertRevert(
+        await assertRevert(
           deployer.deploy(
             valoraAccount,
             implementation.address,
