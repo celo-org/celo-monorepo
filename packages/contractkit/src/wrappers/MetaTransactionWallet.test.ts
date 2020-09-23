@@ -67,8 +67,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
 
     describe('as the signer', () => {
       it('can transfer funds', async () => {
-        const receiverBalanceBefore = new BigNumber(await web3.eth.getBalance(emptyAccounts[0]))
-        const walletBalanceBefore = new BigNumber(await web3.eth.getBalance(wallet.address))
+        const walletBalanceBefore = await gold.balanceOf(wallet.address)
         const value = new BigNumber(1e18)
         const result = await wallet
           .executeTransaction({
@@ -78,11 +77,8 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
           .sendAndWaitForReceipt()
         expect(result.status).toBe(true)
 
-        const receiverBalanceAfter = new BigNumber(await web3.eth.getBalance(emptyAccounts[0]))
-        const walletBalanceAfter = new BigNumber(await web3.eth.getBalance(wallet.address))
-
-        expect(receiverBalanceAfter).toEqual(receiverBalanceBefore.plus(value))
-        expect(walletBalanceAfter).toEqual(walletBalanceBefore.minus(value))
+        expect(await gold.balanceOf(emptyAccounts[0])).toEqual(value)
+        expect(await gold.balanceOf(wallet.address)).toEqual(walletBalanceBefore.minus(value))
       })
 
       it('can call contracts', async () => {
@@ -124,9 +120,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
 
     describe('as the signer', () => {
       it('can transfer funds', async () => {
-        const receiver1BalanceBefore = new BigNumber(await web3.eth.getBalance(emptyAccounts[0]))
-        const receiver2BalanceBefore = new BigNumber(await web3.eth.getBalance(emptyAccounts[1]))
-        const walletBalanceBefore = new BigNumber(await web3.eth.getBalance(wallet.address))
+        const walletBalanceBefore = await gold.balanceOf(wallet.address)
         const value = new BigNumber(1e18)
         const result = await wallet
           .executeTransactions([
@@ -142,13 +136,11 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
           .sendAndWaitForReceipt()
         expect(result.status).toBe(true)
 
-        const receiver1BalanceAfter = new BigNumber(await web3.eth.getBalance(emptyAccounts[0]))
-        const receiver2BalanceAfter = new BigNumber(await web3.eth.getBalance(emptyAccounts[1]))
-        const walletBalanceAfter = new BigNumber(await web3.eth.getBalance(wallet.address))
-
-        expect(receiver1BalanceAfter).toEqual(receiver1BalanceBefore.plus(value))
-        expect(receiver2BalanceAfter).toEqual(receiver2BalanceBefore.plus(value))
-        expect(walletBalanceAfter).toEqual(walletBalanceBefore.minus(value.times(2)))
+        expect(await gold.balanceOf(wallet.address)).toEqual(
+          walletBalanceBefore.minus(value.times(2))
+        )
+        expect(await gold.balanceOf(emptyAccounts[0])).toEqual(value)
+        expect(await gold.balanceOf(emptyAccounts[1])).toEqual(value)
       })
 
       it('can call contracts', async () => {
