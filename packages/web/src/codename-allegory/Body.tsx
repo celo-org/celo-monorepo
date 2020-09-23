@@ -25,16 +25,18 @@ export default React.memo(function Body({ isOpen }: Props) {
       <Poem />
 
       <View style={styles.footer}>
-        <Fade duration={2000} fraction={1} rootMargin={'-5% 0% -25%'} style={styles.imagine}>
-          <Image source={Abundance} style={styles.abundance} />
-        </Fade>
-        <Fade duration={5000} fraction={1} rootMargin={'-20% 0% -40%'}>
-          <Text style={[fonts.legal, textStyles.center]}>
-            <RingsGlyph height={15} color={colors.dark} />
-            {'  '}
-            Imagined with Celo
-          </Text>
-        </Fade>
+        <View>
+          <Fade duration={2000} fraction={1} rootMargin={'-5% 0% -20%'} style={styles.imagine}>
+            <Image source={Abundance} style={styles.abundance} />
+          </Fade>
+          <Fade duration={5000} fraction={1} rootMargin={'-20% 0% -30%'}>
+            <Text style={[fonts.legal, textStyles.center]}>
+              <RingsGlyph height={15} color={colors.dark} />
+              {'  '}
+              Imagined with Celo
+            </Text>
+          </Fade>
+        </View>
       </View>
     </View>
   )
@@ -46,12 +48,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     alignItems: 'center',
     paddingTop: '15vh',
-    marginBottom: '40vh',
   },
   abundance: { width: 196, height: 200 },
   footer: {
-    marginTop: '45vh',
-    marginVertical: 30,
+    marginBottom: 30,
+    height: '100vh',
+    justifyContent: 'center',
   },
   open: {
     opacity: 0,
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: '10vh',
   },
-  imagine: { marginBottom: 15 },
+  imagine: { marginVertical: 15 },
   mist: {
     zIndex: -2,
     position: 'fixed',
