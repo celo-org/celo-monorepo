@@ -38,6 +38,9 @@ while getopts 'p:t:frd' flag; do
   esac
 done
 
+# Flakey tracker retries don't work well with these e2e tests, so we disable them.
+export NUM_RETRIES=0
+
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 echo "Network delay: $NET_DELAY"
 
@@ -81,10 +84,11 @@ preloadBundle() {
 }
 
 runTest() {
-  reuse_param=""
+  extra_param=""
   if [[ $DEV_MODE == true ]]; then
-    export NUM_RETRIES=0
-    reuse_param="--reuse"
+    extra_param="--reuse"
+  else
+    extra_param="--cleanup"
   fi
   yarn detox test \
     --configuration $CONFIG_NAME \
@@ -94,7 +98,7 @@ runTest() {
     --record-logs=failing \
     --detectOpenHandles \
     --loglevel verbose \
-    "${reuse_param}" 
+    "${extra_param}" 
   TEST_STATUS=$?
 }
 
