@@ -30,7 +30,7 @@ export class Avatar extends React.PureComponent<Props> {
     } = this.props
 
     return (
-      <View style={style.container}>
+      <View style={styles.container}>
         <ContactCircle
           contact={contact}
           thumbnailPath={thumbnailPath}
@@ -39,7 +39,7 @@ export class Avatar extends React.PureComponent<Props> {
           size={iconSize}
         />
         <Text
-          style={[displayNameStyle || fontStyles.small500, style.contactName]}
+          style={[displayNameStyle || fontStyles.small500, styles.contactName]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
@@ -54,7 +54,7 @@ export class Avatar extends React.PureComponent<Props> {
 
         {!e164Number && address ? (
           <Text
-            style={[fontStyles.small, style.contactName]}
+            style={[fontStyles.small, styles.contactName]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -66,7 +66,7 @@ export class Avatar extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     justifyContent: 'center',

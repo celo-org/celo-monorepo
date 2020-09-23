@@ -9,13 +9,13 @@ interface Props {
 
 function SectionHead({ text }: Props) {
   return (
-    <View style={style.container}>
-      <Text style={style.text}>{text}</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>{text}</Text>
     </View>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
     paddingBottom: 8,

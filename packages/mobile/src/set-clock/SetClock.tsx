@@ -30,10 +30,10 @@ export class SetClock extends React.Component<WithTranslation> {
     const { t } = this.props
 
     return (
-      <View style={style.backgroundContainer}>
-        <View style={style.header}>
-          <Image source={clockIcon} style={style.clockImage} resizeMode="contain" />
-          <Text style={[fontStyles.h1, style.time]} testID="SetClockTitle">
+      <View style={styles.backgroundContainer}>
+        <View style={styles.header}>
+          <Image source={clockIcon} style={styles.clockImage} resizeMode="contain" />
+          <Text style={[fontStyles.h1, styles.time]} testID="SetClockTitle">
             {format(getRemoteTime(), 'Pp')}
           </Text>
           <Text style={fontStyles.regular} testID="SetClockTitle">
@@ -41,12 +41,12 @@ export class SetClock extends React.Component<WithTranslation> {
           </Text>
         </View>
         <View>
-          <Text style={[fontStyles.h1, style.bodyText]} testID="SetClockTitle">
+          <Text style={[fontStyles.h1, styles.bodyText]} testID="SetClockTitle">
             {t('yourClockIsBroke')}
           </Text>
         </View>
         <View>
-          <Text style={[fontStyles.small, style.instructions]}>{t('adjustYourClock')}</Text>
+          <Text style={[fontStyles.small, styles.instructions]}>{t('adjustYourClock')}</Text>
           <Button
             onPress={this.goToSettings}
             text={t('adjustDate')}
@@ -59,7 +59,7 @@ export class SetClock extends React.Component<WithTranslation> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
     flexDirection: 'column',

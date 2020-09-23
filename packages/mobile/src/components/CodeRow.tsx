@@ -3,7 +3,6 @@ import withTextInputPasteAware from '@celo/react-components/components/WithTextI
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
@@ -96,10 +95,11 @@ function CodeRow({
 
 const styles = StyleSheet.create({
   codeInput: {
-    ...componentStyles.roundedBorder,
     flex: 0,
     backgroundColor: '#FFF',
     borderColor: colors.gray2,
+    borderRadius: 3,
+    borderWidth: 1,
     height: 50,
     marginVertical: 5,
   },
@@ -119,13 +119,14 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   codeProcessingContainer: {
-    ...componentStyles.roundedBorder,
     backgroundColor: '#FFF',
     position: 'relative',
     justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
     borderColor: colors.gray2,
+    borderRadius: 3,
+    borderWidth: 1,
     height: 50,
   },
   codeInputSpinner: {

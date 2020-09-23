@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { getShadowStyle, Shadow } from '@celo/react-components/styles/styles.v2'
+import { getShadowStyle, Shadow } from '@celo/react-components/styles/styles'
 import React from 'react'
 import { StyleSheet, View, ViewProps } from 'react-native'
 

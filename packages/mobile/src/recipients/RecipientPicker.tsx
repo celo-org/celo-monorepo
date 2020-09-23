@@ -91,7 +91,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     }
   }
 
-  renderItemSeparator = () => <View style={style.separator} />
+  renderItemSeparator = () => <View style={styles.separator} />
 
   renderEmptyView = () => {
     const parsedNumber = parsePhoneNumber(
@@ -108,19 +108,19 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   renderNoContentEmptyView = () => (
-    <View style={style.emptyView}>
+    <View style={styles.emptyView}>
       {this.props.searchQuery !== '' ? (
         <>
-          <View style={style.emptyViewBody}>
+          <View style={styles.emptyViewBody}>
             <Text style={fontStyles.emptyState}>
               {this.props.t('noResultsFor')}
               <Text style={fontStyles.emptyState}>{` "${this.props.searchQuery}"`}</Text>
             </Text>
-            <Text style={style.emptyStateBody}>{this.props.t('searchForSomeone')}</Text>
+            <Text style={styles.emptyStateBody}>{this.props.t('searchForSomeone')}</Text>
           </View>
         </>
       ) : (
-        <View style={style.emptyViewBody}>
+        <View style={styles.emptyViewBody}>
           <Text style={fontStyles.emptyState}>{this.props.t('noContacts')}</Text>
         </View>
       )}
@@ -179,7 +179,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const { sections, listHeaderComponent } = this.props
 
     return (
-      <View style={style.body} testID={this.props.testID}>
+      <View style={styles.body} testID={this.props.testID}>
         <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <SectionList
@@ -210,7 +210,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   body: {
     flex: 1,
   },

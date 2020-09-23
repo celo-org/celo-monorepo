@@ -2,7 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import UpHandle from '@celo/react-components/icons/UpHandle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { Spacing } from '@celo/react-components/styles/styles'
 import { useIsFocused } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import LottieView from 'lottie-react-native'

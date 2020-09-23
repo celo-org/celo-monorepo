@@ -21,7 +21,7 @@ export default class SectionHead extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   sectionHead: {
     backgroundColor: colors.gray1,
     paddingHorizontal: 10,

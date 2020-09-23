@@ -1,7 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { Spacing } from '@celo/react-components/styles/styles'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'

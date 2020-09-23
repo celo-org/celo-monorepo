@@ -1,7 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Switch from '@celo/react-components/components/Switch'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -122,7 +121,7 @@ class BackupSocial extends React.Component<Props, State> {
               showCopy={true}
               mode={BackupPhraseContainerMode.READONLY}
               type={BackupPhraseType.SOCIAL_BACKUP}
-              style={componentStyles.marginTop20}
+              style={styles.backupContainer}
             />
           </View>
           {!socialBackupCompleted && (
@@ -150,6 +149,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
+  },
+  backupContainer: {
+    marginTop: 20,
   },
   scrollContainer: {
     flexGrow: 1,

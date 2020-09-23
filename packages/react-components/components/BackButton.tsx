@@ -25,7 +25,7 @@ export default class BackButton extends React.PureComponent<Props> {
 }
 const SIZE = 16
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     padding: 5,
     justifyContent: 'center',

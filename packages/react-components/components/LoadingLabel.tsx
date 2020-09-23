@@ -42,7 +42,7 @@ export default class LoadingLabel extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

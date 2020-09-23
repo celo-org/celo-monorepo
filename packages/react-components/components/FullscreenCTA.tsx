@@ -17,13 +17,13 @@ class FullscreenCTA extends React.PureComponent<Props> {
     const { title, subtitle, CTAText, CTAHandler } = this.props
 
     return (
-      <SafeAreaView style={style.container}>
-        <View style={style.header}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
           <Text style={fontStyles.h1}>{title}</Text>
           <Text style={fontStyles.h2}>{subtitle}</Text>
         </View>
         {this.props.children}
-        <View style={style.button}>
+        <View style={styles.button}>
           <Button
             onPress={CTAHandler}
             text={CTAText}
@@ -37,7 +37,7 @@ class FullscreenCTA extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     height: variables.height,
     width: variables.width,

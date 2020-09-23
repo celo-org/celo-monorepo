@@ -82,7 +82,7 @@ class PincodeEnter extends React.Component<Props, State> {
     const { t } = this.props
     const { pin, errorText } = this.state
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <Pincode
           title={t('confirmPin.title')}
           errorText={errorText}
@@ -95,7 +95,7 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',

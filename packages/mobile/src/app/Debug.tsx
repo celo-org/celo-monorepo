@@ -70,31 +70,31 @@ export class Debug extends React.Component<RootState, State> {
     const deviceId = DeviceInfo.getDeviceId()
 
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <Text
           onPress={this.onClickText(deviceId, phoneNumber)}
-          style={style.singleLine}
+          style={styles.singleLine}
         >{`Device Id: ${deviceId} | Phone Number: ${phoneNumber}`}</Text>
         <Text
           onPress={this.onClickText(version, buildNumber, String(apiLevel))}
-          style={style.singleLine}
+          style={styles.singleLine}
         >{`Version: ${version} | Build Number: ${buildNumber} | Api Level: ${apiLevel}`}</Text>
-        <Text style={style.singleLine}>{`Pin Type: ${pincodeType}`}</Text>
+        <Text style={styles.singleLine}>{`Pin Type: ${pincodeType}`}</Text>
         <Text
           onPress={this.onClickText(address)}
-          style={style.singleLine}
+          style={styles.singleLine}
         >{`Address: ${address}`}</Text>
-        <Text style={style.singleLine}>{`Latest Block: ${latestBlockNumber}`}</Text>
+        <Text style={styles.singleLine}>{`Latest Block: ${latestBlockNumber}`}</Text>
         <LogView
           title={'React-Native Logs'}
           logs={reactNativeLogs}
-          style={style.logView}
+          style={styles.logView}
           onPress={this.onClickText(reactNativeLogs)}
         />
         <LogView
           title={'Geth Logs'}
           logs={gethLogs}
-          style={style.logView}
+          style={styles.logView}
           onPress={this.onClickText(gethLogs)}
         />
         <Button
@@ -102,14 +102,14 @@ export class Debug extends React.Component<RootState, State> {
           text={'Email logs to support'}
           standard={true}
           type={BtnTypes.PRIMARY}
-          style={style.button}
+          style={styles.button}
         />
       </SafeAreaView>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingVertical: 5,

@@ -2,7 +2,6 @@
 
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React from 'react'
@@ -62,7 +61,8 @@ WithdrawCeloQrScannerScreen.navigationOptions = () => {
     headerTitle: i18n.t('exchangeFlow9:withdrawScanQrTitle'),
     headerTitleStyle: {
       ...fontStyles.navigationHeader,
-      ...componentStyles.screenHeader,
+      textAlign: 'center',
+      fontWeight: undefined,
       color: colors.light,
     },
   }

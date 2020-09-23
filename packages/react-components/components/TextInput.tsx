@@ -66,11 +66,11 @@ export class CTextInput extends React.Component<Props, State> {
     const { isFocused = false } = this.state
 
     return (
-      <View style={[style.container, propsStyle]}>
+      <View style={[styles.container, propsStyle]}>
         <RNTextInput
           ref={forwardedRef}
           style={{
-            ...style.borderedText,
+            ...styles.borderedText,
             ...(passThroughProps.multiline && { textAlignVertical: 'top' }),
           }}
           value={value}
@@ -80,7 +80,7 @@ export class CTextInput extends React.Component<Props, State> {
         />
         {isFocused && !!value && showClearButton && (
           <CircleButton
-            style={style.iconStyle}
+            style={styles.iconStyle}
             onPress={this.onClear}
             solid={true}
             size={20}
@@ -101,7 +101,7 @@ const TextInput = React.forwardRef((props: Props, ref: React.RefObject<RNTextInp
 export default TextInput
 export type TextInputProps = Props
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',

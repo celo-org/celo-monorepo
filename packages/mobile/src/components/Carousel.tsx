@@ -2,7 +2,7 @@ import Card from '@celo/react-components/components/Card'
 import Pagination from '@celo/react-components/components/Pagination'
 import fontStyles from '@celo/react-components/styles/fonts'
 import progressDots from '@celo/react-components/styles/progressDots'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { Spacing } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import React, { useState } from 'react'
 import {

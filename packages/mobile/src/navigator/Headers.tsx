@@ -1,7 +1,6 @@
 import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import { StackNavigationOptions } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans } from 'react-i18next'
@@ -37,6 +36,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  screenHeader: {
+    textAlign: 'center',
+    fontWeight: undefined,
+  },
 })
 
 export const nuxNavigationOptions: StackNavigationOptions = {
@@ -63,7 +66,7 @@ export const nuxNavigationOptionsNoBackButton: StackNavigationOptions = {
 export const emptyHeader: StackNavigationOptions = {
   headerTitle: ' ',
   headerShown: true,
-  headerTitleStyle: [styles.headerTitle, componentStyles.screenHeader],
+  headerTitleStyle: [styles.headerTitle, styles.screenHeader],
   headerTitleContainerStyle: {
     alignItems: 'center',
   },

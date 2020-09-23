@@ -1,14 +1,24 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import fontFamily from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
+
+const styles = StyleSheet.create({
+  errorMessage: {
+    ...fontFamily.regular,
+    fontSize: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(238, 238, 238, 0.75)',
+    padding: 15,
+  },
+})
 
 function FullscreenCTAContentMaker(errorMessage: string) {
   return (
     <View>
-      <Text style={componentStyles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
+      <Text style={styles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
         {errorMessage}
       </Text>
     </View>

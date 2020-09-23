@@ -22,44 +22,44 @@ function DigitButton({
   const onPress = () => onDigitPress(digit)
   return (
     <Touchable borderless={true} onPress={onPress} testID={`digit${digit}`}>
-      <Text style={style.digit}>{digit}</Text>
+      <Text style={styles.digit}>{digit}</Text>
     </Touchable>
   )
 }
 
 export default function NumberKeypad(props: Props) {
   return (
-    <View style={style.container}>
-      <View style={style.row}>
+    <View style={styles.container}>
+      <View style={styles.row}>
         <DigitButton digit={1} onDigitPress={props.onDigitPress} />
         <DigitButton digit={2} onDigitPress={props.onDigitPress} />
         <DigitButton digit={3} onDigitPress={props.onDigitPress} />
       </View>
-      <View style={style.row}>
+      <View style={styles.row}>
         <DigitButton digit={4} onDigitPress={props.onDigitPress} />
         <DigitButton digit={5} onDigitPress={props.onDigitPress} />
         <DigitButton digit={6} onDigitPress={props.onDigitPress} />
       </View>
-      <View style={style.row}>
+      <View style={styles.row}>
         <DigitButton digit={7} onDigitPress={props.onDigitPress} />
         <DigitButton digit={8} onDigitPress={props.onDigitPress} />
         <DigitButton digit={9} onDigitPress={props.onDigitPress} />
       </View>
-      <View style={style.row}>
+      <View style={styles.row}>
         {props.decimalSeparator && props.onDecimalPress ? (
           <Touchable
             borderless={true}
             onPress={props.onDecimalPress}
             testID={`digit${props.decimalSeparator}`}
           >
-            <Text style={style.digit}>{props.decimalSeparator}</Text>
+            <Text style={styles.digit}>{props.decimalSeparator}</Text>
           </Touchable>
         ) : (
-          <View style={style.digit} />
+          <View style={styles.digit} />
         )}
         <DigitButton digit={0} onDigitPress={props.onDigitPress} />
         <Touchable borderless={true} onPress={props.onBackspacePress}>
-          <View style={style.digit}>
+          <View style={styles.digit}>
             <Backspace />
           </View>
         </Touchable>
@@ -68,7 +68,7 @@ export default function NumberKeypad(props: Props) {
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     width: '100%',
     alignItems: 'center',

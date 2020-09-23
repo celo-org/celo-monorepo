@@ -3,7 +3,6 @@ import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardA
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
@@ -108,7 +107,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
             mode={BackupPhraseContainerMode.INPUT}
             type={BackupPhraseType.SOCIAL_BACKUP}
             index={1}
-            style={componentStyles.marginTop20}
+            style={styles.backupContainer}
           />
           <BackupPhraseContainer
             onChangeText={this.setBackupPhrase(2)}
@@ -117,7 +116,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
             mode={BackupPhraseContainerMode.INPUT}
             type={BackupPhraseType.SOCIAL_BACKUP}
             index={2}
-            style={componentStyles.marginTop20}
+            style={styles.backupContainer}
           />
           <Text style={styles.tip}>
             <Text style={fontStyles.regular500}>{t('tip')}</Text>
@@ -153,6 +152,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
+  },
+  backupContainer: {
+    marginTop: 20,
   },
   scrollContainer: {
     padding: 20,
