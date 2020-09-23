@@ -54,7 +54,8 @@
     "web3-eth": "1.2.4",
     "web3-eth-abi": "1.2.4",
     "web3-eth-contract": "1.2.4",
-    "web3-utils": "1.2.11"
+    "web3-utils": "1.2.11",
+    "inquirer": "^7.0.5"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
@@ -67,7 +68,8 @@
     "fetch-mock": "9.10.4",
     "@types/secp256k1": "^3.5.3",
     "dotenv": "^8.2.0",
-    "fetch-mock": "9.10.4",
+    "jest": "^25.2.4",
+    "@types/inquirer": "^6.5.0",
     "ts-node": "8.3.0",
     "typedoc": "^0.16.9",
     "typedoc-plugin-markdown": "^2.2.16"
