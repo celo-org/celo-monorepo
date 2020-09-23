@@ -10,25 +10,23 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
+  Actions,
   cancelVerification,
   completeAttestationCode,
   setCompletedCodes,
   setVerificationStatus,
   udpateVerificationState,
 } from 'src/identity/actions'
-import {
-  balanceSufficientForSigRetrieval,
-  fetchPhoneHashPrivate,
-} from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   attestationCodesSelector,
+  isBalanceSufficientForSigRetrievalSelector,
   isVerificationStateExpiredSelector,
   verificationStateSelector,
 } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
-  balanceSufficientForAttestations,
   doVerificationFlow,
   fetchVerificationState,
   NUM_ATTESTATIONS_REQUIRED,
@@ -245,11 +243,16 @@ describe(fetchVerificationState, () => {
           },
         ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
-        [call(balanceSufficientForSigRetrieval), true],
-        [call(balanceSufficientForAttestations, 3), true],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
       ])
       .put(setVerificationStatus(VerificationStatus.GettingStatus))
-      .put(udpateVerificationState(mockVerificationStateUnverified))
+      .put(
+        udpateVerificationState({
+          phoneHashDetails: mockVerificationStateUnverified.phoneHashDetails,
+          actionableAttestations: mockVerificationStateUnverified.actionableAttestations,
+          status: mockVerificationStateUnverified.status,
+        })
+      )
       .run()
   })
 
@@ -273,14 +276,14 @@ describe(fetchVerificationState, () => {
           },
         ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
-        [call(balanceSufficientForSigRetrieval), true],
-        [call(balanceSufficientForAttestations, 0), true],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
       ])
       .put(setVerificationStatus(VerificationStatus.GettingStatus))
       .put(
         udpateVerificationState({
-          ...mockVerificationStatePartlyVerified,
+          phoneHashDetails: mockVerificationStatePartlyVerified.phoneHashDetails,
           actionableAttestations: [mockActionableAttestations[0]],
+          status: mockVerificationStatePartlyVerified.status,
         })
       )
       .run()
@@ -302,15 +305,10 @@ describe(fetchVerificationState, () => {
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
-        [call(balanceSufficientForSigRetrieval), false],
+        [select(isBalanceSufficientForSigRetrievalSelector), false],
         [select(verificationStateSelector), mockVerificationStateUnverified],
       ])
-      .put(
-        udpateVerificationState({
-          ...mockVerificationStateUnverified,
-          isBalanceSufficient: false,
-        })
-      )
+      .not.put.like({ action: { type: Actions.UPDATE_VERIFICATION_STATE } })
       .run()
   })
 })
@@ -322,6 +320,10 @@ describe(doVerificationFlow, () => {
       .provide([
         [select(verificationStateSelector), mockVerificationStateUnverified],
         [call(getConnectedUnlockedAccount), mockAccount],
+        // TODO (i1skn): remove next two lines when
+        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -421,6 +423,10 @@ describe(doVerificationFlow, () => {
       .provide([
         [select(verificationStateSelector), mockVerificationStateUnverified],
         [call(getConnectedUnlockedAccount), mockAccount],
+        // TODO (i1skn): remove next two lines when
+        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperRevealFailure,

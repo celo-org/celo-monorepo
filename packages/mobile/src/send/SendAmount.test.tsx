@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { ActivityIndicator } from 'react-native'
 import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render, RenderAPI } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
@@ -35,6 +36,17 @@ const storeData = {
       },
     },
   },
+}
+
+const mockE164NumberToAddress: E164NumberToAddressType = {
+  [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
+}
+
+const mockTransactionData2 = {
+  type: mockTransactionData.type,
+  recipient: mockTransactionData.recipient,
+  amount: new BigNumber('3.706766917293233083'),
+  reason: '',
 }
 
 const mockScreenProps = (isOutgoingPaymentRequest?: true) =>
@@ -160,20 +172,52 @@ describe('SendAmount', () => {
       const reviewButton = wrapper.getByTestId('Review')
       expect(reviewButton.props.disabled).toBe(true)
     })
+
+    it('displays the loading spinner when review button is pressed and verification status is unknown', () => {
+      let store = createMockStore({
+        identity: {
+          e164NumberToAddress: {},
+          secureSendPhoneNumberMapping: {},
+        },
+        ...storeData,
+      })
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+
+      expect(tree.getByType(ActivityIndicator)).toBeTruthy()
+
+      store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
+        },
+        ...storeData,
+      })
+
+      tree.rerender(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+
+      expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        transactionData: mockTransactionData2,
+      })
+    })
   })
 
   describe('Navigation', () => {
-    const mockE164NumberToAddress: E164NumberToAddressType = {
-      [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
-    }
-
-    const mockTransactionData2 = {
-      type: mockTransactionData.type,
-      recipient: mockTransactionData.recipient,
-      amount: new BigNumber('3.70676691729323309'),
-      reason: '',
-    }
-
     it('navigates to ValidateRecipientIntro screen on Send click when a manual address check is needed', () => {
       const store = createMockStore({
         identity: {
