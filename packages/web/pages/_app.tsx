@@ -9,11 +9,11 @@ import analytics, { canTrack, initializeAnalytics } from 'src/analytics/analytic
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer'
+import pagePaths from 'src/shared/menu-items'
 import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
-import pagePaths from 'src/shared/menu-items'
 
 config({ ssrReveal: true })
 
