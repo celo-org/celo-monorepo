@@ -1,14 +1,12 @@
-import { BigNumber } from 'bignumber.js'
-import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
 import { Text, View } from 'react-native'
-import ValidatorsListRow, { CeloGroup, localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
+import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
-import { weiToDecimal } from 'src/utils/utils'
+import { cleanData, isPinned, ValidatorsListProps } from 'src/utils/validators'
 
 interface HeaderCellProps {
   style: any[]
@@ -56,58 +54,6 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
       </Hoverable>
     )
   }
-}
-
-interface Edges<T> {
-  edges: Array<{
-    node: T
-  }>
-}
-
-interface CeloValidatorGroup {
-  account: {
-    address: string
-    lockedGold: string
-    name: string
-    usd: string
-    claims: Edges<{
-      verified: boolean
-      element: string
-    }>
-  }
-  accumulatedActive: string
-  accumulatedRewards: string
-  affiliates: Edges<{
-    account: {
-      claims: Edges<{
-        verified: boolean
-        element: string
-      }>
-    }
-    address: string
-    attestationsFulfilled: number
-    attestationsRequested: number
-    lastElected: number
-    lastOnline: number
-    lockedGold: string
-    name: string
-    score: string
-    usd: string
-  }>
-  commission: string
-  numMembers: number
-  receivableVotes: string
-  rewardsRatio: string
-  votes: string
-}
-
-interface ValidatorsListProps {
-  router: Router
-  data: {
-    celoValidatorGroups: CeloValidatorGroup[]
-    latestBlock: number
-  }
-  isLoading: boolean
 }
 
 type Props = ValidatorsListProps & I18nProps
@@ -178,106 +124,13 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     this.setState({ orderBy, orderAsc })
   }
 
-  cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
-    if (this.cachedCleanData) {
-      return this.cachedCleanData
-    }
-    const totalVotes: BigNumber = celoValidatorGroups
-      .map(({ receivableVotes }) => new BigNumber(receivableVotes))
-      .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
+  sortData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']): CeloGroup[] {
+    // Clean data if not already cached
+    const data = this.cachedCleanData
+      ? this.cachedCleanData
+      : cleanData({ celoValidatorGroups, latestBlock })
+    this.cachedCleanData = data
 
-    const getClaims = (claims: CeloValidatorGroup['account']['claims'] = {} as any): string[] =>
-      (claims.edges || [])
-        .map(({ node }) => node)
-        .filter(({ verified }) => verified)
-        .map(({ element }) => element)
-
-    const cleanData = celoValidatorGroups
-      .map(
-        ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
-          const group = account
-          const rewards = rewardsRatio === null ? null : Math.round(+rewardsRatio * 100 * 10) / 10
-          const rewardsStyle =
-            rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
-          const receivableVotesPer = new BigNumber(receivableVotes)
-            .dividedBy(totalVotes)
-            .multipliedBy(100)
-          const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
-          const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
-          const totalFulfilled = affiliates.edges.reduce((acc, obj) => {
-            return acc + (obj.node.attestationsFulfilled || 0)
-          }, 0)
-          const totalRequested = affiliates.edges.reduce((acc, obj) => {
-            return acc + (obj.node.attestationsRequested || 0)
-          }, 0)
-          return {
-            attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
-            order: Math.random(),
-            pinned: this.isPinned(group.address),
-            name: group.name,
-            address: group.address,
-            usd: weiToDecimal(+group.usd),
-            gold: weiToDecimal(+group.lockedGold),
-            receivableRaw: weiToDecimal(+receivableVotes),
-            receivableVotes: receivableVotesPer.toString(),
-            votesRaw: weiToDecimal(+votes),
-            votes: votesPer.toString(),
-            votesAbsolute: votesAbsolutePer.toString(),
-            commission: (+commission * 100) / 10 ** 24,
-            rewards,
-            rewardsStyle,
-            numMembers,
-            claims: getClaims(group.claims),
-            validators: affiliates.edges.map(({ node: validator }) => {
-              const {
-                address,
-                lastElected,
-                lastOnline,
-                name,
-                usd,
-                lockedGold,
-                score,
-                attestationsFulfilled,
-                attestationsRequested,
-              } = validator
-              return {
-                name,
-                address,
-                usd: weiToDecimal(+usd),
-                gold: weiToDecimal(+lockedGold),
-                elected: lastElected >= latestBlock,
-                online: lastOnline >= latestBlock,
-                uptime: (+score * 100) / 10 ** 24,
-                attestation:
-                  Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
-                claims: getClaims(validator.account.claims),
-              }
-            }),
-          }
-        }
-      )
-      .map((group, id) => {
-        const data = group.validators.reduce(
-          ({ elected, online, total, uptime }, validator) => ({
-            elected: elected + +validator.elected,
-            online: online + +validator.online,
-            total: total + 1,
-            uptime: uptime + validator.uptime,
-          }),
-          { elected: 0, online: 0, total: 0, uptime: 0 }
-        )
-        data.uptime = data.uptime / group.validators.length
-        return {
-          id,
-          ...group,
-          ...data,
-        }
-      })
-    this.cachedCleanData = cleanData
-    return cleanData
-  }
-
-  sortData<T extends any & { id: number }>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
     const accessor = this.orderAccessors[orderBy] || (() => 0)
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
@@ -296,12 +149,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     return (data || [])
       .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
       .sort((a, b) => dir * compare(accessor(a), accessor(b)))
-      .sort((a, b) => this.isPinned(b) - this.isPinned(a))
-  }
-
-  isPinned({ address }: any) {
-    const list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
-    return +list.includes(address)
+      .sort((a, b) => isPinned(b) - isPinned(a))
   }
 
   onPinned() {
@@ -311,7 +159,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
   render() {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
-    const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
+    const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(data)
     const onPinned = () => this.onPinned()
     return (
       <View style={styles.pStatic}>
@@ -390,7 +238,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             />
           </View>
           {validatorGroups.map((group, i) => (
-            <div key={group.id} onClick={this.expand.bind(this, i)}>
+            <div key={i} onClick={this.expand.bind(this, i)}>
               <ValidatorsListRow onPinned={onPinned} group={group} expanded={expanded === i} />
             </div>
           ))}
