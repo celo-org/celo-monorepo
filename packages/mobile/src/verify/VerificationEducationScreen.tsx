@@ -12,7 +12,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
 import i18n, { Namespaces } from 'src/i18n'
-import { fetchVerificationState, setHasSeenVerificationNux } from 'src/identity/actions'
+import {
+  fetchVerificationState,
+  setHasSeenVerificationNux,
+  startVerification,
+} from 'src/identity/actions'
 import { verificationStateSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
@@ -56,7 +60,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const onPressStart = (withoutRevealing: boolean) => {
     return () => {
       dispatch(setHasSeenVerificationNux(true))
-      navigation.navigate(Screens.VerificationLoadingScreen, { withoutRevealing })
+      dispatch(startVerification(withoutRevealing))
     }
   }
 
@@ -111,7 +115,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     )
   } else if (isBalanceSufficient) {
     // Sufficient balance
-    const withoutRevealing = actionableAttestations.length === numAttestationsRemaining
+    const withoutRevealing = actionableAttestations.length >= numAttestationsRemaining
     bodyText = t('verificationEducation.body')
     firstButton = (
       <Button

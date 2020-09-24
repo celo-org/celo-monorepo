@@ -61,6 +61,8 @@ export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
 // we would refetch verification state before going to VerificationInputScreen
 export const VERIFICATION_STATE_EXPIRY_SECONDS = 30
 
+export const ATTESTATION_REVEAL_TIMEOUT = 60 * 1000 // 1 minute
+
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
   DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET

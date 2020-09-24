@@ -59,6 +59,7 @@
     "cancel": "Go Back",
     "confirm": "Skip for now"
   },
+  "verificationPrematureRevealMessage": "Please wait 1 minute before requesting message resend.",
   "verificationLearnMoreDialog": {
     "title": "Phone Numbers and Valora",
     "body": "Confirming makes it easy to connect with our friends by allowing you to send and receive funds to your phone number.\n\n<0>Can I do this later?</0>\n\nYes, but unconfirmed accounts can only send payments with QR codes or account numbers (addresses).\n\n<1>Secure and Private</1>\n\nValora uses state of the art cryptography to keep your phone number private.",

@@ -409,7 +409,7 @@ describe(doVerificationFlow, () => {
       .run()
   })
 
-  it('shows error on reveal failure', async () => {
+  it('asks for more attestations on reveal failure', async () => {
     const mockAttestationsWrapperRevealFailure = {
       ...mockAttestationsWrapperPartlyVerified,
       revealPhoneNumberToIssuer: jest.fn(() => {
@@ -435,7 +435,7 @@ describe(doVerificationFlow, () => {
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
       ])
-      .put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
+      // .put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
       .run()
   })
 })

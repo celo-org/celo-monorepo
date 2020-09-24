@@ -12,17 +12,19 @@ import { WithTranslation } from 'react-i18next'
 import { LayoutAnimation, Platform, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect, useDispatch } from 'react-redux'
-import { hideAlert } from 'src/alert/actions'
+import { hideAlert, showMessage } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton.v2'
 import DevSkipButton from 'src/components/DevSkipButton'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   cancelVerification,
   receiveAttestationMessage,
   reRevealActionableAttestations,
 } from 'src/identity/actions'
+import { isRevealAllowed } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
@@ -49,6 +51,7 @@ interface StateProps {
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   underlyingError: ErrorMessages | null | undefined
+  isRevealAllowed: boolean
 }
 
 interface DispatchProps {
@@ -56,6 +59,7 @@ interface DispatchProps {
   receiveAttestationMessage: typeof receiveAttestationMessage
   reRevealActionableAttestations: typeof reRevealActionableAttestations
   hideAlert: typeof hideAlert
+  showMessage: typeof showMessage
 }
 
 type Props = StateProps & DispatchProps & WithTranslation & ScreenProps
@@ -73,6 +77,7 @@ const mapDispatchToProps = {
   receiveAttestationMessage,
   reRevealActionableAttestations,
   hideAlert,
+  showMessage,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -82,6 +87,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     numCompleteAttestations: state.identity.numCompleteAttestations,
     verificationStatus: state.identity.verificationStatus,
     underlyingError: errorSelector(state),
+    isRevealAllowed: isRevealAllowed(state),
   }
 }
 
@@ -214,7 +220,15 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   onPressResend = () => {
-    this.props.reRevealActionableAttestations()
+    if (this.props.isRevealAllowed) {
+      this.props.reRevealActionableAttestations()
+    } else {
+      this.props.showMessage(
+        this.props.t('verificationPrematureRevealMessage'),
+        ALERT_BANNER_DURATION,
+        null
+      )
+    }
   }
 
   render() {

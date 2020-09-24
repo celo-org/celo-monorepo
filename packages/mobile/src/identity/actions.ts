@@ -40,6 +40,7 @@ export enum Actions {
   FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
   RE_REVEAL_ACTIONABLE_ATTESTATIONS = 'IDENTITY/RE_REVEAL_ACTIONABLE_ATTESTATIONS',
+  SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
 }
 
 export interface StartVerificationAction {
@@ -191,6 +192,11 @@ export interface ReRevealActionableAttestations {
   type: Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS
 }
 
+export interface SetLastRevealAttempt {
+  type: Actions.SET_LAST_REVEAL_ATTEMPT
+  time: number
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -219,6 +225,7 @@ export type ActionTypes =
   | FetchVerificationState
   | UpdateVerificationState
   | ReRevealActionableAttestations
+  | SetLastRevealAttempt
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -400,4 +407,9 @@ export const udpateVerificationState = (
 
 export const reRevealActionableAttestations = (): ReRevealActionableAttestations => ({
   type: Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS,
+})
+
+export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
+  type: Actions.SET_LAST_REVEAL_ATTEMPT,
+  time,
 })

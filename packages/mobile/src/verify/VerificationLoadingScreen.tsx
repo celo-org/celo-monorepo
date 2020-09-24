@@ -3,10 +3,10 @@ import UpHandle from '@celo/react-components/icons/UpHandle'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
-import { useIsFocused } from '@react-navigation/native'
+import { useFocusEffect, useIsFocused } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import LottieView from 'lottie-react-native'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 // Note: we're NOT using Animated from 'react-native-reanimated'
 // because it currently has a glitch on Android and is 1 frame behind
@@ -18,7 +18,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import CancelButton from 'src/components/CancelButton.v2'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import { Namespaces } from 'src/i18n'
-import { cancelVerification, startVerification } from 'src/identity/actions'
+import { cancelVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/types'
 import {
   verificationEducation1,
@@ -37,8 +37,6 @@ import VerificationCountdown from 'src/verify/VerificationCountdown'
 import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 
 const TAG = 'VerificationLoadingScreen'
-
-const WAIT_AFTER_REVEAL = 6000 // 6s
 
 const mapStateToProps = (state: RootState) => {
   return {
@@ -61,9 +59,13 @@ export default function VerificationLoadingScreen({ route }: Props) {
   const dispatch = useDispatch()
   const isFocused = useIsFocused()
 
-  useEffect(() => {
-    dispatch(startVerification(!!route.params.withoutRevealing))
-  }, [])
+  const [countdownStartTime, setCountdownStartTime] = useState(Date.now())
+
+  useFocusEffect(
+    useCallback(() => {
+      setCountdownStartTime(Date.now())
+    }, [])
+  )
 
   useEffect(() => {
     if (!isFocused || verificationStatusRef.current === verificationStatus) {
@@ -71,20 +73,11 @@ export default function VerificationLoadingScreen({ route }: Props) {
     }
     verificationStatusRef.current = verificationStatus
 
-    let timeout: number | undefined
-
-    if (verificationStatus === VerificationStatus.RevealingNumber) {
-      timeout = window.setTimeout(
-        () => {
-          navigate(Screens.VerificationInputScreen)
-        },
-        route.params.withoutRevealing ? 0 : WAIT_AFTER_REVEAL
-      )
+    if (verificationStatus === VerificationStatus.CompletingAttestations) {
+      navigate(Screens.VerificationInputScreen)
     } else if (verificationStatus === VerificationStatus.Done) {
       navigate(Screens.ImportContacts)
     }
-
-    return () => clearTimeout(timeout)
   }, [verificationStatus, isFocused])
 
   useBackHandler(() => {
@@ -102,7 +95,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
   const onFinishCountdown = () => {
     // For now switch to the verification screen
     // if we haven't reached the reveal stage yet
-    if (!isFocused || verificationStatus === VerificationStatus.RevealingNumber) {
+    if (!isFocused || verificationStatus === VerificationStatus.CompletingAttestations) {
       return
     }
     navigate(Screens.VerificationInputScreen)
@@ -226,7 +219,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
           <Animated.View style={statusContainerStyle}>
             <Text style={styles.statusText}>{t('loading.confirming')}</Text>
             {!route.params.withoutRevealing && (
-              <VerificationCountdown onFinish={onFinishCountdown} />
+              <VerificationCountdown startTime={countdownStartTime} onFinish={onFinishCountdown} />
             )}
           </Animated.View>
           <Animated.View style={learnMoreContainerStyle}>
