@@ -77,14 +77,6 @@ project.ext.react = [
         enableHermes: true,  // clean and rebuild if changing
         hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
         hermesFlagsDebug: ["-w", "-O", "-output-source-map"],
-        bundleInIntegration: true,
-        devDisabledInIntegration: true,
-        bundleInAlfajores: true,
-        devDisabledInAlfajores: true,
-        bundleInPilot: true,
-        devDisabledInPilot: true,
-        bundleInMainnet: true,
-        devDisabledInMainnet: true,
         cliPath: "../../node_modules/react-native/cli.js",
         hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes",
         composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
@@ -92,11 +84,12 @@ project.ext.react = [
 ]
 
 project.ext.envConfigFiles = [
-    debug: ".env",
-    integration: ".env.integration",
+    // IMPORTANT: longer variants should be first, as react-native-config plugin matches the first prefix it finds
+    alfajoresdev: ".env.alfajores.dev",
     alfajores: ".env.alfajores",
-    pilot: ".env.pilot",
+    mainnetdev: ".env.mainnet.dev",
     mainnet: ".env.mainnet",
+    "": ".env.alfajores.dev", // Fallback
 ]
 
 project.ext.sentryCli = [
@@ -203,38 +196,25 @@ android {
             signingConfig signingConfigs.debug
         }
 
-        integration {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
-        }
-
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
-
+    }
+    flavorDimensions "default"
+    productFlavors {
         alfajores {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
+            dimension "default"
         }
-
-        pilot {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
+        alfajoresDev {
+            dimension "default"
         }
-
         mainnet {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
+            dimension "default"
+        }
+        mainnetDev {
+            dimension "default"
         }
     }
     // applicationVariants are e.g. debug, release
@@ -290,10 +270,6 @@ dependencies {
     if (enableHermes) {
         def hermesPath = "../../../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
-        integrationImplementation files(hermesPath + "hermes-release.aar")
-        alfajoresImplementation files(hermesPath + "hermes-release.aar")
-        pilotImplementation files(hermesPath + "hermes-release.aar")
-        mainnetImplementation files(hermesPath + "hermes-release.aar")
         releaseImplementation files(hermesPath + "hermes-release.aar")
     } else {
         implementation jscFlavor
