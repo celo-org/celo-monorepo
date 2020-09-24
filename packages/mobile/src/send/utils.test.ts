@@ -1,12 +1,7 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
-import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { UriData, urlFromUriData } from 'src/qrcode/schema'
-import { setRecipientCache } from 'src/recipients/actions'
-import { RecipientKind, RecipientWithQrCode } from 'src/recipients/recipient'
-import { recipientCacheSelector } from 'src/recipients/reducer'
 import { PaymentInfo } from 'src/send/reducers'
 import {
   dailyAmountRemaining,
@@ -15,7 +10,6 @@ import {
   // tslint:disable-next-line: ordered-imports
   handleSendPaymentData,
   _isPaymentLimitReached,
-  _updateRecipientCache,
 } from 'src/send/utils'
 
 describe('send/utils', () => {
@@ -137,45 +131,6 @@ describe('send/utils', () => {
       }
       await expectSaga(handlePaymentDeeplink, deeplink)
         .provide([[matchers.call.fn(handleSendPaymentData), parsed]])
-        .run()
-    })
-  })
-
-  describe('_updateRecipientCache', () => {
-    const recipient: RecipientWithQrCode = {
-      kind: RecipientKind.QrCode,
-      address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB'.toLowerCase(),
-      displayId: '+12022003243',
-      displayName: 'Super 8',
-      e164PhoneNumber: '+12022003243',
-      contactId: '',
-      phoneNumberLabel: undefined,
-      thumbnailPath: undefined,
-    }
-
-    it('should cache recipient name when scanning QR code', async () => {
-      await expectSaga(_updateRecipientCache, recipient)
-        .provide([
-          [matchers.select(addressToE164NumberSelector), {}],
-          [matchers.select(recipientCacheSelector), {}],
-        ])
-        .put(
-          setRecipientCache({
-            [recipient.e164PhoneNumber || '']: {
-              contactId: '',
-              ...recipient,
-              kind: RecipientKind.Contact,
-            },
-          })
-        )
-        .put(
-          updateE164PhoneNumberAddresses(
-            {},
-            {
-              [recipient.address]: recipient.e164PhoneNumber || '',
-            }
-          )
-        )
         .run()
     })
   })

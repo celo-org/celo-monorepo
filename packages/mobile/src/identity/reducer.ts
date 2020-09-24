@@ -42,6 +42,10 @@ export interface AddressToDataEncryptionKeyType {
   [address: string]: string | null // null means no DEK registered
 }
 
+export interface AddressToDisplayNameType {
+  [address: string]: string
+}
+
 export interface ImportContactProgress {
   status: ImportContactsStatus
   current: number
@@ -89,6 +93,8 @@ export interface State {
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
+  // Doesn't contain all known addresses, use only as a fallback.
+  addressToDisplayName: AddressToDisplayNameType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
@@ -112,6 +118,7 @@ const initialState: State = {
   e164NumberToAddress: {},
   e164NumberToSalt: {},
   addressToDataEncryptionKey: {},
+  addressToDisplayName: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -205,6 +212,14 @@ export const reducer = (
       return {
         ...state,
         e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
+      }
+    case Actions.ADD_ADDRESS_TO_DISPLAY_NAME:
+      return {
+        ...state,
+        addressToDisplayName: {
+          ...state.addressToDisplayName,
+          [action.address]: action.displayName,
+        },
       }
     case Actions.IMPORT_CONTACTS:
       return {
@@ -362,6 +377,8 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const addressToDisplayNameSelector = (state: RootState) =>
+  state.identity.addressToDisplayName
 
 export const isBalanceSufficientForSigRetrievalSelector = (state: RootState) => {
   const dollarBalance = stableTokenBalanceSelector(state) || 0

@@ -23,6 +23,7 @@ export enum Actions {
   COMPLETE_ATTESTATION_CODE = 'IDENTITY/COMPLETE_ATTESTATION_CODE',
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
+  ADD_ADDRESS_TO_DISPLAY_NAME = 'IDENTITY/ADD_ADDRESS_TO_DISPLAY_NAME',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
   END_FETCHING_ADDRESSES = 'IDENTITY/END_FETCHING_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
@@ -98,6 +99,12 @@ export interface UpdateE164PhoneNumberAddressesAction {
 export interface UpdateE164PhoneNumberSaltAction {
   type: Actions.UPDATE_E164_PHONE_NUMBER_SALT
   e164NumberToSalt: E164NumberToSaltType
+}
+
+export interface AddAddressToDisplayNameAction {
+  type: Actions.ADD_ADDRESS_TO_DISPLAY_NAME
+  address: string
+  displayName: string
 }
 
 export interface FetchAddressesAndValidateAction {
@@ -198,6 +205,7 @@ export type ActionTypes =
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
   | UpdateE164PhoneNumberSaltAction
+  | AddAddressToDisplayNameAction
   | ImportContactsAction
   | UpdateImportContactProgress
   | EndImportContactsAction
@@ -293,6 +301,15 @@ export const updateE164PhoneNumberSalts = (
 ): UpdateE164PhoneNumberSaltAction => ({
   type: Actions.UPDATE_E164_PHONE_NUMBER_SALT,
   e164NumberToSalt,
+})
+
+export const addAddressToDisplayName = (
+  address: string,
+  displayName: string
+): AddAddressToDisplayNameAction => ({
+  type: Actions.ADD_ADDRESS_TO_DISPLAY_NAME,
+  address,
+  displayName,
 })
 
 export const importContacts = (doMatchmaking: boolean = false): ImportContactsAction => ({
