@@ -1,7 +1,7 @@
 // HOC to add a paste button to a text input
 
+import { deviceIsIos14OrNewer } from '@celo/react-components/components/utils/IosVersionUtils'
 import Clipboard from '@react-native-community/clipboard'
-import { deviceIsIos14OrNewer } from 'components/utils/IosVersionUtils'
 import * as React from 'react'
 import { AppState, ViewProps } from 'react-native'
 
