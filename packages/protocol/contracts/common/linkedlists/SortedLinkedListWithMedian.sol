@@ -120,14 +120,7 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-<<<<<<< HEAD
-  ) public {
-=======
   ) internal {
-    // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
-    // don't change.
-    // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
->>>>>>> 8a8b82252... Script to deploy smart contract changes to a network via governance (#4706)
     remove(list, key);
     insert(list, key, value, lesserKey, greaterKey);
   }
