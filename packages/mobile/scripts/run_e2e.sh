@@ -39,7 +39,7 @@ while getopts 'p:t:frd' flag; do
 done
 
 # Flakey tracker retries don't work well with these e2e tests, so we disable them.
-export NUM_RETRIES=0
+export NUM_RETRIES='0'
 
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 echo "Network delay: $NET_DELAY"
