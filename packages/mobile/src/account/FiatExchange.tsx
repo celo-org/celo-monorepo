@@ -67,7 +67,7 @@ function FiatExchange() {
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
         </ListItem>
         <ListItem onPress={goToExternalExchanges}>
-          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:exchanges')}</Text>
+          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:buySellOnExchanges')}</Text>
         </ListItem>
         {features.SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
