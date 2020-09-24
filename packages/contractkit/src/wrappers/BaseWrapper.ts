@@ -17,7 +17,7 @@ export interface Filter {
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
-  constructor(protected readonly kit: ContractKit, public readonly contract: T) {}
+  constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
 
   /** Contract address */
   get address(): string {
