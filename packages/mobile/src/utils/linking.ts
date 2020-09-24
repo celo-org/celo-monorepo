@@ -1,11 +1,16 @@
-import { Linking } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { APP_STORE_ID } from 'src/config'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'utils/linking'
 
-export function navigateToWalletPlayStorePage() {
-  navigateToURI(`market://details?id=${DeviceInfo.getBundleId()}`)
+export function navigateToWalletStorePage() {
+  if (Platform.OS === 'android') {
+    navigateToURI(`market://details?id=${DeviceInfo.getBundleId()}`)
+  } else {
+    navigateToURI(`https://apps.apple.com/app/id${APP_STORE_ID}`)
+  }
 }
 
 export function navigateToURI(uri: string, backupUri?: string) {
