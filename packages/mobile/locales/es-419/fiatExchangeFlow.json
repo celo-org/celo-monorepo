@@ -1,5 +1,7 @@
 {
   "addFunds": "Añadir Fondos",
+  "exchanges": "Intercambiar",
+  "buySellOnExchanges": "Comprar/Vender en Intercambios",
   "cashOut": "Retirar",
   "cashOutComingSoon": "Retirar (Muy Pronto)",
   "celoDollarsAt": "Celo Dollars @ <1></1>",

@@ -288,6 +288,10 @@ export enum CeloExchangeEvents {
   celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
+export enum FiatExchangeEvents {
+  external_exchange_link = 'external_exchange_link',
+}
+
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
   geth_init_start = 'geth_init_start',
