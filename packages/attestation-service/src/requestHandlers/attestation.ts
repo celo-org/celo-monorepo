@@ -1,6 +1,7 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
+import { sleep } from '@celo/utils/lib/async'
 import { AttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
@@ -69,18 +70,28 @@ class AttestationRequestHandler {
       throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
     }
 
-    if (!isDevMode()) {
-      const attestations = await kit.contracts.getAttestations()
-      const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
+    if (isDevMode()) {
+      return
+    }
 
-      if (state.attestationState !== AttestationState.Incomplete) {
-        Counters.attestationRequestsWOIncompleteAttestation.inc()
-        throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
+    // Check the on-chain status of the attestation. If it's marked Complete, don't do it.
+    // If it's missing, the full node could be behind by a block or two. Try a few times before erroring.
+    const attestations = await kit.contracts.getAttestations()
+    for (let i = 0; i < 4; i++) {
+      const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
+      if (state.attestationState === AttestationState.Incomplete) {
+        return
+      } else if (state.attestationState === AttestationState.Complete) {
+        break
+      } else {
+        await sleep(2500)
       }
     }
 
+    Counters.attestationRequestsWOIncompleteAttestation.inc()
+    throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
+
     // TODO: Check expiration
-    return
   }
 
   async signAttestation() {
