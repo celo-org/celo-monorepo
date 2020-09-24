@@ -24,6 +24,10 @@ function FiatExchange() {
     navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: true })
   }
 
+  function goToExternalExchanges() {
+    navigation.navigate(Screens.ExternalExchanges, { isAddFunds: false })
+  }
+
   function goToCashOut() {
     navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: false })
   }
@@ -61,6 +65,9 @@ function FiatExchange() {
       <View style={styles.optionsListContainer}>
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
+        </ListItem>
+        <ListItem onPress={goToExternalExchanges}>
+          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:exchanges')}</Text>
         </ListItem>
         {features.SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
