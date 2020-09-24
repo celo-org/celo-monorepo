@@ -125,7 +125,11 @@ const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
-      <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
+      <Navigator.Screen
+        name={Screens.UpgradeScreen}
+        component={UpgradeScreen}
+        options={UpgradeScreen.navigationOptions}
+      />
       <Navigator.Screen
         name={Screens.DappKitAccountAuth}
         component={DappKitAccountScreen}
