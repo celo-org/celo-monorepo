@@ -107,9 +107,12 @@ const styles = StyleSheet.create({
     width: 0,
     willChange: 'width',
     transitionProperty: 'width',
-    transitionDuration: '800ms',
+    transitionDuration: '1300ms',
+    transitionDelay: '300ms',
   },
   expanderOpen: {
+    transitionDuration: '1200ms',
+    transitionDelay: '00ms',
     width: WIDTH,
   },
   root: {
@@ -117,9 +120,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     justifyContent: 'space-between',
     minHeight: 'calc(100vh - 50px)',
-    willChange: 'transform',
-    transitionProperty: 'transform',
-    transitionDuration: '1200ms',
+    willChange: 'opacity',
+    transitionProperty: 'opacity, transform',
     width: WIDTH,
     position: 'absolute',
     right: 0,
@@ -145,10 +147,16 @@ const styles = StyleSheet.create({
     zIndex: -20,
   },
   showSide: {
+    transitionDuration: '800ms',
+    transitionDelay: '400ms',
     opacity: 1,
+    transform: [{ translateX: 0 }],
   },
   hideSide: {
-    transform: [{ translateX: WIDTH + 10 }],
+    transitionProperty: 'opacity, transform',
+    transitionDuration: '800ms, 1600ms',
+    opacity: 0,
+    transform: [{ translateX: 20 }],
   },
   role: {
     textTransform: 'uppercase',
