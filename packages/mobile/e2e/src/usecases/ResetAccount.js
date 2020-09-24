@@ -29,7 +29,9 @@ export default ResetAccount = () => {
     // Go through the quiz.
     await element(by.id('backupKeySavedSwitch')).longPress()
     await element(by.id('backupKeyContinue')).tap()
-    for (const word of SAMPLE_BACKUP_KEY.split(' ')) {
+    const mnemonic = SAMPLE_BACKUP_KEY.split(' ')
+    await waitForElementId(`backupQuiz/${mnemonic[0]}`)
+    for (const word of mnemonic) {
       await element(by.id(`backupQuiz/${word}`)).tap()
     }
     await element(by.id('QuizSubmit')).tap()
