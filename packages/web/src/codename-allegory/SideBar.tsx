@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
+import { useCopyToClipboard } from 'src/hooks/useCopyToClipboard'
 import Chainlink from 'src/icons/Chainlink'
 import { TweetLogo } from 'src/icons/TwitterLogo'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { colors, fonts, standardStyles, textStyles, typeFaces } from 'src/styles'
-import { copyToClipboad } from 'src/utils/utils'
 import LightButon from './LightButton'
 
 const WIDTH = 340
@@ -59,9 +59,7 @@ export default function SideBar({ isOpen }) {
           </View>
           <View style={[standardStyles.row, standardStyles.elementalMargin]}>
             <TweetButton />
-            <LightButon onPress={copyURL} style={styles.copyButton}>
-              <Chainlink size={16} color={colors.dark} /> Copy
-            </LightButon>
+            <CopyButton />
           </View>
         </View>
         <View style={standardStyles.blockMarginBottomMobile}>
@@ -75,8 +73,18 @@ export default function SideBar({ isOpen }) {
   )
 }
 
-function copyURL() {
-  copyToClipboad(window.location.href)
+function CopyButton() {
+  const [justCopied, copyText] = useCopyToClipboard()
+
+  function copyURL() {
+    copyText(window.location.href)
+  }
+
+  return (
+    <LightButon onPress={copyURL} style={styles.copyButton}>
+      <Chainlink size={16} color={colors.dark} /> {justCopied ? ' Copied' : ' Copy'}
+    </LightButon>
+  )
 }
 
 const TweetButton = React.memo(() => {
