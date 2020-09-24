@@ -30,10 +30,8 @@ export default React.memo(function Body({ isOpen }: Props) {
             <Image source={Abundance} style={styles.abundance} />
           </Fade>
           <Fade duration={5000} fraction={1} rootMargin={'-20% 0% -30%'}>
-            <Text style={[fonts.legal, textStyles.center]}>
-              <RingsGlyph height={15} color={colors.dark} />
-              {'  '}
-              Imagined with Celo
+            <Text style={[fonts.legal, textStyles.center, textStyles.italic]}>
+              – Imagined with Celo
             </Text>
           </Fade>
         </View>
@@ -51,6 +49,7 @@ const styles = StyleSheet.create({
   },
   abundance: { width: 196, height: 200 },
   footer: {
+    zIndex: -10,
     marginBottom: 30,
     height: '100vh',
     justifyContent: 'center',
