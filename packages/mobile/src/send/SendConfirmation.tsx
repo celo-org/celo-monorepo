@@ -71,8 +71,7 @@ interface StateProps {
   addressValidationType: AddressValidationType
   validatedRecipientAddress?: string
   addressJustValidated?: boolean
-  localCurrencyCode: LocalCurrencyCode
-  localCurrencyExchangeRate?: string | null
+  currencyInfo: CurrencyInfo
   isDekRegistered: boolean
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
 }
@@ -113,10 +112,10 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
   // Undefined or null means no addresses ever validated through secure send
   const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
-  const localCurrencyCode = currencyInfo ? currencyInfo.currencyCode : getLocalCurrencyCode(state)
-  const localCurrencyExchangeRate = currencyInfo
-    ? currencyInfo.exchangeRate
-    : getLocalCurrencyExchangeRate(state)
+  const currInfo = {
+    currencyCode: currencyInfo ? currencyInfo.currencyCode : getLocalCurrencyCode(state),
+    exchangeRate: currencyInfo ? currencyInfo.exchangeRate : getLocalCurrencyExchangeRate(state),
+  }
 
   return {
     account: currentAccountSelector(state),
@@ -129,8 +128,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     addressValidationType,
     validatedRecipientAddress,
     addressJustValidated,
-    localCurrencyCode,
-    localCurrencyExchangeRate,
+    currencyInfo: currInfo,
     isDekRegistered: isDekRegisteredSelector(state) ?? false,
     addressToDataEncryptionKey: state.identity.addressToDataEncryptionKey,
   }
@@ -193,15 +191,15 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     const localCurrencyAmount = convertDollarsToLocalAmount(
       amount,
-      this.props.localCurrencyExchangeRate
+      this.props.currencyInfo?.exchangeRate
     )
 
     ValoraAnalytics.track(SendEvents.send_confirm_send, {
       isScan: !!this.props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       isRequest: type === TokenTransactionType.PayRequest,
-      localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
-      localCurrency: this.props.localCurrencyCode,
+      localCurrencyExchangeRate: this.props.currencyInfo?.exchangeRate,
+      localCurrency: this.props.currencyInfo?.currencyCode,
       dollarAmount: amount.toString(),
       localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
       commentLength: comment.length,
@@ -364,18 +362,9 @@ export class SendConfirmation extends React.Component<Props, State> {
             feeLoading={asyncFee.loading}
             feeHasError={!!asyncFee.error}
             totalFee={fee}
-            currencyInfo={{
-              currencyCode: this.props.localCurrencyCode,
-              exchangeRate: this.props.localCurrencyExchangeRate,
-            }}
+            currencyInfo={this.props.currencyInfo}
           />
-          <TotalLineItem
-            amount={totalAmount}
-            currencyInfo={{
-              currencyCode: this.props.localCurrencyCode,
-              exchangeRate: this.props.localCurrencyExchangeRate,
-            }}
-          />
+          <TotalLineItem amount={totalAmount} currencyInfo={this.props.currencyInfo} />
         </View>
       )
     }
@@ -436,10 +425,7 @@ export class SendConfirmation extends React.Component<Props, State> {
               type={DisplayType.Default}
               style={styles.amount}
               amount={subtotalAmount}
-              currencyInfo={{
-                currencyCode: this.props.localCurrencyCode,
-                exchangeRate: this.props.localCurrencyExchangeRate,
-              }}
+              currencyInfo={this.props.currencyInfo}
             />
             {type === TokenTransactionType.PayRequest ||
             type === TokenTransactionType.PayPrefill ? (

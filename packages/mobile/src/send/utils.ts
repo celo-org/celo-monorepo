@@ -185,8 +185,6 @@ export function* handleSendPaymentData(
   yield put(storeLatestInRecents(recipient))
 
   if (data.amount && data.currencyCode) {
-    // TODO: integrate with SendConfirmation component
-    // const exchangeRate = yield select(getLocalCurrencyExchangeRate)
     const currency = data.currencyCode as LocalCurrencyCode
     const exchangeRate = yield call(fetchExchangeRate, currency)
     const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
