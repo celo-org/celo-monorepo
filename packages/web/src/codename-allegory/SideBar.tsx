@@ -14,10 +14,11 @@ const WIDTH = 340
 export default function SideBar({ isOpen }) {
   const { isMobile } = useScreenSize()
   const openStyle = isMobile ? styles.showSideMobile : styles.showSide
+  const closedStyle = isMobile ? styles.hideSideMobile : styles.hideSide
   return (
     <>
       <View style={[styles.expander, !isMobile && isOpen && styles.expanderOpen]} />
-      <View style={[styles.root, isOpen ? openStyle : styles.hideSide]}>
+      <View style={[styles.root, isMobile && styles.rootMobile, isOpen ? openStyle : closedStyle]}>
         <View>
           <H4
             style={[
@@ -112,6 +113,7 @@ const styles = StyleSheet.create({
     width: WIDTH,
   },
   root: {
+    paddingHorizontal: 16,
     backgroundColor: colors.white,
     justifyContent: 'space-between',
     minHeight: 'calc(100vh - 50px)',
@@ -119,19 +121,29 @@ const styles = StyleSheet.create({
     transitionProperty: 'transform',
     transitionDuration: '1200ms',
     width: WIDTH,
-    paddingHorizontal: 10,
     position: 'absolute',
     right: 0,
+  },
+  rootMobile: {
+    willChange: 'opacity, transform',
+    transitionProperty: 'opacity, transform',
+    transitionDuration: '800ms',
+    width: '100vw',
   },
   showSideMobile: {
     height: 400,
     minHeight: 'calc(100vh - 50px)',
     overflow: 'scroll',
     width: '100vw',
-    paddingHorizontal: 16,
+    transform: [{ translateY: 0 }],
+    opacity: 1,
+  },
+  hideSideMobile: {
+    opacity: 0,
+    transform: [{ translateY: 5 }],
+    zIndex: -20,
   },
   showSide: {
-    paddingHorizontal: 16,
     opacity: 1,
   },
   hideSide: {
