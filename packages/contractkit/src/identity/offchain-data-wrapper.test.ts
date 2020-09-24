@@ -252,8 +252,8 @@ testWithGanache('Offchain Data', (web3) => {
           throw new Error("Shouldn't get here")
         }
 
-        expect(JSON.parse(result1.result.toString()).name).toEqual(testname)
-        expect(JSON.parse(result2.result.toString()).name).toEqual(testname)
+        expect(result1.result.name).toEqual(testname)
+        expect(result2.result.name).toEqual(testname)
 
         kit.removeAccount(writerAddress)
         kit.removeAccount(readerAddress)

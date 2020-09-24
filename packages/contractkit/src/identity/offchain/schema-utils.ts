@@ -181,7 +181,7 @@ export const writeEncryptedWithSymmetric = async (
   const key = randomBytes(16)
   const cipher = createCipheriv('aes-128-ctr', key, iv)
 
-  const output = cipher.update(Buffer.from(JSON.stringify(data)))
+  const output = cipher.update(data)
   const payload = Buffer.concat([iv, output, cipher.final()])
 
   await wrapper.writeDataTo(payload, `${dataPath}.enc`)
@@ -218,9 +218,11 @@ const readEncrypted = async (
     return Err(new OffchainError(encryptedPayloadOrKey.error))
   }
 
+  const payloadOrKey = await wallet.decrypt(recipientAddress, encryptedPayloadOrKey.result)
+
   // encrypted with symmetric key
   if (encryptedPayload.ok) {
-    const key = encryptedPayloadOrKey.result
+    const key = payloadOrKey
     const payload = encryptedPayload.result
     const iv = payload.slice(0, 16)
     const encryptedData = payload.slice(16)
@@ -230,7 +232,7 @@ const readEncrypted = async (
     return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
   }
 
-  return Ok(await wallet.decrypt(recipientAddress, encryptedPayloadOrKey.result))
+  return Ok(payloadOrKey)
 }
 
 export const deserialize = <DataType>(
