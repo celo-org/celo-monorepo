@@ -6125,9 +6125,9 @@
     wcwidth "^1.0.1"
     ws "^1.1.0"
 
-"@react-native-community/clipboard@git+https://github.com/celo-org/clipboard#9b72963":
+"@react-native-community/clipboard@git+https://github.com/celo-org/clipboard#5afb848":
   version "1.2.3"
-  resolved "git+https://github.com/celo-org/clipboard#9b72963504cb61fef5738d5eae4d6a9af02f9e78"
+  resolved "git+https://github.com/celo-org/clipboard#5afb8484215495bce475efb8da24e65339e21164"
 
 "@react-native-community/eslint-config@^1.1.0":
   version "1.1.0"
