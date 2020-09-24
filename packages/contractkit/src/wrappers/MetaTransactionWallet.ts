@@ -4,6 +4,8 @@ import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typ
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { HttpProvider } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
+import { Contract } from 'web3-eth-contract'
 import { Address } from '../base'
 import { MetaTransactionWallet } from '../generated/MetaTransactionWallet'
 import {
@@ -17,19 +19,9 @@ import {
   valueToInt,
 } from './BaseWrapper'
 
-export interface MTWTransaction {
-  destination: Address
+export interface TransactionWrapper<T> {
+  txo: TransactionObject<T>
   value?: BigNumber.Value
-  data?: string
-}
-
-export interface MTWMetaTransaction extends MTWTransaction {
-  nonce: number
-}
-
-export interface MTWSignedMetaTransaction extends MTWTransaction {
-  nonce: number
-  signature: Signature
 }
 
 /**
@@ -41,13 +33,13 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if the caller is not a signer
    * @param tx a MTWTransaction
    */
-  executeTransaction(tx: MTWTransaction) {
+  public executeTransaction<T>(wrappedTx: TransactionWrapper<T>): CeloTransactionObject<string> {
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeTransaction(
-        tx.destination,
-        numericToHex(tx.value),
-        tx.data || '0x'
+        getTxoDestination(wrappedTx.txo),
+        numericToHex(wrappedTx.value),
+        wrappedTx.txo.encodeABI()
       )
     )
   }
@@ -57,43 +49,20 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if the caller is not a signer
    * @param txs An array of MTWTransactions
    */
-  executeTransactions(txs: MTWTransaction[]) {
-    return toTransactionObject(this.kit, this.buildExecuteTransactionsTx(txs))
-  }
-
-  /**
-   * Builds the TransactionObject for executeTransactions
-   * Reverts if the caller is not a signer
-   * @param txs An array of MTWTransactions
-   */
-  buildExecuteTransactionsTx(txs: MTWTransaction[]) {
-    const destinations = txs.map((tx) => tx.destination)
-    const values = txs.map((tx) => numericToHex(tx.value))
-    const callData = ensureLeading0x(txs.map((tx) => trimLeading0x(tx.data || '0x')).join(''))
-    const callDataLengths = txs.map((tx) => trimLeading0x(tx.data || '0x').length / 2)
-
-    return this.contract.methods.executeTransactions(
-      destinations,
-      values,
-      callData,
-      callDataLengths
+  public executeTransactions(
+    wrappedTxs: Array<TransactionWrapper<any>>
+  ): CeloTransactionObject<void> {
+    const destinations = wrappedTxs.map((wtx) => getTxoDestination(wtx.txo))
+    const values = wrappedTxs.map((wtx) => numericToHex(wtx.value))
+    const callData = ensureLeading0x(
+      wrappedTxs.map((wtx) => trimLeading0x(wtx.txo.encodeABI())).join('')
     )
-  }
+    const callDataLengths = wrappedTxs.map((wtx) => trimLeading0x(wtx.txo.encodeABI()).length / 2)
 
-  /**
-   * Builds a MetaTransaction that wraps a series of Transactions
-   * Reverts if the caller is not a signer
-   * @param txs An array of MTWTransactions
-   * @returns MTWMetaTransaction
-   */
-  buildExecuteTransactionsWrapperTx(txs: MTWTransaction[]): MTWTransaction {
-    const executeTransactionsTx = this.buildExecuteTransactionsTx(txs)
-
-    return {
-      destination: this.address,
-      value: new BigNumber(0),
-      data: executeTransactionsTx.encodeABI(),
-    }
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.executeTransactions(destinations, values, callData, callDataLengths)
+    )
   }
 
   /**
@@ -101,39 +70,41 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if meta-tx signer is not a signer for the wallet
    * @param mtx a MTWSignedMetaTransaction
    */
-  executeMetaTransaction(mtx: MTWSignedMetaTransaction) {
+  public executeMetaTransaction(
+    wrappedTx: TransactionWrapper<any>,
+    signature: Signature
+  ): CeloTransactionObject<string> {
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeMetaTransaction(
-        mtx.destination,
-        numericToHex(mtx.value),
-        mtx.data || '0x',
-        mtx.signature.v,
-        mtx.signature.r,
-        mtx.signature.s
+        getTxoDestination(wrappedTx.txo),
+        numericToHex(wrappedTx.value),
+        wrappedTx.txo.encodeABI(),
+        signature.v,
+        signature.r,
+        signature.s
       )
     )
   }
 
   /**
    * Signs a meta transaction as EIP712 typed data
-   * @param mtx a MTWTransaction
-   * @returns smtx a MTWSignedMetaTransaction
+   * @param tx a TransactionWrapper
+   * @param nonce Optional -- will query contract state if not passed
+   * @returns signature a Signature
    */
   async signMetaTransaction(
-    signer: Address,
-    tx: MTWTransaction,
+    wrappedTx: TransactionWrapper<any>,
     nonce?: number
-  ): Promise<MTWSignedMetaTransaction> {
-    const metaTx: MTWMetaTransaction = {
-      ...tx,
-      nonce: nonce === undefined ? await this.nonce() : nonce,
+  ): Promise<Signature> {
+    if (nonce === undefined) {
+      nonce = await this.nonce()
     }
-
-    const typedData = await this.getMetaTransactionTypedData(metaTx)
+    const typedData = buildMetaTxTypedData(this.address, wrappedTx, nonce, await this.chainId())
     // TODO: This should be cached by the CeloProvider and executed through the wallets.
     //       But I think the GethNativeBridgeWallet currently doesn't support this, it's
     //       in the works.
+    const signer = await this.signer()
     const signature = await new Promise<string>((resolve, reject) => {
       ;(this.kit.web3.currentProvider as Pick<HttpProvider, 'send'>).send(
         {
@@ -154,63 +125,59 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     })
 
     const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-    const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
-    return {
-      ...metaTx,
-      signature: parsedSignature,
-    }
+    return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
   /**
-   * Get MetaTransaction Typed Data
-   * @param mtx MTWMetaTransaction
-   * @returns EIP712TypedData
+   * Execute a signed meta transaction
+   * Reverts if meta-tx signer is not a signer for the wallet
+   * @param mtx a MTWSignedMetaTransaction
    */
-  async getMetaTransactionTypedData(mtx: MTWMetaTransaction) {
-    return buildMetaTxTypedData(this.address, mtx, await this._getChainId())
+  public async signAndExecuteMetaTransaction(
+    wrappedTx: TransactionWrapper<any>
+  ): Promise<CeloTransactionObject<string>> {
+    const signature = await this.signMetaTransaction(wrappedTx)
+    return this.executeMetaTransaction(wrappedTx, signature)
   }
 
-  _spreadMetaTx = (mtx: MTWMetaTransaction): [string, string, string, number] => [
-    mtx.destination,
-    numericToHex(mtx.value),
-    mtx.data || '0x',
-    mtx.nonce,
+  private getMetaTransactionDigestParams = (
+    tx: TransactionWrapper<any>,
+    nonce: number
+  ): [string, string, string, number] => [
+    getTxoDestination(tx.txo),
+    numericToHex(tx.value),
+    tx.txo.encodeABI(),
+    nonce,
   ]
-
-  _spreadSignedMetaTx = (
-    mtx: MTWSignedMetaTransaction
-  ): [string, string, string, number, number, string, string] => [
-    mtx.destination,
-    numericToHex(mtx.value),
-    mtx.data || '0x',
-    mtx.nonce,
-    mtx.signature.v,
-    mtx.signature.r,
-    mtx.signature.s,
-  ]
-
   getMetaTransactionDigest = proxyCall(
     this.contract.methods.getMetaTransactionDigest,
-    this._spreadMetaTx,
+    this.getMetaTransactionDigestParams,
     stringIdentity
   )
 
-  getMetaTransactionStructHash = proxyCall(
-    this.contract.methods.getMetaTransactionStructHash,
-    this._spreadMetaTx,
-    stringIdentity
-  )
-
+  private getMetaTransactionSignerParams = (
+    tx: TransactionWrapper<any>,
+    nonce: number,
+    signature: Signature
+  ): [string, string, string, number, number, string, string] => [
+    getTxoDestination(tx.txo),
+    numericToHex(tx.value),
+    tx.txo.encodeABI(),
+    nonce,
+    signature.v,
+    signature.r,
+    signature.s,
+  ]
   getMetaTransactionSigner = proxyCall(
     this.contract.methods.getMetaTransactionSigner,
-    this._spreadSignedMetaTx,
+    this.getMetaTransactionSignerParams,
     stringIdentity
   )
 
   eip712DomainSeparator = proxyCall(this.contract.methods.eip712DomainSeparator)
   isOwner = proxyCall(this.contract.methods.isOwner)
   nonce = proxyCall(this.contract.methods.nonce, undefined, valueToInt)
-  signer = proxyCall(this.contract.methods.signer, undefined, stringIdentity)
+  private getSigner = proxyCall(this.contract.methods.signer, undefined, stringIdentity)
 
   transferOwnership: (newOwner: Address) => CeloTransactionObject<void> = proxySend(
     this.kit,
@@ -231,18 +198,39 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Get an cache the chain ID -- assume it's static for a kit instance
    * @returns chainId
    */
-  _chainId?: number = undefined
-  async _getChainId() {
+  _chainId?: number
+  private async chainId(): Promise<number> {
     if (this._chainId === undefined) {
       this._chainId = await this.kit.web3.eth.net.getId()
     }
     return this._chainId
   }
+
+  /**
+   * Get an cache the signer - it should be static for a Wallet instance
+   * @returns signer
+   */
+  _signer?: Address
+  public async signer() {
+    if (this._signer === undefined) {
+      this._signer = await this.getSigner()
+    }
+    return this._signer
+  }
+}
+
+const getTxoDestination = (txo: TransactionObject<any>): string => {
+  // XXX: Slight hack alert - getting the parent contract from a txo
+  //      I'm not sure why it's not included in the type, but it's always there
+  //      from what I could find.
+  const parent = (txo as any)._parent as Contract
+  return parent.options.address
 }
 
 export const buildMetaTxTypedData = (
   walletAddress: Address,
-  tx: MTWMetaTransaction,
+  tx: TransactionWrapper<any>,
+  nonce: number,
   chainId: number
 ): EIP712TypedData => {
   return {
@@ -269,10 +257,10 @@ export const buildMetaTxTypedData = (
     },
     message: tx
       ? {
-          destination: tx.destination,
+          destination: getTxoDestination(tx.txo),
           value: numericToHex(tx.value),
-          data: tx.data || '0x',
-          nonce: tx.nonce,
+          data: tx.txo.encodeABI(),
+          nonce,
         }
       : {},
   }
