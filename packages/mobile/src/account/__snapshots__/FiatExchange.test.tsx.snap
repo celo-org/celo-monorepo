@@ -277,7 +277,7 @@ exports[`FiatExchange renders correctly 1`] = `
               }
             }
           >
-            fiatExchangeFlow:exchanges
+            fiatExchangeFlow:buySellOnExchanges
           </Text>
         </View>
       </View>

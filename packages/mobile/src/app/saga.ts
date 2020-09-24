@@ -41,8 +41,8 @@ export function* appInit() {
 
   if (isDeprecated) {
     Logger.warn(TAG, 'App version is deprecated')
-    navigate(Screens.UpgradeScreen)
-    return
+    // navigate(Screens.UpgradeScreen)
+    // return
   } else {
     Logger.debug(TAG, 'App version is valid')
   }
