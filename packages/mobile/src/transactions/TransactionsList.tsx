@@ -11,7 +11,11 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { RootState } from 'src/redux/reducers'
 import { newTransactionsInFeed } from 'src/transactions/actions'
 import { knownFeedTransactionsSelector, KnownFeedTransactionsType } from 'src/transactions/reducer'
-import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
+import TransactionFeed, {
+  FeedItem,
+  FeedType,
+  TransactionFeedFragments,
+} from 'src/transactions/TransactionFeed'
 import { getNewTxsFromUserTxQuery, getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
 import {
   ExchangeStandby,
@@ -55,7 +59,7 @@ export const TRANSACTIONS_QUERY = gql`
     }
   }
 
-  ${TransactionFeed.fragments.transaction}
+  ${TransactionFeedFragments.transaction}
 `
 
 const mapStateToProps = (state: RootState): StateProps => ({

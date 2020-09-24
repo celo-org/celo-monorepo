@@ -95,7 +95,7 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
       <Logo height={32} />
       <Text style={styles.h1}>{t('introTitle')}</Text>
       <Text style={styles.body}>{t('introBody')}</Text>
-      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} />
+      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} testID="SetUpAccountKey" />
     </ScrollView>
   )
 }
