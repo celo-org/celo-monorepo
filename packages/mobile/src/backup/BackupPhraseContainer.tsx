@@ -92,7 +92,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
         </View>
         {mode === BackupPhraseContainerMode.READONLY && (
           <View style={styles.phraseContainer}>
-            {!!words && <Text style={styles.phraseText}>{words}</Text>}
+            {!!words && (
+              <Text style={styles.phraseText} testID="AccountKeyWords">
+                {words}
+              </Text>
+            )}
           </View>
         )}
         {mode === BackupPhraseContainerMode.INPUT && (
@@ -171,12 +175,6 @@ const styles = StyleSheet.create({
   },
   socialPhraseInputText: {
     minHeight: 90,
-  },
-  button: {
-    alignSelf: 'center',
-    flex: 1,
-    paddingBottom: 0,
-    marginBottom: 0,
   },
 })
 

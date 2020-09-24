@@ -65,6 +65,7 @@ export default function CeloExchangeButtons({ navigation }: Props) {
           onPress={goToBuyGold}
           style={styles.button}
           type={BtnTypes.TERTIARY}
+          testID="BuyCelo"
         />
       )}
       {hasGold && (
@@ -74,6 +75,7 @@ export default function CeloExchangeButtons({ navigation }: Props) {
           onPress={goToBuyDollars}
           style={styles.button}
           type={BtnTypes.TERTIARY}
+          testID="SellCelo"
         />
       )}
     </View>

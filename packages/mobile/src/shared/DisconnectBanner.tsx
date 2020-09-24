@@ -72,9 +72,6 @@ class DisconnectBanner extends React.PureComponent<Props> {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    opacity: 0.5,
-  },
   text: {
     ...fontStyles.bodySmall,
     textAlign: 'center',
