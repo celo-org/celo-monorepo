@@ -1,8 +1,9 @@
 // HOC to add a paste button to a text input
 
 import Clipboard from '@react-native-community/clipboard'
+import { deviceIsIos14OrNewer } from 'components/utils/IosVersionUtils'
 import * as React from 'react'
-import { AppState, Platform, ViewProps } from 'react-native'
+import { AppState, ViewProps } from 'react-native'
 
 interface PasteAwareProps {
   value: string
@@ -19,11 +20,6 @@ export interface PasteAwareWrappedElementProps {
 interface PasteAwareState {
   isPasteIconVisible: boolean
   clipboardContent: string | null
-}
-
-export function deviceIsIos14OrNewer() {
-  const majorVersionIOS = parseInt(Platform.Version.toString(), 10)
-  return Platform.OS === 'ios' && majorVersionIOS >= 14
 }
 
 export function withPasteAware<P extends ViewProps>(

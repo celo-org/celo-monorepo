@@ -1,4 +1,4 @@
-import { deviceIsIos14OrNewer } from '@celo/react-components/components/WithPasteAware'
+import { deviceIsIos14OrNewer } from '@celo/react-components/components/utils/IosVersionUtils'
 import Clipboard from '@react-native-community/clipboard'
 import { useEffect, useState } from 'react'
 import { AppState } from 'react-native'
