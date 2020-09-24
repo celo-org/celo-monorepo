@@ -20,6 +20,7 @@
 - [Glossary](GLOSSARY.md)
 
 ## CELO Holder Guide
+
 - [Quick Start](celo-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
@@ -40,6 +41,7 @@
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 
 ## Developer Guide
+
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
@@ -47,7 +49,7 @@
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
-- [Overview]()
+- [Overview](developer-resources/overview.md)
   <!-- - [The Celo Protocol]()
     - [Architecture]()
     - [Similarities with Ethereum]()
@@ -69,7 +71,6 @@
       - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
       - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
       - [Querying on-chain identifiers with ODIS](developer-resources/contractkit/odis.md)
-    - [Forno](developer-resources/forno/README.md)
       <!-- - [Example of querying (web3, kit)]()
       - [Example of sending tx (kit)]() -->
     <!-- - [Using Truffle]()
@@ -83,6 +84,7 @@
         - [Expo]() -->
       - [Usage](developer-resources/dappkit/usage.md)
     <!-- - [Guide to Asset Custody]() -->
+  - [Forno](developer-resources/forno/README.md)
   - [Celo for Ethereum Developers](developer-resources/celo-for-eth-devs.md)
   - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
   - [Integrations](developer-resources/integrations/integrations.md)
