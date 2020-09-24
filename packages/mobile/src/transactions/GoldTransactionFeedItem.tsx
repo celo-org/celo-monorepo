@@ -80,10 +80,6 @@ export function ExchangeFeedItem(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  arrow: {
-    paddingHorizontal: 5,
-    paddingBottom: 8,
-  },
   container: {
     justifyContent: 'space-between',
     flex: 1,
