@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
     width: '100vw',
   },
   showSideMobile: {
+    transitionDelay: '600ms',
     height: 400,
     minHeight: 'calc(100vh - 50px)',
     overflow: 'scroll',

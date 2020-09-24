@@ -11,15 +11,16 @@ export interface Options {
   rootMargin?: string
 }
 
-export default function useFade({ rootMargin, duration, fraction }: Options) {
+export default function useFade({ rootMargin, duration, fraction, delay }: Options) {
   const ref = React.useRef(null)
 
   const isOnScreen = useOnScreen(ref, fraction, rootMargin)
-
+  const transitionDelay = delay ? `${delay}ms` : null
   const style = React.useMemo(
     () =>
       StyleSheet.create({
         base: {
+          transitionDelay,
           transitionDuration: `${duration}ms`,
           transitionProperty: 'opacity, transform',
           opacity: isOnScreen ? 1 : 0,

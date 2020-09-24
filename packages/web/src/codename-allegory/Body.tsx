@@ -55,11 +55,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   open: {
+    transitionDelay: '0ms',
     opacity: 0,
     height: 'calc(100vh - 50px)',
   },
   mobile: {
-    transitionDuration: '700ms',
+    transitionDelay: '600ms',
+    transitionDuration: '800ms',
     transitionProperty: 'opacity',
     width: '100vw',
     paddingHorizontal: 0,
