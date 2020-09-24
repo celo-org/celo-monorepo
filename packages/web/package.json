@@ -15,7 +15,7 @@
     "deploy:routes:prod": "gcloud config set project celo-testnet-production; DISPATCH=dispatch-celo-testnet-production.yaml yarn run deploy:routes",
     "deploy:routes:non-prod": "gcloud config set project celo-testnet; DISPATCH=dispatch-celo-testnet.yaml yarn run deploy:routes",
     "deploy:dev": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
-    "deploy:staging": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=staging MANIFEST=staging.yaml yarn run deploy",
+    "deploy:stage": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=staging MANIFEST=staging.yaml yarn run deploy",
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
     "view": "gcloud app browse -s website-$DEPLOY_ENV",
     "lint": "tslint -c tslint.json --project tsconfig.json",
