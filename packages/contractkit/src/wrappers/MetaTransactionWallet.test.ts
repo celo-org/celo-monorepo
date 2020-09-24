@@ -146,6 +146,17 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     })
   })
 
+  describe('#signMetaTransaction', () => {
+    describe('with an unlocked account', () => {
+      it('returns a signature', async () => {
+        const signature = await wallet.signMetaTransaction({
+          txo: gold.transfer(emptyAccounts[0], 1000).txo,
+        })
+        expect(signature).toBeDefined()
+      })
+    })
+  })
+
   describe('#executeMetaTransaction', () => {
     describe('as a rando', () => {
       it('can execute transactions', async () => {
