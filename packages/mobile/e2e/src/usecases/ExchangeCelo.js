@@ -37,7 +37,7 @@ export default ExchangeCelo = () => {
 
     await enterPinUiIfNecessary()
 
-    // Return to the Exchange CELO screen and check balance
+    // Return to the Exchange CELO screen.
     await expect(element(by.id('BuyCelo'))).toBeVisible()
   })
 
@@ -63,9 +63,6 @@ export default ExchangeCelo = () => {
     await enterPinUiIfNecessary()
 
     // Return to the Exchange CELO screen after confirming.
-    await waitFor(element(by.id('WithdrawCELO')))
-      .toBeVisible()
-      .whileElement(by.id('ExchangeScrollView'))
-      .scroll(50, 'down')
+    await expect(element(by.id('BuyCelo'))).toBeVisible()
   })
 }
