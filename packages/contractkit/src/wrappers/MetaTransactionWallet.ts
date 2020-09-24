@@ -19,10 +19,12 @@ import {
   valueToInt,
 } from './BaseWrapper'
 
-export interface TransactionWrapper<T> {
+export interface TransactionObjectWithValue<T> {
   txo: TransactionObject<T>
-  value?: BigNumber.Value
+  value: BigNumber.Value
 }
+
+export type TransactionInput<T> = TransactionObject<T> | TransactionObjectWithValue<T>
 
 /**
  * Class that wraps the MetaTransactionWallet
@@ -33,13 +35,16 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if the caller is not a signer
    * @param tx a MTWTransaction
    */
-  public executeTransaction<T>(wrappedTx: TransactionWrapper<T>): CeloTransactionObject<string> {
+  public executeTransaction(tx: TransactionInput<any>): CeloTransactionObject<string> {
+    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
+    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
+
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeTransaction(
-        getTxoDestination(wrappedTx.txo),
-        numericToHex(wrappedTx.value),
-        wrappedTx.txo.encodeABI()
+        getTxoDestination(txo),
+        numericToHex(value),
+        txo.encodeABI()
       )
     )
   }
@@ -49,15 +54,12 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if the caller is not a signer
    * @param txs An array of MTWTransactions
    */
-  public executeTransactions(
-    wrappedTxs: Array<TransactionWrapper<any>>
-  ): CeloTransactionObject<void> {
-    const destinations = wrappedTxs.map((wtx) => getTxoDestination(wtx.txo))
-    const values = wrappedTxs.map((wtx) => numericToHex(wtx.value))
-    const callData = ensureLeading0x(
-      wrappedTxs.map((wtx) => trimLeading0x(wtx.txo.encodeABI())).join('')
-    )
-    const callDataLengths = wrappedTxs.map((wtx) => trimLeading0x(wtx.txo.encodeABI()).length / 2)
+  public executeTransactions(txs: Array<TransactionInput<any>>): CeloTransactionObject<void> {
+    const txos: Array<TransactionObject<any>> = txs.map((tx) => ('value' in tx ? tx.txo : tx))
+    const destinations = txos.map((txo) => getTxoDestination(txo))
+    const values = txs.map((tx) => numericToHex('value' in tx ? tx.value : 0))
+    const callData = ensureLeading0x(txos.map((txo) => trimLeading0x(txo.encodeABI())).join(''))
+    const callDataLengths = txos.map((txo) => trimLeading0x(txo.encodeABI()).length / 2)
 
     return toTransactionObject(
       this.kit,
@@ -71,15 +73,18 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param mtx a MTWSignedMetaTransaction
    */
   public executeMetaTransaction(
-    wrappedTx: TransactionWrapper<any>,
+    tx: TransactionInput<any>,
     signature: Signature
   ): CeloTransactionObject<string> {
+    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
+    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
+
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeMetaTransaction(
-        getTxoDestination(wrappedTx.txo),
-        numericToHex(wrappedTx.value),
-        wrappedTx.txo.encodeABI(),
+        getTxoDestination(txo),
+        numericToHex(value),
+        txo.encodeABI(),
         signature.v,
         signature.r,
         signature.s
@@ -93,14 +98,11 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param nonce Optional -- will query contract state if not passed
    * @returns signature a Signature
    */
-  async signMetaTransaction(
-    wrappedTx: TransactionWrapper<any>,
-    nonce?: number
-  ): Promise<Signature> {
+  async signMetaTransaction(tx: TransactionInput<any>, nonce?: number): Promise<Signature> {
     if (nonce === undefined) {
       nonce = await this.nonce()
     }
-    const typedData = buildMetaTxTypedData(this.address, wrappedTx, nonce, await this.chainId())
+    const typedData = buildMetaTxTypedData(this.address, tx, nonce, await this.chainId())
     // TODO: This should be cached by the CeloProvider and executed through the wallets.
     //       But I think the GethNativeBridgeWallet currently doesn't support this, it's
     //       in the works.
@@ -134,21 +136,22 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param mtx a MTWSignedMetaTransaction
    */
   public async signAndExecuteMetaTransaction(
-    wrappedTx: TransactionWrapper<any>
+    tx: TransactionInput<any>
   ): Promise<CeloTransactionObject<string>> {
-    const signature = await this.signMetaTransaction(wrappedTx)
-    return this.executeMetaTransaction(wrappedTx, signature)
+    const signature = await this.signMetaTransaction(tx)
+    return this.executeMetaTransaction(tx, signature)
   }
 
   private getMetaTransactionDigestParams = (
-    tx: TransactionWrapper<any>,
+    tx: TransactionInput<any>,
     nonce: number
-  ): [string, string, string, number] => [
-    getTxoDestination(tx.txo),
-    numericToHex(tx.value),
-    tx.txo.encodeABI(),
-    nonce,
-  ]
+  ): [string, string, string, number] => {
+    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
+    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
+
+    return [getTxoDestination(txo), numericToHex(value), txo.encodeABI(), nonce]
+  }
+
   getMetaTransactionDigest = proxyCall(
     this.contract.methods.getMetaTransactionDigest,
     this.getMetaTransactionDigestParams,
@@ -156,18 +159,23 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   )
 
   private getMetaTransactionSignerParams = (
-    tx: TransactionWrapper<any>,
+    tx: TransactionInput<any>,
     nonce: number,
     signature: Signature
-  ): [string, string, string, number, number, string, string] => [
-    getTxoDestination(tx.txo),
-    numericToHex(tx.value),
-    tx.txo.encodeABI(),
-    nonce,
-    signature.v,
-    signature.r,
-    signature.s,
-  ]
+  ): [string, string, string, number, number, string, string] => {
+    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
+    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
+
+    return [
+      getTxoDestination(txo),
+      numericToHex(value),
+      txo.encodeABI(),
+      nonce,
+      signature.v,
+      signature.r,
+      signature.s,
+    ]
+  }
   getMetaTransactionSigner = proxyCall(
     this.contract.methods.getMetaTransactionSigner,
     this.getMetaTransactionSignerParams,
@@ -229,10 +237,13 @@ const getTxoDestination = (txo: TransactionObject<any>): string => {
 
 export const buildMetaTxTypedData = (
   walletAddress: Address,
-  tx: TransactionWrapper<any>,
+  tx: TransactionInput<any>,
   nonce: number,
   chainId: number
 ): EIP712TypedData => {
+  const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
+  const value: BigNumber.Value = 'value' in tx ? tx.value : 0
+
   return {
     types: {
       EIP712Domain: [
@@ -257,9 +268,9 @@ export const buildMetaTxTypedData = (
     },
     message: tx
       ? {
-          destination: getTxoDestination(tx.txo),
-          value: numericToHex(tx.value),
-          data: tx.txo.encodeABI(),
+          destination: getTxoDestination(txo),
+          value: numericToHex(value),
+          data: txo.encodeABI(),
           nonce,
         }
       : {},
