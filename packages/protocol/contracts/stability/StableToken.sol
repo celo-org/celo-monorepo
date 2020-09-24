@@ -28,8 +28,7 @@ contract StableToken is
   CalledByVm,
   IStableToken,
   IERC20,
-  ICeloToken,
-  ICeloVersionedContract
+  ICeloToken
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
