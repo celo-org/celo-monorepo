@@ -241,6 +241,55 @@ exports[`FiatExchange renders correctly 1`] = `
       }
     >
       <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "marginLeft": 16,
+              "paddingVertical": 16,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            fiatExchangeFlow:exchanges
+          </Text>
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+        }
+      }
+    >
+      <View
         style={
           Object {
             "borderBottomColor": "#EDEEEF",
