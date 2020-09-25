@@ -105,7 +105,8 @@ resource "google_compute_global_forwarding_rule" "forwarding_rule" {
   port_range = "443"
 }
 
-# This allows GCP's health checks to make the required requests
+# This allows GCP health check traffic AND traffic that is being sent from LBs
+# to network endpoints
 resource "google_compute_firewall" "allow-health-check" {
   name = "${var.celo_env}-forno-health-check-firewall"
   direction = "INGRESS"
@@ -114,6 +115,6 @@ resource "google_compute_firewall" "allow-health-check" {
 
   allow {
     protocol = "tcp"
-    ports    = ["6000", "6001"]
+    ports    = ["6000", "6001", "8545", "8546"]
   }
 }

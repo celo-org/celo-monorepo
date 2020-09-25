@@ -105,7 +105,7 @@ release: {{ .Release.Name }}
     if [[ -f /root/.celo/pkey ]]; then
       NODE_KEY=$(cat /root/.celo/pkey)
       if [[ ! -z ${NODE_KEY} ]]; then
-        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey" && echo "Node key: ${NODE_KEY}"
+        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey"
       fi
     fi
     {{ if .proxy | default false }}
