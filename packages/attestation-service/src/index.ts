@@ -7,7 +7,12 @@ import express from 'express'
 import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
-import { initializeDB, initializeKit, verifyConfigurationAndGetURL } from './db'
+import {
+  initializeDB,
+  initializeKit,
+  startPeriodicHealthCheck,
+  verifyConfigurationAndGetURL,
+} from './db'
 import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
 import { rootLogger } from './logger'
 import { asyncHandler, createValidatedHandler, loggerMiddleware } from './request'
@@ -37,6 +42,8 @@ async function init() {
   const deliveryStatusURLForProviderType = (t: string) => `${externalURL}/delivery_status_${t}`
 
   await initializeSmsProviders(deliveryStatusURLForProviderType)
+
+  await startPeriodicHealthCheck()
 
   const rateLimiter = rateLimit({
     windowMs: 5 * 60 * 100, // 5 minutes

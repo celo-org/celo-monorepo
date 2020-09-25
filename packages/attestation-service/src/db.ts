@@ -6,11 +6,13 @@ import moment from 'moment'
 import { FindOptions, Op, Sequelize, Transaction } from 'sequelize'
 import { fetchEnv, fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
+import { Gauges } from './metrics'
 import Attestation, {
   AttestationKey,
   AttestationModel,
   AttestationStatic,
 } from './models/attestation'
+import { ErrorMessages } from './request'
 
 export let sequelize: Sequelize | undefined
 
@@ -130,6 +132,11 @@ export async function initializeKit() {
   }
 }
 
+export async function startPeriodicHealthCheck() {
+  await tryHealthCheck()
+  setInterval(tryHealthCheck, 60 * 1000)
+}
+
 let AttestationTable: AttestationStatic
 
 async function getAttestationTable() {
@@ -216,5 +223,51 @@ async function purgeExpiredRecords() {
     }
   } catch (err) {
     rootLogger.error({ err }, 'Cannot purge expired records')
+  }
+}
+
+// Do the health check to update the gauge
+async function tryHealthCheck() {
+  try {
+    const failureReason = await doHealthCheck()
+    if (failureReason) {
+      rootLogger.warn(`Health check failed: ${failureReason}`)
+    }
+  } catch {
+    rootLogger.warn(`Health check failed`)
+  }
+}
+
+// Check health and return failure reason, null on success.
+export async function doHealthCheck(): Promise<string | null> {
+  try {
+    if (!(await isAttestationSignerUnlocked())) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.ATTESTATION_SIGNER_CANNOT_SIGN
+    }
+
+    if (await isNodeSyncing()) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.NODE_IS_SYNCING
+    }
+
+    const { ageOfLatestBlock } = await getAgeOfLatestBlock()
+    if (ageOfLatestBlock > 15) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.NODE_IS_STUCK
+    }
+
+    try {
+      await isDBOnline()
+    } catch (error) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.DATABASE_IS_OFFLINE
+    }
+
+    Gauges.healthy.set(1)
+    return null
+  } catch (error) {
+    Gauges.healthy.set(0)
+    return ErrorMessages.UNKNOWN_ERROR
   }
 }

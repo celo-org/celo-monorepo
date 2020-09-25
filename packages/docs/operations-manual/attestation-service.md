@@ -277,7 +277,9 @@ The Attestation Service provides JSON-format structured logs.
 
 ### Healthcheck
 
-The `/healthz` endpoint will respond with status `200` when all of the following are true: the attestation signer key is available and unlocked, the node is not syncing, the latest block is recent, and the database is online. Otherwise it will respond with status `500`.
+The `/healthz` endpoint will respond with status `200` when all of the following are true: the attestation signer key is available and unlocked, the node is not syncing, the latest block is recent, and the database is accessible. Otherwise it will respond with status `500`.
+
+Use this endpoint when configuring a load balancer in front of multiple instances.  The results of the last healthcheck are reported via the `attestation_service_healthy` metric.
 
 Attestation Service also has a `/status` endpoint for configuration information.
 
@@ -286,6 +288,12 @@ Attestation Service also has a `/status` endpoint for configuration information.
 Attestation Service exposes the following Prometheus format metrics at `/metrics` for attestations made. Please note that metrics are per instance.
 
 Please note that monitoring endpoints including metrics are exposed as a path on the usual host port. This means they are public by default. If you want metrics to be internal only, you will need to configure a load balancer appropriately.
+
+Metrics for the service:
+
+- `attestation_service_healthy`: Gauge with value `0` or `1` indicating whether the instance failed or passed its last [healthcheck](#healthcheck). Calls to `/healthz` update this gauge, and the process also runs a background healthcheck every minute. It is strongly recommended that you monitor this metric.
+
+Metrics for attestation requests:
 
 - `attestation_requests_total`: Counter for the number of attestation requests.
 
@@ -331,4 +339,6 @@ Administrative metrics:
 
 ### Blockchain
 
-The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen by entering the Validator's address on the [Celo Explorer](https://explorer.celo.org) and clicking the 'Celo Info' tab.  
+The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen at [Celo Explorer](https://explorer.celo.org): enter the Validator's address and click the 'Celo Info' tab.  
+
+[TheCelo](https://thecelo.com/?tab=attestations) tracks global attestation counts and success rates, and shows detailed information about recent attestation attempts.

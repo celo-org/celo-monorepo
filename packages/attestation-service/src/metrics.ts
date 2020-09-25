@@ -74,4 +74,8 @@ export const Gauges = {
     labelNames: ['provider'],
     help: 'Gauge for provider outstanding account balance',
   }),
+  healthy: new Gauge({
+    name: 'attestation_service_healthy',
+    help: 'Gauge for overall health check passing',
+  }),
 }
