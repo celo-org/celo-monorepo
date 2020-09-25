@@ -9,45 +9,10 @@ import Checkmark from 'src/icons/Checkmark'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
+import { CeloGroup, localStoragePinnedKey } from 'src/utils/validators'
 
 const unknownGroupName = 'Unnamed Group'
 const unknownValidatorName = 'Unnamed Validator'
-
-export const localStoragePinnedKey = 'pinnedValidators'
-
-export interface CeloGroup {
-  id: number
-  elected: number
-  online: number
-  total: number
-  uptime: number
-  attestation: number
-  name: string
-  address: string
-  usd: number
-  gold: number
-  receivableRaw: number
-  receivableVotes: string
-  votesRaw: number
-  votes: string
-  votesAbsolute: string
-  commission: number
-  rewards: number
-  rewardsStyle: any
-  numMembers: number
-  claims: string[]
-  validators: Array<{
-    name: string
-    address: string
-    usd: number
-    gold: number
-    elected: boolean
-    online: boolean
-    uptime: number
-    attestation: number
-    claims: string[]
-  }>
-}
 
 interface Props {
   group: CeloGroup
@@ -379,7 +344,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {formatNumber(validator.attestation, 1)}%
+                  {validator.neverElected ? 'n/a' : formatNumber(validator.attestation, 1)}%
                 </Text>
               </View>
             ))}

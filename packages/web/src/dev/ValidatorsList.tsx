@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
-import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
+import ValidatorsListRow from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
-import { CeloValidatorGroup, cleanData, isPinned } from 'src/utils/validators'
+import { CeloGroup, CeloValidatorGroup, cleanData } from 'src/utils/validators'
 
 interface HeaderCellProps {
   style: any[]
@@ -116,7 +116,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
 
   expand(expanded: number) {
     if (this.state.expanded === expanded) {
-      this.setState({ expanded: undefined })
+      return this.setState({ expanded: undefined })
     }
     this.setState({ expanded })
   }
@@ -124,7 +124,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
   orderBy = (key: orderByTypes) => {
     const { orderAsc, orderKey } = this.state
     const asc = key === orderKey && orderAsc ? false : true
-    this.setState({ orderKey: key, orderAsc: asc })
+    this.setState({ orderKey: key, orderAsc: asc, expanded: undefined })
   }
 
   sortData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']): CeloGroup[] {
@@ -146,9 +146,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       return a > b ? 1 : -1
     }
 
-    return (data || [])
-      .sort((a, b) => dir * compare(accessor(a), accessor(b)))
-      .sort((a, b) => isPinned(b) - isPinned(a))
+    return (data || []).sort((a, b) => dir * compare(accessor(a), accessor(b)))
   }
 
   onPinned() {

@@ -1,7 +1,9 @@
 import { BigNumber } from 'bignumber.js'
-import { localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
+import { ValidatorsListProps } from 'src/dev/ValidatorsList'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { weiToDecimal } from 'src/utils/utils'
+
+export const localStoragePinnedKey = 'pinnedValidators'
 
 export interface Edges<T> {
   edges: Array<{
@@ -33,6 +35,7 @@ export interface CeloValidatorGroup {
     attestationsFulfilled: number
     attestationsRequested: number
     lastElected: number
+    neverElected: boolean
     lastOnline: number
     lockedGold: string
     name: string
@@ -46,9 +49,39 @@ export interface CeloValidatorGroup {
   votes: string
 }
 
-export interface ValidatorsData {
-  celoValidatorGroups: CeloValidatorGroup[]
-  latestBlock: number
+export interface CeloGroup {
+  id: number
+  elected: number
+  online: number
+  total: number
+  uptime: number
+  attestation: number
+  name: string
+  address: string
+  usd: number
+  gold: number
+  receivableRaw: number
+  receivableVotes: string
+  votesRaw: number
+  votes: string
+  votesAbsolute: string
+  commission: number
+  rewards: number
+  rewardsStyle: any
+  numMembers: number
+  claims: string[]
+  validators: Array<{
+    name: string
+    address: string
+    usd: number
+    gold: number
+    elected: boolean
+    neverElected: boolean
+    online: boolean
+    uptime: number
+    attestation: number
+    claims: string[]
+  }>
 }
 
 export function isPinned({ address }: any) {
@@ -56,7 +89,7 @@ export function isPinned({ address }: any) {
   return +list.includes(address)
 }
 
-export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsData) {
+export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
   const totalVotes: BigNumber = celoValidatorGroups
     .map(({ receivableVotes }) => new BigNumber(receivableVotes))
     .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
@@ -124,6 +157,7 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsData) 
               online: lastOnline >= latestBlock,
               uptime: (+score * 100) / 10 ** 24,
               attestation: Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
+              neverElected: !lastElected && !attestationsRequested,
               claims: getClaims(validator.account.claims),
             }
           }),
