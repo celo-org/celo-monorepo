@@ -11,7 +11,6 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # Flags:
 # -p: Platform (android or ios)
 # -v (Optional): Name of virual machine to run
-# -f (Optional): Fast (skip build step)
 # -r (Optional): Use release build (by default uses debug)
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 # -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
@@ -20,16 +19,14 @@ export ENVFILE="${ENVFILE:-.env.test}"
 
 PLATFORM=""
 VD_NAME="Pixel_API_29_AOSP_x86_64"
-FAST=false
 RELEASE=false
 NET_DELAY="none"
 DEV_MODE=false
 FILE_TO_RUN=""
-while getopts 'p:t:frd' flag; do
+while getopts 'p:t:v:n:rd' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
-    f) FAST=true ;;
     r) RELEASE=true ;;
     n) NET_DELAY="$OPTARG" ;;
     d) DEV_MODE=true ;;
@@ -132,11 +129,6 @@ if [ $PLATFORM = "android" ]; then
     CONFIG_NAME="android.emu.release"
   fi
 
-  if [ "$FAST" = false ]; then
-    echo "Configuring the app"
-    ./scripts/run_app.sh -p $PLATFORM -b
-  fi
-
   if [ $DEV_MODE = false ]; then
     echo "Building detox"
     yarn detox build -c $CONFIG_NAME
@@ -180,11 +172,6 @@ elif [ $PLATFORM = "ios" ]; then
     CONFIG_NAME="ios.sim.debug"
   else
     CONFIG_NAME="ios.sim.release"
-  fi
-
-  if [ "$FAST" = false ]; then
-    echo "Configuring the app"
-    ./scripts/run_app.sh -p $PLATFORM -b
   fi
 
   if [ $DEV_MODE = false ]; then
