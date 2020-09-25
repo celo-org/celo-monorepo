@@ -764,6 +764,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                         "padding": 8,
                       }
                     }
+                    testID="SingleDigitInput/digit0"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -816,6 +817,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                         "padding": 8,
                       }
                     }
+                    testID="SingleDigitInput/digit1"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -868,6 +870,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                         "padding": 8,
                       }
                     }
+                    testID="SingleDigitInput/digit2"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -920,6 +923,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                         "padding": 8,
                       }
                     }
+                    testID="SingleDigitInput/digit3"
                     underlineColorAndroid="transparent"
                     value=""
                   />
