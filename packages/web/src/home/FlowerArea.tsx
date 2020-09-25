@@ -10,7 +10,7 @@ import { useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import pagePaths, { CeloLinks } from 'src/shared/menu-items'
-import { standardStyles } from 'src/styles'
+import { standardStyles, textStyles } from 'src/styles'
 
 export default function FlowerArea() {
   const [t] = useTranslation('home')
@@ -19,17 +19,27 @@ export default function FlowerArea() {
     <GridRow
       desktopStyle={standardStyles.sectionMarginBottom}
       tabletStyle={standardStyles.sectionMarginBottomTablet}
-      mobileStyle={[standardStyles.sectionMarginBottomMobile, { paddingHorizontal: 0 }]}
+      mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.noPad]}
     >
-      <Cell span={Spans.full} style={{ paddingHorizontal: 0 }}>
+      <Cell span={Spans.full} style={styles.noPad}>
         <Fade distance="30px" duration={800} bottom={true}>
           <AspectRatio ratio={isMobile ? 1 : 937 / 526}>
             <Image source={isMobile ? MistFlowerMobile : MistFlower} style={standardStyles.image} />
           </AspectRatio>
         </Fade>
-        <View style={standardStyles.centered}>
-          <H2 style={standardStyles.elementalMarginTop}>{t('flowersTitle')}</H2>
-          <H4 style={standardStyles.elementalMarginBottom}>{t('flowersSubtitle')}</H4>
+        <View style={[standardStyles.centered, isMobile && styles.content]}>
+          <H2
+            style={[
+              textStyles.center,
+              isMobile && standardStyles.halfElement,
+              standardStyles.elementalMarginTop,
+            ]}
+          >
+            {isMobile ? t('flowersTitleMobile') : t('flowersTitle')}
+          </H2>
+          <H4 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+            {t('flowersSubtitle')}
+          </H4>
           <View style={standardStyles.row}>
             <Button
               text={t('flowersButton')}
@@ -53,6 +63,7 @@ export default function FlowerArea() {
 }
 
 const styles = StyleSheet.create({
-  root: {},
+  content: { paddingHorizontal: 24 },
+  noPad: { paddingHorizontal: 0 },
   kuneco: { marginRight: 30 },
 })
