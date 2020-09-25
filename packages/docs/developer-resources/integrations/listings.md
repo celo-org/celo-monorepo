@@ -14,7 +14,7 @@ If you have any questions or need assistance with these instructions, please con
 
 This guide will also help you find all the necessary information about brand assets, how to integrate with Celo and what useful listing information are made available to you as well as any information about looking for support.
 
-The Celo Protocol Github is located [here.](https://github.com/celo-org/)
+The Celo Protocol GitHub is located [here.](https://github.com/celo-org/)
 
 
 ## Outline
