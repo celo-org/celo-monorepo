@@ -10,7 +10,7 @@ export const odisMonitorScheduleFunction = functions
     rootLogger.info('Performing test query')
     try {
       const res = await queryOdisForSalt()
-      rootLogger.info(res, 'ODIS salt request successful. System is healthy.')
+      rootLogger.info({ res }, 'ODIS salt request successful. System is healthy.')
     } catch (e) {
       if ((e as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
         rootLogger.info(
