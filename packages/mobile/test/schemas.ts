@@ -398,6 +398,7 @@ export const v5Schema = {
       },
       lastFetch: null,
     },
+    addressToDisplayName: {},
   },
 }
 
