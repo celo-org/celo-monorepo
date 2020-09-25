@@ -152,7 +152,7 @@ If the contents of the release (i.e. source Git commit) change at any point afte
 
 ### Communication guidelines
 
-Communicating your upcoming governance proposal to the community is critical and may help getting it approved. 
+Communicating the upcoming governance proposal to the community is critical and may help getting it approved. 
 
 Each smart contract release governance proposal should be accompanied by a [Governance category](https://forum.celo.org/c/governance/) forum post that contains the following information:
 * Name of proposer (individual contributor or organization).
