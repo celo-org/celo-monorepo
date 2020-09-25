@@ -419,6 +419,8 @@ PODS:
     - Segment-Firebase
   - RNCAsyncStorage (1.9.0):
     - React
+  - RNCClipboard (1.2.3):
+    - React-Core
   - RNCMaskedView (0.1.10):
     - React
   - RNDeviceInfo (5.5.6):
@@ -546,6 +548,7 @@ DEPENDENCIES:
   - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
   - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-community/async-storage`)"
+  - "RNCClipboard (from `../../../node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNExitApp (from `../../../node_modules/react-native-exit-app`)
@@ -697,6 +700,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@segment/analytics-react-native-firebase"
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-community/async-storage"
+  RNCClipboard:
+    :path: "../../../node_modules/@react-native-community/clipboard"
   RNCMaskedView:
     :path: "../../../node_modules/@react-native-community/masked-view"
   RNDeviceInfo:
@@ -814,6 +819,7 @@ SPEC CHECKSUMS:
   RNAnalytics: bf9743995acee035396822c40bcdd1b87e90ba76
   RNAnalyticsIntegration-Firebase: 87b33dc507fd78b2f1f97d65fe022442ba0c367b
   RNCAsyncStorage: 453cd7c335ec9ba3b877e27d02238956b76f3268
+  RNCClipboard: 546484405eaa1c8a3eccce77b8c8871242e73b20
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNDeviceInfo: 722dc13c269b9dbf305aa4b790d36731602e99b7
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
