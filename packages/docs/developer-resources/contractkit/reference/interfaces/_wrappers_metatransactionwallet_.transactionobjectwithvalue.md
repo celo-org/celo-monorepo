@@ -21,7 +21,7 @@
 
 • **txo**: *TransactionObject‹T›*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L23)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L22)*
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 • **value**: *BigNumber.Value*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L24)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L23)*

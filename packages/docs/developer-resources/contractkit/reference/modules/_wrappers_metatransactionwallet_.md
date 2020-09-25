@@ -8,6 +8,7 @@
 
 ### Interfaces
 
+* [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)
 * [TransactionObjectWithValue](../interfaces/_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)
 
 ### Type aliases
@@ -22,24 +23,24 @@
 
 ###  TransactionInput
 
-Ƭ **TransactionInput**: *TransactionObject‹T› | [TransactionObjectWithValue](../interfaces/_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)‹T›*
+Ƭ **TransactionInput**: *TransactionObject‹T› | [TransactionObjectWithValue](../interfaces/_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)‹T› | [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L27)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L32)*
 
 ## Functions
 
 ### `Const` buildMetaTxTypedData
 
-▸ **buildMetaTxTypedData**(`walletAddress`: [Address](_base_.md#address), `tx`: [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any›, `nonce`: number, `chainId`: number): *EIP712TypedData*
+▸ **buildMetaTxTypedData**(`walletAddress`: [Address](_base_.md#address), `tx`: [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md), `nonce`: number, `chainId`: number): *EIP712TypedData*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L238)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:259](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L259)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
 `walletAddress` | [Address](_base_.md#address) |
-`tx` | [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any› |
+`tx` | [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md) |
 `nonce` | number |
 `chainId` | number |
 
