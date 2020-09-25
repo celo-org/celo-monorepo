@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Animated, Image, StyleSheet } from 'react-native'
-import Cambio from 'src/codename-allegory/color-flower.png'
+import Cambio from 'src/codename-allegory/color-flower.jpg'
 import Outline from 'src/codename-allegory/outline-flower.png'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
@@ -23,7 +23,7 @@ function useAnimatedScroll() {
   return position
 }
 
-function useScroll(handleScroll: (event: any) => void) {
+function useScroll(handleScroll: (event: Event) => void) {
   React.useEffect(() => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -39,14 +39,11 @@ export default function Flower() {
 
   const { isMobile } = useScreenSize()
   const value = useAnimatedScroll()
-
   const scale = value.interpolate(isMobile ? SCALER_MOBILE : SCALER_DESKTOP)
 
   const colorOpacity = value.interpolate(isMobile ? COLOR_OPACITY_MOBILE : COLOR_OPACITY)
 
   const outlineOpacity = value.interpolate(isMobile ? OUTLINE_OPACITY_MOBILE : OUTLINE_OPACITY)
-
-  const translateY = value.interpolate(isMobile ? POSITIONING_MOBILE : POSITIONING_DESKTOP)
 
   const skewX = value.interpolate(SKEW)
 
@@ -66,13 +63,13 @@ export default function Flower() {
           styles.root,
           isMobile && styles.mobileRoot,
           {
-            transform: [{ scale }, { translateY }, { skewX }, { rotate }],
+            transform: [{ scale }, { skewX }, { rotate }],
             opacity: isLoaded ? 1 : 0,
           },
         ]}
       >
         <AnimatedRatio ratio={1} style={[styles.outline, { opacity: outlineOpacity }]}>
-          <Image source={Outline} style={[standardStyles.image, {}]} />
+          <Image source={Outline} style={standardStyles.image} />
         </AnimatedRatio>
         <AnimatedRatio ratio={1} style={{ opacity: colorOpacity }}>
           <Image source={Cambio} style={standardStyles.image} onLoadEnd={showImage} />
@@ -151,16 +148,6 @@ const SCALER_DESKTOP = {
 const SCALER_MOBILE = {
   inputRange: [0, 0.5],
   outputRange: [1, 0.6],
-}
-
-const POSITIONING_DESKTOP = {
-  inputRange: [0, 0.5],
-  outputRange: ['0%', '20%'],
-}
-
-const POSITIONING_MOBILE = {
-  inputRange: [0, 0.5],
-  outputRange: ['0%', '40%'],
 }
 
 const SKEW = {
