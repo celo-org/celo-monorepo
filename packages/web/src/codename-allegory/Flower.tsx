@@ -71,7 +71,7 @@ export default function Flower() {
         <AnimatedRatio ratio={1} style={[styles.outline, { opacity: outlineOpacity }]}>
           <Image source={Outline} style={standardStyles.image} />
         </AnimatedRatio>
-        <AnimatedRatio ratio={1} style={{ opacity: colorOpacity }}>
+        <AnimatedRatio ratio={1} style={{ opacity: colorOpacity, willChange: 'opacity' }}>
           <Image source={Cambio} style={standardStyles.image} onLoadEnd={showImage} />
         </AnimatedRatio>
       </Animated.View>
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   outline: {
+    willChange: 'opacity',
     position: 'absolute',
     width: '100%',
   },
@@ -105,6 +106,7 @@ const styles = StyleSheet.create({
     maxWidth: 1270,
     justifyContent: 'center',
     width: '100%',
+    willChange: 'transform, opacity',
     animationIterationCount: 'infinite',
     animationDirection: 'alternate',
     animationDuration: '3s',
@@ -121,37 +123,37 @@ const styles = StyleSheet.create({
 })
 
 const COLOR_OPACITY = {
-  inputRange: [0, 0.25, 0.35],
+  inputRange: [0, 0.25, 0.3],
   outputRange: [1, 1, 0.1],
 }
 
 const COLOR_OPACITY_MOBILE = {
-  inputRange: [0, 0.1, 0.17],
+  inputRange: [0, 0.1, 0.16],
   outputRange: [1, 0.5, 0],
 }
 
 const OUTLINE_OPACITY = {
-  inputRange: [0, 0.25, 0.3, 0.4],
+  inputRange: [0, 0.25, 0.3, 0.39],
   outputRange: [0, 1, 1, 0],
 }
 
 const OUTLINE_OPACITY_MOBILE = {
-  inputRange: [0, 0.1, 0.15, 0.25],
+  inputRange: [0, 0.1, 0.15, 0.22],
   outputRange: [0, 1, 1, 0],
 }
 
 const SCALER_DESKTOP = {
-  inputRange: [0, 0.15, 0.5],
+  inputRange: [0, 0.15, 0.45],
   outputRange: [1, 0.75, 0.1],
 }
 
 const SCALER_MOBILE = {
-  inputRange: [0, 0.5],
+  inputRange: [0, 0.45],
   outputRange: [1, 0.6],
 }
 
 const SKEW = {
-  inputRange: [0, 0.27, 0.45, 0.66],
+  inputRange: [0, 0.27, 0.45, 0.64],
   outputRange: ['0deg', '4deg', '-2deg', '2deg'],
 }
 
