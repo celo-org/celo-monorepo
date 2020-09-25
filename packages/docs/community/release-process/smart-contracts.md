@@ -101,7 +101,8 @@ Deploying a new contract release should occur with the following process:
         <li>Receive report from auditors.</li>
         <li>If all issues in the audit report have straightforward fixes, announce a forthcoming smart contract release. </li>
         <li>Commit audit fixes to <code>master</code> and cherry-pick to the release branch.</li>
-        <li>Submit audit fixes to auditors for review. </li>
+        <li>Submit audit fixes to auditors for review.</li>
+        <li>Let the community know about the upcoming release proposal by posting details to the Governance category on https://forum.celo.org and cross post in the Discord <code>#governance</code> channel. See the 'Communication guidelines' section below for information on what your post should contain.</li>
       </ol>
     </td>
   </tr>
@@ -111,6 +112,7 @@ Deploying a new contract release should occur with the following process:
       <ol>
         <li>Tag the release on Github.</li>
         <li>Run the smart contract release script to deploy the contracts to Baklava and submit a governance proposal.</li>
+        <li>Update your forum post with the Baklava <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
       </ol>
     </td>
   </tr>
@@ -120,6 +122,7 @@ Deploying a new contract release should occur with the following process:
       <ol>
         <li>Confirm all contracts working as intended on Baklava.</li>
         <li>Run the smart contract release script to deploy the contracts to Alfajores and submit a governance proposal.</li>
+        <li>Update your forum post with the Alfajores <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
       </ol>
     </td>
   </tr>
@@ -128,7 +131,9 @@ Deploying a new contract release should occur with the following process:
     <td>
       <ol>
         <li>Confirm all contracts working as intended on Alfajores.</li>
+        <li>Confirm audit is complete and make sure your forum post contains a link to it.</li>
         <li>Run the smart contract release script to deploy the contracts to Mainnet and submit a governance proposal.</li>
+         <li>Update your forum post with the Mainnet <code>PROPOSAL_ID</code>, updated timings (if any changes), and notify the community in the Discord <code>#governance</code> channel.</li>
       </ol>
     </td>
   </tr>
@@ -137,12 +142,28 @@ Deploying a new contract release should occur with the following process:
     <td>
       <ol>
         <li>Confirm all contracts working as intended on Mainnet.</li>
+         <li>Update your forum post with the Mainnet governance outcome (<code>Passed</code> or <code>Rejected</code>) and notify the community in the Discord <code>#governance</code> channel.</li>
       </ol>
     </td>
   </tr>
 </table>
 
 If the contents of the release (i.e. source Git commit) change at any point after the release has been tagged in Git, the process should increment the release identifier, and process should start again from the beginning. If the changes are small or do not introduce new code (e.g. reverting a contract to a previous version) the audit step may be accelerated.
+
+### Communication guidelines
+
+Communicating your upcoming governance proposal to the community is critical and may help getting it approved. 
+
+Each smart contract release governance proposal should be accompanied by a [Governance category](https://forum.celo.org/c/governance/) forum post that contains the following information:
+* Name of proposer (individual contributor or organization).
+* Background information.
+* Link to the release notes.
+* Link to the audit report(s).
+* Anticipated timings for the Baklava and Alfajores testnets and Mainnet.
+
+It's recommended to post as early as possible and at minimum one week before the anticipated Baklava testnet governance proposal date. 
+
+Make sure to keep the post up to date. All updates (excluding fixing typos) should be communicated to the community in the [Discord](http://chat.celo.org/) `#governance` channel.
 
 ### Emergency patches
 
