@@ -7,7 +7,7 @@ import { TweetLogo } from 'src/icons/TwitterLogo'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { colors, fonts, standardStyles, textStyles, typeFaces } from 'src/styles'
-import LightButon from './LightButton'
+import LightButton from './LightButton'
 
 const WIDTH = 340
 
@@ -81,9 +81,27 @@ function CopyButton() {
   }
 
   return (
-    <LightButon onPress={copyURL} style={styles.copyButton}>
-      <Chainlink size={16} color={colors.dark} /> {justCopied ? ' Copied' : ' Copy'}
-    </LightButon>
+    <LightButton onPress={copyURL} style={styles.copyButton}>
+      <Chainlink size={16} color={colors.dark} />
+      <View style={{ marginLeft: 5 }}>
+        <Text
+          style={[
+            styles.copyButtonText,
+            justCopied ? styles.copyButtonTextHiding : styles.copyButtonTextShowing,
+          ]}
+        >
+          Copy
+        </Text>
+        <Text
+          style={[
+            styles.copyButtonText,
+            justCopied ? styles.copyButtonTextShowing : styles.copyButtonTextHiding,
+          ]}
+        >
+          Copied
+        </Text>
+      </View>
+    </LightButton>
   )
 }
 
@@ -92,11 +110,11 @@ const TweetButton = React.memo(() => {
   const url = 'celo.org/flowers'
   return (
     <>
-      <LightButon
+      <LightButton
         href={`https://twitter.com/intent/tweet?hashtags=celoflora&related=celoOrg&via=celoOrg&text=${text}&url=${url}`}
       >
         <TweetLogo height={16} color={colors.dark} /> Tweet
-      </LightButon>
+      </LightButton>
     </>
   )
 })
@@ -182,6 +200,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
   },
   copyButton: { marginLeft: 10 },
+  copyButtonText: {
+    transitionDuration: '400ms',
+    transitionProperty: 'opacity, width',
+  },
+  copyButtonTextHiding: {
+    transform: [{ scaleX: 0 }],
+    width: 0,
+    height: 0,
+    opacity: 0,
+  },
+  copyButtonTextShowing: {
+    transform: [{ scaleX: 1 }],
+    opacity: 1,
+  },
   aside: {
     fontSize: 18,
     lineHeight: 24,
