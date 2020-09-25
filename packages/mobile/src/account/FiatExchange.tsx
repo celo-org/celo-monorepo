@@ -25,7 +25,7 @@ function FiatExchange() {
   }
 
   function goToExternalExchanges() {
-    navigation.navigate(Screens.ExternalExchanges, { isAddFunds: false })
+    navigation.navigate(Screens.ExternalExchanges)
   }
 
   function goToCashOut() {
