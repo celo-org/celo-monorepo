@@ -6,7 +6,7 @@ This guide assumes:
 
 * You are a listing site like a digital-asset exchange (e.g. Coinbase, Binance, Kraken, etc.) or a ranking site (e.g. CMC, dAppRadar, etc.).
 * You are going to be running your own Celo blockchain node (either on your own hardware or on a cloud provider infrastructure).
-* You want to list CELO (previously cGLD)  and cUSD on your exchange or ranking site and you want to find useful information that is relevant for listing those digital assets.
+* You want to list CELO (previously cGLD) and cUSD on your exchange or ranking site and you want to find useful information that is relevant for listing those digital assets.
 * You want to find relevant resources for brand assets that will visually aid in those listings.
 
 ## Support
