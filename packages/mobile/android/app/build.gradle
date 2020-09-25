@@ -89,6 +89,7 @@ project.ext.envConfigFiles = [
     alfajores: ".env.alfajores",
     mainnetdev: ".env.mainnetdev",
     mainnet: ".env.mainnet",
+    apptest: ".env.test",
     "": ".env.alfajoresdev", // Fallback
 ]
 
@@ -102,9 +103,9 @@ apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
 /**
  * Build for Detox should be minSdkVersion >= 18
- * Use the taskname to recognize the build is for detox
+ * Use passed property to recognize the build is for detox
  */
-def isDetoxTestBuild = gradle.startParameter.taskNames.contains("assembleAndroidTest")
+def isDetoxTestBuild = Boolean.valueOf(project.properties['isDetoxBuild'] ?: 'false')
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -214,6 +215,10 @@ android {
             dimension "default"
         }
         mainnetdev {
+            dimension "default"
+        }
+        // ProductFlavor names cannot start with 'test'
+        apptest {
             dimension "default"
         }
     }

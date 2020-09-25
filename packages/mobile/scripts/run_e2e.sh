@@ -40,6 +40,11 @@ echo "Network delay: $NET_DELAY"
 
 # Start the packager and wait until ready
 startPackager() {
+    if [ "$RELEASE" = true ]; then
+      echo "Skipping metro packager in release mode"
+      return
+    fi
+    
     echo "Starting metro packager"
     yarn react-native start &
 
