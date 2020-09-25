@@ -23,7 +23,7 @@ export const AVAILABLE_LANGUAGES = [
 ]
 
 // DEV only related settings
-export const isE2EEnv = Config.IS_E2E || false
+export const isE2EEnv = stringToBoolean(Config.IS_E2E || 'false')
 export const DEV_RESTORE_NAV_STATE_ON_RELOAD = stringToBoolean(
   Config.DEV_RESTORE_NAV_STATE_ON_RELOAD || 'false'
 )
