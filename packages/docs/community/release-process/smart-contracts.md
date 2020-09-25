@@ -102,7 +102,7 @@ Deploying a new contract release should occur with the following process:
         <li>If all issues in the audit report have straightforward fixes, announce a forthcoming smart contract release. </li>
         <li>Commit audit fixes to <code>master</code> and cherry-pick to the release branch.</li>
         <li>Submit audit fixes to auditors for review.</li>
-        <li>Let the community know about the upcoming release proposal by posting details to the Governance category on https://forum.celo.org and cross post in the Discord <code>#governance</code> channel. See the 'Communication guidelines' section below for information on what your post should contain.</li>
+        <li>Let the community know about the upcoming release proposal by posting details to the Governance category on https://forum.celo.org and cross post in the <a href="https://discord.com/channels/600834479145353243/704805825373274134">Discord <code>#governance</code> channel</a>. See the 'Communication guidelines' section below for information on what your post should contain.</li>
       </ol>
     </td>
   </tr>
