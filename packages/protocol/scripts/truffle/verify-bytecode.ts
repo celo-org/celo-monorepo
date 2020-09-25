@@ -1,9 +1,7 @@
-import { getBuildArtifacts } from '@openzeppelin/upgrades'
-
-import { ProxyInstance, RegistryInstance } from 'types'
-
-import { verifyBytecodesDfs } from '@celo/protocol/lib/compatibility/verify-bytecode'
+import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
+import { getBuildArtifacts } from '@openzeppelin/upgrades'
+import { ProxyInstance, RegistryInstance } from 'types'
 
 import fs = require('fs')
 
@@ -23,7 +21,7 @@ module.exports = async (callback: (error?: any) => number) => {
   try {
     const registry = await Registry.at(celoRegistryAddress)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
-    await verifyBytecodesDfs(
+    await verifyBytecodes(
       Object.keys(CeloContractName),
       buildArtifacts,
       registry,
