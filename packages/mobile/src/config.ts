@@ -48,8 +48,7 @@ export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 // The number of seconds before the sender can reclaim the payment.
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
-// We need to fallback to `integration` for testing under jest where react-native-config is undefined.
-export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
+export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
 // ODIS minimum dollar balance for pepper quota retrieval
