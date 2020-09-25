@@ -11,7 +11,8 @@ import { CeloValidatorGroup, cleanData, isPinned } from 'src/utils/validators'
 interface HeaderCellProps {
   style: any[]
   name: string
-  ordered: boolean | null
+  ordered: boolean
+  asc: boolean
   tooltip?: string
   orderFn: (orderKey: orderByTypes) => void
   orderKey: orderByTypes
@@ -30,7 +31,7 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
   }
 
   render() {
-    const { style, name, ordered, tooltip } = this.props
+    const { asc, style, name, ordered, tooltip } = this.props
     const { hover } = this.state
     return (
       <Hoverable onHoverIn={this.onHoverIn} onHoverOut={this.onHoverOut}>
@@ -41,14 +42,11 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
               style={[
                 styles.defaultText,
                 styles.tableHeaderCellArrow,
-                ...(ordered !== null ? [styles.tableHeaderCellArrowVisible] : []),
+                ...(ordered ? [styles.tableHeaderCellArrowVisible] : []),
+                ...(ordered && !asc ? [styles.tableHeaderCellArrowDesc] : []),
               ]}
             >
-              <Chevron
-                direction={ordered ? Direction.up : Direction.down}
-                color={colors.white}
-                size={10}
-              />
+              <Chevron direction={Direction.up} color={colors.white} size={10} />
             </Text>
 
             {tooltip && hover && (
@@ -165,7 +163,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { expanded, orderKey } = this.state
+    const { expanded, orderAsc, orderKey } = this.state
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(data)
     return (
@@ -181,6 +179,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.tableHeaderCellPadding]}
               name="Name"
               ordered={orderKey === 'name'}
+              asc={orderAsc}
               tooltip="Name of validator group and validators in it"
             />
             <HeaderCell
@@ -189,6 +188,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Elected/ Total"
               ordered={orderKey === 'total'}
+              asc={orderAsc}
               tooltip="Number of validators in the group"
             />
             <HeaderCell
@@ -197,6 +197,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeXL]}
               name="Votes Available"
               ordered={orderKey === 'votes'}
+              asc={orderAsc}
               tooltip="% of total locked CELO votes received"
             />
             <HeaderCell
@@ -205,6 +206,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Votes"
               ordered={orderKey === 'rawVotes'}
+              asc={orderAsc}
               tooltip="Votes received as a percentage of capacity"
             />
             <HeaderCell
@@ -213,6 +215,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Votes Available"
               ordered={orderKey === 'votesAvailables'}
+              asc={orderAsc}
               tooltip="Vote capacity as a percentage of total locked CELO"
             />
             <HeaderCell
@@ -221,6 +224,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Locked CELO"
               ordered={orderKey === 'celo'}
+              asc={orderAsc}
             />
             <HeaderCell
               orderFn={this.orderBy}
@@ -228,6 +232,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Group Share"
               ordered={orderKey === 'commission'}
+              asc={orderAsc}
               tooltip="Amount of CELO locked by group/validator"
             />
             <HeaderCell
@@ -236,6 +241,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeM]}
               name="Voter Rewards"
               ordered={orderKey === 'rewards'}
+              asc={orderAsc}
               tooltip="% of max possible rewards received"
             />
             {/* <HeaderCell
@@ -243,6 +249,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeS]}
               name="Uptime"
               ordered={orderKey === 'uptime'}
+              asc={orderAsc}
               tooltip="Validator performance score"
             /> */}
             <HeaderCell
@@ -251,6 +258,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               style={[styles.sizeS]}
               name="Attestation"
               ordered={orderKey === 'attestation'}
+              asc={orderAsc}
             />
           </View>
           {validatorGroups.map((group, i) => (

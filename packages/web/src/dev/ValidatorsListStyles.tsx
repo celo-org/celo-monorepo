@@ -113,6 +113,11 @@ export const styles = StyleSheet.create({
   },
   tableHeaderCellArrowVisible: {
     opacity: 0.6,
+    transitionProperty: 'transform',
+    transitionDuration: '0.4s',
+  },
+  tableHeaderCellArrowDesc: {
+    transform: [{ rotateZ: '180deg' }, { translateX: -5 }, { translateY: -2 }],
   },
   tableCell: {
     paddingVertical: 12,
