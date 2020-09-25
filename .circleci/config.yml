@@ -93,6 +93,28 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
+      - run:
+          name: Fail if there are vulnerabilities in packages
+          command: |
+            generate_post_data()
+            {
+              cat <<EOF
+            {
+              "summary": "Vulnerability found in CI during yarn audit",
+              "details": "$REPORT",
+              "targets": [{
+                "type": "EscalationPolicy",
+                "slug": "pol-bu0pGzGe3mMQ1W8D",
+              }]
+            }
+            EOF
+            }
+            REPORT=$(yarn audit --groups dependencies --level high)
+            if [[ $? -ge 8 ]]; then
+              curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' \
+              --header "X-VO-Api-Id: $VICTOROPS_API_ID" --header "X-VO-Api-Key: $VICTOROPS_API_KEY" \
+              -d "$(generate_post_data)" 'https://api.victorops.com/api-public/v1/incidents'
+            fi
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
       - run:
