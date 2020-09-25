@@ -1,7 +1,7 @@
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignature } from '@celo/utils/lib/signatureUtils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
@@ -63,8 +63,32 @@ const constructMetaTransactionExecutionDigest = (walletAddress: Address, tx: Met
   return ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
 }
 
-const getSignatureForDigest = async (digest: string, signer: Address) => {
-  return parseSignature(digest, await web3.eth.sign(digest, signer), signer)
+const getSignatureForMetaTransaction = async (
+  signer: Address,
+  walletAddress: Address,
+  tx: MetaTransaction
+) => {
+  const typedData = getTypedData(walletAddress, tx)
+
+  const signature = await new Promise<string>((resolve, reject) => {
+    web3.currentProvider.send(
+      {
+        method: 'eth_signTypedData',
+        params: [signer, typedData],
+      },
+      (error, resp) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(resp.result)
+        }
+      }
+    )
+  })
+
+  const messageHash = constructMetaTransactionExecutionDigest(walletAddress, tx)
+  const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
+  return parsedSignature
 }
 
 contract('MetaTransactionWallet', (accounts: string[]) => {
@@ -436,13 +460,12 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
                 transactions.map((t) => trimLeading0x(t.data).length / 2)
               )
               .encodeABI()
-            const digest = constructMetaTransactionExecutionDigest(wallet.address, {
+            const { v, r, s } = await getSignatureForMetaTransaction(signer, wallet.address, {
               destination: wallet.address,
               value: 0,
               data,
               nonce: 0,
             })
-            const { v, r, s } = await getSignatureForDigest(digest, signer)
             await wallet.executeMetaTransaction(wallet.address, 0, data, v, r, s, {
               from: signer,
             })
@@ -489,13 +512,12 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     let transferSigner
 
     const doTransfer = async () => {
-      const digest = constructMetaTransactionExecutionDigest(wallet.address, {
+      const { v, r, s } = await getSignatureForMetaTransaction(transferSigner, wallet.address, {
         value,
         destination,
         data,
         nonce,
       })
-      const { v, r, s } = await getSignatureForDigest(digest, transferSigner)
 
       return wallet.executeMetaTransaction(destination, value, data, v, r, s, {
         from: submitter,
