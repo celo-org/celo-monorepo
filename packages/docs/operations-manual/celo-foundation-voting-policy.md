@@ -46,6 +46,10 @@ To support effective and responsible validators, the Foundation considers the fo
 
 * **Attestation Service.** Ability and commitment to running attestation services.
 
+* **Performance.** Performance score over the past 30 days on Mainnet (or Baklava if not elected on Mainnet)
+
+* **Attestation Performance.** Attestation Performance over the past 30 days on Mainnet (or Baklava if not elected Mainnet)
+
 
 ### Additional Criteria
 
