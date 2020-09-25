@@ -17,7 +17,6 @@ Contract for handling deposits needed for voting.
 ### Properties
 
 * [_relock](_wrappers_lockedgold_.lockedgoldwrapper.md#_relock)
-* [contract](_wrappers_lockedgold_.lockedgoldwrapper.md#contract)
 * [events](_wrappers_lockedgold_.lockedgoldwrapper.md#events)
 * [getAccountNonvotingLockedGold](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccountnonvotinglockedgold)
 * [getAccountTotalLockedGold](_wrappers_lockedgold_.lockedgoldwrapper.md#getaccounttotallockedgold)
@@ -89,16 +88,6 @@ Name | Type |
 ------ | ------ |
 `index` | number |
 `value` | BigNumber.Value |
-
-___
-
-###  contract
-
-• **contract**: *LockedGold*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

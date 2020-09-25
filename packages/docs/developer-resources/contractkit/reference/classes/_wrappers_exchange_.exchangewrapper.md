@@ -17,7 +17,6 @@ using a Constant Product Market Maker Model
 
 ### Properties
 
-* [contract](_wrappers_exchange_.exchangewrapper.md#contract)
 * [events](_wrappers_exchange_.exchangewrapper.md#events)
 * [exchange](_wrappers_exchange_.exchangewrapper.md#exchange)
 * [getBuyAndSellBuckets](_wrappers_exchange_.exchangewrapper.md#getbuyandsellbuckets)
@@ -67,16 +66,6 @@ Name | Type |
 **Returns:** *[ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *Exchange*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  events
 

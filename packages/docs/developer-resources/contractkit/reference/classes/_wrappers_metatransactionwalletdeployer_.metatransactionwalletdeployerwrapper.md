@@ -16,7 +16,6 @@
 
 * [canDeploy](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#candeploy)
 * [changeDeployerPermission](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#changedeployerpermission)
-* [contract](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#contract)
 * [deploy](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#deploy)
 * [events](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#events)
 * [getWallet](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#getwallet)
@@ -84,16 +83,6 @@ ___
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
-
-___
-
-###  contract
-
-• **contract**: *MetaTransactionWalletDeployer*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

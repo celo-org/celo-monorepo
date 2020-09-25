@@ -20,7 +20,6 @@ Stable token with variable supply (cUSD)
 * [approve](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#approve)
 * [balanceOf](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#balanceof)
 * [burn](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#burn)
-* [contract](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#contract)
 * [decimals](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#decimals)
 * [decreaseAllowance](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#decreaseallowance)
 * [events](_wrappers_stabletokenwrapper_.stabletokenwrapper.md#events)
@@ -167,16 +166,6 @@ ___
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
-
-___
-
-###  contract
-
-• **contract**: *StableToken*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

@@ -16,7 +16,6 @@ Contract for handling deposits needed for voting.
 
 ### Properties
 
-* [contract](_wrappers_accounts_.accountswrapper.md#contract)
 * [createAccount](_wrappers_accounts_.accountswrapper.md#createaccount)
 * [events](_wrappers_accounts_.accountswrapper.md#events)
 * [getAttestationSigner](_wrappers_accounts_.accountswrapper.md#getattestationsigner)
@@ -75,16 +74,6 @@ Name | Type |
 **Returns:** *[AccountsWrapper](_wrappers_accounts_.accountswrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *Accounts*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  createAccount
 

@@ -16,7 +16,6 @@ Contract for voting for validators and managing validator groups.
 
 ### Properties
 
-* [contract](_wrappers_election_.electionwrapper.md#contract)
 * [electabilityThreshold](_wrappers_election_.electionwrapper.md#electabilitythreshold)
 * [events](_wrappers_election_.electionwrapper.md#events)
 * [getCurrentValidatorSigners](_wrappers_election_.electionwrapper.md#getcurrentvalidatorsigners)
@@ -79,16 +78,6 @@ Name | Type |
 **Returns:** *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *Election*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  electabilityThreshold
 

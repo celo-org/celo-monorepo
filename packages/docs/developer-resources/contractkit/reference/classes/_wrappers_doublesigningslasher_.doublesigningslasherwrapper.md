@@ -16,7 +16,6 @@ Contract handling slashing for Validator double-signing
 
 ### Properties
 
-* [contract](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#contract)
 * [events](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#events)
 * [slashingIncentives](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md#slashingincentives)
 
@@ -51,16 +50,6 @@ Name | Type |
 **Returns:** *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *DoubleSigningSlasher*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  events
 

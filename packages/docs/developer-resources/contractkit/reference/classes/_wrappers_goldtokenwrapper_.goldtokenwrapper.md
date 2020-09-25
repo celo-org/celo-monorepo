@@ -18,7 +18,6 @@ ERC-20 contract for Celo native currency.
 
 * [allowance](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#allowance)
 * [approve](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#approve)
-* [contract](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#contract)
 * [decimals](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#decimals)
 * [decreaseAllowance](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#decreaseallowance)
 * [events](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#events)
@@ -109,16 +108,6 @@ Approve a user to transfer CELO on behalf of another user.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
-
-___
-
-###  contract
-
-• **contract**: *GoldToken*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 

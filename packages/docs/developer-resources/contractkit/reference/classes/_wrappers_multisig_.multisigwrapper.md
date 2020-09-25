@@ -16,7 +16,6 @@ Contract for handling multisig actions
 
 ### Properties
 
-* [contract](_wrappers_multisig_.multisigwrapper.md#contract)
 * [events](_wrappers_multisig_.multisigwrapper.md#events)
 * [getInternalRequired](_wrappers_multisig_.multisigwrapper.md#getinternalrequired)
 * [getOwners](_wrappers_multisig_.multisigwrapper.md#getowners)
@@ -56,16 +55,6 @@ Name | Type |
 **Returns:** *[MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *MultiSig*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  events
 

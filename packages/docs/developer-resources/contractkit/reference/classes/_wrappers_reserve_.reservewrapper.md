@@ -16,7 +16,6 @@ Contract for handling reserve for stable currencies
 
 ### Properties
 
-* [contract](_wrappers_reserve_.reservewrapper.md#contract)
 * [events](_wrappers_reserve_.reservewrapper.md#events)
 * [frozenReserveGoldDays](_wrappers_reserve_.reservewrapper.md#frozenreservegolddays)
 * [frozenReserveGoldStartBalance](_wrappers_reserve_.reservewrapper.md#frozenreservegoldstartbalance)
@@ -59,16 +58,6 @@ Name | Type |
 **Returns:** *[ReserveWrapper](_wrappers_reserve_.reservewrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *Reserve*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  events
 

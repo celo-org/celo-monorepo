@@ -16,7 +16,6 @@ Network parameters that are configurable by governance.
 
 ### Properties
 
-* [contract](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#contract)
 * [events](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#events)
 * [getBlockGasLimit](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getblockgaslimit)
 * [setBlockGasLimit](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#setblockgaslimit)
@@ -51,16 +50,6 @@ Name | Type |
 **Returns:** *[BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)*
 
 ## Properties
-
-###  contract
-
-• **contract**: *BlockchainParameters*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
-
-___
 
 ###  events
 

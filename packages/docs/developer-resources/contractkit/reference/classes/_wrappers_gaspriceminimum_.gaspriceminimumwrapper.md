@@ -17,7 +17,6 @@ Stores the gas price minimum
 ### Properties
 
 * [adjustmentSpeed](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#adjustmentspeed)
-* [contract](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#contract)
 * [events](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#events)
 * [gasPriceMinimum](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#gaspriceminimum)
 * [getGasPriceMinimum](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md#getgaspriceminimum)
@@ -76,16 +75,6 @@ Query adjustment speed parameter
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
-
-___
-
-###  contract
-
-• **contract**: *GasPriceMinimum*
-
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[contract](_wrappers_basewrapper_.basewrapper.md#contract)*
-
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L20)*
 
 ___
 
