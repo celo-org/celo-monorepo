@@ -93,7 +93,6 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
-
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
       - run:
