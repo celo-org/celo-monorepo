@@ -7,20 +7,17 @@ set -euo pipefail
 
 # Flags:
 # -p: Platform (android or ios)
-# -n (Optional): Name of the network to run on 
-# -d (Optional): Dev variant (true by default)
+# -e (Optional): Name of the env to run
 # -r (Optional): Use release build (by default uses debug). Note: on Android the release keystore needs to be present and the password in the env variable for this to work.
 
 PLATFORM=""
-NETWORK="alfajores"
-DEV=true
+ENV_NAME="alfajoresdev"
 RELEASE=false
 
-while getopts 'p:n:d:r' flag; do
+while getopts 'p:e:r' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
-    n) NETWORK="$OPTARG" ;;
-    d) DEV=$OPTARG ;;
+    e) ENV_NAME="$OPTARG" ;;
     r) RELEASE=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
@@ -40,16 +37,11 @@ esac
 echo "Machine type: $MACHINE"
 echo "Current directory: $(pwd)"
 
-case "$DEV" in
-  true) ENV_SUFFIX=".dev" ;;
-  *) ENV_SUFFIX="" ;;
-esac
-
 # Read values from the .env file and put them in env vars
-ENV_FILENAME=".env.${NETWORK}${ENV_SUFFIX}"
+ENV_FILENAME=".env.${ENV_NAME}"
 # From https://stackoverflow.com/a/56229034/158525
 # Supports vars with spaces and single or double quotes
-eval "$(grep -v -e '^#' $ENV_FILENAME | xargs -I {} echo export \'{}\')"
+eval "$(grep -v -e '^#' "$ENV_FILENAME" | xargs -I {} echo export \'{}\')"
 
 startPackager() {
   export RCT_METRO_PORT="${RCT_METRO_PORT:=8081}"
@@ -81,27 +73,17 @@ if [ "$PLATFORM" = "android" ]; then
     exit 1
   fi
 
-  case "$DEV" in
-    true) VARIANT_SUFFIX="Dev" ;;
-    *) VARIANT_SUFFIX="" ;;
-  esac
-
   case "$RELEASE" in
-    true) VARIANT_SUFFIX="${VARIANT_SUFFIX}Release" ;;
-    *) VARIANT_SUFFIX="${VARIANT_SUFFIX}Debug" ;;
+    true) BUILD_TYPE="Release" ;;
+    *) BUILD_TYPE="Debug" ;;
   esac
 
   # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
   startPackager
-  yarn react-native run-android --variant "${NETWORK}${VARIANT_SUFFIX}" --appId "$APP_BUNDLE_ID" --no-packager
+  yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
 
 elif [ "$PLATFORM" = "ios" ]; then
   echo "Using platform ios"
-
-  case "$DEV" in
-    true) SCHEME_SUFFIX="-dev" ;;
-    *) SCHEME_SUFFIX="" ;;
-  esac
 
   case "$RELEASE" in
     true) CONFIGURATION="Release" ;;
@@ -110,7 +92,7 @@ elif [ "$PLATFORM" = "ios" ]; then
 
   # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
   startPackager
-  yarn react-native run-ios --scheme "celo-${NETWORK}${SCHEME_SUFFIX}" --configuration "$CONFIGURATION" --no-packager
+  yarn react-native run-ios --scheme "celo-${ENV_NAME}" --configuration "$CONFIGURATION" --no-packager
 
 else
   echo "Invalid value for platform, must be 'android' or 'ios'"

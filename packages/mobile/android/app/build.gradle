@@ -85,11 +85,11 @@ project.ext.react = [
 
 project.ext.envConfigFiles = [
     // IMPORTANT: longer variants should be first, as react-native-config plugin matches the first prefix it finds
-    alfajoresdev: ".env.alfajores.dev",
+    alfajoresdev: ".env.alfajoresdev",
     alfajores: ".env.alfajores",
-    mainnetdev: ".env.mainnet.dev",
+    mainnetdev: ".env.mainnetdev",
     mainnet: ".env.mainnet",
-    "": ".env.alfajores.dev", // Fallback
+    "": ".env.alfajoresdev", // Fallback
 ]
 
 project.ext.sentryCli = [
@@ -207,13 +207,13 @@ android {
         alfajores {
             dimension "default"
         }
-        alfajoresDev {
+        alfajoresdev {
             dimension "default"
         }
         mainnet {
             dimension "default"
         }
-        mainnetDev {
+        mainnetdev {
             dimension "default"
         }
     }
