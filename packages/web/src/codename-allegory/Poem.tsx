@@ -5,9 +5,9 @@ import { useScreenSize } from 'src/layout/ScreenSize'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export default function Poem() {
-  const { isDesktop } = useScreenSize()
+  const { isDesktop, isTablet } = useScreenSize()
   return (
-    <View style={[styles.root, isDesktop && styles.desktopRoot]}>
+    <View style={[styles.root, isDesktop && styles.desktopRoot, isTablet && styles.tabletRoot]}>
       <H4 style={[textStyles.italic, standardStyles.elementalMarginBottom]}>For Value Flowers</H4>
       {STANZAS.map((verse) => (
         <Text key={verse.slice(0, 20)} style={fonts.p}>
@@ -21,6 +21,9 @@ export default function Poem() {
 const styles = StyleSheet.create({
   root: {
     zIndex: -5,
+  },
+  tabletRoot: {
+    marginTop: '15vh',
   },
   desktopRoot: {
     marginTop: '20vh',
