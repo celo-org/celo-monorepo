@@ -347,6 +347,7 @@ async function doSendSms(
     )
 
     if (attestation.attempt >= maxDeliveryAttempts) {
+      attestation.completedAt = new Date()
       attestation.message = ''
       logger.info('Final failure to send')
       Counters.attestationRequestsFailedToDeliverSms.inc()
@@ -427,6 +428,7 @@ export async function receivedDeliveryReport(
           attestation.attempt += 1
 
           if (attestation.attempt >= maxDeliveryAttempts) {
+            attestation.completedAt = new Date()
             attestation.message = ''
             logger.info(
               {
@@ -439,6 +441,7 @@ export async function receivedDeliveryReport(
             shouldRetry = true
           }
         } else if (deliveryStatus === AttestationStatus.Delivered) {
+          attestation.completedAt = new Date()
           attestation.message = ''
           Counters.attestationRequestsBelievedDelivered.inc()
           attestation.ongoingDeliveryId = null

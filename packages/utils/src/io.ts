@@ -143,6 +143,9 @@ export const AttestationResponseType = t.type({
   attempt: t.union([t.undefined, t.number]),
   countryCode: t.union([t.undefined, t.string]),
 
+  // Time to receive eventual delivery/failure (inc retries)
+  duration: t.union([t.undefined, t.number]),
+
   // Only used by test endpoint to return randomly generated salt.
   // Never return a user-supplied salt.
   salt: t.union([t.undefined, t.string]),

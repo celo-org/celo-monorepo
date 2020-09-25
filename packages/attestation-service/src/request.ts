@@ -97,6 +97,9 @@ export function respondWithAttestation(
       provider: attestation.provider() ?? undefined,
       errors: attestation.errors ?? undefined,
       error: attestation.currentError(),
+      duration: attestation.completedAt
+        ? attestation.completedAt!.getTime() - attestation.createdAt.getTime()
+        : undefined,
     })
   )
 }

@@ -14,6 +14,8 @@ export interface AttestationModel extends Model {
   attempt: number
   status: AttestationStatus
   errors: string | null
+  createdAt: Date
+  completedAt: Date | null
   key: () => AttestationKey
   provider: () => string | null
   recordError: (error: string) => void
@@ -54,6 +56,8 @@ export default (sequelize: Sequelize) => {
     attempt: DataTypes.INTEGER,
     status: DataTypes.STRING,
     errors: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
+    completedAt: DataTypes.DATE,
   }) as AttestationStatic
 
   model.prototype.key = function(): AttestationKey {
