@@ -1,5 +1,4 @@
 import { BigNumber } from 'bignumber.js'
-import { SingletonRouter as Router } from 'next/router'
 import { localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { weiToDecimal } from 'src/utils/utils'
@@ -47,13 +46,9 @@ export interface CeloValidatorGroup {
   votes: string
 }
 
-export interface ValidatorsListProps {
-  router: Router
-  data: {
-    celoValidatorGroups: CeloValidatorGroup[]
-    latestBlock: number
-  }
-  isLoading: boolean
+export interface ValidatorsData {
+  celoValidatorGroups: CeloValidatorGroup[]
+  latestBlock: number
 }
 
 export function isPinned({ address }: any) {
@@ -61,7 +56,7 @@ export function isPinned({ address }: any) {
   return +list.includes(address)
 }
 
-export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
+export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsData) {
   const totalVotes: BigNumber = celoValidatorGroups
     .map(({ receivableVotes }) => new BigNumber(receivableVotes))
     .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
