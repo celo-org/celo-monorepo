@@ -1,11 +1,15 @@
-import { Address, ensureLeading0x } from '@celo/base'
+import { Address, ensureLeading0x, Signature } from '@celo/base'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
 import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import BigNumber from 'bignumber.js'
 import { newKitFromWeb3 } from '../kit'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
-import { buildMetaTxTypedData, MetaTransactionWalletWrapper } from './MetaTransactionWallet'
+import {
+  buildMetaTxTypedData,
+  MetaTransactionWalletWrapper,
+  RawTransaction,
+} from './MetaTransactionWallet'
 
 const contract = require('@truffle/contract')
 const MetaTransactionWallet = contract(MTWContract)
@@ -113,7 +117,12 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     it('should match the digest created off-chain', async () => {
       const metaTransfer = gold.transfer(emptyAccounts[0], 1000).txo
       const onChainDigest = await wallet.getMetaTransactionDigest(metaTransfer, 0)
-      const typedData = buildMetaTxTypedData(wallet.address, metaTransfer, 0, chainId)
+      const typedData = buildMetaTxTypedData(
+        wallet.address,
+        wallet.toRawTransaction(metaTransfer),
+        0,
+        chainId
+      )
       const offChainDigest = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
 
       expect(onChainDigest).toEqual(offChainDigest)
@@ -181,6 +190,34 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
         }
       })
     })
+
+    describe('when passed over the wire', () => {
+      it('can hydrate and execute directly', async () => {
+        const walletBalanceBefore = await gold.balanceOf(wallet.address)
+        const value = new BigNumber(1e18)
+        const metaTx = wallet.executeTransactions([
+          gold.transfer(emptyAccounts[0], value.toFixed()).txo,
+          gold.transfer(emptyAccounts[1], value.toFixed()).txo,
+          gold.transfer(emptyAccounts[2], value.toFixed()).txo,
+        ]).txo
+        const signature = await wallet.signMetaTransaction(metaTx, 0)
+        const rawTx = wallet.toRawTransaction(metaTx)
+        const payload = JSON.stringify({ rawTx, signature })
+        // Now we're somewhere else:
+        const resp: { rawTx: RawTransaction; signature: Signature } = JSON.parse(payload)
+        const result = await wallet
+          .executeMetaTransaction(resp.rawTx, resp.signature)
+          .sendAndWaitForReceipt({ from: rando })
+        expect(result.status).toBe(true)
+
+        expect(await gold.balanceOf(wallet.address)).toEqual(
+          walletBalanceBefore.minus(value.times(3))
+        )
+        for (let i = 0; i < 3; i++) {
+          expect(await gold.balanceOf(emptyAccounts[i])).toEqual(value)
+        }
+      })
+    })
   })
 
   describe('#signAndExecuteMetaTransaction', () => {
@@ -201,13 +238,14 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
       it('can batch transactions as a call to self', async () => {
         const walletBalanceBefore = await gold.balanceOf(wallet.address)
         const value = new BigNumber(1e18)
-        const metaBatch = wallet.executeTransactions([
-          gold.transfer(emptyAccounts[0], value.toFixed()).txo,
-          gold.transfer(emptyAccounts[1], value.toFixed()).txo,
-          gold.transfer(emptyAccounts[2], value.toFixed()).txo,
-        ]).txo
 
-        const tx = await wallet.signAndExecuteMetaTransaction(metaBatch)
+        const tx = await wallet.signAndExecuteMetaTransaction(
+          wallet.executeTransactions([
+            gold.transfer(emptyAccounts[0], value.toFixed()).txo,
+            gold.transfer(emptyAccounts[1], value.toFixed()).txo,
+            gold.transfer(emptyAccounts[2], value.toFixed()).txo,
+          ]).txo
+        )
         const result = await tx.sendAndWaitForReceipt({ from: rando })
         expect(result.status).toBe(true)
 

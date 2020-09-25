@@ -5,18 +5,17 @@ import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { HttpProvider } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
-import { Contract } from 'web3-eth-contract'
 import { Address } from '../base'
 import { MetaTransactionWallet } from '../generated/MetaTransactionWallet'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  numericToHex,
   proxyCall,
   proxySend,
   stringIdentity,
   toTransactionObject,
   valueToInt,
+  valueToString,
 } from './BaseWrapper'
 
 export interface TransactionObjectWithValue<T> {
@@ -24,7 +23,16 @@ export interface TransactionObjectWithValue<T> {
   value: BigNumber.Value
 }
 
-export type TransactionInput<T> = TransactionObject<T> | TransactionObjectWithValue<T>
+export interface RawTransaction {
+  destination: string
+  value: string
+  data: string
+}
+
+export type TransactionInput<T> =
+  | TransactionObject<T>
+  | TransactionObjectWithValue<T>
+  | RawTransaction
 
 /**
  * Class that wraps the MetaTransactionWallet
@@ -36,16 +44,10 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param tx a MTWTransaction
    */
   public executeTransaction(tx: TransactionInput<any>): CeloTransactionObject<string> {
-    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
-    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
-
+    const rawTx = this.toRawTransaction(tx)
     return toTransactionObject(
       this.kit,
-      this.contract.methods.executeTransaction(
-        getTxoDestination(txo),
-        numericToHex(value),
-        txo.encodeABI()
-      )
+      this.contract.methods.executeTransaction(rawTx.destination, rawTx.value, rawTx.data)
     )
   }
 
@@ -55,11 +57,11 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param txs An array of MTWTransactions
    */
   public executeTransactions(txs: Array<TransactionInput<any>>): CeloTransactionObject<void> {
-    const txos: Array<TransactionObject<any>> = txs.map((tx) => ('value' in tx ? tx.txo : tx))
-    const destinations = txos.map((txo) => getTxoDestination(txo))
-    const values = txs.map((tx) => numericToHex('value' in tx ? tx.value : 0))
-    const callData = ensureLeading0x(txos.map((txo) => trimLeading0x(txo.encodeABI())).join(''))
-    const callDataLengths = txos.map((txo) => trimLeading0x(txo.encodeABI()).length / 2)
+    const rawTxs: RawTransaction[] = txs.map(this.toRawTransaction)
+    const destinations = rawTxs.map((rtx) => rtx.destination)
+    const values = rawTxs.map((rtx) => rtx.value)
+    const callData = ensureLeading0x(rawTxs.map((rtx) => trimLeading0x(rtx.data)).join(''))
+    const callDataLengths = rawTxs.map((rtx) => trimLeading0x(rtx.data).length / 2)
 
     return toTransactionObject(
       this.kit,
@@ -76,15 +78,14 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     tx: TransactionInput<any>,
     signature: Signature
   ): CeloTransactionObject<string> {
-    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
-    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
+    const rawTx = this.toRawTransaction(tx)
 
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeMetaTransaction(
-        getTxoDestination(txo),
-        numericToHex(value),
-        txo.encodeABI(),
+        rawTx.destination,
+        rawTx.value,
+        rawTx.data,
         signature.v,
         signature.r,
         signature.s
@@ -102,7 +103,12 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     if (nonce === undefined) {
       nonce = await this.nonce()
     }
-    const typedData = buildMetaTxTypedData(this.address, tx, nonce, await this.chainId())
+    const typedData = buildMetaTxTypedData(
+      this.address,
+      this.toRawTransaction(tx),
+      nonce,
+      await this.chainId()
+    )
     // TODO: This should be cached by the CeloProvider and executed through the wallets.
     //       But I think the GethNativeBridgeWallet currently doesn't support this, it's
     //       in the works.
@@ -146,10 +152,8 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     tx: TransactionInput<any>,
     nonce: number
   ): [string, string, string, number] => {
-    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
-    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
-
-    return [getTxoDestination(txo), numericToHex(value), txo.encodeABI(), nonce]
+    const rawTx = this.toRawTransaction(tx)
+    return [rawTx.destination, rawTx.value, rawTx.data, nonce]
   }
 
   getMetaTransactionDigest = proxyCall(
@@ -163,13 +167,11 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     nonce: number,
     signature: Signature
   ): [string, string, string, number, number, string, string] => {
-    const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
-    const value: BigNumber.Value = 'value' in tx ? tx.value : 0
-
+    const rawTx = this.toRawTransaction(tx)
     return [
-      getTxoDestination(txo),
-      numericToHex(value),
-      txo.encodeABI(),
+      rawTx.destination,
+      rawTx.value,
+      rawTx.data,
       nonce,
       signature.v,
       signature.r,
@@ -225,25 +227,41 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     }
     return this._signer
   }
-}
 
-const getTxoDestination = (txo: TransactionObject<any>): string => {
-  // XXX: Slight hack alert - getting the parent contract from a txo
-  //      I'm not sure why it's not included in the type, but it's always there
-  //      from what I could find.
-  const parent = (txo as any)._parent as Contract
-  return parent.options.address
+  /**
+   * Turns any possible way to pass in a tranasction into the raw values
+   * that are actually required. This is used both internally to normalize
+   * ways in which transactions are passed in but also public in order
+   * for one instance of ContractKit to serialize a meta transaction to
+   * send over the wire and be consumed somewhere else.
+   * @param tx TransactionInput<any> union of all the ways we expect transactions
+   * @returns a RawTransactions that's serializable
+   */
+  public toRawTransaction(tx: TransactionInput<any>): RawTransaction {
+    if ('destination' in tx) {
+      return tx
+    } else if ('value' in tx) {
+      return {
+        destination: tx.txo._parent.options.address,
+        data: tx.txo.encodeABI(),
+        value: valueToString(tx.value),
+      }
+    } else {
+      return {
+        destination: tx._parent.options.address,
+        data: tx.encodeABI(),
+        value: '0',
+      }
+    }
+  }
 }
 
 export const buildMetaTxTypedData = (
   walletAddress: Address,
-  tx: TransactionInput<any>,
+  tx: RawTransaction,
   nonce: number,
   chainId: number
 ): EIP712TypedData => {
-  const txo: TransactionObject<any> = 'value' in tx ? tx.txo : tx
-  const value: BigNumber.Value = 'value' in tx ? tx.value : 0
-
   return {
     types: {
       EIP712Domain: [
@@ -266,13 +284,6 @@ export const buildMetaTxTypedData = (
       chainId,
       verifyingContract: walletAddress,
     },
-    message: tx
-      ? {
-          destination: getTxoDestination(txo),
-          value: numericToHex(value),
-          data: txo.encodeABI(),
-          nonce,
-        }
-      : {},
+    message: tx ? { ...tx, nonce } : {},
   }
 }
