@@ -1,5 +1,5 @@
+import { logger } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
-import logger from './common/logger'
 import { VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'

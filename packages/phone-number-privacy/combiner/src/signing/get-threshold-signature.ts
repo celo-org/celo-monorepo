@@ -4,6 +4,7 @@ import {
   hasValidQueryPhoneNumberParam,
   hasValidTimestamp,
   isBodyReasonablySized,
+  logger,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   phoneNumberHashIsValidIfExists,
   SignMessageResponse,
@@ -17,7 +18,6 @@ import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import logger from '../common/logger'
 import config, { VERSION } from '../config'
 
 // TODO change to /getBlindedMessagePartialSig when all signers are running 1.1.0

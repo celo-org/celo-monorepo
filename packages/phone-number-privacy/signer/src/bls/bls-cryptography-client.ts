@@ -1,7 +1,5 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import logger from '../common/logger'
-
 /*
  * Computes the BLS signature for the blinded phone number.
  */

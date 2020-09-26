@@ -1,12 +1,11 @@
 import {
   ErrorMessage,
+  logger,
   SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response } from 'express'
 import { getVersion } from '../config'
-import logger from './logger'
-
 export type ErrorType = ErrorMessage | WarningMessage
 
 export function respondWithError(

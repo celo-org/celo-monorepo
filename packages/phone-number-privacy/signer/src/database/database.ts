@@ -1,6 +1,6 @@
+import { logger } from '@celo/phone-number-privacy-common'
 import knex from 'knex'
 import Knex from 'knex/types'
-import logger from '../common/logger'
 import config, { DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 

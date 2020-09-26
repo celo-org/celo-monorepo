@@ -1,7 +1,6 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { getDatabase } from '../database'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
+import { NumberPair, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
 function numberPairs() {
   return getDatabase()<NumberPair>(NUMBER_PAIRS_TABLE)

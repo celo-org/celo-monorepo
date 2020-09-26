@@ -1,5 +1,4 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 

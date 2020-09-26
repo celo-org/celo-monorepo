@@ -4,6 +4,7 @@ import {
   hasValidQueryPhoneNumberParam,
   hasValidTimestamp,
   isBodyReasonablySized,
+  logger,
   phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
@@ -13,7 +14,6 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import logger from '../common/logger'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'

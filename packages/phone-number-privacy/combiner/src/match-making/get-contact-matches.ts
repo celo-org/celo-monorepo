@@ -4,12 +4,12 @@ import {
   hasValidContractPhoneNumbersParam,
   hasValidPhoneNumberHash,
   hasValidUserPhoneNumberParam,
+  logger,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
-import logger from '../common/logger'
 import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'

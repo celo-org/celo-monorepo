@@ -1,8 +1,8 @@
 import { newKit, OdisUtils } from '@celo/contractkit'
 import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { fetchEnv } from '@celo/phone-number-privacy-common'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import * as functions from 'firebase-functions'
-import { fetchEnv } from './env'
 
 const privateKey = fetchEnv('PRIVATE_KEY')
 const phoneNumber = fetchEnv('PHONE_NUMBER')

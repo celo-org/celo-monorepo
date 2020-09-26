@@ -1,6 +1,5 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
-import logger from '../common/logger'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 

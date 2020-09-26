@@ -1,6 +1,5 @@
 import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../common/logger'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 

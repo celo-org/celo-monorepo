@@ -1,5 +1,4 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
 import { getDatabase } from '../database'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'

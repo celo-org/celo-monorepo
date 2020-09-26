@@ -2,6 +2,7 @@ import {
   ErrorMessage,
   hasValidAccountParam,
   isBodyReasonablySized,
+  logger,
   phoneNumberHashIsValidIfExists,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
@@ -12,7 +13,6 @@ import { BigNumber } from 'bignumber.js'
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import logger from '../common/logger'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit, isVerified } from '../web3/contracts'

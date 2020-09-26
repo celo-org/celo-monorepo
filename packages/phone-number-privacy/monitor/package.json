@@ -21,17 +21,10 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.4.14",
-    "@celo/phone-number-privacy-common": "1.0.7",
+    "@celo/phone-number-privacy-common": "1.0.9-dev",
     "@celo/utils": "0.1.18",
-    "bunyan": "1.8.12",
-    "bunyan-gke-stackdriver": "0.1.2",
-    "bunyan-debug-stream": "2.0.0",
-    "dotenv": "^8.2.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0"
-  },
-  "devDependencies": {
-    "@types/bunyan": "1.8.4"
   },
   "engines": {
     "node": "10"

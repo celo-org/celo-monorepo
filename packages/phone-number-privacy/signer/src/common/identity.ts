@@ -1,9 +1,9 @@
+import { logger } from '@celo/phone-number-privacy-common'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
 import { getDataEncryptionKey } from '../web3/contracts'
-import logger from './logger'
 
 const ec = new EC('secp256k1')
 

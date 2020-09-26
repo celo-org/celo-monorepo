@@ -7,7 +7,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
 import { RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
-import logger from './logger'
+import { logger } from './logger'
 
 const ec = new EC('secp256k1')
 
