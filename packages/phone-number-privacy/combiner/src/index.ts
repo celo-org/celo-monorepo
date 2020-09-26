@@ -4,6 +4,8 @@ import { VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'
 
+require('dotenv').config()
+
 // DEPRECATED, TODO: Remove once clients are all on contract kit version 4.11
 export const getDistributedBlindedSalt = functions
   .region('us-central1', 'europe-west3')
