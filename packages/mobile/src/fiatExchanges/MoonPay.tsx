@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import compareVersions from 'compare-versions'
 import * as React from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
@@ -14,7 +14,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
-import { getWebViewVersion } from 'src/utils/linking'
+import { getWebViewVersion, navigateToURI } from 'src/utils/linking'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const celoCurrencyCode = 'celo'
@@ -62,7 +62,15 @@ function FiatExchangeWeb({ route }: Props) {
       .catch(() => showError(ErrorMessages.FIREBASE_FAILED)) // Firebase signing function failed
   }, [])
 
-  if (version && compareVersions.compare(version, '83.0.4103.106', '<')) {
+  // XSS vulnerability in Android WebView
+  // https://github.com/react-native-webview/react-native-webview/security/advisories/GHSA-36j3-xxf7-4pqg
+  if (
+    uri &&
+    Platform.OS === 'android' &&
+    version &&
+    compareVersions.compare(version, '83.0.4103.106', '<')
+  ) {
+    navigateToURI(uri)
     return
   }
 

@@ -40,9 +40,7 @@ export function navigateToPhoneSettings() {
 
 export function getWebViewVersion() {
   const userAgent = DeviceInfo.getUserAgentSync()
-  Logger.debug(TAG, 'user agent is: ', userAgent)
   const parser = new UAParser(userAgent)
   const result = parser.getResult()
-  Logger.debug(TAG, `parsed user agent: ${JSON.stringify(result)}`)
   return result.browser.version
 }
