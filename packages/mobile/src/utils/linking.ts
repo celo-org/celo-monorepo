@@ -2,6 +2,7 @@ import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { APP_STORE_ID } from 'src/config'
 import Logger from 'src/utils/Logger'
+import { UAParser } from 'ua-parser-js'
 
 const TAG = 'utils/linking'
 
@@ -35,4 +36,13 @@ export function navigateToPhoneSettings() {
   Linking.openSettings().catch((reason: string) =>
     Logger.error(TAG, `Error navigating to phone settings: ${reason}`)
   )
+}
+
+export function getWebViewVersion() {
+  const userAgent = DeviceInfo.getUserAgentSync()
+  Logger.debug(TAG, 'user agent is: ', userAgent)
+  const parser = new UAParser(userAgent)
+  const result = parser.getResult()
+  Logger.debug(TAG, `parsed user agent: ${JSON.stringify(result)}`)
+  return result.browser.version
 }
