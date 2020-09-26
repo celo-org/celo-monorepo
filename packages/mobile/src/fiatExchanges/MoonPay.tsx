@@ -71,7 +71,8 @@ function FiatExchangeWeb({ route }: Props) {
     compareVersions.compare(version, '83.0.4103.106', '<')
   ) {
     navigateToURI(uri)
-    return
+    // TODO(erdal) what should we do here? end the activity?
+    return <ActivityIndicator size="large" color={colors.greenBrand} />
   }
 
   return (
