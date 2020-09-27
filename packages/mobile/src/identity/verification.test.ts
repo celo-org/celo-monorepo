@@ -2,13 +2,14 @@ import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestatio
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
-import { call, delay, select } from 'redux-saga/effects'
+import { all, call, delay, race, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { AppEvents, VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import {
   Actions,
   cancelVerification,
@@ -28,6 +29,7 @@ import {
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
+  BALANCE_CHECK_TIMEOUT,
   doVerificationFlow,
   fetchVerificationState,
   MAX_ACTIONABLE_ATTESTATIONS,
@@ -35,6 +37,8 @@ import {
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
+import { waitFor } from 'src/redux/sagas-helpers'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
@@ -329,6 +333,16 @@ describe(fetchVerificationState, () => {
             pepper: mockE164NumberPepper,
           },
         ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
         [select(isBalanceSufficientForSigRetrievalSelector), true],
       ])
@@ -362,6 +376,16 @@ describe(fetchVerificationState, () => {
             pepper: mockE164NumberPepper,
           },
         ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
         [select(isBalanceSufficientForSigRetrievalSelector), true],
       ])
@@ -391,9 +415,47 @@ describe(fetchVerificationState, () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
         [select(isBalanceSufficientForSigRetrievalSelector), false],
-        [select(verificationStateSelector), mockVerificationStateUnverified],
+      ])
+      .not.put.like({ action: { type: Actions.UPDATE_VERIFICATION_STATE } })
+      .run()
+  })
+  it('catches when balances are not fetched', async () => {
+    const contractKit = await getContractKitAsync()
+    await expectSaga(fetchVerificationState)
+      .provide([
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperUnverified,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
+        ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: true },
+        ],
       ])
       .not.put.like({ action: { type: Actions.UPDATE_VERIFICATION_STATE } })
       .run()

@@ -3,14 +3,16 @@ import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { useFocusEffect } from '@react-navigation/native'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
+import BackButton from 'src/components/BackButton.v2'
 import i18n, { Namespaces } from 'src/i18n'
 import {
   fetchVerificationState,
@@ -51,11 +53,14 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     }
   }, [status.isVerified])
 
-  useEffect(() => {
-    if (!partOfOnboarding) {
-      dispatch(fetchVerificationState())
-    }
-  }, [])
+  useFocusEffect(
+    // useCallback is needed here: https://bit.ly/2G0WKTJ
+    useCallback(() => {
+      if (!partOfOnboarding) {
+        dispatch(fetchVerificationState())
+      }
+    }, [partOfOnboarding])
+  )
 
   const onPressStart = (withoutRevealing: boolean) => {
     return () => {
@@ -195,6 +200,7 @@ VerificationEducationScreen.navigationOptions = ({ navigation, route }: ScreenPr
           titleStyle={{ color: colors.goldDark }}
         />
       ),
+    headerLeft: () => route.params?.hideOnboardingStep && <BackButton />,
   }
 }
 

@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 // when swiping quickly
 import { Animated, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import KeepAwake from 'react-native-keep-awake'
 import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import CancelButton from 'src/components/CancelButton.v2'
@@ -186,6 +187,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
 
   return (
     <View style={styles.container}>
+      <KeepAwake />
       <LottieView
         source={require('./backgroundAnim.json')}
         resizeMode="cover"

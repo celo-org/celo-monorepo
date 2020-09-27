@@ -23,6 +23,7 @@ import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
 import { features } from 'src/flags'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -50,6 +51,7 @@ import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
@@ -63,6 +65,7 @@ const TAG = 'identity/verification'
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const ESTIMATED_COST_PER_ATTESTATION = 0.051
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
+export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
 
@@ -89,10 +92,22 @@ export function* fetchVerificationState() {
 
     let phoneHash: string
     let phoneHashDetails: PhoneNumberHashDetails
+    const { timeout } = yield race({
+      balances: all([
+        call(waitFor, stableTokenBalanceSelector),
+        call(waitFor, celoTokenBalanceSelector),
+      ]),
+      timeout: delay(BALANCE_CHECK_TIMEOUT),
+    })
+    if (timeout) {
+      Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
+      return
+    }
     const isBalanceSufficientForSigRetrieval = yield select(
       isBalanceSufficientForSigRetrievalSelector
     )
     if (!isBalanceSufficientForSigRetrieval) {
+      Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
       return
     }
 
