@@ -39,7 +39,7 @@ export enum Actions {
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
   FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
-  RE_REVEAL_ACTIONABLE_ATTESTATIONS = 'IDENTITY/RE_REVEAL_ACTIONABLE_ATTESTATIONS',
+  RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
   SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
 }
 
@@ -188,8 +188,8 @@ export interface UpdateVerificationState {
   state: UpdatableVerificationState
 }
 
-export interface ReRevealActionableAttestations {
-  type: Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS
+export interface ResendAttestations {
+  type: Actions.RESEND_ATTESTATIONS
 }
 
 export interface SetLastRevealAttempt {
@@ -224,7 +224,7 @@ export type ActionTypes =
   | UpdateAddressDekMapAction
   | FetchVerificationState
   | UpdateVerificationState
-  | ReRevealActionableAttestations
+  | ResendAttestations
   | SetLastRevealAttempt
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
@@ -405,8 +405,8 @@ export const udpateVerificationState = (
   state,
 })
 
-export const reRevealActionableAttestations = (): ReRevealActionableAttestations => ({
-  type: Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS,
+export const resendAttestations = (): ResendAttestations => ({
+  type: Actions.RESEND_ATTESTATIONS,
 })
 
 export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({

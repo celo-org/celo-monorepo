@@ -122,6 +122,7 @@
   "addressLookupFailure": "Error al buscar la dirección del número de teléfono",
   "saltFetchFailure": "Error al recuperar el secreto del número de teléfono",
   "saltQuotaExceededError": "Tu cuota de búsqueda de número de teléfono está agotada",
+  "maxActionableAttestationsExceededError": "Error al reenviar mensajes",
   "matchmakingQuotaExceededError": "El emparejamiento solo se puede hacer una vez",
   "odisInsufficientBalance": "Tu saldo es demasiado bajo para completar este proceso",
   "paymentLimitReached": "El límite diario es {{dailyLimitcUSD}} cUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}} cUSD ({{currencySymbol}}{{dailyRemaining}}) restante",

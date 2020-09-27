@@ -64,6 +64,7 @@ export const NUM_ATTESTATIONS_REQUIRED = 3
 export const ESTIMATED_COST_PER_ATTESTATION = 0.051
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
+export const MAX_ACTIONABLE_ATTESTATIONS = 5
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -190,7 +191,7 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
 
     const { verification, restart } = yield race({
       verification: call(doVerificationFlow, withoutRevealing),
-      restart: take(Actions.RE_REVEAL_ACTIONABLE_ATTESTATIONS),
+      restart: take(Actions.RESEND_ATTESTATIONS),
     })
     if (restart) {
       isRestarted = true
@@ -202,6 +203,8 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
 }
 
 export function* doVerificationFlow(withoutRevealing: boolean = false) {
+  let receiveMessageTask: Task | undefined
+  let autoRetrievalTask: Task | undefined
   try {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const {
@@ -231,29 +234,22 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       yield put(setCompletedCodes(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
       let attestations = actionableAttestations
-      let attestationsToRequest = 0
-      let receiveMessageTask: Task | undefined
-      let autoRetrievalTask: Task | undefined
 
       if (Platform.OS === 'android') {
         autoRetrievalTask = yield fork(startAutoSmsRetrieval)
       }
 
-      yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
-      while (true) {
-        const issuers = attestations.map((a) => a.issuer)
-        // Start listening for manual and/or auto message inputs
-        receiveMessageTask = yield takeEvery(
-          Actions.RECEIVE_ATTESTATION_MESSAGE,
-          attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
-        )
+      let issuers = attestations.map((a) => a.issuer)
+      // Start listening for manual and/or auto message inputs
+      receiveMessageTask = yield takeEvery(
+        Actions.RECEIVE_ATTESTATION_MESSAGE,
+        attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+      )
 
-        if (withoutRevealing) {
-          break
-        }
-
-        // Request codes for the already existing attestations if any
+      if (!withoutRevealing) {
         ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
+        // Request codes for the already existing attestations if any.
+        // We check after which ones were successfull
         const reveals: boolean[] = yield call(
           revealAttestations,
           attestationsWrapper,
@@ -264,33 +260,53 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
         ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
         // count how much more attestations we need to request
-        attestationsToRequest =
+        const attestationsToRequest =
           status.numAttestationsRemaining - reveals.filter((r: boolean) => r).length
 
-        if (!attestationsToRequest) {
-          break
+        // check if we hit the limit for max actionable attestations at the same time
+        if (attestationsToRequest + attestations.length > MAX_ACTIONABLE_ATTESTATIONS) {
+          throw new Error(ErrorMessages.MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED)
         }
 
-        // request more attestations
-        ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
-          attestationsToRequest,
-        })
-        attestations = yield call(
-          requestAndRetrieveAttestations,
-          attestationsWrapper,
-          phoneHash,
-          account,
-          attestations,
-          attestations.length + attestationsToRequest
-        )
-        ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
-          issuers,
-        })
+        if (attestationsToRequest) {
+          yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
+          // request more attestations
+          ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
+            attestationsToRequest,
+          })
+          attestations = yield call(
+            requestAndRetrieveAttestations,
+            attestationsWrapper,
+            phoneHash,
+            account,
+            attestations,
+            attestations.length + attestationsToRequest
+          )
+          ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
+            issuers,
+          })
 
-        receiveMessageTask?.cancel()
+          // start listening for the new list of attestations
+          receiveMessageTask?.cancel()
+          issuers = attestations.map((a) => a.issuer)
+          receiveMessageTask = yield takeEvery(
+            Actions.RECEIVE_ATTESTATION_MESSAGE,
+            attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+          )
+
+          ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
+          // Request codes for the new list of attestations. We ignore unsuccessfull reveals here,
+          // cause we do not want to go into a loop of re-requesting more and more attestations
+          yield call(
+            revealAttestations,
+            attestationsWrapper,
+            account,
+            phoneHashDetails,
+            attestations
+          )
+          ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
+        }
       }
-
-      yield put(setLastRevealAttempt(Date.now()))
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
       yield race({
@@ -334,6 +350,11 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
     }
     return error.message
+  } finally {
+    receiveMessageTask?.cancel()
+    if (Platform.OS === 'android') {
+      autoRetrievalTask?.cancel()
+    }
   }
 }
 
@@ -618,6 +639,7 @@ function* revealAttestations(
     }
     reveals.push(result)
   }
+  yield put(setLastRevealAttempt(Date.now()))
   return reveals
 }
 function* completeAttestations(

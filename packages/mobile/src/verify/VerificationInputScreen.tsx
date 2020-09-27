@@ -22,7 +22,7 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   cancelVerification,
   receiveAttestationMessage,
-  reRevealActionableAttestations,
+  resendAttestations,
 } from 'src/identity/actions'
 import { isRevealAllowed } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
@@ -57,7 +57,7 @@ interface StateProps {
 interface DispatchProps {
   cancelVerification: typeof cancelVerification
   receiveAttestationMessage: typeof receiveAttestationMessage
-  reRevealActionableAttestations: typeof reRevealActionableAttestations
+  resendAttestations: typeof resendAttestations
   hideAlert: typeof hideAlert
   showMessage: typeof showMessage
 }
@@ -75,7 +75,7 @@ interface State {
 const mapDispatchToProps = {
   cancelVerification,
   receiveAttestationMessage,
-  reRevealActionableAttestations,
+  resendAttestations,
   hideAlert,
   showMessage,
 }
@@ -221,7 +221,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   onPressResend = () => {
     if (this.props.isRevealAllowed) {
-      this.props.reRevealActionableAttestations()
+      this.props.resendAttestations()
     } else {
       this.props.showMessage(
         this.props.t('verificationPrematureRevealMessage'),
