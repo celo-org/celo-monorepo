@@ -343,6 +343,7 @@ export type AnalyticsEventType =
   | IdentityEvents
   | InviteEvents
   | EscrowEvents
+  | FiatExchangeEvents
   | SendEvents
   | RequestEvents
   | FeeEvents

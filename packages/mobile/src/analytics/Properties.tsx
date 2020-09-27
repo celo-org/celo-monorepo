@@ -580,6 +580,7 @@ interface CeloExchangeEventsProperties {
 
 interface FiatExchangeEventsProperties {
   [FiatExchangeEvents.external_exchange_link]: {
+    name: string
     link: string
   }
 }

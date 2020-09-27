@@ -25,12 +25,19 @@ export const externalExchangesScreenOptions = () => {
   }
 }
 
+export interface ExternalExchangeProvider {
+  name: string
+  link: string
+}
+
 function ExternalExchanges() {
   const account = useSelector(currentAccountSelector)
 
-  const goToProvider = (link: string) => {
+  const goToProvider = (provider: ExternalExchangeProvider) => {
+    const { name, link } = provider
     return () => {
       ValoraAnalytics.track(FiatExchangeEvents.external_exchange_link, {
+        name,
         link,
       })
       navigateToURI(link)
@@ -38,7 +45,7 @@ function ExternalExchanges() {
   }
 
   const { t } = useTranslation('fiatExchangeFlow')
-  const providers = EXCHANGE_PROVIDER_LINKS // TODO Dynamically fetch exchange provider links so they can be updated between releases
+  const providers: ExternalExchangeProvider[] = EXCHANGE_PROVIDER_LINKS // TODO Dynamically fetch exchange provider links so they can be updated between releases
 
   return (
     <ScrollView style={styles.container}>
@@ -54,7 +61,7 @@ function ExternalExchanges() {
         <View style={styles.providersContainer}>
           {providers.map((provider, idx) => {
             return (
-              <ListItem key={idx} onPress={goToProvider(provider.link)}>
+              <ListItem key={provider.name} onPress={goToProvider(provider)}>
                 <View style={styles.providerListItem}>
                   <Text style={styles.optionTitle}>{provider.name}</Text>
                   <LinkArrow />

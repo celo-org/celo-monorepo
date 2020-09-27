@@ -1,6 +1,7 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
+import { ExternalExchangeProvider } from 'src/fiatExchanges/ExternalExchanges'
 import { GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
@@ -96,7 +97,7 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
 )
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
 
-export const EXCHANGE_PROVIDER_LINKS = [
+export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
     name: 'Bittrex (CELO)',
     link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
