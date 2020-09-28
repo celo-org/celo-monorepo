@@ -649,9 +649,9 @@ function* revealAttestations(
       phoneHashDetails,
       attestation
     )
-    // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
-    // when https://github.com/celo-org/celo-labs/issues/578 is resolved
-    // send messages with 5000ms delay on Android if reveals is successful
+    // TODO (i1skn): remove this clause when
+    // https://github.com/celo-org/celo-labs/issues/578 is resolved.
+    // This sends messages with 5000ms delay on Android if reveals is successful
     if (success && Platform.OS === 'android') {
       Logger.debug(
         TAG + '@revealAttestations',
