@@ -124,7 +124,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
               implementation.methods.initialize(beneficiary).encodeABI()
             )
             .sendAndWaitForReceipt({ from: rando })
-        ).rejects.toThrow(/not-allowed/)
+        ).rejects.toThrow(/sender not authorized to deploy wallet/)
       })
     })
   })
@@ -158,11 +158,13 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     })
   })
 
-  describe('#changeDeployerAllowance', () => {
+  describe('#changeDeployerPermission', () => {
     describe('as a rando', () => {
       it('reverts', async () => {
         await expect(
-          walletDeployer.changeDeployerAllowance(rando, true).sendAndWaitForReceipt({ from: rando })
+          walletDeployer
+            .changeDeployerPermission(rando, true)
+            .sendAndWaitForReceipt({ from: rando })
         ).rejects.toThrow(/Ownable: caller is not the owner/)
       })
     })
@@ -170,7 +172,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     describe('as the owner', () => {
       let result: TransactionReceipt
       beforeEach(async () => {
-        result = await walletDeployer.changeDeployerAllowance(rando, true).sendAndWaitForReceipt()
+        result = await walletDeployer.changeDeployerPermission(rando, true).sendAndWaitForReceipt()
       })
 
       it('emits an event', async () => {
