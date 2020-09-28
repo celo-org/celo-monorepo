@@ -47,16 +47,16 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
     })
   })
 
-  describe('#changeDeployerAllowance', async () => {
-    let changeAllowanceRes
+  describe('#changeDeployerPermission', async () => {
+    let changePermissionRes
     describe('when permission is revoked', async () => {
       beforeEach(async () => {
-        changeAllowanceRes = await deployer.changeDeployerAllowance(allowedDeployer, false)
+        changePermissionRes = await deployer.changeDeployerPermission(allowedDeployer, false)
       })
 
       it('should have removed the allowance and emit an event', async () => {
         assert.equal(await deployer.canDeploy(allowedDeployer), false)
-        assertLogMatches2(changeAllowanceRes.logs[0], {
+        assertLogMatches2(changePermissionRes.logs[0], {
           event: 'DeployerStatusRevoked',
           args: {
             addr: allowedDeployer,
@@ -67,12 +67,12 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
 
     describe('when permission is granted', async () => {
       beforeEach(async () => {
-        changeAllowanceRes = await deployer.changeDeployerAllowance(otherAllowedDeployer, true)
+        changePermissionRes = await deployer.changeDeployerPermission(otherAllowedDeployer, true)
       })
 
       it('should have added the allownace and emit an event', async () => {
         assert.equal(await deployer.canDeploy(otherAllowedDeployer), true)
-        assertLogMatches2(changeAllowanceRes.logs[0], {
+        assertLogMatches2(changePermissionRes.logs[0], {
           event: 'DeployerStatusGranted',
           args: {
             addr: otherAllowedDeployer,

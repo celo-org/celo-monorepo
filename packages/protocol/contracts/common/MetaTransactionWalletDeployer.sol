@@ -30,7 +30,10 @@ contract MetaTransactionWalletDeployer is
      * @dev Verifies that the sender is allowed to deploy a wallet
      */
   modifier onlyCanDeploy() {
-    require(msg.sender == owner() || canDeploy[msg.sender] == true, "not-allowed");
+    require(
+      msg.sender == owner() || canDeploy[msg.sender] == true,
+      "sender not authorized to deploy wallet"
+    );
     _;
   }
 
@@ -49,25 +52,25 @@ contract MetaTransactionWalletDeployer is
   function initialize(address[] calldata initialDeployers) external initializer {
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < initialDeployers.length; i++) {
-      _changeDeployerAllowance(initialDeployers[i], true);
+      _changeDeployerPermission(initialDeployers[i], true);
     }
   }
 
   /**
-     * @notice Change the deployer status of an address
+     * @notice Change the permission of an address to deploy
      * @param target The address to be allowed as a deployer
      * @param allowedToDeploy toggle whether the address is allowed or not
      */
-  function changeDeployerAllowance(address target, bool allowedToDeploy) external onlyOwner {
-    _changeDeployerAllowance(target, allowedToDeploy);
+  function changeDeployerPermission(address target, bool allowedToDeploy) external onlyOwner {
+    _changeDeployerPermission(target, allowedToDeploy);
   }
 
   /**
-     * @notice Implementation of the allowance change
+     * @notice Implementation of permission change
      * @param target The address to be allowed as a deployer
      * @param allowedToDeploy toggle whether the address is allowed or not
      */
-  function _changeDeployerAllowance(address target, bool allowedToDeploy) internal {
+  function _changeDeployerPermission(address target, bool allowedToDeploy) internal {
     canDeploy[target] = allowedToDeploy;
     if (allowedToDeploy == true) {
       emit DeployerStatusGranted(target);
@@ -81,6 +84,7 @@ contract MetaTransactionWalletDeployer is
      * initialize, transfer ownership and emit an event.
      * @param owner The external account which will act as signer and owner of the proxy
      * @param implementation The address of the implementation which the proxy will point to
+     * @param initCallData calldata pointing to a method on implementation used to initialize
      */
   function deploy(address owner, address implementation, bytes calldata initCallData)
     external
