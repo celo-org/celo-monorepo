@@ -27,6 +27,7 @@ export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
   SALT_FETCH_FAILURE = 'saltFetchFailure',
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
+  MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED = 'maxActionableAttestationsExceededError',
   ODIS_INSUFFICIENT_BALANCE = 'odisInsufficientBalance',
   MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
