@@ -25,11 +25,6 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
     setIsDismissed(false) // Prevents a ghost modal from showing up briefly
   }, []) // after opening Verification Loading when it is already dismissed
 
-  const onDismiss = () => {
-    setIsDismissed(true)
-    navigate(Screens.VerificationInputScreen)
-  }
-
   const onSkip = () => {
     dispatch(cancelVerification())
     navigateHome()
@@ -47,12 +42,10 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
 
   const isVisible =
     (verificationStatus === VerificationStatus.Failed ||
-      verificationStatus === VerificationStatus.RevealAttemptFailed ||
       userBalanceInsufficient ||
       saltQuotaExceeded) &&
     !isDismissed
 
-  const allowEnterCodes = verificationStatus === VerificationStatus.RevealAttemptFailed
   // Only prompt forno switch if not already in forno mode and failure
   // wasn't due to insuffuicient balance or exceeded quota for lookups
   const promptRetryWithForno =
@@ -72,22 +65,6 @@ export function VerificationFailedModal({ verificationStatus, retryWithForno, fo
         {t('retryWithFornoModal.body1')}
         {'\n\n'}
         {t('retryWithFornoModal.body2')}
-      </Dialog>
-    )
-  } else if (allowEnterCodes) {
-    // Option to enter codes if reveal attempt failed
-    return (
-      <Dialog
-        isVisible={isVisible}
-        title={t('failModal.header')}
-        actionText={t('education.skip')}
-        actionPress={onSkip}
-        secondaryActionText={t('failModal.enterCodesButton')}
-        secondaryActionPress={onDismiss}
-      >
-        {t('failModal.body1')}
-        {'\n\n'}
-        {t('failModal.enterCodesBody')}
       </Dialog>
     )
   } else if (userBalanceInsufficient) {
