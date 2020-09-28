@@ -1,6 +1,5 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -28,7 +27,6 @@ class FullscreenCTA extends React.PureComponent<Props> {
           <Button
             onPress={CTAHandler}
             text={CTAText}
-            standard={true}
             type={BtnTypes.PRIMARY}
             testID="ErrorContinueButton"
           />
@@ -43,14 +41,16 @@ const style = StyleSheet.create({
     height: variables.height,
     width: variables.width,
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 55,
     paddingBottom: 30,
     paddingHorizontal: 20,
-    backgroundColor: colors.background,
   },
-  header: {},
+  header: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 120,
+  },
   button: { alignItems: 'center' },
 })
 

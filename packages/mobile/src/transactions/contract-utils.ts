@@ -49,6 +49,15 @@ export enum SendTransactionLogEventType {
   Exception,
 }
 
+export type SendTransactionLogEvent =
+  | Started
+  | EstimatedGas
+  | ReceiptReceived
+  | TransactionHashReceived
+  | Confirmed
+  | Failed
+  | Exception
+
 interface Started {
   type: SendTransactionLogEventType.Started
 }
@@ -62,15 +71,6 @@ interface Confirmed {
 function Confirmed(n: number): Confirmed {
   return { type: SendTransactionLogEventType.Confirmed, number: n }
 }
-
-export type SendTransactionLogEvent =
-  | Started
-  | EstimatedGas
-  | ReceiptReceived
-  | TransactionHashReceived
-  | Confirmed
-  | Failed
-  | Exception
 
 interface EstimatedGas {
   type: SendTransactionLogEventType.EstimatedGas
@@ -172,7 +172,7 @@ export async function sendTransactionAsync<T>(
       feeCurrency: feeCurrencyAddress,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
       // the suggested price in the selected feeCurrency.
-      gasPrice: gasPrice ? gasPrice : '0',
+      gasPrice: gasPrice ?? '0',
       nonce,
     }
 

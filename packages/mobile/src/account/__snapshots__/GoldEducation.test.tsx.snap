@@ -20,8 +20,8 @@ exports[`renders correctly 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
+        "height": 56,
+        "justifyContent": "center",
       }
     }
     testID="DrawerTopBar"
@@ -29,6 +29,14 @@ exports[`renders correctly 1`] = `
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -38,12 +46,15 @@ exports[`renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -80,13 +91,6 @@ exports[`renders correctly 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <View
     style={
@@ -105,7 +109,7 @@ exports[`renders correctly 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
@@ -115,12 +119,13 @@ exports[`renders correctly 1`] = `
           "borderRadius": 5,
           "flex": 0,
           "height": 5,
-          "marginHorizontal": 5,
+          "marginHorizontal": 3,
           "width": 5,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
+      removeClippedSubviews={false}
     >
       <View
         style={
@@ -409,7 +414,7 @@ exports[`renders correctly 1`] = `
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }

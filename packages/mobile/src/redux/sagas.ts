@@ -16,6 +16,7 @@ import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
 import { localCurrencySaga } from 'src/localCurrency/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
+import { paymentRequestSaga } from 'src/paymentRequest/saga'
 import { waitForRehydrate } from 'src/redux/persist-helper'
 import { sendSaga } from 'src/send/saga'
 import { sentrySaga } from 'src/sentry/saga'
@@ -31,12 +32,9 @@ const loggerBlacklist = [
   'ACCOUNT/SET_PHONE_NUMBER',
   'ACCOUNT/SET_PINCODE',
   'SEND/SET_RECIPIENT_CACHE',
+  'SEND/STORE_LATEST_IN_RECENTS',
   'IMPORT/IMPORT_BACKUP_PHRASE',
-  'WEB3/SET_COMMENT_KEY',
-  'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
-  'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
-  'IDENTITY/FETCH_PHONE_ADDRESSES',
-  'IDENTITY/ADD_CONTACT_MATCHES',
+  'WEB3/SET_DATA_ENCRYPTION_KEY',
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
@@ -50,9 +48,13 @@ function* loggerSaga() {
   }
 
   yield takeEvery('*', (action: AnyAction) => {
-    if (action && action.type && loggerBlacklist.includes(action.type)) {
+    if (
+      action?.type &&
+      (action.type.includes('IDENTITY/') || loggerBlacklist.includes(action.type))
+    ) {
       // Log only action type, but not the payload as it can have
-      // sensitive information.
+      // sensitive information. Excluding all IDENTITY/ actions because high likelyhood
+      // they contain PII and the blacklist may get out of date.
       Logger.debug('redux/saga@logger', `${action.type} (payload not logged)`)
       return
     }
@@ -79,6 +81,7 @@ export function* rootSaga() {
   yield spawn(web3Saga)
   yield spawn(accountSaga)
   yield spawn(firebaseSaga)
+  yield spawn(transactionSaga)
   yield spawn(homeSaga)
   yield spawn(identitySaga)
   yield spawn(localCurrencySaga)
@@ -87,7 +90,7 @@ export function* rootSaga() {
   yield spawn(goldTokenSaga)
   yield spawn(sendSaga)
   yield spawn(exchangeSaga)
-  yield spawn(transactionSaga)
+  yield spawn(paymentRequestSaga)
   yield spawn(escrowSaga)
   yield spawn(inviteSaga)
   yield spawn(importSaga)

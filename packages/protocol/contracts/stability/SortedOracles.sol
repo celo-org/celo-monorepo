@@ -5,13 +5,25 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/ISortedOracles.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
+pragma solidity ^0.5.3;
+
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+import "./interfaces/IReserve.sol";
+import "./interfaces/ISortedOracles.sol";
+
+import "../common/FixidityLib.sol";
+import "../common/Initializable.sol";
+import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
-contract SortedOracles is ISortedOracles, Ownable, Initializable {
+contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -42,6 +54,14 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
     _;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**

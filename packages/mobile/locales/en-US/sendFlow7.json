@@ -15,10 +15,12 @@
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "addDescription": "Add description",
   "sentTo": "Sent To",
+  "withdrawnTo": "Withdrawn to",
   "receivedFrom": "Received From",
   "accountNumberLabel": "Account\nNo.",
   "commentLabel": "Message",
   "amountSent": "Amount Sent",
+  "amountCeloWithdrawn": "Amount (CELO)",
   "fee": "Fee",
   "securityFee": "Security Fee",
   "inviteFee": "Invitation Fee",
@@ -37,7 +39,7 @@
   "inviteVerifyPayment": "Invite & Verify Payment",
   "inviteFriends": "Invite Friends",
   "noResultsFor": "No results for",
-  "noContacts": "No contacts found",
+  "noContacts": "No contacts",
   "searchForSomeone": "Search for someone using their name, phone number, or address",
   "pending": "Pending",
   "sentPayment": "Sent Payment",
@@ -113,5 +115,13 @@
   "addressConfirmed": "Account number confirmed",
   "sending": "Sending",
   "feeActual": "Fees",
-  "feeEstimate": "Estimated Fees"
+  "feeEstimate": "Estimated Fees",
+  "encryption": {
+    "warningLabel": "This comment will not be encrypted",
+    "warningModalHeader": "About Encryption",
+    "warningModalBody": "Encryption ensures your comments are kept private. Valora uses encryption on transaction comments when both the sender and receiver have this feature set up. Set up will normally occur automatically once a user sends their first transaction.",
+    "feeLabel": "One-Time Encryption Fee",
+    "feeModalHeader": "One-Time Encryption Fee",
+    "feeModalBody": "Encryption helps keep your sensitive data private. A small one-time fee is added to your first transaction to setup encryption. This ensures your comments will be sent securely and privately."
+  }
 }

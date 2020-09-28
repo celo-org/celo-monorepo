@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress } from '@celo/base/lib/address'
 import { AttestationServiceStatusResponseType, UrlType } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'

@@ -71,6 +71,7 @@ geth:
   azure_mixed_protocols: true
   use_static_ips: true
   readiness_probe_max_block_age_seconds: 30
+  rpc_apis: eth,net,rpc,web3
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:

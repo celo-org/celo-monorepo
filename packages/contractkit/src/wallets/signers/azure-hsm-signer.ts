@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from '../../utils/azure-key-vault-client'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
@@ -55,5 +55,11 @@ export class AzureHSMSigner implements Signer {
 
   getNativeKey(): string {
     return this.keyName
+  }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
   }
 }

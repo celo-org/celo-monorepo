@@ -4,7 +4,6 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -87,7 +86,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   },
                   Object {
                     "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
+                    "borderColor": "#EDEEEF",
                     "borderRadius": 3,
                     "borderWidth": 1,
                     "flex": 0,
@@ -108,7 +107,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 style={
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
+                    "borderColor": "#EDEEEF",
                     "borderRadius": 3,
                     "flex": 1,
                     "fontFamily": "Hind-Regular",
@@ -176,7 +175,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   "justifyContent": "center",
                   "minWidth": 120,
                   "opacity": undefined,
-                  "paddingHorizontal": 16,
+                  "paddingHorizontal": 24,
                   "paddingVertical": 5,
                 }
               }
@@ -653,7 +652,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -737,7 +735,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -759,7 +757,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -789,7 +787,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -811,7 +809,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -841,7 +839,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -863,7 +861,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -893,7 +891,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -915,7 +913,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     style={
                       Object {
                         "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "flex": 1,
                         "fontFamily": "Hind-Regular",
@@ -985,7 +983,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   "justifyContent": "center",
                   "minWidth": 120,
                   "opacity": undefined,
-                  "paddingHorizontal": 16,
+                  "paddingHorizontal": 24,
                   "paddingVertical": 5,
                 }
               }

@@ -1,1 +1,5 @@
 *.sol linguist-language=Solidity
+packages/docs/developer-resources/contractkit/reference/**/*.md  -diff -merge
+packages/docs/developer-resources/contractkit/reference/**/*.md  linguist-generated=true
+packages/docs/command-line-interface/**/*.md  -diff -merge
+packages/docs/command-line-interface/**/*.md  linguist-generated=true

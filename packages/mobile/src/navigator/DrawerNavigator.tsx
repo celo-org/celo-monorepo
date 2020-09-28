@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
-import colorsV2 from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import {
@@ -8,7 +8,6 @@ import {
   DrawerContentComponentProps,
   DrawerContentOptions,
   DrawerContentScrollView,
-  DrawerItem,
 } from '@react-navigation/drawer'
 import {
   DrawerDescriptorMap,
@@ -20,6 +19,7 @@ import {
   DrawerNavigationState,
   useLinkBuilder,
 } from '@react-navigation/native'
+import { TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -48,7 +48,9 @@ import { Gold } from 'src/icons/navigator/Gold'
 import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
 import { Settings } from 'src/icons/navigator/Settings'
+import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
+import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
@@ -91,7 +93,8 @@ function CustomDrawerItemList({
       })
     }
     const onPress = () => {
-      if (protectedRoutes.includes(route.name)) {
+      const activeRouteName = getActiveRouteName(navigation.dangerouslyGetState())
+      if (protectedRoutes.includes(route.name) && activeRouteName !== route.name) {
         // Route should be protected by PIN code
         ensurePincode()
           .then(navigateToItem)
@@ -106,6 +109,7 @@ function CustomDrawerItemList({
     return (
       <DrawerItem
         {...passThroughProps}
+        testID={`DrawerItem/${title}`}
         key={route.key}
         label={drawerLabel !== undefined ? drawerLabel : title !== undefined ? title : route.name}
         icon={drawerIcon}
@@ -185,8 +189,8 @@ export default function DrawerNavigator() {
       drawerContent={drawerContent}
       backBehavior={'initialRoute'}
       drawerContentOptions={{
-        labelStyle: [fontStyles.regular, { marginLeft: -20 }],
-        activeBackgroundColor: colorsV2.gray2,
+        labelStyle: [fontStyles.regular, { marginLeft: -20, fontWeight: 'normal' }],
+        activeBackgroundColor: colors.gray2,
       }}
     >
       <Drawer.Screen
@@ -204,7 +208,11 @@ export default function DrawerNavigator() {
         <Drawer.Screen
           name={Screens.GoldEducation}
           component={GoldEducation}
-          options={{ title: t('celoGold'), drawerIcon: Gold }}
+          options={{
+            title: t('celoGold'),
+            drawerIcon: Gold,
+            ...TransitionPresets.ModalTransition,
+          }}
         />
       )}
       <Drawer.Screen
@@ -246,17 +254,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 12,
     height: 1,
-    backgroundColor: colorsV2.gray2,
+    backgroundColor: colors.gray2,
     alignSelf: 'stretch',
   },
   dollarsLabel: {
     ...fontStyles.small,
-    color: colorsV2.gray4,
+    color: colors.gray4,
     marginTop: 2,
   },
   borderBottom: {
     height: 1,
-    backgroundColor: colorsV2.gray2,
+    backgroundColor: colors.gray2,
     alignSelf: 'stretch',
     marginTop: 12,
     marginBottom: 12,
@@ -276,6 +284,6 @@ const styles = StyleSheet.create({
   },
   smallLabel: {
     ...fontStyles.small,
-    color: colorsV2.gray4,
+    color: colors.gray4,
   },
 })

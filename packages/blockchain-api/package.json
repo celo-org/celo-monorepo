@@ -39,6 +39,9 @@
     "tsc-watch": "^4.2.3",
     "typescript": "^3.8.3"
   },
+  "peerDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev"
+  },
   "resolutions": {
     "**/cross-fetch": "3.0.4"
   }

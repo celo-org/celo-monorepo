@@ -1,6 +1,11 @@
+import { toBool, toNum } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
-export const VERSION = process.env.npm_package_version
+require('dotenv').config()
+
+export function getVersion(): string {
+  return process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+}
 export const DEV_MODE = process.env.NODE_ENV !== 'production'
 
 export const DEV_PUBLIC_KEY =
@@ -29,11 +34,12 @@ interface Config {
     sslKeyPath?: string
     sslCertPath?: string
   }
-  salt: {
+  quota: {
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
     minDollarBalance: BigNumber
+    minCeloBalance: BigNumber
   }
   attestations: {
     numberAttestationsRequired: number
@@ -72,10 +78,6 @@ interface Config {
   }
 }
 
-const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
-const toBool = (value: string | undefined, fallback: boolean) =>
-  value ? value.toLowerCase() === 'true' : fallback
-
 const env = process.env as any
 const config: Config = {
   server: {
@@ -83,11 +85,14 @@ const config: Config = {
     sslKeyPath: env.SERVER_SSL_KEY_PATH,
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
-  salt: {
-    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX) || 2,
-    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
-    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION) || 2,
-    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE || 100000000000000000),
+  quota: {
+    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 2,
+    additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
+    queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
+    // Min balance is .01 cUSD
+    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    // Min balance is .005 CELO
+    minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
   },
   attestations: {
     numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,

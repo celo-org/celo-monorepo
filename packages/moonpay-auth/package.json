@@ -7,9 +7,10 @@
   "main": "dist/index.js",
   "scripts": {
     "serve": "firebase serve --only functions",
-    "copy-env-to-firebase": "firebase functions:config:set envs.public_key=$(grep PUBLIC_KEY .env | cut -d '=' -f 2-) envs.private_key=$(grep PRIVATE_KEY .env | cut -d '=' -f 2-)",
-    "predeploy": "yarn copy-env-to-firebase",
-    "deploy": "firebase deploy --only functions",
+    "update-firebase-config:prod": "firebase functions:config:set envs.public_key_staging=$(grep PUBLIC_KEY_STAGING .env | cut -d '=' -f 2-) envs.secret_key_staging=$(grep SECRET_KEY_STAGING .env | cut -d '=' -f 2-)",
+    "update-firebase-config:staging": "firebase functions:config:set envs.public_key_prod=$(grep PUBLIC_KEY_PROD .env | cut -d '=' -f 2-) envs.secret_key_prod=$(grep SECRET_KEY_PROD .env | cut -d '=' -f 2-)",
+    "deploy:prod": "firebase use prod && yarn update-firebase-config:prod && firebase deploy --only functions:signMoonpayProd",
+    "deploy:staging": "firebase use default && yarn update-firebase-config:staging && firebase deploy --only functions:signMoonpayStaging",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project ."

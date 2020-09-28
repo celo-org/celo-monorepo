@@ -1,6 +1,5 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import colors from '@celo/react-components/styles/colors'
-import variables from '@celo/react-components/styles/variables'
 import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -40,8 +39,6 @@ import { initializeSentryUserContext } from 'src/sentry/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
   loading: boolean
@@ -165,13 +162,13 @@ export class WalletHome extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, activeNotificationCount, callToActNotification } = this.props
+    const { activeNotificationCount, callToActNotification } = this.props
 
     const refresh: React.ReactElement<RefreshControlProps> = (
       <RefreshControl
         refreshing={this.props.loading}
         onRefresh={this.onRefresh}
-        colors={[colors.celoGreen]}
+        colors={[colors.greenUI]}
       />
     ) as React.ReactElement<RefreshControlProps>
 
@@ -185,7 +182,6 @@ export class WalletHome extends React.Component<Props, State> {
     }
 
     sections.push({
-      title: t('activity'),
       data: [{}],
       renderItem: () => (
         <TransactionsList key={'TransactionList'} currency={CURRENCY_ENUM.DOLLAR} />
@@ -225,31 +221,7 @@ export class WalletHome extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     position: 'relative',
-  },
-  banner: { paddingVertical: 15, marginTop: 50 },
-  containerFeed: {
-    paddingBottom: 40,
-  },
-  header: {
-    backgroundColor: colors.background,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  headerRight: {
-    position: 'absolute',
-    top: 0,
-    right: variables.contentPadding - HEADER_BUTTON_MARGIN,
-    bottom: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerButton: {
-    justifyContent: 'flex-end',
-    margin: HEADER_BUTTON_MARGIN,
   },
 })
 

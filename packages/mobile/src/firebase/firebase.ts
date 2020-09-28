@@ -7,18 +7,13 @@ import '@react-native-firebase/messaging'
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
-import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState } from 'src/account/types'
-import { showError } from 'src/alert/actions'
-import { RequestEvents } from 'src/analytics/Events'
-import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { call, select, spawn, take } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
-import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { NotificationReceiveState } from 'src/notifications/types'
 import Logger from 'src/utils/Logger'
+import { Awaited } from 'src/utils/typescript'
 
 const TAG = 'firebase/firebase'
 
@@ -78,12 +73,20 @@ export const initializeAuth = async (app: ReactNativeFirebase.Module, address: s
   Logger.info(TAG, 'Firebase Auth initialized successfully')
 }
 
+export const firebaseSignOut = async (app: ReactNativeFirebase.FirebaseApp) => {
+  await app.auth().signOut()
+}
+
 export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, address: string) {
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
 
   // this call needs to include context: https://github.com/redux-saga/redux-saga/issues/27
-  const enabled = yield call([app.messaging(), 'hasPermission'])
-  if (!enabled) {
+  // Manual type checking because yield calls can't infer return type yet :'(
+  const authStatus: Awaited<ReturnType<
+    FirebaseMessagingTypes.Module['hasPermission']
+  >> = yield call([app.messaging(), 'hasPermission'])
+  Logger.info(TAG, 'Current messaging authorization status', authStatus.toString())
+  if (authStatus === firebase.messaging.AuthorizationStatus.NOT_DETERMINED) {
     try {
       yield call([app.messaging(), 'requestPermission'])
     } catch (error) {
@@ -110,8 +113,8 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
 
   // Listen for notification messages while the app is open
   const channelOnNotification: EventChannel<NotificationChannelEvent> = eventChannel((emitter) => {
-    const unsuscribe = () => {
-      Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
+    const unsubscribe = () => {
+      Logger.info(TAG, 'Notification channel closed, resetting callbacks. This is likely an error.')
       app.messaging().onMessage(() => null)
       app.messaging().onNotificationOpenedApp(() => null)
     }
@@ -131,7 +134,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
         stateType: NotificationReceiveState.APP_FOREGROUNDED,
       })
     })
-    return unsuscribe
+    return unsubscribe
   })
   yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
@@ -166,20 +169,6 @@ export const registerTokenToDb = async (
   } catch (error) {
     Logger.error(TAG, 'Failed to register Firebase FCM token', error)
     throw error
-  }
-}
-
-export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
-  try {
-    Logger.info(TAG, `Writing pending request to database`)
-    const pendingRequestRef = firebase.database().ref(`pendingRequests`)
-    yield call(() => pendingRequestRef.push(paymentInfo))
-
-    navigateHome()
-  } catch (error) {
-    Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
-    ValoraAnalytics.track(RequestEvents.request_error, { error: error.message })
-    yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
   }
 }
 

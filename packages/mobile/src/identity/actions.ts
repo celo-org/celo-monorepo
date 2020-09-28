@@ -4,6 +4,7 @@ import {
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
+  UpdatableVerificationState,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -15,6 +16,7 @@ export enum Actions {
   RESET_VERIFICATION = 'IDENTITY/RESET_VERIFICATION',
   SET_VERIFICATION_STATUS = 'IDENTITY/SET_VERIFICATION_STATUS',
   SET_SEEN_VERIFICATION_NUX = 'IDENTITY/SET_SEEN_VERIFICATION_NUX',
+  SET_COMPLETED_CODES = 'IDENTITY/SET_COMPLETED_CODES',
   REVOKE_VERIFICATION = 'IDENTITY/REVOKE_VERIFICATION',
   RECEIVE_ATTESTATION_MESSAGE = 'IDENTITY/RECEIVE_ATTESTATION_MESSAGE',
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
@@ -22,19 +24,26 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
+  END_FETCHING_ADDRESSES = 'IDENTITY/END_FETCHING_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
   UPDATE_IMPORT_CONTACT_PROGRESS = 'IDENTITY/UPDATE_IMPORT_CONTACT_PROGRESS',
   CANCEL_IMPORT_CONTACTS = 'IDENTITY/CANCEL_IMPORT_CONTACTS',
   END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
   ADD_CONTACT_MATCHES = 'IDENTITY/ADD_CONTACT_MATCHES',
-  VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
-  VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
-  REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
+  VALIDATE_RECIPIENT_ADDRESS = 'IDENTITY/VALIDATE_RECIPIENT_ADDRESS',
+  VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'IDENTITY/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
+  VALIDATE_RECIPIENT_ADDRESS_RESET = 'IDENTITY/VALIDATE_RECIPIENT_ADDRESS_RESET',
+  REQUIRE_SECURE_SEND = 'IDENTITY/REQUIRE_SECURE_SEND',
+  FETCH_DATA_ENCRYPTION_KEY = 'IDENTITY/FETCH_DATA_ENCRYPTION_KEY',
+  UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
+  FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
+  UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
 }
 
 export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
+  withoutRevealing: boolean
 }
 
 export interface SetVerificationStatusAction {
@@ -65,6 +74,11 @@ export interface ReceiveAttestationMessageAction {
   inputType: CodeInputType
 }
 
+export interface SetCompletedCodesAction {
+  type: Actions.SET_COMPLETED_CODES
+  numComplete: number
+}
+
 export interface InputAttestationCodeAction {
   type: Actions.INPUT_ATTESTATION_CODE
   code: AttestationCode
@@ -72,7 +86,7 @@ export interface InputAttestationCodeAction {
 
 export interface CompleteAttestationCodeAction {
   type: Actions.COMPLETE_ATTESTATION_CODE
-  numComplete: number
+  code: AttestationCode
 }
 
 export interface UpdateE164PhoneNumberAddressesAction {
@@ -88,6 +102,12 @@ export interface UpdateE164PhoneNumberSaltAction {
 
 export interface FetchAddressesAndValidateAction {
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS
+  e164Number: string
+  requesterAddress?: string
+}
+
+export interface EndFetchingAddressesAction {
+  type: Actions.END_FETCHING_ADDRESSES
   e164Number: string
 }
 
@@ -126,6 +146,7 @@ export interface ValidateRecipientAddressAction {
   userInputOfFullAddressOrLastFourDigits: string
   addressValidationType: AddressValidationType
   recipient: Recipient
+  requesterAddress?: string
 }
 
 export interface ValidateRecipientAddressSuccessAction {
@@ -134,10 +155,35 @@ export interface ValidateRecipientAddressSuccessAction {
   validatedAddress: string
 }
 
+export interface ValidateRecipientAddressResetAction {
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_RESET
+  e164Number: string
+}
+
 export interface RequireSecureSendAction {
   type: Actions.REQUIRE_SECURE_SEND
   e164Number: E164Number
   addressValidationType: AddressValidationType
+}
+
+export interface FetchDataEncryptionKeyAction {
+  type: Actions.FETCH_DATA_ENCRYPTION_KEY
+  address: string
+}
+
+export interface UpdateAddressDekMapAction {
+  type: Actions.UPDATE_ADDRESS_DEK_MAP
+  address: string
+  dataEncryptionKey: string | null
+}
+
+export interface FetchVerificationState {
+  type: Actions.FETCH_VERIFICATION_STATE
+}
+
+export interface UpdateVerificationState {
+  type: Actions.UPDATE_VERIFICATION_STATE
+  state: UpdatableVerificationState
 }
 
 export type ActionTypes =
@@ -146,6 +192,7 @@ export type ActionTypes =
   | ResetVerificationAction
   | SetVerificationStatusAction
   | SetHasSeenVerificationNux
+  | SetCompletedCodesAction
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
@@ -158,10 +205,18 @@ export type ActionTypes =
   | AddContactMatchesAction
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
+  | ValidateRecipientAddressResetAction
   | RequireSecureSendAction
+  | FetchAddressesAndValidateAction
+  | EndFetchingAddressesAction
+  | FetchDataEncryptionKeyAction
+  | UpdateAddressDekMapAction
+  | FetchVerificationState
+  | UpdateVerificationState
 
-export const startVerification = (): StartVerificationAction => ({
+export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
+  withoutRevealing,
 })
 
 export const cancelVerification = (): CancelVerificationAction => ({
@@ -195,20 +250,32 @@ export const receiveAttestationMessage = (
   inputType,
 })
 
+export const setCompletedCodes = (numComplete: number): SetCompletedCodesAction => ({
+  type: Actions.SET_COMPLETED_CODES,
+  numComplete,
+})
+
 export const inputAttestationCode = (code: AttestationCode): InputAttestationCodeAction => ({
   type: Actions.INPUT_ATTESTATION_CODE,
   code,
 })
 
-export const completeAttestationCode = (
-  numComplete: number = 1
-): CompleteAttestationCodeAction => ({
+export const completeAttestationCode = (code: AttestationCode): CompleteAttestationCodeAction => ({
   type: Actions.COMPLETE_ATTESTATION_CODE,
-  numComplete,
+  code,
 })
 
-export const fetchAddressesAndValidate = (e164Number: string): FetchAddressesAndValidateAction => ({
+export const fetchAddressesAndValidate = (
+  e164Number: string,
+  requesterAddress?: string
+): FetchAddressesAndValidateAction => ({
   type: Actions.FETCH_ADDRESSES_AND_VALIDATION_STATUS,
+  e164Number,
+  requesterAddress,
+})
+
+export const endFetchingAddresses = (e164Number: string): EndFetchingAddressesAction => ({
+  type: Actions.END_FETCHING_ADDRESSES,
   e164Number,
 })
 
@@ -265,12 +332,14 @@ export const addContactsMatches = (matches: ContactMatches): AddContactMatchesAc
 export const validateRecipientAddress = (
   userInputOfFullAddressOrLastFourDigits: string,
   addressValidationType: AddressValidationType,
-  recipient: Recipient
+  recipient: Recipient,
+  requesterAddress?: string
 ): ValidateRecipientAddressAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS,
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 })
 
 export const validateRecipientAddressSuccess = (
@@ -282,6 +351,13 @@ export const validateRecipientAddressSuccess = (
   validatedAddress,
 })
 
+export const validateRecipientAddressReset = (
+  e164Number: E164Number
+): ValidateRecipientAddressResetAction => ({
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_RESET,
+  e164Number,
+})
+
 export const requireSecureSend = (
   e164Number: E164Number,
   addressValidationType: AddressValidationType
@@ -289,4 +365,29 @@ export const requireSecureSend = (
   type: Actions.REQUIRE_SECURE_SEND,
   e164Number,
   addressValidationType,
+})
+
+export const fetchDataEncryptionKey = (address: string): FetchDataEncryptionKeyAction => ({
+  type: Actions.FETCH_DATA_ENCRYPTION_KEY,
+  address,
+})
+
+export const updateAddressDekMap = (
+  address: string,
+  dataEncryptionKey: string | null
+): UpdateAddressDekMapAction => ({
+  type: Actions.UPDATE_ADDRESS_DEK_MAP,
+  address,
+  dataEncryptionKey,
+})
+
+export const fetchVerificationState = (): FetchVerificationState => ({
+  type: Actions.FETCH_VERIFICATION_STATE,
+})
+
+export const udpateVerificationState = (
+  state: UpdatableVerificationState
+): UpdateVerificationState => ({
+  type: Actions.UPDATE_VERIFICATION_STATE,
+  state,
 })

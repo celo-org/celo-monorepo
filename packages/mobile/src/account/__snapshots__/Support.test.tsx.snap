@@ -4,7 +4,6 @@ exports[`Support renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -17,14 +16,22 @@ exports[`Support renders correctly 1`] = `
         "borderBottomColor": 0,
         "borderBottomWidth": 1,
         "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
+        "height": 56,
+        "justifyContent": "center",
       }
     }
   >
     <View
       accessible={true}
       focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -34,12 +41,15 @@ exports[`Support renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
+          "left": 0,
           "marginBottom": 0,
-          "marginLeft": 4,
+          "marginLeft": 16,
           "opacity": 1,
-          "padding": 8,
+          "padding": 0,
+          "position": "absolute",
         }
       }
+      testID="Hamburguer"
     >
       <svg
         fill="none"
@@ -76,13 +86,6 @@ exports[`Support renders correctly 1`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Object {
-          "width": 45,
-        }
-      }
-    />
   </View>
   <RCTScrollView>
     <View>
@@ -174,6 +177,14 @@ exports[`Support renders correctly 1`] = `
                     faq
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -245,6 +256,14 @@ exports[`Support renders correctly 1`] = `
                     forum
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -316,6 +335,14 @@ exports[`Support renders correctly 1`] = `
                     contact
                   </Text>
                 </View>
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                    }
+                  }
+                />
               </View>
             </View>
           </View>

@@ -1,17 +1,15 @@
+import Pagination from '@celo/react-components/components/Pagination'
 import SimpleMessagingCard from '@celo/react-components/components/SimpleMessagingCard'
-import progressDotsStyle from '@celo/react-components/styles/progressDots'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
-import { dismissEarnRewards, dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
-import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequest } from 'src/account/types'
+import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from 'src/account/actions'
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { PROMOTE_REWARDS_APP } from 'src/config'
+import { verificationPossibleSelector } from 'src/app/selectors'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
@@ -24,9 +22,13 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/IncomingPaymentRequestSummaryNotification'
 import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/OutgoingPaymentRequestSummaryNotification'
+import {
+  getIncomingPaymentRequests,
+  getOutgoingPaymentRequests,
+} from 'src/paymentRequest/selectors'
+import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
-import { navigateToVerifierApp } from 'src/utils/linking'
 
 export enum NotificationBannerTypes {
   incoming_tx_request = 'incoming_tx_request',
@@ -34,7 +36,6 @@ export enum NotificationBannerTypes {
   escrow_tx_summary = 'escrow_tx_summary',
   escrow_tx_pending = 'escrow_tx_pending',
   celo_asset_education = 'celo_asset_education',
-  celo_rewards_education = 'celo_rewards_education',
   invite_prompt = 'invite_prompt',
   verification_prompt = 'verification_prompt',
   backup_prompt = 'backup_prompt',
@@ -53,9 +54,10 @@ interface StateProps {
   backupCompleted: boolean
   numberVerified: boolean
   goldEducationCompleted: boolean
-  dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  verificationPossible: boolean
+  dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
@@ -64,9 +66,9 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  dismissEarnRewards: typeof dismissEarnRewards
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
+  dismissGoldEducation: typeof dismissGoldEducation
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -77,18 +79,19 @@ const mapStateToProps = (state: RootState): StateProps => ({
   goldEducationCompleted: state.goldToken.educationCompleted,
   incomingPaymentRequests: getIncomingPaymentRequests(state),
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
-  dismissedEarnRewards: state.account.dismissedEarnRewards,
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
+  verificationPossible: verificationPossibleSelector(state),
+  dismissedGoldEducation: state.account.dismissedGoldEducation,
   backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
   invitees: inviteesSelector(state),
 })
 
 const mapDispatchToProps = {
-  dismissEarnRewards,
   dismissInviteFriends,
   dismissGetVerified,
+  dismissGoldEducation,
 }
 
 interface State {
@@ -140,15 +143,16 @@ export class NotificationBox extends React.Component<Props, State> {
       backupCompleted,
       numberVerified,
       goldEducationCompleted,
-      dismissedEarnRewards,
       dismissedInviteFriends,
       dismissedGetVerified,
+      verificationPossible,
+      dismissedGoldEducation,
     } = this.props
     const actions = []
 
     if (!backupCompleted) {
       actions.push({
-        title: t('backupKeyFlow6:yourBackupKey'),
+        title: t('backupKeyFlow6:yourAccountKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
         icon: backupKey,
         callToActions: [
@@ -166,7 +170,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedGetVerified && !numberVerified) {
+    if (!dismissedGetVerified && !numberVerified && verificationPossible) {
       actions.push({
         title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
@@ -179,11 +183,13 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.verification_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.VerificationEducationScreen)
+              navigate(Screens.VerificationEducationScreen, {
+                hideOnboardingStep: true,
+              })
             },
           },
           {
-            text: t('global:remind'),
+            text: t('global:dismiss'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.verification_prompt,
@@ -196,38 +202,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedEarnRewards && PROMOTE_REWARDS_APP) {
-      actions.push({
-        title: t('walletFlow5:earnCeloRewards'),
-        text: t('walletFlow5:earnCeloGold'),
-        icon: null,
-        callToActions: [
-          {
-            text: t('walletFlow5:startEarning'),
-            onPress: () => {
-              this.props.dismissEarnRewards()
-              ValoraAnalytics.track(HomeEvents.notification_select, {
-                notificationType: NotificationBannerTypes.celo_rewards_education,
-                selectedAction: NotificationBannerCTATypes.accept,
-              })
-              navigateToVerifierApp()
-            },
-          },
-          {
-            text: t('maybeLater'),
-            onPress: () => {
-              this.props.dismissEarnRewards()
-              ValoraAnalytics.track(HomeEvents.notification_select, {
-                notificationType: NotificationBannerTypes.celo_rewards_education,
-                selectedAction: NotificationBannerCTATypes.decline,
-              })
-            },
-          },
-        ],
-      })
-    }
-
-    if (!goldEducationCompleted) {
+    if (!dismissedGoldEducation && !goldEducationCompleted) {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
@@ -250,6 +225,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.celo_asset_education,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
+              this.props.dismissGoldEducation()
             },
           },
         ],
@@ -288,28 +264,6 @@ export class NotificationBox extends React.Component<Props, State> {
     }
 
     return actions.map((notification, i) => <SimpleMessagingCard key={i} {...notification} />)
-  }
-
-  paginationDots = (notifications: Array<React.ReactElement<any>>) => {
-    if (notifications.length < 2) {
-      return null
-    }
-    return (
-      <View style={styles.pagination}>
-        {notifications.map((n, i) => {
-          return (
-            <View
-              key={i}
-              style={
-                this.state.currentIndex === i
-                  ? progressDotsStyle.circleActive
-                  : progressDotsStyle.circlePassive
-              }
-            />
-          )
-        })}
-      </View>
-    )
   }
 
   handleScroll = (event: { nativeEvent: NativeScrollEvent }) => {
@@ -354,7 +308,11 @@ export class NotificationBox extends React.Component<Props, State> {
             </View>
           ))}
         </ScrollView>
-        {this.paginationDots(notifications)}
+        <Pagination
+          style={styles.pagination}
+          count={notifications.length}
+          activeIndex={this.state.currentIndex}
+        />
       </View>
     )
   }
@@ -371,11 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 24, // Enough space so the shadow is not clipped
   },
   pagination: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
     paddingBottom: variables.contentPadding,
-    alignItems: 'center',
   },
 })
 

@@ -25,7 +25,7 @@ exports[`RecipientItem renders correctly 1`] = `
         "alignItems": "center",
         "flex": 1,
         "flexDirection": "row",
-        "height": 80,
+        "height": 64,
         "justifyContent": "space-between",
         "paddingHorizontal": 16,
       }

@@ -1,5 +1,5 @@
-import { Address } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
+import { Address } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
 import { ABIDefinition } from 'web3-eth-abi'
 import { AllContracts } from '../base'
 import { ContractKit } from '../kit'

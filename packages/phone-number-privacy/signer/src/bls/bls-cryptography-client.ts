@@ -1,5 +1,5 @@
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import { ErrorMessage } from '../common/error-utils'
 import logger from '../common/logger'
 
 /*

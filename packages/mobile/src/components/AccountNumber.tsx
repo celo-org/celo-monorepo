@@ -1,9 +1,10 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getAddressChunks } from '@celo/utils/src/address'
+import Clipboard from '@react-native-community/clipboard'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
@@ -47,7 +48,11 @@ export default function AccountNumber({ address, touchDisabled, location }: Prop
   return touchDisabled ? (
     <View style={styles.container}>{formattedAddress}</View>
   ) : (
-    <TouchableOpacity style={styles.container} onPress={onPressAddress}>
+    <TouchableOpacity
+      style={styles.container}
+      onLongPress={onPressAddress}
+      onPress={onPressAddress}
+    >
       {formattedAddress}
     </TouchableOpacity>
   )

@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
-import FeeIcon from 'src/components/FeeIcon'
+import { SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -164,7 +164,7 @@ export class InviteReview extends React.Component<Props, State> {
         />
         {inviteInProgress && (
           <View style={styles.loadingIcon}>
-            <ActivityIndicator size="large" color={colors.celoGreen} />
+            <ActivityIndicator size="large" color={colors.greenBrand} />
           </View>
         )}
       </View>
@@ -227,7 +227,7 @@ export class InviteReview extends React.Component<Props, State> {
                     />
                     <LineItemRow
                       title={t('sendFlow7:securityFee')}
-                      titleIcon={<FeeIcon />}
+                      titleIcon={<SecurityFeeIcon />}
                       amount={
                         securityFeeAmount && (
                           <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
@@ -255,9 +255,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingBottom: 25,
   },
-  editContainer: {
-    flexDirection: 'row',
-  },
   bottomContainer: {
     marginTop: 5,
     flexDirection: 'column',
@@ -274,7 +271,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 })
 

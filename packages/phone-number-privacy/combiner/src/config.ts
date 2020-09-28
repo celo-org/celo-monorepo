@@ -1,3 +1,4 @@
+import { toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import logger from './common/logger'
 
@@ -23,7 +24,7 @@ interface Config {
     host: string
     ssl: boolean
   }
-  pgpnpServices: {
+  odisServices: {
     signers: string
     timeoutMilliSeconds: number
   }
@@ -48,7 +49,7 @@ if (DEV_MODE) {
       host: 'fakeHost',
       ssl: false,
     },
-    pgpnpServices: {
+    odisServices: {
       signers: '[{"url": "http://localhost:3000"}]',
       timeoutMilliSeconds: 5 * 1000,
     },
@@ -68,12 +69,11 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
-      // Cody TODO: replace with combined lib version once it's published
-      ssl: functionConfig.db.ssl ? functionConfig.db.ssl.toLowerCase() === 'true' : true,
+      ssl: toBool(functionConfig.db.ssl, true),
     },
-    pgpnpServices: {
-      signers: functionConfig.pgpnpservices.signers,
-      timeoutMilliSeconds: functionConfig.pgpnpservices.timeoutMilliSeconds || 5 * 1000,
+    odisServices: {
+      signers: functionConfig.odisservices.signers,
+      timeoutMilliSeconds: functionConfig.odisservices.timeoutMilliSeconds || 5 * 1000,
     },
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,

@@ -1,4 +1,10 @@
-import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import {
+  normalizeAddressWith0x,
+  privateKeyToAddress,
+  privateKeyToPublicKey,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
+import { Encrypt } from '@celo/utils/lib/ecies'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -48,6 +54,7 @@ const TYPED_DATA = {
 }
 
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+const PUBLIC_KEY1 = privateKeyToPublicKey(PRIVATE_KEY1)
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
@@ -206,6 +213,28 @@ describe('Local wallet class', () => {
             const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
             expect(valid).toBeTruthy()
           })
+        })
+      })
+    })
+
+    describe('decryption', () => {
+      describe('using an unknown address', () => {
+        test('fails calling decrypt', async () => {
+          await expect(
+            wallet.decrypt(ACCOUNT_ADDRESS2, Buffer.from('anything'))
+          ).rejects.toThrowError()
+        })
+      })
+
+      describe('using a known address', () => {
+        test('properly decrypts the ciphertext', async () => {
+          const plaintext = 'test_plaintext'
+          const ciphertext = Encrypt(
+            Buffer.from(trimLeading0x(PUBLIC_KEY1), 'hex'),
+            Buffer.from(plaintext)
+          )
+          const decryptedPlaintext = await wallet.decrypt(ACCOUNT_ADDRESS1, ciphertext)
+          expect(decryptedPlaintext.toString()).toEqual(plaintext)
         })
       })
     })

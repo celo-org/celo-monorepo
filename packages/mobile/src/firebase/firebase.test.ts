@@ -1,3 +1,4 @@
+import firebase from '@react-native-firebase/app'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
@@ -48,7 +49,10 @@ describe(initializeCloudMessaging, () => {
 
     await expectSaga(initializeCloudMessaging, app, address)
       .provide([
-        [call([app.messaging(), 'hasPermission']), false],
+        [
+          call([app.messaging(), 'hasPermission']),
+          firebase.messaging.AuthorizationStatus.NOT_DETERMINED,
+        ],
         [call([app.messaging(), 'requestPermission']), throwError(errorToRaise)],
         {
           spawn(effect, next) {

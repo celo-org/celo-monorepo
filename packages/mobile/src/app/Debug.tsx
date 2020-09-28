@@ -1,6 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Clipboard from '@react-native-community/clipboard'
 import * as React from 'react'
-import { Clipboard, StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
@@ -115,7 +116,6 @@ const style = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
   },
   singleLine: {
     marginTop: 5,

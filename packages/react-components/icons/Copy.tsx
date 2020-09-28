@@ -12,7 +12,7 @@ export default class Copy extends React.PureComponent<Props> {
   static defaultProps = {
     width: 20,
     height: 25,
-    color: colors.white,
+    color: colors.light,
   }
 
   render() {

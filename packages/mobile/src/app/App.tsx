@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { DeviceEventEmitter, Linking, Platform, StatusBar, YellowBox } from 'react-native'
+import { Dimensions, Linking, StatusBar, YellowBox } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
@@ -37,6 +37,10 @@ BigNumber.config({
   },
 })
 
+interface Props {
+  appStartedMillis: number
+}
+
 // Enables LayoutAnimation on Android. It makes transitions between states smoother.
 // https://reactnative.dev/docs/layoutanimation
 // Disabling it for now as it seems to cause blank white screens on certain android devices
@@ -44,26 +48,33 @@ BigNumber.config({
 //   UIManager.setLayoutAnimationEnabledExperimental(true)
 // }
 
-export class App extends React.Component {
+export class App extends React.Component<Props> {
+  reactLoadTime: number = Date.now()
+
   async componentDidMount() {
     await ValoraAnalytics.init()
-    const appLoadedAt: Date = new Date()
-
-    if (Platform.OS === 'android') {
-      const appStartListener = DeviceEventEmitter.addListener(
-        'AppStartedLoading',
-        (appInitializedAtString: string) => {
-          const appInitializedAt = new Date(appInitializedAtString)
-          const loadingDuration = appLoadedAt.getTime() - appInitializedAt.getTime()
-          ValoraAnalytics.startSession(AppEvents.app_launched, { loadingDuration })
-          appStartListener.remove()
-        }
-      )
-    } else {
-      ValoraAnalytics.startSession(AppEvents.app_launched, {})
-    }
 
     Linking.addEventListener('url', this.handleOpenURL)
+
+    this.logAppLoadTime()
+  }
+
+  logAppLoadTime() {
+    const { appStartedMillis } = this.props
+    const reactLoadDuration = (this.reactLoadTime - appStartedMillis) / 1000
+    const appLoadDuration = (Date.now() - appStartedMillis) / 1000
+    Logger.debug(
+      'App/logAppLoadTime',
+      `reactLoad: ${reactLoadDuration} appLoad: ${appLoadDuration}`
+    )
+    const { width, height } = Dimensions.get('window')
+
+    ValoraAnalytics.startSession(AppEvents.app_launched, {
+      deviceHeight: height,
+      deviceWidth: width,
+      reactLoadDuration,
+      appLoadDuration,
+    })
   }
 
   componentWillUnmount() {

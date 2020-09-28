@@ -25,11 +25,14 @@ export enum HomeEvents {
 export enum SettingsEvents {
   settings_profile_edit = 'settings_profile_edit',
   settings_profile_name_edit = 'settings_profile_name_edit',
+  settings_verify_number = 'settings_verify_number',
   language_select = 'language_select',
   pin_require_on_load = 'pin_require_on_load',
   forno_toggle = 'forno_toggle',
   licenses_view = 'licenses_view',
   tos_view = 'tos_view',
+  start_account_removal = 'start_account_removal',
+  completed_account_removal = 'completed_account_removal',
   // intentionally not tracking analytics opt in/out
   // to avoid tracking through omission
 }
@@ -39,6 +42,12 @@ export enum OnboardingEvents {
   onboarding_education_scroll = 'onboarding_education_scroll',
   onboarding_education_complete = 'onboarding_education_complete',
   onboarding_education_cancel = 'onboarding_education_cancel',
+
+  create_account_start = 'create_account_start',
+  create_account_cancel = 'create_account_cancel',
+
+  restore_account_start = 'create_account_start',
+  restore_account_cancel = 'create_account_cancel',
 
   backup_education_start = 'backup_education_start',
   backup_education_scroll = 'backup_education_scroll',
@@ -79,8 +88,11 @@ export enum OnboardingEvents {
 
   invite_redeem_start = 'invite_redeem_start',
   invite_redeem_complete = 'invite_redeem_complete',
+  invite_redeem_cancel = 'invite_redeem_cancel',
   invite_redeem_timeout = 'invite_redeem_timeout',
   invite_redeem_error = 'invite_redeem_error',
+  invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
+  invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
   invite_redeem_skip_start = 'invite_redeem_skip_start',
   invite_redeem_skip_complete = 'invite_redeem_skip_complete',
@@ -89,6 +101,11 @@ export enum OnboardingEvents {
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
+
+  account_dek_register_start = 'account_dek_register_start',
+  account_dek_register_account_unlocked = 'account_dek_register_account_unlocked',
+  account_dek_register_account_checked = 'account_dek_register_account_checked',
+  account_dek_register_complete = 'account_dek_register_complete',
 }
 
 export enum VerificationEvents {
@@ -118,7 +135,6 @@ export enum VerificationEvents {
   verification_code_received = 'verification_code_received',
   verification_code_validate_start = 'verification_code_validate_start',
   verification_code_validate_complete = 'verification_code_validate_complete',
-  verification_account_set = 'verification_account_set',
 
   verification_reveal_all_attestations_start = 'verification_reveal_all_attestations_start',
   verification_reveal_all_attestations_complete = 'verification_reveal_all_attestations_complete',
@@ -188,7 +204,7 @@ export enum SendEvents {
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_amount_continue = 'send_amount_continue', // when next button pressed on amount enter page
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
-  send_confim_send = 'send_confim_send', // when send button pressed on send confirmation screen
+  send_confirm_send = 'send_confirm_send', // when send button pressed on send confirmation screen
 
   send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
   send_secure_back = 'send_secure_back', // when back button is pressed during secure send
@@ -231,6 +247,7 @@ export enum TransactionEvents {
   transaction_gas_estimated = 'transaction_gas_estimated',
   transaction_hash_received = 'transaction_hash_received',
   transaction_receipt_received = 'transaction_receipt_received',
+  transaction_confirmed = 'transaction_confirmed',
   transaction_error = 'transaction_error',
   transaction_exception = 'transaction_exception',
 }
@@ -239,6 +256,7 @@ export enum CeloExchangeEvents {
   celo_home_info = 'celo_home_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
   celo_home_buy = 'celo_home_buy', // when the “Buy” button is clicked
   celo_home_sell = 'celo_home_sell', // when the “Sell” button is clicked
+  celo_home_withdraw = 'celo_home_withdraw', // when the “Withdraw” button is clicked
   celo_transaction_select = 'celo_transaction_select', // when an transaction item is clicked
   celo_transaction_back = 'celo_transaction_back', // when back caret is clicked from drilldown
 
@@ -261,14 +279,55 @@ export enum CeloExchangeEvents {
   celo_fetch_exchange_rate_start = 'celo_fetch_exchange_rate_start',
   celo_fetch_exchange_rate_complete = 'celo_fetch_exchange_rate_complete',
   celo_fetch_exchange_rate_error = 'celo_fetch_exchange_rate_error',
+
+  celo_withdraw_review = 'celo_withdraw_review', // when ‘review’ is clicked on the withdraw amount screen
+  celo_withdraw_edit = 'celo_withdraw_edit', // when ‘edit’ is clicked on the review screen
+  celo_withdraw_cancel = 'celo_withdraw_cancel', // when ’cancel’ is clicked on the review screen
+  celo_withdraw_confirm = 'celo_withdraw_confirm', // when ‘withdraw’ is clicked on the review screen
+  celo_withdraw_completed = 'celo_withdraw_completed', // when the transaction for the withdrawal is completed
+  celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
+  geth_init_start = 'geth_init_start',
   geth_init_success = 'geth_init_success',
   geth_init_failure = 'geth_init_failure',
   geth_restart_to_fix_init = 'geth_restart_to_fix_init',
   prompt_forno = 'prompt_forno',
+  create_geth_start = 'create_geth_start',
+  create_geth_finish = 'create_geth_finish',
+  create_geth_error = 'create_geth_error',
+  start_geth_start = 'start_geth_start',
+  start_geth_finish = 'start_geth_finish',
+}
+
+export enum NetworkEvents {
+  // Events triggered when the app detects it is connected or disconnected from the Celo network.
+  network_connected = 'network_connected',
+  network_disconnected = 'network_disconnected',
+
+  // Events triggered when the app detects it loses or restores sync with the Celo network.
+  network_sync_lost = 'network_sync_lost',
+  network_sync_restored = 'network_sync_restored',
+
+  // Events triggered during a syncing or waiting to start syncing.
+  network_sync_waiting = 'network_sync_waiting',
+  network_sync_start = 'network_sync_start',
+  network_sync_finish = 'network_sync_finish',
+  network_sync_error = 'network_sync_error',
+}
+
+export enum ContractKitEvents {
+  init_contractkit_start = 'init_contractkit_start',
+  init_contractkit_geth_init_start = 'init_contractkit_geth_init_start',
+  init_contractkit_geth_init_finish = 'init_contractkit_geth_init_finish',
+  init_contractkit_get_ipc_start = 'init_contractkit_get_ipc_start',
+  init_contractkit_get_ipc_finish = 'init_contractkit_get_ipc_finish',
+  init_contractkit_get_wallet_start = 'init_contractkit_get_wallet_start',
+  init_contractkit_get_wallet_finish = 'init_contractkit_get_wallet_finish',
+  init_contractkit_init_wallet_finish = 'init_contractkit_init_wallet_finish',
+  init_contractkit_finish = 'init_contractkit_finish',
 }
 
 export type AnalyticsEventType =
@@ -286,3 +345,4 @@ export type AnalyticsEventType =
   | TransactionEvents
   | CeloExchangeEvents
   | GethEvents
+  | NetworkEvents

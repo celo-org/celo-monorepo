@@ -1,11 +1,12 @@
 import { Response } from 'node-fetch'
+import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { authenticateUser, isVerified } from '../src/common/identity'
 import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
-import { getContactMatches, getDistributedBlindedSalt } from '../src/index'
+import { getBlindedMessageSig, getContactMatches } from '../src/index'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
@@ -15,8 +16,12 @@ mockAuthenticateUser.mockReturnValue(true)
 const mockIsVerified = isVerified as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
-const mockComputeBlindedSignature = BLSCryptographyClient.combinePartialBlindedSignatures as jest.Mock
+const mockComputeBlindedSignature = jest.fn()
+BLSCryptographyClient.prototype.combinePartialBlindedSignatures = mockComputeBlindedSignature
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
+const mockSufficientVerifiedSigs = jest.fn()
+BLSCryptographyClient.prototype.hasSufficientVerifiedSignatures = mockSufficientVerifiedSigs
+mockSufficientVerifiedSigs.mockResolvedValue(true)
 
 jest.mock('../src/database/wrappers/account')
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
@@ -41,7 +46,7 @@ const defaultResponseJson = JSON.stringify({
   signature: 'string',
 })
 
-describe(`POST /getDistributedBlindedSalt endpoint`, () => {
+describe(`POST /getBlindedMessageSig endpoint`, () => {
   beforeEach(() => {
     fetchMock.mockClear()
     fetchMock.mockImplementation(() => Promise.resolve(new FetchResponse(defaultResponseJson)))
@@ -52,11 +57,13 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
     const mockHeader = 'fdsfdsfs'
+    const timestamp = Date.now()
 
     const mockRequestData = {
       blindedQueryPhoneNumber,
       hashedPhoneNumber,
       account,
+      timestamp,
     }
     const req = {
       body: mockRequestData,
@@ -74,7 +81,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      await getDistributedBlindedSalt(req, res)
+      await getBlindedMessageSig(req, res)
     })
     it('returns 500 on bls error', async () => {
       mockComputeBlindedSignature.mockImplementation(() => {
@@ -88,7 +95,7 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      await getDistributedBlindedSalt(req, res)
+      await getBlindedMessageSig(req, res)
     })
   })
   describe('with invalid input', () => {
@@ -96,11 +103,13 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = 'd31509C31d654056A45185ECb6'
+      const timestamp = Date.now()
 
       const mockRequestData = {
         blindedQueryPhoneNumber,
         hashedPhoneNumber,
         account,
+        timestamp,
       }
       const req = { body: mockRequestData }
 
@@ -112,18 +121,20 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getDistributedBlindedSalt(req, res)
+      getBlindedMessageSig(req, res)
     })
     it('invalid hashedPhoneNumber returns 400', async () => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '+1234567890'
       const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
       const mockHeader = 'fdsfdsfs'
+      const timestamp = Date.now()
 
       const mockRequestData = {
         blindedQueryPhoneNumber,
         hashedPhoneNumber,
         account,
+        timestamp,
       }
       const req = {
         body: mockRequestData,
@@ -140,7 +151,37 @@ describe(`POST /getDistributedBlindedSalt endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      await getDistributedBlindedSalt(req, res)
+      await getBlindedMessageSig(req, res)
+    })
+    it('expired timestamp returns 400', async () => {
+      const blindedQueryPhoneNumber = '+5555555555'
+      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
+      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
+      const mockHeader = 'fdsfdsfs'
+      const timestamp = Date.now() - REQUEST_EXPIRY_WINDOW_MS
+
+      const mockRequestData = {
+        blindedQueryPhoneNumber,
+        hashedPhoneNumber,
+        account,
+        timestamp,
+      }
+      const req = {
+        body: mockRequestData,
+        headers: {
+          authorization: mockHeader,
+        },
+      }
+
+      const res = {
+        status: (status: any) => {
+          expect(status).toEqual(400)
+          // tslint:disable-next-line: no-empty
+          return { json: () => {} }
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      await getBlindedMessageSig(req, res)
     })
   })
 })

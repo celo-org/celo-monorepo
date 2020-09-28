@@ -8,7 +8,11 @@ import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
-import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
+import {
+  getGenesisBlockFromGoogleStorage,
+  getProxiesPerValidator,
+  getProxyName
+} from './testnet-utils'
 import { outputIncludes } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
@@ -355,17 +359,28 @@ export async function createStaticIPs(celoEnv: string) {
   if (useStaticIPsForGethNodes()) {
     await registerIPAddress(`${celoEnv}-bootnode`)
 
-    const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-    await Promise.all(
-      range(numValdiators).map((i) => registerIPAddress(`${celoEnv}-validators-${i}`))
-    )
+    const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+    const proxiesPerValidator = getProxiesPerValidator()
+    // only create IPs for validators that are not proxied
+    for (let i = proxiesPerValidator.length; i < validatorCount; i++) {
+      await registerIPAddress(`${celoEnv}-validators-${i}`)
+    }
+
+    // and create IPs for all the proxies
+    let validatorIndex = 0
+    for (const proxyCount of proxiesPerValidator) {
+      for (let i = 0; i < proxyCount; i++) {
+        await registerIPAddress(getProxyName(celoEnv, validatorIndex, i))
+      }
+      validatorIndex++
+    }
+
+    // Create IPs for the private tx nodes
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
     await Promise.all(
       range(numPrivateTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
     )
   }
-
-  return
 }
 
 export async function upgradeStaticIPs(celoEnv: string) {
@@ -376,12 +391,22 @@ export async function upgradeStaticIPs(celoEnv: string) {
   if (useStaticIPsForGethNodes()) {
     const prevValidatorNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators`)
     const newValidatorNodeCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-    await upgradeNodeTypeStaticIPs(
-      celoEnv,
-      'validators',
-      prevValidatorNodeCount,
-      newValidatorNodeCount
-    )
+    await upgradeValidatorStaticIPs(celoEnv, prevValidatorNodeCount, newValidatorNodeCount)
+
+    const proxiesPerValidator = getProxiesPerValidator()
+    // Iterate through all validators and check to see if there are changes in proxies
+    const higherValidatorCount = Math.max(prevValidatorNodeCount, newValidatorNodeCount)
+    for (let i = 0; i < higherValidatorCount; i++) {
+      const proxyCount = i < proxiesPerValidator.length ? proxiesPerValidator[i] : 0
+      let prevProxyCount = 0
+      try {
+        prevProxyCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators-${i}-proxy`)
+      } catch (e) {
+        console.info(`Unable to find any previous proxies for validator ${i}`)
+      }
+      await upgradeNodeTypeStaticIPs(celoEnv, `validators-${i}-proxy`, prevProxyCount, proxyCount)
+    }
+
     const prevPrivateTxNodeCount = await getStatefulSetReplicas(
       celoEnv,
       `${celoEnv}-tx-nodes-private`
@@ -393,6 +418,34 @@ export async function upgradeStaticIPs(celoEnv: string) {
       prevPrivateTxNodeCount,
       newPrivateTxNodeCount
     )
+  }
+}
+
+async function upgradeValidatorStaticIPs(
+  celoEnv: string,
+  prevValidatorNodeCount: number,
+  newValidatorNodeCount: number
+) {
+  const proxiesPerValidator = getProxiesPerValidator()
+
+  // Iterate through each validator & create or destroy
+  // IP addresses as necessary. If n validators are to be proxied,
+  // indices 0 through n - 1 will not have public IP addresses.
+  const higherValidatorCount = Math.max(prevValidatorNodeCount, newValidatorNodeCount)
+  for (let i = 0; i < higherValidatorCount; i++) {
+    const ipName = `${celoEnv}-validators-${i}`
+    let ipExists
+    try {
+      await retrieveIPAddress(ipName)
+      ipExists = true
+    } catch (e) {
+      ipExists = false
+    }
+    if (ipExists && (i < proxiesPerValidator.length || i >= newValidatorNodeCount)) {
+      await deleteIPAddress(ipName)
+    } else if (!ipExists && i >= proxiesPerValidator.length && i < newValidatorNodeCount) {
+      await registerIPAddress(ipName)
+    }
   }
 }
 
@@ -453,6 +506,7 @@ export async function pollForBootnodeLoadBalancer(celoEnv: string) {
   console.info(`\nReset all pods now that the bootnode load balancer has provisioned`)
   await execCmdWithExitOnFailure(`kubectl delete pod -n ${celoEnv} --selector=component=validators`)
   await execCmdWithExitOnFailure(`kubectl delete pod -n ${celoEnv} --selector=component=tx_nodes`)
+  await execCmdWithExitOnFailure(`kubectl delete pod -n ${celoEnv} --selector=component=proxy`)
   return
 }
 
@@ -466,6 +520,13 @@ export async function deleteStaticIPs(celoEnv: string) {
 
   const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   await Promise.all(range(numValidators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
+
+  const proxiesPerValidator = getProxiesPerValidator()
+  for (let valIndex = 0; valIndex < proxiesPerValidator.length; valIndex++) {
+    for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[valIndex]; proxyIndex++) {
+      await deleteIPAddress(getProxyName(celoEnv, valIndex, proxyIndex))
+    }
+  }
 
   const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   await Promise.all(
@@ -510,33 +571,54 @@ async function helmIPParameters(celoEnv: string) {
     range(numTxNodes).map((i) => retrieveIPAddress(`${celoEnv}-tx-nodes-${i}`))
   )
 
-  const singleAddressParameters = txAddresses.map(
-    (address, i) => `--set geth.tx_nodes_${i}IpAddress=${address}`
-  )
-
-  ipAddressParameters.push(...singleAddressParameters)
-
-  const listOfTxNodeAddresses = txAddresses.join(',')
-  ipAddressParameters.push(`--set geth.tx_node_ip_addresses='{${listOfTxNodeAddresses}}'`)
+  // Tx-node IPs
+  const txNodeIpParams = setHelmArray('geth.txNodesIPAddressArray', txAddresses)
+  ipAddressParameters.push(...txNodeIpParams)
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
       `--set geth.bootnodeIpAddress=${await retrieveIPAddress(`${celoEnv}-bootnode`)}`
     )
 
+    // Validator IPs
     const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+    const proxiesPerValidator = getProxiesPerValidator()
+    // This tracks validator IP addresses for each corresponding validator. If the validator
+    // is proxied, there is no public IP address, so it's set as an empty string
+    const validatorIpAddresses = []
+    for (let i = 0; i < numValidators; i++) {
+      if (i < proxiesPerValidator.length) {
+        // Then this validator is proxied
+        validatorIpAddresses.push('')
+      } else {
+        validatorIpAddresses.push(await retrieveIPAddress(`${celoEnv}-validators-${i}`))
+      }
+    }
+    const validatorIpParams = setHelmArray('geth.validatorsIPAddressArray', validatorIpAddresses)
+    ipAddressParameters.push(...validatorIpParams)
 
-    const validatorsAddresses = await Promise.all(
-      range(numValidators).map((i) => retrieveIPAddress(`${celoEnv}-validators-${i}`))
+    // Proxy IPs
+    // Helm ran into issues when dealing with 2-d lists,
+    // so each index corresponds to a particular validator.
+    // Multiple proxy IPs for a single validator are separated by '/'
+    const proxyIpAddressesPerValidator = []
+    let validatorIndex = 0
+    for (const proxyCount of proxiesPerValidator) {
+      const proxyIpAddresses = []
+      for (let i = 0; i < proxyCount; i++) {
+        proxyIpAddresses.push(await retrieveIPAddress(getProxyName(celoEnv, validatorIndex, i)))
+      }
+      const listOfProxyIpAddresses = proxyIpAddresses.join('/')
+      proxyIpAddressesPerValidator.push(listOfProxyIpAddresses)
+
+      validatorIndex++
+    }
+
+    const proxyIpAddressesParams = setHelmArray(
+      'geth.proxyIPAddressesPerValidatorArray',
+      proxyIpAddressesPerValidator
     )
-
-    const singleValidatorAddressParameters = validatorsAddresses.map(
-      (address, i) => `--set geth.validators_${i}IpAddress=${address}`
-    )
-
-    ipAddressParameters.push(...singleValidatorAddressParameters)
-    const listOfValidatorAddresses = validatorsAddresses.join(',')
-    ipAddressParameters.push(`--set geth.validator_ip_addresses='{${listOfValidatorAddresses}}'`)
+    ipAddressParameters.push(...proxyIpAddressesParams)
 
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
     const privateTxAddresses = await Promise.all(
@@ -556,13 +638,24 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
-  const bucketName = isProduction() ? 'contract_artifacts_production' : 'contract_artifacts'
   const productionTagOverrides = isProduction()
     ? [
         `--set gethexporter.image.repository=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')}`,
         `--set gethexporter.image.tag=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_TAG')}`,
       ]
     : []
+
+  const gethMetricsOverrides = fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === "true"
+    ? [
+        `--set metrics="true"`,
+        `--set pprof.enabled="true"`,
+        `--set pprof.path="/debug/metrics/prometheus"`,
+        `--set pprof.port="6060"`,
+      ]
+    : [
+        `--set metrics="false"`,
+        `--set pprof.enabled="false"`,
+      ]
 
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
@@ -580,15 +673,10 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
-    `--set cluster.zone=${fetchEnv('KUBERNETES_CLUSTER_ZONE')}`,
-    `--set cluster.name=${fetchEnv('KUBERNETES_CLUSTER_NAME')}`,
-    `--set bucket=${bucketName}`,
-    `--set project.name=${fetchEnv('TESTNET_PROJECT_NAME')}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
-    `--set geth.consensus_type=${fetchEnv('CONSENSUS_TYPE')}`,
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
     `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
@@ -607,8 +695,10 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
-    `--set geth.proxiedValidators=${fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')}`,
+    `--set geth.diskSizeGB=${fetchEnvOrFallback(envVar.NODE_DISK_SIZE_GB, '10')}`,
+    ...setHelmArray('geth.proxiesPerValidator', getProxiesPerValidator()),
     ...productionTagOverrides,
+    ...gethMetricsOverrides,
     ...(await helmIPParameters(celoEnv)),
   ]
 }
@@ -692,16 +782,15 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
-  const proxySetName = `${celoEnv}-proxy`
   const privateTxNodesSetname = `${celoEnv}-tx-nodes-private`
   const persistentVolumeClaimsLabels = ['validators', 'tx_nodes', 'proxy', 'tx_nodes_private']
 
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
-  // allow to fail for the cases where a testnet does not include the proxy statefulset yet
-  await scaleResource(celoEnv, 'StatefulSet', proxySetName, 0, true)
+  // allow to fail for the cases where a testnet does not include the privatetxnode statefulset yet
   await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, 0, true)
+  await scaleProxies(celoEnv, 0)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv, persistentVolumeClaimsLabels)
@@ -712,8 +801,6 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  // assumes 1 proxy per proxied validator
-  const numProxies = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
   const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
 
   // Note(trevor): helm upgrade only compares the current chart to the
@@ -721,9 +808,45 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
   // to manually scale up to account for when a node count is the same
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
-  await scaleResource(celoEnv, 'StatefulSet', proxySetName, numProxies)
   await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, numPrivateTxNodes)
+  await scaleProxies(celoEnv)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
+}
+
+// scaleProxies scales all proxy statefulsets to have `replicas` replicas.
+// If `replicas` is undefined, proxies will be scaled to their intended
+// replica counts
+async function scaleProxies(celoEnv: string, replicas?: number) {
+  if (replicas !== undefined) {
+    const statefulsetNames = await getProxyStatefulsets(celoEnv)
+    for (const name of statefulsetNames) {
+      await scaleResource(celoEnv, 'StatefulSet', name, replicas)
+    }
+  } else {
+    const proxiesPerValidator = getProxiesPerValidator()
+    let validatorIndex = 0
+    for (const proxyCount of proxiesPerValidator) {
+      // allow to fail for the cases where a testnet does not include the proxy statefulset yet
+      await scaleResource(
+        celoEnv,
+        'StatefulSet',
+        `${celoEnv}-validators-${validatorIndex}-proxy`,
+        proxyCount,
+        true
+      )
+      validatorIndex++
+    }
+  }
+}
+
+async function getProxyStatefulsets(celoEnv: string) {
+  const [output] = await execCmd(
+    `kubectl get statefulsets --selector=component=proxy --no-headers -o custom-columns=":metadata.name" -n ${celoEnv}`
+  )
+  if (!output) {
+    return []
+  }
+  return output.split('\n').filter((name) => name)
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -732,6 +855,10 @@ export async function removeHelmRelease(celoEnv: string) {
 
 export function makeHelmParameters(map: { [key: string]: string }) {
   return entries(map).map(([key, value]) => `--set ${key}=${value}`)
+}
+
+export function setHelmArray(paramName: string, arr: any[]) {
+  return arr.map((value, i) => `--set ${paramName}[${i}]="${value}"`)
 }
 
 export async function deleteFromCluster(celoEnv: string) {
