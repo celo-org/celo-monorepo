@@ -29,7 +29,6 @@ export default function OpenGraph({ description, image, title, path }: Props) {
       <meta name="twitter:image" content={metaImage} />
       <meta name="twitter:site" content={'@celoOrg'} />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
     </Head>
   )
 }
