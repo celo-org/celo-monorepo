@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   bottomText: {
-    textAlign: 'right',
+    textAlign: 'center',
   },
 })
