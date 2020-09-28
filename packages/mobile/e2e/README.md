@@ -28,17 +28,17 @@ The run_e2e.sh script will take care of configuring and building the app for you
 
 ## Adding a test
 
-There is one main file called `TestRunner.spec.js` which calls the specific tests for each use case which live in the root of the `src` folder.
+The main test files are the ones on the root of the e2e/src directory. The "main" one is `FundedAccount.spec.js` which calls the specific tests which live in the `usecases` folder.
 
 While developing and adding new tests, it's useful to run only the ones we are working on and not go through the onboading on each run. To do this, the following strategy might be useful:
-- First, go to `TestRunner` and comment out or skip all tests except the `Onboarding` one.
-- Run `yarn test:e2e:ios`. Wait while the app goes through the onboarding process.
+- First, go to `FundedAccount.spec.js` and comment out or skip all tests except the `Onboarding` one.
+- Run `yarn test:e2e:ios -t e2e/src/FundedAccount.spec.js`. Wait while the app goes through the onboarding process.
 - If the tests passes you should see the Wallet Home screen.
 - Run `yarn test:e2e:packager` to start the packager.
 - Comment out or skip the `Onboarding` test and uncomment or unskip whatever test you would like to run or develop against.
-- Run `yarn test:e2e:ios -d`. The `-d` flag will prevent the app from reinstalling and reuse the previous install and will not restart the packager.
+- Run `yarn test:e2e:ios -d -t e2e/src/FundedAccount.spec.js`. The `-d` flag will prevent the app from reinstalling and reuse the previous install and will not restart the packager.
 
-When doing the steps above note that some tests will require the PIN if run standalone but not require it if run after the rest of the tests because a previous one already set it.
+A similar process can be followed to run and develop other test files.
 
 For most e2e tests you will only need to do three things:
 

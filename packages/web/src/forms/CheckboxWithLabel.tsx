@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createElement, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, unstable_createElement as createElement, View } from 'react-native-web'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { Label } from './FormComponents'
 
