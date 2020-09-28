@@ -155,7 +155,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
               from: maliciousDeployer,
             }
           ),
-          'not-allowed'
+          'sender not allowed to deploy'
         )
       })
     })
@@ -178,7 +178,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
             // @ts-ignore
             implementation.contract.methods.initialize(valoraAccount).encodeABI()
           ),
-          'wallet-already-deployed'
+          'wallet already deployed'
         )
       })
     })

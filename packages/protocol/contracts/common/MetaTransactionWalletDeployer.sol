@@ -32,7 +32,7 @@ contract MetaTransactionWalletDeployer is
   modifier onlyCanDeploy() {
     require(
       msg.sender == owner() || canDeploy[msg.sender] == true,
-      "sender not authorized to deploy wallet"
+      "sender not allowed to deploy wallet"
     );
     _;
   }
@@ -90,7 +90,7 @@ contract MetaTransactionWalletDeployer is
     external
     onlyCanDeploy
   {
-    require(wallets[owner] == address(0), "wallet-already-deployed");
+    require(wallets[owner] == address(0), "wallet already deployed");
 
     MetaTransactionWalletProxy proxy = new MetaTransactionWalletProxy();
     proxy._setAndInitializeImplementation(implementation, initCallData);
