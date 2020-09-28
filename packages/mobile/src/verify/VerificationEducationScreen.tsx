@@ -3,16 +3,22 @@ import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { useFocusEffect } from '@react-navigation/native'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
+import BackButton from 'src/components/BackButton.v2'
 import i18n, { Namespaces } from 'src/i18n'
-import { fetchVerificationState, setHasSeenVerificationNux } from 'src/identity/actions'
+import {
+  fetchVerificationState,
+  setHasSeenVerificationNux,
+  startVerification,
+} from 'src/identity/actions'
 import { verificationStateSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
@@ -47,16 +53,19 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     }
   }, [status.isVerified])
 
-  useEffect(() => {
-    if (!partOfOnboarding) {
-      dispatch(fetchVerificationState())
-    }
-  }, [])
+  useFocusEffect(
+    // useCallback is needed here: https://bit.ly/2G0WKTJ
+    useCallback(() => {
+      if (!partOfOnboarding) {
+        dispatch(fetchVerificationState())
+      }
+    }, [partOfOnboarding])
+  )
 
   const onPressStart = (withoutRevealing: boolean) => {
     return () => {
       dispatch(setHasSeenVerificationNux(true))
-      navigation.navigate(Screens.VerificationLoadingScreen, { withoutRevealing })
+      dispatch(startVerification(withoutRevealing))
     }
   }
 
@@ -96,7 +105,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
 
   let bodyText
   let firstButton
-  let secondButton
 
   if (numberVerified) {
     // Already verified
@@ -112,6 +120,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     )
   } else if (isBalanceSufficient) {
     // Sufficient balance
+    const withoutRevealing = actionableAttestations.length >= numAttestationsRemaining
     bodyText = t('verificationEducation.body')
     firstButton = (
       <Button
@@ -120,23 +129,12 @@ function VerificationEducationScreen({ route, navigation }: Props) {
             ? t('verificationEducation.resume')
             : t('verificationEducation.start')
         }
-        onPress={onPressStart(false)}
+        onPress={onPressStart(withoutRevealing)}
         type={BtnTypes.ONBOARDING}
         style={styles.startButton}
         testID="VerificationEducationContinue"
       />
     )
-    if (actionableAttestations.length === numAttestationsRemaining) {
-      secondButton = (
-        <Button
-          text={t('verificationEducation.receivedCodes')}
-          onPress={onPressStart(true)}
-          type={BtnTypes.ONBOARDING_SECONDARY}
-          style={styles.startButton}
-          testID="VerificationEducationAlready"
-        />
-      )
-    }
   } else {
     // Insufficient balance
     bodyText = t('verificationEducation.bodyInsufficientBalance')
@@ -162,7 +160,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         </Text>
         <Text style={styles.body}>{bodyText}</Text>
         {firstButton}
-        {secondButton}
         <View style={styles.spacer} />
         <TextButton style={styles.doINeedToConfirmButton} onPress={onPressLearnMore}>
           {t('verificationEducation.doINeedToConfirm')}
@@ -203,6 +200,7 @@ VerificationEducationScreen.navigationOptions = ({ navigation, route }: ScreenPr
           titleStyle={{ color: colors.goldDark }}
         />
       ),
+    headerLeft: () => route.params?.hideOnboardingStep && <BackButton />,
   }
 }
 
