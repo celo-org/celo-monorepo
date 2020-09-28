@@ -5,28 +5,27 @@ import { LayoutAnimation } from 'react-native'
 import { Namespaces } from 'src/i18n'
 
 interface Props {
-  clipboardContent: string
-  shouldShow: (clipboardContent: string) => boolean
+  getClipboardContent: () => Promise<string>
+  shouldShow: boolean
   onPress: (clipboardContent: string) => void
 }
 
 export default function ClipboardAwarePasteButton({
-  clipboardContent,
+  getClipboardContent,
   shouldShow,
   onPress,
 }: Props) {
   const { t } = useTranslation(Namespaces.global)
-  const isVisible = shouldShow(clipboardContent)
 
   useLayoutEffect(() => {
     LayoutAnimation.easeInEaseOut()
-  }, [isVisible])
+  }, [shouldShow])
 
-  function onPressInternal() {
-    onPress(clipboardContent)
+  async function onPressInternal() {
+    onPress(await getClipboardContent())
   }
 
-  if (!isVisible) {
+  if (!shouldShow) {
     return null
   }
 
