@@ -17,8 +17,8 @@ export function computeBlindedSignature(base64BlindedMessage: string, privateKey
     }
 
     return Buffer.from(signedMsg).toString('base64')
-  } catch (e) {
-    logger.error(ErrorMessage.SIGNATURE_COMPUTATION_FAILURE, e)
-    throw e
+  } catch (err) {
+    logger.error({ err }, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE)
+    throw err
   }
 }

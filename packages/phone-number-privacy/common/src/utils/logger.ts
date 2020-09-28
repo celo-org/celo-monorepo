@@ -5,7 +5,7 @@ import { fetchEnv, fetchEnvOrDefault } from './config-utils'
 
 const logLevel = fetchEnvOrDefault('LOG_LEVEL', 'info') as LogLevelString
 const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
-const service = fetchEnv('ODIS_SERVICE')
+const serviceName = fetchEnv('SERVICE_NAME')
 
 let stream: any
 switch (logFormat) {
@@ -21,7 +21,7 @@ switch (logFormat) {
 }
 
 export const logger: Logger = createLogger({
-  name: service,
+  name: serviceName,
   serializers: stdSerializers,
   streams: [stream],
 })

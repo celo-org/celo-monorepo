@@ -4,7 +4,7 @@ import { VERSION } from '../config'
 
 export type ErrorType = ErrorMessage | WarningMessage
 
-export function respondWithError(res: Response, statusCode: number, error: ErrorType) {
-  logger.error('Responding with error', error)
-  res.status(statusCode).json({ success: false, error, version: VERSION })
+export function respondWithError(res: Response, statusCode: number, err: ErrorType) {
+  logger.error({ err, statusCode }, `Responding with error`)
+  res.status(statusCode).json({ success: false, err, version: VERSION })
 }

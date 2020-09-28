@@ -1,6 +1,6 @@
 import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { getDatabase } from '../database'
-import { NumberPair, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
+import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
 
 function numberPairs() {
   return getDatabase()<NumberPair>(NUMBER_PAIRS_TABLE)
@@ -22,8 +22,8 @@ export async function getNumberPairContacts(
     return contentPairs
       .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
       .filter((number) => contactPhonesSet.has(number))
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
     return []
   }
 }
@@ -42,10 +42,10 @@ export async function setNumberPairContacts(
   }
   try {
     await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
-  } catch (e) {
+  } catch (err) {
     // ignore duplicate insertion error (23505)
-    if (e.code !== '23505') {
-      logger.error(ErrorMessage.DATABASE_INSERT_FAILURE, e)
+    if (err.code !== '23505') {
+      logger.error({ err }, ErrorMessage.DATABASE_INSERT_FAILURE)
     }
   }
 }

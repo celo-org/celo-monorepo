@@ -37,8 +37,8 @@ export class AWSKeyProvider extends KeyProviderBase {
         throw new Error('Secret is empty or undefined')
       }
       this.setPrivateKey(privateKey)
-    } catch (error) {
-      logger.error('Error retrieving key', error)
+    } catch (err) {
+      logger.error({ err }, 'Error retrieving key')
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }

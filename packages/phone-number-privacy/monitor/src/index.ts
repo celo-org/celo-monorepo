@@ -1,3 +1,4 @@
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { ErrorMessages } from '@celo/contractkit/lib/identity/odis/query'
 import { logger } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
@@ -9,14 +10,14 @@ export const odisMonitorScheduleFunction = functions
   .onRun(async () => {
     logger.info('Performing test query')
     try {
-      const res = await queryOdisForSalt()
-      logger.info({ res }, 'ODIS salt request successful. System is healthy.')
-    } catch (e) {
-      if ((e as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
-        logger.info({ e }, 'ODIS salt request out of quota. This is expected. System is healthy.')
+      const odisResponse: PhoneNumberHashDetails = await queryOdisForSalt()
+      logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
+    } catch (err) {
+      if ((err as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
+        logger.info({ err }, 'ODIS salt request out of quota. This is expected. System is healthy.')
       } else {
-        logger.error({ e }, 'ODIS salt request failed.')
-        throw e
+        logger.error({ err }, 'ODIS salt request failed.')
+        throw err
       }
     }
   })

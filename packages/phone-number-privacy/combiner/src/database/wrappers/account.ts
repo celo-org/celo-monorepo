@@ -26,8 +26,8 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
       return false
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
     return false
   }
 }
@@ -36,7 +36,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
 export async function setDidMatchmaking(account: string) {
-  logger.debug('Setting did matchmaking')
+  logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
       return accounts()
@@ -47,8 +47,8 @@ export async function setDidMatchmaking(account: string) {
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
       return insertRecord(newAccount)
     }
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+  } catch (err) {
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     return null
   }
 }

@@ -6,7 +6,7 @@ import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
-  logger.info('Initializing database connection')
+  logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl } = config.db
 
   let dbConfig: any

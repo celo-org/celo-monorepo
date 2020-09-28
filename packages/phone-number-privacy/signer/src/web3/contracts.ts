@@ -31,9 +31,13 @@ export async function isVerified(account: string, hashedPhoneNumber: string): Pr
         total,
       } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
 
-      logger.debug(
-        `Account ${account} is verified=${_isVerified} with ${completed} completed attestations, ${numAttestationsRemaining} remaining, total of ${total} requested.`
-      )
+      logger.debug({
+        account,
+        isVerified: _isVerified,
+        completedAttestations: completed,
+        remainingAttestations: numAttestationsRemaining,
+        totalAttestationsRequested: total,
+      })
       return _isVerified
     },
     RETRY_COUNT,

@@ -1,4 +1,5 @@
 import {
+  authenticateUser,
   ErrorMessage,
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
@@ -13,12 +14,11 @@ import {
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import { authenticateUser } from '../common/identity'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
-import { getBlockNumber } from '../web3/contracts'
+import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
 export interface GetBlindedMessagePartialSigRequest {
@@ -38,7 +38,7 @@ export async function handleGetBlindedMessagePartialSig(
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request))) {
+    if (!(await authenticateUser(request, getContractKit()))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
@@ -56,14 +56,14 @@ export async function handleGetBlindedMessagePartialSig(
       const queryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
       performedQueryCount = queryCount.performedQueryCount
       totalQuota = queryCount.totalQuota
-    } catch (error) {
-      logger.error('Failed to get user quota', error)
+    } catch (err) {
+      logger.error({ err }, 'Failed to get user quota')
       errorMsg = ErrorMessage.DATABASE_GET_FAILURE
     }
     try {
       blockNumber = await getBlockNumber()
-    } catch (error) {
-      logger.error('Failed to get latest block number', error)
+    } catch (err) {
+      logger.error({ err }, 'Failed to get latest block number')
       errorMsg = ErrorMessage.CONTRACT_GET_FAILURE
     }
 
@@ -120,8 +120,8 @@ export async function handleGetBlindedMessagePartialSig(
     }
     logger.debug('Signature retrieval success')
     response.json(signMessageResponse)
-  } catch (error) {
-    logger.error('Failed to get signature', error)
+  } catch (err) {
+    logger.error({ err }, 'Failed to get signature')
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }

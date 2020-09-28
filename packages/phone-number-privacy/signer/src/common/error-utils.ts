@@ -18,7 +18,7 @@ export function respondWithError(
   signature?: string
 ) {
   const loggerMethod = error in WarningMessage ? logger.warn : logger.error
-  loggerMethod('Responding with error', error)
+  loggerMethod({ err: error }, 'Responding with error')
   const response: SignMessageResponseFailure = {
     success: false,
     version: getVersion(),

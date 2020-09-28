@@ -11,9 +11,10 @@ export async function getRequestExists(
   request: GetBlindedMessagePartialSigRequest
 ): Promise<boolean> {
   if (!request.timestamp) {
+    logger.debug('request does not have timestamp')
     return false // TODO(Alec) make timestamps required
   }
-  logger.debug('Checking if request exists')
+  logger.debug({ request }, 'Checking if request exists')
   try {
     const existingRequest = await requests()
       .where({
@@ -23,24 +24,25 @@ export async function getRequestExists(
       })
       .first()
     return !!existingRequest
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
     return false
   }
 }
 
 export async function storeRequest(request: GetBlindedMessagePartialSigRequest) {
   if (!request.timestamp) {
+    logger.debug('request does not have timestamp')
     return true // TODO remove once backwards compatibility isn't necessary
   }
-  logger.debug('Storing salt request')
+  logger.debug({ request }, 'Storing salt request')
   try {
     await requests()
       .insert(new Request(request))
       .timeout(DB_TIMEOUT)
     return true
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+  } catch (err) {
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     return null
   }
 }

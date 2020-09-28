@@ -1,4 +1,5 @@
 import {
+  authenticateUser,
   ErrorMessage,
   hasValidAccountParam,
   isBodyReasonablySized,
@@ -12,7 +13,6 @@ import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { BigNumber } from 'bignumber.js'
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
-import { authenticateUser } from '../common/identity'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit, isVerified } from '../web3/contracts'
@@ -32,7 +32,7 @@ export async function handleGetQuota(
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request))) {
+    if (!(await authenticateUser(request, getContractKit()))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
@@ -47,8 +47,8 @@ export async function handleGetQuota(
       performedQueryCount: queryCount.performedQueryCount,
       totalQuota: queryCount.totalQuota,
     })
-  } catch (error) {
-    logger.error('Failed to get user quota', error)
+  } catch (err) {
+    logger.error({ err }, 'Failed to get user quota')
     respondWithError(response, 500, ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
@@ -81,7 +81,7 @@ export async function getRemainingQueryCount(
  */
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber))) {
-    logger.debug('Account is verified')
+    logger.debug({ account }, 'Account is verified')
     const transactionCount = await getTransactionCountFromAccount(account)
     return (
       config.quota.unverifiedQueryMax +
@@ -110,13 +110,13 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
     cUSDAccountBalance.isGreaterThanOrEqualTo(config.quota.minDollarBalance) ||
     celoAccountBalance.isGreaterThanOrEqualTo(config.quota.minCeloBalance)
   ) {
-    logger.debug('Account is not verified but meets min balance')
+    logger.debug({ account }, 'Account is not verified but meets min balance')
     // TODO consider granting these unverified users slightly less queryPerTx
     const transactionCount = await getTransactionCountFromAccount(account)
     return config.quota.unverifiedQueryMax + config.quota.queryPerTransaction * transactionCount
   }
 
-  logger.debug('Account does not meet query quota criteria')
+  logger.debug({ account }, 'Account does not meet query quota criteria')
   return 0
 }
 

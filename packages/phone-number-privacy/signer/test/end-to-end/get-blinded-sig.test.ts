@@ -1,12 +1,14 @@
+import { TestUtils } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import { getBlindedPhoneNumber, replenishQuota } from '../../../common/src/test/utils'
 import config from '../../src/config'
 
 require('dotenv').config()
+
+const { replenishQuota, getBlindedPhoneNumber } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
@@ -117,7 +119,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns sig when querying succeeds with unused request', async () => {
-      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
@@ -133,7 +135,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns sig when querying succeeds with used request', async () => {
-      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2)
       const response = await postToSignMessage(
         BLINDED_PHONE_NUMBER,
         PRIVATE_KEY2,
@@ -149,7 +151,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns sig when querying succeeds with missing timestamp', async () => {
-      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2, DEFAULT_FORNO_URL)
+      await replenishQuota(ACCOUNT_ADDRESS2, PRIVATE_KEY2)
       const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY2, ACCOUNT_ADDRESS2)
       expect(response.status).toBe(200)
     })

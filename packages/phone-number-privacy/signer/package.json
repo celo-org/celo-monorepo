@@ -12,12 +12,13 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
+    "test:e2e": "jest --runInBand test/end-to-end",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "bls:keygen": "ts-node scripts/create-bls-keys.ts",
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.12",
+    "@celo/contractkit": "0.4.15-dev",
     "@celo/phone-number-privacy-common": "1.0.9-dev",
     "@celo/utils": "0.1.18",
     "@google-cloud/secret-manager": "3.0.0",

@@ -21,8 +21,8 @@ export class GoogleKeyProvider extends KeyProviderBase {
       }
 
       this.setPrivateKey(privateKey)
-    } catch (error) {
-      logger.error('Error retrieving key', error)
+    } catch (err) {
+      logger.error({ err }, 'Error retrieving key')
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }
