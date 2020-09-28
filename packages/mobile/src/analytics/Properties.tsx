@@ -6,6 +6,7 @@ import {
   ContractKitEvents,
   EscrowEvents,
   FeeEvents,
+  FiatExchangeEvents,
   GethEvents,
   HomeEvents,
   IdentityEvents,
@@ -577,6 +578,13 @@ interface CeloExchangeEventsProperties {
   }
 }
 
+interface FiatExchangeEventsProperties {
+  [FiatExchangeEvents.external_exchange_link]: {
+    name: string
+    link: string
+  }
+}
+
 interface GethEventsProperties {
   [GethEvents.blockchain_corruption]: undefined
   [GethEvents.geth_init_success]: undefined
@@ -658,6 +666,7 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FeeEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
+  FiatExchangeEventsProperties &
   GethEventsProperties &
   NetworkEventsProperties &
   ContractKitEventsProperties
