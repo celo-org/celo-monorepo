@@ -128,6 +128,7 @@ Deploying a new contract release should occur with the following process. On-cha
     <td>T</td>
     <td>
       <ol>
+        <li>Create a Github issue tracking all these checklist items as an audit log</li>
         <li>Create a <code>release/celo-core-contracts/${N}</code> release branch at the desired commit.</li>
         <li>Tag the commit <code>celo-core-contracts-v${N}.pre-audit</code></li>
         <li>Create Github release with above tag</li>
@@ -185,7 +186,7 @@ Deploying a new contract release should occur with the following process. On-cha
     <td>
       <ol>
         <li>Confirm all contracts working as intended on Alfajores.</li>
-        <li>Confirm audit is complete and make the release notes contains a link to it.</li>
+        <li>Confirm audit is complete and make the release notes and forum post contain a link to it.</li>
         <li>On Tuesday: Run the <a href="https://docs.celo.org/community/release-process/smart-contracts#build-process">smart contract release script</a> in order to to deploy the contracts to Mainnet as well as submit a governance proposal.</li>
         <li>Tag the commit that is being proposed with <code>celo-core-contracts-v${N}.mainnet</code></li>
         <li>Update the corresponding governance proposal with the updated on-chain <code>PROPOSAL_ID</code> and mark CGP status as "PROPOSED".</li>
