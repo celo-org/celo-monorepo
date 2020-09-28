@@ -124,7 +124,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
               implementation.methods.initialize(beneficiary).encodeABI()
             )
             .sendAndWaitForReceipt({ from: rando })
-        ).rejects.toThrow(/sender not authorized to deploy wallet/)
+        ).rejects.toThrow(/sender not allowed to deploy wallet/)
       })
     })
   })
