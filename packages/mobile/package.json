@@ -132,7 +132,7 @@
     "react-native-tcp": "https://github.com/celo-org/react-native-tcp#0b5948e",
     "react-native-udp": "git+https://github.com/celo-org/react-native-udp#730f295",
     "react-native-url-polyfill": "^1.2.0",
-    "react-native-webview": "git+https://github.com/celo-org/react-native-webview#4840eeb",
+    "react-native-webview": "^10.8.3",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
