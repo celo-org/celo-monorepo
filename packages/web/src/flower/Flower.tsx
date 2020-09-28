@@ -3,6 +3,8 @@ import { Animated, Image, StyleSheet } from 'react-native'
 import FlowerTablet from 'src/flower/color-flower-mid.jpg'
 import FlowerMobile from 'src/flower/color-flower-small.jpg'
 import FlowerDesktop from 'src/flower/color-flower.jpg'
+import OutlineMobile from 'src/flower/outline-flower-mobile.png'
+import OutlineTablet from 'src/flower/outline-flower-tablet.png'
 import Outline from 'src/flower/outline-flower.png'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
@@ -71,7 +73,7 @@ export default function Flower() {
         ]}
       >
         <AnimatedRatio ratio={1} style={[styles.outline, { opacity: outlineOpacity }]}>
-          <Image source={Outline} style={standardStyles.image} />
+          <FlowerOutline />
         </AnimatedRatio>
         <AnimatedRatio ratio={1} style={{ opacity: colorOpacity, willChange: 'opacity' }}>
           <FlowerIllo onLoadEnd={showImage} />
@@ -83,13 +85,26 @@ export default function Flower() {
 
 function FlowerIllo({ onLoadEnd }) {
   const { screen } = useScreenSize()
-  return <Image source={SOURCES[screen]} style={standardStyles.image} onLoadEnd={onLoadEnd} />
+  return (
+    <Image source={COLOR_FLOWER_SRC[screen]} style={standardStyles.image} onLoadEnd={onLoadEnd} />
+  )
 }
 
-const SOURCES = {
+function FlowerOutline() {
+  const { screen } = useScreenSize()
+  return <Image source={OUTLINE_FLOWER_SRC[screen]} style={standardStyles.image} />
+}
+
+const COLOR_FLOWER_SRC = {
   [ScreenSizes.MOBILE]: FlowerMobile,
   [ScreenSizes.TABLET]: FlowerTablet,
   [ScreenSizes.DESKTOP]: FlowerDesktop,
+}
+
+const OUTLINE_FLOWER_SRC = {
+  [ScreenSizes.MOBILE]: OutlineMobile,
+  [ScreenSizes.TABLET]: OutlineTablet,
+  [ScreenSizes.DESKTOP]: Outline,
 }
 
 const styles = StyleSheet.create({
