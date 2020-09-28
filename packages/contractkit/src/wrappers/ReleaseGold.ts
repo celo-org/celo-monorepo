@@ -33,6 +33,7 @@ export interface ReleaseGoldInfo {
   releaseGoldWrapperAddress: string
   beneficiary: string
   releaseOwner: string
+  owner: string
   refundAddress: string
   liquidityProvisionMet: boolean
   canValidate: boolean
