@@ -189,6 +189,7 @@
     "redux-saga-test-plan": "^4.0.0-beta.2",
     "remote-redux-devtools": "^0.5.12",
     "tslint-react-native": "^0.0.7",
+    "twilio": "^3.49.1",
     "web3-core": "1.2.4",
     "web3-eth": "1.2.4"
   },

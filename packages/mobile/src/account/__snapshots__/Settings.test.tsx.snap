@@ -222,6 +222,7 @@ exports[`Account renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="SettingsConfirmNumber"
           >
             <View
               style={
@@ -2224,6 +2225,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="SettingsConfirmNumber"
           >
             <View
               style={

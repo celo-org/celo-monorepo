@@ -326,7 +326,11 @@ export class Account extends React.Component<Props, State> {
           <View style={styles.containerList}>
             <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
             {!numberVerified && verificationPossible && (
-              <SettingsItemTextValue title={t('confirmNumber')} onPress={this.goToConfirmNumber} />
+              <SettingsItemTextValue
+                title={t('confirmNumber')}
+                onPress={this.goToConfirmNumber}
+                testID="SettingsConfirmNumber"
+              />
             )}
             <SettingsItemTextValue
               title={t('languageSettings')}

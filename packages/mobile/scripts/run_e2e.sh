@@ -88,6 +88,7 @@ runTest() {
   if [[ $DEV_MODE == true ]]; then
     extra_param="--reuse"
   fi
+  export INVITE_CODE=$(../celotool/bin/celotooljs.sh account invite -e alfajores --phone +12057368924 --yesreally | grep "Invite code:" | awk '{print $3}')
   yarn detox test \
     --configuration $CONFIG_NAME \
     "${FILE_TO_RUN}" \

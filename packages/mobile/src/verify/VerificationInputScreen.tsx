@@ -254,6 +254,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
                           attestationCodes={attestationCodes}
                           numCompleteAttestations={numCompleteAttestations}
                           style={styles.codeInput}
+                          testID={`VerificationCode${i}`}
                         />
                       </View>
                     ))}

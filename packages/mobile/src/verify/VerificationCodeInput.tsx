@@ -18,6 +18,7 @@ interface Props {
   attestationCodes: AttestationCode[] // The codes in the redux store
   numCompleteAttestations: number // has the code been accepted and completed
   style?: StyleProp<ViewStyle>
+  testID?: string
 }
 
 function VerificationCodeInput({
@@ -31,6 +32,7 @@ function VerificationCodeInput({
   attestationCodes,
   numCompleteAttestations,
   style,
+  testID,
 }: Props) {
   let codeStatus: CodeInputStatus = CodeInputStatus.DISABLED
   if (numCompleteAttestations > index) {
@@ -55,6 +57,7 @@ function VerificationCodeInput({
       onInputChange={onInputChange}
       shouldShowClipboard={shouldShowClipboard(attestationCodes)}
       style={style}
+      testID={testID}
     />
   )
 }
