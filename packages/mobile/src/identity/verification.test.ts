@@ -499,6 +499,10 @@ describe(doVerificationFlow, () => {
       .provide([
         [select(verificationStateSelector), mockVerificationStatePartlyVerified],
         [call(getConnectedUnlockedAccount), mockAccount],
+        // TODO (i1skn): remove next two lines when
+        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperPartlyVerified,

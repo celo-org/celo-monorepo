@@ -150,6 +150,8 @@ export enum VerificationEvents {
   verification_revoke_start = 'verification_revoke_start',
   verification_revoke_finish = 'verification_revoke_finish',
   verification_revoke_error = 'verification_revoke_error',
+
+  verification_resend_messages = 'verification_resend_messages',
 }
 
 export enum IdentityEvents {

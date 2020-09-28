@@ -9,7 +9,7 @@ import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
-import { ATTESTATION_REVEAL_TIMEOUT, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { ATTESTATION_REVEAL_TIMEOUT_SECONDS, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
@@ -416,6 +416,6 @@ export const isVerificationStateExpiredSelector = (state: RootState) => {
 export const isRevealAllowed = ({ identity: { lastRevealAttempt } }: RootState) => {
   return (
     !lastRevealAttempt ||
-    timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT
+    timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
   )
 }

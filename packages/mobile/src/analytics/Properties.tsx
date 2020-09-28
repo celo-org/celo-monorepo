@@ -277,6 +277,9 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_revoke_error]: {
     error: string
   }
+  [VerificationEvents.verification_resend_messages]: {
+    count: number
+  }
 }
 
 interface IdentityEventsProperties {

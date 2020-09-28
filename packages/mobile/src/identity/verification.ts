@@ -66,8 +66,9 @@ export const NUM_ATTESTATIONS_REQUIRED = 3
 export const ESTIMATED_COST_PER_ATTESTATION = 0.051
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
-const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
+const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
+const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -210,6 +211,10 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
     })
     if (restart) {
       isRestarted = true
+      const { status }: VerificationState = yield select(verificationStateSelector)
+      ValoraAnalytics.track(VerificationEvents.verification_resend_messages, {
+        count: status.numAttestationsRemaining,
+      })
     } else {
       return verification
     }
@@ -264,7 +269,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       if (!withoutRevealing) {
         ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
         // Request codes for the already existing attestations if any.
-        // We check after which ones were successfull
+        // We check after which ones were successful
         const reveals: boolean[] = yield call(
           revealAttestations,
           attestationsWrapper,
@@ -332,17 +337,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           call(registerAccountDek, account),
         ]),
         // This is needed, because we can have more actionableAttestations than NUM_ATTESTATIONS_REQUIRED
-        requiredAttestationsCompleted: call(function*() {
-          while (true) {
-            yield take(Actions.COMPLETE_ATTESTATION_CODE)
-            const acceptedAttestationCodes: AttestationCode[] = yield select(
-              acceptedAttestationCodesSelector
-            )
-            if (acceptedAttestationCodes.length >= NUM_ATTESTATIONS_REQUIRED) {
-              return
-            }
-          }
-        }),
+        requiredAttestationsCompleted: call(requiredAttestationsCompleted),
       })
 
       receiveMessageTask?.cancel()
@@ -369,6 +364,18 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
     receiveMessageTask?.cancel()
     if (Platform.OS === 'android') {
       autoRetrievalTask?.cancel()
+    }
+  }
+}
+
+export function* requiredAttestationsCompleted() {
+  while (true) {
+    yield take(Actions.COMPLETE_ATTESTATION_CODE)
+    const acceptedAttestationCodes: AttestationCode[] = yield select(
+      acceptedAttestationCodesSelector
+    )
+    if (acceptedAttestationCodes.length >= NUM_ATTESTATIONS_REQUIRED) {
+      return
     }
   }
 }
@@ -633,26 +640,26 @@ function* revealAttestations(
   attestations: ActionableAttestation[]
 ) {
   Logger.debug(TAG + '@revealAttestations', `Revealing ${attestations.length} attestations`)
-  let i = 0
-  const delayPeriod = 5000
   const reveals = []
   for (const attestation of attestations) {
-    const result = yield call(
+    const success = yield call(
       revealAttestation,
       attestationsWrapper,
       account,
       phoneHashDetails,
-      attestation,
-      // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
-      // when https://github.com/celo-org/celo-labs/issues/578 is resolved
-      // send messages with 5000ms delay on Android
-      Platform.OS === 'android' ? delayPeriod * i : 0
+      attestation
     )
-    // apply delay only on successful reveal
-    if (result) {
-      i++
+    // TODO (i1skn): remove this method and uncomment revealNeededAttestations above
+    // when https://github.com/celo-org/celo-labs/issues/578 is resolved
+    // send messages with 5000ms delay on Android if reveals is successful
+    if (success && Platform.OS === 'android') {
+      Logger.debug(
+        TAG + '@revealAttestations',
+        `Delaying the next one for: ${ANDROID_DELAY_REVEAL_ATTESTATION}ms`
+      )
+      yield delay(ANDROID_DELAY_REVEAL_ATTESTATION)
     }
-    reveals.push(result)
+    reveals.push(success)
   }
   yield put(setLastRevealAttempt(Date.now()))
   return reveals
@@ -678,14 +685,9 @@ function* revealAttestation(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation,
-  delayInMs: number = 0
+  attestation: ActionableAttestation
 ) {
   const issuer = attestation.issuer
-  if (delayInMs) {
-    Logger.debug(TAG + '@tryRevealPhoneNumber', `Delaying for: ${delayInMs}ms`)
-    yield delay(delayInMs)
-  }
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
   return yield call(
     tryRevealPhoneNumber,
