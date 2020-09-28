@@ -15,15 +15,16 @@ export default function Canvas() {
   const [isOpen, toggleSidebar] = useBooleanToggle()
   return (
     <>
+      <Head>
+        <script async={true} src="https://platform.twitter.com/widgets.js" />
+        <link key="favicon" rel="shortcut icon" href="/flowers-favicon.png" type="image/png" />
+      </Head>
       <OpenGraph
         title="For Value Flowers"
         description="This art form is a testament to the creative trinity of code, poetry, and illustration. As a work centered around channelling the Celo story, For Value Flowers is a gift of optimism. It gives shape to a spirit of collective prosperity, and celebrates it when brought to life. Our intention for this gift is to ground a space for a special, expressive tone of togetherness, our 'Kuneco'. Here, we gather — for the intimate connection that forms the heart of communal interdependence, dedicated to making the conditions for prosperity to flower throughout the world."
         path={menuItems.FLOWERS.link}
         image={preview}
       />
-      <Head>
-        <script async={true} src="https://platform.twitter.com/widgets.js" />
-      </Head>
       <View style={styles.root}>
         <View style={styles.nav}>
           <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy, styles.navText]}>

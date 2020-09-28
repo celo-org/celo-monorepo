@@ -106,7 +106,7 @@ function CopyButton() {
 }
 
 const TweetButton = React.memo(() => {
-  const text = encodeURI('Blooming more beautiful money, as wealth flowers 🌺')
+  const text = encodeURI('Blooming more beautiful money — for value flowers 🌺')
   const url = 'celo.org/flowers'
   return (
     <>

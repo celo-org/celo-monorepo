@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { Animated, Image, StyleSheet } from 'react-native'
-import Cambio from 'src/codename-allegory/color-flower.jpg'
+import FlowerTablet from 'src/codename-allegory/color-flower-mid.jpg'
+import FlowerMobile from 'src/codename-allegory/color-flower-small.jpg'
+import FlowerDesktop from 'src/codename-allegory/color-flower.jpg'
 import Outline from 'src/codename-allegory/outline-flower.png'
-import { useScreenSize } from 'src/layout/ScreenSize'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import { standardStyles } from 'src/styles'
 
@@ -72,11 +74,22 @@ export default function Flower() {
           <Image source={Outline} style={standardStyles.image} />
         </AnimatedRatio>
         <AnimatedRatio ratio={1} style={{ opacity: colorOpacity, willChange: 'opacity' }}>
-          <Image source={Cambio} style={standardStyles.image} onLoadEnd={showImage} />
+          <FlowerIllo onLoadEnd={showImage} />
         </AnimatedRatio>
       </Animated.View>
     </Animated.View>
   )
+}
+
+function FlowerIllo({ onLoadEnd }) {
+  const { screen } = useScreenSize()
+  return <Image source={SOURCES[screen]} style={standardStyles.image} onLoadEnd={onLoadEnd} />
+}
+
+const SOURCES = {
+  [ScreenSizes.MOBILE]: FlowerMobile,
+  [ScreenSizes.TABLET]: FlowerTablet,
+  [ScreenSizes.DESKTOP]: FlowerDesktop,
 }
 
 const styles = StyleSheet.create({

@@ -47,6 +47,7 @@ export default function FlowerArea() {
               href={pagePaths.FLOWERS.link}
               kind={BTN.NAKED}
               size={SIZE.normal}
+              target={'_blank'}
             />
             <Button
               text={'Kuneco'}
