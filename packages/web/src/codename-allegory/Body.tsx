@@ -30,7 +30,7 @@ export default React.memo(function Body({ isOpen }: Props) {
             <Image source={Abundance} style={styles.abundance} />
           </Fade>
           <Fade duration={5000} fraction={1} rootMargin={'-20% 0% -30%'}>
-            <Text style={[fonts.legal, textStyles.center, textStyles.italic]}>
+            <Text style={[fonts.p, textStyles.center, textStyles.italic]}>
               – Imagined with Celo
             </Text>
           </Fade>

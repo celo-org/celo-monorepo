@@ -134,11 +134,9 @@ const styles = StyleSheet.create({
     willChange: 'width',
     transitionProperty: 'width',
     transitionDuration: '1300ms',
-    transitionDelay: '300ms',
   },
   expanderOpen: {
     transitionDuration: '1200ms',
-    transitionDelay: '00ms',
     width: WIDTH,
   },
   root: {
@@ -180,9 +178,9 @@ const styles = StyleSheet.create({
   },
   hideSide: {
     transitionProperty: 'opacity, transform',
-    transitionDuration: '800ms, 1600ms',
+    transitionDuration: '800ms',
     opacity: 0,
-    transform: [{ translateX: 20 }],
+    transform: [{ translateX: 120 }],
   },
   role: {
     textTransform: 'uppercase',
