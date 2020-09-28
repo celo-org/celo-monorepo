@@ -29333,10 +29333,9 @@ react-native-web@^0.13.12:
     prop-types "^15.6.0"
     react-timer-mixin "^0.13.4"
 
-react-native-webview@^10.8.3:
-  version "10.8.3"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-10.8.3.tgz#63245fdf39320dbbc67c26e1e305342a51f93d66"
-  integrity sha512-QV3dCGG8xsr/65Rpf2/Khno8fzkyyJKUZpn00y6Wd1hbYRqataZOesCm2ceZS21yXzLLGVHmQlB5/41h3K787Q==
+"react-native-webview@git+https://github.com/celo-org/react-native-webview#8081443":
+  version "10.3.3"
+  resolved "git+https://github.com/celo-org/react-native-webview#8081443c53dd7542af821ec5ff9275c4ecd5748b"
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
