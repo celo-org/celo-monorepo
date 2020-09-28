@@ -348,6 +348,50 @@ exports[`VerificationInputScreen renders correctly 1`] = `
             </View>
           </View>
         </View>
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        />
+        <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#A49B80",
+                  "padding": 16,
+                  "textAlign": "center",
+                },
+              ]
+            }
+          >
+            verificationInput.resendMessages_all
+          </Text>
+        </View>
       </View>
     </RCTScrollView>
     <View
