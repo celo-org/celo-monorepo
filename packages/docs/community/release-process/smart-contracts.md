@@ -35,7 +35,10 @@ Every deployed smart contract has its current version number as a constant which
 Contracts deployed to a live network without the `getVersion()` function, such as the original set of core contracts, are to be considered version `1.1.0.0`.
 
 ## Build and Release Process
-Using the following scripts, new contracts can be built and deployed alongside a corresponding on-chain governance proposal. Run the following scripts from the branch with the new release contracts:
+When a release branch is audited and ready for release, the corresponding commit will be tagged according to [Release management in Git/Github](#Release-management-in-Git/Github). All contracts at this commit that differ from the current contracts will all be built and deployed at once. The version number of each contract will reflect changes since the previous release, according to [Versioning](#Versioning). The github CI ensures that all versioning accurately reflects the changes made since the previous release, and this will be further reinforced when using the release scripts below.
+
+### Build and Release Scripts
+Using the following scripts, new contracts will be built and deployed alongside a corresponding on-chain governance proposal. Run the following scripts from the tagged commit with the new release contracts:
 
 ```bash
 ## Script 1 ##
