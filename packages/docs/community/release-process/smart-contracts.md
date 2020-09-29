@@ -37,57 +37,63 @@ When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit th
 After a completed release process, the release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
 
 
-## Build and Release Process
+## Release Process
 
-Using the following scripts, new contracts can be built and deployed alongside a corresponding on-chain governance proposal. Run the following scripts from the branch with the new release contracts:
+Using the following procedure, a new contract release can be built, deployed, and proposed for upgrade automatically.
 
+### Verify Current Deployment
+
+Compile the contracts in <code>$RELEASE_BRANCH</code> branch and verify that the deployed bytecode on <code>$NETWORK</code> matches compiled bytecode.
 ```bash
-## Script 1 ##
-# TODO: command to pull source code from release N-1, compile and get the artifacts
-# verify the current contract bytecode on the network matches the contracts currently on the RC1 branch
-yarn truffle exec --network $NETWORK ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
-
-## Script 2 ##
-# TODO: command to pull source code from current release branch
-# generate report on backwards compatibility between RC1 and current branch with new release contracts
-yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/rc1 -n build/contracts --output_file report.json
-
-## Script 3 ##
-# deploy new contracts and generate governance proposal for upgrade
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data example-initialize-data.json'
+yarn verify-deployed -n $NETWORK -b $RELEASE_BRANCH
 ```
 
-These scripts do the following:
+### Check Backward Compatibility
 
-#### Script 1:
+Compile the contracts in <code>$RELEASE_BRANCH</code> and <code>$BRANCH</code> branches and check backwards compatibility against a release, subject to the following exceptions:
+  1. If the STORAGE version has changed, do not perform backwards compatibility checks
+  2. If the MAJOR version has changed, check storage layout is backwards compatible, but do not check contract ABI is backwards compatible
 
-1. Compiles the contracts at <code>rc1</code> branch and confirms that the compiled bytecode matches what is currently deployed on the specified network.
-
-#### Script 2:
-
-1. Compiles the contracts in the current branch and checks backwards compatibility with what is currently deployed on the specified network, with the following exceptions:
-   1. If the STORAGE version has changed, does not perform backwards compatibility checks
-   2. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
-2. For contracts that have changed, confirms that the version number in the current branch is strictly greater than the deployed version number.
-3. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
-
-#### Script 3:
-
-1. For contracts that have changed, deploys those contracts to the specified network.
-2. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
-   1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Registry contract.
-   2. All other updates are adopted by updating the proxy contract’s implementation pointer.
-
-## Verify Release Process
-
-Using the following script, any stakeholders can verify that the release contracts deployed as a part of the upgrade proposal match the contracts from the release branch exactly. Run this script from the relevant release tag (`celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`) or release branch `release/celo-core-contracts/N`:
+For changed contracts, confirm that version number in <code>$BRANCH</code> is strictly greater than <code>$RELEASE_BRANCH</code> version number.
+For unchanged contracts, confirm that version number in <code>$BRANCH</code> is exactly the <code>$RELEASE_BRANCH</code> version number.
+Output a JSON backwards compatibility report to <code>$REPORT</code> file.
 
 ```bash
-# verify bytecode of upgrade deployment
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
+yarn check-versions -a $RELEASE_BRANCH -b $BRANCH -r $REPORT
 ```
 
-This script compiles the contracts at the current branch and confirms that the compiled bytecode matches the bytecode of contracts deployed as a part of the ugrade propsal.
+### Deploy New Contracts
+
+Build contracts on <code>$BRANCH</code> and, using corresponding backwards compatibility report <code>$REPORT</code>, deploy changed contracts to <code>$NETWORK</code>.
+STORAGE updates are adopted by deploying a new proxy/implementation pair. Initialize new contracts with values using <code>$INITIALIZE_DATA</code> when specified.
+Output a JSON upgrade governance proposal to <code>$PROPOSAL</code> file. The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Other storage compatible upgrades are encoded by repointing the existing proxy's implementation.
+
+```bash
+yarn make-release -r $REPORT -b $BRANCH -n $NETWORK -i $INITIALIZE_DATA -p $PROPOSAL
+```
+
+### Submit Upgrade Proposal
+
+Submit the autogenerated upgrade proposal to the Governance contract for review by voters, outputting a unique identifier.
+
+```bash
+celocli governance:propose <...> --jsonTransactions $PROPOSAL
+# save id to $UPGRADE_PROPOSAL_ID
+```
+
+## Review Release Tooling
+
+Fetch the upgrade proposal identified by <code>$UPGRADE_PROPOSAL_ID</code> and output the JSON encoded proposal contents to <code>$UPGRADE_PROPOSAL</code>.
+
+```bash
+celocli governance:show <...> --proposalID $UPGRADE_PROPOSAL_ID --jsonFile $UPGRADE_PROPOSAL
+```
+
+Verify that the <code>$UPGRADE_PROPOSAL</code> proposal performs an upgrade to contract addresses which match compiled bytecode from the release candidate <code>$BRANCH</code> branch exactly.
+
+```bash
+yarn verify-release -b $BRANCH -n $NETWORK -p $UPGRADE_PROPOSAL
+```
 
 ## Testing
 
