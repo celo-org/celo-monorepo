@@ -6,7 +6,7 @@ exports[`renders banner when app is disconnected 1`] = `
     Array [
       Object {
         "color": "#2E3338",
-        "fontFamily": "Hind-Regular",
+        "fontFamily": "Inter-Regular",
         "fontSize": 14,
         "lineHeight": undefined,
         "textAlign": "center",
@@ -15,7 +15,10 @@ exports[`renders banner when app is disconnected 1`] = `
         "color": "#9CA4A9",
       },
       Object {
-        "fontFamily": "Hind-Bold",
+        "color": "#2E3338",
+        "fontFamily": "Inter-SemiBold",
+        "fontSize": 16,
+        "lineHeight": 22,
       },
     ]
   }
