@@ -9,14 +9,17 @@ import express from 'express'
 import { findAttestationByKey, kit, makeSequelizeLogger, SequelizeLogger } from '../db'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { Counters } from '../metrics'
-import { AttestationKey, AttestationStatus } from '../models/attestation'
-import { respondWithAttestation, respondWithError, Response } from '../request'
-import { startSendSms } from '../sms'
+import { AttestationKey, AttestationModel } from '../models/attestation'
+import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
+import { rerequestAttestation, startSendSms } from '../sms'
 import { obfuscateNumber } from '../sms/base'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
 const ATTESTATION_ALREADY_SENT_ERROR = 'Attestation already sent'
+
+// Time within which we allow forcing a retry of completed (or any state) attestations
+const allowRetryWithinCompletedMs = 20 * 60 * 1000
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -52,26 +55,35 @@ class AttestationRequestHandler {
     this.key = getAttestationKey(this.attestationRequest)
   }
 
-  async validateAttestationRequest() {
+  async findOrValidateRequest(): Promise<AttestationModel | null> {
     const { account, issuer } = this.attestationRequest
 
     const address = getAccountAddress()
     if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
-      throw new Error(`Mismatching issuer, I am ${address}`)
+      throw new ErrorWithResponse(`Mismatching issuer, I am ${address}`, 422)
     }
 
-    const attestationRecord = await findAttestationByKey(this.key, {
+    const attestation = await findAttestationByKey(this.key, {
       logging: this.sequelizeLogger,
     })
 
-    if (attestationRecord && attestationRecord.status !== AttestationStatus.NotSent) {
-      Counters.attestationRequestsAlreadySent.inc()
-      throw new Error(ATTESTATION_ALREADY_SENT_ERROR)
+    if (attestation && attestation.completedAt) {
+      const completedAgo = Date.now() - attestation.completedAt!.getTime()
+      if (completedAgo >= allowRetryWithinCompletedMs) {
+        Counters.attestationRequestsAlreadySent.inc()
+        throw new ErrorWithResponse(ATTESTATION_ALREADY_SENT_ERROR, 422)
+      }
+    }
+
+    // Re-requests for existing attestations skip the on-chain check.
+    if (attestation) {
+      Counters.attestationRequestsRerequest.inc()
+      return attestation
     }
 
     if (isDevMode()) {
-      return
+      return attestation
     }
 
     // Check the on-chain status of the attestation. If it's marked Complete, don't do it.
@@ -80,7 +92,8 @@ class AttestationRequestHandler {
     for (let i = 0; i < 4; i++) {
       const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
       if (state.attestationState === AttestationState.Incomplete) {
-        return
+        Counters.attestationRequestsValid.inc()
+        return null
       } else if (state.attestationState === AttestationState.Complete) {
         break
       } else {
@@ -89,7 +102,7 @@ class AttestationRequestHandler {
     }
 
     Counters.attestationRequestsWOIncompleteAttestation.inc()
-    throw new Error(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR)
+    throw new ErrorWithResponse(NO_INCOMPLETE_ATTESTATION_FOUND_ERROR, 422)
 
     // TODO: Check expiration
   }
@@ -113,7 +126,7 @@ class AttestationRequestHandler {
     }
   }
 
-  async validateAttestation(attestationCode: string) {
+  async validateAttestationCode(attestationCode: string) {
     if (!isDevMode()) {
       const { account } = this.attestationRequest
       const address = getAccountAddress()
@@ -127,24 +140,45 @@ class AttestationRequestHandler {
 
       if (!isValid) {
         Counters.attestationRequestsAttestationErrors.inc()
-        throw new Error(ATTESTATION_ERROR)
+        throw new ErrorWithResponse(ATTESTATION_ERROR, 422)
       }
     }
   }
 
-  async sendSms(attestationCode: string) {
-    const textMessage = createAttestationTextMessage(
-      attestationCode,
-      this.attestationRequest.smsRetrieverAppSig
-    )
+  // Main process for handling an attestation.
+  async doAttestation() {
+    Counters.attestationRequestsTotal.inc()
+    let attestation = await this.findOrValidateRequest()
 
-    return startSendSms(
-      this.key,
-      this.attestationRequest.phoneNumber,
-      textMessage,
-      this.logger,
-      this.sequelizeLogger
-    )
+    if (attestation && attestation.message) {
+      // Re-request existing attestation
+      attestation = await rerequestAttestation(this.key, this.logger, this.sequelizeLogger)
+    } else {
+      // New attestation: create text message, new delivery.
+      const attestationCode = await this.signAttestation()
+      await this.validateAttestationCode(attestationCode)
+
+      const textMessage = createAttestationTextMessage(
+        attestationCode,
+        this.attestationRequest.smsRetrieverAppSig
+      )
+
+      attestation = await startSendSms(
+        this.key,
+        this.attestationRequest.phoneNumber,
+        textMessage,
+        this.logger,
+        this.sequelizeLogger
+      )
+    }
+
+    if (attestation.failure()) {
+      Counters.attestationRequestsFailedToSendSms.inc()
+    } else {
+      Counters.attestationRequestsSentSms.inc()
+    }
+
+    return attestation
   }
 }
 
@@ -154,33 +188,16 @@ export async function handleAttestationRequest(
   attestationRequest: AttestationRequest
 ) {
   const handler = new AttestationRequestHandler(attestationRequest, res.locals.logger)
-  let attestationCode
   try {
-    Counters.attestationRequestsTotal.inc()
-    await handler.validateAttestationRequest()
-    Counters.attestationRequestsValid.inc()
-    attestationCode = await handler.signAttestation()
-    await handler.validateAttestation(attestationCode)
-  } catch (error) {
-    handler.logger.info({ error })
-    respondWithError(res, 422, `${error.message ?? error}`)
-    return
-  }
-
-  try {
-    const attestation = await handler.sendSms(attestationCode)
-
-    if (attestation.failure()) {
-      Counters.attestationRequestsFailedToSendSms.inc()
-    } else {
-      Counters.attestationRequestsSentSms.inc()
-    }
-
+    const attestation = await handler.doAttestation()
     respondWithAttestation(res, attestation)
   } catch (error) {
-    Counters.attestationRequestUnexpectedErrors.inc()
-    handler.logger.error({ error })
-    respondWithError(res, 500, `${error.message ?? error}`)
-    return
+    if (!error.responseCode) {
+      handler.logger.error({ error })
+      Counters.attestationRequestUnexpectedErrors.inc()
+    } else {
+      handler.logger.info({ error })
+    }
+    respondWithError(res, error.responseCode ?? 500, `${error.message ?? error}`)
   }
 }

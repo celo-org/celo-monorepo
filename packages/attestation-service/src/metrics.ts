@@ -22,6 +22,10 @@ export const Counters = {
     name: 'attestation_requests_valid',
     help: 'Counter for the number of requests involving valid attestation requests',
   }),
+  attestationRequestsRerequest: new Counter({
+    name: 'attestation_requests_rerequest',
+    help: 'Counter for the number of requests that are re-requests',
+  }),
   attestationRequestsAttestationErrors: new Counter({
     name: 'attestation_requests_attestation_errors',
     help: 'Counter for the number of requests for which producing the attestation failed',

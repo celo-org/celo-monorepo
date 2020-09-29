@@ -15,6 +15,7 @@ import {
 import { fetchEnv, fetchEnvOrDefault } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
+import { ErrorWithResponse } from '../request'
 import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
@@ -220,11 +221,9 @@ export async function startSendSms(
     if (!countryCode) {
       Counters.attestationRequestsUnableToServe.labels('unknown').inc()
       attestation.recordError(`Could not parse ${phoneNumber}`)
-      attestation.message = ''
     } else if (providers.length === 0) {
       Counters.attestationRequestsUnableToServe.labels(countryCode).inc()
       attestation.recordError(`No matching SMS providers`)
-      attestation.message = ''
     } else {
       if (numberType !== null) {
         Counters.attestationRequestsByNumberType
@@ -247,6 +246,57 @@ export async function startSendSms(
   // If there was an error sending, backoff and retry while holding open client conn.
   if (shouldRetry && attestation) {
     await sleep(Math.pow(2, attestation!.attempt) * 1000)
+    attestation = await findAttestationAndSendSms(key, logger, sequelizeLogger)
+  }
+
+  return attestation
+}
+
+// Force an existing attestation (could have received a delivery status or not) to be rerequested
+// immediately if there are sufficient attempts remaining.
+export async function rerequestAttestation(
+  key: AttestationKey,
+  logger: Logger,
+  sequelizeLogger: SequelizeLogger
+): Promise<AttestationModel> {
+  let shouldRetry = false
+  let attestation: AttestationModel | null = null
+
+  const transaction = await sequelize!.transaction({
+    logging: sequelizeLogger,
+    type: Transaction.TYPES.IMMEDIATE,
+  })
+
+  try {
+    attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
+    if (!attestation) {
+      throw new Error('Cannot retrieve attestation')
+    }
+
+    attestation.recordError(`Rerequested when status was ${AttestationStatus[attestation.status]}`)
+    attestation.status = AttestationStatus.NotSent
+    attestation.ongoingDeliveryId = null
+    attestation.completedAt = null
+    attestation.attempt += 1
+
+    if (attestation.attempt >= maxDeliveryAttempts) {
+      throw new ErrorWithResponse('Delivery attempts exceeded', 422)
+    }
+
+    const providers = getProvidersFor(attestation, logger)
+    shouldRetry = await doSendSms(attestation, providers, logger)
+
+    await attestation.save({ transaction, logging: sequelizeLogger })
+    await transaction.commit()
+  } catch (err) {
+    logger.error({ err })
+    await transaction.rollback()
+    throw err
+  }
+
+  // If there was an error sending, backoff and retry while holding open client conn.
+  if (shouldRetry && attestation) {
+    await sleep(Math.pow(2, attestation.attempt) * 1000)
     attestation = await findAttestationAndSendSms(key, logger, sequelizeLogger)
   }
 
@@ -348,7 +398,6 @@ async function doSendSms(
 
     if (attestation.attempt >= maxDeliveryAttempts) {
       attestation.completedAt = new Date()
-      attestation.message = ''
       logger.info('Final failure to send')
       Counters.attestationRequestsFailedToDeliverSms.inc()
       return false
@@ -429,7 +478,6 @@ export async function receivedDeliveryReport(
 
           if (attestation.attempt >= maxDeliveryAttempts) {
             attestation.completedAt = new Date()
-            attestation.message = ''
             logger.info(
               {
                 deliveryId,
@@ -442,7 +490,6 @@ export async function receivedDeliveryReport(
           }
         } else if (deliveryStatus === AttestationStatus.Delivered) {
           attestation.completedAt = new Date()
-          attestation.message = ''
           Counters.attestationRequestsBelievedDelivered.inc()
           attestation.ongoingDeliveryId = null
         }

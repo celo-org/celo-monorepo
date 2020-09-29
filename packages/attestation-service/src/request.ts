@@ -122,3 +122,12 @@ export function loggerMiddleware(
   requestLogger.info({ req })
   next()
 }
+
+export class ErrorWithResponse extends Error {
+  responseCode: number | undefined
+  constructor(message?: string, responseCode?: number) {
+    super(message)
+    Object.setPrototypeOf(this, new.target.prototype)
+    this.responseCode = responseCode
+  }
+}
