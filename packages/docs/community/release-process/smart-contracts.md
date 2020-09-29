@@ -45,6 +45,7 @@ Using the following procedure, a new contract release can be built, deployed, an
 
 Compile the contracts in <code>$RELEASE_BRANCH</code> branch and verify that the deployed bytecode on <code>$NETWORK</code> matches compiled bytecode.
 ```bash
+# TODO: command to pull source code from release N-1, compile and get the artifacts
 yarn verify-deployed -n $NETWORK -b $RELEASE_BRANCH
 ```
 
@@ -59,6 +60,7 @@ For unchanged contracts, confirm that version number in <code>$BRANCH</code> is 
 Output a JSON backwards compatibility report to <code>$REPORT</code> file.
 
 ```bash
+# TODO: command to pull source code from current release branch
 yarn check-versions -a $RELEASE_BRANCH -b $BRANCH -r $REPORT
 ```
 
@@ -81,7 +83,11 @@ celocli governance:propose <...> --jsonTransactions $PROPOSAL
 # save id to $UPGRADE_PROPOSAL_ID
 ```
 
-## Review Release Tooling
+## Verify Release Candidate
+
+Using the following procedure, stakeholders can verify a contract release candidate against the contents of a governance upgrade proposal.
+
+### Fetch Upgrade Proposal
 
 Fetch the upgrade proposal identified by <code>$UPGRADE_PROPOSAL_ID</code> and output the JSON encoded proposal contents to <code>$UPGRADE_PROPOSAL</code>.
 
@@ -89,7 +95,9 @@ Fetch the upgrade proposal identified by <code>$UPGRADE_PROPOSAL_ID</code> and o
 celocli governance:show <...> --proposalID $UPGRADE_PROPOSAL_ID --jsonFile $UPGRADE_PROPOSAL
 ```
 
-Verify that the <code>$UPGRADE_PROPOSAL</code> proposal performs an upgrade to contract addresses which match compiled bytecode from the release candidate <code>$BRANCH</code> branch exactly.
+### Verify Release Candidate
+
+Verify that the <code>$UPGRADE_PROPOSAL</code> proposal performs an upgrade to contract addresses which match compiled bytecode from the release candidate <code>$BRANCH</code> branch exactly. Releases are tagged as `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
 
 ```bash
 yarn verify-release -b $BRANCH -n $NETWORK -p $UPGRADE_PROPOSAL
