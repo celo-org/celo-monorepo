@@ -26,6 +26,10 @@ const maxDeliveryAttempts = parseInt(
   10
 )
 
+// Time within which we allow forcing a retry of completed (or any state) attestations
+const allowRetryWithinCompletedMs =
+  1000 * parseInt(fetchEnvOrDefault('MAX_REREQUEST_DELAY_SECS', '1200'), 10)
+
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
 
@@ -273,6 +277,14 @@ export async function rerequestAttestation(
       throw new Error('Cannot retrieve attestation')
     }
 
+    if (attestation.completedAt) {
+      const completedAgo = Date.now() - attestation.completedAt!.getTime()
+      if (completedAgo >= allowRetryWithinCompletedMs) {
+        Counters.attestationRequestsAlreadySent.inc()
+        throw new ErrorWithResponse('Attestation can no longer be rerequested', 422)
+      }
+    }
+
     attestation.recordError(`Rerequested when status was ${AttestationStatus[attestation.status]}`)
     attestation.status = AttestationStatus.NotSent
     attestation.ongoingDeliveryId = null
@@ -280,6 +292,7 @@ export async function rerequestAttestation(
     attestation.attempt += 1
 
     if (attestation.attempt >= maxDeliveryAttempts) {
+      Counters.attestationRequestsAlreadySent.inc()
       throw new ErrorWithResponse('Delivery attempts exceeded', 422)
     }
 

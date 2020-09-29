@@ -16,10 +16,6 @@ import { obfuscateNumber } from '../sms/base'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
-const ATTESTATION_ALREADY_SENT_ERROR = 'Attestation already sent'
-
-// Time within which we allow forcing a retry of completed (or any state) attestations
-const allowRetryWithinCompletedMs = 20 * 60 * 1000
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -67,14 +63,6 @@ class AttestationRequestHandler {
     const attestation = await findAttestationByKey(this.key, {
       logging: this.sequelizeLogger,
     })
-
-    if (attestation && attestation.completedAt) {
-      const completedAgo = Date.now() - attestation.completedAt!.getTime()
-      if (completedAgo >= allowRetryWithinCompletedMs) {
-        Counters.attestationRequestsAlreadySent.inc()
-        throw new ErrorWithResponse(ATTESTATION_ALREADY_SENT_ERROR, 422)
-      }
-    }
 
     // Re-requests for existing attestations skip the on-chain check.
     if (attestation) {
