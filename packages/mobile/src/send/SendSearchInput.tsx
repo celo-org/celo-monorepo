@@ -1,4 +1,4 @@
-import TextInput from '@celo/react-components/components/TextInput.v2'
+import TextInput from '@celo/react-components/components/TextInput'
 import withTextSearchPasteAware from '@celo/react-components/components/WithTextSearchPasteAware'
 import { isValidAddress } from '@celo/utils/src/address'
 import * as React from 'react'

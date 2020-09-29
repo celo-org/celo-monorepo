@@ -1,4 +1,4 @@
-import Button, { BtnSizes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes } from '@celo/react-components/components/Button'
 import Touchable from '@celo/react-components/components/Touchable'
 import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import colors from '@celo/react-components/styles/colors'

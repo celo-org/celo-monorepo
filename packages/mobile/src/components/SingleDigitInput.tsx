@@ -1,6 +1,5 @@
 import TextInput from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
 
@@ -29,10 +28,11 @@ export function SingleDigitInput({ inputValue, inputPlaceholder, onInputChange, 
 
 const styles = StyleSheet.create({
   codeInput: {
-    ...componentStyles.roundedBorder,
+    borderColor: colors.gray2,
+    borderRadius: 3,
+    borderWidth: 1,
     flex: 0,
     backgroundColor: '#FFF',
-    borderColor: colors.gray2,
     height: 50,
     width: 50,
     marginVertical: 5,
