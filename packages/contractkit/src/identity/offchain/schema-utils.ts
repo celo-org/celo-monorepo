@@ -1,3 +1,4 @@
+import { makeAsyncThrowable } from '@celo/base/lib/result'
 import { Err, Ok, parseJsonAsResult, Result, RootError, trimLeading0x } from '@celo/base/src'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { Encrypt } from '@celo/utils/lib/ecies'
@@ -84,7 +85,7 @@ export class SimpleSchema<DataType> {
     )
   }
 
-  async read(account: string): Promise<Result<DataType, SchemaErrors>> {
+  async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
 
     if (!rawData.ok) {
@@ -105,6 +106,8 @@ export class SimpleSchema<DataType> {
 
     return deserializedResult
   }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   private async readEncrypted(account: string): Promise<Result<DataType, SchemaErrors>> {
     const encryptedResult = await readEncrypted(this.wrapper, this.dataPath, account)
@@ -132,7 +135,7 @@ export class BinarySchema {
     return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, toAddresses)
   }
 
-  async read(account: string): Promise<Result<Buffer, SchemaErrors>> {
+  async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
     if (!rawData.ok) {
       return this.readEncrypted(account)
@@ -145,6 +148,8 @@ export class BinarySchema {
     }
     return Ok(rawData.result)
   }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   private async readEncrypted(account: string) {
     return readEncrypted(this.wrapper, this.dataPath, account)

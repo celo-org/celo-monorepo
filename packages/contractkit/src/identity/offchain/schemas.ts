@@ -1,4 +1,4 @@
-import { Err } from '@celo/base/lib/result'
+import { Err, makeAsyncThrowable } from '@celo/base/lib/result'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
@@ -32,7 +32,7 @@ export class AuthorizedSignerAccessor {
   basePath = '/account/authorizedSigners'
   constructor(readonly wrapper: OffchainDataWrapper) {}
 
-  async read(account: Address, signer: Address) {
+  async readAsResult(account: Address, signer: Address) {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
       this.basePath + '/' + toChecksumAddress(signer)
@@ -43,6 +43,8 @@ export class AuthorizedSignerAccessor {
 
     return deserialize(AuthorizedSignerSchema, rawData.result)
   }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   async write(signer: Address, proofOfPossession: string, filteredDataPaths: string) {
     await this.wrapper.writeDataTo(

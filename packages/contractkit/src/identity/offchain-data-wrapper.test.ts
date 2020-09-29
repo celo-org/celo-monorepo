@@ -89,7 +89,7 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const resp = await nameAccessor.read(writerAddress)
+      const resp = await nameAccessor.readAsResult(writerAddress)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       } else {
@@ -137,10 +137,10 @@ testWithGanache('Offchain Data', (web3) => {
     const nameAccessor = new NameAccessor(wrapper)
     await nameAccessor.write({ name: testname })
 
-    const receivedName = await nameAccessor.read(writerAddress)
+    const receivedName = await nameAccessor.readAsResult(writerAddress)
     expect(receivedName.ok).toEqual(false)
     const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-    const authorization = await authorizedSignerAccessor.read(writerAddress, signer)
+    const authorization = await authorizedSignerAccessor.readAsResult(writerAddress, signer)
     expect(authorization.ok).toEqual(false)
   })
 
@@ -167,7 +167,7 @@ testWithGanache('Offchain Data', (web3) => {
 
     it('can read the authorization', async () => {
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      const authorization = await authorizedSignerAccessor.read(writerAddress, signer)
+      const authorization = await authorizedSignerAccessor.readAsResult(writerAddress, signer)
       expect(authorization).toBeDefined()
     })
 
@@ -176,7 +176,7 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write({ name: testname })
 
-      const resp = await nameAccessor.read(writerAddress)
+      const resp = await nameAccessor.readAsResult(writerAddress)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       }
@@ -208,7 +208,7 @@ testWithGanache('Offchain Data', (web3) => {
         await nameAccessor.writeEncrypted(payload, readerAddress)
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.read(writerAddress)
+        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
 
         if (receivedName.ok) {
           expect(receivedName.result.name).toEqual(testname)
@@ -226,7 +226,7 @@ testWithGanache('Offchain Data', (web3) => {
         await nameAccessor.writeWithSymmetric(payload, [readerAddress])
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.read(writerAddress)
+        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
 
         if (receivedName.ok) {
           expect(receivedName.result.name).toEqual(testname)
@@ -246,7 +246,7 @@ testWithGanache('Offchain Data', (web3) => {
         await nameAccessor.writeEncrypted(payload, readerAddress)
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.read(writerAddress)
+        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
 
         if (receivedName.ok) {
           throw new Error('Should not get here')
