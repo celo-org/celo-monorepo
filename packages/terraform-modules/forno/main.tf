@@ -61,11 +61,19 @@ resource "google_compute_global_address" "global_address" {
 resource "google_compute_managed_ssl_certificate" "ssl_cert" {
   provider = google-beta
 
-  name = "${var.celo_env}-forno-ssl-cert"
+  name = "${var.celo_env}-forno-ssl-cert-${random_id.ssl_random_suffix.hex}"
 
   managed {
     domains = var.ssl_cert_domains
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "random_id" "ssl_random_suffix" {
+  byte_length = 4
 }
 
 resource "google_compute_url_map" "url_map" {

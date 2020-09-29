@@ -60,6 +60,37 @@ export async function upgradePrometheus() {
 }
 
 async function helmParameters(clusterConfig?: BaseClusterConfig) {
+  // To save $, don't send metrics to SD that probably won't be used
+  const exclusions = [
+    '__name__!~"kube_.+_labels"',
+    '__name__!~"apiserver_.+"',
+    '__name__!~"kube_certificatesigningrequest_.+"',
+    '__name__!~"kube_configmap_.+"',
+    '__name__!~"kube_cronjob_.+"',
+    '__name__!~"kube_endpoint_.+"',
+    '__name__!~"kube_horizontalpodautoscaler_.+"',
+    '__name__!~"kube_ingress_.+"',
+    '__name__!~"kube_job_.+"',
+    '__name__!~"kube_lease_.+"',
+    '__name__!~"kube_limitrange_.+"',
+    '__name__!~"kube_mutatingwebhookconfiguration_.+"',
+    '__name__!~"kube_namespace_.+"',
+    '__name__!~"kube_networkpolicy_.+"',
+    '__name__!~"kube_poddisruptionbudget_.+"',
+    '__name__!~"kube_replicaset_.+"',
+    '__name__!~"kube_replicationcontroller_.+"',
+    '__name__!~"kube_resourcequota_.+"',
+    '__name__!~"kube_secret_.+"',
+    '__name__!~"kube_service_.+"',
+    '__name__!~"kube_storageclass_.+"',
+    '__name__!~"kube_service_.+"',
+    '__name__!~"kube_validatingwebhookconfiguration_.+"',
+    '__name__!~"kube_verticalpodautoscaler_.+"',
+    '__name__!~"kube_volumeattachment_.+"',
+    '__name__!~"kubelet_.+"',
+    '__name__!~"phoenix_.+"',
+    '__name__!~"workqueue_.+"'
+  ]
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
@@ -72,7 +103,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     // has some metrics of the form "kube_.+_labels" that provides the labels
     // of k8s resources as metric labels. If some k8s resources have too many labels,
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
-    `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\,__name__!~"phoenix_.+"\\}'`,
+    `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
   ]
   if (clusterConfig) {
     params.push(
