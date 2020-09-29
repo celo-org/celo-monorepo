@@ -127,11 +127,13 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     this.setState({ orderKey: key, orderAsc: asc, expanded: undefined })
   }
 
-  sortData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']): CeloGroup[] {
-    // Clean data if not already cached
-    const data = this.cachedCleanData || cleanData({ celoValidatorGroups, latestBlock })
-    this.cachedCleanData = data
+  getData(): CeloGroup[] {
+    this.cachedCleanData = this.cachedCleanData || cleanData(this.props.data)
+    return this.cachedCleanData
+  }
 
+  sortData() {
+    const data = this.getData()
     const { orderAsc, orderKey } = this.state
     const accessor = this.orderAccessors[orderKey]
     const dir = orderAsc ? 1 : -1
@@ -153,8 +155,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
 
   render() {
     const { expanded, orderAsc, orderKey } = this.state
-    const { data } = this.props
-    const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(data)
+    const validatorGroups = this.sortData()
     return (
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
