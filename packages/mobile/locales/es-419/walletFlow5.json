@@ -115,5 +115,6 @@
   "transactionHeaderWithdrewCelo": "Retiro de CELO",
   "transactionHeaderEscrowSent": "Escrow Pago Enviado",
   "transactionHeaderReceived": "Pago Recibido",
-  "transactionHeaderEscrowReceived": "Escrow Pago Recibido"
+  "transactionHeaderEscrowReceived": "Escrow Pago Recibido",
+  "feedSectionHeaderRecent": "Recientes"
 }
