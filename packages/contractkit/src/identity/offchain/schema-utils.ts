@@ -86,20 +86,34 @@ export class SimpleSchema<DataType> {
 
   async read(account: string): Promise<Result<DataType, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
+
     if (!rawData.ok) {
-      return Err(new OffchainError(rawData.error))
+      return this.readEncrypted(account)
     }
 
-    return this.deserialize(rawData.result)
+    const deserializedResult = this.deserialize(rawData.result)
+
+    if (deserializedResult.ok) {
+      return deserializedResult
+    }
+
+    const encryptedResult = await this.readEncrypted(account)
+
+    if (encryptedResult.ok) {
+      return encryptedResult
+    }
+
+    return deserializedResult
   }
 
-  async readEncrypted(senderAddress: string): Promise<Result<DataType, SchemaErrors>> {
-    const result = await readEncrypted(this.wrapper, this.dataPath, senderAddress)
-    if (!result.ok) {
-      return Err(result.error)
+  private async readEncrypted(account: string): Promise<Result<DataType, SchemaErrors>> {
+    const encryptedResult = await readEncrypted(this.wrapper, this.dataPath, account)
+
+    if (encryptedResult.ok) {
+      return this.deserialize(encryptedResult.result)
     }
 
-    return this.deserialize(result.result)
+    return encryptedResult
   }
 }
 
@@ -121,14 +135,19 @@ export class BinarySchema {
   async read(account: string): Promise<Result<Buffer, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
     if (!rawData.ok) {
-      return Err(new OffchainError(rawData.error))
+      return this.readEncrypted(account)
     }
 
+    const encryptedResult = await this.readEncrypted(account)
+
+    if (encryptedResult.ok) {
+      return encryptedResult
+    }
     return Ok(rawData.result)
   }
 
-  async readEncrypted(senderAddress: string) {
-    return readEncrypted(this.wrapper, this.dataPath, senderAddress)
+  private async readEncrypted(account: string) {
+    return readEncrypted(this.wrapper, this.dataPath, account)
   }
 }
 
@@ -204,6 +223,9 @@ const readEncrypted = async (
     accounts.getDataEncryptionKey(senderAddress),
   ])
 
+  if (readerPubKey === null) {
+    return Err(new UnavailableKey())
+  }
   const readerPublicKeyAddress = publicKeyToAddress(readerPubKey)
 
   if (!wallet.hasAccount(readerPublicKeyAddress)) {

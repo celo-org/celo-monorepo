@@ -208,7 +208,7 @@ testWithGanache('Offchain Data', (web3) => {
         await nameAccessor.writeEncrypted(payload, readerAddress)
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readEncrypted(writerAddress)
+        const receivedName = await readerNameAccessor.read(writerAddress)
 
         if (receivedName.ok) {
           expect(receivedName.result.name).toEqual(testname)
@@ -226,7 +226,7 @@ testWithGanache('Offchain Data', (web3) => {
         await nameAccessor.writeWithSymmetric(payload, [readerAddress])
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readEncrypted(writerAddress)
+        const receivedName = await readerNameAccessor.read(writerAddress)
 
         if (receivedName.ok) {
           expect(receivedName.result.name).toEqual(testname)
@@ -246,7 +246,7 @@ testWithGanache('Offchain Data', (web3) => {
         await nameAccessor.writeEncrypted(payload, readerAddress)
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readEncrypted(writerAddress)
+        const receivedName = await readerNameAccessor.read(writerAddress)
 
         if (receivedName.ok) {
           throw new Error('Should not get here')
