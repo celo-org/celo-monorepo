@@ -1,5 +1,5 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
-import fontFamily from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
@@ -7,7 +7,7 @@ import * as renderer from 'react-test-renderer'
 
 const styles = StyleSheet.create({
   errorMessage: {
-    ...fontFamily.regular,
+    ...fontStyles.regular,
     fontSize: 12,
     borderRadius: 25,
     backgroundColor: 'rgba(238, 238, 238, 0.75)',

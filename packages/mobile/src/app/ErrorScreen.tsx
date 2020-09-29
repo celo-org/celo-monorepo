@@ -1,5 +1,5 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
-import fontFamily from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { RouteProp } from '@react-navigation/native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -45,7 +45,7 @@ class ErrorScreen extends React.Component<Props> {
 
 const styles = StyleSheet.create({
   errorMessage: {
-    ...fontFamily.regular,
+    ...fontStyles.regular,
     fontSize: 12,
     borderRadius: 25,
     backgroundColor: 'rgba(238, 238, 238, 0.75)',
