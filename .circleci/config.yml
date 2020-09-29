@@ -474,7 +474,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             git fetch --all
-            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
+            RELEASE_BRANCH=release/contracts/base_release
             yarn --cwd packages/protocol check-versions -a $RELEASE_BRANCH -b $CIRCLE_BRANCH
 
             LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only packages/protocol/contracts/common/linkedlists)
