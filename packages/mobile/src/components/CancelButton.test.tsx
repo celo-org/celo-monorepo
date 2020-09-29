@@ -1,7 +1,7 @@
 import * as React from 'react'
 import 'react-native'
 import { render } from 'react-native-testing-library'
-import CancelButton from 'src/components/CancelButton.v2'
+import CancelButton from 'src/components/CancelButton'
 
 describe('CancelButton', () => {
   it('displays cancel', () => {

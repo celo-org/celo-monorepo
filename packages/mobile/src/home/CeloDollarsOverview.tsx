@@ -28,7 +28,7 @@ function CeloDollarsOverview({ t }: Props) {
     <View style={styles.container}>
       {dollarBalanceAmount && (
         <Text style={styles.balance} testID="DollarBalance">
-          <CurrencyDisplay style={fontStyles.semiBold} amount={dollarBalanceAmount} />
+          <CurrencyDisplay style={fontStyles.regular500} amount={dollarBalanceAmount} />
         </Text>
       )}
       {!isUsdLocalCurrency && dollarBalanceAmount && (
@@ -61,9 +61,8 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   dollarBalance: {
-    ...fontStyles.light,
-    fontSize: 18,
-    color: '#B0B5B9',
+    ...fontStyles.large,
+    color: colors.gray5,
   },
 })
 

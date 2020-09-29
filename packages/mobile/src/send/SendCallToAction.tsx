@@ -17,7 +17,7 @@ export function SendCallToAction(props: SendCTAProps) {
     <View style={styles.container}>
       {props.icon}
       <View style={styles.textContainer}>
-        <Text style={fontStyles.bodySmallSemiBold}>{props.header}</Text>
+        <Text style={fontStyles.small500}>{props.header}</Text>
         <Text style={styles.bodyText}>{props.body}</Text>
         <TextButton onPress={props.onPressCta}>{props.cta}</TextButton>
       </View>
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   bodyText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     marginVertical: 10,
   },
 })
