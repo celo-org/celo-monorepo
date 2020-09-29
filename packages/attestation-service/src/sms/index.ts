@@ -28,7 +28,7 @@ const maxDeliveryAttempts = parseInt(
 
 // Time within which we allow forcing a retry of completed (or any state) attestations
 const allowRetryWithinCompletedMs =
-  1000 * parseInt(fetchEnvOrDefault('MAX_REREQUEST_DELAY_SECS', '1200'), 10)
+  1000 * 60 * parseInt(fetchEnvOrDefault('MAX_REREQUEST_MINS', '20'), 10)
 
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
