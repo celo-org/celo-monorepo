@@ -2,9 +2,10 @@ import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import Clipboard from '@react-native-community/clipboard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { isValidBackupPhrase, isValidSocialBackupPhrase } from 'src/backup/utils'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -91,7 +92,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
         </View>
         {mode === BackupPhraseContainerMode.READONLY && (
           <View style={styles.phraseContainer}>
-            {!!words && <Text style={styles.phraseText}>{words}</Text>}
+            {!!words && (
+              <Text style={styles.phraseText} testID="AccountKeyWords">
+                {words}
+              </Text>
+            )}
           </View>
         )}
         {mode === BackupPhraseContainerMode.INPUT && (
@@ -170,12 +175,6 @@ const styles = StyleSheet.create({
   },
   socialPhraseInputText: {
     minHeight: 90,
-  },
-  button: {
-    alignSelf: 'center',
-    flex: 1,
-    paddingBottom: 0,
-    marginBottom: 0,
   },
 })
 

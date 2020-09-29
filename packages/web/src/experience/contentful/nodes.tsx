@@ -1,6 +1,7 @@
 import { RenderNode } from '@contentful/rich-text-react-renderer'
 import { BLOCKS, INLINES } from '@contentful/rich-text-types'
 import { Asset, Sys } from 'contentful'
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import YouTube from 'react-youtube'
 import { brandStyles } from 'src/experience/common/constants'

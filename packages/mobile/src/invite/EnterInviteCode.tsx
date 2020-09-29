@@ -192,7 +192,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                 <UseBackToWelcomeScreen
                   backAnalyticsEvents={[OnboardingEvents.create_account_cancel]}
                 />
-                <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
+                <DevSkipButton onSkip={this.skipInvite} />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
                   contentContainerStyle={[
