@@ -1,4 +1,4 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import _ from 'lodash'
 import * as React from 'react'
@@ -28,7 +28,7 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
-import Logo from 'src/icons/Logo.v2'
+import Logo from 'src/icons/Logo'
 import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -139,7 +139,7 @@ export class WalletHome extends React.Component<Props, State> {
     if (!title) {
       return null
     }
-    return <SectionHeadNew text={title} />
+    return <SectionHead text={title} />
   }
 
   keyExtractor = (_item: any, index: number) => {

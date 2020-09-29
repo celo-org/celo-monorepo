@@ -64,7 +64,7 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
       Array [
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 14,
           "lineHeight": 18,
         },
@@ -85,12 +85,9 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
       Array [
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Regular",
+          "fontFamily": "Inter-Regular",
           "fontSize": 14,
           "lineHeight": 18,
-        },
-        Object {
-          "fontFamily": "Hind-Light",
         },
         Object {
           "marginHorizontal": 20,
@@ -174,7 +171,7 @@ exports[`Avatar renders correctly with contact 1`] = `
       Array [
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 14,
           "lineHeight": 18,
         },
@@ -299,7 +296,7 @@ exports[`Avatar renders correctly with number but without contact 1`] = `
       Array [
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 14,
           "lineHeight": 18,
         },
@@ -424,7 +421,7 @@ exports[`Avatar renders correctly without contact and number 1`] = `
       Array [
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 14,
           "lineHeight": 18,
         },

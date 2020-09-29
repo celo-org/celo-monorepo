@@ -105,14 +105,19 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 rejectResponderTermination={true}
                 shouldShowClipboard={[Function]}
                 style={
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#EDEEEF",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "paddingHorizontal": 0,
+                      "paddingVertical": 12,
+                    },
+                    undefined,
+                    undefined,
+                  ]
                 }
                 underlineColorAndroid="transparent"
                 value=""
@@ -755,14 +760,19 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="k"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#EDEEEF",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
                     testID="SingleDigitInput/digit0"
                     underlineColorAndroid="transparent"
@@ -808,14 +818,19 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="0"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#EDEEEF",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
                     testID="SingleDigitInput/digit1"
                     underlineColorAndroid="transparent"
@@ -861,14 +876,19 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="F"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#EDEEEF",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
                     testID="SingleDigitInput/digit2"
                     underlineColorAndroid="transparent"
@@ -914,14 +934,19 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="4"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#EDEEEF",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
                     testID="SingleDigitInput/digit3"
                     underlineColorAndroid="transparent"
