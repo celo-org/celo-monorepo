@@ -4,7 +4,6 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "alignItems": "center",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",
@@ -16,7 +15,13 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
   }
 >
   <View
-    style={Object {}}
+    style={
+      Object {
+        "alignItems": "center",
+        "height": 120,
+        "justifyContent": "space-between",
+      }
+    }
   >
     <Text
       style={
@@ -144,7 +149,6 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
-      "alignItems": "center",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",
@@ -156,7 +160,13 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
   }
 >
   <View
-    style={Object {}}
+    style={
+      Object {
+        "alignItems": "center",
+        "height": 120,
+        "justifyContent": "space-between",
+      }
+    }
   >
     <Text
       style={

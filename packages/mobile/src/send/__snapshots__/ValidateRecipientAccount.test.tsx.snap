@@ -580,7 +580,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                         "lineHeight": 18,
                       },
                       Object {
-                        "textAlign": "right",
+                        "textAlign": "center",
                       },
                     ]
                   }
@@ -1408,7 +1408,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                         "lineHeight": 18,
                       },
                       Object {
-                        "textAlign": "right",
+                        "textAlign": "center",
                       },
                     ]
                   }

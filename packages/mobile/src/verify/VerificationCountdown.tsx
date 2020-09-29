@@ -22,11 +22,12 @@ function formatTimeRemaining(seconds: number) {
 
 interface Props {
   onFinish: () => void
+  startTime: number
 }
 
-export default function VerificationCountdown({ onFinish }: Props) {
+export default function VerificationCountdown({ onFinish, startTime }: Props) {
   const hasCalledOnFinishRef = useRef(false)
-  const endTime = useRef(Date.now() + TOTAL_TIME).current
+  const endTime = useMemo(() => startTime + TOTAL_TIME, [startTime])
   // Used for re-rendering, actual value unused
   const [, setTimer] = useState(0)
 

@@ -162,7 +162,7 @@ export class WalletHome extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, activeNotificationCount, callToActNotification } = this.props
+    const { activeNotificationCount, callToActNotification } = this.props
 
     const refresh: React.ReactElement<RefreshControlProps> = (
       <RefreshControl
@@ -182,7 +182,6 @@ export class WalletHome extends React.Component<Props, State> {
     }
 
     sections.push({
-      title: t('activity'),
       data: [{}],
       renderItem: () => (
         <TransactionsList key={'TransactionList'} currency={CURRENCY_ENUM.DOLLAR} />

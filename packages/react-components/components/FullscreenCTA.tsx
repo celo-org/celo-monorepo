@@ -1,5 +1,5 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import fontStyles from '@celo/react-components/styles/fonts'
+import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -41,13 +41,16 @@ const styles = StyleSheet.create({
     height: variables.height,
     width: variables.width,
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 55,
     paddingBottom: 30,
     paddingHorizontal: 20,
   },
-  header: {},
+  header: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 120,
+  },
   button: { alignItems: 'center' },
 })
 
