@@ -26,7 +26,7 @@ export function deleteChainDataAndRestartApp() {
 
 export function restartApp() {
   ValoraAnalytics.track(AppEvents.user_restart)
-  Logger.info('utils/AppRestart/deleteChainDataAndRestartApp', 'Restarting app')
+  Logger.info('utils/AppRestart/restartApp', 'Restarting app')
   if (Platform.OS === 'android') {
     RestartAndroid.restart()
   } else {

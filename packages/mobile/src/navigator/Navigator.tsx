@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator, StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import * as React from 'react'
@@ -31,6 +31,12 @@ import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
+import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
+import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
+import ExternalExchanges, {
+  externalExchangesScreenOptions,
+} from 'src/fiatExchanges/ExternalExchanges'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -119,7 +125,11 @@ const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
-      <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
+      <Navigator.Screen
+        name={Screens.UpgradeScreen}
+        component={UpgradeScreen}
+        options={UpgradeScreen.navigationOptions}
+      />
       <Navigator.Screen
         name={Screens.DappKitAccountAuth}
         component={DappKitAccountScreen}
@@ -358,6 +368,21 @@ const exchangeScreens = (Navigator: typeof Stack) => (
       component={ExchangeReview}
       options={exchangeReviewScreenOptions}
     />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloScreen}
+      component={WithdrawCeloScreen}
+      options={WithdrawCeloScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloQrScannerScreen}
+      component={WithdrawCeloQrScannerScreen}
+      options={WithdrawCeloQrScannerScreen.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.WithdrawCeloReviewScreen}
+      component={WithdrawCeloReviewScreen}
+      options={WithdrawCeloReviewScreen.navigationOptions}
+    />
   </>
 )
 
@@ -383,6 +408,16 @@ const settingsScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen options={headerWithBackButton} name={Screens.Profile} component={Profile} />
     <Navigator.Screen
+      name={Screens.Language}
+      component={Language}
+      options={Language.navigationOptions(false)}
+    />
+    <Navigator.Screen
+      name={Screens.SelectLocalCurrency}
+      component={SelectLocalCurrency}
+      options={headerWithBackButton}
+    />
+    <Navigator.Screen
       options={headerWithBackButton}
       name={Screens.InviteReview}
       component={InviteReview}
@@ -401,6 +436,11 @@ const settingsScreens = (Navigator: typeof Stack) => (
       options={fiatExchangesAmountScreenOptions}
       name={Screens.FiatExchangeAmount}
       component={FiatExchangeAmount}
+    />
+    <Navigator.Screen
+      options={externalExchangesScreenOptions}
+      name={Screens.ExternalExchanges}
+      component={ExternalExchanges}
     />
     <Navigator.Screen
       options={fiatExchangesOptionsScreenOptions}
@@ -456,6 +496,7 @@ type InitialRouteName = ExtractProps<typeof Stack.Navigator>['initialRouteName']
 
 export function MainStackScreen() {
   const [initialRouteName, setInitialRoute] = React.useState<InitialRouteName>(undefined)
+
   React.useEffect(() => {
     const {
       choseToRestoreAccount,
@@ -464,7 +505,6 @@ export function MainStackScreen() {
       acceptedTerms,
       pincodeType,
       redeemComplete,
-      account,
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
@@ -475,7 +515,7 @@ export function MainStackScreen() {
     } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
-    } else if (!redeemComplete && !account) {
+    } else if (!redeemComplete) {
       initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
@@ -512,16 +552,6 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={Send.navigationOptions} />
     <Navigator.Screen
-      name={Screens.Language}
-      component={Language}
-      options={Language.navigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.SelectLocalCurrency}
-      component={SelectLocalCurrency}
-      options={headerWithBackButton}
-    />
-    <Navigator.Screen
       name={Screens.PincodeEnter}
       component={PincodeEnter}
       options={PincodeEnter.navigationOptions}
@@ -545,6 +575,11 @@ const modalAnimatedScreens = (Navigator: typeof Stack) => (
       name={Screens.AccountKeyEducation}
       component={AccountKeyEducation}
       options={AccountKeyEducation.navigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.LanguageModal}
+      component={Language}
+      options={Language.navigationOptions(true)}
     />
     <Navigator.Screen
       name={Screens.SelectCountry}

@@ -1,5 +1,5 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import gql from 'graphql-tag'
@@ -80,10 +80,6 @@ export function ExchangeFeedItem(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  arrow: {
-    paddingHorizontal: 5,
-    paddingBottom: 8,
-  },
   container: {
     justifyContent: 'space-between',
     flex: 1,

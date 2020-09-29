@@ -1,23 +1,31 @@
 import ListItem from '@celo/react-components/components/ListItem'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Trans, useTranslation } from 'react-i18next'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { FUNDING_LINK } from 'src/config'
 import { features } from 'src/flags'
+import { Namespaces } from 'src/i18n'
+import { fiatExchange } from 'src/images/Images'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+import { navigateToURI } from 'src/utils/linking'
 
 function FiatExchange() {
   function goToAddFunds() {
     navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: true })
+  }
+
+  function goToExternalExchanges() {
+    navigation.navigate(Screens.ExternalExchanges)
   }
 
   function goToCashOut() {
@@ -32,24 +40,34 @@ function FiatExchange() {
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
 
+  const onOpenOtherFundingOptions = () => {
+    navigateToURI(FUNDING_LINK)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <DrawerTopBar />
-      <View style={styles.image} />
-      <View style={styles.balanceSheet}>
-        <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
-        <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
-        <CurrencyDisplay
-          style={styles.dollarBalance}
-          amount={dollarAmount}
-          showLocalAmount={false}
-          hideFullCurrencyName={false}
-          hideSymbol={true}
-        />
+      <View style={styles.container}>
+        <Image source={fiatExchange} style={styles.image} resizeMode={'contain'} />
+        <View style={styles.balanceSheet}>
+          <Text style={styles.currentBalance}>{t('global:currentBalance')}</Text>
+          <CurrencyDisplay style={styles.localBalance} amount={dollarAmount} />
+          <CurrencyDisplay
+            style={styles.dollarBalance}
+            amount={dollarAmount}
+            showLocalAmount={false}
+            hideFullCurrencyName={false}
+            hideSymbol={true}
+          />
+        </View>
       </View>
-      <View>
+
+      <View style={styles.optionsListContainer}>
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
+        </ListItem>
+        <ListItem onPress={goToExternalExchanges}>
+          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:buySellOnExchanges')}</Text>
         </ListItem>
         {features.SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
@@ -63,6 +81,11 @@ function FiatExchange() {
           </ListItem>
         )}
       </View>
+      <Text style={styles.moreWays}>
+        <Trans i18nKey="otherFundingOptions" ns={Namespaces.fiatExchangeFlow}>
+          <Text onPress={onOpenOtherFundingOptions} style={styles.fundingOptionsLink} />
+        </Trans>
+      </Text>
     </SafeAreaView>
   )
 }
@@ -70,8 +93,11 @@ function FiatExchange() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
   },
-  image: { height: 200 },
+  image: {
+    alignSelf: 'center',
+  },
   balanceSheet: {
     paddingVertical: variables.contentPadding,
     paddingRight: variables.contentPadding,
@@ -92,16 +118,23 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
     color: colors.gray4,
   },
-  option: {
-    backgroundColor: colors.background,
+  optionsListContainer: {
+    flex: 1,
   },
-
   optionTitle: {
     ...fontStyles.regular,
   },
   optionTitleComingSoon: {
     ...fontStyles.regular,
     color: colors.gray3,
+  },
+  moreWays: {
+    ...fontStyles.regular,
+    color: colors.gray5,
+    margin: variables.contentPadding,
+  },
+  fundingOptionsLink: {
+    textDecorationLine: 'underline',
   },
 })
 

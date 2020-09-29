@@ -59,14 +59,14 @@ describe('FellowshipForm', () => {
 
       const submitButton = getByText('submit')
       fireEvent.click(submitButton)
-
       // expectations
+      await waitForElement(() => getByText('common:applicationSubmitted'))
+
       const emailErrorEl = getByText('common:validationErrors.email')
       expect(emailErrorEl).not.toBeVisible()
       queryAllByText('common:validationErrors:generic').forEach((element) =>
         expect(element).not.toBeVisible()
       )
-      await waitForElement(() => getByText('common:applicationSubmitted'))
 
       expect(getByText('common:applicationSubmitted')).toBeVisible()
     })

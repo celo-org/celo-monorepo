@@ -38,15 +38,20 @@
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
-    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>"
+    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>",
+    "loadingHeader": "Creating account...",
+    "loadingBody": "This can take up to 90 seconds"
   },
   "verificationEducation": {
     "title": "Confirm",
     "header": "Confirm phone number",
-    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.07 cUSD each.\n\nConfirming your number takes about three minutes.",
+    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.05 cUSD each.\n\nConfirming your number takes about three minutes.",
     "start": "Start",
     "resume": "Resume",
-    "learnMore": "Learn more"
+    "doINeedToConfirm": "Do I need to confirm?",
+    "skipForNow": "Skip for now",
+    "bodyInsufficientBalance": "Your current balance is not high enough to complete the verification process.\n\nPlease try again when you have added funds to your wallet.",
+    "bodyAlreadyVerified": "Your number is already confirmed!"
   },
   "verificationSkipDialog": {
     "title": "Are you sure?",
@@ -54,13 +59,14 @@
     "cancel": "Go Back",
     "confirm": "Skip for now"
   },
+  "verificationPrematureRevealMessage": "Please wait one minute before resending",
   "verificationLearnMoreDialog": {
-    "title": "Phone Number Confirmation",
-    "body": "Phone number confirmation works by associating your account with your phone number.\n\n<0>Do I need to complete this?</0>\n\nConfirmation is not required, however, unconfirmed accounts can only send payments using Celo addresses or QR codes.\n\n<1>Security and Privacy</1>\n\nTo protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain.",
+    "title": "Phone Numbers and Valora",
+    "body": "Confirming makes it easy to connect with our friends by allowing you to send and receive funds to your phone number.\n\n<0>Can I do this later?</0>\n\nYes, but unconfirmed accounts can only send payments with QR codes or account numbers (addresses).\n\n<1>Secure and Private</1>\n\nValora uses state of the art cryptography to keep your phone number private.",
     "dismiss": "Dismiss"
   },
   "importExistingKey": {
-    "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.",
+    "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.\n\nNote that your language preference must match the language used when you created your account.",
     "keyPlaceholder": "horse leopard dog monkey ..."
   },
   "verificationInput": {
@@ -77,7 +83,10 @@
     "codePlaceholder3": "Copy the third message",
     "codePlaceholder3_ios": "Tap or copy the third message",
     "codePlaceholderWithCodeInClipboard": "Great! Paste it here",
-    "typingTip": "Typing? Try copying and pasting"
+    "typingTip": "Typing? Try copying and pasting",
+    "resendMessages": "Resend last message",
+    "resendMessages_plural": "Resend {{count}} messages",
+    "resendMessages_all": "Resend all messages"
   },
   "verificationInputHelpDialog": {
     "title": "Help",

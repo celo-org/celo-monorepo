@@ -23,7 +23,7 @@
   "learnGovernance": "Learn About Governance",
   "viewReserve": "View Reserve",
   "stayConnected": "Stay Connected",
-  "backers": "Backers",
+  "backers": "Early Backers",
   "systemsApproach": "We embrace a full-stack approach, reimagining technology at each layer",
   "designedWithCommunities": "Our innovations are designed with communities around the world",
   "buildOnCelo": "Build on Celo",
@@ -57,7 +57,7 @@
   "timeline": {
     "title": "Celo's Journey",
     "subtitle": "Milestones",
-    "intro": "The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.",
+    "intro": "The Celo Community's past and upcoming milestones.",
     "upcomingTitle": "Upcoming Milestones",
     "pastTitle": "Previous Milestones",
     "legendTitle": "Milestone Key",

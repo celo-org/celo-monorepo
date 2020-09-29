@@ -62,7 +62,7 @@ function FiatExchangeWeb({ route }: Props) {
   return (
     <View style={styles.container}>
       {uri === '' ? (
-        <ActivityIndicator size="large" color={colors.celoGreen} />
+        <ActivityIndicator size="large" color={colors.greenBrand} />
       ) : (
         <WebView style={styles.exchangeWebView} source={{ uri }} />
       )}

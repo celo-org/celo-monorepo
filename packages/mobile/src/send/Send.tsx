@@ -1,7 +1,7 @@
 import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import Times from '@celo/react-components/icons/Times'
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
 import { throttle } from 'lodash'
@@ -13,6 +13,7 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { verificationPossibleSelector } from 'src/app/selectors'
 import { estimateFee, FeeType } from 'src/fees/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
@@ -59,6 +60,7 @@ interface StateProps {
   defaultCountryCode: string | null
   e164PhoneNumber: string | null
   numberVerified: boolean
+  verificationPossible: boolean
   devModeActive: boolean
   recentRecipients: Recipient[]
   allRecipients: NumberToRecipient
@@ -81,6 +83,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
   e164PhoneNumber: state.account.e164PhoneNumber,
   numberVerified: state.app.numberVerified,
+  verificationPossible: verificationPossibleSelector(state),
   devModeActive: state.account.devModeActive,
   recentRecipients: state.send.recentRecipients,
   allRecipients: recipientCacheSelector(state),
@@ -246,7 +249,9 @@ class Send extends React.Component<Props, State> {
   }
 
   onPressStartVerification = () => {
-    navigate(Screens.VerificationEducationScreen)
+    navigate(Screens.VerificationEducationScreen, {
+      hideOnboardingStep: true,
+    })
   }
 
   onPressContactsSettings = () => {
@@ -265,12 +270,12 @@ class Send extends React.Component<Props, State> {
   }
 
   renderListHeader = () => {
-    const { t, numberVerified } = this.props
+    const { t, numberVerified, verificationPossible } = this.props
     const { hasGivenContactPermission } = this.state
 
     return (
       <>
-        {!numberVerified && (
+        {!numberVerified && verificationPossible && (
           <SendCallToAction
             icon={<VerifyPhone height={49} />}
             header={t('verificationCta.header')}

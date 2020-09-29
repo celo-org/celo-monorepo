@@ -1,14 +1,14 @@
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class Withdraw extends ReleaseGoldCommand {
+export default class Withdraw extends ReleaseGoldBaseCommand {
   static description =
     'Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     value: Flags.wei({
       required: true,
       description: 'Amount of released gold (in wei) to withdraw',
@@ -38,6 +38,20 @@ export default class Withdraw extends ReleaseGoldCommand {
       )
       .addCheck('Contract has met liquidity provision if applicable', () =>
         this.releaseGoldWrapper.getLiquidityProvisionMet()
+      )
+      .addCheck(
+        'Contract would self-destruct with cUSD left when withdrawing the whole balance',
+        async () => {
+          if (value.eq(remainingUnlockedBalance)) {
+            const stableToken = await this.kit.contracts.getStableToken()
+            const stableBalance = await stableToken.balanceOf(this.releaseGoldWrapper.address)
+            if (stableBalance.gt(0)) {
+              return false
+            }
+          }
+
+          return true
+        }
       )
       .runChecks()
 

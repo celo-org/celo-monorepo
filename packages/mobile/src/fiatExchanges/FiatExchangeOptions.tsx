@@ -1,5 +1,5 @@
 import ListItem from '@celo/react-components/components/ListItem'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { NavigationProp, RouteProp } from '@react-navigation/core'
@@ -174,10 +174,6 @@ function FiatExchangeOptions({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: variables.contentPadding,
-  },
-  optionTitle: {
-    ...fontStyles.regular,
-    paddingLeft: variables.contentPadding,
   },
   pleaseSelectProvider: {
     ...fontStyles.regular,

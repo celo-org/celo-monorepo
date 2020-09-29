@@ -10,7 +10,7 @@ interface Props {
 export default class InfoIcon extends React.PureComponent<Props> {
   static defaultProps = {
     size: 12,
-    tintColor: colors.celoGreen,
+    tintColor: colors.greenBrand,
   }
 
   render() {

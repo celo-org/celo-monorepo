@@ -311,6 +311,14 @@ exports[`SettingsItemTextValue renders correctly without value 1`] = `
           title
         </Text>
       </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+          }
+        }
+      />
     </View>
   </View>
 </View>

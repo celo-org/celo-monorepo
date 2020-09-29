@@ -4,12 +4,13 @@ import * as Keychain from 'react-native-keychain'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupPhrase from 'src/backup/BackupPhrase'
-import { createMockStore } from 'test/utils'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 it('renders correctly with backup not completed', () => {
   const tree = renderer.create(
     <Provider store={createMockStore()}>
-      <BackupPhrase />
+      <BackupPhrase {...getMockStackScreenProps(Screens.BackupPhrase)} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()
@@ -18,7 +19,7 @@ it('renders correctly with backup not completed', () => {
 it('renders correctly with backup completed', () => {
   const tree = renderer.create(
     <Provider store={createMockStore({ account: { backupCompleted: true } })}>
-      <BackupPhrase />
+      <BackupPhrase {...getMockStackScreenProps(Screens.BackupPhrase)} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()
@@ -30,7 +31,7 @@ it('still renders when mnemonic doesnt show up', () => {
 
   const tree = renderer.create(
     <Provider store={createMockStore({ account: { backupCompleted: true } })}>
-      <BackupPhrase />
+      <BackupPhrase {...getMockStackScreenProps(Screens.BackupPhrase)} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()

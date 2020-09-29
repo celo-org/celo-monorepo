@@ -1,6 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
@@ -57,24 +57,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
-  nameContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingRight: 5,
-  },
   name: { ...fontStyles.regular500, color: colors.dark },
-  invite: {
-    color: colors.celoGreen,
-    lineHeight: 41,
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-  },
-  image: {
-    height: 40,
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   phone: {
     ...fontStyles.small,
     color: colors.gray4,

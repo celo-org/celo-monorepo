@@ -14,7 +14,7 @@ export default function LanguageButton() {
 
   // Push to stack to prevent going to the initial language selection
   // when we couldn't find the best language
-  const onPress = () => pushToStack(Screens.Language, { nextScreen: route.name })
+  const onPress = () => pushToStack(Screens.LanguageModal, { nextScreen: route.name })
 
   return (
     <TopBarTextButtonOnboarding

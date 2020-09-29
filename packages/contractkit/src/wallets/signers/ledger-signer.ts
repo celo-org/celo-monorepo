@@ -1,4 +1,4 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { TransportStatusError } from '@ledgerhq/errors'
 import debugFactory from 'debug'
@@ -180,5 +180,11 @@ export class LedgerSigner implements Signer {
         }
       }
     }
+  }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
   }
 }

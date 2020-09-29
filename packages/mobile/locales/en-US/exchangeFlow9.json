@@ -9,6 +9,7 @@
   "exchange": "Exchange",
   "buy": "Buy",
   "sell": "Sell",
+  "withdrawCelo": "Withdraw CELO",
   "buyGold": "Buy CELO",
   "sellGold": "Sell CELO",
   "exchangeAmount": "Amount ({{tokenName}})",
@@ -39,5 +40,12 @@
   "yourGoldBalance": "Your CELO Balance",
   "goldAmount": "CELO Amount",
   "purchasedGold": "Purchased CELO",
-  "soldGold": "Sold CELO"
+  "soldGold": "Sold CELO",
+  "accountAddressLabel": "Account No. or Address",
+  "celoAmountLabel": "Amount (CELO)",
+  "maxSymbol": "Max",
+  "withdrawCeloReview": "Review",
+  "withdrawCeloTo": "Withdraw to",
+  "withdrawCeloAmount": "Amount (CELO)",
+  "withdrawScanQrTitle": "Scan"
 }

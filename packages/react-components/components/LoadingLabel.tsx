@@ -28,7 +28,7 @@ export default class LoadingLabel extends React.PureComponent<Props> {
         {isLoading && (
           <>
             <Text style={[fontStyles.bodySmall, labelTextStyle]}>{loadingLabelText}</Text>
-            <ActivityIndicator style={style.loadingIcon} size="small" color={colors.celoGreen} />
+            <ActivityIndicator style={style.loadingIcon} size="small" color={colors.greenBrand} />
           </>
         )}
         {!isLoading && labelText && (

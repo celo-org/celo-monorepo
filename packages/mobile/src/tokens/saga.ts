@@ -10,7 +10,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
-import { TransactionStatus } from 'src/transactions/types'
+import { TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -68,7 +68,7 @@ interface TokenFetchFactory {
 export function tokenFetchFactory({ actionName, token, actionCreator, tag }: TokenFetchFactory) {
   function* tokenFetch() {
     try {
-      Logger.debug(tag, 'Fetching balance')
+      Logger.debug(tag, `Fetching ${token} balance`)
       const account = yield call(getConnectedAccount)
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
@@ -102,7 +102,7 @@ export interface TokenTransfer {
   recipientAddress: string
   amount: string
   comment: string
-  txId: string
+  context: TransactionContext
 }
 
 export type TokenTransferAction = { type: string } & TokenTransfer
@@ -158,13 +158,19 @@ export function tokenTransferFactory({
   return function*() {
     while (true) {
       const transferAction: TokenTransferAction = yield take(actionName)
-      const { recipientAddress, amount, comment, txId } = transferAction
+      const { recipientAddress, amount, comment, context } = transferAction
 
-      Logger.debug(tag, 'Transferring token', amount, txId)
+      Logger.debug(
+        tag,
+        'Transferring token',
+        amount,
+        context.id,
+        context.description ?? 'No description'
+      )
 
       yield put(
         addStandbyTransaction({
-          id: txId,
+          context,
           type: TokenTransactionType.Sent,
           comment,
           status: TransactionStatus.Pending,
@@ -188,10 +194,10 @@ export function tokenTransferFactory({
           }
         )
 
-        yield call(sendAndMonitorTransaction, txId, tx, account, currency)
+        yield call(sendAndMonitorTransaction, tx, account, context, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
-        yield put(removeStandbyTransaction(txId))
+        yield put(removeStandbyTransaction(context.id))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))
         } else {

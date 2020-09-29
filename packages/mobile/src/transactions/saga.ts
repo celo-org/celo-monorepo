@@ -27,7 +27,7 @@ import {
   standbyTransactionsSelector,
 } from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
+import { StandbyTransaction, TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'transactions/saga'
@@ -44,7 +44,7 @@ function* cleanupStandbyTransactions({ transactions }: NewTransactionsInFeedActi
       standbyTx.status !== TransactionStatus.Failed &&
       newFeedTxHashes.has(standbyTx.hash)
     ) {
-      yield put(removeStandbyTransaction(standbyTx.id))
+      yield put(removeStandbyTransaction(standbyTx.context.id))
     }
   }
 }
@@ -60,30 +60,29 @@ export function* waitForTransactionWithId(txId: string) {
 }
 
 export function* sendAndMonitorTransaction<T>(
-  txId: string,
   tx: CeloTransactionObject<T>,
   account: string,
+  context: TransactionContext,
   currency?: CURRENCY_ENUM
 ) {
   try {
-    Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
+    Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${context.id}`)
 
     const sendTxMethod = function*(nonce?: number) {
       const { transactionHash, confirmation }: TxPromises = yield call(
         sendTransactionPromises,
         tx.txo,
         account,
-        TAG,
-        txId,
+        context,
         nonce
       )
       const hash = yield transactionHash
-      yield put(addHashToStandbyTransaction(txId, hash))
+      yield put(addHashToStandbyTransaction(context.id, hash))
       const result = yield confirmation
       return result
     }
-    yield call(wrapSendTransactionWithRetry, txId, sendTxMethod)
-    yield put(transactionConfirmed(txId))
+    yield call(wrapSendTransactionWithRetry, sendTxMethod, context)
+    yield put(transactionConfirmed(context.id))
 
     if (currency === CURRENCY_ENUM.GOLD) {
       yield put(fetchGoldBalance())
@@ -95,9 +94,9 @@ export function* sendAndMonitorTransaction<T>(
       yield put(fetchDollarBalance())
     }
   } catch (error) {
-    Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
-    yield put(removeStandbyTransaction(txId))
-    yield put(transactionFailed(txId))
+    Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${context.id}`, error)
+    yield put(removeStandbyTransaction(context.id))
+    yield put(transactionFailed(context.id))
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
 }

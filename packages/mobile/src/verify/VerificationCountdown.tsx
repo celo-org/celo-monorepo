@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -22,11 +22,12 @@ function formatTimeRemaining(seconds: number) {
 
 interface Props {
   onFinish: () => void
+  startTime: number
 }
 
-export default function VerificationCountdown({ onFinish }: Props) {
+export default function VerificationCountdown({ onFinish, startTime }: Props) {
   const hasCalledOnFinishRef = useRef(false)
-  const endTime = useRef(Date.now() + TOTAL_TIME).current
+  const endTime = useMemo(() => startTime + TOTAL_TIME, [startTime])
   // Used for re-rendering, actual value unused
   const [, setTimer] = useState(0)
 

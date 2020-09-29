@@ -18,6 +18,7 @@ export enum Screens {
   ExchangeHomeScreen = 'ExchangeHomeScreen',
   ExchangeReview = 'ExchangeReview',
   ExchangeTradeScreen = 'ExchangeTradeScreen',
+  ExternalExchanges = 'ExternalExchanges',
   FiatExchange = 'FiatExchange',
   FiatExchangeAmount = 'FiatExchangeAmount',
   FiatExchangeOptions = 'FiatExchangeOptions',
@@ -28,6 +29,7 @@ export enum Screens {
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
   Invite = 'Invite',
   InviteReview = 'InviteReview',
+  LanguageModal = 'LanguageModal',
   Language = 'Language',
   Licenses = 'Licenses',
   Main = 'Main',
@@ -68,4 +70,7 @@ export enum Screens {
   VerificationLoadingScreen = 'VerificationLoadingScreen',
   WalletHome = 'WalletHome',
   Welcome = 'Welcome',
+  WithdrawCeloQrScannerScreen = 'WithdrawCeloQrScannerScreen',
+  WithdrawCeloReviewScreen = 'WithdrawCeloReviewScreen',
+  WithdrawCeloScreen = 'WithdrawCeloScreen',
 }

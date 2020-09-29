@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
@@ -156,7 +156,7 @@ export class ImportWallet extends React.Component<Props, State> {
             {(insets) => (
               <View style={styles.container}>
                 <UseBackToWelcomeScreen
-                  backAnalyticsEvent={OnboardingEvents.restore_account_cancel}
+                  backAnalyticsEvents={[OnboardingEvents.restore_account_cancel]}
                 />
                 <KeyboardAwareScrollView
                   style={headerHeight ? { marginTop: headerHeight } : undefined}
@@ -225,18 +225,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 16,
   },
-  logo: {
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  loadingSpinnerContainer: {
-    marginVertical: 20,
-  },
   button: {
     paddingVertical: 16,
-  },
-  wordsInput: {
-    minHeight: 80,
   },
   explanation: {
     ...fontStyles.regular,

@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import AsyncStorage from '@react-native-community/async-storage'
 import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
@@ -20,7 +20,7 @@ import Logger from 'src/utils/Logger'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // @ts-ignore https://reactnavigation.org/docs/screen-tracking/
-const getActiveRouteName = (state: NavigationState) => {
+export const getActiveRouteName = (state: NavigationState) => {
   const route = state.routes[state.index]
 
   if (route.state) {
