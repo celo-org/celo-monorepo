@@ -1,4 +1,4 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHead'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
 import _ from 'lodash'
 import * as React from 'react'
@@ -139,7 +139,7 @@ export class WalletHome extends React.Component<Props, State> {
     if (!title) {
       return null
     }
-    return <SectionHeadNew text={title} />
+    return <SectionHead text={title} />
   }
 
   keyExtractor = (_item: any, index: number) => {

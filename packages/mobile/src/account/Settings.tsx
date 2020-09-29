@@ -1,4 +1,4 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHead'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import {
   SettingsExpandedItem,
   SettingsItemSwitch,
@@ -338,7 +338,7 @@ export class Account extends React.Component<Props, State> {
               value={this.props.preferredCurrencyCode}
               onPress={this.goToLocalCurrencySetting}
             />
-            <SectionHeadNew text={t('securityAndData')} style={styles.sectionTitle} />
+            <SectionHead text={t('securityAndData')} style={styles.sectionTitle} />
             <SettingsItemSwitch
               title={t('requirePinOnAppOpen')}
               value={this.props.requirePinOnAppOpen}
@@ -356,10 +356,10 @@ export class Account extends React.Component<Props, State> {
               onValueChange={this.props.setAnalyticsEnabled}
               details={t('shareAnalytics_detail')}
             />
-            <SectionHeadNew text={t('legal')} style={styles.sectionTitle} />
+            <SectionHead text={t('legal')} style={styles.sectionTitle} />
             <SettingsItemTextValue title={t('licenses')} onPress={this.goToLicenses} />
             <SettingsItemTextValue title={t('termsOfServiceLink')} onPress={this.onTermsPress} />
-            <SectionHeadNew text={''} style={styles.sectionTitle} />
+            <SectionHead text={''} style={styles.sectionTitle} />
             <SettingsExpandedItem
               title={t('removeAccountTitle')}
               details={t('removeAccountDetails')}
