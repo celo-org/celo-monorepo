@@ -102,9 +102,16 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             <View style={[styles.pin, isPinned ? styles.pinned : {}]} />
           </View>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
-            <Text style={[styles.defaultText, styles.tableCell, styles.tableCellTitleArrow]}>
+            <Text
+              style={[
+                styles.defaultText,
+                styles.tableCell,
+                styles.tableCellTitleArrow,
+                ...(expanded ? [styles.tableCellTitleArrowExpanded] : []),
+              ]}
+            >
               <Chevron
-                direction={expanded ? Direction.down : Direction.right}
+                direction={Direction.right}
                 opacity={expanded ? 1 : 0.4}
                 color={colors.white}
                 size={10}
@@ -344,7 +351,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {validator.neverElected ? 'n/a' : formatNumber(validator.attestation, 1)}%
+                  {validator.neverElected ? 'n/a' : `${formatNumber(validator.attestation, 1)}%`}
                 </Text>
               </View>
             ))}

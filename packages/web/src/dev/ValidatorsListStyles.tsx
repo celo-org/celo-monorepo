@@ -165,6 +165,11 @@ export const styles = StyleSheet.create({
     marginRight: 20,
     width: 20,
     textAlign: 'center',
+    transitionProperty: 'transform',
+    transitionDuration: '0.2s',
+  },
+  tableCellTitleArrowExpanded: {
+    transform: [{ rotateZ: '90deg' }, { translateX: -5 }, { translateY: -2 }],
   },
   tableCellTitleNumber: {
     marginLeft: 20 + 20,
