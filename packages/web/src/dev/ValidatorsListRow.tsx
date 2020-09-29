@@ -158,7 +158,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             ellipsizeMode="tail"
           >
             {formatNumber(+group.votesRaw, 0)}
-            {'\n'}({formatNumber((group.gold / group.votesRaw) * 100, 1) || 0}%)
+            {'\n'}({formatNumber((group.celo / group.votesRaw) * 100, 1) || 0}%)
           </Text>
           <Text
             style={[styles.defaultText, styles.tableCell, styles.tableCellCenter, styles.sizeM]}
@@ -166,14 +166,14 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             ellipsizeMode="tail"
           >
             {formatNumber(+group.receivableRaw, 0)}
-            {'\n'}({formatNumber((group.gold / +group.receivableRaw) * 100, 1) || 0}%)
+            {'\n'}({formatNumber((group.celo / +group.receivableRaw) * 100, 1) || 0}%)
           </Text>
           <Text
             style={[styles.defaultText, styles.tableCell, styles.tableCellCenter, styles.sizeM]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {formatNumber(group.gold, 0)}
+            {formatNumber(group.celo, 0)}
           </Text>
           <Text
             style={[styles.defaultText, styles.tableCell, styles.tableCellCenter, styles.sizeM]}
@@ -284,7 +284,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {formatNumber(validator.gold, 0)}
+                  {formatNumber(validator.celo, 0)}
                 </Text>
                 <Text style={[styles.defaultText, styles.tableCell, styles.sizeM]} />
                 <Text style={[styles.defaultText, styles.tableCell, styles.sizeM]} />

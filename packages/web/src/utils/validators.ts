@@ -59,7 +59,7 @@ export interface CeloGroup {
   name: string
   address: string
   usd: number
-  gold: number
+  celo: number
   receivableRaw: number
   receivableVotes: string
   votesRaw: number
@@ -74,7 +74,7 @@ export interface CeloGroup {
     name: string
     address: string
     usd: number
-    gold: number
+    celo: number
     elected: boolean
     neverElected: boolean
     online: boolean
@@ -125,7 +125,7 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
           name: group.name,
           address: group.address,
           usd: weiToDecimal(+group.usd),
-          gold: weiToDecimal(+group.lockedGold),
+          celo: weiToDecimal(+group.lockedGold),
           receivableRaw: weiToDecimal(+receivableVotes),
           receivableVotes: receivableVotesPer.toString(),
           votesRaw: weiToDecimal(+votes),
@@ -152,7 +152,7 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
               name,
               address,
               usd: weiToDecimal(+usd),
-              gold: weiToDecimal(+lockedGold),
+              celo: weiToDecimal(+lockedGold),
               elected: lastElected >= latestBlock,
               online: lastOnline >= latestBlock,
               uptime: (+score * 100) / 10 ** 24,
