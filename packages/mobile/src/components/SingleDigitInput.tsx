@@ -7,11 +7,12 @@ export interface SingleDigitInputProps {
   inputValue: string
   inputPlaceholder: string
   onInputChange: (value: string) => void
+  testID?: string
 }
 
 type Props = SingleDigitInputProps
 
-export function SingleDigitInput({ inputValue, inputPlaceholder, onInputChange }: Props) {
+export function SingleDigitInput({ inputValue, inputPlaceholder, onInputChange, testID }: Props) {
   return (
     <TextInput
       value={inputValue}
@@ -20,6 +21,7 @@ export function SingleDigitInput({ inputValue, inputPlaceholder, onInputChange }
       maxLength={1}
       showClearButton={false}
       style={styles.codeInput}
+      testID={testID}
     />
   )
 }
