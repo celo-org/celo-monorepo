@@ -9,13 +9,13 @@ export const describe = 'deploy full-nodes in a particular context'
 
 type FullNodeInitialArgv = InitialArgv &
   ContextArgv & {
-    createNeg: boolean
+    createNEG: boolean
     staticNodes: boolean
   }
 
 export const builder = (argv: yargs.Argv) => {
   return addContextMiddleware(argv)
-    .option('createNeg', {
+    .option('createNEG', {
       type: 'boolean',
       description:
         'When enabled, will create a network endpoint group for the full node http & ws ports. Only works for GCP.',
@@ -31,5 +31,5 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: FullNodeInitialArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
-  await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNeg)
+  await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
 }

@@ -77,6 +77,7 @@ export abstract class BaseClusterManager {
   abstract getAndSwitchToClusterContext(): Promise<void>
 
   abstract get kubernetesContextName(): string
+  abstract get cloudProvider(): CloudProvider
 
   get clusterConfig(): BaseClusterConfig {
     return this._clusterConfig

@@ -1,5 +1,5 @@
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { BaseClusterConfig, BaseClusterManager } from './base'
+import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
 /**
  * Basic info for an EKS cluster
@@ -26,5 +26,9 @@ export class AWSClusterManager extends BaseClusterManager {
 
   get kubernetesContextName(): string {
     return this.clusterConfig.clusterName
+  }
+
+  get cloudProvider(): CloudProvider {
+    return CloudProvider.AWS
   }
 }

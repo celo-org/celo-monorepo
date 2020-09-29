@@ -1,7 +1,7 @@
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { installGCPSSDStorageClass } from '../helm_deploy'
 import { switchToGCPProject } from '../utils'
-import { BaseClusterConfig, BaseClusterManager } from './base'
+import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
 export interface GCPClusterConfig extends BaseClusterConfig {
   projectName: string
@@ -35,5 +35,9 @@ export class GCPClusterManager extends BaseClusterManager {
 
   get kubernetesContextName(): string {
     return `gke_${this.clusterConfig.projectName}_${this.clusterConfig.zone}_${this.clusterConfig.clusterName}`
+  }
+
+  get cloudProvider(): CloudProvider {
+    return CloudProvider.GCP
   }
 }

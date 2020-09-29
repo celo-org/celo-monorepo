@@ -1,6 +1,6 @@
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { outputIncludes } from '../utils'
-import { BaseClusterConfig, BaseClusterManager } from './base'
+import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
 export interface AKSClusterConfig extends BaseClusterConfig {
   tenantId: string
@@ -56,5 +56,9 @@ export class AKSClusterManager extends BaseClusterManager {
 
   get kubernetesContextName(): string {
     return this.clusterConfig.clusterName
+  }
+
+  get cloudProvider(): CloudProvider {
+    return CloudProvider.AZURE
   }
 }

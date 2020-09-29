@@ -35,7 +35,7 @@ const deploymentConfigGetterByCloudProvider: {
  * Gets the appropriate cloud platform's full node deployer given the celoEnv
  * and context.
  */
-export function getFullNodeDeployerForContext(celoEnv: string, context: string, generateNodeKeys: boolean, createNeg: boolean) {
+export function getFullNodeDeployerForContext(celoEnv: string, context: string, generateNodeKeys: boolean, createNEG: boolean) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
   let deploymentConfig = deploymentConfigGetterByCloudProvider[cloudProvider](context)
   if (generateNodeKeys) {
@@ -47,13 +47,13 @@ export function getFullNodeDeployerForContext(celoEnv: string, context: string, 
       }
     }
   }
-  if (createNeg) {
+  if (createNEG) {
     if (cloudProvider !== CloudProvider.GCP) {
       throw Error('Cannot create NEG for cloud providers other than GCP')
     }
     deploymentConfig = {
       ...deploymentConfig,
-      createNeg: true
+      createNEG: true
     } as GCPFullNodeDeploymentConfig
   }
   return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
@@ -63,8 +63,8 @@ export function getFullNodeDeployerForContext(celoEnv: string, context: string, 
  * Uses the appropriate cloud platform's full node deployer to install the full
  * node chart.
  */
-export async function installFullNodeChart(celoEnv: string, context: string, staticNodes: boolean = false, createNeg: boolean = false) {
-  const deployer = getFullNodeDeployerForContext(celoEnv, context, staticNodes, createNeg)
+export async function installFullNodeChart(celoEnv: string, context: string, staticNodes: boolean = false, createNEG: boolean = false) {
+  const deployer = getFullNodeDeployerForContext(celoEnv, context, staticNodes, createNEG)
   const enodes = await deployer.installChart()
   if (enodes) {
     await uploadStaticNodeEnodes(celoEnv, context, enodes)
@@ -75,8 +75,8 @@ export async function installFullNodeChart(celoEnv: string, context: string, sta
  * Uses the appropriate cloud platform's full node deployer to upgrade the full
  * node chart.
  */
-export async function upgradeFullNodeChart(celoEnv: string, context: string, reset: boolean, generateNodeKeys: boolean = false, createNeg: boolean = false) {
-  const deployer = getFullNodeDeployerForContext(celoEnv, context, generateNodeKeys, createNeg)
+export async function upgradeFullNodeChart(celoEnv: string, context: string, reset: boolean, generateNodeKeys: boolean = false, createNEG: boolean = false) {
+  const deployer = getFullNodeDeployerForContext(celoEnv, context, generateNodeKeys, createNEG)
   const enodes = await deployer.upgradeChart(reset)
   if (enodes) {
     await uploadStaticNodeEnodes(celoEnv, context, enodes)
@@ -148,6 +148,6 @@ function getGCPFullNodeDeploymentConfig(context: string): GCPFullNodeDeploymentC
     ...fullNodeDeploymentConfig,
     clusterConfig: getGCPClusterConfig(context),
     // Default value
-    createNeg: false,
+    createNEG: false,
   }
 }

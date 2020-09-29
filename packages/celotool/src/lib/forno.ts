@@ -1,6 +1,7 @@
 import { execCmd } from './cmd-utils'
 import { coerceContext, getClusterManagerForContext, readableContext } from './context-utils'
 import { envVar, fetchEnv } from './env-utils'
+import { CloudProvider } from './k8s-cluster/base'
 import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { TerraformVars } from './terraform'
 import { deployModule, destroyModule } from './vm-testnet-utils'
@@ -42,6 +43,9 @@ async function getFornoTerraformVars(celoEnv: string, contexts: string[]): Promi
     contexts.reduce(async (aggPromise, context: string) => {
       const agg = await aggPromise
       const clusterManager = getClusterManagerForContext(celoEnv, context)
+      if (clusterManager.cloudProvider !== CloudProvider.GCP) {
+        throw Error(`Forno only accepts GCP contexts, context ${context} is ${clusterManager.cloudProvider}`)
+      }
       const contextGcloudProject = (clusterManager.clusterConfig as GCPClusterConfig).projectName
       // Require all the contexts to have the same project
       if (gcloudProject === undefined) {
