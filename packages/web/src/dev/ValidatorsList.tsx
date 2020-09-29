@@ -146,11 +146,9 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       return a > b ? 1 : -1
     }
 
-    return (data || []).sort((a, b) => dir * compare(accessor(a), accessor(b)))
-  }
+    this.cachedCleanData = (data || []).sort((a, b) => dir * compare(accessor(a), accessor(b)))
 
-  onPinned() {
-    this.setState({ update: Math.random() } as any)
+    return (data || []).sort((a, b) => dir * compare(accessor(a), accessor(b)))
   }
 
   render() {
@@ -245,7 +243,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           </View>
           {validatorGroups.map((group, i) => (
             <div key={i} onClick={this.expand.bind(this, i)}>
-              <ValidatorsListRow onPinned={this.onPinned} group={group} expanded={expanded === i} />
+              <ValidatorsListRow group={group} expanded={expanded === i} />
             </div>
           ))}
         </View>

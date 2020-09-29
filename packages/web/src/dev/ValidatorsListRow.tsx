@@ -9,7 +9,7 @@ import Checkmark from 'src/icons/Checkmark'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
-import { CeloGroup, localStoragePinnedKey } from 'src/utils/validators'
+import { CeloGroup } from 'src/utils/validators'
 
 const unknownGroupName = 'Unnamed Group'
 const unknownValidatorName = 'Unnamed Validator'
@@ -21,13 +21,11 @@ interface Props {
 }
 interface State {
   tooltip?: boolean
-  isPinned?: boolean
 }
 
 class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
   state = {
     tooltip: false,
-    isPinned: false,
   }
   tooltipRef = React.createRef<any>()
   removeDocumentListener: () => void
@@ -50,57 +48,22 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
       document.removeEventListener('click', onDocumentClick, false)
   }
 
-  componentDidMount() {
-    this.setState({ isPinned: this.isPinned() })
-  }
-
   componentWillUnmount() {
     this.removeDocumentListener()
   }
 
-  isPinned(toggle?: boolean) {
-    const { address } = this.props.group
-    let list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
-    let isPinned = list.includes(address)
-    if (toggle) {
-      if (!isPinned) {
-        list.push(address)
-      } else {
-        list = list.filter((_) => _ !== address)
-      }
-      isPinned = !isPinned
-      localStorage.setItem(localStoragePinnedKey, list.join(','))
-      this.props.onPinned()
-    }
-    return isPinned
-  }
-
-  stopPropagation = (event) => {
-    event.stopPropagation()
-  }
   toggleTooltip = (event) => {
     event.stopPropagation()
     this.setState({ tooltip: !this.state.tooltip })
   }
-  togglePinned: any = (event) => {
-    event.stopPropagation()
-    const is = this.isPinned(true)
-    this.setState({ isPinned: is })
-  }
 
   render() {
     const { group, expanded } = this.props
-    const { tooltip, isPinned } = this.state
+    const { tooltip } = this.state
 
     return (
       <div style={tooltip ? { zIndex: 2 } : {}}>
         <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
-          <View
-            style={[styles.tableCell, styles.pinContainer, styles.sizeXXS]}
-            onClick={this.togglePinned}
-          >
-            <View style={[styles.pin, isPinned ? styles.pinned : {}]} />
-          </View>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
             <Text
               style={[
@@ -132,32 +95,30 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
 
                 {!!group.claims.length && (
                   <Text style={[styles.defaultText, styles.checkmark]}>
-                    <div onClick={this.stopPropagation}>
-                      <div ref={this.tooltipRef} onClick={this.toggleTooltip}>
-                        <Checkmark color={colors.black} size={8} />
-                      </div>
-
-                      {tooltip && (
-                        <Text style={[styles.defaultText, styles.tooltip]}>
-                          {group.claims.map((domain, i) => (
-                            <Text key={domain} style={[styles.defaultText, styles.tooltipRow]}>
-                              {i + 1}.
-                              <Text
-                                accessibilityRole="link"
-                                target="_blank"
-                                href={`https://${domain}`}
-                                style={[styles.defaultText, styles.tooltipText]}
-                              >
-                                {domain}
-                              </Text>
-                              <Text style={[styles.defaultText, styles.checkmark]}>
-                                <Checkmark color={colors.black} size={8} />
-                              </Text>
-                            </Text>
-                          ))}
-                        </Text>
-                      )}
+                    <div ref={this.tooltipRef} onClick={this.toggleTooltip}>
+                      <Checkmark color={colors.black} size={8} />
                     </div>
+
+                    {tooltip && (
+                      <Text style={[styles.defaultText, styles.tooltip]}>
+                        {group.claims.map((domain, i) => (
+                          <Text key={domain} style={[styles.defaultText, styles.tooltipRow]}>
+                            {i + 1}.
+                            <Text
+                              accessibilityRole="link"
+                              target="_blank"
+                              href={`https://${domain}`}
+                              style={[styles.defaultText, styles.tooltipText]}
+                            >
+                              {domain}
+                            </Text>
+                            <Text style={[styles.defaultText, styles.checkmark]}>
+                              <Checkmark color={colors.black} size={8} />
+                            </Text>
+                          </Text>
+                        ))}
+                      </Text>
+                    )}
                   </Text>
                 )}
               </Text>
