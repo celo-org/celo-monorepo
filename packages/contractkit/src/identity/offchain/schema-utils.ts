@@ -1,17 +1,17 @@
 import { Err, Ok, parseJsonAsResult, Result, RootError, trimLeading0x } from '@celo/base/src'
+import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { Encrypt } from '@celo/utils/lib/ecies'
-import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import { trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { Address } from '../../base'
 import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
 
 export enum SchemaErrorTypes {
   InvalidDataError = 'InvalidDataError',
   OffchainError = 'OffchainError',
   UnknownCiphertext = 'UnknownCiphertext',
+  UnavailableKey = 'UnavailableKey',
 }
 
 export class InvalidDataError extends RootError<SchemaErrorTypes.InvalidDataError> {
@@ -32,7 +32,13 @@ export class UnknownCiphertext extends RootError<SchemaErrorTypes.UnknownCiphert
   }
 }
 
-type SchemaErrors = InvalidDataError | OffchainError | UnknownCiphertext
+export class UnavailableKey extends RootError<SchemaErrorTypes.UnavailableKey> {
+  constructor() {
+    super(SchemaErrorTypes.UnavailableKey)
+  }
+}
+
+type SchemaErrors = InvalidDataError | OffchainError | UnknownCiphertext | UnavailableKey
 
 export class SimpleSchema<DataType> {
   constructor(
@@ -57,15 +63,15 @@ export class SimpleSchema<DataType> {
     await this.wrapper.writeDataTo(this.serialize(data), this.dataPath)
   }
 
-  async writeEncrypted(data: DataType, fromAddress: string, toAddress: string) {
+  async writeEncrypted(data: DataType, toAddress: string) {
     if (!this.type.is(data)) {
       return
     }
 
-    return writeEncrypted(this.wrapper, this.dataPath, this.serialize(data), fromAddress, toAddress)
+    return writeEncrypted(this.wrapper, this.dataPath, this.serialize(data), toAddress)
   }
 
-  async writeWithSymmetric(data: DataType, fromAddress: string, toAddresses: string[]) {
+  async writeWithSymmetric(data: DataType, toAddresses: string[]) {
     if (!this.type.is(data)) {
       return
     }
@@ -74,7 +80,6 @@ export class SimpleSchema<DataType> {
       this.wrapper,
       this.dataPath,
       this.serialize(data),
-      fromAddress,
       toAddresses
     )
   }
@@ -88,11 +93,8 @@ export class SimpleSchema<DataType> {
     return this.deserialize(rawData.result)
   }
 
-  async readEncrypted(
-    senderAddress: string,
-    recipientAddress: Address
-  ): Promise<Result<DataType, SchemaErrors>> {
-    const result = await readEncrypted(this.wrapper, this.dataPath, senderAddress, recipientAddress)
+  async readEncrypted(senderAddress: string): Promise<Result<DataType, SchemaErrors>> {
+    const result = await readEncrypted(this.wrapper, this.dataPath, senderAddress)
     if (!result.ok) {
       return Err(result.error)
     }
@@ -108,12 +110,12 @@ export class BinarySchema {
     await this.wrapper.writeDataTo(data, this.dataPath)
   }
 
-  async writeEncrypted(data: Buffer, fromAddress: string, toAddress: string) {
-    return writeEncrypted(this.wrapper, this.dataPath, data, fromAddress, toAddress)
+  async writeEncrypted(data: Buffer, toAddress: string) {
+    return writeEncrypted(this.wrapper, this.dataPath, data, toAddress)
   }
 
-  async writeWithSymmetric(data: Buffer, fromAddress: string, toAddresses: string[]) {
-    return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, fromAddress, toAddresses)
+  async writeWithSymmetric(data: Buffer, toAddresses: string[]) {
+    return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, toAddresses)
   }
 
   async read(account: string): Promise<Result<Buffer, SchemaErrors>> {
@@ -125,8 +127,8 @@ export class BinarySchema {
     return Ok(rawData.result)
   }
 
-  async readEncrypted(senderAddress: string, recipientAddress: Address) {
-    return readEncrypted(this.wrapper, this.dataPath, senderAddress, recipientAddress)
+  async readEncrypted(senderAddress: string) {
+    return readEncrypted(this.wrapper, this.dataPath, senderAddress)
   }
 }
 
@@ -146,20 +148,21 @@ export function getDataPath(
     .digest('base64')
 }
 
+// Assumes that the wallet has the dataEncryptionKey of wrapper.self available
+// TODO: Should check and throw a more meaningful error if not
 export const writeEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
-  fromAddress: string,
   toAddress: string
 ) => {
+  const accounts = await wrapper.kit.contracts.getAccounts()
   const [fromPubKey, toPubKey] = await Promise.all([
-    addressToPublicKey(fromAddress, wrapper.kit.web3.eth.sign),
-    addressToPublicKey(toAddress, wrapper.kit.web3.eth.sign),
+    accounts.getDataEncryptionKey(wrapper.self),
+    accounts.getDataEncryptionKey(toAddress),
   ])
-
   const wallet = wrapper.kit.getWallet()
-  const sharedSecret = await wallet.computeSharedSecret(fromAddress, toPubKey)
+  const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
   const computedDataPath = getDataPath(dataPath, sharedSecret, fromPubKey, toPubKey)
   const encryptedData = Encrypt(
@@ -174,7 +177,6 @@ export const writeEncryptedWithSymmetric = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
-  fromAddress: string,
   toAddresses: string[]
 ) => {
   const iv = randomBytes(16)
@@ -186,28 +188,31 @@ export const writeEncryptedWithSymmetric = async (
 
   await wrapper.writeDataTo(payload, `${dataPath}.enc`)
   await Promise.all(
-    toAddresses.map(async (toAddress) =>
-      writeEncrypted(wrapper, dataPath, key, fromAddress, toAddress)
-    )
+    toAddresses.map(async (toAddress) => writeEncrypted(wrapper, dataPath, key, toAddress))
   )
 }
 
 const readEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
-  senderAddress: string,
-  recipientAddress: string
+  senderAddress: string
 ): Promise<Result<Buffer, SchemaErrors>> => {
+  const accounts = await wrapper.kit.contracts.getAccounts()
   const wallet = wrapper.kit.getWallet()
-  const sharedSecret = await wallet.computeSharedSecret(
-    recipientAddress,
-    await addressToPublicKey(senderAddress, wrapper.kit.web3.eth.sign)
-  )
+  const [readerPubKey, senderPubKey] = await Promise.all([
+    accounts.getDataEncryptionKey(wrapper.self),
+    accounts.getDataEncryptionKey(senderAddress),
+  ])
 
-  const senderPubKey = await addressToPublicKey(senderAddress, wrapper.kit.web3.eth.sign)
-  const recipientPubKey = await addressToPublicKey(recipientAddress, wrapper.kit.web3.eth.sign)
+  const readerPublicKeyAddress = publicKeyToAddress(readerPubKey)
 
-  const computedDataPath = getDataPath(dataPath, sharedSecret, senderPubKey, recipientPubKey)
+  if (!wallet.hasAccount(readerPublicKeyAddress)) {
+    return Err(new UnavailableKey())
+  }
+
+  const sharedSecret = await wallet.computeSharedSecret(readerPublicKeyAddress, senderPubKey)
+
+  const computedDataPath = getDataPath(dataPath, sharedSecret, senderPubKey, readerPubKey)
 
   const [encryptedPayload, encryptedPayloadOrKey] = await Promise.all([
     wrapper.readDataFromAsResult(senderAddress, `${dataPath}.enc`),
@@ -218,7 +223,7 @@ const readEncrypted = async (
     return Err(new OffchainError(encryptedPayloadOrKey.error))
   }
 
-  const payloadOrKey = await wallet.decrypt(recipientAddress, encryptedPayloadOrKey.result)
+  const payloadOrKey = await wallet.decrypt(readerPublicKeyAddress, encryptedPayloadOrKey.result)
 
   // encrypted with symmetric key
   if (encryptedPayload.ok) {

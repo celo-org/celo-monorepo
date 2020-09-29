@@ -1,11 +1,13 @@
 import { ACCOUNT_ADDRESSES, ACCOUNT_PRIVATE_KEYS } from '@celo/dev-utils/lib/ganache-setup'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import {
+  ensureLeading0x,
   privateKeyToPublicKey,
   publicKeyToAddress,
   toChecksumAddress,
 } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
+import { randomBytes } from 'crypto'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
@@ -34,18 +36,27 @@ testWithGanache('Offchain Data', (web3) => {
   const signer = ACCOUNT_ADDRESSES[3]
   // const reader = ACCOUNT_ADDRESSES[2]
 
-  // const readerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
-  // const readerEncryptionKeyPublic = privateKeyToPublicKey(readerEncryptionKeyPrivate)
+  const writerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
+  const writerEncryptionKeyPublic = privateKeyToPublicKey(writerEncryptionKeyPrivate)
+  const readerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
+  const readerEncryptionKeyPublic = privateKeyToPublicKey(readerEncryptionKeyPrivate)
 
   const WRITER_METADATA_URL = 'http://example.com/writer'
   const WRITER_STORAGE_ROOT = 'http://example.com/root'
   const WRITER_LOCAL_STORAGE_ROOT = `/tmp/offchain/${writerAddress}`
   let accounts: AccountsWrapper
   let wrapper: OffchainDataWrapper
+  let readerWrapper: OffchainDataWrapper
 
   beforeEach(async () => {
     accounts = await kit.contracts.getAccounts()
     await accounts.createAccount().sendAndWaitForReceipt({ from: writerAddress })
+
+    await accounts
+      .setAccountDataEncryptionKey(writerEncryptionKeyPublic)
+      .sendAndWaitForReceipt({ from: writerAddress })
+
+    kit.addAccount(writerEncryptionKeyPrivate)
 
     const metadata = IdentityMetadataWrapper.fromEmpty(writerAddress)
     await metadata.addClaim(
@@ -64,6 +75,8 @@ testWithGanache('Offchain Data', (web3) => {
       WRITER_STORAGE_ROOT,
       fetchMock
     )
+
+    readerWrapper = new OffchainDataWrapper(readerAddress, kit)
   })
 
   afterEach(() => {
@@ -170,94 +183,76 @@ testWithGanache('Offchain Data', (web3) => {
     })
   })
 
-  describe('encryption', () => {
-    describe('when no keys are loaded in the wallet', () => {
-      it('cannot write encrypted data', async () => {
+  describe('with a reader that has a dataEncryptionKey registered', () => {
+    beforeEach(async () => {
+      await accounts.createAccount().sendAndWaitForReceipt({ from: readerAddress })
+      await accounts
+        .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
+        .sendAndWaitForReceipt({ from: readerAddress })
+    })
+
+    describe('when the key is added to the wallet', () => {
+      beforeEach(() => {
+        kit.addAccount(readerEncryptionKeyPrivate)
+      })
+
+      afterEach(() => {
+        kit.removeAccount(publicKeyToAddress(readerEncryptionKeyPublic))
+      })
+
+      it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
         const testname = 'test'
         const payload = { name: testname }
 
         const nameAccessor = new NameAccessor(wrapper)
+        await nameAccessor.writeEncrypted(payload, readerAddress)
 
-        try {
-          await nameAccessor.writeEncrypted(payload, writerAddress, readerAddress)
-          throw new Error("Shouldn't get here")
-        } catch (e) {
-          expect(e.message).toEqual(`Could not find address ${writerAddress.toLowerCase()}`)
+        const readerNameAccessor = new NameAccessor(readerWrapper)
+        const receivedName = await readerNameAccessor.readEncrypted(writerAddress)
+
+        if (receivedName.ok) {
+          expect(receivedName.result.name).toEqual(testname)
+        } else {
+          console.error(receivedName.error)
+          throw new Error('should not get here')
         }
       })
 
+      it('can encrypt data with symmetric keys', async () => {
+        const testname = 'test'
+        const payload = { name: testname }
+
+        const nameAccessor = new NameAccessor(wrapper)
+        await nameAccessor.writeWithSymmetric(payload, [readerAddress])
+
+        const readerNameAccessor = new NameAccessor(readerWrapper)
+        const receivedName = await readerNameAccessor.readEncrypted(writerAddress)
+
+        if (receivedName.ok) {
+          expect(receivedName.result.name).toEqual(testname)
+        } else {
+          console.error(receivedName.error)
+          throw new Error('should not get here')
+        }
+      })
+    })
+
+    describe('when the key is not added to the wallet', () => {
       it('the reader cannot decrypt the data', async () => {
         const testname = 'test'
         const payload = { name: testname }
 
         const nameAccessor = new NameAccessor(wrapper)
-        kit.addAccount(writerPrivate)
-        await nameAccessor.writeEncrypted(payload, writerAddress, readerAddress)
+        await nameAccessor.writeEncrypted(payload, readerAddress)
 
-        try {
-          await nameAccessor.readEncrypted(writerAddress, readerAddress)
+        const readerNameAccessor = new NameAccessor(readerWrapper)
+        const receivedName = await readerNameAccessor.readEncrypted(writerAddress)
+
+        if (receivedName.ok) {
           throw new Error('Should not get here')
-        } catch (e) {
-          expect(e.message).toEqual(`Could not find address ${readerAddress.toLowerCase()}`)
         }
 
-        kit.removeAccount(writerAddress)
-      })
-    })
-
-    describe('using keys in the wallet', () => {
-      it('reads and writes metadata', async () => {
-        kit.addAccount(writerPrivate)
-        kit.addAccount(readerPrivate)
-        kit.addAccount(reader2Private)
-
-        const testname = 'test'
-        const payload = { name: testname }
-
-        const nameAccessor = new NameAccessor(wrapper)
-
-        await nameAccessor.writeEncrypted(payload, writerAddress, readerAddress)
-        const receivedName = await nameAccessor.readEncrypted(writerAddress, readerAddress)
-        expect(receivedName).toBeDefined()
-
-        if (!receivedName.ok) {
-          throw new Error("Shouldn't get here")
-        }
-
-        expect(receivedName.result).toEqual(payload)
-
-        kit.removeAccount(writerAddress)
-        kit.removeAccount(readerAddress)
-        kit.removeAccount(reader2Address)
-      })
-
-      it('distributes a symmetric key', async () => {
-        kit.addAccount(writerPrivate)
-        kit.addAccount(readerPrivate)
-        kit.addAccount(reader2Private)
-
-        const testname = 'test'
-        const payload = { name: testname }
-
-        const nameAccessor = new NameAccessor(wrapper)
-        await nameAccessor.writeWithSymmetric(payload, writerAddress, [
-          readerAddress,
-          reader2Address,
-        ])
-
-        const result1 = await nameAccessor.readEncrypted(writerAddress, readerAddress)
-        const result2 = await nameAccessor.readEncrypted(writerAddress, reader2Address)
-
-        if (!result1.ok || !result2.ok) {
-          throw new Error("Shouldn't get here")
-        }
-
-        expect(result1.result.name).toEqual(testname)
-        expect(result2.result.name).toEqual(testname)
-
-        kit.removeAccount(writerAddress)
-        kit.removeAccount(readerAddress)
-        kit.removeAccount(reader2Address)
+        expect(receivedName.error.errorType).toEqual(SchemaErrorTypes.UnavailableKey)
       })
     })
   })
