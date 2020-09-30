@@ -104,7 +104,7 @@ export const orderAccessors = {
  * Determines whether a validator is pinned
  * Pinned validators are set to the top of the table, regardless of how the table is sorted
  * @param  {Address}    address The address of a given Validator
- * @return {boolean}    Whether the given validator is pinned
+ * @return {number}     1 if the address is pinned, 0 if not
  */
 export function isPinned(address: Address) {
   const list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
@@ -126,7 +126,6 @@ export function togglePin(address: Address) {
     list = list.filter((_) => _ !== address)
   }
   localStorage.setItem(localStoragePinnedKey, list.join(','))
-  return !pinned
 }
 
 /**

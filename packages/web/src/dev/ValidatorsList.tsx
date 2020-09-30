@@ -6,7 +6,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
-import { CeloGroup, orderAccessors, sortData } from 'src/utils/validators'
+import { Address, CeloGroup, orderAccessors, sortData } from 'src/utils/validators'
 
 interface HeaderCellProps {
   style: any[]
@@ -75,7 +75,7 @@ type orderByTypes =
   | 'attestation'
 
 export interface State {
-  expanded: string | undefined
+  expanded: Address | undefined
   orderKey: orderByTypes
   orderAsc: boolean
   sortedData: CeloGroup[]
@@ -109,7 +109,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     this.forceUpdate()
   }
 
-  expand(expanded: string) {
+  expand(expanded: Address) {
     if (this.state.expanded === expanded) {
       return this.setState({ expanded: undefined })
     }
@@ -212,10 +212,10 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             />
           </View>
           {validatorGroups.map((group, i) => (
-            <div key={i} onClick={this.expand.bind(this, group.name)}>
+            <div key={i} onClick={this.expand.bind(this, group.address)}>
               <ValidatorsListRow
                 group={group}
-                expanded={expanded === group.name}
+                expanded={expanded === group.address}
                 onPinned={this.setData}
               />
             </div>
