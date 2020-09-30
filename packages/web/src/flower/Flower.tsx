@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { StyleSheet, View } from 'react-native'
 import FlowerTablet from 'src/flower/color-flower-mid.jpg'
 import FlowerMobile from 'src/flower/color-flower-small.jpg'
 import FlowerDesktop from 'src/flower/color-flower.jpg'
@@ -9,7 +10,7 @@ import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 
 export default function Flower() {
   const canvasRef = React.useRef(null)
-  const { screen } = useScreenSize()
+  const { screen, isMobile } = useScreenSize()
   React.useEffect(() => {
     const viewCtx = canvasRef.current.getContext('2d')
     // reset
@@ -25,22 +26,24 @@ export default function Flower() {
       0
     )
 
-    const handleScroll = (event) => {
+    const handleScroll = () => {
       requestAnimationFrame(() => {
         viewCtx.clearRect(0, 0, canvasWidth, canvasHeight)
-        const percent = window.scrollY / event?.target?.scrollingElement?.scrollHeight
+        const percent = getScrollPercent()
         const factor = 1 - percent
 
         viewCtx.save()
         scaleFromCenter(viewCtx, factor)
-        const colorOpacity = Math.max(1.25 - percent * 6, 0)
+        const colorOpacity = isMobile
+          ? Math.max(1.25 - percent * 8, 0)
+          : Math.max(1.25 - percent * 6, 0)
         viewCtx.globalAlpha = colorOpacity
         viewCtx.drawImage(colorFlower, 0, 0, canvasWidth, canvasHeight)
         viewCtx.restore()
 
         viewCtx.save()
         scaleFromCenter(viewCtx, factor)
-        const opacity = Math.max(-1 + percent * 8, 0)
+        const opacity = isMobile ? Math.max(-0.25 + percent * 8, 0) : Math.max(-1 + percent * 8, 0)
         viewCtx.globalAlpha = opacity
         viewCtx.drawImage(outlineFlower, 0, 0, canvasWidth, canvasHeight)
         viewCtx.restore()
@@ -49,10 +52,17 @@ export default function Flower() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [canvasRef])
+  }, [canvasRef, isMobile])
 
   return (
-    <canvas ref={canvasRef} width="1270" height="1270" style={{ maxWidth: '100vw', padding: 10 }} />
+    <View style={[styles.breathe, isMobile && styles.breatheMobile]}>
+      <canvas
+        ref={canvasRef}
+        width="1270"
+        height="1270"
+        style={{ maxWidth: '100vw', padding: 10 }}
+      />
+    </View>
   )
 }
 
@@ -62,16 +72,22 @@ function scaleFromCenter(viewCtx, factor: number) {
   const canvasWidth = viewCtx.canvas.width
   const inversion = 1 - scale
   viewCtx.scale(scale, scale)
-  viewCtx.translate(inversion * canvasWidth, inversion * canvasHeight)
+
+  viewCtx.translate(inversion * canvasWidth, inversion * canvasHeight * (1 + inversion))
 }
 
-function setImage(viewCtx, width, height, path, opacity) {
+function setImage(viewCtx, width, height, path, opacity: number) {
   const image = new Image()
 
   image.onload = () => {
     viewCtx.save()
-    viewCtx.globalAlpha = opacity
-    viewCtx.drawImage(image, 0, 0, width, height)
+    if (opacity === 1) {
+      fadeIn(viewCtx, 0, image, width, height)
+    } else {
+      viewCtx.globalAlpha = opacity
+      viewCtx.drawImage(image, 0, 0, width, height)
+    }
+
     viewCtx.restore()
   }
   image.src = path
@@ -79,17 +95,24 @@ function setImage(viewCtx, width, height, path, opacity) {
   return image
 }
 
-// function FlowerIllo({ onLoadEnd }) {
-//   const { screen } = useScreenSize()
-//   return (
-//     <Image source={COLOR_FLOWER_SRC[screen]} style={standardStyles.image} onLoadEnd={onLoadEnd} />
-//   )
-// }
+function getScrollPercent() {
+  return window.scrollY / document.scrollingElement.scrollHeight
+}
 
-// function FlowerOutline() {
-//   const { screen } = useScreenSize()
-//   return <Image source={OUTLINE_FLOWER_SRC[screen]} style={standardStyles.image} />
-// }
+function fadeIn(viewCtx, opacity, image, width, height) {
+  requestAnimationFrame(() => {
+    viewCtx.save()
+    const percent = getScrollPercent()
+    const factor = 1 - percent
+    scaleFromCenter(viewCtx, factor)
+    viewCtx.globalAlpha = opacity + 16 / 2000
+    viewCtx.drawImage(image, 0, 0, width, height)
+    if (viewCtx.globalAlpha < 1) {
+      fadeIn(viewCtx, viewCtx.globalAlpha, image, width, height)
+    }
+    viewCtx.restore()
+  })
+}
 
 const COLOR_FLOWER_SRC = {
   [ScreenSizes.MOBILE]: FlowerMobile,
@@ -103,90 +126,29 @@ const OUTLINE_FLOWER_SRC = {
   [ScreenSizes.DESKTOP]: Outline,
 }
 
-// const styles = StyleSheet.create({
-//   root: {
-//     marginTop: 60,
-//     width: '100%',
-//     willChange: 'transform, opacity',
-//     transitionProperty: 'opacity',
-//     transitionDuration: '4s',
-//     transformOrigin: 'bottom',
-//     justifyContent: 'center',
-//   },
-//   mobileRoot: {
-//     transformOrigin: 'bottom',
-//     marginTop: 40,
-//   },
-//   outline: {
-//     willChange: 'opacity',
-//     position: 'absolute',
-//     width: '100%',
-//   },
-//   breatheMobile: {
-//     height: 'calc(100vh - 50px)',
-//     justifyContent: 'flex-start',
-//   },
-//   breathe: {
-//     maxWidth: 1270,
-//     justifyContent: 'center',
-//     width: '100%',
-//     willChange: 'transform, opacity',
-//     animationIterationCount: 'infinite',
-//     animationDirection: 'alternate',
-//     animationDuration: '3s',
-//     animationFillMode: 'both',
-//     animationKeyframes: [
-//       {
-//         from: { opacity: 0.85, filter: 'brightness(1.1)' },
-//         '10%': { opacity: 0.85 },
-//         '90%': { opacity: 1 },
-//         to: { opacity: 1, filter: 'brightness(1) hue-rotate(-5deg)' },
-//       },
-//     ],
-//   },
-// })
-
-// const COLOR_OPACITY = {
-//   inputRange: [0, 0.25, 0.3],
-//   outputRange: [1, 1, 0.1],
-// }
-
-// const COLOR_OPACITY_MOBILE = {
-//   inputRange: [0, 0.1, 0.16],
-//   outputRange: [1, 0.5, 0],
-// }
-
-// const OUTLINE_OPACITY = {
-//   inputRange: [0, 0.25, 0.3, 0.39],
-//   outputRange: [0, 1, 1, 0],
-// }
-
-// const OUTLINE_OPACITY_MOBILE = {
-//   inputRange: [0, 0.1, 0.15, 0.22],
-//   outputRange: [0, 1, 1, 0],
-// }
-
-// const SCALER_DESKTOP = {
-//   inputRange: [0, 0.15, 0.45],
-//   outputRange: [1, 0.75, 0.1],
-// }
-
-// const SCALER_MOBILE = {
-//   inputRange: [0, 0.45],
-//   outputRange: [1, 0.6],
-// }
-
-// const SKEW = {
-//   inputRange: [0, 0.27, 0.45, 0.64],
-//   outputRange: ['0deg', '4deg', '-2deg', '2deg'],
-// }
-
-// const ROTATE = {
-//   inputRange: [0, 0.66],
-//   outputRange: ['0deg', '45deg'],
-// }
-
-// const ROTATE2 = {
-//   inputRange: [0, 0.66],
-//   outputRange: ['0deg', '18deg'],
-// }
+const styles = StyleSheet.create({
+  breatheMobile: {
+    marginTop: 40,
+    height: 'calc(100vh - 200px)',
+    justifyContent: 'flex-start',
+  },
+  breathe: {
+    marginTop: 60,
+    maxWidth: 1270,
+    justifyContent: 'center',
+    width: '100%',
+    willChange: 'transform, opacity',
+    animationIterationCount: 'infinite',
+    animationDirection: 'alternate',
+    animationDuration: '3s',
+    animationFillMode: 'both',
+    animationKeyframes: [
+      {
+        from: { opacity: 0.85, filter: 'brightness(1.1)' },
+        '10%': { opacity: 0.85 },
+        '90%': { opacity: 1 },
+        to: { opacity: 1, filter: 'brightness(1) hue-rotate(-5deg)' },
+      },
+    ],
+  },
+})
