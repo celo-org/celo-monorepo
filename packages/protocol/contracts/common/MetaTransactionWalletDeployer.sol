@@ -31,7 +31,7 @@ contract MetaTransactionWalletDeployer is
      */
   modifier onlyCanDeploy() {
     require(
-      msg.sender == owner() || canDeploy[msg.sender] == true,
+      msg.sender == owner() || canDeploy[msg.sender],
       "sender not allowed to deploy wallet"
     );
     _;
