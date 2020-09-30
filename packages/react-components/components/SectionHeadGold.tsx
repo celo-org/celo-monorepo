@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -9,13 +9,13 @@ interface Props {
 
 function SectionHead({ text }: Props) {
   return (
-    <View style={style.container}>
-      <Text style={style.text}>{text}</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>{text}</Text>
     </View>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
     paddingBottom: 8,

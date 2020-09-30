@@ -1,7 +1,7 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import Clipboard from '@react-native-community/clipboard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'

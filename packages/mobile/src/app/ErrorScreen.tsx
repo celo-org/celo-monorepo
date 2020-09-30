@@ -1,9 +1,9 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { RouteProp } from '@react-navigation/native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -34,7 +34,7 @@ class ErrorScreen extends React.Component<Props> {
         subtitle={t('somethingWrong')}
       >
         <View>
-          <Text style={componentStyles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
+          <Text style={styles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
             {t(errorMessage)}
           </Text>
         </View>
@@ -42,5 +42,15 @@ class ErrorScreen extends React.Component<Props> {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  errorMessage: {
+    ...fontStyles.regular,
+    fontSize: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(238, 238, 238, 0.75)',
+    padding: 15,
+  },
+})
 
 export default withTranslation<Props>(Namespaces.global)(ErrorScreen)

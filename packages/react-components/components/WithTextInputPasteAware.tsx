@@ -18,11 +18,11 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
     render() {
       const { isPasteIconVisible, onPressPaste } = this.props
       return (
-        <View style={style.container}>
+        <View style={styles.container}>
           <WrappedTextInput {...this.props} showClearButton={!isPasteIconVisible} />
           {isPasteIconVisible && (
             <TouchableDefault
-              style={[style.pasteIconContainer, pasteIconContainerStyle]}
+              style={[styles.pasteIconContainer, pasteIconContainerStyle]}
               onPress={onPressPaste}
               hitSlop={iconHitslop}
             >
@@ -36,7 +36,7 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
   return withPasteAware(Wrapper)
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     position: 'relative',
   },

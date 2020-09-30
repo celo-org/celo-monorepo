@@ -1,4 +1,4 @@
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useLayoutEffect } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text } from 'react-native'
