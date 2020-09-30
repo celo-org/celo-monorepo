@@ -49,13 +49,13 @@ export default function SideBar({ isOpen }) {
               href="#poemlink"
               size={SIZE.normal}
             />
-            <Button
+            {/* <Button
               kind={BTN.DARKNAKED}
               text="Read about the art"
               href="#artlink"
               style={styles.chevronButton}
               size={SIZE.normal}
-            />
+            /> */}
           </View>
           <View style={[standardStyles.row, standardStyles.elementalMargin]}>
             <TweetButton />
