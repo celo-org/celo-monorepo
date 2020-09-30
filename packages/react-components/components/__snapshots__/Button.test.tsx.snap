@@ -1,185 +1,65 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Button renders with minimum props 1`] = `
-<View
-  style={
-    Array [
-      Object {
-        "alignItems": "center",
-        "borderRadius": 3,
-        "flexDirection": "row",
-      },
-      Object {
-        "marginVertical": 10,
-      },
-      Object {
-        "marginBottom": 10,
-      },
-      undefined,
-      Object {
-        "backgroundColor": "#42D689",
-      },
-    ]
-  }
->
-  <View
-    accessible={true}
-    focusable={true}
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "flex": 1,
-          "justifyContent": "center",
-        },
-        Object {
-          "backgroundColor": "#42D689",
-        },
-        Object {
-          "height": 50,
-        },
-        Object {
-          "borderColor": "#42D689",
-          "borderRadius": 3,
-          "borderWidth": 2,
-        },
-      ]
-    }
-  >
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "flex": 1,
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-        }
-      }
-    >
-      <Text
-        style={
-          Array [
-            Object {
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 16,
-            },
-            Object {
-              "color": "#FFFFFF",
-            },
-            Object {
-              "paddingLeft": 5,
-              "paddingRight": 5,
-            },
-          ]
-        }
-      >
-        TEST_TEXT
-      </Text>
-    </View>
-  </View>
-</View>
-`;
-
 exports[`Button when type is SECONDARY renders 1`] = `
 <View
   style={
     Array [
       Object {
-        "alignItems": "center",
-        "borderRadius": 3,
         "flexDirection": "row",
       },
-      Object {
-        "marginVertical": 10,
-      },
-      Object {
-        "marginBottom": 10,
-      },
       undefined,
-      Object {
-        "backgroundColor": "transparent",
-      },
     ]
   }
 >
   <View
-    accessible={true}
-    focusable={true}
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
     style={
       Array [
         Object {
-          "alignItems": "center",
-          "flex": 1,
-          "justifyContent": "center",
+          "overflow": "hidden",
         },
         Object {
-          "backgroundColor": "transparent",
-        },
-        Object {
-          "height": 50,
-        },
-        Object {
-          "borderColor": "#42D689",
-          "borderRadius": 3,
-          "borderWidth": 2,
+          "borderRadius": 100,
         },
       ]
     }
   >
     <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
-          "flexDirection": "row",
-          "justifyContent": "space-between",
+          "backgroundColor": "#F1F0EB",
+          "height": 48,
+          "justifyContent": "center",
+          "minWidth": 120,
+          "opacity": undefined,
+          "paddingHorizontal": 24,
+          "paddingVertical": 5,
         }
       }
     >
-      <Text>
-        child text
-      </Text>
       <Text
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 16,
-            },
-            Object {
-              "color": "#42D689",
-            },
-            Object {
-              "paddingLeft": 5,
-              "paddingRight": 5,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 22,
+          }
         }
       >
         Button
@@ -194,88 +74,130 @@ exports[`Button when type is TERTIARY renders 1`] = `
   style={
     Array [
       Object {
-        "alignItems": "center",
-        "borderRadius": 3,
         "flexDirection": "row",
       },
-      Object {
-        "marginVertical": 10,
-      },
-      Object {
-        "marginBottom": 10,
-      },
       undefined,
-      Object {
-        "backgroundColor": "transparent",
-      },
     ]
   }
 >
   <View
-    accessible={true}
-    focusable={true}
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
     style={
       Array [
         Object {
-          "alignItems": "center",
-          "flex": 1,
-          "justifyContent": "center",
+          "overflow": "hidden",
         },
         Object {
-          "backgroundColor": "transparent",
-        },
-        Object {
-          "height": 50,
-        },
-        Object {
-          "borderColor": "transparent",
-          "borderRadius": 3,
-          "borderWidth": 2,
+          "borderRadius": 100,
         },
       ]
     }
   >
     <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
-          "flexDirection": "row",
-          "justifyContent": "space-between",
+          "backgroundColor": "#EEB93C",
+          "height": 48,
+          "justifyContent": "center",
+          "minWidth": 120,
+          "opacity": undefined,
+          "paddingHorizontal": 24,
+          "paddingVertical": 5,
         }
       }
     >
-      <Text>
-        child text
-      </Text>
       <Text
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 16,
-            },
-            Object {
-              "color": "#2E3338",
-            },
-            Object {
-              "paddingLeft": 5,
-              "paddingRight": 5,
-            },
-          ]
+          Object {
+            "color": "#FFFFFF",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 22,
+          }
+        }
+      >
+        Button
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Button when type not given defaults to primary 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "flexDirection": "row",
+      },
+      undefined,
+    ]
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "overflow": "hidden",
+        },
+        Object {
+          "borderRadius": 100,
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#1AB775",
+          "height": 48,
+          "justifyContent": "center",
+          "minWidth": 120,
+          "opacity": undefined,
+          "paddingHorizontal": 24,
+          "paddingVertical": 5,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#FFFFFF",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 22,
+          }
         }
       >
         Button
