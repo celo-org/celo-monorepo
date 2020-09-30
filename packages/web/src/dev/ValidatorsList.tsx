@@ -6,7 +6,13 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
-import { CeloGroup, CeloValidatorGroup, cleanData } from 'src/utils/validators'
+import {
+  CeloGroup,
+  CeloValidatorGroup,
+  cleanData,
+  orderAccessors,
+  sortData,
+} from 'src/utils/validators'
 
 interface HeaderCellProps {
   style: any[]
@@ -81,6 +87,7 @@ export interface State {
   expanded: number | undefined
   orderKey: orderByTypes
   orderAsc: boolean
+  sortedData: CeloGroup[]
 }
 
 // tslint:disable-next-line
@@ -89,19 +96,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     expanded: undefined,
     orderKey: 'order' as orderByTypes,
     orderAsc: true,
-  }
-  private orderAccessors = {
-    order: (_) => _.order,
-    name: (_) => (_.name || '').toLowerCase() || null,
-    total: (_) => _.numMembers * 1000 + _.elected,
-    votes: (_) => +_.votesAbsolute || 0,
-    rawVotes: (_) => _.votesRaw || 0,
-    votesAvailables: (_) => _.receivableRaw || 0,
-    celo: (_) => _.celo || 0,
-    commission: (_) => _.commission || 0,
-    rewards: (_) => _.rewards || 0,
-    uptime: (_) => _.uptime || 0,
-    attestation: (_) => _.attestation || 0,
+    sortedData: [],
   }
   private cachedCleanData: CeloGroup[]
   private orderByFn: { [by: string]: any } = {}
@@ -109,9 +104,25 @@ class ValidatorsList extends React.PureComponent<Props, State> {
   constructor(...args) {
     super(args[0], args[1])
 
-    Object.keys(this.orderAccessors).forEach(
+    Object.keys(orderAccessors).forEach(
       (orderType: any) => (this.orderByFn[orderType] = () => this.orderBy(orderType))
     )
+
+    const data = cleanData(this.props.data)
+    const { orderAsc, orderKey } = this.state
+    this.cachedCleanData = data
+    this.state.sortedData = sortData(data, orderAsc, orderKey)
+  }
+
+  UNSAFE_componentWillMount() {
+    this.setState({ sortedData: this.cachedCleanData })
+  }
+
+  setData = () => {
+    const { orderAsc, orderKey } = this.state
+    const sortedData = sortData(this.cachedCleanData, orderAsc, orderKey)
+    this.setState({ sortedData })
+    this.forceUpdate()
   }
 
   expand(expanded: number) {
@@ -125,37 +136,11 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     const { orderAsc, orderKey } = this.state
     const asc = key === orderKey && orderAsc ? false : true
     this.setState({ orderKey: key, orderAsc: asc, expanded: undefined })
-  }
-
-  getData(): CeloGroup[] {
-    this.cachedCleanData = this.cachedCleanData || cleanData(this.props.data)
-    return this.cachedCleanData
-  }
-
-  sortData() {
-    const data = this.getData()
-    const { orderAsc, orderKey } = this.state
-    const accessor = this.orderAccessors[orderKey]
-    const dir = orderAsc ? 1 : -1
-
-    const compare = (a, b): number => {
-      if (a === null) {
-        return 1
-      }
-      if (b === null) {
-        return -1
-      }
-      return a > b ? 1 : -1
-    }
-
-    this.cachedCleanData = (data || []).sort((a, b) => dir * compare(accessor(a), accessor(b)))
-
-    return (data || []).sort((a, b) => dir * compare(accessor(a), accessor(b)))
+    this.setData()
   }
 
   render() {
-    const { expanded, orderAsc, orderKey } = this.state
-    const validatorGroups = this.sortData()
+    const { expanded, orderAsc, orderKey, sortedData: validatorGroups } = this.state
     return (
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
@@ -244,7 +229,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           </View>
           {validatorGroups.map((group, i) => (
             <div key={i} onClick={this.expand.bind(this, i)}>
-              <ValidatorsListRow group={group} expanded={expanded === i} />
+              <ValidatorsListRow group={group} expanded={expanded === i} onPinned={this.setData} />
             </div>
           ))}
         </View>

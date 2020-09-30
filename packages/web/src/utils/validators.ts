@@ -11,6 +11,8 @@ export interface Edges<T> {
   }>
 }
 
+export type Address = string
+
 export interface CeloValidatorGroup {
   account: {
     address: string
@@ -57,7 +59,7 @@ export interface CeloGroup {
   uptime: number
   attestation: number
   name: string
-  address: string
+  address: Address
   usd: number
   celo: number
   receivableRaw: number
@@ -72,7 +74,7 @@ export interface CeloGroup {
   claims: string[]
   validators: Array<{
     name: string
-    address: string
+    address: Address
     usd: number
     celo: number
     elected: boolean
@@ -84,11 +86,55 @@ export interface CeloGroup {
   }>
 }
 
-export function isPinned({ address }: any) {
+export const orderAccessors = {
+  order: (_) => _.order,
+  name: (_) => (_.name || '').toLowerCase() || null,
+  total: (_) => _.numMembers * 1000 + _.elected,
+  votes: (_) => +_.votesAbsolute || 0,
+  rawVotes: (_) => _.votesRaw || 0,
+  votesAvailables: (_) => _.receivableRaw || 0,
+  celo: (_) => _.celo || 0,
+  commission: (_) => _.commission || 0,
+  rewards: (_) => _.rewards || 0,
+  uptime: (_) => _.uptime || 0,
+  attestation: (_) => _.attestation || 0,
+}
+
+/**
+ * Determines whether a validator is pinned
+ * Pinned validators are set to the top of the table, regardless of how the table is sorted
+ * @param  {Address}    address The address of a given Validator
+ * @return {boolean}    Whether the given validator is pinned
+ */
+export function isPinned(address: Address) {
   const list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
   return +list.includes(address)
 }
 
+/**
+ * Toggles the pinned status of a validator
+ * Pinned validators are set to the top of the table, regardless of how the table is sorted
+ * @param {Address}     address The address of a given Validator
+ * @return {boolean}    Whether the given validator is pinned
+ */
+export function togglePin(address: Address) {
+  let list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
+  const pinned = list.includes(address)
+  if (!pinned) {
+    list.push(address)
+  } else {
+    list = list.filter((_) => _ !== address)
+  }
+  localStorage.setItem(localStoragePinnedKey, list.join(','))
+  return !pinned
+}
+
+/**
+ * Formats data into usable data for table
+ * @param {ValidatorsListProps['data']} data.celoValidatorGroups The validator groups data
+ * @param {ValidatorsListProps['data']} data.latestBlock The height of the latest block
+ * @return {CeloGroup}    The group of validators with formatted data
+ */
 export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
   const totalVotes: BigNumber = celoValidatorGroups
     .map(({ receivableVotes }) => new BigNumber(receivableVotes))
@@ -119,6 +165,7 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
         }, 0)
         return {
           attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
+          // Randomizes the order of validators on every load
           order: Math.random(),
           pinned: isPinned(account.address),
           name: account.name,
@@ -180,4 +227,30 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
         ...data,
       }
     })
+}
+
+/**
+ * Sorts validator data by specified key, with pinned validators at the beginning
+ * @param {ValidatorsListProps['data']} data The validators data
+ * @param {boolean}       asc Whether the data should be sorted in ascending or descending order
+ * @param {string}        key The key to sort by (e.g. name, votes, lockedCelo, etc)
+ * @return {CeloGroup}    The group of validators with formatted data
+ */
+export function sortData(data: CeloGroup[], asc: boolean, key: string) {
+  const accessor = orderAccessors[key]
+  const dir = asc ? 1 : -1
+
+  const compare = (a, b): number => {
+    if (a === null) {
+      return 1
+    }
+    if (b === null) {
+      return -1
+    }
+    return a > b ? 1 : -1
+  }
+
+  return (data || [])
+    .sort((a, b) => dir * compare(accessor(a), accessor(b)))
+    .sort((a, b) => isPinned(b.address) - isPinned(a.address))
 }

@@ -9,7 +9,7 @@ import Checkmark from 'src/icons/Checkmark'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
-import { CeloGroup } from 'src/utils/validators'
+import { CeloGroup, isPinned, togglePin } from 'src/utils/validators'
 
 const unknownGroupName = 'Unnamed Group'
 const unknownValidatorName = 'Unnamed Validator'
@@ -57,13 +57,25 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     this.setState({ tooltip: !this.state.tooltip })
   }
 
+  togglePin(event) {
+    event.stopPropagation()
+    togglePin(this.props.group.address)
+    this.props.onPinned()
+    this.forceUpdate()
+  }
+
   render() {
     const { group, expanded } = this.props
     const { tooltip } = this.state
+    const pin = this.togglePin.bind(this)
+    const pinned = isPinned(group.address)
 
     return (
       <div style={tooltip ? { zIndex: 2 } : {}}>
         <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
+          <View style={[styles.tableCell, styles.pinContainer, styles.sizeXXS]} onClick={pin}>
+            <View style={[styles.pin, pinned && styles.pinned]} />
+          </View>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
             <Text
               style={[
