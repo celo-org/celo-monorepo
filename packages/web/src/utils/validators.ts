@@ -103,7 +103,6 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
   return celoValidatorGroups
     .map(
       ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
-        const group = account
         const rewards = rewardsRatio === null ? null : Math.round(+rewardsRatio * 100 * 10) / 10
         const rewardsStyle =
           rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
@@ -121,11 +120,11 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
         return {
           attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
           order: Math.random(),
-          pinned: isPinned(group.address),
-          name: group.name,
-          address: group.address,
-          usd: weiToDecimal(+group.usd),
-          celo: weiToDecimal(+group.lockedGold),
+          pinned: isPinned(account.address),
+          name: account.name,
+          address: account.address,
+          usd: weiToDecimal(+account.usd),
+          celo: weiToDecimal(+account.lockedGold),
           receivableRaw: weiToDecimal(+receivableVotes),
           receivableVotes: receivableVotesPer.toString(),
           votesRaw: weiToDecimal(+votes),
@@ -135,7 +134,7 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
           rewards,
           rewardsStyle,
           numMembers,
-          claims: getClaims(group.claims),
+          claims: getClaims(account.claims),
           validators: affiliates.edges.map(({ node: validator }) => {
             const {
               address,

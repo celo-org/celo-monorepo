@@ -36,8 +36,8 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
             style={[
               styles.defaultText,
               styles.tableHeaderCellArrow,
-              ...(ordered ? [styles.tableHeaderCellArrowVisible] : []),
-              ...(ordered && !asc ? [styles.tableHeaderCellArrowDesc] : []),
+              ordered && styles.tableHeaderCellArrowVisible,
+              ordered && !asc && styles.tableHeaderCellArrowDesc,
             ]}
           >
             <Chevron direction={Direction.up} color={colors.white} size={10} />

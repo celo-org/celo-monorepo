@@ -70,7 +70,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                 styles.defaultText,
                 styles.tableCell,
                 styles.tableCellTitleArrow,
-                ...(expanded ? [styles.tableCellTitleArrowExpanded] : []),
+                expanded && styles.tableCellTitleArrowExpanded,
               ]}
             >
               <Chevron
