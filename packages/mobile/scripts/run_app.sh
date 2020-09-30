@@ -34,14 +34,20 @@ case "${unameOut}" in
     MINGW*)     MACHINE=MinGw;;
     *)          MACHINE="UNKNOWN:${unameOut}"
 esac
-echo "Machine type: $MACHINE"
-echo "Current directory: $(pwd)"
 
 # Read values from the .env file and put them in env vars
 ENV_FILENAME=".env.${ENV_NAME}"
 # From https://stackoverflow.com/a/56229034/158525
 # Supports vars with spaces and single or double quotes
 eval "$(grep -v -e '^#' "$ENV_FILENAME" | xargs -I {} echo export \'{}\')"
+
+echo "**************************"
+echo "Current directory: $(pwd)"
+echo "Machine type: $MACHINE"
+echo "Environment: $ENV_FILENAME"
+echo "Network: $DEFAULT_TESTNET"
+echo "Platform: $PLATFORM"
+echo "**************************"
 
 startPackager() {
   export RCT_METRO_PORT="${RCT_METRO_PORT:=8081}"
@@ -65,7 +71,6 @@ startPackager() {
 
 # Build the app and run it
 if [ "$PLATFORM" = "android" ]; then
-  echo "Using platform android"
 
   NUM_DEVICES=$(adb devices -l | wc -l)
   if [ "$NUM_DEVICES" -lt 3 ]; then 
@@ -83,7 +88,6 @@ if [ "$PLATFORM" = "android" ]; then
   yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
 
 elif [ "$PLATFORM" = "ios" ]; then
-  echo "Using platform ios"
 
   case "$RELEASE" in
     true) CONFIGURATION="Release" ;;
