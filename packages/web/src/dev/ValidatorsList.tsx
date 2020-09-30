@@ -114,10 +114,6 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     this.state.sortedData = sortData(data, orderAsc, orderKey)
   }
 
-  UNSAFE_componentWillMount() {
-    this.setState({ sortedData: this.cachedCleanData })
-  }
-
   setData = () => {
     const { orderAsc, orderKey } = this.state
     const sortedData = sortData(this.cachedCleanData, orderAsc, orderKey)
