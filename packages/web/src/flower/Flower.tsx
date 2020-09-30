@@ -16,7 +16,6 @@ export default function Flower() {
     // reset
     const canvasHeight = viewCtx.canvas.height
     const canvasWidth = viewCtx.canvas.width
-
     const colorFlower = setImage(viewCtx, canvasWidth, canvasHeight, COLOR_FLOWER_SRC[screen], 1)
     const outlineFlower = setImage(
       viewCtx,
@@ -36,14 +35,16 @@ export default function Flower() {
         scaleFromCenter(viewCtx, factor)
         const colorOpacity = isMobile
           ? Math.max(1.25 - percent * 8, 0)
-          : Math.max(1.25 - percent * 6, 0)
+          : Math.max(1.6 - percent * 6, 0)
         viewCtx.globalAlpha = colorOpacity
         viewCtx.drawImage(colorFlower, 0, 0, canvasWidth, canvasHeight)
         viewCtx.restore()
 
         viewCtx.save()
         scaleFromCenter(viewCtx, factor)
-        const opacity = isMobile ? Math.max(-0.25 + percent * 8, 0) : Math.max(-1 + percent * 8, 0)
+        const opacity = isMobile
+          ? Math.max(-0.25 + percent * 8, 0)
+          : Math.max(-1.1 + percent * 8, 0)
         viewCtx.globalAlpha = opacity
         viewCtx.drawImage(outlineFlower, 0, 0, canvasWidth, canvasHeight)
         viewCtx.restore()
@@ -56,12 +57,7 @@ export default function Flower() {
 
   return (
     <View style={[styles.breathe, isMobile && styles.breatheMobile]}>
-      <canvas
-        ref={canvasRef}
-        width="1270"
-        height="1270"
-        style={{ maxWidth: '100vw', padding: 10 }}
-      />
+      <canvas ref={canvasRef} width="1270" height="1270" style={{ maxWidth: '100%' }} />
     </View>
   )
 }
@@ -133,6 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   breathe: {
+    padding: 20,
     marginTop: 60,
     maxWidth: 1270,
     justifyContent: 'center',
