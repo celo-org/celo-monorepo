@@ -13,7 +13,6 @@ export default function Flower() {
   const { screen, isMobile } = useScreenSize()
   React.useEffect(() => {
     const viewCtx = canvasRef.current.getContext('2d')
-    // reset
     const canvasHeight = viewCtx.canvas.height
     const canvasWidth = viewCtx.canvas.width
     const colorFlower = setImage(viewCtx, canvasWidth, canvasHeight, COLOR_FLOWER_SRC[screen], 1)
@@ -28,10 +27,10 @@ export default function Flower() {
     const handleScroll = () => {
       requestAnimationFrame(() => {
         viewCtx.clearRect(0, 0, canvasWidth, canvasHeight)
-        const percent = getScrollPercent()
-        const factor = 1 - percent
 
         viewCtx.save()
+        const percent = getScrollPercent()
+        const factor = 1 - percent
         scaleFromCenter(viewCtx, factor)
         const colorOpacity = isMobile
           ? Math.max(1.25 - percent * 8, 0)
@@ -72,7 +71,7 @@ function scaleFromCenter(viewCtx, factor: number) {
   viewCtx.translate(inversion * canvasWidth, inversion * canvasHeight * (1 + inversion))
 }
 
-function setImage(viewCtx, width, height, path, opacity: number) {
+function setImage(viewCtx, width: number, height: number, path, opacity: number) {
   const image = new Image()
 
   image.onload = () => {
@@ -101,7 +100,7 @@ function fadeIn(viewCtx, opacity, image, width, height) {
     const percent = getScrollPercent()
     const factor = 1 - percent
     scaleFromCenter(viewCtx, factor)
-    viewCtx.globalAlpha = opacity + 16 / 2000
+    viewCtx.globalAlpha = opacity + 16 / FADE_IN_MS
     viewCtx.drawImage(image, 0, 0, width, height)
     if (viewCtx.globalAlpha < 1) {
       fadeIn(viewCtx, viewCtx.globalAlpha, image, width, height)
@@ -110,6 +109,7 @@ function fadeIn(viewCtx, opacity, image, width, height) {
   })
 }
 
+const FADE_IN_MS = 2000
 const COLOR_FLOWER_SRC = {
   [ScreenSizes.MOBILE]: FlowerMobile,
   [ScreenSizes.TABLET]: FlowerTablet,
