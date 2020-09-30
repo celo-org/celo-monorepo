@@ -72,7 +72,7 @@ contract MetaTransactionWalletDeployer is
      */
   function _changeDeployerPermission(address target, bool allowedToDeploy) internal {
     canDeploy[target] = allowedToDeploy;
-    if (allowedToDeploy == true) {
+    if (allowedToDeploy) {
       emit DeployerStatusGranted(target);
     } else {
       emit DeployerStatusRevoked(target);
