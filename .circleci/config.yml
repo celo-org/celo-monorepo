@@ -497,20 +497,20 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Verify bytecodes between RC1 and current branch
+          name: Verify bytecodes between current release and current branch
           command: |
+            RELEASE_TAG=celo-core-contracts-v1.pre-audit
             cd packages/protocol
-
-            # deploy RC1 contracts to ganache devchain
+            # deploy release contracts to ganache devchain
             # We fetch via HTTPS instead of SSH to avoid the interactive "do you
             # trust the RSA key fingerprint" prompt.
             git remote add origin-https https://github.com/celo-org/celo-monorepo.git
-            git fetch origin-https rc1
-            git checkout rc1
+            git fetch origin-https $RELEASE_TAG
+            git checkout $RELEASE_TAG
             rm -rf build/contracts
             yarn devchain generate-tar devchain.tar.gz --migration_override <(echo '{"downtimeSlasher": { "slashableDowntime": 60 } }')
-            # store build artifacts in build/rc1
-            mv build/contracts build/rc1
+            # store build artifacts in build/release
+            mv build/contracts build/release
 
             # build current contracts (artifacts in build/contracts)
             git checkout ${CIRCLE_BRANCH}
@@ -523,10 +523,10 @@ jobs:
             echo "Waiting for ganache to start"
             sleep 30
 
-            # verify bytecodes of RC1 deployment
-            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
-            # generate report between RC1 and current branch
-            yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/rc1 -n build/contracts --output_file report.json
+            # verify bytecodes of release deployment
+            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/release --before_release_1
+            # generate report between release and current branch
+            yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/release -n build/contracts --output_file report.json
             # deploy new contracts and generate Governance proposal for upgrade
             # TODO: remove --truffle_override once gas limit is increased
             yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data example-initialize-data.json --truffle_override '{"gasLimit": 12500000, "gas": 12500000 }'
