@@ -6,13 +6,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
-import {
-  CeloGroup,
-  CeloValidatorGroup,
-  cleanData,
-  orderAccessors,
-  sortData,
-} from 'src/utils/validators'
+import { CeloGroup, orderAccessors, sortData } from 'src/utils/validators'
 
 interface HeaderCellProps {
   style: any[]
@@ -61,10 +55,7 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
 }
 
 export interface ValidatorsListProps {
-  data: {
-    celoValidatorGroups: CeloValidatorGroup[]
-    latestBlock: number
-  }
+  data: CeloGroup[]
   isLoading: boolean
 }
 
@@ -98,7 +89,6 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     orderAsc: true,
     sortedData: [],
   }
-  private cachedCleanData: CeloGroup[]
   private orderByFn: { [by: string]: any } = {}
 
   constructor(...args) {
@@ -108,15 +98,14 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       (orderType: any) => (this.orderByFn[orderType] = () => this.orderBy(orderType))
     )
 
-    const data = cleanData(this.props.data)
+    const { data } = this.props
     const { orderAsc, orderKey } = this.state
-    this.cachedCleanData = data
     this.state.sortedData = sortData(data, orderAsc, orderKey)
   }
 
   setData = () => {
     const { orderAsc, orderKey } = this.state
-    const sortedData = sortData(this.cachedCleanData, orderAsc, orderKey)
+    const sortedData = sortData(this.props.data, orderAsc, orderKey)
     this.setState({ sortedData })
     this.forceUpdate()
   }
