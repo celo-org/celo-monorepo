@@ -70,7 +70,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
         changePermissionRes = await deployer.changeDeployerPermission(otherAllowedDeployer, true)
       })
 
-      it('should have added the allownace and emit an event', async () => {
+      it('should have added the allowance and emit an event', async () => {
         assert.equal(await deployer.canDeploy(otherAllowedDeployer), true)
         assertLogMatches2(changePermissionRes.logs[0], {
           event: 'DeployerStatusGranted',
