@@ -48,7 +48,7 @@ contract MetaTransactionWallet is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 1, 0, 1);
   }
 
   /**
@@ -56,6 +56,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function initialize(address _signer) external initializer {
+    _transferOwnership(msg.sender);
     setSigner(_signer);
     setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
