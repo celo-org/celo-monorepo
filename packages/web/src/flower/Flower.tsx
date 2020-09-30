@@ -33,15 +33,14 @@ export default function Flower() {
 
         viewCtx.save()
         scaleFromCenter(viewCtx, factor)
-        const colorOpacity = factor ** 5 + 0.3
+        const colorOpacity = Math.max(1.25 - percent * 6, 0)
         viewCtx.globalAlpha = colorOpacity
         viewCtx.drawImage(colorFlower, 0, 0, canvasWidth, canvasHeight)
         viewCtx.restore()
 
         viewCtx.save()
         scaleFromCenter(viewCtx, factor)
-        const opacity = percent
-        console.log(opacity)
+        const opacity = Math.max(-1 + percent * 8, 0)
         viewCtx.globalAlpha = opacity
         viewCtx.drawImage(outlineFlower, 0, 0, canvasWidth, canvasHeight)
         viewCtx.restore()
@@ -52,7 +51,9 @@ export default function Flower() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [canvasRef])
 
-  return <canvas ref={canvasRef} width="1270" height="1270" />
+  return (
+    <canvas ref={canvasRef} width="1270" height="1270" style={{ maxWidth: '100vw', padding: 10 }} />
+  )
 }
 
 function scaleFromCenter(viewCtx, factor: number) {
