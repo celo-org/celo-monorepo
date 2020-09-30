@@ -78,15 +78,17 @@ class AttestationRequestHandler {
     // If it's missing, the full node could be behind by a block or two. Try a few times before erroring.
     const attestations = await kit.contracts.getAttestations()
     for (let i = 0; i < 4; i++) {
-      const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
-      if (state.attestationState === AttestationState.Incomplete) {
-        Counters.attestationRequestsValid.inc()
-        return null
-      } else if (state.attestationState === AttestationState.Complete) {
-        break
-      } else {
-        await sleep(2500)
-      }
+      try {
+        const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
+        if (state?.attestationState === AttestationState.Incomplete) {
+          Counters.attestationRequestsValid.inc()
+          return null
+        } else if (state?.attestationState === AttestationState.Complete) {
+          break
+        }
+        // tslint:disable-next-line: no-empty
+      } catch {}
+      await sleep(2500)
     }
 
     Counters.attestationRequestsWOIncompleteAttestation.inc()

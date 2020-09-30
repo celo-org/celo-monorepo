@@ -36,7 +36,7 @@ An Attestation Service is usually deployed alongside a Celo full node instance, 
 
 Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers: one the attestation service, a Celo Blockchain node, and a single database instance.
 
-For a high availability setup, multiple instances can be deployed behind a load balancer configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can act on it and resend if necessary.
+For a high availability setup, multiple instances can be deployed behind a load balancer and sharing a single database service. The load balancer should be configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can identify the matching record in the shared database and act on the receipt to resend if necessary.
 
 Every record in the database includes the issuer (i.e. validator) in its key, so a single setup like the above can be used to provide attestations for multiple validators.
 
