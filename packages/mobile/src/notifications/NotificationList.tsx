@@ -27,7 +27,7 @@ export function NotificationList<T>(props: Props<T>) {
           <View style={styles.scrollArea}>{props.items.map(props.listItemRenderer)}</View>
         </ScrollView>
       ) : (
-        <Text style={[fontStyles.bodySecondary, styles.empty]}>{i18n.t('global:emptyList')}</Text>
+        <Text style={[fontStyles.regular, styles.empty]}>{i18n.t('global:emptyList')}</Text>
       )}
     </SafeAreaView>
   )

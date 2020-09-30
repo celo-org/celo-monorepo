@@ -2,7 +2,7 @@ import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithCloseButton } from 'src/navigator/Headers.v2'
+import { headerWithCloseButton } from 'src/navigator/Headers'
 import { navigateToWalletStorePage } from 'src/utils/linking'
 
 type Props = WithTranslation

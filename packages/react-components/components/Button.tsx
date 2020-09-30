@@ -1,9 +1,9 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors'
+import colors, { Colors } from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { debounce } from 'lodash'
-import React, { useCallback } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { ReactNode, useCallback } from 'react'
+import { ActivityIndicator, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
 const DEBOUNCE_OPTIONS = {
@@ -12,131 +12,160 @@ const DEBOUNCE_OPTIONS = {
 }
 
 export enum BtnTypes {
-  PRIMARY = 'Primary', // CeloGreen background and White text
-  SECONDARY = 'Secondary', // Transparent background and CeloGreen text
-  TERTIARY = 'Tertiary', // Transparent background and Dark text
+  PRIMARY = 'Primary',
+  SECONDARY = 'Secondary',
+  TERTIARY = 'Tertiary',
+  ONBOARDING = 'Onboarding',
+  ONBOARDING_SECONDARY = 'OnboardingSecondary',
+}
+
+export enum BtnSizes {
+  SMALL = 'small',
+  MEDIUM = 'medium',
+  FULL = 'full',
 }
 
 export interface ButtonProps {
   onPress: () => void
-  style?: any
-  text: string | React.ReactNode
+  style?: StyleProp<ViewStyle>
+  text: string | ReactNode
+  showLoading?: boolean
+  loadingColor?: string
   accessibilityLabel?: string
-  lineHeight?: number
-  type: BtnTypes
+  type?: BtnTypes
+  rounded?: boolean
   disabled?: boolean
-  standard: boolean
+  size?: BtnSizes
   testID?: string
-  children?: React.ReactNode
 }
 
-export default function Button(props: ButtonProps) {
+export default React.memo(function Button(props: ButtonProps) {
+  const {
+    accessibilityLabel,
+    disabled,
+    size,
+    testID,
+    text,
+    type = BtnTypes.PRIMARY,
+    rounded = true,
+    style,
+    showLoading,
+    loadingColor = colors.greenBrand,
+  } = props
+
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
   const debouncedOnPress = useCallback(
     debounce(props.onPress, BUTTON_TAP_DEBOUNCE_TIME, DEBOUNCE_OPTIONS),
-    [props.onPress]
+    [props.onPress, disabled]
   )
 
-  const {
-    testID,
-    style,
-    text,
-    accessibilityLabel,
-    lineHeight,
-    type,
-    disabled,
-    standard,
-    children,
-  } = props
-  let textColor
-  let backgroundColor
-  let borderColor
-
-  const isPrimary = type === BtnTypes.PRIMARY
-  const isSecondary = type === BtnTypes.SECONDARY
-  const isTertiary = type === BtnTypes.TERTIARY
-
-  switch (type) {
-    case BtnTypes.PRIMARY:
-      textColor = colors.light
-      backgroundColor = disabled ? colors.greenFaint : colors.greenBrand
-      borderColor = disabled ? colors.greenFaint : colors.greenBrand
-      break
-    case BtnTypes.SECONDARY:
-      textColor = disabled ? colors.greenFaint : colors.greenBrand
-      backgroundColor = 'transparent'
-      borderColor = disabled ? colors.greenFaint : colors.greenBrand
-      break
-    case BtnTypes.TERTIARY:
-      textColor = disabled ? colors.gray4 : colors.dark
-      backgroundColor = 'transparent'
-      borderColor = 'transparent'
-      break
-    default:
-      if (__DEV__) {
-        throw new Error('No Button Type Specified')
-      }
-      textColor = colors.light
-      backgroundColor = disabled ? colors.greenFaint : colors.greenBrand
-  }
+  const { textColor, backgroundColor, opacity } = getColors(type, disabled)
 
   return (
-    <View
-      style={[
-        styles.row,
-        (isPrimary || isSecondary || isTertiary) && standard ? { marginVertical: 10 } : null,
-        standard ? { marginBottom: 10 } : null,
-        style,
-        { backgroundColor },
-      ]}
-    >
-      <Touchable
-        onPress={debouncedOnPress}
-        disabled={disabled}
-        style={[
-          styles.button,
-          { backgroundColor },
-          lineHeight !== undefined ? { height: lineHeight } : { height: 50 },
-          standard && (isPrimary || isSecondary || isTertiary)
-            ? { borderColor, borderRadius: 3, borderWidth: 2 }
-            : { borderWidth: 0 },
-        ]}
-        testID={testID}
-      >
-        <View style={styles.containerButton}>
-          {children}
-          <Text
-            accessibilityLabel={accessibilityLabel}
-            style={[fontStyles.buttonText, { color: textColor }, styles.text]}
-          >
-            {text}
-          </Text>
-        </View>
-      </Touchable>
+    <View style={getStyleForWrapper(size, style)}>
+      {/* these Views cannot be combined as it will cause ripple to not respect the border radius */}
+      <View style={[styles.containRipple, rounded && styles.rounded]}>
+        <Touchable
+          onPress={debouncedOnPress}
+          disabled={disabled}
+          style={getStyle(size, backgroundColor, opacity)}
+          testID={testID}
+        >
+          {showLoading ? (
+            <ActivityIndicator size="small" color={loadingColor} />
+          ) : (
+            <Text
+              accessibilityLabel={accessibilityLabel}
+              style={{ ...fontStyles.regular600, color: textColor }}
+            >
+              {text}
+            </Text>
+          )}
+        </Touchable>
+      </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 3,
+  // on android Touchable Provides a ripple effect, by itself it does not respect the border radius on Touchable
+  containRipple: {
+    overflow: 'hidden',
+  },
+  rounded: {
+    borderRadius: 100,
   },
   button: {
     alignItems: 'center',
-    flex: 1,
     justifyContent: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 24,
   },
-  containerButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  small: {
+    height: 40,
+    minWidth: 120,
   },
-  text: {
-    paddingLeft: 5,
-    paddingRight: 5,
+  medium: {
+    height: 48,
+    minWidth: 120,
+  },
+  full: {
+    height: 48,
+    flexGrow: 1,
   },
 })
+
+function getColors(type: BtnTypes, disabled: boolean | undefined) {
+  let textColor
+  let backgroundColor
+  let opacity
+  switch (type) {
+    case BtnTypes.PRIMARY:
+      textColor = colors.light
+      backgroundColor = disabled ? colors.greenFaint : colors.greenUI
+      break
+    case BtnTypes.SECONDARY:
+      textColor = disabled ? colors.gray4 : colors.dark
+      backgroundColor = colors.beige
+      break
+    case BtnTypes.TERTIARY:
+      textColor = colors.light
+      backgroundColor = disabled ? colors.goldFaint : colors.goldUI
+      break
+    case BtnTypes.ONBOARDING:
+      textColor = colors.onboardingBlue
+      backgroundColor = colors.onboardingLightBlue
+      opacity = disabled ? 0.5 : 1.0
+      break
+    case BtnTypes.ONBOARDING_SECONDARY:
+      textColor = colors.onboardingBlue
+      backgroundColor = colors.light
+      opacity = disabled ? 0.5 : 1.0
+      break
+  }
+
+  return { textColor, backgroundColor, opacity }
+}
+
+function getStyle(
+  size: BtnSizes | undefined,
+  backgroundColor: Colors,
+  opacity: number | undefined
+) {
+  switch (size) {
+    case BtnSizes.SMALL:
+      return { ...styles.button, ...styles.small, backgroundColor, opacity }
+    case BtnSizes.FULL:
+      return { ...styles.button, ...styles.full, backgroundColor, opacity }
+    default:
+      return { ...styles.button, ...styles.medium, backgroundColor, opacity }
+  }
+}
+
+function getStyleForWrapper(
+  size: BtnSizes | undefined,
+  style: StyleProp<ViewStyle>
+): StyleProp<ViewStyle> {
+  return [{ flexDirection: size === BtnSizes.FULL ? 'column' : 'row' }, style]
+}

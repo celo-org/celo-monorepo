@@ -8,7 +8,7 @@ These are the End-to-End (e2e) tests for the wallet mobile app. They run an emul
 
 ### Android
 
-First install the emulator as described in the [SETUP readme](../../../SETUP.md#optional-install-an-android-emulator).
+First install the emulator as described in the [mobile readme](../README.md#optional-install-an-android-emulator).
 
 By default, the e2e scripts will assume the VM name of `Pixel_API_29_AOSP_x86_64` recommended in the instructions but you can rename the VM as you like.
 
