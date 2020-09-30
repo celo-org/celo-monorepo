@@ -68,7 +68,7 @@ interface TokenFetchFactory {
 export function tokenFetchFactory({ actionName, token, actionCreator, tag }: TokenFetchFactory) {
   function* tokenFetch() {
     try {
-      Logger.debug(tag, 'Fetching balance')
+      Logger.debug(tag, `Fetching ${token} balance`)
       const account = yield call(getConnectedAccount)
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)

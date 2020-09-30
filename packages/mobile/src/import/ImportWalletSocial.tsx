@@ -2,8 +2,7 @@ import { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
@@ -100,7 +99,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
         >
           <SafeguardsIcon style={styles.logo} width={147} height={75} />
           <Text style={fontStyles.h1}>{t('restoreSocial')}</Text>
-          <Text style={fontStyles.body}>{t('socialImportInfo')}</Text>
+          <Text style={fontStyles.regular}>{t('socialImportInfo')}</Text>
           <BackupPhraseContainer
             onChangeText={this.setBackupPhrase(1)}
             value={phrase1}
@@ -108,7 +107,7 @@ export class ImportWalletSocial extends React.Component<Props, State> {
             mode={BackupPhraseContainerMode.INPUT}
             type={BackupPhraseType.SOCIAL_BACKUP}
             index={1}
-            style={componentStyles.marginTop20}
+            style={styles.backupContainer}
           />
           <BackupPhraseContainer
             onChangeText={this.setBackupPhrase(2)}
@@ -117,10 +116,10 @@ export class ImportWalletSocial extends React.Component<Props, State> {
             mode={BackupPhraseContainerMode.INPUT}
             type={BackupPhraseType.SOCIAL_BACKUP}
             index={2}
-            style={componentStyles.marginTop20}
+            style={styles.backupContainer}
           />
           <Text style={styles.tip}>
-            <Text style={fontStyles.semiBold}>{t('tip')}</Text>
+            <Text style={fontStyles.regular500}>{t('tip')}</Text>
             {t('socialTip')}
           </Text>
         </KeyboardAwareScrollView>
@@ -139,7 +138,6 @@ export class ImportWalletSocial extends React.Component<Props, State> {
           }
           onPress={this.onPressRestore}
           text={t('restoreWallet')}
-          standard={false}
           type={BtnTypes.PRIMARY}
           testID="ImportWalletSocialButton"
         />
@@ -154,6 +152,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
+  backupContainer: {
+    marginTop: 20,
+  },
   scrollContainer: {
     padding: 20,
     paddingTop: 0,
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tip: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     color: colors.gray5,
     marginTop: 20,
     marginHorizontal: 2,

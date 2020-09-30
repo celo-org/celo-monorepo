@@ -1,6 +1,6 @@
 import ListItem from '@celo/react-components/components/ListItem'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { useNavigation } from '@react-navigation/native'
@@ -22,6 +22,10 @@ import { navigateToURI } from 'src/utils/linking'
 function FiatExchange() {
   function goToAddFunds() {
     navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: true })
+  }
+
+  function goToExternalExchanges() {
+    navigation.navigate(Screens.ExternalExchanges)
   }
 
   function goToCashOut() {
@@ -61,6 +65,9 @@ function FiatExchange() {
       <View style={styles.optionsListContainer}>
         <ListItem onPress={goToAddFunds}>
           <Text style={styles.optionTitle}>{t('fiatExchangeFlow:addFunds')}</Text>
+        </ListItem>
+        <ListItem onPress={goToExternalExchanges}>
+          <Text style={styles.optionTitle}>{t('fiatExchangeFlow:buySellOnExchanges')}</Text>
         </ListItem>
         {features.SHOW_CASH_OUT ? (
           <ListItem onPress={goToCashOut}>
@@ -113,9 +120,6 @@ const styles = StyleSheet.create({
   },
   optionsListContainer: {
     flex: 1,
-  },
-  option: {
-    backgroundColor: colors.light,
   },
   optionTitle: {
     ...fontStyles.regular,

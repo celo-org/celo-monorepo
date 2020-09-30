@@ -1,6 +1,5 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
-import variables from '@celo/react-components/styles/variables'
 import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -29,7 +28,7 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
-import Logo from 'src/icons/Logo.v2'
+import Logo from 'src/icons/Logo'
 import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -40,8 +39,6 @@ import { initializeSentryUserContext } from 'src/sentry/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
   loading: boolean
@@ -142,7 +139,7 @@ export class WalletHome extends React.Component<Props, State> {
     if (!title) {
       return null
     }
-    return <SectionHeadNew text={title} />
+    return <SectionHead text={title} />
   }
 
   keyExtractor = (_item: any, index: number) => {
@@ -165,7 +162,7 @@ export class WalletHome extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, activeNotificationCount, callToActNotification } = this.props
+    const { activeNotificationCount, callToActNotification } = this.props
 
     const refresh: React.ReactElement<RefreshControlProps> = (
       <RefreshControl
@@ -185,7 +182,6 @@ export class WalletHome extends React.Component<Props, State> {
     }
 
     sections.push({
-      title: t('activity'),
       data: [{}],
       renderItem: () => (
         <TransactionsList key={'TransactionList'} currency={CURRENCY_ENUM.DOLLAR} />
@@ -226,29 +222,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
-  },
-  banner: { paddingVertical: 15, marginTop: 50 },
-  containerFeed: {
-    paddingBottom: 40,
-  },
-  header: {
-    backgroundColor: colors.light,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  headerRight: {
-    position: 'absolute',
-    top: 0,
-    right: variables.contentPadding - HEADER_BUTTON_MARGIN,
-    bottom: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerButton: {
-    justifyContent: 'flex-end',
-    margin: HEADER_BUTTON_MARGIN,
   },
 })
 
