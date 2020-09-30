@@ -13,8 +13,8 @@ export default function Flower() {
   const { screen, isMobile } = useScreenSize()
   React.useEffect(() => {
     const viewCtx = canvasRef.current.getContext('2d')
-    const canvasHeight = viewCtx.canvas.height
-    const canvasWidth = viewCtx.canvas.width
+    const canvasHeight = Math.floor(viewCtx.canvas.height)
+    const canvasWidth = Math.floor(viewCtx.canvas.width)
     const colorFlower = setImage(viewCtx, canvasWidth, canvasHeight, COLOR_FLOWER_SRC[screen], 1)
     const outlineFlower = setImage(
       viewCtx,
@@ -27,7 +27,6 @@ export default function Flower() {
     const handleScroll = () => {
       requestAnimationFrame(() => {
         viewCtx.clearRect(0, 0, canvasWidth, canvasHeight)
-
         viewCtx.save()
         const percent = getScrollPercent()
         const factor = 1 - percent
