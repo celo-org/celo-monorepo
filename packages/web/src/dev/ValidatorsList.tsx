@@ -116,10 +116,10 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     this.setState({ expanded })
   }
 
-  orderBy = (key: orderByTypes) => {
+  orderBy = async (key: orderByTypes) => {
     const { orderAsc, orderKey } = this.state
     const asc = key === orderKey && orderAsc ? false : true
-    this.setState({ orderKey: key, orderAsc: asc, expanded: undefined })
+    await this.setState({ orderKey: key, orderAsc: asc, expanded: undefined })
     this.setData()
   }
 
