@@ -3,7 +3,7 @@ import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers.v2'
+import { headerWithBackButton } from 'src/navigator/Headers'
 
 type Props = {} & WithTranslation
 

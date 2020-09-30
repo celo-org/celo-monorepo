@@ -1,4 +1,4 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
