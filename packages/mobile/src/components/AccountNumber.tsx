@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { getAddressChunks } from '@celo/utils/src/address'
 import Clipboard from '@react-native-community/clipboard'
 import React from 'react'
@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   bottomText: {
-    textAlign: 'right',
+    textAlign: 'center',
   },
 })

@@ -1,6 +1,7 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
+import { ExternalExchangeProvider } from 'src/fiatExchanges/ExternalExchanges'
 import { GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
@@ -60,6 +61,8 @@ export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
 // we would refetch verification state before going to VerificationInputScreen
 export const VERIFICATION_STATE_EXPIRY_SECONDS = 30
 
+export const ATTESTATION_REVEAL_TIMEOUT_SECONDS = 60 // 1 minute
+
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
   DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET
@@ -94,6 +97,33 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
   'MOONPAY_PUBLIC_KEY'
 )
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
+
+export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
+  {
+    name: 'Bittrex (CELO)',
+    link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
+  },
+  {
+    name: 'OKCoin (CELO, CUSD)',
+    link: 'https://www.okcoin.com/en/spot/trade/cusd-usd/',
+  },
+  {
+    name: 'OKEx (CELO)',
+    link: 'https://www.okex.com/spot/trade/CELO-USDT',
+  },
+  {
+    name: 'CoinList Pro (CELO)',
+    link: 'https://coinlist.co/asset/celo',
+  },
+  {
+    name: 'Coinbase Pro (CELO as CGLD)',
+    link: 'https://pro.coinbase.com/trade/CGLD-USD',
+  },
+  {
+    name: 'Coinbase (CELO as CGLD)',
+    link: 'https://www.coinbase.com',
+  },
+]
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN
