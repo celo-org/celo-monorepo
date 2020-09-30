@@ -27,9 +27,10 @@ export default function Flower() {
     const handleScroll = () => {
       requestAnimationFrame(() => {
         viewCtx.clearRect(0, 0, canvasWidth, canvasHeight)
-        viewCtx.save()
         const percent = getScrollPercent()
         const factor = 1 - percent
+        viewCtx.save()
+
         scaleFromCenter(viewCtx, factor)
         const colorOpacity = isMobile
           ? Math.max(1.25 - percent * 8, 0)
@@ -64,10 +65,10 @@ function scaleFromCenter(viewCtx, factor: number) {
   const scale = factor * factor
   const canvasHeight = viewCtx.canvas.height
   const canvasWidth = viewCtx.canvas.width
-  const inversion = 1 - scale
-  viewCtx.scale(scale, scale)
+  const inversion = (1 - scale) / 2
 
-  viewCtx.translate(inversion * canvasWidth, inversion * canvasHeight * (1 + inversion))
+  viewCtx.translate(canvasWidth * inversion, canvasHeight * inversion * 2)
+  viewCtx.scale(scale, scale)
 }
 
 function setImage(viewCtx, width: number, height: number, path, opacity: number) {
