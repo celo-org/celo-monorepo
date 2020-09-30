@@ -1,8 +1,8 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { HeaderHeightContext } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
@@ -20,7 +20,7 @@ import {
   extractInviteCodeAndPrivateKey,
   extractValuesFromDeepLink,
 } from 'src/invite/utils'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
