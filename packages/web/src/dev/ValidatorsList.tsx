@@ -30,7 +30,7 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
     const { hover } = this.state
     return (
       <Hoverable onHoverIn={this.onHoverIn} onHoverOut={this.onHoverOut} onPress={orderFn}>
-        <View style={[styles.tableHeaderCell, ...((style || []) as any)]}>
+        <View style={[styles.tableHeaderCell, style]}>
           <Text style={styles.defaultText}>{name}</Text>
           <Text
             style={[
@@ -75,13 +75,12 @@ type orderByTypes =
   | 'attestation'
 
 export interface State {
-  expanded: number | undefined
+  expanded: string | undefined
   orderKey: orderByTypes
   orderAsc: boolean
   sortedData: CeloGroup[]
 }
 
-// tslint:disable-next-line
 class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
@@ -110,7 +109,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     this.forceUpdate()
   }
 
-  expand(expanded: number) {
+  expand(expanded: string) {
     if (this.state.expanded === expanded) {
       return this.setState({ expanded: undefined })
     }
@@ -213,8 +212,12 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             />
           </View>
           {validatorGroups.map((group, i) => (
-            <div key={i} onClick={this.expand.bind(this, i)}>
-              <ValidatorsListRow group={group} expanded={expanded === i} onPinned={this.setData} />
+            <div key={i} onClick={this.expand.bind(this, group.name)}>
+              <ValidatorsListRow
+                group={group}
+                expanded={expanded === group.name}
+                onPinned={this.setData}
+              />
             </div>
           ))}
         </View>
