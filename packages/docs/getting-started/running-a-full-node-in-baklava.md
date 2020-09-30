@@ -13,7 +13,7 @@ Full node incentives have not been enabled yet because the mechanism for negotia
 {% endhint %}
 
 {% hint style="info" %}
-If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can either shut down your existing node, delete the `celo` folder, and continue by following the guide below starting with [configuring your node](#configure-the-node), or create a new node following these directions.
+If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can either shut down your existing node, delete the `celo` folder, and continue by following the guide below or create a new node following these directions.
 
 Key differences are:
 * New network ID is `62320`
