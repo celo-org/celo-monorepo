@@ -986,9 +986,6 @@ workflows:
       - protocol-test-common:
           requires:
             - lint-checks
-      - protocol-verify-bytecodes:
-          requires:
-            - lint-checks
       - protocol-test-compatibility:
           requires:
             - lint-checks
