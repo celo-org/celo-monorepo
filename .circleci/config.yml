@@ -478,7 +478,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             git fetch --all
-            RELEASE_TAG=celo-core-contracts-v1.pre-audit
+            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
             yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
 
             LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
@@ -503,7 +503,7 @@ jobs:
       - run:
           name: Verify bytecodes between current release and current branch
           command: |
-            RELEASE_TAG=celo-core-contracts-v1.pre-audit
+            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
             cd packages/protocol
             # deploy release contracts to ganache devchain
             # We fetch via HTTPS instead of SSH to avoid the interactive "do you
