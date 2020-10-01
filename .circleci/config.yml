@@ -473,20 +473,6 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Check contract versions
-          command: |
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            git fetch --all
-            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
-            yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
-
-            LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
-            if [[ $LIBRARIES_CHANGED ]]; then
-              echo "Changing the linked list libraries is not currently supported."
-              exit 0
-            fi
-      - run:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
 
