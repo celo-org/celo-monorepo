@@ -1016,6 +1016,9 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
+      - vulnerability-checks:
+          requires:
+            - install_dependencies
       - general-test:
           requires:
             - install_dependencies
