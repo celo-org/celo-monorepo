@@ -181,7 +181,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
         expect(addr).toEqual(rando)
       })
 
-      it('markes the new address as allowed', async () => {
+      it('marks the new address as allowed', async () => {
         expect(await walletDeployer.canDeploy(rando)).toBe(true)
       })
     })
