@@ -2,7 +2,7 @@
 Welcome to the Listing Guide documentation page. If you are a digital asset exchange or ranking site, this guide will help you run a node and audit your setup. 
 
 ## Support
-If you have any questions or need assistance with these instructions, please contact cLabs or ask in the #exchanges channel on [Celo’s Discord server](https://chat.celo.org/) . Remember that Discord is a public channel: never disclose recovery phrases (also known as backup keys, or mnemonics), private keys, unsanitized log output, or personal information.
+If you have any questions or need assistance with these instructions, please contact cLabs or ask in the #exchanges channel on [Celo’s Discord server](https://chat.celo.org/). Remember that Discord is a public channel: never disclose recovery phrases (also known as backup keys, or mnemonics), private keys, unsanitized log output, or personal information.
 
 This guide will also help you find all the necessary information about brand assets, how to integrate with Celo and what useful listing information are made available to you as well as any information about looking for support.
 
