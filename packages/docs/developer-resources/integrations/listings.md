@@ -98,6 +98,8 @@ If you need more information to explore other aspects of the Celo Protocol, ther
 To learn more about the Stability Mechanism, you can find it over [here](https://docs.celo.org/celo-codebase/protocol/stability). 
 The [Stability Analysis Whitepaper](https://celo.org/papers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5) are also linked.
 
+If you want to find more information about the Celo Reserve, please visit the link [here](https://celoreserve.org ).
+
 ### Github
 The Celo Protocol GitHub is located [here.](https://github.com/celo-org/)
 
