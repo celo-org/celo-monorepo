@@ -1,4 +1,5 @@
 import { StaticNodeUtils } from './static-node-utils'
+// import timezone from './timezone'
 
 const NETWORK_NAME = 'alfajores'
 const ENDPOINT = `https://www.googleapis.com/storage/v1/b/static_nodes/o/${NETWORK_NAME}?alt=media`
@@ -16,7 +17,6 @@ const mockStaticNodes = [
   'enode://703cf979becdc501c4221090296fe75299cb9520f19a344098154c14c7133ebf6b649dad7f3f42947ad96312930bea5380a8ff86faa5a3795b0b6cc483adcfc8@35.230.23.131:30303',
 ]
 
-// TODO Create e2e test that actually performs network request to bucket
 describe(StaticNodeUtils, () => {
   describe(StaticNodeUtils.getStaticNodesAsync, () => {
     afterEach(() => {
@@ -25,8 +25,9 @@ describe(StaticNodeUtils, () => {
 
     it('should be able to get static nodes', async () => {
       fetchMock.mock(ENDPOINT, mockStaticNodes)
-      const nodes = await StaticNodeUtils.getStaticNodesAsync(NETWORK_NAME)
-      // Fail if genesis block is not proper JSON.
+      //const nodes = await StaticNodeUtils.getStaticNodesAsync(NETWORK_NAME)
+      const nodes = await StaticNodeUtils.getStaticNodesAsync('baklava')
+      // Fail if the static nodes is not proper JSON.
       const nodesJson = await JSON.parse(nodes)
       // Fail if genesis block is less than 100 characters.
       // An arbitrary limit which ensures that genesis block has some data.
