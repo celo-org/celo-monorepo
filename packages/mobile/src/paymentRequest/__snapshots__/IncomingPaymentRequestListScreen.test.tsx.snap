@@ -12,10 +12,10 @@ exports[`IncomingPaymentRequestListScreen renders correctly with no requests 1`]
     style={
       Array [
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         },
         Object {
           "marginTop": 30,
