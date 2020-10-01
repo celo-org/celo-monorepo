@@ -478,7 +478,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             git fetch --all
-            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
+            RELEASE_TAG=celo-core-contracts-v1.pre-audit
             yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
 
             LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
@@ -528,7 +528,7 @@ jobs:
             sleep 30
 
             # verify bytecodes of release deployment
-            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/release --before_release_1
+            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/release
             # generate report between release and current branch
             yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/release -n build/contracts --output_file report.json
             # deploy new contracts and generate Governance proposal for upgrade
