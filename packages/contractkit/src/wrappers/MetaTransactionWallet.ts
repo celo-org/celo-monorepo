@@ -229,7 +229,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   }
 
   /**
-   * Turns any possible way to pass in a tranasction into the raw values
+   * Turns any possible way to pass in a transaction into the raw values
    * that are actually required. This is used both internally to normalize
    * ways in which transactions are passed in but also public in order
    * for one instance of ContractKit to serialize a meta transaction to
