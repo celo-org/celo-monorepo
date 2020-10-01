@@ -233,7 +233,7 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
  * @param {ValidatorsListProps['data']} data The validators data
  * @param {boolean}       asc Whether the data should be sorted in ascending or descending order
  * @param {string}        key The key to sort by (e.g. name, votes, lockedCelo, etc)
- * @return {CeloGroup}    The group of validators with formatted data
+ * @return {CeloGroup[]}    The group of validators with formatted data
  */
 export function sortData(data: CeloGroup[], asc: boolean, key: string) {
   const accessor = orderAccessors[key]
