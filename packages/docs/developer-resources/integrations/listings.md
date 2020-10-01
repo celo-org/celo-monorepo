@@ -17,7 +17,7 @@ There are several ways to integrate the Celo Platform with your infrastructure.
 
 A general overview of integrations that would be relevant to you listing Celo Platform are shown [here](https://docs.celo.org/developer-guide/overview/integrations/general).
 
-For more specific use-cases for exchanges, please checkout the [Custody Integration Guide](https://docs.celo.org/developer-guide/overview/integrations/custody) as well.
+For more specific use-cases for exchanges, please checkout the [Custody and Exchange Integration Guide](https://docs.celo.org/developer-guide/overview/integrations/custody) as well.
 
 ## Important Information
 ### Celo Native Asset and Celo Dollar
