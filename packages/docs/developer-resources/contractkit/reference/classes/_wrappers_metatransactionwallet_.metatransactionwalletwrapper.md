@@ -402,7 +402,7 @@ ___
 
 *Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L240)*
 
-Turns any possible way to pass in a tranasction into the raw values
+Turns any possible way to pass in a transaction into the raw values
 that are actually required. This is used both internally to normalize
 ways in which transactions are passed in but also public in order
 for one instance of ContractKit to serialize a meta transaction to
