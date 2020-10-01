@@ -37,7 +37,6 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: FullNodeUpgradeArgv) => {
   await switchToContextCluster(argv.celoEnv, argv.context)
-  // return
   await upgradeFullNodeChart(
     argv.celoEnv,
     argv.context,
