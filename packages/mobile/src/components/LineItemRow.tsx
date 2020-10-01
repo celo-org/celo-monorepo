@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
 
@@ -53,8 +53,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   text: {
-    ...fontStyles.body,
-    fontSize: 15,
+    ...fontStyles.regular,
     color: colors.dark,
   },
   loadingContainer: {
