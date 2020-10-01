@@ -93,9 +93,6 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
-      - run:
-          name: Fail if there are vulnerabilities in packages
-          command: ./scripts/ci_check_vulnerabilities.sh
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -387,6 +384,13 @@ jobs:
       # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
+
+  vulnerability-checks:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run: ./scripts/ci_check_vulnerabilities.sh
 
   general-test:
     <<: *defaults
