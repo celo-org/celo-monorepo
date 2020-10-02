@@ -24,7 +24,8 @@ interface Region {
 function inRegion(coords: Coordinates, region: Region): boolean {
   // Check that x in is the range, wrapping if range min is greater than the max.
   const rangeCheck = (x: number, range: Range | undefined) =>
-    range === undefined || (range.min <= x && x < range.max) === range.min <= range.max
+    range === undefined ||
+    (range.min <= range.max ? range.min <= x && x < range.max : range.min <= x || x < range.max)
 
   return (
     rangeCheck(coords.lattitude, region.lattitude) && rangeCheck(coords.longitude, region.longitude)
@@ -53,12 +54,12 @@ const StaticNodeRegions: { [network: string]: Region[] } = {
     {
       name: 'gcp-us-east1',
       lattitude: { min: 0, max: 90 },
-      longitude: { min: -170, max: -105 },
+      longitude: { min: -105, max: -25 },
     },
     {
       name: 'gcp-us-west1',
       lattitude: { min: 0, max: 90 },
-      longitude: { min: -105, max: -25 },
+      longitude: { min: -170, max: -105 },
     },
   ],
 }
@@ -100,7 +101,7 @@ export class StaticNodeUtils {
   static getRegionalStaticNodesAsync(networkName: string, region?: string): Promise<string> {
     const resolvedRegion = region ?? StaticNodeUtils.getStaticNodeRegion(networkName)
     const bucketName = StaticNodesGoogleStorageBucketName
-    const fileName = resolvedRegion ? `${networkName}.${region}` : networkName
+    const fileName = resolvedRegion ? `${networkName}.${resolvedRegion}` : networkName
     return GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName)
   }
 

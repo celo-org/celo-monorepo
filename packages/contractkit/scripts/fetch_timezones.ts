@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { Timezone } from '../src/utils/timezone'
 
-const TZ_URL = 'https://data.iana.org/time-zones/tzdb/zone1970.tab'
+const TZ_URL = 'https://data.iana.org/time-zones/tzdb/zone.tab'
 const OUTPUT_PATH = path.normalize(path.join(__dirname, '..', 'src', 'utils', 'timezones.json'))
 
 // Parse a lattitude coordinate as encoded in the zone.tab file.

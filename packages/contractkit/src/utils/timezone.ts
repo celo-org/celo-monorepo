@@ -4,6 +4,10 @@ const timezones: { [name: string]: Timezone } = require('./timezones.json')
 // Used in testing to override the timezone which is returned by the system.
 let _testTimezoneOverride: string | undefined
 
+export function _testSetTimezoneOverride(zone: string | undefined) {
+  _testTimezoneOverride = zone
+}
+
 export interface Coordinates {
   lattitude: number
   longitude: number
