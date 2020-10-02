@@ -43,7 +43,7 @@ const DefaultConfig = {
       patch: 0,
     },
     deploymentBlockGasLimit: 20000000,
-    blockGasLimit: 20000000,
+    blockGasLimit: 13000000,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD
@@ -59,7 +59,7 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
-    frozen: false,
+    frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -81,14 +81,14 @@ const DefaultConfig = {
     communityRewardFraction: 1 / 4,
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
     carbonOffsettingFraction: 1 / 1000,
-    frozen: false,
+    frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
-    frozen: false,
+    frozen: true,
   },
   gasPriceMinimum: {
     minimumFloor: 1,
@@ -97,7 +97,7 @@ const DefaultConfig = {
     adjustmentSpeed: 0,
   },
   goldToken: {
-    frozen: false,
+    frozen: true,
   },
   governance: {
     queueExpiry: 4 * WEEK,
@@ -195,7 +195,7 @@ const DefaultConfig = {
       '0x5091110175318A2A8aF88309D1648c1D84d31B29',
       '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
     ],
-    frozen: false,
+    frozen: true,
   },
   transferWhitelist: {
     // Whitelist genesis block addresses.
@@ -287,11 +287,6 @@ const NetworkConfigs = {
     },
     goldToken: {
       frozen: false,
-    },
-    // TODO(jcortejoso): Delete this before merging
-    governance: {
-      skipSetConstitution: true,
-      skipTransferOwnership: true,
     },
     governanceApproverMultiSig: {
       signatories: [network.from],
@@ -518,12 +513,6 @@ const NetworkConfigs = {
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
-NetworkConfigs.loadtesting = NetworkConfigs.development
-NetworkConfigs.loadtesting.gasPriceMinimum = {
-  adjustmentSpeed: 0,
-  minimumFloor: 100000000,
-  targetDensity: 1 / 2,
-}
 
 const linkedLibraries = {
   FixidityLib: [
@@ -556,7 +545,6 @@ const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 
-// TODO(jcortejoso): Now default config is development. Use the `ENV_TYPE` variable to get the config
 const networkOverride =
   argv.network && argv.network in NetworkConfigs ? argv.network : `development`
 

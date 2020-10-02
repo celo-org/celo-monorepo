@@ -1,5 +1,4 @@
 /* tslint:disable:no-console */
-// import { config } from '@celo/protocol/migrationsConfig'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,

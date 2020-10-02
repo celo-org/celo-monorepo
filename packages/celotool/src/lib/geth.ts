@@ -508,7 +508,6 @@ export const simulateClient = async (
   // Assume the node is accessible via localhost with senderAddress unlocked
   const kit = newKit(web3Provider)
   kit.defaultAccount = senderAddress
-  const gasPriceFixed = 101000000
 
   const baseLogMessage: any = {
     loadTestID: index,
@@ -528,7 +527,6 @@ export const simulateClient = async (
 
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
-    // const feeCurrencyGold = false
     
     let feeCurrency, gasPrice, txOptions
     try {
@@ -550,17 +548,13 @@ export const simulateClient = async (
         const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
         gasPrice = new BigNumber(
           await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
-        ).times(1)
-        gasPrice = gasPriceFixed // TODO
+        ).times(2)
         txOptions = {
-          // gas: 70000,
           gasPrice: gasPrice.toString(),
           feeCurrency,
         }
       } else {
-        gasPrice = gasPriceFixed // TODO
         txOptions = {
-          gasPrice: gasPrice.toString(),
         }
       }
     } catch (error) {
@@ -597,36 +591,6 @@ export const simulateClient = async (
     if (sendTransactionTime + txPeriodMs > Date.now() ) {
       await sleep(sendTransactionTime + txPeriodMs - Date.now())
     }
-    // await sleep(txPeriodMs)
-
-    // const txHash = await transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, txOptions)
-    // while (true) {
-    //   const receipt = web3.eth.getTransactionReceipt(txResult)
-    //   if (receipt && receipt.blockNumber) {
-    //     break
-    //   }
-    //   await sleep(1000)
-    // }
-    // await onLoadTestTxResult(
-    //   kit,
-    //   senderAddress,
-    //   txHash,
-    //   sendTransactionTime,
-    //   baseLogMessage,
-    //   blockscoutUrl,
-    //   blockscoutMeasurePercent
-    // )
-    // .catch((error: any) => {
-    //   console.error('Load test transaction failed with error:', error)
-    //   tracerLog({
-    //     tag: LOG_TAG_TRANSACTION_ERROR,
-    //     error: error.toString(),
-    //     ...baseLogMessage,
-    //   })
-    // })
-    // if (sendTransactionTime + txPeriodMs > Date.now() ) {
-    //   await sleep(sendTransactionTime + txPeriodMs - Date.now())
-    // }
   }
 }
 
