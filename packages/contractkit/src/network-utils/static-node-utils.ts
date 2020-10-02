@@ -1,5 +1,8 @@
 import { GoogleStorageUtils } from './google-storage-utils'
 import { Coordinates, timezone } from '../utils/timezone'
+import debugFactory from 'debug'
+
+const debug = debugFactory('kit:network-utils:static-node-utils')
 
 // The bucket where we store static_nodes information for all the networks.
 const StaticNodesGoogleStorageBucketName = `static_nodes`
@@ -83,12 +86,16 @@ export class StaticNodeUtils {
   static getStaticNodeRegion(networkName: string): string {
     // Get the lattitude and longitude of the timezone locations.
     // Note: This is the location of the city that the user has the timzone set to.
-    const coords = timezone().coordinates
+    const tz = timezone()
+    const coords = tz.coordinates
     if (coords === undefined) {
+      debug('Could not resolve region from timezone %s', tz.name)
       return '' // Use the default region of static nodes
     }
     const regions = StaticNodeRegions[networkName] ?? []
-    return regions.find((region) => inRegion(coords, region))?.name ?? ''
+    const result = regions.find((region) => inRegion(coords, region))?.name ?? ''
+    debug('Resolve region %s from timezone %s', result, tz.name)
+    return result
   }
 
   /**
@@ -99,7 +106,7 @@ export class StaticNodeUtils {
    * @param networkName Name of the network to fetch config for
    */
   static getRegionalStaticNodesAsync(networkName: string, region?: string): Promise<string> {
-    const resolvedRegion = region ?? StaticNodeUtils.getStaticNodeRegion(networkName)
+    const resolvedRegion = region ?? this.getStaticNodeRegion(networkName)
     const bucketName = StaticNodesGoogleStorageBucketName
     const fileName = resolvedRegion ? `${networkName}.${resolvedRegion}` : networkName
     return GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName)
@@ -112,6 +119,12 @@ export class StaticNodeUtils {
    * @param networkName Name of the network to fetch config for
    */
   static async getStaticNodesAsync(networkName: string): Promise<string> {
-    return this.getRegionalStaticNodesAsync(networkName, '')
+    // Try to get a region-specific set of static nodes or fallback to the default.
+    try {
+      return await this.getRegionalStaticNodesAsync(networkName)
+    } catch {
+      debug('Failed to fetch regional static nodes for %s', networkName)
+      return this.getRegionalStaticNodesAsync(networkName, '')
+    }
   }
 }
