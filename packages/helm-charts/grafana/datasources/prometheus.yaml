@@ -1,0 +1,36 @@
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-datasource
+  labels:
+     grafana_datasource: "1"
+type: Opaque
+stringData:
+  datasource.yaml: |-
+    apiVersion: 1
+
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+
+    datasources:
+    - id: 1
+      orgId: 1
+      name: Prometheus
+      type: prometheus
+      typeLogoUrl: ''
+      access: proxy
+      url: http://prometheus-server.prometheus:9090
+      password: ''
+      user: ''
+      database: ''
+      basicAuth: false
+      basicAuthUser: ''
+      basicAuthPassword: ''
+      withCredentials: false
+      isDefault: true
+      jsonData: {}
+      secureJsonFields: {}
+      version: 2
+      readOnly: false

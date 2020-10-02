@@ -18,23 +18,33 @@ metadata:
   name: prometheus
   namespace: {{ .Values.namespace }}
   labels:
-    name: prometheus
-    chart: prometheus-stackdriver
-    release: prometheus-stackdriver
-    heritage: prometheus-stackdriver
-    component: prometheus-stackdriver
+{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
 spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path:  "/metrics"
+        prometheus.io/port: "9090"
       labels:
+{{ include "prometheus-stackdriver.labels" .  | indent 8 }}
         app: prometheus-server
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: prometheus
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 2
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.retention.time={{ .Values.prometheus.retention_time | default "7d" }}"
             - "--storage.tsdb.path=/prometheus/"
           ports:
             - containerPort: 9090
@@ -43,6 +53,7 @@ spec:
               mountPath: /etc/prometheus/
             - name: prometheus-storage-volume
               mountPath: /prometheus/
+{{- if not .Values.disableStackDriverMetrics }}
         - name: sidecar
           image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:{{ .Values.sidecar.imageTag }}
           imagePullPolicy: Always
@@ -67,13 +78,15 @@ spec:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/prometheus-service-account.json
 {{- end }}
+{{- end }}
       volumes:
         - name: prometheus-config-volume
           configMap:
             defaultMode: 420
             name: prometheus-server-conf
         - name: prometheus-storage-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: prometheus
 {{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
         - name: prometheus-service-account-key
           secret:

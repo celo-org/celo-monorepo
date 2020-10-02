@@ -12,7 +12,7 @@ spec:
   selector:
     component: validators
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-validators
@@ -121,6 +121,11 @@ spec:
 
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
             done
+            # Workaround
+            # wget https://storage.googleapis.com/static_nodes/{{ .Release.Namespace }} -O /root/.celo/static-nodes.json
+            # echo {{ .Values.staticnodes.staticnodesBase64 | b64dec | quote }} > /root/.celo/static-nodes.json
+            txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
+            echo "[\"enode://$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303\"]" > /root/.celo/static-nodes.json
           fi
         env:
         - name: POD_IP
@@ -171,7 +176,13 @@ spec:
           fi
 
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
-          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          if [ "$PROXY_COUNT" -gt 0 ]; then
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+            #ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxycelostats=$(cat /root/.celo/proxyEnodeUrlPairs  | cut -d';' -f1)"
+          else
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+          fi
+          [ -z "$PROXY_COUNT" ] && rm -f /root/.celo/static-nodes.json
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
@@ -197,17 +208,17 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
+            --etherbase=${ACCOUNT_ADDRESS} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
-            --maxpeers=125 \
+            --maxpeers=500 \
+            --maxpendpeers=300 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
             ${ADDITIONAL_FLAGS}
@@ -234,6 +245,8 @@ spec:
           value: "{{ default false .Values.geth.ping_ip_from_packet }}"
         - name: IN_MEMORY_DISCOVERY_TABLE
           value: "{{ default "false" .Values.geth.in_memory_discovery_table }}"
+        - name: CLEAN_VALIDATOR_ROUNTSTATE_FOLDER
+          value: "{{ default "false" .Values.geth.clean_validator_rountstate_folder }}"
         ports:
         - name: discovery-udp
           containerPort: 30303

@@ -1,5 +1,7 @@
+import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
+import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { AzureClusterConfig } from './azure'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
@@ -14,6 +16,7 @@ import {
   getProxyName
 } from './testnet-utils'
 import { outputIncludes } from './utils'
+const generator = require('generate-password')
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -50,30 +53,26 @@ async function copySecret(secretName: string, srcNamespace: string, destNamespac
   sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
-export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {
+export async function createCloudSQLInstanceIfNotExists(celoEnv: string, instanceName: string, dbSuffix: string) {
   await ensureAuthenticatedGcloudAccount()
   console.info('Creating Cloud SQL database, this might take a minute or two ...')
 
   await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
 
-  try {
-    await execCmd(`gcloud sql instances describe ${instanceName}`)
-    // if we get to here, that means the instance already exists
-    console.warn(
-      `A Cloud SQL instance named ${instanceName} already exists, so in all likelihood you cannot deploy initial with ${instanceName}`
+  const DBExists = await outputIncludes(
+    `gcloud sql instances list`,
+    `${instanceName} `,
+    `DB exists, skipping creation: ${instanceName}`
+  )
+
+  if (DBExists) {
+    console.info(
+      `A Cloud SQL instance named ${instanceName} already exists, so we skip the database ${instanceName} creation`
     )
-  } catch (error) {
-    if (
-      error.message.trim() !==
-      `Command failed: gcloud sql instances describe ${instanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
-    ) {
-      console.error(error.message.trim())
-      process.exit(1)
-    }
+    return retrieveCloudSQLConnectionInfo(celoEnv, instanceName, dbSuffix)
   }
 
   // Quite often these commands timeout, but actually succeed anyway. By ignoring errors we allow them to be re-run.
-
   try {
     await execCmd(
       `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
@@ -101,12 +100,17 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random()
-    .toString(36)
-    .slice(-8)
-  const blockscoutDBPassword = Math.random()
-    .toString(36)
-    .slice(-8)
+  const passwordOptions = {
+    length: 22,
+    numbers: true,
+    symbols: false,
+    lowercase: true,
+    uppercase: true,
+    strict: true
+  }
+
+  const blockscoutDBUsername = generator.generate(passwordOptions)
+  const blockscoutDBPassword = generator.generate(passwordOptions)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -267,10 +271,10 @@ export async function retrieveCloudSQLConnectionInfo(
   await validateExistingCloudSQLInstance(instanceName)
   const secretName = `${celoEnv}-blockscout${dbSuffix}`
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} --namespace ${celoEnv} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} --namespace ${celoEnv} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -301,6 +305,7 @@ export async function resetCloudSQLInstance(instanceName: string) {
 
   console.info('Creating blockscout database')
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
+
 }
 
 async function registerIPAddress(name: string) {
@@ -637,7 +642,52 @@ async function helmIPParameters(celoEnv: string) {
   return ipAddressParameters
 }
 
+// async function helmParametersFile(celoEnv: string, useExistingGenesis: boolean) {
+//   const parameters: any = {}
+//   if (isProduction()) {
+//     parameters.bucket = `contract_artifacts_production`
+//     parameters.gethexporter.image.repository=fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')
+//     parameters.gethexporter.image.tag=fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_TAG')
+//   } else {
+//     parameters.bucket = `contract_artifacts`
+//   }
+//   parameters.domain.name=fetchEnv('CLUSTER_DOMAIN_NAME')
+//   parameters.genesis.networkId=fetchEnv(envVar.NETWORK_ID)
+//   parameters.geth.verbosity=fetchEnvOrFallback('GETH_VERBOSITY', '4')
+//   parameters.geth.vmodule=fetchEnvOrFallback('GETH_VMODULE', '')
+//   parameters.geth.resources.requests.cpu=fetchEnv('GETH_NODE_CPU_REQUEST')
+//   parameters.geth.resources.requests.memory=fetchEnv('GETH_NODE_MEMORY_REQUEST')
+//   parameters.geth.image.repository=fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')
+//   parameters.geth.image.tag=fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')
+//   parameters.bootnode.image.repository=fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')
+//   parameters.bootnode.image.tag=fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')
+//   parameters.cluster.zone=fetchEnv('KUBERNETES_CLUSTER_ZONE')
+//   parameters.cluster.name=fetchEnv('KUBERNETES_CLUSTER_NAME')
+//   parameters.project.name=fetchEnv('TESTNET_PROJECT_NAME')
+//   parameters.celotool.image.repository=fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')
+//   parameters.celotool.image.tag=fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')
+//   parameters.promtosd.scrape_interval=fetchEnv('PROMTOSD_SCRAPE_INTERVAL')
+//   parameters.promtosd.export_interval=fetchEnv('PROMTOSD_EXPORT_INTERVAL')
+//   parameters.geth.consensus_type=fetchEnv('CONSENSUS_TYPE')
+//   parameters.geth.blocktime=fetchEnv('BLOCK_TIME')
+//   parameters.geth.validators=fetchEnv('VALIDATORS')
+//   parameters.geth.istanbulrequesttimeout=fetchEnvOrFallback('ISTANBUL_REQUEST_TIMEOUT_MS', '3000')
+//   parameters.geth.faultyValidators=fetchEnvOrFallback('FAULTY_VALIDATORS', '0')
+//   parameters.geth.faultyValidatorType=fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')
+//   parameters.geth.tx_nodes=fetchEnv('TX_NODES')
+//   parameters.geth.private_tx_nodes=fetchEnv(envVar.PRIVATE_TX_NODES)
+//   parameters.geth.ssd_disks=fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')
+//   parameters.mnemonic=fetchEnv('MNEMONIC')
+//   parameters.geth.account.secret=fetchEnv('GETH_ACCOUNT_SECRET')
+//   parameters.geth.ping_ip_from_packet=fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')
+//   parameters.geth.in_memory_discovery_table=fetchEnvOrFallback('IN_MEMORY_DISCOVERY_TABLE', 'false')
+//   parameters.geth.clean_validator_rountstate_folder=fetchEnvOrFallback('CLEAN_VALIDATOR_ROUNTSTATE_FOLDER', 'false')
+//   parameters.geth.proxiedValidators=fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')
+// }
+
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
   const productionTagOverrides = isProduction()
     ? [
         `--set gethexporter.image.repository=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')}`,
@@ -657,13 +707,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
         `--set pprof.enabled="false"`,
       ]
 
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
-
   return [
+    `-f ${valueFilePath}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
@@ -715,6 +761,7 @@ async function helmCommand(command: string) {
 
 function buildHelmChartDependencies(chartDir: string) {
   console.info(`Building any chart dependencies...`)
+  console.info(`helm dep build ${chartDir}`)
   return helmCommand(`helm dep build ${chartDir}`)
 }
 
@@ -724,8 +771,9 @@ export async function installGenericHelmChart(
   chartDir: string,
   parameters: string[]
 ) {
-  await buildHelmChartDependencies(chartDir)
-
+  // if (chartDir != 'stable/chaoskube') {
+  //   await buildHelmChartDependencies(chartDir)
+  // }
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
     `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`
@@ -745,6 +793,21 @@ export async function upgradeGenericHelmChart(
     `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
   )
   console.info(`Upgraded helm release ${releaseName}`)
+}
+
+export async function installUpgradeGenericChart(
+  celoEnv: string,
+  releaseName: string,
+  chartDir: string,
+  parameters: string[]
+) {
+  await buildHelmChartDependencies(chartDir)
+
+  console.info(`Installing or Upgrading helm release ${releaseName}`)
+  await helmCommand(
+    `helm upgrade ${releaseName} --install ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+  )
+  console.info(`Installed or Upgraded helm release ${releaseName}`)
 }
 
 export function isCelotoolVerbose() {
@@ -864,9 +927,25 @@ export function setHelmArray(paramName: string, arr: any[]) {
 export async function deleteFromCluster(celoEnv: string) {
   await removeHelmRelease(celoEnv)
   console.info(`Deleting namespace ${celoEnv}`)
+  // Todo: Clean the testnet resources (pvc) and do not delete the namespace if there is any other resource on it
   await execCmdWithExitOnFailure(`kubectl delete namespace ${celoEnv}`)
 }
 
 function useStaticIPsForGethNodes() {
   return fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true'
+}
+
+export async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, useExistingGenesis: boolean) {
+  const genesisContent = useExistingGenesis
+  ? await getGenesisBlockFromGoogleStorage(celoEnv)
+  : generateGenesisFromEnv()
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
+
+  const valueFileContent = `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+staticnodes:
+  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }

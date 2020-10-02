@@ -12,7 +12,7 @@ spec:
   selector:
     component: load-test
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ .Values.environment }}-load-test
@@ -42,25 +42,27 @@ spec:
       - name: generate-keys
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        args:
+        - |
+          [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+          RID=${BASH_REMATCH[1]}
+          echo $RID > /root/.celo/rid
+          celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /root/.celo/bootnodeEnodeAddress
+          echo -n "Generating Bootnode enode address for the validator: "
+          cat /root/.celo/bootnodeEnodeAddress
+
+          BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
+          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo -n "Generating Bootnode enode for the validator: "
+          cat /root/.celo/bootnodeEnode
+
+          celotooljs.sh generate prepare-load-test \
+            --mnemonic "$MNEMONIC" \
+            --threads {{ .Values.threads | default "1" }} \
+            --index $RID
         command:
-          - bash
-          - "-c"
-          - |
-            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
-            RID=${BASH_REMATCH[1]}
-            echo $RID > /root/.celo/rid
-
-            echo "Generating private key for rid=$RID"
-            celotooljs.sh generate bip32 \
-              --mnemonic "$MNEMONIC" \
-              --accountType load_testing \
-              --index $RID \
-              > /root/.celo/pkey
-
-            echo "Generating account address for rid=$RID"
-            celotooljs.sh generate account-address \
-              --private-key `cat /root/.celo/pkey` \
-              > /root/.celo/address
+        - bash
+        - -c
         env:
         - name: REPLICA_NAME
           valueFrom:
@@ -75,58 +77,76 @@ spec:
         - name: data
           mountPath: /root/.celo
 {{ include "common.init-genesis-container" .  | indent 6 }}
-{{ include "common.import-geth-account-container" .  | indent 6 }}
-      containers:
-      - name: geth
+      - name: import-geth-account
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command: ["/bin/sh"]
         args:
         - "-c"
-        - |-
-          set -euo pipefail
-          cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
-
-          ACCOUNT_ADDRESS=`cat /root/.celo/address`
-
-          exec geth \
-          --rpc \
-          --rpcapi=eth,web3,debug,admin,personal,net \
-          --rpcvhosts=* \
-          --networkid={{ .Values.geth.networkID }} \
-          --nodekey=/root/.celo/pkey \
-          --syncmode=ultralight \
-          --consoleformat=json \
-          --consoleoutput=stdout \
-          --verbosity={{ .Values.geth.verbosity }} \
-          --unlock=${ACCOUNT_ADDRESS} \
-          --etherbase=${ACCOUNT_ADDRESS} \
-          --password=/root/.celo/account/accountSecret
-        ports:
-        - name: discovery-udp
-          containerPort: 30303
-          protocol: UDP
-        - name: discovery-tcp
-          containerPort: 30303
-        - name: rpc
-          containerPort: 8545
-        - name: ws
-          containerPort: 8546
-        resources:
-          requests:
-            memory: 250Mi
-            cpu: 40m
+        - |
+          for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
+            geth --nousb account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
+          done
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-        - name: config
-          mountPath: /var/geth
         - name: account
           mountPath: "/root/.celo/account"
           readOnly: true
+      containers:
+{{ range $index, $e := until (.Values.threads | int) }}
+      - name: geth-{{ $index }}
+        image: {{ $.Values.geth.image.repository }}:{{ $.Values.geth.image.tag }}
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          set -euo pipefail
+          cp -rp /root/.celo_share /root/.celo
+          cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
+
+          ACCOUNT_ADDRESS=$(awk 'NR=={{ add $index 1 }}' /root/.celo/address)
+          PASSWORD=$(cat /root/.celo/account/accountSecret)
+
+          exec geth \
+          --nousb \
+          --rpc \
+          --rpcapi=eth,web3,debug,admin,personal,net \
+          --allow-insecure-unlock \
+          --rpcvhosts=* \
+          --networkid={{ $.Values.geth.networkID }} \
+          --nodekey=/root/.celo/pkey{{ $index }} \
+          --syncmode=lightest \
+          --consoleformat=json \
+          --consoleoutput=stdout \
+          --verbosity=1 \
+          --unlock=$ACCOUNT_ADDRESS \
+          --password=/root/.celo/account/accountSecret \
+          --port {{ add 30303 $index }} \
+          --rpcport {{ add 8545 $index }}
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 100m
+          limits:
+            memory: 1Gi
+            cpu: 1
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo_share
+          readOnly: true
+        - name: config
+          mountPath: /var/geth
+        - name: account
+          mountPath: "/root/.celo_share/account"
+          readOnly: true
+{{ end }}
       - name: simulate-client
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+        securityContext:
+          runAsUser: 0
         command:
           - bash
           - "-c"
@@ -142,11 +162,12 @@ spec:
               --delay {{ .Values.delay }} \
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
-              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }}
+              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
+              --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
-            memory: 256Mi
-            cpu: 5m
+            memory: 400Mi
+            cpu: 400m
         env:
         - name: MNEMONIC
           valueFrom:

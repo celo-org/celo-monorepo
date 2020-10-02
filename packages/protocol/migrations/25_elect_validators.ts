@@ -76,17 +76,18 @@ async function lockGold(
   })
 }
 
-function createAccountOrUseFromGanache() {
+function mnemonicAccountOrUseFromGanache(valGroupKey: string) {
   if (isGanache) {
     const privateKey = extraKeys.pop()
     return { address: privateKeyToAddress(privateKey), privateKey }
   } else {
-    return web3.eth.accounts.create()
+    return { address: privateKeyToAddress(valGroupKey), privateKey: valGroupKey }
   }
 }
 
 async function registerValidatorGroup(
   name: string,
+  valGroupKey: string,
   accounts: AccountsInstance,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
@@ -97,7 +98,8 @@ async function registerValidatorGroup(
   // validator group with, and set the name of the group account to the private key of this account
   // encrypted with the private key of the first validator, so that the group private key
   // can be recovered.
-  const account = createAccountOrUseFromGanache()
+  const account = mnemonicAccountOrUseFromGanache(valGroupKey)
+  // const account = { address: privateKeyToAddress(valGroupKey), privateKey: valGroupKey }
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.
@@ -309,6 +311,7 @@ module.exports = async (_deployer: any, networkName: string) => {
       .times(keys.length)
     return {
       valKeys: keys,
+      valGroupKey: config.validators.validatorGroupKeys[i],
       name: valKeyGroups.length
         ? config.validators.groupName + `(${i + 1})`
         : config.validators.groupName,
@@ -327,6 +330,7 @@ module.exports = async (_deployer: any, networkName: string) => {
     )
     group.account = await registerValidatorGroup(
       group.name,
+      group.valGroupKey,
       accounts,
       lockedGold,
       validators,

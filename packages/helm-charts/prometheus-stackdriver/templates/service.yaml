@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
+  name: prometheus-server
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - name: web
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: prometheus-server
+  sessionAffinity: None
+  type: ClusterIP

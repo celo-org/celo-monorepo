@@ -48,7 +48,7 @@ release: {{ .Release.Name }}
   - -c
   args:
   - |
-      mkdir -p /var/geth /root/celo
+      mkdir -p /var/geth /root/.celo
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
@@ -111,10 +111,6 @@ release: {{ .Release.Name }}
     VALIDATOR_HEX_ADDRESS=$(cat /root/.celo/validator_address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
     {{- end }}
-
-    {{ if .proxied | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
-    {{ end }}
     {{- if .unlock | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
@@ -128,14 +124,18 @@ release: {{ .Release.Name }}
     {{- end }}
     {{- if .in_memory_discovery_table_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
-    {{- end }}
+    {{ end -}}
     {{- if .proxy_allow_private_ip_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.allowprivateip"
-    {{- end }}
-    {{- if .ethstats | default false }}
-    ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
-    {{- end }}
+    {{ end -}}
+    {{- if .ethstats | default false -}}
+    {{- if .proxy | default false }}
+    if [ "$RID" -eq "0" ]; then
+      ACCOUNT_ADDRESS=$(cat /root/.celo/address)
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
+    fi
+    {{ end -}}
+    {{- end -}}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
     {{- end }}
@@ -147,7 +147,8 @@ release: {{ .Release.Name }}
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
-      --maxpeers {{ .maxpeers | default 1100 }} \
+      --maxpeers {{ .maxpeers | default 2000 }} \
+      --maxpendpeers=300 \
       --networkid=${NETWORK_ID} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
@@ -178,6 +179,8 @@ release: {{ .Release.Name }}
       - /bin/sh
       - "-c"
       - |
+        # TODO: WORKAROUND DELETE
+        exit 0
         # fail if any wgets fail
         set -euo pipefail
         RPC_URL=http://localhost:8545
@@ -304,6 +307,11 @@ data:
       echo "enode://$(cat /root/.celo/bootnodeEnodeAddress)@$BOOTNODE_IP_ADDRESS:30301" > /root/.celo/bootnodeEnode
       echo -n "Generating Bootnode enode for tx node: "
       cat /root/.celo/bootnodeEnode
+
+      # Workaround adding txnode static-node file
+      # echo {{ .Values.staticnodes.staticnodesBase64 | b64dec | quote }} > /root/.celo/static-nodes.json
+      txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
+      echo "[\"enode://$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303\"]" > /root/.celo/static-nodes.json
   env:
   - name: POD_IP
     valueFrom:

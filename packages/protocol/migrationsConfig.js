@@ -17,7 +17,9 @@ const network = require('./truffle-config.js').networks[argv.network]
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
-BigNumber.config({ EXPONENTIAL_AT: 1e9 })
+BigNumber.config({
+  EXPONENTIAL_AT: 1e9,
+})
 
 const SECOND = 1
 const MINUTE = 60 * SECOND
@@ -41,7 +43,7 @@ const DefaultConfig = {
       patch: 0,
     },
     deploymentBlockGasLimit: 20000000,
-    blockGasLimit: 10000000,
+    blockGasLimit: 20000000,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD
@@ -57,7 +59,7 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
-    frozen: true,
+    frozen: false,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -79,22 +81,23 @@ const DefaultConfig = {
     communityRewardFraction: 1 / 4,
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
     carbonOffsettingFraction: 1 / 1000,
-    frozen: true,
+    frozen: false,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
-    frozen: true,
+    frozen: false,
   },
   gasPriceMinimum: {
-    minimumFloor: 100000000,
-    targetDensity: 1 / 2,
-    adjustmentSpeed: 1 / 2,
+    minimumFloor: 1,
+    targetDensity: 1,
+    // adjustmentSpeed: 1 / 2,
+    adjustmentSpeed: 0,
   },
   goldToken: {
-    frozen: true,
+    frozen: false,
   },
   governance: {
     queueExpiry: 4 * WEEK,
@@ -108,6 +111,8 @@ const DefaultConfig = {
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
+    skipSetConstitution: true,
+    skipTransferOwnership: true,
   },
   governanceApproverMultiSig: {
     // 3/9 multsig, with 5/9 to make multisig changes.
@@ -190,7 +195,7 @@ const DefaultConfig = {
       '0x5091110175318A2A8aF88309D1648c1D84d31B29',
       '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
     ],
-    frozen: true,
+    frozen: false,
   },
   transferWhitelist: {
     // Whitelist genesis block addresses.
@@ -255,6 +260,7 @@ const DefaultConfig = {
 
     // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
+    validatorGroupKeys: [],
     attestationKeys: [],
     groupName: 'cLabs',
     commission: 0.1,
@@ -268,7 +274,8 @@ const NetworkConfigs = {
       slashableDowntime: 60, // epoch length is 100 for unit tests
     },
     election: {
-      minElectableValidators: '10',
+      minElectableValidators: '3',
+      maxElectableValidators: '100',
       frozen: false,
     },
     epochRewards: {
@@ -280,6 +287,11 @@ const NetworkConfigs = {
     },
     goldToken: {
       frozen: false,
+    },
+    // TODO(jcortejoso): Delete this before merging
+    governance: {
+      skipSetConstitution: true,
+      skipTransferOwnership: true,
     },
     governanceApproverMultiSig: {
       signatories: [network.from],
@@ -506,6 +518,12 @@ const NetworkConfigs = {
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
+NetworkConfigs.loadtesting = NetworkConfigs.development
+NetworkConfigs.loadtesting.gasPriceMinimum = {
+  adjustmentSpeed: 0,
+  minimumFloor: 100000000,
+  targetDensity: 1 / 2,
+}
 
 const linkedLibraries = {
   FixidityLib: [
@@ -538,9 +556,13 @@ const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 
+// TODO(jcortejoso): Now default config is development. Use the `ENV_TYPE` variable to get the config
+const networkOverride =
+  argv.network && argv.network in NetworkConfigs ? argv.network : `development`
+
 // Use lodash merge to deeply override defaults.
-if (argv.network && NetworkConfigs[argv.network]) {
-  lodash.merge(config, NetworkConfigs[argv.network])
+if (networkOverride && NetworkConfigs[networkOverride]) {
+  lodash.merge(config, NetworkConfigs[networkOverride])
 }
 lodash.merge(config, migrationOverride)
 

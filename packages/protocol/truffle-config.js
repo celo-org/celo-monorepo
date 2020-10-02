@@ -37,7 +37,7 @@ const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
 const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
 // Gas limit is doubled for initial contract deployment.
-const gasLimit = argv.reset ? 20000000 : 10000000
+const gasLimit = argv.reset ? 20000000 : 13000000
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -48,7 +48,12 @@ const defaultConfig = {
   gasPrice: 100000000000,
 }
 
-const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
+const freeGasConfig = {
+  ...defaultConfig,
+  ...{
+    gasPrice: 0,
+  },
+}
 
 // Here to avoid recreating it each time
 let coverageProvider = null
@@ -177,9 +182,15 @@ const networks = {
 if (argv.truffle_override || !(argv.network in networks)) {
   const configOverride = argv.truffle_override ? JSON.parse(argv.truffle_override) : {}
   if (argv.network in networks) {
-    networks[argv.network] = { ...networks[argv.network], ...configOverride }
+    networks[argv.network] = {
+      ...networks[argv.network],
+      ...configOverride,
+    }
   } else {
-    networks[argv.network] = { ...defaultConfig, ...configOverride }
+    networks[argv.network] = {
+      ...defaultConfig,
+      ...configOverride,
+    }
   }
 }
 
