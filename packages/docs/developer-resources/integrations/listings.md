@@ -11,7 +11,7 @@ If you are listing Celo on your exchange, you will probably need access to the C
 
 Please ensure your use of the Celo Platform assets provided follows the brand policy found [here](https://celo.org/brand-policy).
 
-## How Tos
+## How To's
 ### Integrating Celo With Your Infrastructure
 There are several ways to integrate the Celo Platform with your infrastructure.
 
@@ -24,17 +24,20 @@ For more specific use-cases for exchanges, please checkout the [Custody and Exch
 
 There are two important assets on the Celo network, the Celo native asset (CELO) and the Celo Dollar (cUSD). CELO was called Celo Gold (cGLD) when the contract was deployed, so you will often see references to Celo Gold in the codebase. To learn more about the two, please read [this](https://docs.celo.org/developer-guide/overview/celo-for-eth-devs#the-celo-native-asset-and-the-celo-dollar) section of the docs.
 
+You can also view the CGP proposal regarding the name change [here](https://github.com/celo-org/celo-proposals/blob/master/CGPs/0003.md) and the forum post about the name change [here](https://forum.celo.org/t/proposal-to-rename-celo-gold-to-celo-native-asset/528).
+
 ## Resources
 ### Address for CELO and cUSD
-The smart contract address for CELO can be found [here](https://explorer.celo.org/address/0x471ece3750da237f93b8e339c536989b8978a438/transactions).
-The smart contract address for cUSD can be found [here](https://explorer.celo.org/address/0x765de816845861e75a25fca122bb6898b8b1282a/transactions).
+The smart contract address for CELO can be found on the explorer [here](https://explorer.celo.org/address/0x471ece3750da237f93b8e339c536989b8978a438/transactions). It is `0x471ece3750da237f93b8e339c536989b8978a438`.
+The smart contract address for cUSD can be found on the explorer [here](https://explorer.celo.org/address/0x765de816845861e75a25fca122bb6898b8b1282a/transactions).
+It is `0x765de816845861e75a25fca122bb6898b8b1282a`.
 
 
 ### Useful API endpoints
 The following are useful API endpoints available to you that would help you in your listings of the CELO and cUSD digital assets.
 
 #### CELO and cUSD
-For querying the API on total coins in circulation in CELO and cUSD, the following endpoint will provide you with that:
+For querying the API on total coins in circulation in CELO and cUSD, which are the total amount of coins in existence right now, the following endpoint will provide you with that:
 ```sh
 $ curl  [https://thecelo.com/api/v0.1.js?method=ex_totalcoins](https://thecelo.com/api/v0.1.js?method=ex_totalcoins) {"code":"200","msg":"success","data":{"CELO":608485841.9959723,"cUSD":10250632.56099673}}
 ```
@@ -46,12 +49,14 @@ $ curl https://thecelo.com/api/v0.1.js?method=ex_cusd_circulating
 11353464.550486518
 ```
 
-#### CP-DOTO 
+#### CP-DOTO (Stability Algorithm)
+
+CP-DOTO information can be found [here](https://docs.celo.org/celo-codebase/protocol/stability/doto).
 
 For API endpoints useful for listing that follow [CMC requirements](https://docs.google.com/document/d/1S4urpzUnO2t7DmS_1dc4EL4tgnnbTObPYXvDeBnukCg/edit#)
 
 ##### Summary
-Summary overview.
+Summary overview of market data for all tickers and all markets.
 
 ```sh 
 $ curl https://thecelo.com/api/v0.1.js?method=ex_summary
@@ -60,6 +65,7 @@ $ curl https://thecelo.com/api/v0.1.js?method=ex_summary
 ```
 
 ##### Assets
+In depth details of the assets available on the exchange.
 
 ```sh
 $ curl https://thecelo.com/api/v0.1.js?method=ex_assets
@@ -68,6 +74,7 @@ $ curl https://thecelo.com/api/v0.1.js?method=ex_assets
 ```
 
 ##### Ticker
+24-hour rolling window price change statistics.
 
 ```sh
 $ curl https://thecelo.com/api/v0.1.js?method=ex_ticker
@@ -76,6 +83,7 @@ $ curl https://thecelo.com/api/v0.1.js?method=ex_ticker
 ```
 
 ##### Orderbook
+Market depth of a trading pair. One array containing a list of ask prices and another array containing bid prices.
 
 ```sh
 $ curl https://thecelo.com/api/v0.1.js?method=ex_orderbook
@@ -84,6 +92,8 @@ $ curl https://thecelo.com/api/v0.1.js?method=ex_orderbook
 ```
 
 ##### CELO cUSD
+Recently completed (past 24h) trades.
+
 ```sh 
 $ curl https://thecelo.com/api/v0.1.js?method=ex_celocusd
 
@@ -96,9 +106,9 @@ To learn about the Celo Protocol, please refer to the [whitepaper](https://celo.
 If you need more information to explore other aspects of the Celo Protocol, there’s a [useful links](https://docs.celo.org/#useful-links) page.
 
 To learn more about the Stability Mechanism, you can find it over [here](https://docs.celo.org/celo-codebase/protocol/stability). 
-The [Stability Analysis Whitepaper](https://celo.org/papers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5) are also linked.
+The [Stability Analysis Whitepaper](https://celo.org/papers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5) will provide a lot more information on the stability algorithm.
 
-If you want to find more information about the Celo Reserve, please visit the link [here](https://celoreserve.org ).
+If you want to find more information about the Celo Reserve, a diversified portfolio of cryptocurrencies supporting the ability of the Celo protocol to expand and contract the supply of Celo stable assets, please visit [https://celoreserve.org](https://celoreserve.org ).
 
 ### Github
 The Celo Protocol GitHub is located [here.](https://github.com/celo-org/)
