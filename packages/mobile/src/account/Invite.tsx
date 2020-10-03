@@ -143,9 +143,9 @@ class Invite extends React.Component<Props, State> {
   render() {
     const { t } = this.props
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <DrawerTopBar />
-        <View style={style.textInputContainer}>
+        <View style={styles.textInputContainer}>
           <SearchInput
             placeholder={t('global:search')}
             value={this.state.searchQuery}
@@ -165,7 +165,7 @@ class Invite extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
   },

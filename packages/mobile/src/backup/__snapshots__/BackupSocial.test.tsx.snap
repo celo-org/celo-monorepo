@@ -24,10 +24,9 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
+              "fontFamily": "Jost-Book",
+              "fontSize": 26,
+              "lineHeight": 32,
             }
           }
         >
@@ -37,9 +36,9 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
+              "fontFamily": "Inter-Regular",
               "fontSize": 16,
-              "lineHeight": 24,
+              "lineHeight": 22,
               "marginBottom": 20,
             }
           }
@@ -216,10 +215,9 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
+              "fontFamily": "Jost-Book",
+              "fontSize": 26,
+              "lineHeight": 32,
             }
           }
         >
@@ -229,9 +227,9 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
+              "fontFamily": "Inter-Regular",
               "fontSize": 16,
-              "lineHeight": 24,
+              "lineHeight": 22,
               "marginBottom": 20,
             }
           }
@@ -394,18 +392,18 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
           onChange={[Function]}
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
-          thumbTintColor="#FFFFFF"
-          trackColorForFalse="#9CA4A9"
-          trackColorForTrue="#42D689"
-          trackTintColor="#9CA4A9"
+          thumbTintColor="#EDEEEF"
+          trackColorForFalse="#B4B9BD"
+          trackColorForTrue="#1AB775"
+          trackTintColor="#B4B9BD"
         />
         <Text
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-SemiBold",
+              "fontFamily": "Inter-Medium",
               "fontSize": 16,
-              "lineHeight": 24,
+              "lineHeight": 22,
               "paddingLeft": 8,
               "paddingRight": 5,
               "paddingTop": 5,
@@ -421,79 +419,61 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
     style={
       Array [
         Object {
-          "alignItems": "center",
-          "borderRadius": 3,
           "flexDirection": "row",
         },
-        null,
-        null,
         undefined,
-        Object {
-          "backgroundColor": "#97DFC1",
-        },
       ]
     }
   >
     <View
-      accessible={true}
-      focusable={false}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
+            "overflow": "hidden",
           },
           Object {
-            "backgroundColor": "#97DFC1",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderWidth": 0,
+            "borderRadius": 100,
           },
         ]
       }
     >
       <View
+        accessible={true}
+        focusable={false}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
             "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "backgroundColor": "#97DFC1",
+            "height": 48,
+            "justifyContent": "center",
+            "minWidth": 120,
+            "opacity": undefined,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-              },
-              Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
-              },
-            ]
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
           }
         >
           global:done

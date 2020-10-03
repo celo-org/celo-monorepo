@@ -315,6 +315,7 @@ export function* redeemInviteSaga({ tempAccountPrivateKey }: RedeemInviteAction)
   if (result?.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
+    yield put(refreshAllBalances())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx

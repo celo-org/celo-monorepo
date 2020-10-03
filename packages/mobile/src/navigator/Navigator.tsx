@@ -22,8 +22,8 @@ import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
 import BackupSocialIntro from 'src/backup/BackupSocialIntro'
-import BackButton from 'src/components/BackButton.v2'
-import CancelButton from 'src/components/CancelButton.v2'
+import BackButton from 'src/components/BackButton'
+import CancelButton from 'src/components/CancelButton'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -34,6 +34,9 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
 import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
 import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
+import ExternalExchanges, {
+  externalExchangesScreenOptions,
+} from 'src/fiatExchanges/ExternalExchanges'
 import FiatExchangeAmount, {
   fiatExchangesAmountScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeAmount'
@@ -59,11 +62,11 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-} from 'src/navigator/Headers.v2'
+} from 'src/navigator/Headers'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
@@ -433,6 +436,11 @@ const settingsScreens = (Navigator: typeof Stack) => (
       options={fiatExchangesAmountScreenOptions}
       name={Screens.FiatExchangeAmount}
       component={FiatExchangeAmount}
+    />
+    <Navigator.Screen
+      options={externalExchangesScreenOptions}
+      name={Screens.ExternalExchanges}
+      component={ExternalExchanges}
     />
     <Navigator.Screen
       options={fiatExchangesOptionsScreenOptions}

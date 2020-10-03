@@ -1,23 +1,43 @@
+import { E164Number } from '@celo/utils/lib/io'
 import { BuildOptions, DataTypes, Model, Sequelize } from 'sequelize'
-import { SmsProviderType } from '../sms/base'
 
 export interface AttestationModel extends Model {
   readonly id: number
   account: string
   identifier: string
   issuer: string
+  countryCode: string
+  phoneNumber: E164Number
+  message: string
+  ongoingDeliveryId: string | null
+  providers: string
+  attempt: number
   status: AttestationStatus
-  smsProvider: SmsProviderType
-
-  canSendSms: () => boolean
+  errors: string | null
+  createdAt: Date
+  completedAt: Date | null
+  key: () => AttestationKey
+  provider: () => string | null
+  recordError: (error: string) => void
+  failure: () => boolean
+  currentError: () => string | undefined
 }
 
+export interface AttestationKey {
+  account: string
+  identifier: string
+  issuer: string
+}
+
+// Attestations only transition from lower to higher
 export enum AttestationStatus {
-  DISPATCHING = 'DISPATCHING',
-  UNABLE_TO_SERVE = 'UNABLE_TO_SERVE',
-  FAILED = 'FAILED',
-  SENT = 'SMS_SEND_SUCCESS',
-  COMPLETE = 'COMPLETE',
+  NotSent, // Not yet received ok by a provider
+  Sent, // Received ok by provider
+  Queued, // Buffered or queued, but still in flight
+  Upstream, // Reached upstream carrier
+  Other,
+  Failed, // We will try to retransmit.
+  Delivered, // Success!
 }
 
 export type AttestationStatic = typeof Model &
@@ -28,16 +48,53 @@ export default (sequelize: Sequelize) => {
     account: DataTypes.STRING,
     identifier: DataTypes.STRING,
     issuer: DataTypes.STRING,
+    countryCode: DataTypes.STRING,
+    phoneNumber: DataTypes.STRING,
+    message: DataTypes.STRING,
+    ongoingDeliveryId: DataTypes.STRING,
+    providers: DataTypes.STRING,
+    attempt: DataTypes.INTEGER,
     status: DataTypes.STRING,
-    smsProvider: DataTypes.STRING,
+    errors: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
+    completedAt: DataTypes.DATE,
   }) as AttestationStatic
 
-  model.prototype.canSendSms = function() {
-    return [
-      AttestationStatus.DISPATCHING,
-      AttestationStatus.FAILED,
-      AttestationStatus.UNABLE_TO_SERVE,
-    ].includes(this.status)
+  model.prototype.key = function(): AttestationKey {
+    return { account: this.account, identifier: this.identifier, issuer: this.issuer }
+  }
+
+  model.prototype.provider = function(): string | null {
+    const pl = this.providers.split(',')
+    return this.providers ? pl[this.attempt % pl.length] : null
+  }
+
+  model.prototype.recordError = function(error: string) {
+    const errors = this.errors ? JSON.parse(this.errors) : {}
+
+    errors[this.attempt] = {
+      provider: this.provider(),
+      error,
+    }
+    this.errors = JSON.stringify(errors)
+  }
+
+  model.prototype.failure = function(): boolean {
+    return (
+      // tslint:disable-next-line: triple-equals
+      this.status == AttestationStatus.NotSent.valueOf() ||
+      // tslint:disable-next-line: triple-equals
+      this.status == AttestationStatus.Failed.valueOf()
+    )
+  }
+
+  model.prototype.currentError = function() {
+    if (this.failure()) {
+      const errors = this.errors ? JSON.parse(this.errors) : {}
+      return errors[this.attempt]?.error ?? errors[this.attempt - 1]?.error ?? undefined
+    } else {
+      return undefined
+    }
   }
 
   return model

@@ -1,5 +1,5 @@
 import FormUnderline from '@celo/react-components/components/FormUnderline'
-import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput.v2'
+import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
 import React from 'react'
 import { View } from 'react-native'
