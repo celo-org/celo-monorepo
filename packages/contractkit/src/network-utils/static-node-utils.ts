@@ -94,7 +94,7 @@ export class StaticNodeUtils {
     }
     const regions = StaticNodeRegions[networkName] ?? []
     const result = regions.find((region) => inRegion(coords, region))?.name ?? ''
-    debug('Resolve region %s from timezone %s', result, tz.name)
+    debug('Resolved region %q from timezone %s', result, tz.name)
     return result
   }
 

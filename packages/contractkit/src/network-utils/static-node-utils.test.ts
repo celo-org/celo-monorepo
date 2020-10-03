@@ -14,134 +14,167 @@ describe(StaticNodeUtils, () => {
   describe(StaticNodeUtils.getStaticNodesAsync, () => {
     afterEach(() => {
       fetchMock.reset()
+      _testSetTimezoneOverride(undefined)
     })
 
-    it('should be able to request static nodes', async () => {
+    it('should fetch static nodes for alfajores', async () => {
       fetchMock.mock(testEndpoint('alfajores'), mockStaticNodes)
       const nodes = await StaticNodeUtils.getStaticNodesAsync('alfajores')
       // Expect that the mocked data was returned.
       expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
     })
 
-    it('should be fail to fetch static nodes for an invalid network', async () => {
-      fetchMock.mock(testEndpoint('alfajores'), 404)
-      await expect(StaticNodeUtils.getStaticNodesAsync('alfajores')).rejects.toEqual(new Error())
+    it('should fail to fetch static nodes for an invalid network', async () => {
+      fetchMock.mock(testEndpoint('churro'), 404)
+      await expect(StaticNodeUtils.getStaticNodesAsync('churro')).rejects.toEqual(new Error())
     })
 
-    describe('when selecting a static node region based on timezone', () => {
-      const cases = [
-        {
-          timezone: 'America/Chicago',
-          region: 'gcp-us-east1',
-        },
-        {
-          timezone: 'America/New_York',
-          region: 'gcp-us-east1',
-        },
-        {
-          timezone: 'America/Los_Angeles',
-          region: 'gcp-us-west1',
-        },
-        {
-          timezone: 'Europe/Istanbul',
-          region: 'gcp-europe-west1',
-        },
-        {
-          timezone: 'America/El_Salvador',
-          region: 'gcp-us-east1',
-        },
-        {
-          timezone: 'Europe/Lisbon',
-          region: 'gcp-europe-west1',
-        },
-        {
-          timezone: 'Europe/Oslo',
-          region: 'gcp-europe-west1',
-        },
-        {
-          timezone: 'America/Mexico_City',
-          region: 'gcp-us-east1',
-        },
-        {
-          timezone: 'Africa/Nairobi',
-          region: 'gcp-europe-west1',
-        },
-        {
-          timezone: 'Africa/Kampala',
-          region: 'gcp-europe-west1',
-        },
-        {
-          timezone: 'America/Argentina/Buenos_Aires',
-          region: 'gcp-southamerica-east1',
-        },
-        {
-          timezone: 'America/Sao_Paulo',
-          region: 'gcp-southamerica-east1',
-        },
-        {
-          timezone: 'America/Bogota',
-          region: 'gcp-us-east1',
-        },
-        {
-          timezone: 'America/Costa_Rica',
-          region: 'gcp-us-east1',
-        },
-        {
-          timezone: 'Asia/Hong_Kong',
-          region: 'gcp-asia-east1',
-        },
-        {
-          timezone: 'Asia/Jakarta',
-          region: 'gcp-asia-east1',
-        },
-        {
-          timezone: 'Australia/Melbourne',
-          region: 'gcp-asia-east1',
-        },
-        {
-          timezone: 'Etc', // Virtual timezone that does not denote location.
-          region: '',
-        },
-        {
-          timezone: 'Oz/Emerald_City', // Not a real timezone
-          region: '',
-        },
-      ]
+    it('should retrieve the regional static nodes file for mainnet', async () => {
+      _testSetTimezoneOverride('Asia/Jakarta')
+      fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), mockStaticNodes)
+      const nodes = await StaticNodeUtils.getStaticNodesAsync('mainnet')
+      // Expect that the mocked data was returned.
+      expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
+    })
 
-      afterEach(() => {
-        _testSetTimezoneOverride(undefined)
+    it('should fallback to the default static nodes file for mainnet when region is unavailable', async () => {
+      _testSetTimezoneOverride('Asia/Jakarta')
+      fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), 404)
+      fetchMock.mock(testEndpoint('mainnet'), mockStaticNodes)
+      const nodes = await StaticNodeUtils.getStaticNodesAsync('mainnet')
+      // Expect that the mocked data was returned.
+      expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
+    })
+  })
+
+  describe(StaticNodeUtils.getRegionalStaticNodesAsync, () => {
+    afterEach(() => {
+      fetchMock.reset()
+      _testSetTimezoneOverride(undefined)
+    })
+
+    it('should retrieve the correct mainnet static nodes file based on the region', async () => {
+      _testSetTimezoneOverride('Asia/Jakarta')
+      fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), mockStaticNodes)
+      const nodes = await StaticNodeUtils.getRegionalStaticNodesAsync('mainnet')
+      // Expect that the mocked data was returned.
+      expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
+    })
+
+    it('should retrieve the default alfajores static nodes file', async () => {
+      _testSetTimezoneOverride('Asia/Jakarta')
+      fetchMock.mock(testEndpoint('alfajores'), mockStaticNodes)
+      const nodes = await StaticNodeUtils.getRegionalStaticNodesAsync('alfajores')
+      // Expect that the mocked data was returned.
+      expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
+    })
+
+    it('should fail to retrieve the correct mainnet static nodes file if the region is not available', async () => {
+      _testSetTimezoneOverride('Asia/Jakarta')
+      fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), 404)
+      await expect(StaticNodeUtils.getRegionalStaticNodesAsync('mainnet')).rejects.toEqual(
+        new Error()
+      )
+    })
+  })
+
+  describe(StaticNodeUtils.getStaticNodeRegion, () => {
+    const cases = [
+      {
+        timezone: 'America/Chicago',
+        region: 'gcp-us-east1',
+      },
+      {
+        timezone: 'America/New_York',
+        region: 'gcp-us-east1',
+      },
+      {
+        timezone: 'America/Los_Angeles',
+        region: 'gcp-us-west1',
+      },
+      {
+        timezone: 'Europe/Istanbul',
+        region: 'gcp-europe-west1',
+      },
+      {
+        timezone: 'America/El_Salvador',
+        region: 'gcp-us-east1',
+      },
+      {
+        timezone: 'Europe/Lisbon',
+        region: 'gcp-europe-west1',
+      },
+      {
+        timezone: 'Europe/Oslo',
+        region: 'gcp-europe-west1',
+      },
+      {
+        timezone: 'America/Mexico_City',
+        region: 'gcp-us-east1',
+      },
+      {
+        timezone: 'Africa/Nairobi',
+        region: 'gcp-europe-west1',
+      },
+      {
+        timezone: 'Africa/Kampala',
+        region: 'gcp-europe-west1',
+      },
+      {
+        timezone: 'America/Argentina/Buenos_Aires',
+        region: 'gcp-southamerica-east1',
+      },
+      {
+        timezone: 'America/Sao_Paulo',
+        region: 'gcp-southamerica-east1',
+      },
+      {
+        timezone: 'America/Bogota',
+        region: 'gcp-us-east1',
+      },
+      {
+        timezone: 'America/Costa_Rica',
+        region: 'gcp-us-east1',
+      },
+      {
+        timezone: 'Asia/Hong_Kong',
+        region: 'gcp-asia-east1',
+      },
+      {
+        timezone: 'Asia/Jakarta',
+        region: 'gcp-asia-east1',
+      },
+      {
+        timezone: 'Australia/Melbourne',
+        region: 'gcp-asia-east1',
+      },
+      {
+        timezone: 'Etc', // Virtual timezone that does not denote location.
+        region: '',
+      },
+      {
+        timezone: 'Oz/Emerald_City', // Not a real timezone
+        region: '',
+      },
+    ]
+
+    afterEach(() => {
+      _testSetTimezoneOverride(undefined)
+    })
+
+    for (const { timezone, region } of cases) {
+      it(`should select the best mainnet region for ${timezone}`, () => {
+        _testSetTimezoneOverride(timezone)
+        expect(StaticNodeUtils.getStaticNodeRegion('mainnet')).toEqual(region)
+        expect(StaticNodeUtils.getStaticNodeRegion('rc1')).toEqual(region)
       })
+    }
 
-      for (const { timezone, region } of cases) {
-        it(`should select the best mainnet region for ${timezone}`, () => {
-          _testSetTimezoneOverride(timezone)
-          expect(StaticNodeUtils.getStaticNodeRegion('mainnet')).toEqual(region)
-          expect(StaticNodeUtils.getStaticNodeRegion('rc1')).toEqual(region)
-        })
+    it(`should always select the default baklava region`, () => {
+      for (const { timezone } of cases) {
+        _testSetTimezoneOverride(timezone)
+        expect(StaticNodeUtils.getStaticNodeRegion('baklava')).toEqual('')
       }
-
-      it(`should always select the default baklava region`, () => {
-        for (const { timezone } of cases) {
-          _testSetTimezoneOverride(timezone)
-          expect(StaticNodeUtils.getStaticNodeRegion('baklava')).toEqual('')
-        }
-      })
-
-      it('should retrieve the correct mainnet static nodes file based on the region', async () => {
-        _testSetTimezoneOverride('Asia/Jakarta')
-        fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), mockStaticNodes)
-        const nodes = await StaticNodeUtils.getRegionalStaticNodesAsync('mainnet')
-        // Expect that the mocked data was returned.
-        expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
-      })
-
-      it('should retrieve the default alfajores static nodes file', async () => {
-        _testSetTimezoneOverride('Asia/Jakarta')
-        fetchMock.mock(testEndpoint('alfajores'), mockStaticNodes)
-        const nodes = await StaticNodeUtils.getRegionalStaticNodesAsync('alfajores')
-        // Expect that the mocked data was returned.
-        expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
-      })
     })
   })
 })
