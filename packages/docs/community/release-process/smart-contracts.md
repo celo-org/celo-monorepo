@@ -30,18 +30,18 @@ Mixin contracts and libraries are considered part of the contracts that consume 
 
 Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut). Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo.
 
-When a new release branch is cut, the following steps are performed:
+#### When a new release branch is cut:
 1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
 2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`. 
 3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
 4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.pre-audit` so that all future changes to master are versioned against the new release.
 5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`. 
 
-During the release proposal stage:
+#### During the release proposal stage:
 1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
 2. When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
 
-After a completed release process:
+#### After a completed release process:
 1. The release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
 2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.mainnet`
 
@@ -138,10 +138,8 @@ Deploying a new contract release should occur with the following process. On-cha
     <td>
       <ol>
         <li>Create a Github issue tracking all these checklist items as an audit log</li>
-        <li>Create a <code>release/celo-core-contracts/${N}</code> release branch at the desired commit.</li>
-        <li>Tag the commit <code>celo-core-contracts-v${N}.pre-audit</code></li>
-        <li>Create Github release with above tag</li>
-        <li>Submit this branch to a reputable third party auditor for review.</li>
+        <li>Implement the <a href="#When-a-new-release-branch-is-cut">git management steps</a> for when a new release branch is cut.</li>
+        <li>Submit release branch to a reputable third party auditor for review.</li>
         <li>Begin drafting release notes.</li>
       </ol>
     </td>
@@ -160,7 +158,7 @@ Deploying a new contract release should occur with the following process. On-cha
         </li>
         <li>Commit audit fixes to the release branch</li>
         <li>Submit audit fixes to auditors for review.</li>
-        <li>Tag the first release candidate commit</li>
+        <li>Tag the first release candidate commit according to the <a href="#During-the-release-proposal-stage">git release management instructions</a>.</li>
         <li>Let the community know about the upcoming release proposal by posting details to the Governance category on https://forum.celo.org and cross post in the <a href="https://discord.com/channels/600834479145353243/704805825373274134">Discord <code>#governance</code> channel</a>. See the 'Communication guidelines' section below for information on what your post should contain.</li>
       </ol>
     </td>
