@@ -37,7 +37,9 @@ It is `0x765de816845861e75a25fca122bb6898b8b1282a`.
 The following are useful API endpoints available to you that would help you in your listings of the CELO and cUSD digital assets.
 
 #### CELO and cUSD
-For querying the API on total coins in circulation in CELO and cUSD, which are the total amount of coins in existence right now, the following endpoint will provide you with that:
+
+##### Total CELO supply
+For querying the API on total coins in circulation in CELO, which are the total amount of coins in existence right now, the following endpoint will provide you with that:
 ```sh
 $ curl  [https://thecelo.com/api/v0.1.js?method=ex_totalcoins](https://thecelo.com/api/v0.1.js?method=ex_totalcoins) {"code":"200","msg":"success","data":{"CELO":608485841.9959723,"cUSD":10250632.56099673}}
 ```
