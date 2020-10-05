@@ -1,6 +1,7 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
+import { BigNumber } from 'bignumber.js'
 import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -34,7 +35,6 @@ import {
 import { StandbyTransaction, TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { fetchNonce } from 'src/web3/actions'
-import { BigNumber } from 'bignumber.js'
 
 const TAG = 'transactions/saga'
 

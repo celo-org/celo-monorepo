@@ -85,6 +85,7 @@ import PaymentRequestUnavailable, {
 } from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
+import QRCode from 'src/qrcode/QRCode'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
 import Send from 'src/send/Send'
@@ -103,7 +104,6 @@ import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
-import QRCode from 'src/qrcode/QRCode'
 
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()

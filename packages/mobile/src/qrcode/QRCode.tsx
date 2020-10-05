@@ -1,21 +1,20 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { StackScreenProps } from '@react-navigation/stack'
 import React, { useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { shallowEqual, useSelector } from 'react-redux'
+import { connect, shallowEqual, useSelector } from 'react-redux'
 import { AvatarSelf } from 'src/components/AvatarSelf'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import QRCode from 'src/qrcode/QRGen'
 import { UriData, urlFromUriData } from 'src/qrcode/schema'
 import { RootState } from 'src/redux/reducers'
 import { SVG } from 'src/send/actions'
-import { currentAccountSelector } from 'src/web3/selectors'
 import Logger from 'src/utils/Logger'
-import { StackScreenProps } from '@react-navigation/stack'
-import { Screens } from 'src/navigator/Screens'
-import { StackParamList } from 'src/navigator/types'
-import { connect } from 'react-redux'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 type OwnProps = StackScreenProps<StackParamList, Screens.QRCode>
 
@@ -38,22 +37,14 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): Partial<UriData>
 }
 
 function QRCodeDisplay(props: Props) {
-  // const data = useSelector(mapStateToProps, shallowEqual)
-  let qrContent: string
-  if (props.rawSignedTransaction) {
-    Logger.debug('Using data.rawSignedTransaction', props.rawSignedTransaction)
-    qrContent = useMemo(
-      () => urlFromUriData({ rawSignedTransaction: props.rawSignedTransaction }),
-      [props.rawSignedTransaction]
-    )
-  } else {
-    Logger.debug('Not using rawSignedTransaction')
-    qrContent = useMemo(() => urlFromUriData(props), [
-      props.address,
-      props.displayName,
-      props.e164PhoneNumber,
-    ])
-  }
+  const qrContent: string = useMemo(() => {
+    if (props.rawSignedTransaction) {
+      Logger.debug('Using data.rawSignedTransaction', props.rawSignedTransaction)
+      return urlFromUriData({ rawSignedTransaction: props.rawSignedTransaction })
+    }
+    Logger.debug('Not using data.rawSignedTransaction')
+    return urlFromUriData(props)
+  }, [props.address, props.displayName, props.e164PhoneNumber, props.rawSignedTransaction])
   Logger.debug('qrContent', qrContent)
   return (
     <SafeAreaView style={styles.container}>

@@ -27,12 +27,12 @@ import Logger from 'src/utils/Logger'
 import {
   Actions,
   completeWeb3Sync,
+  FetchNonceAction,
   setAccount,
   SetAccountAction,
-  setNonce,
-  FetchNonceAction,
   setFornoMode,
   SetIsFornoAction,
+  setNonce,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'

@@ -30,7 +30,7 @@ const WAIT_FOR_CONTRACT_KIT_RETRIES = 10
 let wallet: UnlockableWallet | undefined
 let contractKit: ContractKit | undefined
 
-let initContractKitLock = new Lock()
+const initContractKitLock = new Lock()
 
 async function initWallet() {
   ValoraAnalytics.track(ContractKitEvents.init_contractkit_get_wallet_start)
