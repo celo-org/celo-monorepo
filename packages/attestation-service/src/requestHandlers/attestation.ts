@@ -21,11 +21,6 @@ function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
 
-function createAttestationTextMessage(attestationCode: string, smsRetrieverAppSig?: string) {
-  const messageBase = `celo://wallet/v/${toBase64(attestationCode)}`
-  return smsRetrieverAppSig ? `<#> ${messageBase} ${smsRetrieverAppSig}` : messageBase
-}
-
 function getAttestationKey(attestationRequest: AttestationRequest): AttestationKey {
   return {
     identifier: PhoneNumberUtils.getPhoneHash(
@@ -141,22 +136,37 @@ class AttestationRequestHandler {
     let attestation = await this.findOrValidateRequest()
 
     if (attestation && attestation.message) {
-      // Re-request existing attestation
+      // Re-request existing attestation. In this case, security code prefix is ignored (the message sent is the same as before)
       attestation = await rerequestAttestation(this.key, this.logger, this.sequelizeLogger)
     } else {
       // New attestation: create text message, new delivery.
       const attestationCode = await this.signAttestation()
       await this.validateAttestationCode(attestationCode)
 
-      const textMessage = createAttestationTextMessage(
-        attestationCode,
-        this.attestationRequest.smsRetrieverAppSig
-      )
+      let messageBase, securityCode
+
+      const attestationCodeDeeplink = `celo://wallet/v/${toBase64(attestationCode)}`
+      if (this.attestationRequest.securityCodePrefix) {
+        // Client is requesting a security code SMS. Generate a challenge and just store the deeplink.
+        securityCode = randomBytes(7)
+          .map((x) => x % 10)
+          .join('')
+        messageBase = `${this.attestationRequest.securityCodePrefix}${securityCode}`
+      } else {
+        // Client is requesting direct SMS with the deeplink.
+        messageBase = attestationCodeDeeplink
+      }
+
+      const textMessage = this.attestationRequest.smsRetrieverAppSig
+        ? `<#> ${messageBase} ${this.attestationRequest.smsRetrieverAppSig}`
+        : messageBase
 
       attestation = await startSendSms(
         this.key,
         this.attestationRequest.phoneNumber,
         textMessage,
+        securityCode,
+        attestationCodeDeeplink,
         this.logger,
         this.sequelizeLogger
       )

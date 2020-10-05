@@ -57,7 +57,7 @@ export async function handleGetAttestationRequest(
       return
     }
 
-    respondWithAttestation(res, attestation, true)
+    respondWithAttestation(res, attestation, true, undefined, getRequest.securityCode)
   } catch (error) {
     res.locals.logger.error(error)
     respondWithError(res, 500, `${error.message ?? error}`)
