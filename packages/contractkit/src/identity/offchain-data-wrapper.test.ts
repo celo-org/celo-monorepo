@@ -217,6 +217,11 @@ testWithGanache('Offchain Data', (web3) => {
         .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
         .sendAndWaitForReceipt({ from: readerAddress })
 
+      await accounts.createAccount().sendAndWaitForReceipt({ from: reader2Address })
+      await accounts
+        .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
+        .sendAndWaitForReceipt({ from: reader2Address })
+
       // todo: remove this
       kit.addAccount(writerPrivate)
     })

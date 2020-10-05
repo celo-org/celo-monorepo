@@ -145,7 +145,7 @@ export class BinarySchema {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
   async write(data: Buffer) {
-    const signature = await signBuffer(this.wrapper, this.wrapper.self, data)
+    const signature = await signBuffer(this.wrapper, data)
     await this.wrapper.writeDataTo(data, signature, this.dataPath)
   }
 
@@ -220,7 +220,7 @@ export const writeEncrypted = async (
     Buffer.from(data)
   )
 
-  const signature = await signBuffer(wrapper, wrapper.self, encryptedData)
+  const signature = await signBuffer(wrapper, encryptedData)
   await wrapper.writeDataTo(encryptedData, signature, '/ciphertexts/' + computedDataPath)
 }
 
@@ -232,12 +232,22 @@ export const writeEncryptedWithSymmetric = async (
   toAddresses: string[],
   symmetricKey?: Buffer
 ) => {
+  // if explicitly passing in a symmetric key, use that.
+  // else check for existing key
+  // otherwise generate new one
+  let key: Buffer
+  if (symmetricKey) {
+    key = symmetricKey
+  } else {
+    const keyResult = await readEncrypted(wrapper, `${dataPath}.enc`, wrapper.self)
+    key = keyResult.ok ? keyResult.result : randomBytes(16)
+  }
+
   const iv = randomBytes(16)
-  const key = symmetricKey || randomBytes(16)
   const cipher = createCipheriv('aes-128-ctr', key, iv)
   const payload = Buffer.concat([iv, cipher.update(data), cipher.final()])
 
-  const signature = await signBuffer(wrapper, wrapper.self, payload)
+  const signature = await signBuffer(wrapper, payload)
   await wrapper.writeDataTo(payload, signature, `${dataPath}.enc`)
   await Promise.all(
     toAddresses.map(async (toAddress) => writeEncrypted(wrapper, dataPath, key, toAddress))
@@ -376,9 +386,9 @@ export const buildBinaryEIP712TypedData = async (
   }
 }
 
-export const signBuffer = async (wrapper: OffchainDataWrapper, address: string, buf: Buffer) => {
+export const signBuffer = async (wrapper: OffchainDataWrapper, buf: Buffer) => {
   const typedData = await buildBinaryEIP712TypedData(wrapper, buf)
-  return wrapper.kit.getWallet().signTypedData(address, typedData)
+  return wrapper.kit.getWallet().signTypedData(wrapper.self, typedData)
 }
 
 export const buildEIP712Schema = <DataType>(type: t.Type<DataType>): EIP712Schema => {
