@@ -28,13 +28,22 @@ Mixin contracts and libraries are considered part of the contracts that consume 
 
 ### Release management in Git/Github
 
-Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut).
+Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut). Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo.
 
-Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo. When a new release branch is cut, the commit is tagged with `celo-core-contracts-v${N}.pre-audit`. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
+When a new release branch is cut, the following steps are performed:
+1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
+2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`. 
+3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
+4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.pre-audit` so that all future changes to master are versioned against the new release.
+5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`. 
 
-When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
+During the release proposal stage:
+1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
+2. When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
 
-After a completed release process, the release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
+After a completed release process:
+1. The release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
+2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.mainnet`
 
 
 ## Build and Release Process
