@@ -361,7 +361,7 @@ export function* reserveNonce() {
   const nonce = yield call(getNonce)
   Logger.debug(TAG + '@reserveNonce', `Incrementing nonce to reserve nonce ${nonce}`)
   yield put(setNonce(nonce + 1))
-  return noncek
+  return nonce
 }
 
 export function* watchFornoMode() {
