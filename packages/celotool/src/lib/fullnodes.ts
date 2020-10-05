@@ -54,7 +54,7 @@ export function getFullNodeDeployerForContext(celoEnv: string, context: string, 
     deploymentConfig = {
       ...deploymentConfig,
       createNEG: true
-    } as GCPFullNodeDeploymentConfig
+    } as unknown as GCPFullNodeDeploymentConfig // make typescript happy
   }
   return getFullNodeDeployer(cloudProvider, celoEnv, deploymentConfig)
 }
