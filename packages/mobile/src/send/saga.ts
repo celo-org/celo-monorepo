@@ -26,14 +26,14 @@ import {
 import { transferStableToken } from 'src/stableToken/actions'
 import {
   BasicTokenTransfer,
-  createTokenTransferTransaction,
-  getCurrencyAddress,
+  //  createTokenTransferTransaction,
+  //  getCurrencyAddress,
 } from 'src/tokens/saga'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
-import { estimateGas } from 'src/web3/utils'
+// import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'send/saga'
 
@@ -44,9 +44,9 @@ export async function getSendTxGas(
 ): Promise<BigNumber> {
   try {
     Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
-    const tx = await createTokenTransferTransaction(currency, params)
-    const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
     // DO NOT MERGE: Short circuit the estimation code.
+    // const tx = await createTokenTransferTransaction(currency, params)
+    // const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
     const gas = new BigNumber(200000) // await estimateGas(tx.txo, txParams)
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
