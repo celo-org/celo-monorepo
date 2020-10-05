@@ -70,7 +70,7 @@ export class SimpleSchema<DataType> {
   }
 
   private async sign(data: DataType) {
-    const typedData = await buildEIP712TypedData(this.wrapper, this.type, data)
+    const typedData = await buildEIP712TypedData(this.wrapper, this.type, this.dataPath, data)
     const wallet = this.wrapper.kit.getWallet()
     return wallet.signTypedData(this.wrapper.self, typedData)
   }
@@ -108,7 +108,8 @@ export class SimpleSchema<DataType> {
   async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
-      (buf) => buildEIP712TypedData(this.wrapper, this.type, JSON.parse(buf.toString())),
+      (buf) =>
+        buildEIP712TypedData(this.wrapper, this.type, this.dataPath, JSON.parse(buf.toString())),
       this.dataPath
     )
 
@@ -339,6 +340,7 @@ export const deserialize = <DataType>(
 export const buildEIP712TypedData = async <DataType>(
   wrapper: OffchainDataWrapper,
   type: t.Type<DataType>,
+  path: string,
   data: DataType
 ): Promise<EIP712TypedData> => {
   const chainId = await wrapper.kit.web3.eth.getChainId()
@@ -353,6 +355,10 @@ export const buildEIP712TypedData = async <DataType>(
     types: {
       EIP712Domain,
       Claim,
+      ClaimWithPath: [
+        { name: 'path', type: 'string' },
+        { name: 'payload', type: 'Claim' },
+      ],
     },
     domain: {
       name: 'CIP8 Claim',
@@ -360,7 +366,10 @@ export const buildEIP712TypedData = async <DataType>(
       chainId,
     },
     primaryType: 'Claim',
-    message: (data as unknown) as EIP712Object,
+    message: {
+      path,
+      payload: (data as unknown) as EIP712Object,
+    },
   }
 }
 

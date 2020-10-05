@@ -40,11 +40,17 @@ export class AuthorizedSignerAccessor {
   constructor(readonly wrapper: OffchainDataWrapper) {}
 
   async readAsResult(account: Address, signer: Address) {
+    const dataPath = this.basePath + '/' + toChecksumAddress(signer)
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
       (buf) =>
-        buildEIP712TypedData(this.wrapper, AuthorizedSignerSchema, JSON.parse(buf.toString())),
-      this.basePath + '/' + toChecksumAddress(signer)
+        buildEIP712TypedData(
+          this.wrapper,
+          AuthorizedSignerSchema,
+          dataPath,
+          JSON.parse(buf.toString())
+        ),
+      dataPath
     )
     if (!rawData.ok) {
       return Err(new OffchainError(rawData.error))
@@ -61,12 +67,14 @@ export class AuthorizedSignerAccessor {
       proofOfPossession,
       filteredDataPaths,
     }
-    const typedData = await buildEIP712TypedData(this.wrapper, AuthorizedSignerSchema, payload)
-    const signature = await this.wrapper.kit.getWallet().signTypedData(this.wrapper.self, typedData)
-    await this.wrapper.writeDataTo(
-      Buffer.from(JSON.stringify(payload)),
-      signature,
-      this.basePath + '/' + toChecksumAddress(signer)
+    const dataPath = this.basePath + '/' + toChecksumAddress(signer)
+    const typedData = await buildEIP712TypedData(
+      this.wrapper,
+      AuthorizedSignerSchema,
+      dataPath,
+      payload
     )
+    const signature = await this.wrapper.kit.getWallet().signTypedData(this.wrapper.self, typedData)
+    await this.wrapper.writeDataTo(Buffer.from(JSON.stringify(payload)), signature, dataPath)
   }
 }
