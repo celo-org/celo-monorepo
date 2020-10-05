@@ -49,7 +49,10 @@ const ioTsToSolidityTypeMapping: { [x: string]: string } = {
   [t.boolean._tag]: 'bool',
 }
 export type EIP712Schema = Array<{ name: string; type: string }>
-const binaryEIP712Schema: EIP712Schema = [{ name: 'hash', type: 'string' }]
+const binaryEIP712Schema: EIP712Schema = [
+  { name: 'path', type: 'string' },
+  { name: 'hash', type: 'string' },
+]
 
 export class SimpleSchema<DataType> {
   constructor(
@@ -145,7 +148,7 @@ export class BinarySchema {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
   async write(data: Buffer) {
-    const signature = await signBuffer(this.wrapper, data)
+    const signature = await signBuffer(this.wrapper, this.dataPath, data)
     await this.wrapper.writeDataTo(data, signature, this.dataPath)
   }
 
@@ -160,7 +163,7 @@ export class BinarySchema {
   async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
-      (buf) => buildBinaryEIP712TypedData(this.wrapper, buf),
+      (buf) => buildBinaryEIP712TypedData(this.wrapper, this.dataPath, buf),
       this.dataPath
     )
     if (!rawData.ok) {
@@ -220,8 +223,9 @@ export const writeEncrypted = async (
     Buffer.from(data)
   )
 
-  const signature = await signBuffer(wrapper, encryptedData)
-  await wrapper.writeDataTo(encryptedData, signature, '/ciphertexts/' + computedDataPath)
+  const prefixedDataPath = '/ciphertexts/' + computedDataPath
+  const signature = await signBuffer(wrapper, prefixedDataPath, encryptedData)
+  await wrapper.writeDataTo(encryptedData, signature, prefixedDataPath)
 }
 
 //  file_ciphertext = IV || E(message key, IV, data)
@@ -247,8 +251,9 @@ export const writeEncryptedWithSymmetric = async (
   const cipher = createCipheriv('aes-128-ctr', key, iv)
   const payload = Buffer.concat([iv, cipher.update(data), cipher.final()])
 
-  const signature = await signBuffer(wrapper, payload)
+  const signature = await signBuffer(wrapper, `${dataPath}.enc`, payload)
   await wrapper.writeDataTo(payload, signature, `${dataPath}.enc`)
+
   await Promise.all(
     toAddresses.map(async (toAddress) => writeEncrypted(wrapper, dataPath, key, toAddress))
   )
@@ -279,16 +284,18 @@ const readEncrypted = async (
 
   const computedDataPath = getDataPath(dataPath, sharedSecret, senderPubKey, readerPubKey)
 
+  const encryptedPayloadPath = `${dataPath}.enc`
+  const encryptedPayloadOrKeyPath = '/ciphertexts/' + computedDataPath
   const [encryptedPayload, encryptedPayloadOrKey] = await Promise.all([
     wrapper.readDataFromAsResult(
       senderAddress,
-      (buf) => buildBinaryEIP712TypedData(wrapper, buf),
-      `${dataPath}.enc`
+      (buf) => buildBinaryEIP712TypedData(wrapper, encryptedPayloadPath, buf),
+      encryptedPayloadPath
     ),
     wrapper.readDataFromAsResult(
       senderAddress,
-      (buf) => buildBinaryEIP712TypedData(wrapper, buf),
-      '/ciphertexts/' + computedDataPath
+      (buf) => buildBinaryEIP712TypedData(wrapper, encryptedPayloadOrKeyPath, buf),
+      encryptedPayloadOrKeyPath
     ),
   ])
 
@@ -359,6 +366,7 @@ export const buildEIP712TypedData = async <DataType>(
 
 export const buildBinaryEIP712TypedData = async (
   wrapper: OffchainDataWrapper,
+  path: string,
   buf: Buffer
 ): Promise<EIP712TypedData> => {
   const EIP712Domain = [
@@ -381,13 +389,14 @@ export const buildBinaryEIP712TypedData = async (
     },
     primaryType: 'Hash',
     message: {
+      path,
       hash: keccak256(buf).toString('hex'),
     },
   }
 }
 
-export const signBuffer = async (wrapper: OffchainDataWrapper, buf: Buffer) => {
-  const typedData = await buildBinaryEIP712TypedData(wrapper, buf)
+export const signBuffer = async (wrapper: OffchainDataWrapper, dataPath: string, buf: Buffer) => {
+  const typedData = await buildBinaryEIP712TypedData(wrapper, dataPath, buf)
   return wrapper.kit.getWallet().signTypedData(wrapper.self, typedData)
 }
 
