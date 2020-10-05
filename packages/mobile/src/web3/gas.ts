@@ -8,22 +8,24 @@ import { getContractKitAsync } from 'src/web3/contracts'
 const TAG = 'web3/gas'
 const GAS_PRICE_STALE_AFTER = 150000 // 15 seconds
 
-let gasPrice: BigNumber | null = null
-let gasPriceLastUpdated: number | null = null
+const gasPrice: { [currency: CURRENCY_ENUM]: BigNumber } = {}
+const gasPriceLastUpdated: { [currency: CURRENCY_ENUM]: number } = {}
 
-export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR) {
+export async function getGasPrice(
+  currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
+): Promise<BigNumber> {
   Logger.debug(`${TAG}/getGasPrice`, 'Getting gas price')
 
   try {
     if (
-      !gasPriceLastUpdated ||
-      !gasPrice ||
-      Date.now() - gasPriceLastUpdated >= GAS_PRICE_STALE_AFTER
+      !(currency in gasPriceLastUpdated) ||
+      !(currency in gasPrice) ||
+      Date.now() - gasPriceLastUpdated[currency] >= GAS_PRICE_STALE_AFTER
     ) {
-      gasPrice = await fetchGasPrice(currency)
-      gasPriceLastUpdated = Date.now()
+      gasPrice[currency] = await fetchGasPrice(currency)
+      gasPriceLastUpdated[currency] = Date.now()
     }
-    return gasPrice
+    return gasPrice[currency]
   } catch (error) {
     Logger.error(`${TAG}/getGasPrice`, 'Could not fetch and update gas price.', error)
     throw new Error('Error fetching gas price')
@@ -31,6 +33,8 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
 }
 
 async function fetchGasPrice(currency: CURRENCY_ENUM) {
+  // DO NOT MERGE: Short circuit gas price calculation
+  return new BigNumber(500000000)
   const contractKit = await getContractKitAsync()
   const [gasPriceMinimum, address] = await Promise.all([
     contractKit.contracts.getGasPriceMinimum(),

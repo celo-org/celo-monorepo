@@ -112,6 +112,7 @@ interface TokenTransferFactory {
   tag: string
   currency: CURRENCY_ENUM
   fetchAction: () => any
+  staticGas?: number
 }
 
 // TODO(martinvol) this should go to the SDK
@@ -154,6 +155,7 @@ export function tokenTransferFactory({
   tag,
   currency,
   fetchAction,
+  staticGas,
 }: TokenTransferFactory) {
   return function*() {
     while (true) {
@@ -194,7 +196,7 @@ export function tokenTransferFactory({
           }
         )
 
-        yield call(sendAndMonitorTransaction, tx, account, context, currency)
+        yield call(sendAndMonitorTransaction, tx, account, context, currency, staticGas)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
         yield put(removeStandbyTransaction(context.id))

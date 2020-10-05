@@ -41,12 +41,13 @@ export async function getSendTxGas(
   account: string,
   currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
-) {
+): Promise<BigNumber> {
   try {
     Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
     const tx = await createTokenTransferTransaction(currency, params)
     const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
-    const gas = await estimateGas(tx.txo, txParams)
+    // DO NOT MERGE: Short circuit the estimation code.
+    const gas = new BigNumber(200000) // await estimateGas(tx.txo, txParams)
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
   } catch (error) {

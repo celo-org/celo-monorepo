@@ -85,7 +85,7 @@ if [ $PLATFORM = "android" ]; then
     exit 1
   fi
 
-  if [ $MACHINE = "Mac" ]; then
+  if [ $MACHINE = "null" ]; then
     echo "Starting packager in new terminal"
     RN_START_CMD="cd `pwd` && (yarn react-native start || yarn react-native start)"
     OSASCRIPT_CMD="tell application \"Terminal\" to do script \"$RN_START_CMD\""
@@ -95,7 +95,7 @@ if [ $PLATFORM = "android" ]; then
     yarn react-native run-android --appId $APP_BUNDLE_ID --no-packager
   else 
     # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appId $APP_BUNDLE_ID --no-packager
+    yarn react-native run-android --appId $APP_BUNDLE_ID --no-packager &
     yarn react-native start 
   fi
 

@@ -17,6 +17,7 @@ export const stableTokenTransfer = tokenTransferFactory({
   tag,
   currency: CURRENCY_ENUM.DOLLAR,
   fetchAction: fetchDollarBalance,
+  staticGas: 200000,
 })
 
 export function* stableTokenSaga() {

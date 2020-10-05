@@ -63,7 +63,8 @@ export function* sendAndMonitorTransaction<T>(
   tx: CeloTransactionObject<T>,
   account: string,
   context: TransactionContext,
-  currency?: CURRENCY_ENUM
+  currency?: CURRENCY_ENUM,
+  staticGas?: number
 ) {
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${context.id}`)
@@ -74,7 +75,8 @@ export function* sendAndMonitorTransaction<T>(
         tx.txo,
         account,
         context,
-        nonce
+        nonce,
+        staticGas
       )
       const hash = yield transactionHash
       yield put(addHashToStandbyTransaction(context.id, hash))
