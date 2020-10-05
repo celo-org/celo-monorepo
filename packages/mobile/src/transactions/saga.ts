@@ -26,10 +26,15 @@ import {
   KnownFeedTransactionsType,
   standbyTransactionsSelector,
 } from 'src/transactions/reducer'
-import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
+import {
+  sendTransactionPromises,
+  signTransactionPromise,
+  wrapSendTransactionWithRetry,
+} from 'src/transactions/send'
 import { StandbyTransaction, TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { fetchNonce } from 'src/web3/actions'
+import { BigNumber } from 'bignumber.js'
 
 const TAG = 'transactions/saga'
 
@@ -57,6 +62,31 @@ export function* waitForTransactionWithId(txId: string) {
       // Return true for success, false otherwise
       return action.type === Actions.TRANSACTION_CONFIRMED
     }
+  }
+}
+
+export function* signTransaction<T>(
+  tx: CeloTransactionObject<T>,
+  account: string,
+  context: TransactionContext
+) {
+  try {
+    Logger.debug(TAG + '@signTransaction', `Signing transaction with id: ${context.id}`)
+    const signedTx = yield call(
+      signTransactionPromise,
+      tx.txo,
+      account,
+      context,
+      6,
+      200000,
+      new BigNumber('500000000')
+    )
+    Logger.debug(TAG + '@signTransaction', JSON.stringify(signedTx))
+    return signedTx
+  } catch (error) {
+    Logger.error(TAG + '@signTransaction', `Error signing tx ${context.id}`, error)
+    yield put(transactionFailed(context.id))
+    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
 }
 

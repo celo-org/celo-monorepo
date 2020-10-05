@@ -103,6 +103,7 @@ import { ExtractProps } from 'src/utils/typescript'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
+import QRCode from 'src/qrcode/QRCode'
 
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
@@ -259,6 +260,7 @@ const sendScreens = (Navigator: typeof Stack) => (
       component={SendAmount}
       options={sendAmountScreenNavOptions}
     />
+    <Navigator.Screen name={Screens.QRCode} component={QRCode} options={headerWithBackButton} />
     <Navigator.Screen
       name={Screens.SendConfirmation}
       component={SendConfirmation}

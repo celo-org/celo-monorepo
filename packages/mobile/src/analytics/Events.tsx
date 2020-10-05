@@ -246,6 +246,7 @@ export enum FeeEvents {
 // Generic transaction logging to grab tx hashs
 export enum TransactionEvents {
   transaction_start = 'transaction_start',
+  transaction_signed = 'transaction_signed',
   transaction_gas_estimated = 'transaction_gas_estimated',
   transaction_hash_received = 'transaction_hash_received',
   transaction_receipt_received = 'transaction_receipt_received',

@@ -1,4 +1,5 @@
 import { values } from 'lodash'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
@@ -47,6 +48,7 @@ export enum SendTransactionLogEventType {
   Confirmed,
   Failed,
   Exception,
+  Signed,
 }
 
 export type SendTransactionLogEvent =
@@ -57,6 +59,7 @@ export type SendTransactionLogEvent =
   | Confirmed
   | Failed
   | Exception
+  | Signed
 
 interface Started {
   type: SendTransactionLogEventType.Started
@@ -80,6 +83,11 @@ interface EstimatedGas {
 function EstimatedGas(gas: number): EstimatedGas {
   return { type: SendTransactionLogEventType.EstimatedGas, gas }
 }
+
+interface Signed {
+  type: SendTransactionLogEventType.Signed
+}
+const Signed: Signed = { type: SendTransactionLogEventType.Signed }
 
 interface ReceiptReceived {
   type: SendTransactionLogEventType.ReceiptReceived
@@ -213,5 +221,39 @@ export async function sendTransactionAsync<T>(
     receipt,
     transactionHash,
     confirmation,
+  }
+}
+
+export async function signTransactionAsync<T>(
+  tx: TransactionObject<T>,
+  account: string,
+  feeCurrencyAddress: string | undefined,
+  logger: TxLogger = emptyTxLogger,
+  estimatedGas: number,
+  gasPrice: string,
+  nonce: number
+): Promise<{
+  raw: string
+  tx: any
+}> {
+  logger(Started)
+  const txParams: Tx = {
+    gas: estimatedGas,
+    from: account,
+    feeCurrency: feeCurrencyAddress,
+    // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
+    // the suggested price in the selected feeCurrency.
+    gasPrice: gasPrice ?? '0',
+    nonce,
+  }
+  try {
+    // @ts-ignore - this is not a part of the type definition, but exists in web3.
+    // This will give the tx data without actually sending it.
+    const request = await tx.send.request(txParams)
+    const kit = await getContractKitAsync()
+    return await kit.web3.eth.signTransaction(request.params[0])
+  } catch (e) {
+    logger(Exception(e))
+    throw e
   }
 }
