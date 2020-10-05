@@ -58,15 +58,15 @@ export class SimpleSchema<DataType> {
     readonly dataPath: string
   ) {}
 
-  serialize(data: DataType) {
+  private serialize(data: DataType) {
     return Buffer.from(JSON.stringify(data))
   }
 
-  deserialize(buf: Buffer): Result<DataType, SchemaErrors> {
+  private deserialize(buf: Buffer): Result<DataType, SchemaErrors> {
     return deserialize(this.type, buf)
   }
 
-  async sign(data: DataType) {
+  private async sign(data: DataType) {
     const typedData = await buildEIP712TypedData(this.wrapper, this.type, data)
     const wallet = this.wrapper.kit.getWallet()
     return wallet.signTypedData(this.wrapper.self, typedData)
