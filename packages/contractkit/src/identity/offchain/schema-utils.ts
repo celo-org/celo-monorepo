@@ -2,8 +2,10 @@ import { makeAsyncThrowable } from '@celo/base/lib/result'
 import { Err, Ok, parseJsonAsResult, Result, RootError, trimLeading0x } from '@celo/base/src'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { Encrypt } from '@celo/utils/lib/ecies'
+import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto'
+import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
@@ -41,6 +43,14 @@ export class UnavailableKey extends RootError<SchemaErrorTypes.UnavailableKey> {
 
 type SchemaErrors = InvalidDataError | OffchainError | UnknownCiphertext | UnavailableKey
 
+const ioTsToSolidityTypeMapping: { [x: string]: string } = {
+  [t.string._tag]: 'string',
+  [t.number._tag]: 'uint256',
+  [t.boolean._tag]: 'bool',
+}
+export type EIP712Schema = Array<{ name: string; type: string }>
+const binaryEIP712Schema: EIP712Schema = [{ name: 'hash', type: 'string' }]
+
 export class SimpleSchema<DataType> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
@@ -55,13 +65,18 @@ export class SimpleSchema<DataType> {
   deserialize(buf: Buffer): Result<DataType, SchemaErrors> {
     return deserialize(this.type, buf)
   }
+  async sign(data: DataType) {
+    const typedData = await buildEIP712TypedData(this.wrapper, this.type, data)
+    const wallet = this.wrapper.kit.getWallet()
+    return wallet.signTypedData(this.wrapper.self, typedData)
+  }
 
   async write(data: DataType) {
     if (!this.type.is(data)) {
       return
     }
 
-    await this.wrapper.writeDataTo(this.serialize(data), this.dataPath)
+    await this.wrapper.writeDataTo(this.serialize(data), await this.sign(data), this.dataPath)
   }
 
   async writeEncrypted(data: DataType, toAddress: string) {
@@ -86,7 +101,11 @@ export class SimpleSchema<DataType> {
   }
 
   async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
-    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
+    const rawData = await this.wrapper.readDataFromAsResult(
+      account,
+      (buf) => buildEIP712TypedData(this.wrapper, this.type, JSON.parse(buf.toString())),
+      this.dataPath
+    )
 
     if (!rawData.ok) {
       return this.readEncrypted(account)
@@ -124,7 +143,8 @@ export class BinarySchema {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
   async write(data: Buffer) {
-    await this.wrapper.writeDataTo(data, this.dataPath)
+    const signature = await signBuffer(this.wrapper, this.wrapper.self, data)
+    await this.wrapper.writeDataTo(data, signature, this.dataPath)
   }
 
   async writeEncrypted(data: Buffer, toAddress: string) {
@@ -136,7 +156,11 @@ export class BinarySchema {
   }
 
   async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
-    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
+    const rawData = await this.wrapper.readDataFromAsResult(
+      account,
+      (buf) => buildBinaryEIP712TypedData(this.wrapper, buf),
+      this.dataPath
+    )
     if (!rawData.ok) {
       return this.readEncrypted(account)
     }
@@ -193,7 +217,9 @@ export const writeEncrypted = async (
     Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'),
     Buffer.from(data)
   )
-  await wrapper.writeDataTo(encryptedData, '/ciphertexts/' + computedDataPath)
+
+  const signature = await signBuffer(wrapper, wrapper.self, encryptedData)
+  await wrapper.writeDataTo(encryptedData, signature, '/ciphertexts/' + computedDataPath)
 }
 
 //  file_ciphertext = IV || E(message key, IV, data)
@@ -206,11 +232,10 @@ export const writeEncryptedWithSymmetric = async (
   const iv = randomBytes(16)
   const key = randomBytes(16)
   const cipher = createCipheriv('aes-128-ctr', key, iv)
+  const payload = Buffer.concat([iv, cipher.update(data), cipher.final()])
 
-  const output = cipher.update(data)
-  const payload = Buffer.concat([iv, output, cipher.final()])
-
-  await wrapper.writeDataTo(payload, `${dataPath}.enc`)
+  const signature = await signBuffer(wrapper, wrapper.self, payload)
+  await wrapper.writeDataTo(payload, signature, `${dataPath}.enc`)
   await Promise.all(
     toAddresses.map(async (toAddress) => writeEncrypted(wrapper, dataPath, key, toAddress))
   )
@@ -242,8 +267,16 @@ const readEncrypted = async (
   const computedDataPath = getDataPath(dataPath, sharedSecret, senderPubKey, readerPubKey)
 
   const [encryptedPayload, encryptedPayloadOrKey] = await Promise.all([
-    wrapper.readDataFromAsResult(senderAddress, `${dataPath}.enc`),
-    await wrapper.readDataFromAsResult(senderAddress, '/ciphertexts/' + computedDataPath),
+    wrapper.readDataFromAsResult(
+      senderAddress,
+      (buf) => buildBinaryEIP712TypedData(wrapper, buf),
+      `${dataPath}.enc`
+    ),
+    wrapper.readDataFromAsResult(
+      senderAddress,
+      (buf) => buildBinaryEIP712TypedData(wrapper, buf),
+      '/ciphertexts/' + computedDataPath
+    ),
   ])
 
   if (!encryptedPayloadOrKey.ok) {
@@ -258,7 +291,6 @@ const readEncrypted = async (
     const payload = encryptedPayload.result
     const iv = payload.slice(0, 16)
     const encryptedData = payload.slice(16)
-
     const decipher = createDecipheriv('aes-128-ctr', key, iv)
 
     return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
@@ -282,4 +314,83 @@ export const deserialize = <DataType>(
   }
 
   return Ok(parsedDataAsType.right)
+}
+
+export const buildEIP712TypedData = async <DataType>(
+  wrapper: OffchainDataWrapper,
+  type: t.Type<DataType>,
+  data: DataType
+): Promise<EIP712TypedData> => {
+  const chainId = await wrapper.kit.web3.eth.getChainId()
+  const EIP712Domain = [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+  ]
+  const Claim = buildEIP712Schema(type)
+
+  return {
+    types: {
+      EIP712Domain,
+      Claim,
+    },
+    domain: {
+      name: 'CIP8 Claim',
+      version: '1.0.0',
+      chainId,
+    },
+    primaryType: 'Claim',
+    message: (data as unknown) as EIP712Object,
+  }
+}
+
+export const buildBinaryEIP712TypedData = async (
+  wrapper: OffchainDataWrapper,
+  buf: Buffer
+): Promise<EIP712TypedData> => {
+  const EIP712Domain = [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+  ]
+  const Hash = binaryEIP712Schema
+
+  const chainId = await wrapper.kit.web3.eth.getChainId()
+  return {
+    types: {
+      EIP712Domain,
+      Hash,
+    },
+    domain: {
+      name: 'CIP8 Claim',
+      version: '1.0.0',
+      chainId,
+    },
+    primaryType: 'Hash',
+    message: {
+      hash: keccak256(buf).toString('hex'),
+    },
+  }
+}
+
+export const signBuffer = async (wrapper: OffchainDataWrapper, address: string, buf: Buffer) => {
+  const typedData = await buildBinaryEIP712TypedData(wrapper, buf)
+  return wrapper.kit.getWallet().signTypedData(address, typedData)
+}
+
+export const buildEIP712Schema = <DataType>(type: t.Type<DataType>): EIP712Schema => {
+  // @ts-ignore
+  const shape = type.props
+  // @ts-ignore
+  return Object.entries(shape).reduce((accum, [key, value]) => {
+    // @ts-ignore
+    return [
+      ...accum,
+      {
+        name: key,
+        // @ts-ignore
+        type: ioTsToSolidityTypeMapping[value._tag] || 'string',
+      },
+    ]
+  }, [])
 }

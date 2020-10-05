@@ -4,11 +4,18 @@ import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
 import { Address } from '../../base'
 import OffchainDataWrapper from '../offchain-data-wrapper'
-import { BinarySchema, deserialize, OffchainError, SimpleSchema } from './schema-utils'
+import {
+  BinarySchema,
+  buildEIP712TypedData,
+  deserialize,
+  OffchainError,
+  SimpleSchema,
+} from './schema-utils'
 
 const NameSchema = t.type({
   name: t.string,
 })
+
 export type NameType = t.TypeOf<typeof NameSchema>
 
 export class NameAccessor extends SimpleSchema<NameType> {
@@ -35,6 +42,8 @@ export class AuthorizedSignerAccessor {
   async readAsResult(account: Address, signer: Address) {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
+      (buf) =>
+        buildEIP712TypedData(this.wrapper, AuthorizedSignerSchema, JSON.parse(buf.toString())),
       this.basePath + '/' + toChecksumAddress(signer)
     )
     if (!rawData.ok) {
@@ -47,14 +56,16 @@ export class AuthorizedSignerAccessor {
   read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   async write(signer: Address, proofOfPossession: string, filteredDataPaths: string) {
+    const payload = {
+      address: toChecksumAddress(signer),
+      proofOfPossession,
+      filteredDataPaths,
+    }
+    const typedData = await buildEIP712TypedData(this.wrapper, AuthorizedSignerSchema, payload)
+    const signature = await this.wrapper.kit.getWallet().signTypedData(this.wrapper.self, typedData)
     await this.wrapper.writeDataTo(
-      Buffer.from(
-        JSON.stringify({
-          address: toChecksumAddress(signer),
-          proofOfPossession,
-          filteredDataPaths,
-        })
-      ),
+      Buffer.from(JSON.stringify(payload)),
+      signature,
       this.basePath + '/' + toChecksumAddress(signer)
     )
   }
