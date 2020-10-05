@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { spawn } from 'redux-saga/effects'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, fetchDollarBalance, setBalance } from 'src/stableToken/actions'
@@ -18,6 +19,7 @@ export const stableTokenTransfer = tokenTransferFactory({
   currency: CURRENCY_ENUM.DOLLAR,
   fetchAction: fetchDollarBalance,
   staticGas: 200000,
+  gasPrice: new BigNumber(5e9),
 })
 
 export function* stableTokenSaga() {

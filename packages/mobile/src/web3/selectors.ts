@@ -1,7 +1,8 @@
 import { RootState } from 'src/redux/reducers'
 
 export const currentAccountSelector = (state: RootState) =>
-  (state.web3.account && state.web3.account.toLowerCase()) || null
+  state.web3.account?.toLowerCase() ?? null
+export const nonceSelector = (state: RootState) => state.web3.nonce
 export const currentAccountInWeb3KeystoreSelector = (state: RootState) =>
   state.web3.accountInWeb3Keystore
 export const fornoSelector = (state: RootState) => state.web3.fornoMode

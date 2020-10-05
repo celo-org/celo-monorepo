@@ -9,6 +9,7 @@ import {
   take,
   takeLeading,
 } from 'redux-saga/effects'
+import { fetchNonce } from 'src/web3/actions'
 import { fetchSentEscrowPayments } from 'src/escrow/actions'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
@@ -42,6 +43,7 @@ export function* refreshBalances() {
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
   yield put(fetchSentEscrowPayments())
+  yield put(fetchNonce())
 }
 
 export function* autoRefreshSaga() {

@@ -1,5 +1,7 @@
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
+  SET_NONCE = 'WEB3/SET_NONCE',
+  FETCH_NONCE = 'WEB3/FETCH_NONCE',
   SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
   SET_DATA_ENCRYPTION_KEY = 'WEB3/SET_DATA_ENCRYPTION_KEY',
   REGISTER_DATA_ENCRYPTION_KEY = 'WEB3/REGISTER_DATA_ENCRYPTION_KEY',
@@ -15,6 +17,15 @@ export enum Actions {
 export interface SetAccountAction {
   type: Actions.SET_ACCOUNT
   address: string
+}
+
+export interface SetNonceAction {
+  type: Actions.SET_NONCE
+  nonce: number
+}
+
+export interface FetchNonceAction {
+  type: Actions.FETCH_NONCE
 }
 
 export interface SetAccountInWeb3KeystoreAction {
@@ -57,6 +68,8 @@ export interface UpdateWeb3SyncProgressAction {
 
 export type ActionTypes =
   | SetAccountAction
+  | SetNonceAction
+  | FetchNonceAction
   | SetAccountInWeb3KeystoreAction
   | SetIsFornoAction
   | ToggleIsFornoAction
@@ -69,6 +82,19 @@ export const setAccount = (address: string): SetAccountAction => {
   return {
     type: Actions.SET_ACCOUNT,
     address: address.toLowerCase(),
+  }
+}
+
+export function setNonce(nonce: number): SetNonceAction {
+  return {
+    type: Actions.SET_NONCE,
+    nonce,
+  }
+}
+
+export function fetchNonce(): FetchNonceAction {
+  return {
+    type: Actions.FETCH_NONCE,
   }
 }
 

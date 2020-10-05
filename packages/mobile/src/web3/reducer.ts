@@ -6,6 +6,7 @@ export interface State {
   syncProgress: Web3SyncProgress
   latestBlockNumber: number
   account: string | null
+  nonce: number | null
   accountInWeb3Keystore: string | null
   // The DEK private key
   dataEncryptionKey: string | null
@@ -22,6 +23,7 @@ const initialState: State = {
   },
   latestBlockNumber: 0,
   account: null,
+  nonce: null,
   accountInWeb3Keystore: null,
   dataEncryptionKey: null,
   isDekRegistered: false,
@@ -53,6 +55,12 @@ export const reducer = (
       return {
         ...state,
         account: action.address.toLowerCase(),
+        nonce: null,
+      }
+    case Actions.SET_NONCE:
+      return {
+        ...state,
+        nonce: action.nonce,
       }
     case Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE:
       return {

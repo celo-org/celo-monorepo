@@ -29,6 +29,7 @@ import {
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
 import { StandbyTransaction, TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { fetchNonce } from 'src/web3/actions'
 
 const TAG = 'transactions/saga'
 
@@ -80,6 +81,8 @@ export function* sendAndMonitorTransaction<T>(
       )
       const hash = yield transactionHash
       yield put(addHashToStandbyTransaction(context.id, hash))
+      // Update the cached nonce value, which may have been updated.
+      yield put(fetchNonce())
       const result = yield confirmation
       return result
     }
