@@ -49,6 +49,7 @@ export class MockStorageWriter extends LocalStorageWriter {
     await this.writeToFs(data, dataPath)
     this.fetchMock.mock(this.mockedStorageRoot + dataPath, data, {
       sendAsJson: false,
+      overwriteRoutes: true,
     })
   }
 }

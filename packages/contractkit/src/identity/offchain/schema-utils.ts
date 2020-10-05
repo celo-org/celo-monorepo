@@ -65,6 +65,7 @@ export class SimpleSchema<DataType> {
   deserialize(buf: Buffer): Result<DataType, SchemaErrors> {
     return deserialize(this.type, buf)
   }
+
   async sign(data: DataType) {
     const typedData = await buildEIP712TypedData(this.wrapper, this.type, data)
     const wallet = this.wrapper.kit.getWallet()
@@ -87,7 +88,7 @@ export class SimpleSchema<DataType> {
     return writeEncrypted(this.wrapper, this.dataPath, this.serialize(data), toAddress)
   }
 
-  async writeWithSymmetric(data: DataType, toAddresses: string[]) {
+  async writeWithSymmetric(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
     if (!this.type.is(data)) {
       return
     }
@@ -96,7 +97,8 @@ export class SimpleSchema<DataType> {
       this.wrapper,
       this.dataPath,
       this.serialize(data),
-      toAddresses
+      toAddresses,
+      symmetricKey
     )
   }
 
@@ -151,8 +153,8 @@ export class BinarySchema {
     return writeEncrypted(this.wrapper, this.dataPath, data, toAddress)
   }
 
-  async writeWithSymmetric(data: Buffer, toAddresses: string[]) {
-    return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, toAddresses)
+  async writeWithSymmetric(data: Buffer, toAddresses: string[], symmetricKey?: Buffer) {
+    return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
   }
 
   async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
@@ -227,10 +229,11 @@ export const writeEncryptedWithSymmetric = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
-  toAddresses: string[]
+  toAddresses: string[],
+  symmetricKey?: Buffer
 ) => {
   const iv = randomBytes(16)
-  const key = randomBytes(16)
+  const key = symmetricKey || randomBytes(16)
   const cipher = createCipheriv('aes-128-ctr', key, iv)
   const payload = Buffer.concat([iv, cipher.update(data), cipher.final()])
 

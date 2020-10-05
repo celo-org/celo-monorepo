@@ -17,6 +17,9 @@ import { SchemaErrorTypes } from './offchain/schema-utils'
 import { AuthorizedSignerAccessor, NameAccessor } from './offchain/schemas'
 import { MockStorageWriter } from './offchain/storage-writers'
 
+const testname = 'test'
+const testPayload = { name: testname }
+
 testWithGanache('Offchain Data', (web3) => {
   const kit = newKitFromWeb3(web3)
 
@@ -51,6 +54,7 @@ testWithGanache('Offchain Data', (web3) => {
   let accounts: AccountsWrapper
   let wrapper: OffchainDataWrapper
   let readerWrapper: OffchainDataWrapper
+  let reader2Wrapper: OffchainDataWrapper
 
   beforeEach(async () => {
     accounts = await kit.contracts.getAccounts()
@@ -82,6 +86,7 @@ testWithGanache('Offchain Data', (web3) => {
     )
 
     readerWrapper = new OffchainDataWrapper(readerAddress, kit)
+    reader2Wrapper = new OffchainDataWrapper(reader2Address, kit)
   })
 
   afterEach(() => {
@@ -93,14 +98,12 @@ testWithGanache('Offchain Data', (web3) => {
 
   describe('with the account being the signer', () => {
     it('can write a name', async () => {
-      const testname = 'test'
-
       // todo: remove this
       kit.addAccount(writerPrivate)
       kit.defaultAccount = writerAddress
 
       const nameAccessor = new NameAccessor(wrapper)
-      await nameAccessor.write({ name: testname })
+      await nameAccessor.write(testPayload)
 
       const resp = await nameAccessor.readAsResult(writerAddress)
       if (resp.ok) {
@@ -152,9 +155,8 @@ testWithGanache('Offchain Data', (web3) => {
       fetchMock
     )
 
-    const testname = 'test'
     const nameAccessor = new NameAccessor(wrapper)
-    await nameAccessor.write({ name: testname })
+    await nameAccessor.write(testPayload)
 
     const receivedName = await nameAccessor.readAsResult(writerAddress)
     expect(receivedName.ok).toEqual(false)
@@ -198,9 +200,8 @@ testWithGanache('Offchain Data', (web3) => {
     })
 
     it('can write a name', async () => {
-      const testname = 'test'
       const nameAccessor = new NameAccessor(wrapper)
-      await nameAccessor.write({ name: testname })
+      await nameAccessor.write(testPayload)
 
       const resp = await nameAccessor.readAsResult(writerAddress)
       if (resp.ok) {
@@ -235,11 +236,8 @@ testWithGanache('Offchain Data', (web3) => {
       })
 
       it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
-        const testname = 'test'
-        const payload = { name: testname }
-
         const nameAccessor = new NameAccessor(wrapper)
-        await nameAccessor.writeEncrypted(payload, readerAddress)
+        await nameAccessor.writeEncrypted(testPayload, readerAddress)
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
         const receivedName = await readerNameAccessor.readAsResult(writerAddress)
@@ -252,32 +250,63 @@ testWithGanache('Offchain Data', (web3) => {
         }
       })
 
-      it('can encrypt data with symmetric keys', async () => {
-        const testname = 'test'
-        const payload = { name: testname }
+      describe('symmetric encryption', () => {
+        it('can encrypt data with generated symmetric key', async () => {
+          const nameAccessor = new NameAccessor(wrapper)
+          await nameAccessor.writeWithSymmetric(testPayload, [readerAddress])
 
-        const nameAccessor = new NameAccessor(wrapper)
-        await nameAccessor.writeWithSymmetric(payload, [readerAddress])
+          const readerNameAccessor = new NameAccessor(readerWrapper)
+          const receivedName = await readerNameAccessor.readAsResult(writerAddress)
 
-        const readerNameAccessor = new NameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
+          if (receivedName.ok) {
+            expect(receivedName.result.name).toEqual(testname)
+          } else {
+            console.error(receivedName.error)
+            throw new Error('should not get here')
+          }
+        })
 
-        if (receivedName.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-        } else {
-          console.error(receivedName.error)
-          throw new Error('should not get here')
-        }
+        it('can re-encrypt data to more recipients', async () => {
+          const nameAccessor = new NameAccessor(wrapper)
+          await nameAccessor.writeWithSymmetric(testPayload, [readerAddress])
+          await nameAccessor.writeWithSymmetric(testPayload, [reader2Address])
+
+          const readerNameAccessor = new NameAccessor(readerWrapper)
+          const receivedName = await readerNameAccessor.readAsResult(writerAddress)
+          const reader2NameAccessor = new NameAccessor(reader2Wrapper)
+          const receivedName2 = await reader2NameAccessor.readAsResult(writerAddress)
+
+          if (receivedName.ok && receivedName2.ok) {
+            expect(receivedName.result.name).toEqual(testname)
+            expect(receivedName2.result.name).toEqual(testname)
+          } else {
+            throw new Error('should not get here')
+          }
+        })
+
+        it('can encrypt data with user defined symmetric key', async () => {
+          const symmetricKey = randomBytes(16)
+
+          const nameAccessor = new NameAccessor(wrapper)
+          await nameAccessor.writeWithSymmetric(testPayload, [readerAddress], symmetricKey)
+
+          const readerNameAccessor = new NameAccessor(readerWrapper)
+          const receivedName = await readerNameAccessor.readAsResult(writerAddress)
+
+          if (receivedName.ok) {
+            expect(receivedName.result.name).toEqual(testname)
+          } else {
+            console.error(receivedName.error)
+            throw new Error('should not get here')
+          }
+        })
       })
     })
 
     describe('when the key is not added to the wallet', () => {
       it('the reader cannot decrypt the data', async () => {
-        const testname = 'test'
-        const payload = { name: testname }
-
         const nameAccessor = new NameAccessor(wrapper)
-        await nameAccessor.writeEncrypted(payload, readerAddress)
+        await nameAccessor.writeEncrypted(testPayload, readerAddress)
 
         const readerNameAccessor = new NameAccessor(readerWrapper)
         const receivedName = await readerNameAccessor.readAsResult(writerAddress)
