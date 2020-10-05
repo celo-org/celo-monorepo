@@ -1,9 +1,8 @@
 import { ensureLeading0x, eqAddress, trimLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
-import { NativeSigner } from '@celo/base/lib/signatureUtils'
-import { guessSigner } from '@celo/utils/lib/signatureUtils'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
+import { guessEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import fetch from 'cross-fetch'
-import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'
@@ -46,6 +45,7 @@ export default class OffchainDataWrapper {
 
   async readDataFromAsResult(
     account: string,
+    buildTypedData: (x: Buffer) => Promise<EIP712TypedData>,
     dataPath: string
   ): Promise<Result<Buffer, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
@@ -62,9 +62,9 @@ export default class OffchainDataWrapper {
       return Err(new NoStorageRootProvidedData())
     }
 
-    const item = (await Promise.all(storageRoots.map((_) => _.readAsResult(dataPath)))).find(
-      (_) => _.ok
-    )
+    const item = (
+      await Promise.all(storageRoots.map((_) => _.readAndVerifySignature(dataPath, buildTypedData)))
+    ).find((_) => _.ok)
 
     if (item === undefined) {
       return Err(new NoStorageRootProvidedData())
@@ -75,29 +75,28 @@ export default class OffchainDataWrapper {
 
   readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
-  async writeDataTo(data: Buffer, dataPath: string) {
+  async writeDataTo(data: Buffer, signature: string, dataPath: string) {
     if (this.storageWriter === undefined) {
       throw new Error('no storage writer')
     }
-    await this.storageWriter.write(data, dataPath)
 
-    const signPayload = Buffer.concat([
-      createHash('sha3-256')
-        .update(Buffer.from(dataPath))
-        .digest(),
-      data,
-    ]).toString('hex')
-
-    const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(signPayload)
-    await this.storageWriter.write(Buffer.from(trimLeading0x(sig), 'hex'), dataPath + '.signature')
+    await Promise.all([
+      this.storageWriter.write(data, dataPath),
+      await this.storageWriter.write(
+        Buffer.from(trimLeading0x(signature), 'hex'),
+        dataPath + '.signature'
+      ),
+    ])
   }
 }
 
 class StorageRoot {
   constructor(readonly account: string, readonly address: string) {}
 
-  // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async readAsResult(dataPath: string): Promise<Result<Buffer, OffchainErrors>> {
+  async readAndVerifySignature(
+    dataPath: string,
+    buildTypedData: (x: Buffer) => Promise<EIP712TypedData>
+  ): Promise<Result<Buffer, OffchainErrors>> {
     let dataResponse, signatureResponse
 
     try {
@@ -118,23 +117,18 @@ class StorageRoot {
 
     const body = Buffer.from(dataResponse.body || [])
     const signature = ensureLeading0x(Buffer.from(signatureResponse.body || []).toString('hex'))
-    const signPayload = Buffer.concat([
-      createHash('sha3-256')
-        .update(Buffer.from(dataPath))
-        .digest(),
-      body,
-    ]).toString('hex')
 
-    // TODO: Compare against registered on-chain signers or off-chain signers
-    const signer = guessSigner(signPayload, signature)
-    if (eqAddress(signer, this.account)) {
+    const typedData = await buildTypedData(body)
+    const guessedSigner = guessEIP712TypedDataSigner(typedData, signature)
+    if (eqAddress(guessedSigner, this.account)) {
       return Ok(body)
     }
 
     // The signer might be authorized off-chain
     // TODO: Only if the signer is authorized with an on-chain key
-    return this.readAsResult(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
+    return this.readAndVerifySignature(
+      `/account/authorizedSigners/${toChecksumAddress(guessedSigner)}`,
+      buildTypedData
+    )
   }
-
-  read = makeAsyncThrowable(this.readAsResult.bind(this))
 }

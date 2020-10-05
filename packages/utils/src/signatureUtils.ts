@@ -1,6 +1,7 @@
 import { NativeSigner, serializeSignature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
+import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
@@ -127,6 +128,20 @@ export function parseSignatureWithoutPrefix(
   }
 
   throw new Error(`Unable to parse signature (expected signer ${signer})`)
+}
+
+export function guessEIP712TypedDataSigner(typedData: EIP712TypedData, signature: string): string {
+  const dataBuff = generateTypedDataHash(typedData)
+  const msgHashBuff = ethjsutil.hashPersonalMessage(dataBuff)
+
+  const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
+  const publicKey = ethjsutil.ecrecover(
+    ethjsutil.toBuffer(msgHashBuff),
+    v,
+    ethjsutil.toBuffer(r),
+    ethjsutil.toBuffer(s)
+  )
+  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
 }
 
 export function guessSigner(message: string, signature: string): string {
