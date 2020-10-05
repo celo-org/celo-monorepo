@@ -33,15 +33,11 @@ testWithGanache('Offchain Data', (web3) => {
 
   const reader2Private = ACCOUNT_PRIVATE_KEYS[2]
   const reader2Public = privateKeyToPublicKey(reader2Private)
-  // @ts-ignore
   const reader2Address = publicKeyToAddress(reader2Public)
 
   const signerPrivate = ACCOUNT_PRIVATE_KEYS[3]
   const signerPublic = privateKeyToPublicKey(signerPrivate)
   const signerAddress = publicKeyToAddress(signerPublic)
-  // const reader = ACCOUNT_ADDRESSES[2]
-
-  // kit.addAccount(writerPrivate)
 
   const writerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
   const writerEncryptionKeyPublic = privateKeyToPublicKey(writerEncryptionKeyPrivate)
@@ -64,9 +60,6 @@ testWithGanache('Offchain Data', (web3) => {
       .setAccountDataEncryptionKey(writerEncryptionKeyPublic)
       .sendAndWaitForReceipt({ from: writerAddress })
 
-    // kit.addAccount(writerPrivate) todo: why does this break everything
-    kit.addAccount(writerEncryptionKeyPrivate)
-
     const metadata = IdentityMetadataWrapper.fromEmpty(writerAddress)
     await metadata.addClaim(
       createStorageClaim(WRITER_STORAGE_ROOT),
@@ -77,6 +70,8 @@ testWithGanache('Offchain Data', (web3) => {
     await accounts
       .setMetadataURL(WRITER_METADATA_URL)
       .sendAndWaitForReceipt({ from: writerAddress })
+
+    kit.addAccount(writerPrivate)
 
     wrapper = new OffchainDataWrapper(writerAddress, kit)
     wrapper.storageWriter = new MockStorageWriter(
@@ -91,17 +86,11 @@ testWithGanache('Offchain Data', (web3) => {
 
   afterEach(() => {
     fetchMock.reset()
-
-    // todo: uncomment
-    // kit.removeAccount(writerAddress)
+    kit.removeAccount(writerAddress)
   })
 
   describe('with the account being the signer', () => {
     it('can write a name', async () => {
-      // todo: remove this
-      kit.addAccount(writerPrivate)
-      kit.defaultAccount = writerAddress
-
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write(testPayload)
 
@@ -133,9 +122,6 @@ testWithGanache('Offchain Data', (web3) => {
         }
         throw new Error(error.message)
       }
-
-      // todo: remove this
-      kit.removeAccount(writerAddress)
     })
   })
 
@@ -146,6 +132,7 @@ testWithGanache('Offchain Data', (web3) => {
       404
     )
 
+    // this is so it doesn't fail on writing
     kit.addAccount(signerPrivate)
 
     wrapper = new OffchainDataWrapper(signerAddress, kit)
@@ -176,8 +163,6 @@ testWithGanache('Offchain Data', (web3) => {
         fetchMock
       )
 
-      kit.addAccount(writerPrivate)
-
       const pop = await accounts.generateProofOfKeyPossession(writerAddress, signerAddress)
       const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
       await authorizedSignerAccessor.write(signerAddress, serializeSignature(pop), '.*')
@@ -187,7 +172,6 @@ testWithGanache('Offchain Data', (web3) => {
 
     afterEach(() => {
       kit.removeAccount(signerAddress)
-      kit.removeAccount(writerAddress)
     })
 
     it('can read the authorization', async () => {
@@ -222,13 +206,7 @@ testWithGanache('Offchain Data', (web3) => {
         .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
         .sendAndWaitForReceipt({ from: reader2Address })
 
-      // todo: remove this
-      kit.addAccount(writerPrivate)
-    })
-
-    afterEach(() => {
-      // todo: remove this
-      kit.removeAccount(writerAddress)
+      kit.addAccount(writerEncryptionKeyPrivate)
     })
 
     describe('when the key is added to the wallet', () => {
