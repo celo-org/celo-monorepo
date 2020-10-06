@@ -34,6 +34,7 @@ import {
 } from 'src/transactions/send'
 import { StandbyTransaction, TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { reserveNonce } from 'src/web3/saga'
 import { fetchNonce } from 'src/web3/actions'
 
 const TAG = 'transactions/saga'
@@ -72,16 +73,19 @@ export function* signTransaction<T>(
 ) {
   try {
     Logger.debug(TAG + '@signTransaction', `Signing transaction with id: ${context.id}`)
+
+    // Get a nonce that is "reserved" for this transaction until we are back online.
+    const nonce = yield call(reserveNonce)
     const signedTx = yield call(
       signTransactionPromise,
       tx.txo,
       account,
       context,
-      6,
-      200000,
-      new BigNumber('500000000')
+      nonce,
+      200000, // Assume this costs, at most, as much as a cUSD transfer.
+      new BigNumber('5e9') // Assume 5 GWei gas price is aboce minimum.
     )
-    Logger.debug(TAG + '@signTransaction', JSON.stringify(signedTx))
+    Logger.debug(TAG + '@signTransaction', `Signed transaction: ${JSON.stringify(signedTx)}`)
     return signedTx
   } catch (error) {
     Logger.error(TAG + '@signTransaction', `Error signing tx ${context.id}`, error)
