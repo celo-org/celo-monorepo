@@ -7,6 +7,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { getCurrencyAddress, getTokenContract } from 'src/tokens/saga'
 import {
+  sendSignedTransactionAsync,
   sendTransactionAsync,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
@@ -177,6 +178,18 @@ export function* sendTransactionPromises(
   )
   return transactionPromises
 }
+
+// MEDHA MEDHA MEDHA MEDHA MEDHA
+export function* sendSignedTransactionPromises(rawTx: string, context: TransactionContext) {
+  Logger.debug(
+    `${TAG}@sendSignedTransactionPromises`,
+    `Going to send a signed transaction with id ${context.id}`
+  )
+
+  const transactionPromises = yield call(sendSignedTransactionAsync, rawTx, getLogger(context))
+  return transactionPromises
+}
+// MEDHA MEDHA MEDHA MEDHA MEDHA
 
 // Send a transaction and await for its confirmation
 // Use this method for sending transactions and awaiting them to be confirmed
