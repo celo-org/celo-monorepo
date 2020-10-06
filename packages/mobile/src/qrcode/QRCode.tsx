@@ -5,7 +5,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { connect, shallowEqual, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -20,7 +20,7 @@ type OwnProps = StackScreenProps<StackParamList, Screens.QRCode>
 
 interface Props {
   qrSvgRef: React.MutableRefObject<SVG>
-  address: string
+  address: string | undefined
   displayName: string | undefined
   e164PhoneNumber: string | undefined
   rawSignedTransaction: string | undefined
