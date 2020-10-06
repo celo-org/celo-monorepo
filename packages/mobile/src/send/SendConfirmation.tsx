@@ -292,8 +292,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { comment, modalVisible, buttonReset, encryptionDialogVisible } = this.state
     const {
       t,
-      // DO NOT MERGE: No need for app to be connected.
-      // appConnected,
+      appConnected,
       isSending,
       dollarBalance,
       confirmationInput,
@@ -321,13 +320,13 @@ export class SendConfirmation extends React.Component<Props, State> {
     if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
-        text: i18n.t('global:pay'),
+        text: appConnected ? i18n.t('global:pay') : 'Offline pay',
         disabled: isPrimaryButtonDisabled,
       }
     } else {
       primaryBtnInfo = {
         action: this.onSendClick,
-        text: t('global:send'),
+        text: appConnected ? t('global:send') : 'Offline send',
         disabled: isPrimaryButtonDisabled,
       }
     }
