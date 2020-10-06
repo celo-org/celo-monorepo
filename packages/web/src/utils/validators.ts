@@ -1,5 +1,4 @@
 import { BigNumber } from 'bignumber.js'
-import { ValidatorsListProps } from 'src/dev/ValidatorsList'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { weiToDecimal } from 'src/utils/utils'
 
