@@ -224,6 +224,79 @@ export async function sendTransactionAsync<T>(
   }
 }
 
+// MEDHA MEDHA MEDHA MEDHA MEDHA
+export async function sendSignedTransactionAsync<T>(
+  rawTx: string,
+  logger: TxLogger = emptyTxLogger
+): Promise<TxPromises> {
+  // @ts-ignore
+  const resolvers: TxPromiseResolvers = {}
+  // @ts-ignore
+  const rejectors: TxPromiseReject = {}
+
+  const receipt: Promise<TransactionReceipt> = new Promise((resolve, reject) => {
+    resolvers.receipt = resolve
+    rejectors.receipt = reject
+  })
+
+  const transactionHash: Promise<string> = new Promise((resolve, reject) => {
+    resolvers.transactionHash = resolve
+    rejectors.transactionHash = reject
+  })
+
+  const confirmation: Promise<boolean> = new Promise((resolve, reject) => {
+    resolvers.confirmation = resolve
+    rejectors.confirmation = reject
+  })
+
+  const rejectAll = (error: Error) => {
+    values(rejectors).map((reject) => {
+      // @ts-ignore
+      reject(error)
+    })
+  }
+
+  try {
+    logger(Started)
+    const kit = await getContractKitAsync()
+    await kit.web3.eth
+      .sendSignedTransaction(rawTx)
+      // @ts-ignore
+      .once('receipt', (r: TransactionReceipt) => {
+        logger(ReceiptReceived(r))
+        if (resolvers.receipt) {
+          resolvers.receipt(r)
+        }
+      })
+      .once('transactionHash', (txHash: string) => {
+        logger(TransactionHashReceived(txHash))
+
+        if (resolvers.transactionHash) {
+          resolvers.transactionHash(txHash)
+        }
+      })
+      .once('confirmation', (confirmationNumber: number) => {
+        logger(Confirmed(confirmationNumber))
+        resolvers.confirmation(true)
+      })
+      .once('error', (error: Error) => {
+        logger(Failed(error))
+        rejectAll(error)
+      })
+  } catch (error) {
+    logger(Exception(error))
+    rejectAll(error)
+  }
+
+  return {
+    receipt,
+    transactionHash,
+    confirmation,
+  }
+}
+
+// MEDHA MEDHA MEDHA MEDHA MEDHA
+
 export async function signTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
