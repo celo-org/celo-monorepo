@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import { NextPage } from 'next'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'

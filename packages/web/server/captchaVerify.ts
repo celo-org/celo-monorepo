@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import getConfig from 'next/config'
 const CAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
