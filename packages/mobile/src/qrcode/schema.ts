@@ -32,7 +32,7 @@ export const uriDataFromJson = (obj: object): UriData => {
 }
 export const uriDataFromUrl = (url: string) => uriDataFromJson(parse(decodeURI(url), true).query)
 
-enum UriMethod {
+export enum UriMethod {
   pay = 'pay',
   tx = 'tx',
 }

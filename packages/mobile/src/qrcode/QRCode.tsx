@@ -10,7 +10,7 @@ import { AvatarSelf } from 'src/components/AvatarSelf'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import QRCode from 'src/qrcode/QRGen'
-import { UriData, urlFromUriData } from 'src/qrcode/schema'
+import { UriData, UriMethod, urlFromUriData } from 'src/qrcode/schema'
 import { RootState } from 'src/redux/reducers'
 import { SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
@@ -40,7 +40,7 @@ function QRCodeDisplay(props: Props) {
   const qrContent: string = useMemo(() => {
     if (props.rawSignedTransaction) {
       Logger.debug('Using data.rawSignedTransaction', props.rawSignedTransaction)
-      return urlFromUriData({ rawSignedTransaction: props.rawSignedTransaction })
+      return urlFromUriData({ rawSignedTransaction: props.rawSignedTransaction }, UriMethod.tx)
     }
     Logger.debug('Not using data.rawSignedTransaction')
     return urlFromUriData(props)
