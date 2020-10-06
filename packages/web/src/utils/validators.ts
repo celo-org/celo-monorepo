@@ -86,6 +86,11 @@ export interface CeloGroup {
   }>
 }
 
+export interface ValidatorsListData {
+  celoValidatorGroups: CeloValidatorGroup[]
+  latestBlock: number
+}
+
 export const orderAccessors = {
   order: (_) => _.order,
   name: (_) => (_.name || '').toLowerCase() || null,
@@ -130,11 +135,11 @@ export function togglePin(address: Address) {
 
 /**
  * Formats data into usable data for table
- * @param {ValidatorsListProps['data']} data.celoValidatorGroups The validator groups data
- * @param {ValidatorsListProps['data']} data.latestBlock The height of the latest block
- * @return {CeloGroup}    The group of validators with formatted data
+ * @param {ValidatorsListData}   data.celoValidatorGroups The validator groups data
+ * @param {ValidatorsListData}   data.latestBlock The height of the latest block
+ * @return {CeloGroup}           The group of validators with formatted data
  */
-export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
+export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListData) {
   const totalVotes: BigNumber = celoValidatorGroups
     .map(({ receivableVotes }) => new BigNumber(receivableVotes))
     .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
@@ -230,10 +235,10 @@ export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListPr
 
 /**
  * Sorts validator data by specified key, with pinned validators at the beginning
- * @param {ValidatorsListProps['data']} data The validators data
+ * @param {CeloGroup[]}   data The validators data
  * @param {boolean}       asc Whether the data should be sorted in ascending or descending order
  * @param {string}        key The key to sort by (e.g. name, votes, lockedCelo, etc)
- * @return {CeloGroup[]}    The group of validators with formatted data
+ * @return {CeloGroup[]}  The group of validators with formatted data
  */
 export function sortData(data: CeloGroup[], asc: boolean, key: string) {
   const accessor = orderAccessors[key]
@@ -249,7 +254,7 @@ export function sortData(data: CeloGroup[], asc: boolean, key: string) {
     return a > b ? 1 : -1
   }
 
-  return (data || [])
+  return data
     .sort((a, b) => dir * compare(accessor(a), accessor(b)))
     .sort((a, b) => isPinned(b.address) - isPinned(a.address))
 }
