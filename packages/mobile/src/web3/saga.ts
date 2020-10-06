@@ -289,6 +289,16 @@ export function* getConnectedAccount() {
   return account
 }
 
+export function* getUnlockedAccount() {
+  const account: string = yield call(getAccount)
+  const success: boolean = yield call(unlockAccount, account)
+  if (success) {
+    return account
+  } else {
+    throw new Error(ErrorMessages.INCORRECT_PIN)
+  }
+}
+
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)

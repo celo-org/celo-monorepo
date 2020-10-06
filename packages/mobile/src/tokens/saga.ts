@@ -7,6 +7,7 @@ import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { DEFAULT_TESTNET } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -15,7 +16,7 @@ import { sendAndMonitorTransaction, signTransaction } from 'src/transactions/sag
 import { TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
@@ -24,6 +25,19 @@ const TAG = 'tokens/saga'
 const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.GOLD]: null,
   [CURRENCY_ENUM.DOLLAR]: null,
+}
+
+const hardcodedTokenContractAddresses: {
+  [network: string]: { [key in CURRENCY_ENUM]?: string }
+} = {
+  alfajores: {
+    [CURRENCY_ENUM.GOLD]: '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9',
+    [CURRENCY_ENUM.DOLLAR]: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+  },
+  mainnet: {
+    [CURRENCY_ENUM.GOLD]: '0x471EcE3750Da237f93B8E339c536989b8978a438',
+    [CURRENCY_ENUM.DOLLAR]: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+  },
 }
 
 function* getWeiPerUnit(token: CURRENCY_ENUM) {
@@ -48,13 +62,15 @@ export function* convertToContractDecimals(value: BigNumber, token: CURRENCY_ENU
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
-  Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
+  // Try the hardcoded list of contract addresses first.
+  const address = hardcodedTokenContractAddresses[DEFAULT_TESTNET]?.[CURRENCY_ENUM.GOLD]
+  Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token} at ${address}`)
   const contractKit = await getContractKitAsync()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
-      return contractKit.contracts.getGoldToken()
+      return contractKit.contracts.getGoldToken(address)
     case CURRENCY_ENUM.DOLLAR:
-      return contractKit.contracts.getStableToken()
+      return contractKit.contracts.getStableToken(address)
     default:
       throw new Error(`Could not fetch contract for unknown token ${token}`)
   }
@@ -126,7 +142,7 @@ export async function createTokenTransferTransaction(
   const { recipientAddress, amount, comment } = transferAction
   const contract = await getTokenContract(currency)
 
-  const decimals = await contract.decimals()
+  const decimals = 18 // await contract.decimals()
   const decimalBigNum = new BigNumber(decimals)
   const decimalFactor = new BigNumber(10).pow(decimalBigNum.toNumber())
   const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor).toFixed(0)
@@ -188,8 +204,7 @@ export function tokenTransferFactory({
       )
 
       try {
-        const account = yield call(getConnectedUnlockedAccount)
-
+        const account = yield call(getUnlockedAccount)
         const tx: CeloTransactionObject<boolean> = yield call(
           createTokenTransferTransaction,
           currency,
@@ -199,6 +214,7 @@ export function tokenTransferFactory({
             comment,
           }
         )
+
         // NOTE ---- this is the normal flow
         if (false) {
           yield call(sendAndMonitorTransaction, tx, account, context, currency, staticGas)

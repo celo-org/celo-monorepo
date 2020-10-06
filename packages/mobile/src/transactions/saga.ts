@@ -90,7 +90,7 @@ export function* signTransaction<T>(
   } catch (error) {
     Logger.error(TAG + '@signTransaction', `Error signing tx ${context.id}`, error)
     yield put(transactionFailed(context.id))
-    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+    throw error
   }
 }
 
