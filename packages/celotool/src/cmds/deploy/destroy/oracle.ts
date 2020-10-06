@@ -1,15 +1,20 @@
-import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { removeHelmRelease } from 'src/lib/oracle'
+import {
+  addOracleMiddleware,
+  OracleArgv,
+  removeHelmRelease,
+  switchToAzureContextCluster,
+} from 'src/lib/oracle'
 import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'oracle'
 
 export const describe = 'destroy the oracle package'
 
-export const builder = {}
+type OracleDestroyArgv = DestroyArgv & OracleArgv
 
-export const handler = async (argv: DestroyArgv) => {
-  await switchToClusterFromEnv()
+export const builder = addOracleMiddleware
 
-  await removeHelmRelease(argv.celoEnv)
+export const handler = async (argv: OracleDestroyArgv) => {
+  await switchToAzureContextCluster(argv.celoEnv, argv.context)
+  await removeHelmRelease(argv.celoEnv, argv.context)
 }

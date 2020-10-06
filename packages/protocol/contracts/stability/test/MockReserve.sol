@@ -37,10 +37,6 @@ contract MockReserve {
     return true;
   }
 
-  function mintToken(address, address, uint256) external pure returns (bool) {
-    return true;
-  }
-
   function getUnfrozenReserveGoldBalance() external view returns (uint256) {
     return address(this).balance;
   }

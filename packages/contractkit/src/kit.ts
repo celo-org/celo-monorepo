@@ -1,5 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
+import net from 'net'
 import Web3 from 'web3'
 import { Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
@@ -8,9 +9,11 @@ import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
-import { Wallet } from './wallets/wallet'
+import { estimateGas } from './utils/web3-utils'
+import { ReadOnlyWallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
@@ -28,8 +31,11 @@ const debug = debugFactory('kit:kit')
  * @param url CeloBlockchain node url
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKit(url: string, wallet?: Wallet) {
-  return newKitFromWeb3(new Web3(url), wallet)
+export function newKit(url: string, wallet?: ReadOnlyWallet) {
+  const web3 = url.endsWith('.ipc')
+    ? new Web3(new Web3.providers.IpcProvider(url, net))
+    : new Web3(url)
+  return newKitFromWeb3(web3, wallet)
 }
 
 /**
@@ -37,7 +43,7 @@ export function newKit(url: string, wallet?: Wallet) {
  * @param web3 Web3 instance
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKitFromWeb3(web3: Web3, wallet?: Wallet) {
+export function newKitFromWeb3(web3: Web3, wallet?: ReadOnlyWallet) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
@@ -63,20 +69,22 @@ export interface NetworkConfig {
   reserve: ReserveConfig
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
+  downtimeSlasher: DowntimeSlasherConfig
 }
 
 export interface KitOptions {
   gasInflationFactor: number
   gasPrice: string
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  gasPriceSuggestionMultiplier: number
   feeCurrency?: Address
   from?: Address
 }
 
 interface AccountBalance {
-  gold: BigNumber
-  usd: BigNumber
-  total: BigNumber
-  lockedGold: BigNumber
+  CELO: BigNumber
+  cUSD: BigNumber
+  lockedCELO: BigNumber
   pending: BigNumber
 }
 
@@ -89,11 +97,12 @@ export class ContractKit {
   readonly contracts: WrapperCache
 
   private config: KitOptions
-  constructor(readonly web3: Web3, wallet?: Wallet) {
+  constructor(readonly web3: Web3, wallet?: ReadOnlyWallet) {
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
       gasPrice: '0',
+      gasPriceSuggestionMultiplier: 5,
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
@@ -107,27 +116,23 @@ export class ContractKit {
   }
 
   async getTotalBalance(address: string): Promise<AccountBalance> {
-    const goldToken = await this.contracts.getGoldToken()
+    const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
-    const lockedGold = await this.contracts.getLockedGold()
-    const exchange = await this.contracts.getExchange()
-    const goldBalance = await goldToken.balanceOf(address)
-    const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
+    const lockedCelo = await this.contracts.getLockedGold()
+    const goldBalance = await celoToken.balanceOf(address)
+    const lockedBalance = await lockedCelo.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
     let pending = new BigNumber(0)
     try {
-      pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
+      pending = await lockedCelo.getPendingWithdrawalsTotalValue(address)
     } catch (err) {
       // Just means that it's not an account
     }
+
     return {
-      gold: goldBalance,
-      lockedGold: lockedBalance,
-      usd: dollarBalance,
-      total: goldBalance
-        .plus(lockedBalance)
-        .plus(await exchange.quoteUsdSell(dollarBalance))
-        .plus(pending),
+      CELO: goldBalance,
+      lockedCELO: lockedBalance,
+      cUSD: dollarBalance,
       pending,
     }
   }
@@ -135,7 +140,10 @@ export class ContractKit {
   async getNetworkConfig(): Promise<NetworkConfig> {
     const token1 = await this.registry.addressFor(CeloContract.GoldToken)
     const token2 = await this.registry.addressFor(CeloContract.StableToken)
-    const contracts = await Promise.all([
+    // There can only be `10` unique parametrized types in Promise.all call, that is how
+    // its typescript typing is setup. Thus, since we crossed threshold of 10
+    // have to explicitly cast it to just any type and discard type information.
+    const promises: Array<Promise<any>> = [
       this.contracts.getExchange(),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
@@ -146,7 +154,9 @@ export class ContractKit {
       this.contracts.getReserve(),
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
-    ])
+      this.contracts.getDowntimeSlasher(),
+    ]
+    const contracts = await Promise.all(promises)
     const res = await Promise.all([
       contracts[0].getConfig(),
       contracts[1].getConfig(),
@@ -158,6 +168,7 @@ export class ContractKit {
       contracts[7].getConfig(),
       contracts[8].getConfig(),
       contracts[9].getConfig(),
+      contracts[10].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -170,12 +181,13 @@ export class ContractKit {
       reserve: res[7],
       stableToken: res[8],
       validators: res[9],
+      downtimeSlasher: res[10],
     }
   }
 
   /**
    * Set CeloToken to use to pay for gas fees
-   * @param token cUSD (StableToken) or cGLD (GoldToken)
+   * @param token cUSD (StableToken) or CELO (GoldToken)
    */
   async setFeeCurrency(token: CeloToken): Promise<void> {
     this.config.feeCurrency =
@@ -223,7 +235,7 @@ export class ContractKit {
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
    *
-   * Set to `null` to use cGLD
+   * Set to `null` to use CELO
    *
    * @param address ERC20 address
    */
@@ -255,6 +267,20 @@ export class ContractKit {
     })
   }
 
+  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  async fillGasPrice(tx: Tx): Promise<Tx> {
+    if (tx.feeCurrency && tx.gasPrice === '0') {
+      const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
+      const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(tx.feeCurrency)
+      return {
+        ...tx,
+        gasPrice: rawGasPrice.multipliedBy(this.config.gasPriceSuggestionMultiplier).toFixed(),
+      }
+    } else {
+      return tx
+    }
+  }
+
   /**
    * Send a transaction to celo-blockchain.
    *
@@ -265,13 +291,19 @@ export class ContractKit {
    */
   async sendTransaction(tx: Tx): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
+    tx = await this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round(
-        (await this.web3.eth.estimateGas({ ...tx })) * this.config.gasInflationFactor
-      )
-      debug('estimatedGas: %s', gas)
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, this.web3.eth.estimateGas, this.web3.eth.call)) *
+            this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
@@ -287,11 +319,24 @@ export class ContractKit {
     tx?: Omit<Tx, 'data'>
   ): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
+    tx = await this.fillGasPrice(tx)
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round((await txObj.estimateGas({ ...tx })) * this.config.gasInflationFactor)
-      debug('estimatedGas: %s', gas)
+      const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
+      const getCallTx = (_tx: Tx) => {
+        // @ts-ignore missing _parent property from TransactionObject type.
+        return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
+      }
+      const caller = (_tx: Tx) => this.web3.eth.call(getCallTx(_tx))
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
@@ -309,41 +354,41 @@ export class ContractKit {
       gasPrice: this.config.gasPrice,
     }
 
-    if (this.config.feeCurrency) {
-      defaultTx.feeCurrency = this.config.feeCurrency
-    }
-
     return {
       ...defaultTx,
       ...tx,
     }
   }
 
-  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
+  async getEpochSize(): Promise<number> {
     const validators = await this.contracts.getValidators()
     const epochSize = await validators.getEpochSize()
+
+    return epochSize.toNumber()
+  }
+
+  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
+    const epochSize = await this.getEpochSize()
     // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     if (epochNumber === 0) {
       // No first block for epoch 0
       return 0
     }
-    return (epochNumber - 1) * epochSize.toNumber() + 1
+    return (epochNumber - 1) * epochSize + 1
   }
 
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    const epochSize = await validators.getEpochSize()
+    const epochSize = await this.getEpochSize()
     // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     if (epochNumber === 0) {
       return 0
     }
     const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
-    return firstBlockNumberForEpoch + (epochSize.toNumber() - 1)
+    return firstBlockNumberForEpoch + (epochSize - 1)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    const epochSize = (await validators.getEpochSize()).toNumber()
+    const epochSize = await this.getEpochSize()
     // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
     const epochNumber = Math.floor(blockNumber / epochSize)
     if (blockNumber % epochSize === 0) {

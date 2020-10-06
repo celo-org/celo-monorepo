@@ -166,6 +166,7 @@ contract('MultiSig', (accounts: any) => {
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
+      assert.sameMembers([accounts[0], accounts[1], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to add an owner', async () => {
@@ -210,6 +211,7 @@ contract('MultiSig', (accounts: any) => {
       assert.isFalse(await multiSig.isOwner(accounts[1]))
       assertEqualBN(await multiSig.required(), 1)
       assertEqualBN(await multiSig.internalRequired(), 1)
+      assert.sameMembers([accounts[0]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to remove an owner', async () => {
@@ -235,6 +237,7 @@ contract('MultiSig', (accounts: any) => {
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
       assert.isFalse(await multiSig.isOwner(accounts[1]))
+      assert.sameMembers([accounts[0], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to replace an owner', async () => {

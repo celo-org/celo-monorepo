@@ -1,16 +1,17 @@
 import sleep from 'sleep-promise'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   createAndUploadBackupSecretIfNotExists,
-  createServiceAccountIfNotExists,
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
   redeployTiller,
-  uploadStorageClass,
+  uploadStorageClass
 } from './helm_deploy'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { createServiceAccountIfNotExists } from './service-account-utils'
+import { outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = [
@@ -45,6 +46,7 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
       `gcloud container clusters get-credentials ${kubernetesClusterName} --project ${projectName} --zone ${kubernetesClusterZone}`
     )
   }
+  await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
 }
 
 export async function createClusterIfNotExists() {
@@ -71,18 +73,22 @@ export async function createClusterIfNotExists() {
   return false
 }
 
-export async function setupCluster(celoEnv: string, createdCluster: boolean) {
-  const envType = fetchEnv(envVar.ENV_TYPE)
-
+export async function createNamespaceIfNotExists(namespace: string) {
   const namespaceExists = await outputIncludes(
-    `kubectl get namespaces ${celoEnv} || true`,
-    celoEnv,
-    `Namespace ${celoEnv} exists, skipping creation`
+    `kubectl get namespaces ${namespace} || true`,
+    namespace,
+    `Namespace ${namespace} exists, skipping creation`
   )
   if (!namespaceExists) {
     console.info('Creating kubernetes namespace')
-    await execCmdWithExitOnFailure(`kubectl create namespace ${celoEnv}`)
+    await execCmdWithExitOnFailure(`kubectl create namespace ${namespace}`)
   }
+}
+
+export async function setupCluster(celoEnv: string, createdCluster: boolean) {
+  const envType = fetchEnv(envVar.ENV_TYPE)
+
+  await createNamespaceIfNotExists(celoEnv)
 
   const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
   console.info(`Service account for blockchain backup is \"${blockchainBackupServiceAccountName}\"`)
@@ -103,7 +109,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
     await pollForRunningCluster()
   }
 
-  console.info('Deploying Tiller and Helm chart...')
+  console.info('Deploying Tiller and Cert Manager Helm chart...')
 
   await uploadStorageClass()
   await redeployTiller()
@@ -111,9 +117,10 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
-    await installAndEnableMetricsDeps()
+    console.info('Installing metric tools installation')
+    await installAndEnableMetricsDeps(true)
   } else {
-    console.info('Skipping metrics installation for this development env.')
+    console.info('Skipping metric tools installation for this development env')
   }
 
   await setClusterLabels(celoEnv)

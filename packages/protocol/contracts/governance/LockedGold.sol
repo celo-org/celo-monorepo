@@ -9,9 +9,16 @@ import "./interfaces/ILockedGold.sol";
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is
+  ILockedGold,
+  ICeloVersionedContract,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
 
   struct PendingWithdrawal {
@@ -31,7 +38,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  mapping(address => Balances) private balances;
+  mapping(address => Balances) internal balances;
 
   // Iterable map to store whitelisted identifiers.
   // Necessary to allow iterating over whitelisted IDs to check ID's address at runtime.
@@ -56,6 +63,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
+  event GoldRelocked(address indexed account, uint256 value);
   event GoldWithdrawn(address indexed account, uint256 value);
   event SlasherWhitelistAdded(string indexed slasherIdentifier);
   event SlasherWhitelistRemoved(string indexed slasherIdentifier);
@@ -65,6 +73,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address indexed reporter,
     uint256 reward
   );
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -161,6 +177,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
+    // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
   }
@@ -182,7 +199,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    emit GoldLocked(msg.sender, value);
+    emit GoldRelocked(msg.sender, value);
   }
 
   /**
@@ -197,6 +214,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
+    require(value <= address(this).balance, "Inconsistent balance");
     msg.sender.transfer(value);
     emit GoldWithdrawn(msg.sender, value);
   }
@@ -359,6 +377,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.transfer(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }

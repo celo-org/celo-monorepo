@@ -26,6 +26,10 @@ Network parameters that are configurable by governance.
 
 * [address](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#address)
 
+### Methods
+
+* [getPastEvents](_wrappers_blockchainparameters_.blockchainparameterswrapper.md#getpastevents)
+
 ## Constructors
 
 ###  constructor
@@ -34,7 +38,7 @@ Network parameters that are configurable by governance.
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -53,7 +57,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
 
 ___
 
@@ -61,7 +65,7 @@ ___
 
 • **getBlockGasLimit**: *function* = proxyCall(this.contract.methods.blockGasLimit, undefined, valueToInt)
 
-*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L19)*
+*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L19)*
 
 Getting the block gas limit.
 
@@ -81,7 +85,7 @@ ___
 
 • **setBlockGasLimit**: *function* = proxySend(this.kit, this.contract.methods.setBlockGasLimit)
 
-*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L23)*
+*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L23)*
 
 Setting the block gas limit.
 
@@ -104,7 +108,7 @@ ___
     this.contract.methods.setIntrinsicGasForAlternativeFeeCurrency
   )
 
-*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L11)*
+*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L11)*
 
 Setting the extra intrinsic gas for transactions, where gas is paid using non-gold currency.
 
@@ -124,7 +128,7 @@ ___
 
 • **setMinimumClientVersion**: *function* = proxySend(this.kit, this.contract.methods.setMinimumClientVersion)
 
-*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L27)*
+*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L27)*
 
 Set minimum client version.
 
@@ -146,8 +150,29 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 
 **Returns:** *string*
+
+## Methods
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

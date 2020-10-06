@@ -16,8 +16,14 @@ export enum Actions {
   SKIP_INVITE_FAILURE = 'INVITE/SKIP_INVITE_FAILURE',
 }
 
-export interface Invitees {
-  [tempAddress: string]: string // tempAddress -> e164Number
+export interface InviteDetails {
+  timestamp: number
+  e164Number: string
+  tempWalletAddress: string
+  tempWalletPrivateKey: string
+  tempWalletRedeemed: boolean
+  inviteCode: string
+  inviteLink: string
 }
 
 export enum InviteBy {
@@ -27,20 +33,12 @@ export enum InviteBy {
 
 export interface StoreInviteeDataAction {
   type: Actions.STORE_INVITEE_DATA
-  address: string
-  inviteCode: string
-  e164Number: string
+  inviteDetails: InviteDetails
 }
 
-export const storeInviteeData = (
-  address: string,
-  inviteCode: string,
-  e164Number: string
-): StoreInviteeDataAction => ({
+export const storeInviteeData = (inviteDetails: InviteDetails): StoreInviteeDataAction => ({
   type: Actions.STORE_INVITEE_DATA,
-  address,
-  inviteCode,
-  e164Number,
+  inviteDetails,
 })
 
 export interface SendInviteAction {
@@ -84,12 +82,12 @@ export const sendInviteFailure = (error: ErrorMessages): SendInviteFailureAction
 
 export interface RedeemInviteAction {
   type: Actions.REDEEM_INVITE
-  inviteCode: string
+  tempAccountPrivateKey: string
 }
 
-export const redeemInvite = (inviteCode: string): RedeemInviteAction => ({
+export const redeemInvite = (tempAccountPrivateKey: string): RedeemInviteAction => ({
   type: Actions.REDEEM_INVITE,
-  inviteCode,
+  tempAccountPrivateKey,
 })
 
 export interface RedeemInviteSuccessAction {

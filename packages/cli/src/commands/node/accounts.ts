@@ -13,6 +13,7 @@ export default class NodeAccounts extends BaseCommand {
     this.parse(NodeAccounts)
 
     const accounts = await this.kit.web3.eth.getAccounts()
+    console.log('***This command will be deprecated, please use "account:list" ***')
     console.log(accounts)
   }
 }

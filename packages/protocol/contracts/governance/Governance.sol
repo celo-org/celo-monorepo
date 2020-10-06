@@ -13,6 +13,7 @@ import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
@@ -21,6 +22,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Governance is
   IGovernance,
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   ReentrancyGuard,
@@ -177,6 +179,14 @@ contract Governance is
 
   function() external payable {
     require(msg.data.length == 0, "unknown method");
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -858,11 +868,15 @@ contract Governance is
    * @notice Returns an accounts vote record on a particular index in `dequeued`.
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
-   * @return The corresponding proposal ID and vote value.
+   * @return The corresponding proposal ID, vote value, and weight.
    */
-  function getVoteRecord(address account, uint256 index) external view returns (uint256, uint256) {
+  function getVoteRecord(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256, uint256)
+  {
     VoteRecord storage record = voters[account].referendumVotes[index];
-    return (record.proposalId, uint256(record.value));
+    return (record.proposalId, uint256(record.value), record.weight);
   }
 
   /**

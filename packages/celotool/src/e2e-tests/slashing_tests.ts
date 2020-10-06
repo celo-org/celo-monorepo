@@ -15,6 +15,8 @@ const headerHex =
 
 const TMP_PATH = '/tmp/e2e'
 
+const safeMarginBlocks = 4
+
 function headerArray(block: any) {
   return [
     block.parentHash,
@@ -58,6 +60,36 @@ async function findDoubleSignerIndex(
     bmNum2 = bmNum2 >> 1
   }
   return signerIdx
+}
+
+async function generateValidIntervalArrays(
+  startBlock: number,
+  endBlock: number,
+  startEpoch: number,
+  slotSize: number,
+  kit: ContractKit
+): Promise<{
+  startBlocks: number[]
+  endBlocks: number[]
+}> {
+  const startBlocks: number[] = []
+  const endBlocks: number[] = []
+
+  const nextEpochStart = await kit.getFirstBlockNumberForEpoch(startEpoch + 1)
+  for (let currentSlotStart = startBlock; currentSlotStart <= endBlock; ) {
+    let currentSlotEnd = currentSlotStart + slotSize - 1
+    currentSlotEnd = currentSlotEnd > endBlock ? endBlock : currentSlotEnd
+    // avoids crossing the epoch
+    currentSlotEnd =
+      currentSlotEnd >= nextEpochStart && currentSlotStart < nextEpochStart
+        ? nextEpochStart - 1
+        : currentSlotEnd
+    startBlocks.push(currentSlotStart)
+    endBlocks.push(currentSlotEnd)
+    currentSlotStart = currentSlotEnd + 1
+  }
+
+  return { startBlocks, endBlocks }
 }
 
 describe('slashing tests', function(this: any) {
@@ -197,13 +229,14 @@ describe('slashing tests', function(this: any) {
     it('slash for downtime', async function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDowntimeSlasher()
+      const slashableDowntime = new BigNumber(await slasher.methods.slashableDowntime().call())
       const blockNumber = await web3.eth.getBlockNumber()
-      await waitForBlock(web3, blockNumber + 20)
+      await waitForBlock(web3, blockNumber + slashableDowntime.toNumber() + 2 * safeMarginBlocks)
 
       // Store this block for testing double signing
-      doubleSigningBlock = await web3.eth.getBlock(blockNumber + 15)
+      doubleSigningBlock = await web3.eth.getBlock(blockNumber + 2 * safeMarginBlocks)
 
-      const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber + 12).call()
+      const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber).call()
 
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
@@ -213,11 +246,31 @@ describe('slashing tests', function(this: any) {
       const history = await validatorsContract.methods.getMembershipHistory(signer).call()
       const historyIndex = history[0].length - 1
 
+      const slotSize = slashableDowntime.dividedToIntegerBy(3).toNumber()
+
+      const startBlock = blockNumber + safeMarginBlocks
+      const endBlock = startBlock + slashableDowntime.toNumber() - 1
+      const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
+
+      const intervalArrays = await generateValidIntervalArrays(
+        startBlock,
+        endBlock,
+        startEpoch,
+        slotSize,
+        kit
+      )
+
+      for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {
+        await slasher.methods
+          .setBitmapForInterval(intervalArrays.startBlocks[i], intervalArrays.endBlocks[i])
+          .send({ from: validator, gas: 5000000 })
+      }
+
       await slasher.methods
         .slash(
-          blockNumber + 12,
-          4,
-          4,
+          intervalArrays.startBlocks,
+          intervalArrays.endBlocks,
+          [4, 4],
           historyIndex,
           [],
           [],
@@ -244,18 +297,44 @@ describe('slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDowntimeSlasher()
       const blockNumber = await web3.eth.getBlockNumber()
-      await waitForBlock(web3, blockNumber + 20)
+      const slashableDowntime = await slasher.slashableDowntime()
 
-      const validator = (await kit.web3.eth.getAccounts())[0]
-      await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      await waitForBlock(web3, blockNumber + slashableDowntime + 2 * safeMarginBlocks)
 
-      const tx = await slasher.slashEndSignerIndex(blockNumber + 12, 4)
-      const txResult = await tx.send({ from: validator, gas: 5000000 })
+      const user = (await kit.web3.eth.getAccounts())[0]
+      await kit.web3.eth.personal.unlockAccount(user, '', 1000000)
+
+      const startBlock = blockNumber + safeMarginBlocks
+      const endBlock = startBlock + slashableDowntime - 1
+      const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
+      const slotSize = Math.floor(slashableDowntime / 2)
+
+      const election = await kit.contracts.getElection()
+      const signer = await election.validatorSignerAddressFromSet(4, startBlock)
+
+      const intervalArrays = await generateValidIntervalArrays(
+        startBlock,
+        endBlock,
+        startEpoch,
+        slotSize,
+        kit
+      )
+
+      for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {
+        await slasher
+          .setBitmapForInterval(intervalArrays.startBlocks[i], intervalArrays.endBlocks[i])
+          .send({ from: user, gas: 5000000 })
+      }
+
+      const tx = await slasher.slashValidator(
+        signer,
+        intervalArrays.startBlocks,
+        intervalArrays.endBlocks
+      )
+      const txResult = await tx.send({ from: user, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)
 
-      const election = await kit.contracts.getElection()
-      const signer = await election.validatorSignerAddressFromSet(4, blockNumber + 12)
       const lockedGold = await kit.contracts.getLockedGold()
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
       // Penalty is defined to be 100 cGLD in migrations, locked gold is 10000 cGLD for a validator

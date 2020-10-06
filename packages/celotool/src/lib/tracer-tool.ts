@@ -1,5 +1,5 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesAddresses } from 'src/lib/geth'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv } from './env-utils'
 
 export async function installHelmChart(celoEnv: string) {

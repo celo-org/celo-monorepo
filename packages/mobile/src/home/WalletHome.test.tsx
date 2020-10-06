@@ -10,7 +10,6 @@ const storeData = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     accountCreationTime: new Date().getTime() - TWO_DAYS_MS,
     paymentRequests: [],
@@ -33,7 +32,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -44,6 +42,10 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
+          migrateAccount={jest.fn()}
+          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -58,7 +60,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -69,6 +70,10 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
+          migrateAccount={jest.fn()}
+          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -81,7 +86,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -92,6 +96,10 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
+          migrateAccount={jest.fn()}
+          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>

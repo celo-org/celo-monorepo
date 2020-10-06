@@ -46,7 +46,9 @@ const MAIN_LOCATIONS = [
 function getWorldWideLocations(jobs: LeverJob[]) {
   return jobs.reduce((collection, current) => {
     if (
-      ![Locations.SF.toString(), Locations.BER.toString()].includes(current.categories.location)
+      ![Locations.SF.toString(), Locations.BER.toString(), Locations.BA.toString()].includes(
+        current.categories.location
+      )
     ) {
       return collection.add(current.categories.location)
     } else {

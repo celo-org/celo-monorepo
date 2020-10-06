@@ -1,6 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
-import { getNumberFormatSettings } from 'react-native-localize'
 import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 
@@ -40,7 +39,8 @@ export const getExchangeRateDisplayValue = (value: BigNumber.Value): string => {
 
 export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): string => {
   return value
-    ? BigNumber.max(value, 0.001)
+    ? // Show 0.001 if fee > 0 and <= 0.001
+      BigNumber.max(value, new BigNumber(value).isZero() ? 0 : 0.001)
         .decimalPlaces(4)
         .toFormat()
     : ''
@@ -107,26 +107,18 @@ export function roundUp(
 export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
   switch (currencyType) {
     case CURRENCY_ENUM.DOLLAR:
-      return colors.celoGreen
+      return colors.greenBrand
     case CURRENCY_ENUM.GOLD:
-      return colors.celoGold
+      return colors.goldBrand
   }
 }
 
 export const getBalanceColor = (accountBalance: BigNumber): string => {
   if (accountBalance.isGreaterThan(0)) {
-    return colors.celoGreen
+    return colors.greenBrand
   }
   if (accountBalance.isLessThan(0)) {
-    return colors.errorRed
+    return colors.warning
   }
   return colors.dark
-}
-
-export const convertToPeriodDecimalSeparator = (value: string) => {
-  const { decimalSeparator } = getNumberFormatSettings()
-  if (decimalSeparator !== '.') {
-    value = value.replace(decimalSeparator, '.')
-  }
-  return value
 }

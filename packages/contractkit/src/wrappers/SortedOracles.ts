@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress } from '@celo/base/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
@@ -52,7 +52,7 @@ export interface MedianRate {
 export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Gets the number of rates that have been reported for the given token
-   * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
+   * @param token The CeloToken token for which the CELO exchange rate is being reported.
    * @return The number of reported oracle rates for `token`.
    */
   async numRates(token: CeloToken): Promise<number> {
@@ -63,9 +63,9 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Returns the median rate for the given token
-   * @param token The CeloToken token for which the Celo Gold exchange rate is being reported.
+   * @param token The CeloToken token for which the CELO exchange rate is being reported.
    * @return The median exchange rate for `token`, expressed as:
-   *   amount of that token / equivalent amount in Celo Gold
+   *   amount of that token / equivalent amount in CELO
    */
   async medianRate(token: CeloToken): Promise<MedianRate> {
     const tokenAddress = await this.kit.registry.addressFor(token)
@@ -106,9 +106,40 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   )
 
   /**
+   * Checks if the oldest report for a given token is expired
+   * @param token The token for which to check reports
+   */
+  async isOldestReportExpired(token: CeloToken): Promise<[boolean, Address]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.isOldestReportExpired(tokenAddress).call()
+    return response as [boolean, Address]
+  }
+
+  /**
+   * Removes expired reports, if any exist
+   * @param token The token to remove reports for
+   * @param numReports The upper-limit of reports to remove. For example, if there
+   * are 2 expired reports, and this param is 5, it will only remove the 2 that
+   * are expired.
+   */
+  async removeExpiredReports(
+    token: CeloToken,
+    numReports?: number
+  ): Promise<CeloTransactionObject<void>> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    if (!numReports) {
+      numReports = (await this.getReports(token)).length - 1
+    }
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.removeExpiredReports(tokenAddress, numReports)
+    )
+  }
+
+  /**
    * Updates an oracle value and the median.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param value The amount of `token` equal to one Celo Gold.
+   * @param token The token for which the CELO exchange rate is being reported.
+   * @param value The amount of `token` equal to one CELO.
    */
   async report(
     token: CeloToken,
@@ -133,7 +164,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
 
   /**
    * Updates an oracle value and the median.
-   * @param value The amount of US Dollars equal to one Celo Gold.
+   * @param value The amount of US Dollars equal to one CELO.
    */
   async reportStableToken(
     value: BigNumber.Value,

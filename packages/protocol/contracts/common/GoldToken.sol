@@ -136,6 +136,26 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   }
 
   /**
+   * @notice Mints new cGLD and gives it to 'to'.
+   * @param to The account for which to mint tokens.
+   * @param value The amount of cGLD to mint.
+   */
+  function mint(address to, uint256 value) external onlyVm returns (bool) {
+    if (value == 0) {
+      return true;
+    }
+
+    totalSupply_ = totalSupply_.add(value);
+
+    bool success;
+    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(address(0), to, value));
+    require(success, "Celo Gold transfer failed");
+
+    emit Transfer(address(0), to, value);
+    return true;
+  }
+
+  /**
    * @return The name of the Celo Gold token.
    */
   function name() external view returns (string memory) {

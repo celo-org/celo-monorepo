@@ -14,6 +14,22 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --wait                                             Wait until all pending votes can be activated
 
 EXAMPLES
@@ -30,6 +46,14 @@ Outputs the set of validators currently participating in BFT to create blocks. A
 ```
 USAGE
   $ celocli election:current
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
+  --valset                                       Show currently used signers from valset (by default the authorized
+                                                 validator signers are shown). Useful for checking if keys have been
+                                                 rotated.
 ```
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
@@ -41,6 +65,10 @@ Prints the list of validator groups, the number of votes they have received, the
 ```
 USAGE
   $ celocli election:list
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   list
@@ -59,6 +87,22 @@ USAGE
 OPTIONS
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --value=value                                      (required) Value of votes to revoke
 
 EXAMPLE
@@ -75,6 +119,10 @@ Runs a "mock" election and prints out the validators that would be elected if th
 ```
 USAGE
   $ celocli election:run
+
+OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 ```
 
 _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
@@ -91,8 +139,12 @@ ARGUMENTS
   ADDRESS  Voter or Validator Groups's address
 
 OPTIONS
-  --group  Show information about a group running in Validator elections
-  --voter  Show information about an account voting in Validator elections
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
+  --group                                        Show information about a group running in Validator elections
+
+  --voter                                        Show information about an account voting in Validator elections
 
 EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter
@@ -112,6 +164,22 @@ USAGE
 OPTIONS
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --value=value                                      (required) Amount of Gold used to vote for group
 
 EXAMPLE

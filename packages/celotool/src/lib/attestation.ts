@@ -1,7 +1,7 @@
 import { Address, CeloTransactionParams } from '@celo/contractkit'
 import {
   ActionableAttestation,
-  AttestationsWrapper,
+  AttestationsWrapper
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -25,9 +25,9 @@ export async function requestMoreAttestations(
       .request(phoneNumber, attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))
   }
-
-  await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).sendAndWaitForReceipt(txParams)
+  
+  const selectIssuers = await attestations.selectIssuersAfterWait(phoneNumber, account)
+  await selectIssuers.sendAndWaitForReceipt(txParams)
 }
 
 type RequestAttestationError =
@@ -168,18 +168,19 @@ async function findSuitableNumber(
   numbers: string[],
   maximumNumberOfAttestations: number
 ) {
-  const attestedAccountsLookup = await attestations.lookupPhoneNumbers(
-    numbers.map(PhoneNumberUtils.getPhoneHash)
+  const attestedAccountsLookup = await attestations.lookupIdentifiers(
+    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n))
   )
   return numbers.find((number) => {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number)
     const allAccounts = attestedAccountsLookup[phoneHash]
 
-    if (allAccounts === undefined) {
+    if (!allAccounts) {
       return true
     }
     const totalAttestations = Object.values(allAccounts)
-      .map((x) => x.total)
+      .filter((x) => !!x)
+      .map((x) => x!.total)
       .reduce((el, sum) => sum + el)
 
     return totalAttestations < maximumNumberOfAttestations

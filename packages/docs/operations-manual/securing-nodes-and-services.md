@@ -1,15 +1,15 @@
 # Securing Celo nodes and services
 
-Running Celo nodes and services securely, especially as part of running a valdiator, is of utmost importance. Failure to do so can lead to severe consequences including, but not limited to loss of funds, slashing due to double signing, etc. Here are some recommendations:
+Running Celo nodes and services securely, especially as part of running a validator, is of utmost importance. Failure to do so can lead to severe consequences including, but not limited to loss of funds, slashing due to double signing, etc. Here are some recommendations:
 
 
 ### RPC Endpoints
 
 Celo nodes can be interacted with through an RPC interface for common interactions such as querying the blockchain, inspecting network connectivity and much more. The RPC interface is exposed via HTTP, WebSockets or a local IPC socket. There are two considerations:
 
-1) There is no authentication in the RPC interface. Anyone with access to the interface will be able to execute any actions that are enabled with the command-line options. This includes sensitive RPC modules like `personal` which interacts with the private keys stored on the node (`admin` is another one). It recommended to not enable RPC modules unless you explicitly need them. Other RPC modules might be less sensitive but could create unnecessary load on your machine (like the `debug` module) to execute a DoS attack.
+1) There is no authentication in the RPC interface. Anyone with access to the interface will be able to execute any actions that are enabled with the command-line options. This includes sensitive RPC modules like `personal` which interacts with the private keys stored on the node (`admin` is another one). It is not recommended to enable RPC modules unless you explicitly need them. Other RPC modules might be less sensitive but could create unnecessary load on your machine (like the `debug` module) to execute a DoS attack.
 
-2) If you do need access to the RPC modules (for example to use `celocli` or the attestation service), use a firewall and similar mechanisms to restrict access to the RPC interface. You almost never want the interface be accessible from outside the machine itself.
+2) If you do need access to the RPC modules (for example to use `celocli` or the attestation service), use a firewall and similar mechanisms to restrict access to the RPC interface. You almost never want the interface to be accessible from outside the machine itself.
 
 
 ### Public Endpoints

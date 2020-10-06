@@ -11,6 +11,7 @@ contract DoubleSigningSlasher is SlasherUtil {
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+  event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -140,6 +141,6 @@ contract DoubleSigningSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
+    emit DoubleSigningSlashPerformed(validator, blockNumber);
   }
-
 }

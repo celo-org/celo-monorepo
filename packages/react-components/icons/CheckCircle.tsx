@@ -11,7 +11,7 @@ export default class CheckCircle extends React.PureComponent<Props> {
   static defaultProps = {
     width: 24,
     height: 24,
-    color: colors.celoGreen,
+    color: colors.greenUI,
   }
 
   render() {

@@ -42,7 +42,6 @@ exports[`About renders 1`] = `
           }
         }
       >
-        }
         <div
           className="css-view-1dbjc4n"
           style={
@@ -138,8 +137,6 @@ exports[`About renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "MozTransitionProperty": "transform",
@@ -167,6 +164,7 @@ exports[`About renders 1`] = `
           aria-level="1"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -224,6 +222,7 @@ exports[`About renders 1`] = `
             aria-level="3"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -259,6 +258,7 @@ exports[`About renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -328,6 +328,7 @@ exports[`About renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -357,6 +358,7 @@ exports[`About renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -395,6 +397,7 @@ exports[`About renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -421,11 +424,11 @@ exports[`About renders 1`] = `
         "WebkitFlexDirection": "column",
         "alignSelf": "center",
         "flexDirection": "column",
-        "marginBottom": "50px",
         "marginTop": "30px",
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -455,6 +458,137 @@ exports[`About renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          onClick={[Function]}
+          style={
+            Object {
+              "lineHeight": "42px",
+            }
+          }
+        >
+          Celo Foundation
+        </span>
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h2
+        aria-level="2"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        onClick={[Function]}
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "28px",
+            "lineHeight": "32px",
+            "marginBottom": "20px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Believes in a future where everyone can prosper
+      </h2>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "marginBottom": "20px",
+            "marginTop": "20px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        The Celo Foundation is a non-profit organization based in the US that supports the growth and development of the open-source Celo Platform. Guided by the Celo community tenets, the Foundation contributes to education, technical research, environmental health, community engagement, and ecosystem outreach—activities that support and encourage an inclusive financial system that creates the conditions for prosperity for everyone.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "50px",
+        "marginTop": "30px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -489,10 +623,11 @@ exports[`About renders 1`] = `
         }
       }
     >
-      <h1
-        aria-level="1"
+      <h2
+        aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -509,7 +644,7 @@ exports[`About renders 1`] = `
         Celo, pronounced 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
-          dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "fontStyle": "italic",
@@ -522,19 +657,14 @@ exports[`About renders 1`] = `
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
@@ -542,7 +672,7 @@ exports[`About renders 1`] = `
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -596,10 +726,11 @@ exports[`About renders 1`] = `
         </div>
         
 means ‘purpose’ in Esperanto.
-      </h1>
+      </h2>
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -676,6 +807,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -705,6 +837,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -742,6 +875,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -756,7 +890,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         Celo is founded on two core values: 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
-          dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "fontWeight": "bold",
@@ -768,7 +902,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
          and 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
-          dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "fontWeight": "bold",
@@ -794,6 +928,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -934,6 +1069,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -951,6 +1087,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -981,6 +1118,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1500,6 +1638,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -1517,6 +1656,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1568,6 +1708,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
           "position": "absolute",
           "right": "0px",
           "top": "0px",
+          "width": "100%",
           "zIndex": -1,
         }
       }
@@ -1602,6 +1743,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
     <div
       className="css-text-901oao"
       dir="auto"
+      onClick={[Function]}
       style={
         Object {
           "color": "rgba(255,255,255,1.00)",
@@ -1623,6 +1765,7 @@ Change the story.
     <div
       className="css-text-901oao"
       dir="auto"
+      onClick={[Function]}
       style={
         Object {
           "color": "rgba(255,255,255,1.00)",
@@ -1652,6 +1795,7 @@ Change the story.
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1681,6 +1825,7 @@ Change the story.
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -1718,6 +1863,7 @@ Change the story.
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1737,8 +1883,6 @@ Change the story.
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -1748,10 +1892,8 @@ Change the story.
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
-            href="http://sacred-economics.com/film/"
+            href="http://sacred-economics.com/film"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1776,16 +1918,13 @@ Change the story.
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <a
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
-          href="http://sacred-economics.com/film/"
+          href="http://sacred-economics.com/film"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -1852,6 +1991,7 @@ Change the story.
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1881,6 +2021,7 @@ Change the story.
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -1918,6 +2059,7 @@ Change the story.
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -1938,8 +2080,6 @@ Change the story.
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <a
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1947,7 +2087,6 @@ Change the story.
           dir="auto"
           href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -2018,6 +2157,7 @@ Change the story.
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2047,6 +2187,7 @@ Change the story.
           aria-level="3"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -2084,6 +2225,7 @@ Change the story.
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -2113,6 +2255,7 @@ Change the story.
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2155,9 +2298,7 @@ Change the story.
               "gridRowGap": "55px",
               "gridTemplateColumns": "repeat(3, 1fr)",
               "minHeight": "50vh",
-              "msGridColumnGap": "40px",
-              "msGridRowGap": "55px",
-              "msGridTemplateColumns": "repeat(3, 1fr)",
+              "msGridColumns": "repeat(3, 1fr)",
             }
           }
         >
@@ -2362,6 +2503,7 @@ Change the story.
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "color": "rgba(46,51,56,1.00)",
@@ -2417,6 +2559,7 @@ Change the story.
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2432,6 +2575,7 @@ Change the story.
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2466,6 +2610,7 @@ Change the story.
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2495,6 +2640,7 @@ Change the story.
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -2507,7 +2653,7 @@ Change the story.
           }
         }
       >
-        Backers
+        Early Backers
       </h3>
     </div>
     <div
@@ -2532,6 +2678,7 @@ Change the story.
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2561,6 +2708,7 @@ Change the story.
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -2789,6 +2937,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3088,6 +3237,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3122,6 +3272,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3156,6 +3307,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3190,6 +3342,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3224,6 +3377,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3258,6 +3412,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3610,6 +3765,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3644,6 +3800,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3731,6 +3888,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3765,6 +3923,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3799,6 +3958,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3833,6 +3993,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3867,6 +4028,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3901,6 +4063,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3935,6 +4098,7 @@ Change the story.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3967,6 +4131,7 @@ Change the story.
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3996,6 +4161,7 @@ Change the story.
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -4033,6 +4199,7 @@ Change the story.
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -4052,8 +4219,6 @@ Change the story.
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -4063,10 +4228,8 @@ Change the story.
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="mailto:press@celo.org"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

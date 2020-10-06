@@ -1,5 +1,5 @@
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
-import { installHelmChart } from 'src/lib/prom-to-sd-utils'
+import { installPrometheusIfNotExists } from 'src/lib/prometheus'
 import { deploy } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
@@ -35,7 +35,5 @@ export const handler = async (argv: VmTestnetArgv) => {
   const createdCluster = await createClusterIfNotExists()
   await switchToClusterFromEnv()
   await setupCluster(argv.celoEnv, createdCluster)
-
-  // deploy prom to sd statefulset
-  await installHelmChart(argv.celoEnv)
+  await installPrometheusIfNotExists()
 }

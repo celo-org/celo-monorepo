@@ -5,6 +5,7 @@ import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { useDispatch } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { MAX_COMMENT_LENGTH } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
 import { getInviteFee } from 'src/invite/saga'
@@ -23,7 +24,7 @@ interface InviteProps extends CommonProps {
   feeType: FeeType.INVITE
   account: string
   amount: BigNumber
-  comment: string
+  comment?: string
 }
 
 interface SendProps extends CommonProps {
@@ -31,7 +32,8 @@ interface SendProps extends CommonProps {
   account: string
   recipientAddress: string
   amount: BigNumber
-  comment: string
+  comment?: string
+  includeDekFee: boolean
 }
 
 interface ExchangeProps extends CommonProps {
@@ -45,9 +47,6 @@ interface ReclaimEscrowProps extends CommonProps {
   paymentID: string
 }
 
-// TODO: remove this once we use TS 3.5
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
-
 export type PropsWithoutChildren =
   | Omit<InviteProps, 'children'>
   | Omit<SendProps, 'children'>
@@ -55,6 +54,9 @@ export type PropsWithoutChildren =
   | Omit<ReclaimEscrowProps, 'children'>
 
 type Props = InviteProps | SendProps | ExchangeProps | ReclaimEscrowProps
+
+// Max lengthed comment to fetch fee estimate before user finalizes comment
+const MAX_PLACEHOLDER_COMMENT: string = '0'.repeat(MAX_COMMENT_LENGTH)
 
 function useAsyncShowError<R, Args extends any[]>(
   asyncFunction: ((...args: Args) => Promise<R>) | (() => Promise<R>),
@@ -67,7 +69,10 @@ function useAsyncShowError<R, Args extends any[]>(
     // Generic error banner
     if (asyncResult.error) {
       Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-      dispatch(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+      const errMsg = asyncResult.error.message?.includes('insufficientBalance')
+        ? ErrorMessages.INSUFFICIENT_BALANCE
+        : ErrorMessages.CALCULATE_FEE_FAILED
+      dispatch(showError(errMsg))
     }
   }, [asyncResult.error])
 
@@ -76,7 +81,7 @@ function useAsyncShowError<R, Args extends any[]>(
 
 const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   const asyncResult = useAsyncShowError(
-    (account: string, amount: BigNumber, comment: string) =>
+    (account: string, amount: BigNumber, comment: string = MAX_PLACEHOLDER_COMMENT) =>
       getInviteFee(account, CURRENCY_ENUM.DOLLAR, amount.valueOf(), comment),
     [props.account, props.amount, props.comment]
   )
@@ -85,13 +90,24 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
 
 const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
   const asyncResult = useAsyncShowError(
-    (account: string, recipientAddress: string, amount: BigNumber, comment: string) =>
-      getSendFee(account, CURRENCY_ENUM.DOLLAR, {
-        recipientAddress,
-        amount: amount.valueOf(),
-        comment,
-      }),
-    [props.account, props.recipientAddress, props.amount, props.comment]
+    (
+      account: string,
+      recipientAddress: string,
+      amount: BigNumber,
+      comment: string = MAX_PLACEHOLDER_COMMENT,
+      includeDekFee: boolean = false
+    ) =>
+      getSendFee(
+        account,
+        CURRENCY_ENUM.DOLLAR,
+        {
+          recipientAddress,
+          amount: amount.valueOf(),
+          comment,
+        },
+        includeDekFee
+      ),
+    [props.account, props.recipientAddress, props.amount, props.comment, props.includeDekFee]
   )
   return props.children(asyncResult) as React.ReactElement
 }

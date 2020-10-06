@@ -11,6 +11,7 @@ NativeModules.RNLocalize = {
       },
     ],
     currencies: ['MXN', 'USD'],
+    country: 'US',
   },
 }
 

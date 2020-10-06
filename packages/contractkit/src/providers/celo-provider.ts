@@ -1,11 +1,12 @@
+import { Lock } from '@celo/base/lib/lock'
 import debugFactory from 'debug'
 import { provider } from 'web3-core'
 import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
-import { DefaultWallet } from '../wallets/default-wallet'
-import { Wallet } from '../wallets/wallet'
+import { LocalWallet } from '../wallets/local-wallet'
+import { ReadOnlyWallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
@@ -24,12 +25,21 @@ export class CeloProvider {
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
-  wallet: Wallet
+  wallet: ReadOnlyWallet
 
-  constructor(readonly existingProvider: provider, wallet: Wallet = new DefaultWallet()) {
+  // Transaction nonce is calculated as the max of an account's nonce on-chain, and any pending transactions in a node's
+  // transaction pool. As a result, once a nonce is used, the transaction must be sent to the node before the nonce can
+  // be calculated for another transaction. In particular the sign and send operation must be completed atomically with
+  // relation to other sign and send operations.
+  nonceLock: Lock
+
+  constructor(readonly existingProvider: provider, wallet: ReadOnlyWallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
+    this.nonceLock = new Lock()
     this.wallet = wallet
+
+    this.addProviderDelegatedFunctions()
   }
 
   addAccount(privateKey: string) {
@@ -168,9 +178,14 @@ export class CeloProvider {
   }
 
   private async handleSendTransaction(payload: JsonRpcPayload): Promise<any> {
-    const signedTx = await this.handleSignTransaction(payload)
-    const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
-    return response.result
+    await this.nonceLock.acquire()
+    try {
+      const signedTx = await this.handleSignTransaction(payload)
+      const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
+      return response.result
+    } finally {
+      this.nonceLock.release()
+    }
   }
 
   private forwardSend(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {
@@ -181,5 +196,74 @@ export class CeloProvider {
     if (!payload.params || payload.params.length < n) {
       throw Error('Invalid params')
     }
+  }
+
+  // Functions required to act as a delefator for the existingProvider
+  private addProviderDelegatedFunctions(): void {
+    if (
+      hasProperty<{ on: (type: string, callback: () => void) => void }>(this.existingProvider, 'on')
+    ) {
+      // @ts-ignore
+      this.on = this.defaultOn
+    }
+    if (
+      hasProperty<{ once: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'once'
+      )
+    ) {
+      // @ts-ignore
+      this.once = this.defaultOnce
+    }
+    if (
+      hasProperty<{ removeListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeListener = this.defaultRemoveListener
+    }
+    if (
+      hasProperty<{ removeAllListener: (type: string, callback: () => void) => void }>(
+        this.existingProvider,
+        'removeAllListener'
+      )
+    ) {
+      // @ts-ignore
+      this.removeAllListener = this.defaultRemoveAllListeners
+    }
+    if (hasProperty<{ reset: () => void }>(this.existingProvider, 'reset')) {
+      // @ts-ignore
+      this.reset = this.defaultReset
+    }
+  }
+
+  get connected() {
+    return (this.existingProvider as any).connected
+  }
+
+  supportsSubscriptions() {
+    return (this.existingProvider as any).supportsSubscriptions()
+  }
+
+  private defaultOn(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).on(type, callback)
+  }
+
+  private defaultOnce(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).once(type, callback)
+  }
+
+  private defaultRemoveListener(type: string, callback: () => void): void {
+    ;(this.existingProvider as any).removeListener(type, callback)
+  }
+
+  private defaultRemoveAllListeners(type: string): void {
+    ;(this.existingProvider as any).removeAllListeners(type)
+  }
+
+  private defaultReset(): void {
+    ;(this.existingProvider as any).reset()
   }
 }

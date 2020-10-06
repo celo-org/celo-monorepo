@@ -1,8 +1,7 @@
 import { values } from 'lodash'
+import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
-
-const gasInflateFactor = 1.5
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -50,16 +49,6 @@ export enum SendTransactionLogEventType {
   Exception,
 }
 
-interface Started {
-  type: SendTransactionLogEventType.Started
-}
-const Started: Started = { type: SendTransactionLogEventType.Started }
-
-interface Confirmed {
-  type: SendTransactionLogEventType.Confirmed
-}
-const Confirmed: Confirmed = { type: SendTransactionLogEventType.Confirmed }
-
 export type SendTransactionLogEvent =
   | Started
   | EstimatedGas
@@ -68,6 +57,20 @@ export type SendTransactionLogEvent =
   | Confirmed
   | Failed
   | Exception
+
+interface Started {
+  type: SendTransactionLogEventType.Started
+}
+const Started: Started = { type: SendTransactionLogEventType.Started }
+
+interface Confirmed {
+  type: SendTransactionLogEventType.Confirmed
+  number: number
+}
+
+function Confirmed(n: number): Confirmed {
+  return { type: SendTransactionLogEventType.Confirmed, number: n }
+}
 
 interface EstimatedGas {
   type: SendTransactionLogEventType.EstimatedGas
@@ -129,11 +132,11 @@ function Exception(error: Error): Exception {
 export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
-  feeCurrencyAddress: string,
-  nonce: number,
+  feeCurrencyAddress: string | undefined,
   logger: TxLogger = emptyTxLogger,
-  estimatedGas?: number | undefined,
-  gasPrice?: string | undefined
+  estimatedGas?: number,
+  gasPrice?: string,
+  nonce?: number
 ): Promise<TxPromises> {
   // @ts-ignore
   const resolvers: TxPromiseResolvers = {}
@@ -169,43 +172,35 @@ export async function sendTransactionAsync<T>(
       feeCurrency: feeCurrencyAddress,
       // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
       // the suggested price in the selected feeCurrency.
-      gasPrice: gasPrice ? gasPrice : '0',
+      gasPrice: gasPrice ?? '0',
       nonce,
     }
 
     if (estimatedGas === undefined) {
-      estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
+      estimatedGas = (await estimateGas(tx, txParams)).toNumber()
       logger(EstimatedGas(estimatedGas))
     }
 
     tx.send({ ...txParams, gas: estimatedGas })
       // @ts-ignore
-      .on('receipt', (r: TransactionReceipt) => {
+      .once('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {
           resolvers.receipt(r)
         }
       })
-      .on('transactionHash', (txHash: string) => {
+      .once('transactionHash', (txHash: string) => {
         logger(TransactionHashReceived(txHash))
 
         if (resolvers.transactionHash) {
           resolvers.transactionHash(txHash)
         }
       })
-      .on('confirmation', (confirmationNumber: number) => {
-        if (confirmationNumber > 1) {
-          // "confirmation" event is called for 24 blocks.
-          // if check to avoid polluting the logs and trying to remove the standby notification more than once
-          return
-        }
-        logger(Confirmed)
-
-        if (resolvers.confirmation) {
-          resolvers.confirmation(true)
-        }
+      .once('confirmation', (confirmationNumber: number) => {
+        logger(Confirmed(confirmationNumber))
+        resolvers.confirmation(true)
       })
-      .on('error', (error: Error) => {
+      .once('error', (error: Error) => {
         logger(Failed(error))
         rejectAll(error)
       })

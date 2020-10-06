@@ -151,7 +151,7 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 # download & apply secrets pulled from Cloud Storage as environment vars
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets
-gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name}-${rid} $SECRETS_ENV_PATH
+gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.${name} $SECRETS_ENV_PATH
 # Apply the .env file
 . $SECRETS_ENV_PATH
 
@@ -167,12 +167,15 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
-RPC_APIS="eth,net,web3,debug"
+RPC_APIS=${rpc_apis}
 
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
-else
-  RPC_APIS="$RPC_APIS,txpool"
+fi
+
+METRICS_FLAGS=""
+if [[ ${geth_metrics} == "true" ]]; then
+  METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
 fi
 
 DATA_DIR=/root/.celo
@@ -186,9 +189,6 @@ echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
-if [ ${name} == "proxy" ]; then
-  echo -n "$VALIDATOR_ADDRESS" > $DATA_DIR/validator_address
-fi
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
@@ -210,8 +210,9 @@ docker run \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
       --light.serve 90 \
-      --light.maxpeers 1000 \
+      --light.maxpeers ${max_light_peers} \
       --maxpeers=${max_peers} \
+      --nousb \
       --rpc \
       --rpcaddr 0.0.0.0 \
       --rpcapi=$RPC_APIS \
@@ -225,28 +226,13 @@ docker run \
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
       --syncmode=full \
+      --gcmode=${gcmode} \
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \
       --ethstats=${node_name}@${ethstats_host} \
       --metrics \
+      --pprof \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $ADDITIONAL_GETH_FLAGS"
 
-# ---- Set Up and Run Geth Exporter ----
-
-GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
-
-echo "Pulling geth exporter..."
-docker pull $GETH_EXPORTER_DOCKER_IMAGE
-
-docker run \
-  -v $DATA_DIR:$DATA_DIR \
-  --name geth-exporter \
-  --restart always \
-  --net=host \
-  -d \
-  $GETH_EXPORTER_DOCKER_IMAGE \
-    /usr/local/bin/geth_exporter \
-      -ipc $DATA_DIR/geth.ipc \
-      -filter "(.*overall|percentiles_95)"

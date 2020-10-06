@@ -1,30 +1,28 @@
 import { AppState, Linking } from 'react-native'
-import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
-import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
-import { PincodeType } from 'src/account/reducer'
+import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import { AppEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
   appLock,
   OpenDeepLink,
+  openDeepLink,
   SetAppState,
   setAppState,
   setLanguage,
 } from 'src/app/actions'
-import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
+import { currentLanguageSelector } from 'src/app/reducers'
+import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { NavActions, navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
-import { getCachedPincode } from 'src/pincode/PincodeCache'
-import { PersistedRootState } from 'src/redux/reducers'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { handlePaymentDeeplink } from 'src/send/utils'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { toggleFornoMode } from 'src/web3/actions'
-import { isInitiallyFornoMode } from 'src/web3/contracts'
-import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -36,49 +34,9 @@ const TAG = 'app/saga'
 //    (which will put an app into `background` state until dialog disappears).
 const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 
-export function* waitForRehydrate() {
-  yield take(REHYDRATE)
-  return
-}
-
-interface PersistedStateProps {
-  language: string | null
-  e164Number: string
-  pincodeType: PincodeType
-  redeemComplete: boolean
-  account: string | null
-  hasSeenVerificationNux: boolean
-}
-
-const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null => {
-  if (!state) {
-    return null
-  }
-  return {
-    language: state.app.language,
-    e164Number: state.account.e164PhoneNumber,
-    pincodeType: state.account.pincodeType,
-    redeemComplete: state.invite.redeemComplete,
-    account: state.web3.account,
-    hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
-  }
-}
-
-// Upon every app restart, web3 is initialized according to .env file
-// This updates to the chosen forno mode in store
-export function* toggleToProperSyncMode() {
-  Logger.info(TAG + '@toggleToProperSyncMode/', 'Ensuring proper sync mode...')
-  yield take(REHYDRATE)
-  const fornoMode = yield select(fornoSelector)
-  if (fornoMode !== isInitiallyFornoMode()) {
-    Logger.info(TAG + '@toggleToProperSyncMode/', `Switching to fornoMode: ${fornoMode}`)
-    yield put(toggleFornoMode(fornoMode))
-  }
-}
-
-export function* navigateToProperScreen() {
-  yield all([take(REHYDRATE), take(NavActions.SET_NAVIGATOR)])
-
+// Work that's done before other sagas are initalized
+// Be mindful to not put long blocking tasks here
+export function* appInit() {
   const isDeprecated: boolean = yield call(isAppVersionDeprecated)
 
   if (isDeprecated) {
@@ -89,61 +47,37 @@ export function* navigateToProperScreen() {
     Logger.debug(TAG, 'App version is valid')
   }
 
-  const mappedState: PersistedStateProps = yield select(mapStateToProps)
-
-  if (!mappedState) {
-    navigate(Stacks.NuxStack)
-    return
-  }
-
-  const {
-    language,
-    e164Number,
-    pincodeType,
-    redeemComplete,
-    account,
-    hasSeenVerificationNux,
-  } = mappedState
-
-  const deepLink = yield call(Linking.getInitialURL)
-  const inSync = yield call(clockInSync)
-
+  const language = yield select(currentLanguageSelector)
   if (language) {
     yield put(setLanguage(language))
   }
 
-  if (deepLink) {
-    handleDeepLink(deepLink)
+  const deepLink: string | null = yield call(Linking.getInitialURL)
+  const inSync = yield call(clockInSync)
+  if (!inSync) {
+    navigate(Screens.SetClock)
     return
   }
 
-  if (!language) {
-    navigate(Stacks.NuxStack)
-  } else if (!inSync) {
-    navigate(Screens.SetClock)
-  } else if (!e164Number) {
-    navigate(Screens.JoinCelo)
-  } else if (pincodeType === PincodeType.Unset) {
-    navigate(Screens.PincodeEducation)
-  } else if (!redeemComplete && !account) {
-    navigate(Screens.EnterInviteCode)
-  } else if (!hasSeenVerificationNux) {
-    navigate(Screens.VerificationEducationScreen)
-  } else {
-    navigate(Stacks.AppStack)
+  if (deepLink) {
+    // TODO: this should dispatch (put) but since this appInit
+    // is called before the listener is set, we do it this way.
+    // This is fragile, change me :D
+    yield call(handleDeepLink, openDeepLink(deepLink))
+    return
   }
 }
 
 export function* handleDeepLink(action: OpenDeepLink) {
   const { deepLink } = action
   Logger.debug(TAG, 'Handling deep link', deepLink)
-  const rawParams = parse(deepLink, true)
+  const rawParams = parse(deepLink)
   if (rawParams.path) {
     if (rawParams.path.startsWith('/v/')) {
       yield put(receiveAttestationMessage(rawParams.path.substr(3), CodeInputType.DEEP_LINK))
-    }
-
-    if (rawParams.path.startsWith('/dappkit')) {
+    } else if (rawParams.path.startsWith('/pay')) {
+      yield call(handlePaymentDeeplink, deepLink)
+    } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
     }
   }
@@ -173,6 +107,7 @@ function* watchAppState() {
       Logger.debug(`${TAG}@monitorAppState`, `App changed state: ${newState}`)
       yield put(setAppState(newState))
     } catch (error) {
+      ValoraAnalytics.track(AppEvents.app_state_error, { error: error.message })
       Logger.error(`${TAG}@monitorAppState`, `App state Error`, error)
     } finally {
       if (yield cancelled()) {
@@ -183,25 +118,17 @@ function* watchAppState() {
 }
 
 export function* handleSetAppState(action: SetAppState) {
-  const appLocked = yield select(getAppLocked)
+  const requirePinOnAppOpen = yield select(getRequirePinOnAppOpen)
   const lastTimeBackgrounded = yield select(getLastTimeBackgrounded)
-  const now = Date.now()
-  const cachedPin = getCachedPincode()
-  const lockWithPinEnabled = yield select(getLockWithPinEnabled)
-  if (
-    !cachedPin &&
-    lockWithPinEnabled &&
-    now - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD &&
-    action.state === 'active' &&
-    !appLocked
-  ) {
+  const isPassedDoNotLockPeriod = Date.now() - lastTimeBackgrounded > DO_NOT_LOCK_PERIOD
+  const isAppActive = action.state === 'active'
+
+  if (requirePinOnAppOpen && isPassedDoNotLockPeriod && isAppActive) {
     yield put(appLock())
   }
 }
 
 export function* appSaga() {
-  yield spawn(navigateToProperScreen)
-  yield spawn(toggleToProperSyncMode)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

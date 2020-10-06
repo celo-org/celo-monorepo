@@ -29,7 +29,7 @@ export const handler = async (argv: LoadTestUpgradeArgv) => {
   await switchToClusterFromEnv()
   setArgvDefaults(argv)
 
-  if (argv.reset) {
+  if (argv.reset === true) {
     await resetAndUpgrade(argv)
   } else {
     await upgrade(argv)

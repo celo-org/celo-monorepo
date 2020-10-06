@@ -3,16 +3,16 @@ import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { AppEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
+import { TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
@@ -24,30 +24,30 @@ const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.DOLLAR]: null,
 }
 
-async function getWeiPerUnit(token: CURRENCY_ENUM) {
+function* getWeiPerUnit(token: CURRENCY_ENUM) {
   let weiPerUnit = contractWeiPerUnit[token]
   if (!weiPerUnit) {
-    const contract = await getTokenContract(token)
-    const decimals = await contract.decimals()
+    const contract = yield call(getTokenContract, token)
+    const decimals = yield call(contract.decimals)
     weiPerUnit = new BigNumber(10).pow(decimals)
     contractWeiPerUnit[token] = weiPerUnit
   }
   return weiPerUnit
 }
 
-export async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
-  const weiPerUnit = await getWeiPerUnit(token)
+export function* convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = yield call(getWeiPerUnit, token)
   return value.dividedBy(weiPerUnit)
 }
 
-export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
-  const weiPerUnit = await getWeiPerUnit(token)
+export function* convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = yield call(getWeiPerUnit, token)
   return weiPerUnit.multipliedBy(value)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitAsync()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -68,12 +68,19 @@ interface TokenFetchFactory {
 export function tokenFetchFactory({ actionName, token, actionCreator, tag }: TokenFetchFactory) {
   function* tokenFetch() {
     try {
-      Logger.debug(tag, 'Fetching balance')
+      Logger.debug(tag, `Fetching ${token} balance`)
       const account = yield call(getConnectedAccount)
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
-      CeloAnalytics.track(CustomEventNames.fetch_balance)
+      ValoraAnalytics.track(
+        AppEvents.fetch_balance,
+        token === CURRENCY_ENUM.DOLLAR
+          ? {
+              dollarBalance: balance.toString(),
+            }
+          : { goldBalance: balance.toString() }
+      )
       yield put(actionCreator(balance.toString()))
     } catch (error) {
       Logger.error(tag, 'Error fetching balance', error)
@@ -87,7 +94,7 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
 
 export interface BasicTokenTransfer {
   recipientAddress: string
-  amount: string
+  amount: BigNumber.Value
   comment: string
 }
 
@@ -95,7 +102,7 @@ export interface TokenTransfer {
   recipientAddress: string
   amount: string
   comment: string
-  txId: string
+  context: TransactionContext
 }
 
 export type TokenTransferAction = { type: string } & TokenTransfer
@@ -108,7 +115,7 @@ interface TokenTransferFactory {
 }
 
 // TODO(martinvol) this should go to the SDK
-export async function createTransaction(
+export async function createTokenTransferTransaction(
   currency: CURRENCY_ENUM,
   transferAction: BasicTokenTransfer
 ) {
@@ -135,7 +142,10 @@ export async function fetchTokenBalanceInWeiWithRetry(token: CURRENCY_ENUM, acco
   // Retry needed here because it's typically the app's first tx and seems to fail on occasion
   // TODO consider having retry logic for ALL contract calls and txs. ContractKit should have this logic.
   const balanceInWei = await retryAsync(tokenContract.balanceOf, 3, [account])
-  Logger.debug(TAG + '@fetchTokenBalanceInWeiWithRetry', 'Account balance', balanceInWei.toString())
+  Logger.debug(
+    TAG + '@fetchTokenBalanceInWeiWithRetry',
+    'Account balance ' + balanceInWei.toString()
+  )
   return balanceInWei
 }
 
@@ -148,13 +158,19 @@ export function tokenTransferFactory({
   return function*() {
     while (true) {
       const transferAction: TokenTransferAction = yield take(actionName)
-      const { recipientAddress, amount, comment, txId } = transferAction
+      const { recipientAddress, amount, comment, context } = transferAction
 
-      Logger.debug(tag, 'Transferring token', amount, txId)
+      Logger.debug(
+        tag,
+        'Transferring token',
+        amount,
+        context.id,
+        context.description ?? 'No description'
+      )
 
       yield put(
         addStandbyTransaction({
-          id: txId,
+          context,
           type: TokenTransactionType.Sent,
           comment,
           status: TransactionStatus.Pending,
@@ -168,16 +184,20 @@ export function tokenTransferFactory({
       try {
         const account = yield call(getConnectedUnlockedAccount)
 
-        const tx: CeloTransactionObject<boolean> = yield call(createTransaction, currency, {
-          recipientAddress,
-          amount,
-          comment,
-        })
+        const tx: CeloTransactionObject<boolean> = yield call(
+          createTokenTransferTransaction,
+          currency,
+          {
+            recipientAddress,
+            amount,
+            comment,
+          }
+        )
 
-        yield call(sendAndMonitorTransaction, txId, tx, account, currency)
+        yield call(sendAndMonitorTransaction, tx, account, context, currency)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
-        yield put(removeStandbyTransaction(txId))
+        yield put(removeStandbyTransaction(context.id))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
           yield put(showError(ErrorMessages.INCORRECT_PIN))
         } else {
@@ -189,7 +209,7 @@ export function tokenTransferFactory({
 }
 
 export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitAsync()
   switch (currency) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.registry.addressFor(CeloContract.GoldToken)

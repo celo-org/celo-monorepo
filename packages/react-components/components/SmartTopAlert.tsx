@@ -1,12 +1,12 @@
 import SmallButton from '@celo/react-components/components/SmallButton'
 import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-context'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-export enum NotificationTypes {
+export enum AlertTypes {
   MESSAGE = 'message',
   ERROR = 'error',
 }
@@ -15,19 +15,20 @@ interface AlertProps {
   title?: string | null
   text: string | null
   onPress: () => void
-  type: NotificationTypes
+  type: AlertTypes
   dismissAfter?: number | null
   buttonMessage?: string | null
 }
 
 interface Props extends AlertProps {
+  isVisible: boolean
   timestamp: number
 }
 
 // This component needs to be always mounted for the hide animation to be visible
 function SmartTopAlert(props: Props) {
   const [visibleAlertState, setVisibleAlertState] = useState<AlertProps | null>(null)
-  const insets = useSafeArea()
+  const insets = useSafeAreaInsets()
   const yOffset = useRef(new Animated.Value(-500))
   const containerRef = useRef<View>()
   const animatedRef = useCallback((node) => {
@@ -37,8 +38,8 @@ function SmartTopAlert(props: Props) {
   const alertState = useMemo(() => {
     // tslint bug?
     // tslint:disable-next-line: no-shadowed-variable
-    const { type, title, text, buttonMessage, dismissAfter, onPress } = props
-    if (title || text) {
+    const { type, title, text, buttonMessage, dismissAfter, onPress, isVisible } = props
+    if (isVisible) {
       return {
         type,
         title,
@@ -131,7 +132,7 @@ function SmartTopAlert(props: Props) {
   }
 
   const { type, title, text, buttonMessage, onPress } = visibleAlertState
-  const isError = type === NotificationTypes.ERROR
+  const isError = type === AlertTypes.ERROR
 
   const testID = isError ? 'errorBanner' : 'infoBanner'
 
@@ -139,6 +140,7 @@ function SmartTopAlert(props: Props) {
     <View style={styles.overflowContainer} testID={testID}>
       <TouchableWithoutFeedback onPress={onPress}>
         <Animated.View
+          // @ts-ignore
           ref={animatedRef}
           style={[
             styles.container,
@@ -152,8 +154,8 @@ function SmartTopAlert(props: Props) {
           ]}
         >
           {isError && <Error style={styles.errorIcon} />}
-          <Text style={[fontStyles.bodySmall, styles.text, isError && fontStyles.semiBold]}>
-            {!!title && <Text style={[styles.text, fontStyles.semiBold]}> {title} </Text>}
+          <Text style={[fontStyles.small, styles.text, isError && fontStyles.small500]}>
+            {!!title && <Text style={[styles.text, fontStyles.small500]}> {title} </Text>}
             {text}
           </Text>
           {buttonMessage && (
@@ -182,12 +184,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.messageBlue,
+    backgroundColor: colors.onboardingBlue,
     paddingBottom: PADDING_VERTICAL,
     paddingHorizontal: 25,
   },
   containerError: {
-    backgroundColor: colors.errorRed,
+    backgroundColor: colors.warning,
   },
   containerWithButton: {
     flexDirection: 'column',
@@ -204,11 +206,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
-    borderColor: colors.white,
+    borderColor: colors.light,
     alignSelf: 'center',
   },
   buttonText: {
-    color: colors.white,
+    color: colors.light,
   },
 })
 

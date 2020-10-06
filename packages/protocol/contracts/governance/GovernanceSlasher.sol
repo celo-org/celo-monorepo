@@ -13,6 +13,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
   mapping(address => uint256) slashed;
 
   event SlashingApproved(address indexed account, uint256 amount);
+  event GovernanceSlashPerformed(address indexed account, uint256 amount);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -68,6 +69,7 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
       electionGreaters,
       electionIndices
     );
+    emit GovernanceSlashPerformed(account, penalty);
     return true;
   }
 }

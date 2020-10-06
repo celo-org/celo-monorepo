@@ -1,10 +1,11 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import Clipboard from '@react-native-community/clipboard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { isValidBackupPhrase, isValidSocialBackupPhrase } from 'src/backup/utils'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -71,11 +72,18 @@ export class BackupPhraseContainer extends React.Component<Props> {
     return (
       <View style={style}>
         <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>
-            {type === BackupPhraseType.BACKUP_KEY
-              ? t('backupKey')
-              : t('socialBackupPhraseHeader', { index })}
-          </Text>
+          {type === BackupPhraseType.BACKUP_KEY &&
+            (BackupPhraseContainerMode.INPUT ? (
+              <View style={styles.writeDownKeyContainer}>
+                <Text style={styles.writeDownKey}>{t('writeDownKey')}</Text>
+                <Text style={fontStyles.label}>{t('yourAccountKey')}</Text>
+              </View>
+            ) : (
+              <Text style={styles.headerText}>{t('yourAccountKey')}</Text>
+            ))}
+          {type === BackupPhraseType.SOCIAL_BACKUP && (
+            <Text style={styles.headerText}>{t('socialBackupPhraseHeader', { index })}</Text>
+          )}
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
               <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
@@ -84,7 +92,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
         </View>
         {mode === BackupPhraseContainerMode.READONLY && (
           <View style={styles.phraseContainer}>
-            {!!words && <Text style={styles.phraseText}>{words}</Text>}
+            {!!words && (
+              <Text style={styles.phraseText} testID="AccountKeyWords">
+                {words}
+              </Text>
+            )}
           </View>
         )}
         {mode === BackupPhraseContainerMode.INPUT && (
@@ -103,7 +115,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                   : isValidSocialBackupPhrase
               }
               underlineColorAndroid="transparent"
-              placeholderTextColor={colors.inactive}
+              placeholderTextColor={colors.gray4}
               enablesReturnKeyAutomatically={true}
               multiline={true}
               autoCorrect={false}
@@ -124,33 +136,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   headerText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.regular500,
+    marginBottom: 8,
   },
   headerButton: {
-    ...fontStyles.headerButton,
-    fontSize: 16,
+    ...fontStyles.regular,
+  },
+  writeDownKeyContainer: {
+    flexDirection: 'column',
+  },
+  writeDownKey: {
+    ...fontStyles.h2,
+    marginBottom: 16,
   },
   phraseContainer: {
-    marginTop: 10,
-    backgroundColor: colors.darkLightest,
+    marginTop: 8,
+    backgroundColor: colors.beige,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
-    padding: 14,
+    padding: 16,
   },
   phraseText: {
-    ...fontStyles.body,
-    lineHeight: 27,
-    color: colors.darkSecondary,
+    ...fontStyles.regular,
   },
   phraseInputContainer: {
     marginTop: 10,
   },
   phraseInputText: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     borderWidth: 1,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 4,
     minHeight: 125,
     padding: 14,
@@ -160,12 +176,6 @@ const styles = StyleSheet.create({
   socialPhraseInputText: {
     minHeight: 90,
   },
-  button: {
-    alignSelf: 'center',
-    flex: 1,
-    paddingBottom: 0,
-    marginBottom: 0,
-  },
 })
 
-export default withTranslation(Namespaces.backupKeyFlow6)(BackupPhraseContainer)
+export default withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupPhraseContainer)

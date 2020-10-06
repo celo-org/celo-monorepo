@@ -1,6 +1,6 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { installHelmChart } from 'src/lib/tracer-tool'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 

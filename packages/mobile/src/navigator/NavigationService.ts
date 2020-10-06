@@ -1,47 +1,82 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
-import SplashScreen from 'react-native-splash-screen'
-import {
-  NavigationActions,
-  NavigationBackActionPayload,
-  NavigationContainerComponent,
-  NavigationParams,
-  NavigationState,
-} from 'react-navigation'
+
+import { NavigationActions, StackActions } from '@react-navigation/compat'
+import { NavigationContainerRef } from '@react-navigation/native'
+import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
+import { requestPincodeInput } from 'src/pincode/authentication'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
 
-export enum NavActions {
-  SET_NAVIGATOR = 'NAVIGATION/SET_NAVIGATOR',
-}
+type SafeNavigate = typeof navigate
 
-let navigator: NavigationContainerComponent
+export const navigationRef = createRef<NavigationContainerRef>()
 
-export const setTopLevelNavigator = (navigatorRef: any) => {
-  Logger.debug(`${TAG}@setTopLevelNavigator`, 'Initialized')
-  navigator = navigatorRef
-  return {
-    type: NavActions.SET_NAVIGATOR,
+async function ensureNavigator() {
+  let retries = 0
+  while (!navigationRef.current && retries < 3) {
+    await sleep(200)
+    retries++
+  }
+  if (!navigationRef.current) {
+    throw new Error('navigator is not initialized')
   }
 }
 
-export function navigate(routeName: string, params?: NavigationParams) {
-  waitForNavigator()
+export const replace: SafeNavigate = (...args) => {
+  const [routeName, params] = args
+  ensureNavigator()
     .then(() => {
-      if (!navigator) {
-        Logger.error(`${TAG}@navigate`, 'Cannot navigate yet, navigator is not initialized')
-        return
-      }
+      Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
+      navigationRef.current?.dispatch(
+        StackActions.replace({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@replace`, `Navigation failure: ${reason}`)
+    })
+}
 
+// for when a screen should be pushed onto stack even if it already exists in it.
+export const pushToStack: SafeNavigate = (...args) => {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@pushToStack`, `Dispatch ${routeName}`)
+      navigationRef.current?.dispatch(
+        StackActions.push({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@pushToStack`, `Navigation failure: ${reason}`)
+    })
+}
+
+export function navigate<RouteName extends keyof StackParamList>(
+  ...args: undefined extends StackParamList[RouteName]
+    ? [RouteName] | [RouteName, StackParamList[RouteName]]
+    : [RouteName, StackParamList[RouteName]]
+) {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
-      navigator.dispatch(
+
+      navigationRef.current?.dispatch(
         NavigationActions.navigate({
           routeName,
           params,
@@ -53,105 +88,67 @@ export function navigate(routeName: string, params?: NavigationParams) {
     })
 }
 
-async function ensurePincode(): Promise<boolean> {
+export async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@ensurePincode', 'Pin has never been set')
+    ValoraAnalytics.track(OnboardingEvents.pin_never_set)
     return false
   }
 
-  if (pincodeType === PincodeType.CustomPin) {
-    Logger.debug(TAG + '@ensurePincode', 'Getting custom pin')
-    let pin
-    try {
-      pin = await new Promise((resolve) => {
-        navigate(Screens.PincodeEnter, {
-          onSuccess: resolve,
-          withVerification: true,
-        })
-      })
-    } catch (error) {
-      Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error)
-      return false
-    }
-
-    if (!pin) {
-      Logger.error(`${TAG}@ensurePincode`, `Empty PIN`)
-      return false
-    }
+  if (pincodeType !== PincodeType.CustomPin) {
+    Logger.error(TAG + '@ensurePincode', `Unsupported Pincode Type ${pincodeType}`)
+    return false
   }
-  return true
+
+  try {
+    await requestPincodeInput(true, false)
+    return true
+  } catch (error) {
+    Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error, true)
+    return false
+  }
 }
 
-export function navigateProtected(routeName: string, params?: NavigationParams) {
-  ensurePincode()
-    .then((ensured) => {
-      if (ensured) {
-        navigate(routeName, params)
-      }
+export function navigateToExchangeHome() {
+  if (store.getState().goldToken.educationCompleted) {
+    navigate(Screens.ExchangeHomeScreen)
+  } else {
+    navigate(Screens.GoldEducation)
+  }
+}
+
+export function navigateBack(params?: object) {
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@navigateBack`, `Dispatch navigate back`)
+      // @ts-ignore
+      navigationRef.current?.dispatch(NavigationActions.back(params))
     })
-    .catch((error) => {
-      Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
+    .catch((reason) => {
+      Logger.error(`${TAG}@navigateBack`, `Navigation failure: ${reason}`)
     })
 }
 
-// Source: https://v1.reactnavigation.org/docs/screen-tracking.html
-function getCurrentRouteName(navState: NavigationState): string {
-  if (!navState) {
-    return ''
-  }
-
-  const route = navState.routes[navState.index]
-  // dive into nested navigators
-  // @ts-ignore
-  if (route.routes) {
-    // @ts-ignore
-    return getCurrentRouteName(route)
-  }
-  return route.routeName
+interface NavigateHomeOptions {
+  onAfterNavigate?: () => void
+  params?: StackParamList[Screens.DrawerNavigator]
 }
 
-let splashHidden = false
+export function navigateHome(options?: NavigateHomeOptions) {
+  const { onAfterNavigate, params } = options ?? {}
+  navigationRef.current?.reset({
+    index: 0,
+    routes: [{ name: Screens.DrawerNavigator, params }],
+  })
 
-export function handleNavigationStateChange(
-  prevState: NavigationState,
-  currentState: NavigationState
-) {
-  const currentScreen = getCurrentRouteName(currentState)
-  const previousScreen = getCurrentRouteName(prevState)
-
-  // Hide native splash if necessary, once we navigate away from AppLoading
-  if (!splashHidden && currentScreen && currentScreen !== Screens.AppLoading) {
-    splashHidden = true
-    // Use requestAnimationFrame to prevent a one frame gap when hiding
-    requestAnimationFrame(() => {
-      SplashScreen.hide()
-    })
+  if (onAfterNavigate) {
+    requestAnimationFrame(onAfterNavigate)
   }
-
-  CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
-}
-
-export function navigateBack(params?: NavigationBackActionPayload) {
-  Logger.debug(`${TAG}@navigate`, `Dispatch navigate back`)
-  navigator.dispatch(NavigationActions.back(params))
-}
-
-export function navigateHome(params?: NavigationParams) {
-  navigate(Screens.WalletHome, params)
 }
 
 export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
-  CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
-  navigate(Screens.ErrorScreen, { errorMessage, error })
-}
-
-async function waitForNavigator() {
-  let retries = 0
-  while (!navigator && retries < 3) {
-    await sleep(200)
-    retries++
-  }
+  navigate(Screens.ErrorScreen, { errorMessage })
 }

@@ -4,6 +4,7 @@
 
 ### Classes
 
+* [InteractiveProposalBuilder](../classes/_governance_proposals_.interactiveproposalbuilder.md)
 * [ProposalBuilder](../classes/_governance_proposals_.proposalbuilder.md)
 
 ### Interfaces
@@ -26,7 +27,7 @@
 
 • **HOTFIX_PARAM_ABI_TYPES**: *string[]* = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
-*Defined in [contractkit/src/governance/proposals.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L15)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L18)*
 
 ## Functions
 
@@ -34,7 +35,7 @@
 
 ▸ **hotfixToEncodedParams**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `proposal`: [Proposal](_wrappers_governance_.md#proposal), `salt`: Buffer): *string*
 
-*Defined in [contractkit/src/governance/proposals.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L17)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L20)*
 
 **Parameters:**
 
@@ -52,7 +53,7 @@ ___
 
 ▸ **hotfixToHash**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `proposal`: [Proposal](_wrappers_governance_.md#proposal), `salt`: Buffer): *Buffer‹›*
 
-*Defined in [contractkit/src/governance/proposals.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L20)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L23)*
 
 **Parameters:**
 
@@ -70,13 +71,17 @@ ___
 
 ▸ **proposalToJSON**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `proposal`: [Proposal](_wrappers_governance_.md#proposal)): *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
 
-*Defined in [contractkit/src/governance/proposals.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L31)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L53)*
+
+Convert a compiled proposal to a human-readable JSON form using network information.
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`kit` | [ContractKit](../classes/_kit_.contractkit.md) |
-`proposal` | [Proposal](_wrappers_governance_.md#proposal) |
+Name | Type | Description |
+------ | ------ | ------ |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) | Contract kit instance used to resolve addresses to contract names. |
+`proposal` | [Proposal](_wrappers_governance_.md#proposal) | A constructed proposal object. |
 
 **Returns:** *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
+
+The JSON encoding of the proposal.

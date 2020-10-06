@@ -7,6 +7,9 @@ import { Flags } from '../../utils/command'
 export default class Approve extends BaseCommand {
   static description = 'Approve a dequeued governance proposal'
 
+  // Only authorized approvers need to know about this command.
+  static hidden = true
+
   static flags = {
     ...BaseCommand.flags,
     proposalID: flags.string({ required: true, description: 'UUID of proposal to approve' }),

@@ -2,24 +2,25 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import { EscrowEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { EscrowedPayment, reclaimEscrowPayment } from 'src/escrow/actions'
+import { reclaimEscrowPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -31,7 +32,7 @@ const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 
 interface StateProps {
   isReclaiming: boolean
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   account: string | null
   dollarBalance: string
   appConnected: boolean
@@ -57,14 +58,17 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
+type Props = DispatchProps &
+  StateProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.ReclaimPaymentConfirmationScreen>
 
 class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
 
-  getReclaimPaymentInput(): EscrowedPayment {
-    const reclaimPaymentInput = this.props.navigation.getParam('reclaimPaymentInput', '')
-    if (reclaimPaymentInput === '') {
+  getReclaimPaymentInput() {
+    const reclaimPaymentInput = this.props.route.params.reclaimPaymentInput
+    if (!reclaimPaymentInput) {
       throw new Error('Reclaim payment input missing')
     }
     return reclaimPaymentInput
@@ -72,7 +76,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   onConfirm = async () => {
     const escrowedPayment = this.getReclaimPaymentInput()
-    CeloAnalytics.track(CustomEventNames.escrowed_payment_reclaimed_by_sender)
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_confirm)
     const address = this.props.account
     if (!address) {
       throw new Error("Can't reclaim funds without a valid account")
@@ -87,8 +91,8 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     }
   }
 
-  onPressEdit = () => {
-    CeloAnalytics.track(CustomEventNames.escrowed_payment_reclaimEdit_by_sender)
+  onPressCancel = () => {
+    ValoraAnalytics.track(EscrowEvents.escrow_reclaim_cancel)
     navigateBack()
   }
 
@@ -100,7 +104,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 
   renderFooter = () => {
     return this.props.isReclaiming ? (
-      <ActivityIndicator size="large" color={colors.celoGreen} />
+      <ActivityIndicator size="large" color={colors.greenBrand} />
     ) : null
   }
 
@@ -127,7 +131,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
               asyncFee.loading ||
               !!asyncFee.error,
           }}
-          modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: isReclaiming }}
+          modifyButton={{ action: this.onPressCancel, text: t('cancel'), disabled: isReclaiming }}
         >
           <ReclaimPaymentConfirmationCard
             recipientPhone={payment.recipientPhone}
@@ -170,14 +174,11 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     paddingTop: 20,
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(ReclaimPaymentConfirmationScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation<Props>(Namespaces.sendFlow7)(ReclaimPaymentConfirmationScreen))

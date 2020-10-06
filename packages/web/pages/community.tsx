@@ -1,3 +1,3 @@
-import ConnectPage from 'src/community/connect/ConnectPage'
+import ConnectPage from 'src/community/CommunityPage'
 
 export default ConnectPage

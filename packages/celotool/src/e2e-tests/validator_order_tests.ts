@@ -16,7 +16,7 @@ describe('governance tests', () => {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
-    migrateTo: 17,
+    migrateTo: 19,
     instances: _.range(VALIDATORS).map((i) => ({
       name: `validator${i}`,
       validating: true,

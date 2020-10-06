@@ -1,0 +1,13 @@
+runtime: nodejs10
+service: blockchain-api
+env_variables:
+  NODE_ENV: 'production'
+  DEPLOY_ENV: 'mainnet'
+  EXCHANGE_RATES_API: 'https://apilayer.net/api'
+  BLOCKSCOUT_API: 'https://rc1-blockscout.celo-testnet.org/graphql'
+  FIREBASE_PROJECT_ID: 'celo-mobile-mainnet'
+  # TODO Pull addresses from the build artifacts of the network in protocol/build
+  FAUCET_ADDRESS: '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
+  # Unused
+  VERIFICATION_REWARDS_ADDRESS: '0x00000000000000000000000000000000000verif'
+  WEB3_PROVIDER_URL: 'https://rc1-forno.celo-testnet.org'

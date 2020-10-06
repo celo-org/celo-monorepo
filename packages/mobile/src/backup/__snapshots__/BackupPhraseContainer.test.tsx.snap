@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders correctly for input backup phrase 1`] = `
+exports[` renders correctly for input backup phrase 1`] = `
 <View>
   <View
     style={
@@ -11,18 +11,39 @@ exports[`renders correctly for input backup phrase 1`] = `
       }
     }
   >
-    <Text
+    <View
       style={
         Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
-          "fontSize": 16,
-          "lineHeight": 24,
+          "flexDirection": "column",
         }
       }
     >
-      backupKey
-    </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 16,
+          }
+        }
+      >
+        writeDownKey
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
+          }
+        }
+      >
+        yourAccountKey
+      </Text>
+    </View>
   </View>
   <View
     style={
@@ -39,19 +60,19 @@ exports[`renders correctly for input backup phrase 1`] = `
       multiline={true}
       onChangeText={[Function]}
       placeholder="backupPhrasePlaceholder"
-      placeholderTextColor="#D1D5D8"
+      placeholderTextColor="#9CA4A9"
       rejectResponderTermination={true}
       shouldShowClipboard={[Function]}
       style={
         Array [
           Object {
-            "borderColor": "#D1D5D8",
+            "borderColor": "#EDEEEF",
             "borderRadius": 4,
             "borderWidth": 1,
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 16,
-            "lineHeight": 24,
+            "lineHeight": 22,
             "minHeight": 125,
             "padding": 14,
             "paddingTop": 16,
@@ -67,7 +88,7 @@ exports[`renders correctly for input backup phrase 1`] = `
 </View>
 `;
 
-exports[`renders correctly for input social backup phrase 1`] = `
+exports[` renders correctly for input social backup phrase 1`] = `
 <View>
   <View
     style={
@@ -82,9 +103,10 @@ exports[`renders correctly for input social backup phrase 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
+          "marginBottom": 8,
         }
       }
     >
@@ -106,19 +128,19 @@ exports[`renders correctly for input social backup phrase 1`] = `
       multiline={true}
       onChangeText={[Function]}
       placeholder="backupPhrasePlaceholder"
-      placeholderTextColor="#D1D5D8"
+      placeholderTextColor="#9CA4A9"
       rejectResponderTermination={true}
       shouldShowClipboard={[Function]}
       style={
         Array [
           Object {
-            "borderColor": "#D1D5D8",
+            "borderColor": "#EDEEEF",
             "borderRadius": 4,
             "borderWidth": 1,
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 16,
-            "lineHeight": 24,
+            "lineHeight": 22,
             "minHeight": 125,
             "padding": 14,
             "paddingTop": 16,
@@ -136,7 +158,7 @@ exports[`renders correctly for input social backup phrase 1`] = `
 </View>
 `;
 
-exports[`renders correctly for readonly backup phrase 1`] = `
+exports[` renders correctly for readonly backup phrase 1`] = `
 <View>
   <View
     style={
@@ -147,40 +169,62 @@ exports[`renders correctly for readonly backup phrase 1`] = `
       }
     }
   >
-    <Text
+    <View
       style={
         Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
-          "fontSize": 16,
-          "lineHeight": 24,
+          "flexDirection": "column",
         }
       }
     >
-      backupKey
-    </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Jost-Medium",
+            "fontSize": 22,
+            "lineHeight": 28,
+            "marginBottom": 16,
+          }
+        }
+      >
+        writeDownKey
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
+          }
+        }
+      >
+        yourAccountKey
+      </Text>
+    </View>
   </View>
   <View
     style={
       Object {
         "alignContent": "center",
-        "backgroundColor": "#EEEEEE",
+        "backgroundColor": "#F1F0EB",
         "borderRadius": 4,
         "justifyContent": "center",
-        "marginTop": 10,
-        "padding": 14,
+        "marginTop": 8,
+        "padding": 16,
       }
     }
   >
     <Text
       style={
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 27,
+          "lineHeight": 22,
         }
       }
+      testID="AccountKeyWords"
     >
       prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake
     </Text>
@@ -188,7 +232,7 @@ exports[`renders correctly for readonly backup phrase 1`] = `
 </View>
 `;
 
-exports[`renders correctly for readonly social backup phrase 1`] = `
+exports[` renders correctly for readonly social backup phrase 1`] = `
 <View>
   <View
     style={
@@ -203,9 +247,10 @@ exports[`renders correctly for readonly social backup phrase 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
+          "marginBottom": 8,
         }
       }
     >
@@ -216,23 +261,24 @@ exports[`renders correctly for readonly social backup phrase 1`] = `
     style={
       Object {
         "alignContent": "center",
-        "backgroundColor": "#EEEEEE",
+        "backgroundColor": "#F1F0EB",
         "borderRadius": 4,
         "justifyContent": "center",
-        "marginTop": 10,
-        "padding": 14,
+        "marginTop": 8,
+        "padding": 16,
       }
     }
   >
     <Text
       style={
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 27,
+          "lineHeight": 22,
         }
       }
+      testID="AccountKeyWords"
     >
       prosper winner find donate tape history measure umbrella agent patrol want rhythm celo
     </Text>

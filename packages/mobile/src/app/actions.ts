@@ -1,6 +1,4 @@
 import i18n from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'app/actions'
@@ -26,6 +24,7 @@ export enum Actions {
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
+  SET_SESSION_ID = 'SET_SESSION_ID',
 }
 
 export interface SetAppState {
@@ -70,7 +69,7 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-interface SetLockWithPinEnabled {
+interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
 }
@@ -83,6 +82,11 @@ export interface Unlock {
   type: Actions.UNLOCK
 }
 
+export interface SetSessionId {
+  type: Actions.SET_SESSION_ID
+  sessionId: string
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -93,9 +97,10 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | SetLockWithPinEnabled
+  | SetRequirePinOnAppOpen
   | Lock
   | Unlock
+  | SetSessionId
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -112,21 +117,18 @@ export const setNumberVerified = (numberVerified: boolean) => ({
   numberVerified,
 })
 
-export const setLanguage = (language: string, nextScreen?: Screens) => {
+export const setLanguage = (language: string) => {
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 
-  if (nextScreen) {
-    navigate(nextScreen)
-  }
   return {
     type: Actions.SET_LANGUAGE,
     language,
   }
 }
 
-export const openDeepLink = (deepLink: string) => {
+export const openDeepLink = (deepLink: string): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
@@ -150,7 +152,7 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })
@@ -161,4 +163,9 @@ export const appLock = (): Lock => ({
 
 export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
+})
+
+export const setSessionId = (sessionId: string) => ({
+  type: Actions.SET_SESSION_ID,
+  sessionId,
 })

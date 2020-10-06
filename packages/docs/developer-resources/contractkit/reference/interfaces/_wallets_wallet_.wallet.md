@@ -2,17 +2,22 @@
 
 ## Hierarchy
 
-* **Wallet**
+* [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md)
+
+  ↳ **Wallet**
+
+  ↳ [UnlockableWallet](_wallets_wallet_.unlockablewallet.md)
 
 ## Implemented by
 
-* [DefaultWallet](../classes/_wallets_default_wallet_.defaultwallet.md)
-* [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LocalWallet](../classes/_wallets_local_wallet_.localwallet.md)
 
 ## Index
 
 ### Properties
 
+* [addAccount](_wallets_wallet_.wallet.md#addaccount)
+* [decrypt](_wallets_wallet_.wallet.md#decrypt)
 * [getAccounts](_wallets_wallet_.wallet.md#getaccounts)
 * [hasAccount](_wallets_wallet_.wallet.md#hasaccount)
 * [signPersonalMessage](_wallets_wallet_.wallet.md#signpersonalmessage)
@@ -21,11 +26,42 @@
 
 ## Properties
 
+###  addAccount
+
+• **addAccount**: *addInMemoryAccount | addRemoteAccount*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L26)*
+
+___
+
+###  decrypt
+
+• **decrypt**: *function*
+
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[decrypt](_wallets_wallet_.readonlywallet.md#decrypt)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L19)*
+
+#### Type declaration:
+
+▸ (`address`: [Address](../modules/_base_.md#address), `ciphertext`: Buffer): *Promise‹Buffer›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+`ciphertext` | Buffer |
+
+___
+
 ###  getAccounts
 
 • **getAccounts**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L6)*
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[getAccounts](_wallets_wallet_.readonlywallet.md#getaccounts)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L14)*
 
 #### Type declaration:
 
@@ -37,7 +73,9 @@ ___
 
 • **hasAccount**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L7)*
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[hasAccount](_wallets_wallet_.readonlywallet.md#hasaccount)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L15)*
 
 #### Type declaration:
 
@@ -55,7 +93,9 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L10)*
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[signPersonalMessage](_wallets_wallet_.readonlywallet.md#signpersonalmessage)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L18)*
 
 #### Type declaration:
 
@@ -74,7 +114,9 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L8)*
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[signTransaction](_wallets_wallet_.readonlywallet.md#signtransaction)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L16)*
 
 #### Type declaration:
 
@@ -92,15 +134,17 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L9)*
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[signTypedData](_wallets_wallet_.readonlywallet.md#signtypeddata)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L17)*
 
 #### Type declaration:
 
-▸ (`address`: string, `typedData`: [EIP712TypedData](_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+▸ (`address`: [Address](../modules/_base_.md#address), `typedData`: EIP712TypedData): *Promise‹string›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`address` | string |
-`typedData` | [EIP712TypedData](_utils_sign_typed_data_utils_.eip712typeddata.md) |
+`address` | [Address](../modules/_base_.md#address) |
+`typedData` | EIP712TypedData |

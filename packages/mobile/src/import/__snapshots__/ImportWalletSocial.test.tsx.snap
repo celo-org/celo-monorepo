@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -67,10 +66,9 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
-            "paddingBottom": 20,
-            "textAlign": "center",
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
+            "lineHeight": 32,
           }
         }
       >
@@ -80,9 +78,9 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 16,
-            "lineHeight": 24,
+            "lineHeight": 22,
           }
         }
       >
@@ -108,9 +106,10 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
@@ -132,19 +131,19 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             multiline={true}
             onChangeText={[Function]}
             placeholder="backupPhrasePlaceholder"
-            placeholderTextColor="#D1D5D8"
+            placeholderTextColor="#9CA4A9"
             rejectResponderTermination={true}
             shouldShowClipboard={[Function]}
             style={
               Array [
                 Object {
-                  "borderColor": "#D1D5D8",
+                  "borderColor": "#EDEEEF",
                   "borderRadius": 4,
                   "borderWidth": 1,
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
+                  "fontFamily": "Inter-Regular",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                   "minHeight": 125,
                   "padding": 14,
                   "paddingTop": 16,
@@ -181,9 +180,10 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
+                "marginBottom": 8,
               }
             }
           >
@@ -205,19 +205,19 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
             multiline={true}
             onChangeText={[Function]}
             placeholder="backupPhrasePlaceholder"
-            placeholderTextColor="#D1D5D8"
+            placeholderTextColor="#9CA4A9"
             rejectResponderTermination={true}
             shouldShowClipboard={[Function]}
             style={
               Array [
                 Object {
-                  "borderColor": "#D1D5D8",
+                  "borderColor": "#EDEEEF",
                   "borderRadius": 4,
                   "borderWidth": 1,
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
+                  "fontFamily": "Inter-Regular",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                   "minHeight": 125,
                   "padding": 14,
                   "paddingTop": 16,
@@ -238,7 +238,7 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
         style={
           Object {
             "color": "#81868B",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
             "marginHorizontal": 2,
@@ -249,7 +249,10 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
         <Text
           style={
             Object {
-              "fontFamily": "Hind-SemiBold",
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 16,
+              "lineHeight": 22,
             }
           }
         >
@@ -263,81 +266,62 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
     style={
       Array [
         Object {
-          "alignItems": "center",
-          "borderRadius": 3,
           "flexDirection": "row",
         },
-        null,
-        null,
         undefined,
-        Object {
-          "backgroundColor": "#A3EBC6",
-        },
       ]
     }
   >
     <View
-      accessible={true}
-      focusable={false}
-      isTVSelectable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
+            "overflow": "hidden",
           },
           Object {
-            "backgroundColor": "#A3EBC6",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderWidth": 0,
+            "borderRadius": 100,
           },
         ]
       }
-      testID="ImportWalletSocialButton"
     >
       <View
+        accessible={true}
+        focusable={false}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
             "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "backgroundColor": "#97DFC1",
+            "height": 48,
+            "justifyContent": "center",
+            "minWidth": 120,
+            "opacity": undefined,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
           }
         }
+        testID="ImportWalletSocialButton"
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-              },
-              Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
-              },
-            ]
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
           }
         >
           restoreWallet
@@ -345,5 +329,21 @@ exports[`ImportWalletSocial renders correctly and is disabled with no text 1`] =
       </View>
     </View>
   </View>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;

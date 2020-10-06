@@ -19,13 +19,13 @@ class FellowSection extends React.PureComponent<I18nProps> {
         <GridRow
           allStyle={standardStyles.centered}
           nativeID={hashNav.connect.fellowship}
-          desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
+          desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottomTablet]}
           tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
           mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
         >
           <Cell span={Spans.three4th} style={standardStyles.centered}>
             <Fade bottom={true} distance={'20px'}>
-              <H2 style={[textStyles.center]}>{t('fellows.formTitle')}</H2>
+              <H2 style={textStyles.center}>{t('fellows.formTitle')}</H2>
             </Fade>
           </Cell>
         </GridRow>

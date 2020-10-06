@@ -9,7 +9,7 @@ export default class ShowMultiSig extends BaseCommand {
   static description = 'Shows information about multi-sig contract'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     tx: flags.integer({
       default: undefined,
       description: 'Show info for a transaction',

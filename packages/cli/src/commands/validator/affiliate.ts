@@ -1,4 +1,6 @@
+import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
+import prompts from 'prompts'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -11,6 +13,7 @@ export default class ValidatorAffiliate extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "Signer or Validator's address" }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
   }
 
   static args: IArg[] = [
@@ -23,7 +26,7 @@ export default class ValidatorAffiliate extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorAffiliate)
-    this.kit.defaultAccount = res.flags.from
+
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this, res.flags.from)
@@ -33,6 +36,19 @@ export default class ValidatorAffiliate extends BaseCommand {
       .isValidatorGroup(res.args.groupAddress)
       .runChecks()
 
+    if (!res.flags.yes) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Are you sure you want to affiliate with this group?\nAffiliating with a Validator Group could result in Locked Gold requirements of up to 10,000 CELO for 60 days. (y/n)',
+      })
+
+      if (!response.confirmation) {
+        console.info('Aborting due to user response')
+        process.exit(0)
+      }
+    }
     await displaySendTx('affiliate', validators.affiliate(res.args.groupAddress))
   }
 }

@@ -18,6 +18,14 @@ library FixidityLib {
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Number of positions that the comma is shifted to the right.
    */
   function digits() internal pure returns (uint8) {
@@ -241,7 +249,7 @@ library FixidityLib {
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     require(y.value != 0, "can't divide by 0");
     uint256 X = x.value * FIXED1_UINT;
-    require(X / FIXED1_UINT == x.value);
+    require(X / FIXED1_UINT == x.value, "overflow at divide");
     return Fraction(X / y.value);
   }
 

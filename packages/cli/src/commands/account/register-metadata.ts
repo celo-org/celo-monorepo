@@ -29,7 +29,6 @@ export default class RegisterMetadata extends BaseCommand {
 
   async run() {
     const res = this.parse(RegisterMetadata)
-    this.kit.defaultAccount = res.flags.from
 
     await newCheckBuilder(this)
       .isAccount(res.flags.from)
@@ -39,7 +38,7 @@ export default class RegisterMetadata extends BaseCommand {
 
     if (!res.flags.force) {
       try {
-        const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+        const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
         console.info('Metadata contains the following claims: \n')
         await displayMetadata(metadata, this.kit)
         console.info() // Print a newline.

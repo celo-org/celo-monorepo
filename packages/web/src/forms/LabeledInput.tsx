@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { ErrorDisplay } from 'src/forms/ErrorDisplay'
+import { ErrorDisplay, ErrorKeys, getErrorTransKey } from 'src/forms/ErrorDisplay'
+import { TextInput } from 'src/forms/TextInput'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { TextInput } from './FormComponents'
 
 interface LabelProps {
   name: string
   multiline?: boolean
   allErrors?: string[]
-  displayErrorAs?: 'email' | 'generic' | undefined
+  displayErrorAs?: ErrorKeys
   value: string
   label: string
   onInput: (x?: unknown) => void
@@ -26,6 +26,11 @@ export function LabeledInput({
   isDarkMode,
 }: LabelProps) {
   const hasError = React.useMemo(() => allErrors && allErrors.includes(name), [allErrors, name])
+
+  const onChange = (newValue) => {
+    return onInput({ name, newValue })
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.labelBox}>
@@ -47,9 +52,11 @@ export function LabeledInput({
         focusStyle={isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused}
         name={name}
         value={value}
-        onChange={onInput}
+        onChangeText={onChange}
       />
-      {allErrors && <ErrorDisplay isShowing={hasError} field={displayErrorAs || name} />}
+      {allErrors && (
+        <ErrorDisplay isShowing={hasError} field={getErrorTransKey(displayErrorAs || name)} />
+      )}
     </View>
   )
 }

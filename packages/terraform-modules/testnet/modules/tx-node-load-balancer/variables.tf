@@ -18,11 +18,6 @@ variable forno_host {
   description = "The host name to use for the tx node forno setup"
 }
 
-variable gcloud_credentials_path {
-  type        = string
-  description = "Path to the file containing the Google Cloud credentials to use"
-}
-
 variable gcloud_project {
   type        = string
   description = "Name of the Google Cloud project to use"
@@ -43,7 +38,12 @@ variable network_name {
   description = "Name of the GCP network the tx-node load balancer is in"
 }
 
+variable private_tx_node_self_links {
+  type        = list(string)
+  description = "A list including the self_links of each private/internal tx-node"
+}
+
 variable tx_node_self_links {
   type        = list(string)
-  description = "A list including the self_links of each tx-node"
+  description = "A list including the self_links of each public/external tx-node"
 }

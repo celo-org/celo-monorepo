@@ -108,6 +108,9 @@ export function cutAddress(address: string) {
 }
 
 export function formatNumber(n: number, decimals: number = 2) {
+  if (n === Infinity) {
+    return undefined as string
+  }
   return isNaN(+n)
     ? (0).toFixed(decimals)
     : (+n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')

@@ -12,6 +12,9 @@ const mock = {
           lockedGold: '92307692307692307692295',
           name: 'Test 1',
           usd: '0',
+          claims: {
+            edges: [],
+          },
         },
         accumulatedActive: '0',
         accumulatedRewards: '0',
@@ -30,6 +33,9 @@ const mock = {
           lockedGold: '10000000000000000000000',
           name: 'Test 2',
           usd: '0',
+          claims: {
+            edges: [],
+          },
         },
         accumulatedActive: '0',
         accumulatedRewards: '0',
@@ -48,6 +54,9 @@ const mock = {
           lockedGold: '12037845136552068543873',
           name: 'Test 3',
           usd: '30061005205326568149',
+          claims: {
+            edges: [],
+          },
         },
         accumulatedActive: '0',
         accumulatedRewards: '0',
@@ -55,6 +64,11 @@ const mock = {
           edges: [
             {
               node: {
+                account: {
+                  claims: {
+                    edges: [],
+                  },
+                },
                 address: '0x811957bf6250975420c9444a4dd4c8a23b20239f',
                 attestationsFulfilled: 0,
                 attestationsRequested: 0,
@@ -80,6 +94,9 @@ const mock = {
           lockedGold: '380209671128494378809487',
           name: 'Test 4',
           usd: '79877906214266341706',
+          claims: {
+            edges: [],
+          },
         },
         accumulatedActive: '4153787989110478975760062',
         accumulatedRewards: '3108266363620940783415',
@@ -98,6 +115,9 @@ const mock = {
           lockedGold: '9987849076990425000001',
           name: 'Test 5',
           usd: '3225648078256849315',
+          claims: {
+            edges: [],
+          },
         },
         accumulatedActive: '81693033207827672895330',
         accumulatedRewards: '15698153980849999999',
@@ -116,6 +136,9 @@ const mock = {
           lockedGold: '10000000000000000000000',
           name: 'Test 6',
           usd: '0',
+          claims: {
+            edges: [],
+          },
         },
         accumulatedActive: '368243202620000365202335',
         accumulatedRewards: '0',

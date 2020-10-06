@@ -1,8 +1,6 @@
 import BigNumber from 'bignumber.js'
-import * as RNLocalize from 'react-native-localize'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import {
-  convertToPeriodDecimalSeparator,
   divideByWei,
   getCentAwareMoneyDisplay,
   getMoneyDisplayValue,
@@ -106,17 +104,6 @@ describe('utils->formatting', () => {
     it('divide by wei', () => {
       expect(divideByWei(new BigNumber(123000000000000000))).toStrictEqual(new BigNumber(0.123))
       expect(divideByWei(new BigNumber(129000000000000000), 2)).toStrictEqual(new BigNumber(0.13))
-    })
-  })
-
-  describe('convertToPeriodDecimalSeparator', () => {
-    it('converts correctly', () => {
-      expect(convertToPeriodDecimalSeparator('1.23')).toBe('1.23')
-      expect(convertToPeriodDecimalSeparator('1,23')).toBe('1,23')
-      ;(RNLocalize.getNumberFormatSettings as jest.Mock).mockReturnValue({
-        decimalSeparator: ',',
-      })
-      expect(convertToPeriodDecimalSeparator('1,23')).toBe('1.23')
     })
   })
 })

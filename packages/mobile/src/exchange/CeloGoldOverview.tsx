@@ -26,11 +26,9 @@ export function CeloGoldOverview({ t, testID }: Props) {
 
   return (
     <View style={styles.container} testID={testID}>
-      <Text style={styles.title}>{t('global:celoGold')}</Text>
-      <Text style={styles.balance}>
-        {goldBalanceAmount && (
-          <CurrencyDisplay style={fontStyles.semiBold} amount={goldBalanceAmount} />
-        )}
+      <Text style={styles.title}>{t('yourGoldBalance')}</Text>
+      <Text style={styles.balance} testID="CeloBalance">
+        {goldBalanceAmount && <CurrencyDisplay amount={goldBalanceAmount} />}
       </Text>
       <Text style={styles.localBalance}>
         {goldBalanceAmount ? (
@@ -48,32 +46,21 @@ export function CeloGoldOverview({ t, testID }: Props) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: variables.contentPadding,
-    paddingBottom: 20,
+    marginVertical: 16,
   },
   title: {
-    fontSize: 18,
-    ...fontStyles.semiBold,
-  },
-  label: {
-    fontSize: 18,
-    color: colors.dark,
+    ...fontStyles.h2,
+    marginBottom: 8,
   },
   balance: {
-    fontSize: 44,
-    // TODO: figure out why specifying the lineHeight with the font we're using
-    // breaks the vertical centering. Then remove the hardcoded height here!
-    lineHeight: 62,
-    height: 48,
+    ...fontStyles.mediumNumber,
     color: colors.dark,
+    marginBottom: 8,
   },
   localBalance: {
-    ...fontStyles.light,
-    fontSize: 18,
-    color: '#B0B5B9',
-  },
-  code: {
-    fontSize: 22,
+    ...fontStyles.regular,
+    color: colors.gray4,
   },
 })
 
-export default withTranslation(Namespaces.exchangeFlow9)(CeloGoldOverview)
+export default withTranslation<Props>(Namespaces.exchangeFlow9)(CeloGoldOverview)

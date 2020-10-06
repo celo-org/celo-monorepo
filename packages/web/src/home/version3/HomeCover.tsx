@@ -1,221 +1,143 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
-import HomeAnimation, { Mode } from 'src/home/HomeAnimation'
-import TextAnimation from 'src/home/TextAnimation'
-import { I18nProps, withNamespaces } from 'src/i18n'
-import Responsive from 'src/shared/Responsive'
+import ChangeStory from 'src/home/change-story/ChangeStory'
+import TextAnimation, { WORDS } from 'src/home/TextAnimation'
+import { NameSpaces, useTranslation } from 'src/i18n'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
+import AspectRatio from 'src/shared/AspectRatio'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { getDeviceMemory, hasGoodConnection } from 'src/utils/utils'
-type Props = I18nProps
+import { fonts, standardStyles } from 'src/styles'
 
-interface State {
-  playing: boolean
-  mode: Mode
-}
+export default function HomeCover() {
+  const [currentWordIndex, setWord] = React.useState(0)
+  const [isReady, setReady] = React.useState(false)
 
-function After({ t }) {
+  const changeWord = React.useCallback(() => {
+    if (currentWordIndex !== WORDS.length - 1) {
+      setWord(currentWordIndex + 1)
+    } else {
+      setWord(0)
+    }
+  }, [currentWordIndex])
+
+  const onReady = React.useCallback(() => setReady(true), [])
+
+  const { t } = useTranslation(NameSpaces.home)
+  const { isMobile, screen, isDesktop } = useScreenSize()
+
   return (
-    <Text style={[fonts.h6, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
+    <GridRow
+      desktopStyle={styles.desktopContainer}
+      tabletStyle={styles.tabletContainer}
+      mobileStyle={styles.mobileContainer}
+    >
+      <Cell
+        span={Spans.full}
+        style={[styles.container, isDesktop && styles.centerMe, !isMobile && standardStyles.row]}
+      >
+        <View style={[styles.animationHolder, getplacement(screen)]}>
+          <AspectRatio ratio={970 / 270}>
+            <ChangeStory onReady={onReady} onLooped={changeWord} />
+          </AspectRatio>
+        </View>
+        <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
+          <TextAnimation currentWord={currentWordIndex} isAnimating={isReady} />
+          <H4 style={styles.coverText}>{t('coverText')}</H4>
+          <Text style={[fonts.h6, styles.coverJoinList]}>{t('coverJoinList')}</Text>
+          <EmailForm
+            placeholder={'saluton@celo.org'}
+            submitText={'Submit'}
+            route={'/contacts'}
+            isDarkMode={false}
+          />
+        </View>
+      </Cell>
+    </GridRow>
   )
 }
 
-const DURATION = 3000
-
-class HomeCover extends React.PureComponent<Props, State> {
-  state = {
-    playing: false,
-    mode: Mode.wait,
-  }
-
-  onLoaded = () => {
-    this.setState({ playing: true })
-  }
-
-  onFinished = () => {
-    this.setState({ playing: false })
-  }
-
-  setStill = () => {
-    this.setState({ mode: Mode.graphic, playing: false })
-  }
-
-  componentDidMount = async () => {
-    const goodConnection = await hasGoodConnection()
-
-    if (!goodConnection || getDeviceMemory() <= 2) {
-      this.setState({ mode: Mode.graphic })
-    } else {
-      this.setState({ mode: Mode.transition })
-      setTimeout(() => {
-        this.setState({ mode: Mode.video })
-      }, DURATION)
-    }
-  }
-
-  render() {
-    const { mode } = this.state
-    return (
-      <Responsive large={styles.largeCover} medium={styles.mediumCover}>
-        <View style={styles.smallCover}>
-          <View style={styles.animationBackground}>
-            <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
-              <View style={styles.animationWrapper}>
-                <HomeAnimation
-                  onLoaded={this.onLoaded}
-                  onFinished={this.onFinished}
-                  onError={this.setStill}
-                  mode={mode}
-                />
-              </View>
-            </Responsive>
-          </View>
-          <Responsive large={styles.largeTextHolder}>
-            <View style={styles.textHolder}>
-              <Responsive large={[styles.textWrapper, styles.largeTextWrapper]}>
-                <View style={styles.textWrapper}>
-                  <TextAnimation
-                    playing={this.state.playing}
-                    willTransition={mode === Mode.transition}
-                    stillMode={
-                      mode === Mode.wait || mode === Mode.transition || mode === Mode.graphic
-                    }
-                  />
-                  <Responsive
-                    large={styles.content}
-                    medium={[styles.contentTablet, standardStyles.sectionMarginBottomTablet]}
-                  >
-                    <View style={styles.contentMobile}>
-                      <View style={styles.form}>
-                        <Text style={[fonts.navigation, styles.foreground]}>
-                          {this.props.t('stayConnected')}
-                        </Text>
-                        <EmailForm
-                          submitText={'Sign Up'}
-                          route={'/contacts'}
-                          whenComplete={<After t={this.props.t} />}
-                          isDarkMode={true}
-                        />
-                      </View>
-                    </View>
-                  </Responsive>
-                </View>
-              </Responsive>
-            </View>
-          </Responsive>
-        </View>
-      </Responsive>
-    )
+function getplacement(screen: ScreenSizes) {
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return styles.animationPlaceDesktop
+    case ScreenSizes.TABLET:
+      return styles.animationPlaceTablet
+    default:
+      return styles.animationPlaceMobile
   }
 }
 
-export default withNamespaces('home')(HomeCover)
-
 const styles = StyleSheet.create({
-  animationWrapper: {
-    flex: 1,
-    height: '100%',
-    justifyContent: 'center',
-  },
-  animationWrapperLargeAug: {
-    justifyContent: 'flex-start',
-    marginTop: 20,
-  },
-  stillText: {
-    marginLeft: 25,
-  },
-  smallCover: {
-    minHeight: 600,
-    marginTop: HEADER_HEIGHT,
+  desktopContainer: {
+    paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
+    maxHeight: '110vw',
     height: '100vh',
-    maxHeight: 800,
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: colors.dark,
   },
-  mediumCover: {
-    minHeight: 600,
-    paddingTop: BANNER_HEIGHT,
-    marginTop: HEADER_HEIGHT,
-    height: 'max-contents',
-    maxHeight: '100vh',
-    justifyContent: 'flex-end',
-    backgroundColor: colors.dark,
-  },
-  largeCover: {
-    paddingTop: HEADER_HEIGHT + BANNER_HEIGHT,
-    minHeight: '100vh',
+  tabletContainer: {
+    paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
+    marginTop: 90,
     height: '100vh',
-    maxHeight: '100vh',
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: colors.dark,
+    marginBottom: 100,
   },
-  content: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    paddingHorizontal: 25,
-    alignSelf: 'flex-end',
-    maxWidth: 500,
-    width: '100%',
+  mobileContainer: { paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90, minHeight: '100vh' },
+  animationHolder: {
+    flex: 4,
+    minWidth: 350,
+    flexBasis: '50%',
+    zIndex: 10,
   },
-  contentTablet: {
-    maxWidth: 500,
-    width: '100%',
-    flexDirection: 'column',
-    paddingHorizontal: 30,
-    paddingTop: 30,
+  centerMe: {
     alignSelf: 'center',
   },
-  contentMobile: {
-    flexDirection: 'column',
-    paddingHorizontal: 30,
-    paddingVertical: 30,
-    alignItems: 'center',
+  animationPlaceDesktop: {
+    marginTop: 30,
+    paddingTop: '6%',
+    paddingRight: 30,
+    transform: [
+      {
+        // @ts-ignore
+        translateX: '-17%',
+      },
+      { scale: 1.1 },
+    ],
   },
-  form: {
-    width: '100%',
-    alignItems: 'flex-start',
+  animationPlaceTablet: {
+    paddingTop: '10%',
+    paddingRight: 40,
+
+    transform: [
+      {
+        translateX: -80,
+      },
+    ],
   },
-  foreground: {
-    color: colors.white,
+  animationPlaceMobile: {
+    paddingBottom: 15,
+    transform: [
+      {
+        translateX: -60,
+      },
+    ],
   },
-  textHolder: {
-    flex: 1,
-    height: 'contents',
+  contentHolder: {
+    flexGrow: 1,
+    flexBasis: 370,
+    maxWidth: '90vw',
   },
-  textWrapper: {
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
+  container: {
+    flexWrap: 'wrap',
   },
-  largeTextWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingBottom: 65,
+  coverText: {
+    marginTop: 10,
+    marginBottom: 30,
+    maxWidth: 450,
   },
-  largeTextHolder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'flex-end',
-  },
-  textContainer: {
-    flexDirection: 'column',
-  },
-  textContainerLarge: {
-    flexDirection: 'row',
-    marginLeft: 25,
-  },
-  animationBackground: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'center',
-    maxWidth: '100vw',
+  coverJoinList: {
+    paddingTop: 10,
+    paddingLeft: 3,
+    paddingBottom: 2,
   },
 })

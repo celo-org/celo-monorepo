@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IStableToken.sol";
 import "../common/interfaces/ICeloToken.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
@@ -26,7 +27,8 @@ contract StableToken is
   CalledByVm,
   IStableToken,
   IERC20,
-  ICeloToken
+  ICeloToken,
+  ICeloVersionedContract
 {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
@@ -81,6 +83,14 @@ contract StableToken is
       emit InflationFactorUpdated(inflationState.factor.unwrap(), inflationState.factorLastUpdated);
     }
     _;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -218,7 +228,10 @@ contract StableToken is
    */
   function _mint(address to, uint256 value) private returns (bool) {
     require(to != address(0), "0 is a reserved address");
-    require(value > 0, "mint value must be > 0");
+    if (value == 0) {
+      return true;
+    }
+
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
@@ -480,6 +493,10 @@ contract StableToken is
    * @notice Reserve balance for making payments for gas in this StableToken currency.
    * @param from The account to reserve balance from
    * @param value The amount of balance to reserve
+   * @dev Note that this function is called by the protocol when paying for tx fees in this
+   * currency. After the tx is executed, gas is refunded to the sender and credited to the
+   * various tx fee recipients via a call to `creditGasFees`. Note too that the events emitted
+   * by `creditGasFees` reflect the *net* gas fee payments for the transaction.
    */
   function debitGasFees(address from, uint256 value)
     external
@@ -502,6 +519,10 @@ contract StableToken is
    * @param tipTxFee Coinbase fee
    * @param baseTxFee Community fund fee
    * @param gatewayFee Gateway fee
+   * @dev Note that this function is called by the protocol when paying for tx fees in this
+   * currency. Before the tx is executed, gas is debited from the sender via a call to
+   * `debitGasFees`. Note too that the events emitted by `creditGasFees` reflect the *net* gas fee
+   * payments for the transaction.
    */
   function creditGasFees(
     address from,

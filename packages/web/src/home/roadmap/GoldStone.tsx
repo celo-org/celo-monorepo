@@ -26,13 +26,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index,
   const isComplete = status === Status.complete
   const delay = DELAY_BASE * index * status
   return (
-    <View
-      style={[
-        styles.container,
-        isMobile && styles.containerMobile,
-        isComplete && !isLast && styles.fillSpace,
-      ]}
-    >
+    <View style={[styles.container, isMobile && styles.containerMobile]}>
       <View
         style={
           isComplete

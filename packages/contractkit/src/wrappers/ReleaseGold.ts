@@ -1,8 +1,6 @@
-import {
-  hashMessageWithPrefix,
-  Signature,
-  signedMessageToPublicKey,
-} from '@celo/utils/lib/signatureUtils'
+import { findAddressIndex } from '@celo/base/lib/address'
+import { Signature } from '@celo/base/lib/signatureUtils'
+import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { ReleaseGold } from '../generated/ReleaseGold'
@@ -11,7 +9,8 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  stringToBytes,
+  stringIdentity,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -54,6 +53,7 @@ interface ReleaseSchedule {
 
 interface RevocationInfo {
   revocable: boolean
+  canExpire: boolean
   releasedBalanceAtRevoke: BigNumber
   revokeTime: number
 }
@@ -148,12 +148,24 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @return A RevocationInfo struct.
    */
   async getRevocationInfo(): Promise<RevocationInfo> {
-    const revocationInfo = await this.contract.methods.revocationInfo().call()
-
-    return {
-      revocable: revocationInfo.revocable,
-      releasedBalanceAtRevoke: valueToBigNumber(revocationInfo.releasedBalanceAtRevoke),
-      revokeTime: valueToInt(revocationInfo.revokeTime),
+    try {
+      const revocationInfo = await this.contract.methods.revocationInfo().call()
+      return {
+        revocable: revocationInfo.revocable,
+        canExpire: revocationInfo.canExpire,
+        releasedBalanceAtRevoke: valueToBigNumber(revocationInfo.releasedBalanceAtRevoke),
+        revokeTime: valueToInt(revocationInfo.revokeTime),
+      }
+    } catch (_) {
+      // This error is caused by a mismatch between the deployed contract and the locally compiled version.
+      // Specifically, networks like baklava and rc0 were deployed before adding `canExpire`.
+      console.info('Some info could not be fetched, returning default for revocation info.')
+      return {
+        revocable: false,
+        canExpire: false,
+        releasedBalanceAtRevoke: new BigNumber(0),
+        revokeTime: 0,
+      }
     }
   }
 
@@ -269,7 +281,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   transfer: (to: Address, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.transfer,
-    tupleParser(valueToString, valueToString)
+    tupleParser(stringIdentity, valueToString)
   )
 
   /**
@@ -397,6 +409,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   setLiquidityProvision = proxySend(this.kit, this.contract.methods.setLiquidityProvision)
 
   /**
+   * Sets the contract's `canExpire` field to `_canExpire`
+   * @param _canExpire If the contract can expire `EXPIRATION_TIME` after the release schedule finishes.
+   */
+  setCanExpire = proxySend(this.kit, this.contract.methods.setCanExpire)
+
+  /**
    * Sets the contract's max distribution
    */
   setMaxDistribution = proxySend(this.kit, this.contract.methods.setMaxDistribution)
@@ -455,7 +473,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
           proofOfSigningKeyPossession.s,
-          stringToBytes(pubKey)
+          stringToSolidityBytes(pubKey)
         )
       )
     } else {
@@ -503,9 +521,9 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s,
-        stringToBytes(pubKey),
-        stringToBytes(blsPublicKey),
-        stringToBytes(blsPop)
+        stringToSolidityBytes(pubKey),
+        stringToSolidityBytes(blsPublicKey),
+        stringToSolidityBytes(blsPop)
       )
     )
   }
@@ -544,7 +562,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)
@@ -569,7 +587,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)

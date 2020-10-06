@@ -8,7 +8,7 @@ import Logger from 'src/utils/Logger'
 import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
 import * as Sentry from '@sentry/react-native'
-import { onBackgroundNotification } from 'src/firebase/firebase'
+import 'react-native-gesture-handler'
 
 // Set this to true, if you want to test Sentry on dev builds
 const sentryEnabled = !__DEV__ || false
@@ -32,4 +32,3 @@ const customErrorHandler = (e, isFatal) => {
 ErrorUtils.setGlobalHandler(customErrorHandler)
 
 AppRegistry.registerComponent('celo', () => App)
-AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => onBackgroundNotification)

@@ -6,7 +6,6 @@ import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
-import { unlockAccount } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
 import fs from 'fs'
@@ -14,8 +13,10 @@ import { merge, range } from 'lodash'
 import fetch from 'node-fetch'
 import path from 'path'
 import sleep from 'sleep-promise'
+import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -28,8 +29,22 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
+
+export async function unlockAccount(
+  web3: Web3,
+  duration: number,
+  password: string,
+  accountAddress: string | null = null
+) {
+  if (accountAddress === null) {
+    const accounts = await web3.eth.getAccounts()
+    accountAddress = accounts[0]
+  }
+  await web3.eth.personal.unlockAccount(accountAddress!, password, duration)
+  return accountAddress!
+}
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
 
@@ -133,6 +148,10 @@ export const getEnodesAddresses = async (namespace: string) => {
 
 export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
   return getEnodesWithIpAddresses(namespace, true)
+}
+
+export function getPrivateTxNodeClusterIP(celoEnv: string) {
+  return retrieveClusterIPAddress('service', 'tx-nodes-private', celoEnv)
 }
 
 export const fetchPassword = (passwordFile: string) => {
@@ -896,6 +915,8 @@ export async function startGeth(
     'extip:127.0.0.1',
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
+    '--istanbul.blockperiod',
+    blocktime.toString(),
   ]
 
   if (rpcport) {
@@ -939,8 +960,6 @@ export async function startGeth(
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
     }
-
-    gethArgs.push(`--istanbul.blockperiod`, blocktime.toString())
 
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
@@ -1165,32 +1184,12 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = merge(
     {
-      downtimeSlasher: {
-        slashableDowntime: 6,
-      },
-      election: {
-        minElectableValidators: '1',
-      },
-      epochRewards: {
-        frozen: false,
-      },
-      exchange: {
-        frozen: false,
-      },
-      goldToken: {
-        frozen: false,
-      },
-      reserve: {
-        initialBalance: 100000000,
-      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
         oracles: validators.map(ensure0x),
-        goldPrice: 10,
-        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),

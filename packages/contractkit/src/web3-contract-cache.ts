@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import { CeloContract } from './base'
+import { CeloContract, ProxyContracts } from './base'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -15,7 +15,9 @@ import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
+import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
 import { newMultiSig } from './generated/MultiSig'
+import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
@@ -27,7 +29,7 @@ import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
-const ContractFactories = {
+export const ContractFactories = {
   [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
@@ -43,6 +45,7 @@ const ContractFactories = {
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
   [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
@@ -53,7 +56,7 @@ const ContractFactories = {
   [CeloContract.Validators]: newValidators,
 }
 
-type CFType = typeof ContractFactories
+export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
 /**
@@ -144,7 +147,9 @@ export class Web3ContractCache {
   async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
-      const createFn = ContractFactories[contract] as CFType[C]
+      const createFn = ProxyContracts.includes(contract)
+        ? newProxy
+        : (ContractFactories[contract] as CFType[C])
       // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,

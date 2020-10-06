@@ -61,11 +61,15 @@ export interface CurrencyConversionArgs {
   sourceCurrencyCode?: string
   currencyCode: string
   timestamp?: number
+  impliedExchangeRates?: MoneyAmount['impliedExchangeRates']
 }
 
 export interface MoneyAmount {
   value: BigNumber.Value
   currencyCode: string
+  // Implied exchange rate (based on exact amount exchanged) which overwrites
+  // the estimate in firebase (based on a constant exchange amount)
+  impliedExchangeRates?: { [key: string]: BigNumber.Value }
   timestamp: number
 }
 
@@ -199,15 +203,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    events(
-      address: String!
-      sort: String
-      startblock: Int
-      endblock: Int
-      page: Int
-      offset: Int
-    ): [Event] @deprecated(reason: "Use tokenTransactions query instead")
-
     rewards(
       address: String!
       sort: String
@@ -243,10 +238,6 @@ interface Context {
 
 export const resolvers = {
   Query: {
-    events: async (_source: any, args: EventArgs, context: Context) => {
-      const { dataSources } = context
-      return dataSources.blockscoutAPI.getFeedEvents(args)
-    },
     rewards: async (_source: any, args: EventArgs, { dataSources }: Context) => {
       return dataSources.blockscoutAPI.getFeedRewards(args)
     },
@@ -323,6 +314,7 @@ export const resolvers = {
         sourceCurrencyCode: moneyAmount.currencyCode,
         currencyCode: localCurrencyCode || 'USD',
         timestamp: moneyAmount.timestamp,
+        impliedExchangeRates: moneyAmount.impliedExchangeRates,
       })
       return {
         value: new BigNumber(moneyAmount.value).multipliedBy(rate).toString(),

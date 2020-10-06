@@ -11,11 +11,3 @@ export const withDecimalSeparator = <T extends WithDecimalSeparatorProps>(
   const { decimalSeparator } = getNumberFormatSettings()
   return <Component {...props} decimalSeparator={decimalSeparator} />
 }
-
-export const convertToPeriodDecimalSeparator = (value: string) => {
-  const { decimalSeparator } = getNumberFormatSettings()
-  if (decimalSeparator !== '.') {
-    value = value.replace(decimalSeparator, '.')
-  }
-  return value
-}
