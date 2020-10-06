@@ -1,8 +1,14 @@
 import { values } from 'lodash'
-import { getContractKitAsync } from 'src/web3/contracts'
+import { DEFAULT_TESTNET } from 'src/config'
+import { getWalletAsync } from 'src/web3/contracts'
 import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
+
+const hardcodedChainIds: { [network: string]: number } = {
+  alfajores: 44787,
+  mainnet: 42220,
+}
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -306,7 +312,7 @@ export async function signTransactionAsync<T>(
   raw: string
   tx: any
 }> {
-  logger(Started)
+  const chainId = hardcodedChainIds[DEFAULT_TESTNET]
   const txParams: Tx = {
     gas: estimatedGas,
     from: account,
@@ -315,13 +321,14 @@ export async function signTransactionAsync<T>(
     // the suggested price in the selected feeCurrency.
     gasPrice: gasPrice ?? '0',
     nonce,
+    chainId,
   }
   try {
     // @ts-ignore - this is not a part of the type definition, but exists in web3.
     // This will give the tx data without actually sending it.
     const request = await tx.send.request(txParams)
-    const kit = await getContractKitAsync()
-    return await kit.web3.eth.signTransaction(request.params[0])
+    const wallet = await getWalletAsync()
+    return await wallet.signTransaction(request.params[0])
   } catch (e) {
     logger(Exception(e))
     throw e

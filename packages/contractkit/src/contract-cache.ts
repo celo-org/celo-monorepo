@@ -87,50 +87,50 @@ export class WrapperCache {
 
   constructor(readonly kit: ContractKit) {}
 
-  getAccounts() {
-    return this.getContract(CeloContract.Accounts)
+  getAccounts(address?: string) {
+    return this.getContract(CeloContract.Accounts, address)
   }
-  getAttestations() {
-    return this.getContract(CeloContract.Attestations)
+  getAttestations(address?: string) {
+    return this.getContract(CeloContract.Attestations, address)
   }
-  getBlockchainParameters() {
-    return this.getContract(CeloContract.BlockchainParameters)
+  getBlockchainParameters(address?: string) {
+    return this.getContract(CeloContract.BlockchainParameters, address)
   }
-  getDoubleSigningSlasher() {
-    return this.getContract(CeloContract.DoubleSigningSlasher)
+  getDoubleSigningSlasher(address?: string) {
+    return this.getContract(CeloContract.DoubleSigningSlasher, address)
   }
-  getDowntimeSlasher() {
-    return this.getContract(CeloContract.DowntimeSlasher)
+  getDowntimeSlasher(address?: string) {
+    return this.getContract(CeloContract.DowntimeSlasher, address)
   }
-  getElection() {
-    return this.getContract(CeloContract.Election)
+  getElection(address?: string) {
+    return this.getContract(CeloContract.Election, address)
   }
-  // getEpochRewards() {
-  //   return this.getContract(CeloContract.EpochRewards)
+  // getEpochRewards(address?: string) {
+  //   return this.getContract(CeloContract.EpochRewards, address)
   // }
-  getEscrow() {
-    return this.getContract(CeloContract.Escrow)
+  getEscrow(address?: string) {
+    return this.getContract(CeloContract.Escrow, address)
   }
-  getExchange() {
-    return this.getContract(CeloContract.Exchange)
+  getExchange(address?: string) {
+    return this.getContract(CeloContract.Exchange, address)
   }
-  getFreezer() {
-    return this.getContract(CeloContract.Freezer)
+  getFreezer(address?: string) {
+    return this.getContract(CeloContract.Freezer, address)
   }
-  // getFeeCurrencyWhitelist() {
-  //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
+  // getFeeCurrencyWhitelist(address?: string) {
+  //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist, address)
   // }
-  getGasPriceMinimum() {
-    return this.getContract(CeloContract.GasPriceMinimum)
+  getGasPriceMinimum(address?: string) {
+    return this.getContract(CeloContract.GasPriceMinimum, address)
   }
-  getGoldToken() {
-    return this.getContract(CeloContract.GoldToken)
+  getGoldToken(address?: string) {
+    return this.getContract(CeloContract.GoldToken, address)
   }
-  getGovernance() {
-    return this.getContract(CeloContract.Governance)
+  getGovernance(address?: string) {
+    return this.getContract(CeloContract.Governance, address)
   }
-  getLockedGold() {
-    return this.getContract(CeloContract.LockedGold)
+  getLockedGold(address?: string) {
+    return this.getContract(CeloContract.LockedGold, address)
   }
   getMetaTransactionWalletDeployer(address: string) {
     return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
@@ -138,20 +138,20 @@ export class WrapperCache {
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
-  // getRegistry() {
-  //   return this.getWrapper(CeloContract.Registry, newRegistry)
+  // getRegistry(address?: string) {
+  //   return this.getWrapper(CeloContract.Registry, newRegistry, address)
   // }
-  getReserve() {
-    return this.getContract(CeloContract.Reserve)
+  getReserve(address?: string) {
+    return this.getContract(CeloContract.Reserve, address)
   }
-  getSortedOracles() {
-    return this.getContract(CeloContract.SortedOracles)
+  getSortedOracles(address?: string) {
+    return this.getContract(CeloContract.SortedOracles, address)
   }
-  getStableToken() {
-    return this.getContract(CeloContract.StableToken)
+  getStableToken(address?: string) {
+    return this.getContract(CeloContract.StableToken, address)
   }
-  getValidators() {
-    return this.getContract(CeloContract.Validators)
+  getValidators(address?: string) {
+    return this.getContract(CeloContract.Validators, address)
   }
 
   /**
