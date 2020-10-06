@@ -225,7 +225,6 @@ export function* handleSendPaymentData(
   }
 }
 
-// MEDHA MEDHA MEDHA MEDHA MEDHA
 export function* handleSendSignedTxData(data: UriData) {
   // DON'T MERGE: just a hacky way to signify a signed txn
   const fakeRecipient: RecipientWithQrCode = {
@@ -238,9 +237,6 @@ export function* handleSendSignedTxData(data: UriData) {
     thumbnailPath: 'fake',
     contactId: 'fake',
   }
-
-  // TODO: idk if i need this
-  // yield put(storeLatestInRecents(recipient))
 
   // DON'T MERGE: just a hacky way to signify a signed txn
   const fakeAmount: BigNumber = new BigNumber('1')
@@ -258,7 +254,6 @@ export function* handleSendSignedTxData(data: UriData) {
     signedTx: data.rawSignedTransaction,
   })
 }
-// MEDHA MEDHA MEDHA MEDHA MEDHA
 
 export function* handlePaymentDeeplink(deeplink: string) {
   try {

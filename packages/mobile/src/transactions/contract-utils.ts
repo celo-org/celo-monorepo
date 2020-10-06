@@ -224,7 +224,6 @@ export async function sendTransactionAsync<T>(
   }
 }
 
-// MEDHA MEDHA MEDHA MEDHA MEDHA
 export async function sendSignedTransactionAsync<T>(
   rawTx: string,
   logger: TxLogger = emptyTxLogger
@@ -294,8 +293,6 @@ export async function sendSignedTransactionAsync<T>(
     confirmation,
   }
 }
-
-// MEDHA MEDHA MEDHA MEDHA MEDHA
 
 export async function signTransactionAsync<T>(
   tx: TransactionObject<T>,

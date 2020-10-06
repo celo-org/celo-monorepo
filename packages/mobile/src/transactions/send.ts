@@ -179,7 +179,6 @@ export function* sendTransactionPromises(
   return transactionPromises
 }
 
-// MEDHA MEDHA MEDHA MEDHA MEDHA
 export function* sendSignedTransactionPromises(rawTx: string, context: TransactionContext) {
   Logger.debug(
     `${TAG}@sendSignedTransactionPromises`,
@@ -189,7 +188,6 @@ export function* sendSignedTransactionPromises(rawTx: string, context: Transacti
   const transactionPromises = yield call(sendSignedTransactionAsync, rawTx, getLogger(context))
   return transactionPromises
 }
-// MEDHA MEDHA MEDHA MEDHA MEDHA
 
 // Send a transaction and await for its confirmation
 // Use this method for sending transactions and awaiting them to be confirmed
