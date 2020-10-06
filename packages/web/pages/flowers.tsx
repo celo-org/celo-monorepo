@@ -1,3 +1,3 @@
-import Page from 'src/codename-allegory/Canvas'
+import Page from 'src/flower/Canvas'
 
 export default Page

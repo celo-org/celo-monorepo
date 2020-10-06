@@ -21,12 +21,11 @@ exports[`BackupComplete renders correctly when social backup is complete 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
+          "fontFamily": "Jost-Book",
+          "fontSize": 26,
+          "lineHeight": 32,
           "marginTop": 20,
-          "paddingBottom": 20,
           "paddingHorizontal": 40,
-          "textAlign": "center",
         }
       }
     >
