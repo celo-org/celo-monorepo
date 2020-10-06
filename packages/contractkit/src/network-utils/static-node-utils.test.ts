@@ -1,5 +1,5 @@
-import { StaticNodeUtils } from './static-node-utils'
 import { _testSetTimezoneOverride } from '../utils/timezone'
+import { StaticNodeUtils } from './static-node-utils'
 
 const testEndpoint = (network: string) =>
   `https://www.googleapis.com/storage/v1/b/static_nodes/o/${network}?alt=media`

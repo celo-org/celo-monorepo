@@ -1,6 +1,6 @@
-import { GoogleStorageUtils } from './google-storage-utils'
-import { Coordinates, timezone } from '../utils/timezone'
 import debugFactory from 'debug'
+import { Coordinates, timezone } from '../utils/timezone'
+import { GoogleStorageUtils } from './google-storage-utils'
 
 const debug = debugFactory('kit:network-utils:static-node-utils')
 
@@ -65,8 +65,33 @@ const StaticNodeRegions: { [network: string]: Region[] } = {
       longitude: { min: -170, max: -105 },
     },
   ],
+  // Alias for mainnet
+  rc1: [
+    {
+      name: 'gcp-asia-east1',
+      longitude: { min: 60, max: -170 },
+    },
+    {
+      name: 'gcp-europe-west1',
+      longitude: { min: -25, max: 60 },
+    },
+    {
+      name: 'gcp-southamerica-east1',
+      lattitude: { min: -90, max: 0 },
+      longitude: { min: -170, max: -25 },
+    },
+    {
+      name: 'gcp-us-east1',
+      lattitude: { min: 0, max: 90 },
+      longitude: { min: -105, max: -25 },
+    },
+    {
+      name: 'gcp-us-west1',
+      lattitude: { min: 0, max: 90 },
+      longitude: { min: -170, max: -105 },
+    },
+  ],
 }
-StaticNodeRegions['rc1'] = StaticNodeRegions['mainnet']
 
 export class StaticNodeUtils {
   static getStaticNodesGoogleStorageBucketName(): string {
