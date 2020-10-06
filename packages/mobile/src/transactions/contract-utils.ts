@@ -1,6 +1,6 @@
 import { values } from 'lodash'
 import { DEFAULT_TESTNET } from 'src/config'
-import { getWalletAsync } from 'src/web3/contracts'
+import { getContractKitAsync, getWalletAsync } from 'src/web3/contracts'
 import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
