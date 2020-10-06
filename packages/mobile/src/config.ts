@@ -128,3 +128,6 @@ export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN
+
+// TODO localize. Ensure a trailing space!
+export const SECURITY_CODE_PREFIX = 'Celo security code: '

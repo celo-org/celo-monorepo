@@ -6,6 +6,7 @@ import {
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { appendPath } from '@celo/utils/lib/string'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
@@ -21,7 +22,7 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
+import { DEFAULT_TESTNET, SECURITY_CODE_PREFIX, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
 import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
@@ -234,7 +235,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       isBalanceSufficient,
     }: VerificationState = yield select(verificationStateSelector)
     if (!status.isVerified) {
-      const { phoneHash } = phoneHashDetails
       const account: string = yield call(getConnectedUnlockedAccount)
 
       const contractKit = yield call(getContractKit)
@@ -263,7 +263,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       // Start listening for manual and/or auto message inputs
       receiveMessageTask = yield takeEvery(
         Actions.RECEIVE_ATTESTATION_MESSAGE,
-        attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+        attestationCodeReceiver(attestationsWrapper, phoneHashDetails, account, attestations)
       )
 
       if (!withoutRevealing) {
@@ -272,7 +272,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
         // We check after which ones were successful
         const reveals: boolean[] = yield call(
           revealAttestations,
-          attestationsWrapper,
           account,
           phoneHashDetails,
           attestations
@@ -297,7 +296,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           attestations = yield call(
             requestAndRetrieveAttestations,
             attestationsWrapper,
-            phoneHash,
+            phoneHashDetails.phoneHash,
             account,
             attestations,
             attestations.length + attestationsToRequest
@@ -311,19 +310,13 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           issuers = attestations.map((a) => a.issuer)
           receiveMessageTask = yield takeEvery(
             Actions.RECEIVE_ATTESTATION_MESSAGE,
-            attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+            attestationCodeReceiver(attestationsWrapper, phoneHashDetails, account, attestations)
           )
 
           ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
           // Request codes for the new list of attestations. We ignore unsuccessfull reveals here,
           // cause we do not want to go into a loop of re-requesting more and more attestations
-          yield call(
-            revealAttestations,
-            attestationsWrapper,
-            account,
-            phoneHashDetails,
-            attestations
-          )
+          yield call(revealAttestations, account, phoneHashDetails, attestations)
           ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
         }
       }
@@ -554,9 +547,9 @@ function* requestAttestations(
 
 function attestationCodeReceiver(
   attestationsWrapper: AttestationsWrapper,
-  phoneHash: string,
+  phoneHashDetails: PhoneNumberHashDetails,
   account: string,
-  allIssuers: string[]
+  attestations: ActionableAttestation[]
 ) {
   return function*(action: ReceiveAttestationMessageAction) {
     if (!action || !action.message) {
@@ -568,7 +561,27 @@ function attestationCodeReceiver(
     }
 
     try {
-      const code = extractAttestationCodeFromMessage(action.message)
+      let code
+
+      // See if this is a security code message. If so, retrieve the actual code from the matching Attestation Service.
+      if (action.message.startsWith(SECURITY_CODE_PREFIX)) {
+        const securityCodeIndex = parseInt(
+          action.message.slice(SECURITY_CODE_PREFIX.length, SECURITY_CODE_PREFIX.length + 1),
+          10
+        )
+        const securityCode = action.message.slice(SECURITY_CODE_PREFIX.length + 1)
+        if (securityCodeIndex < attestations.length) {
+          code = yield call(
+            getAttestationCodeFromSecurityCode,
+            account,
+            phoneHashDetails,
+            attestations[securityCodeIndex],
+            securityCode
+          )
+        }
+      }
+
+      code = code ?? extractAttestationCodeFromMessage(action.message)
       if (!code) {
         throw new Error('No code extracted from message')
       }
@@ -590,10 +603,10 @@ function attestationCodeReceiver(
       ValoraAnalytics.track(VerificationEvents.verification_code_received)
       const issuer = yield call(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
-        phoneHash,
+        phoneHashDetails.phoneHash,
         account,
         code,
-        allIssuers
+        attestations.map((a) => a.issuer)
       )
       if (!issuer) {
         throw new Error('No issuer found for attestion code')
@@ -604,7 +617,7 @@ function attestationCodeReceiver(
       ValoraAnalytics.track(VerificationEvents.verification_code_validate_start, { issuer })
       const isValidRequest = yield call(
         [attestationsWrapper, attestationsWrapper.validateAttestationCode],
-        phoneHash,
+        phoneHashDetails.phoneHash,
         account,
         issuer,
         code
@@ -634,21 +647,15 @@ function* isCodeAlreadyAccepted(code: string) {
 }
 
 function* revealAttestations(
-  attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestations: ActionableAttestation[]
 ) {
   Logger.debug(TAG + '@revealAttestations', `Revealing ${attestations.length} attestations`)
   const reveals = []
-  for (const attestation of attestations) {
-    const success = yield call(
-      revealAttestation,
-      attestationsWrapper,
-      account,
-      phoneHashDetails,
-      attestation
-    )
+  for (let i = 0; i < attestations.length; i++) {
+    const attestation = attestations[i]
+    const success = yield call(revealAttestation, account, phoneHashDetails, attestation, i)
     // TODO (i1skn): remove this clause when
     // https://github.com/celo-org/celo-labs/issues/578 is resolved.
     // This sends messages with 5000ms delay on Android if reveals is successful
@@ -664,6 +671,7 @@ function* revealAttestations(
   yield put(setLastRevealAttempt(Date.now()))
   return reveals
 }
+
 function* completeAttestations(
   attestationsWrapper: AttestationsWrapper,
   account: string,
@@ -678,23 +686,6 @@ function* completeAttestations(
     attestations.map((attestation) => {
       return call(completeAttestation, attestationsWrapper, account, phoneHashDetails, attestation)
     })
-  )
-}
-
-function* revealAttestation(
-  attestationsWrapper: AttestationsWrapper,
-  account: string,
-  phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation
-) {
-  const issuer = attestation.issuer
-  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
-  return yield call(
-    tryRevealPhoneNumber,
-    attestationsWrapper,
-    account,
-    phoneHashDetails,
-    attestation
   )
 }
 
@@ -733,11 +724,88 @@ function* completeAttestation(
   Logger.debug(TAG + '@completeAttestation', `Attestation for issuer ${issuer} completed`)
 }
 
-function* tryRevealPhoneNumber(
-  attestationsWrapper: AttestationsWrapper,
+// Get the code from the store if it's already there, otherwise wait for it
+function* waitForAttestationCode(issuer: string) {
+  Logger.debug(TAG + '@waitForAttestationCode', `Waiting for code for issuer ${issuer}`)
+  const code = yield call(getCodeForIssuer, issuer)
+  if (code) {
+    return code
+  }
+
+  while (true) {
+    const action: InputAttestationCodeAction = yield take(Actions.INPUT_ATTESTATION_CODE)
+    if (action.code.issuer === issuer) {
+      return action.code
+    }
+  }
+}
+
+function* revealAttestation(
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation
+  attestation: ActionableAttestation,
+  index: number
+) {
+  const issuer = attestation.issuer
+  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
+  return yield call(tryRevealPhoneNumber, account, phoneHashDetails, attestation, index)
+}
+
+function* getAttestationCodeFromSecurityCode(
+  account: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  attestation: ActionableAttestation,
+  securityCode: string
+) {
+  const issuer = attestation.issuer
+  Logger.debug(
+    TAG + '@getAttestationCodeFromSecurityCode',
+    `Revealing an attestation for issuer: ${issuer}`
+  )
+  try {
+    // Proxy required for any network where attestation service domains are not static
+    // This works around TLS issues
+    const useProxy = DEFAULT_TESTNET === 'mainnet'
+    const getRequestBody: AttesationServiceRevealRequest = {
+      account,
+      issuer: attestation.issuer,
+      phoneNumber: phoneHashDetails.e164Number,
+      salt: phoneHashDetails.pepper,
+    }
+
+    const { ok, status, body } = yield call(
+      getToAttestationService,
+      attestation.attestationServiceURL,
+      getRequestBody,
+      useProxy,
+      securityCode
+    )
+
+    if (ok && body.attestationCode) {
+      return body.attestationCode
+    }
+
+    throw new Error(`Error submitting security code for ${issuer}. Status code: ${status}`)
+  } catch (error) {
+    Logger.error(
+      TAG + '@getAttestationCodeFromSecurityCode',
+      `get for issuer ${issuer} failed`,
+      error
+    )
+    // TODO new events
+    // ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_error, {
+    //   issuer,
+    //   error: error.message,
+    // })
+    return false
+  }
+}
+
+function* tryRevealPhoneNumber(
+  account: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  attestation: ActionableAttestation,
+  index: number
 ) {
   const issuer = attestation.issuer
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
@@ -756,11 +824,11 @@ function* tryRevealPhoneNumber(
       phoneNumber: phoneHashDetails.e164Number,
       salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
+      securityCodePrefix: `${SECURITY_CODE_PREFIX}${index}`, // TODO localize
     }
 
     const { ok, status, body } = yield call(
       postToAttestationService,
-      attestationsWrapper,
       attestation.attestationServiceURL,
       revealRequestBody,
       useProxy
@@ -783,7 +851,6 @@ function* tryRevealPhoneNumber(
 
       const { ok: retryOk, status: retryStatus } = yield call(
         postToAttestationService,
-        attestationsWrapper,
         attestation.attestationServiceURL,
         revealRequestBody,
         useProxy
@@ -821,7 +888,6 @@ function* tryRevealPhoneNumber(
 }
 
 async function postToAttestationService(
-  attestationsWrapper: AttestationsWrapper,
   attestationServiceUrl: string,
   revealRequestBody: AttesationServiceRevealRequest,
   useProxy: boolean
@@ -853,31 +919,48 @@ async function postToAttestationService(
       `${TAG}@postToAttestationService`,
       `Revealing with contract kit for service url ${attestationServiceUrl}`
     )
-    const response = await attestationsWrapper.revealPhoneNumberToIssuer(
-      revealRequestBody.phoneNumber,
-      revealRequestBody.account,
-      revealRequestBody.issuer,
-      attestationServiceUrl,
-      revealRequestBody.salt,
-      revealRequestBody.smsRetrieverAppSig
-    )
+
+    const response = await fetch(appendPath(attestationServiceUrl, 'attestations'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(revealRequestBody),
+    })
+
     const body = await response.json()
     return { ok: response.ok, status: response.status, body }
   }
 }
 
-// Get the code from the store if it's already there, otherwise wait for it
-function* waitForAttestationCode(issuer: string) {
-  Logger.debug(TAG + '@waitForAttestationCode', `Waiting for code for issuer ${issuer}`)
-  const code = yield call(getCodeForIssuer, issuer)
-  if (code) {
-    return code
-  }
+// Get delivery status and, given a security code, an attestation code
+async function getToAttestationService(
+  attestationServiceUrl: string,
+  revealRequestBody: AttesationServiceRevealRequest,
+  useProxy: boolean,
+  securityCode: string | undefined
+) {
+  if (useProxy) {
+    // TODO
+    throw new Error('Unsupported!')
+  } else {
+    const response = await fetch(
+      appendPath(attestationServiceUrl, 'get_attestations') +
+        '?' +
+        new URLSearchParams({
+          phoneNumber: revealRequestBody.phoneNumber,
+          salt: revealRequestBody.salt ?? '',
+          issuer: revealRequestBody.issuer,
+          account: revealRequestBody.account,
+          securityCode: securityCode ?? '',
+        }),
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
 
-  while (true) {
-    const action: InputAttestationCodeAction = yield take(Actions.INPUT_ATTESTATION_CODE)
-    if (action.code.issuer === issuer) {
-      return action.code
-    }
+    const body = JSON.parse(await response.text())
+    return { ok: response.ok, status: response.status, body }
   }
 }
