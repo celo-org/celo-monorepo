@@ -1,12 +1,12 @@
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Title from 'src/dev/Title'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
@@ -29,7 +29,7 @@ export default withNamespaces(NameSpaces.download)(
           allStyle={standardStyles.centered}
         >
           <Cell span={Spans.half}>
-            <Fade distance={'20px'} bottom={true}>
+            <Fade distance={'20px'} direction="up">
               <View style={standardStyles.centered}>
                 <H1 style={[textStyles.center, standardStyles.elementalMargin]} ariaLevel={'2'}>
                   {t('haveAccount')}

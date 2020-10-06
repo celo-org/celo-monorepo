@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
@@ -20,7 +20,7 @@ class HomeWork extends React.PureComponent<Props> {
         desktopStyle={[standardStyles.sectionMargin]}
       >
         <Cell span={Spans.half} style={styles.alignCenter}>
-          <Fade bottom={true} duration={750} distance="20px">
+          <Fade direction="up" duration={750} distance="20px">
             <View>
               <H1 ariaLevel="2" accessibilityRole={'heading'} style={textStyles.center}>
                 {this.props.t('workOnCelo')}

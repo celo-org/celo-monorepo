@@ -1,12 +1,12 @@
 import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 import * as React from 'react'
 import { View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Articles from 'src/community/Articles'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
@@ -29,7 +29,7 @@ class ArticlesSection extends React.PureComponent<Props> {
           mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
         >
           <Cell span={Spans.full} style={standardStyles.centered}>
-            <Fade bottom={true} distance={'20px'}>
+            <Fade direction="up" distance={'20px'}>
               <H2>{title}</H2>
             </Fade>
           </Cell>
