@@ -115,7 +115,7 @@ export const sendPaymentOrInvite = (
   firebasePendingRequestUid,
 })
 
-export const sendSignedTxn = (rawTx: string): SendSignedTxAction => ({
+export const sendSignedTx = (rawTx: string): SendSignedTxAction => ({
   type: Actions.SEND_SIGNED_TXN,
   rawTx,
 })

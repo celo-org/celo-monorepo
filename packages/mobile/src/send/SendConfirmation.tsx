@@ -47,7 +47,7 @@ import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
-import { sendPaymentOrInvite, sendSignedTxn } from 'src/send/actions'
+import { sendPaymentOrInvite, sendSignedTx } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -75,7 +75,7 @@ interface StateProps {
 
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
-  sendSignedTx: typeof sendSignedTxn
+  sendSignedTx: typeof sendSignedTx
   fetchDollarBalance: typeof fetchDollarBalance
   fetchDataEncryptionKey: typeof fetchDataEncryptionKey
 }
@@ -94,6 +94,7 @@ const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
   fetchDataEncryptionKey,
+  sendSignedTx,
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {

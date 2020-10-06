@@ -226,28 +226,24 @@ export function* handleSendPaymentData(
 }
 
 // MEDHA MEDHA MEDHA MEDHA MEDHA
-export function* handleSendSignedTxData(
-  data: UriData,
-  cachedRecipient?: RecipientWithContact,
-  isOutgoingPaymentRequest?: true
-) {
+export function* handleSendSignedTxData(data: UriData) {
   // DON'T MERGE: just a hacky way to signify a signed txn
   const fakeRecipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
     address: data.address!,
     displayId: data.e164PhoneNumber,
-    displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
+    displayName: data.displayName || 'anonymous',
     e164PhoneNumber: data.e164PhoneNumber,
-    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
-    thumbnailPath: cachedRecipient?.thumbnailPath,
-    contactId: cachedRecipient?.contactId,
+    phoneNumberLabel: 'fake',
+    thumbnailPath: 'fake',
+    contactId: 'fake',
   }
 
   // TODO: idk if i need this
   // yield put(storeLatestInRecents(recipient))
 
   // DON'T MERGE: just a hacky way to signify a signed txn
-  const fakeAmount: BigNumber = new BigNumber(0)
+  const fakeAmount: BigNumber = new BigNumber('1')
 
   const transactionData: TransactionDataInput = {
     recipient: fakeRecipient,
@@ -255,6 +251,7 @@ export function* handleSendSignedTxData(
     reason: data.comment,
     type: TokenTransactionType.SendSignedTx,
   }
+  console.log('before: ', transactionData.amount)
   navigate(Screens.SendConfirmation, {
     transactionData,
     isFromScan: true,
