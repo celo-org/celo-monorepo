@@ -119,7 +119,7 @@ export const vNeg1Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: {},
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -264,7 +264,7 @@ export const v0Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: [],
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -369,6 +369,7 @@ export const v5Schema = {
     ...v3Schema.account,
     incomingPaymentRequests: undefined,
     outgoingPaymentRequests: undefined,
+    dismissedGoldEducation: false,
   },
   paymentRequest: {
     incomingPaymentRequests: [],
@@ -378,6 +379,26 @@ export const v5Schema = {
     ...v3Schema.web3,
     dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
     commentKey: undefined,
+  },
+  identity: {
+    ...v3Schema.identity,
+    lastRevealAttempt: null,
+    verificationState: {
+      isLoading: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: 3,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+    },
   },
 }
 

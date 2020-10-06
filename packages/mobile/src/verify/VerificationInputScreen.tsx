@@ -1,8 +1,9 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import dotProp from 'dot-prop-immutable'
@@ -11,20 +12,26 @@ import { WithTranslation } from 'react-i18next'
 import { LayoutAnimation, Platform, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect, useDispatch } from 'react-redux'
-import { hideAlert } from 'src/alert/actions'
+import { hideAlert, showMessage } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import {
+  cancelVerification,
+  receiveAttestationMessage,
+  resendAttestations,
+} from 'src/identity/actions'
+import { isRevealAllowed } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   CodeInputType,
   NUM_ATTESTATIONS_REQUIRED,
 } from 'src/identity/verification'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -44,12 +51,15 @@ interface StateProps {
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   underlyingError: ErrorMessages | null | undefined
+  isRevealAllowed: boolean
 }
 
 interface DispatchProps {
   cancelVerification: typeof cancelVerification
   receiveAttestationMessage: typeof receiveAttestationMessage
+  resendAttestations: typeof resendAttestations
   hideAlert: typeof hideAlert
+  showMessage: typeof showMessage
 }
 
 type Props = StateProps & DispatchProps & WithTranslation & ScreenProps
@@ -65,7 +75,9 @@ interface State {
 const mapDispatchToProps = {
   cancelVerification,
   receiveAttestationMessage,
+  resendAttestations,
   hideAlert,
+  showMessage,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -75,6 +87,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     numCompleteAttestations: state.identity.numCompleteAttestations,
     verificationStatus: state.identity.verificationStatus,
     underlyingError: errorSelector(state),
+    isRevealAllowed: isRevealAllowed(state),
   }
 }
 
@@ -206,6 +219,18 @@ class VerificationInputScreen extends React.Component<Props, State> {
     navigateHome()
   }
 
+  onPressResend = () => {
+    if (this.props.isRevealAllowed) {
+      this.props.resendAttestations()
+    } else {
+      this.props.showMessage(
+        this.props.t('verificationPrematureRevealMessage'),
+        ALERT_BANNER_DURATION,
+        null
+      )
+    }
+  }
+
   render() {
     const {
       codeInputValues,
@@ -257,6 +282,13 @@ class VerificationInputScreen extends React.Component<Props, State> {
                         />
                       </View>
                     ))}
+                    <View style={styles.spacer} />
+                    <TextButton style={styles.resendButton} onPress={this.onPressResend}>
+                      {t(
+                        `verificationInput.resendMessages${numCompleteAttestations ? '' : '_all'}`,
+                        { count: NUM_ATTESTATIONS_REQUIRED - numCompleteAttestations }
+                      )}
+                    </TextButton>
                   </KeyboardAwareScrollView>
                   <View style={styles.tipContainer} pointerEvents="none">
                     <View
@@ -324,6 +356,14 @@ const styles = StyleSheet.create({
     color: colors.light,
     paddingVertical: Spacing.Smallest8,
     paddingHorizontal: Spacing.Regular16,
+  },
+  resendButton: {
+    textAlign: 'center',
+    color: colors.onboardingBrownLight,
+    padding: Spacing.Regular16,
+  },
+  spacer: {
+    flex: 1,
   },
 })
 

@@ -131,9 +131,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
@@ -168,9 +168,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",

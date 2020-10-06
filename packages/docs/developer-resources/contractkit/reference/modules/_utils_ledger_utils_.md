@@ -12,7 +12,7 @@
 
 ▸ **transportErrorFriendlyMessage**(`error`: any): *void*
 
-*Defined in [contractkit/src/utils/ledger-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/ledger-utils.ts#L5)*
+*Defined in [packages/contractkit/src/utils/ledger-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/ledger-utils.ts#L5)*
 
 **Parameters:**
 

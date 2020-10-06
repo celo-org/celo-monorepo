@@ -98,8 +98,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.red,
   },
   bar: {
-    transformProperty: 'background-color',
-    transformDuration: '1s',
+    transitionProperty: 'background-color',
+    transitionDuration: '1s',
     height: '100%',
     width: '100%',
     transformOrigin: 'left',

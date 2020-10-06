@@ -10,7 +10,8 @@ import { PincodeType } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
-import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { refreshAllBalances } from 'src/home/actions'
+import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
   InviteBy,
   redeemInvite,
@@ -18,14 +19,18 @@ import {
   redeemInviteSuccess,
   sendInvite,
   SENTINEL_INVITE_COMMENT,
+  skipInvite as skipInviteAction,
+  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import {
   generateInviteLink,
   moveAllFundsFromAccount,
+  skipInvite,
   watchRedeemInvite,
   watchSendInvite,
 } from 'src/invite/saga'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { getSendFee } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
@@ -42,10 +47,6 @@ jest.mock('src/firebase/dynamicLinks', () => ({
   generateShortInviteLink: jest.fn(async () => 'http://celo.page.link/PARAMS'),
 }))
 
-jest.mock('src/utils/appstore', () => ({
-  getAppStoreId: jest.fn(async () => '1482389446'),
-}))
-
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
   getPincode: async () => 'pin',
@@ -54,6 +55,13 @@ jest.mock('src/account/actions', () => ({
 jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
+
+jest.mock('src/config', () => {
+  return {
+    ...jest.requireActual('src/config'),
+    APP_STORE_ID: '1482389446',
+  }
+})
 
 SendIntentAndroid.sendSms = jest.fn()
 SendSMS.send = jest.fn()
@@ -85,7 +93,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -116,7 +124,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -147,7 +155,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -172,7 +180,7 @@ describe(watchSendInvite, () => {
       .put(
         transferStableToken({
           recipientAddress: mockAccount,
-          amount: '0.25',
+          amount: '0.30',
           comment: SENTINEL_INVITE_COMMENT,
           context: { id: 'a uuid' },
         })
@@ -258,9 +266,28 @@ describe(generateInviteLink, () => {
     expect(result).toBe('http://celo.page.link/PARAMS')
     expect(generateShortInviteLink).toBeCalledTimes(1)
     expect(generateShortInviteLink).toHaveBeenCalledWith({
-      link: `https://celo.org/build/wallet?invite-code=${mockKey}`,
+      link: `https://valoraapp.com/?invite-code=${mockKey}`,
       appStoreId: '1482389446',
       bundleId: 'org.celo.mobile.alfajores',
     })
+  })
+})
+
+describe(skipInvite, () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('updates the state and navigates to the home screen', async () => {
+    await expectSaga(skipInvite)
+      .provide([[call(getOrCreateAccount), mockAccount]])
+      .withState(state)
+      .put(skipInviteSuccess())
+      .put(refreshAllBalances())
+      .put(setHasSeenVerificationNux(true))
+      .dispatch(skipInviteAction())
+      .run()
+
+    expect(navigateHome).toHaveBeenCalledWith()
   })
 })

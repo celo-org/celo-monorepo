@@ -5266,12 +5266,14 @@ exports[`Error renders 1`] = `
           "justifyContent": "center",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
         }
       }
     >
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5294,6 +5296,7 @@ exports[`Error renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -5315,8 +5318,6 @@ exports[`Error renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",

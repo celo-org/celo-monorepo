@@ -32,6 +32,7 @@ const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
   menu.BRAND_POLICY,
+  menu.PRESS,
   { name: 'Events', link: eventsLink },
   menu.EVENTS_KIT,
   menu.BRAND,
@@ -44,7 +45,7 @@ const SOCIAL_MENU = [
   {
     name: 'Blog',
     link: CeloLinks.mediumPublication,
-    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} />,
+    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} wrapWithLink={false} />,
   },
   {
     name: 'GitHub',

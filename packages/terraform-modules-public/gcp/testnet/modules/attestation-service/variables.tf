@@ -94,6 +94,11 @@ variable nexmo_blacklist {
   description = "Nexmo blacklisted country codes, separated by comma (check nexmo documentation)"
 }
 
+variable nexmo_unsupported_regions {
+  type        = string
+  description = "Nexmo unsupported country codes, separated by comma (check nexmo documentation)"
+}
+
 variable twilio_account_sid {
   type        = string
   description = "Twilio account SID (check twilio documentation)"
@@ -113,6 +118,12 @@ variable twilio_blacklist {
   type        = string
   description = "Twilio blacklisted country codes, separated by comma  (check twilio documentation)"
 }
+
+variable twilio_unsupported_regions {
+  type        = string
+  description = "Twilio unsupported country codes, separated by comma  (check twilio documentation)"
+}
+
 
 variable "service_account_scopes" {
   description = "Scopes to apply to the service account which all nodes in the cluster will inherit"

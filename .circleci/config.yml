@@ -93,10 +93,6 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
-      - run:
-          name: Fail if there are vulnerabilities in packages
-          command: |
-            /bin/bash -c 'yarn audit --groups dependencies --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -389,6 +385,13 @@ jobs:
       - run: yarn run prettify:diff
       - run: yarn run lint
 
+  vulnerability-checks:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run: ./scripts/ci_check_vulnerabilities.sh
+
   general-test:
     <<: *defaults
     steps:
@@ -474,11 +477,12 @@ jobs:
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against first commit to contain version numbers"
             git fetch --all
-            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
-            yarn --cwd packages/protocol check-versions -o $RELEASE_BRANCH -n $CIRCLE_BRANCH
+            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
+            yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
 
-            LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only packages/protocol/contracts/common/linkedlists)
+            LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
             if [[ $LIBRARIES_CHANGED ]]; then
               echo "Changing the linked list libraries is not currently supported."
               exit 0
@@ -961,6 +965,9 @@ workflows:
           requires:
             - install_dependencies
       - lint-checks:
+          requires:
+            - install_dependencies
+      - vulnerability-checks:
           requires:
             - install_dependencies
       - general-test:

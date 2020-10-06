@@ -61,10 +61,10 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 Make sure to complete all prerequisites before applying. 
 {% endhint %}
 
-[APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/Ov9U0S)
+[APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/xcPM1pF9)
 
 ### Timings
-Cohort 5 application deadline: **Oct 1, 2020 at 23:59 UTC**
+Cohort 5 application deadline: **Oct 9, 2020 at 23:59 UTC**
 
 Anticipated vote date for selected applicants in Cohort 5: **Nov 2, 2020**
 

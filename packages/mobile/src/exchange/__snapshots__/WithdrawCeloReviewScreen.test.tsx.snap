@@ -295,24 +295,35 @@ exports[`WithdrawCeloReviewScreen renders correctly 1`] = `
                   
                 </Text>
               </View>
-              <View
+              <Text
                 style={
-                  Object {
-                    "transform": Array [
-                      Object {
-                        "scale": 0.7,
-                      },
-                    ],
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
-                <ActivityIndicator
-                  animating={true}
-                  color="#42D689"
-                  hidesWhenStopped={true}
-                  size="small"
-                />
-              </View>
+                <Text
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      undefined,
+                      Object {
+                        "color": undefined,
+                      },
+                    ]
+                  }
+                >
+                  
+                  
+                  0
+                </Text>
+              </Text>
             </View>
           </View>
         </View>

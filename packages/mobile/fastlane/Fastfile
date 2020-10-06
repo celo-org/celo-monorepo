@@ -20,7 +20,11 @@ def fastlane_supply(env, track)
     track_promote_to: track,
     package_name: get_app_bundle_id(env),
     mapping: get_mapping_path(env),
-    skip_upload_apk: true
+    skip_upload_apk: true,
+    skip_upload_metadata: true,
+    skip_upload_changelogs: true,
+    skip_upload_images: true,
+    skip_upload_screenshots: true
   )
 end
 

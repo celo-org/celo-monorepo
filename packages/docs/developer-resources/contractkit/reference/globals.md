@@ -78,6 +78,7 @@
 * ["wrappers/GoldTokenWrapper"](modules/_wrappers_goldtokenwrapper_.md)
 * ["wrappers/Governance"](modules/_wrappers_governance_.md)
 * ["wrappers/LockedGold"](modules/_wrappers_lockedgold_.md)
+* ["wrappers/MetaTransactionWalletDeployer"](modules/_wrappers_metatransactionwalletdeployer_.md)
 * ["wrappers/MultiSig"](modules/_wrappers_multisig_.md)
 * ["wrappers/ReleaseGold"](modules/_wrappers_releasegold_.md)
 * ["wrappers/Reserve"](modules/_wrappers_reserve_.md)

@@ -6,6 +6,7 @@ import {
   ContractKitEvents,
   EscrowEvents,
   FeeEvents,
+  FiatExchangeEvents,
   GethEvents,
   HomeEvents,
   IdentityEvents,
@@ -80,6 +81,7 @@ interface SettingsEventsProperties {
   [SettingsEvents.language_select]: {
     language: string
   }
+  [SettingsEvents.settings_verify_number]: undefined
   [SettingsEvents.pin_require_on_load]: {
     enabled: boolean
   }
@@ -167,10 +169,13 @@ interface OnboardingEventsProperties {
 
   [OnboardingEvents.invite_redeem_start]: undefined
   [OnboardingEvents.invite_redeem_complete]: undefined
+  [OnboardingEvents.invite_redeem_cancel]: undefined
   [OnboardingEvents.invite_redeem_timeout]: undefined
   [OnboardingEvents.invite_redeem_error]: {
     error: string
   }
+  [OnboardingEvents.invite_redeem_move_funds_start]: undefined
+  [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
   [OnboardingEvents.invite_redeem_skip_start]: undefined
   [OnboardingEvents.invite_redeem_skip_complete]: undefined
@@ -184,7 +189,12 @@ interface OnboardingEventsProperties {
     error: string
   }
 
-  [OnboardingEvents.account_dek_set]: undefined
+  [OnboardingEvents.account_dek_register_start]: undefined
+  [OnboardingEvents.account_dek_register_account_unlocked]: undefined
+  [OnboardingEvents.account_dek_register_account_checked]: undefined
+  [OnboardingEvents.account_dek_register_complete]: {
+    newRegistration: boolean
+  }
 }
 
 interface VerificationEventsProperties {
@@ -267,6 +277,9 @@ interface VerificationEventsProperties {
   [VerificationEvents.verification_revoke_finish]: undefined
   [VerificationEvents.verification_revoke_error]: {
     error: string
+  }
+  [VerificationEvents.verification_resend_messages]: {
+    count: number
   }
 }
 
@@ -568,6 +581,13 @@ interface CeloExchangeEventsProperties {
   }
 }
 
+interface FiatExchangeEventsProperties {
+  [FiatExchangeEvents.external_exchange_link]: {
+    name: string
+    link: string
+  }
+}
+
 interface GethEventsProperties {
   [GethEvents.blockchain_corruption]: undefined
   [GethEvents.geth_init_success]: undefined
@@ -581,7 +601,7 @@ interface GethEventsProperties {
     context: string
   }
   [GethEvents.geth_init_start]: {
-    sync: boolean
+    shouldStartNode: boolean
   }
   [GethEvents.create_geth_start]: undefined
   [GethEvents.create_geth_finish]: undefined
@@ -649,6 +669,7 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FeeEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
+  FiatExchangeEventsProperties &
   GethEventsProperties &
   NetworkEventsProperties &
   ContractKitEventsProperties

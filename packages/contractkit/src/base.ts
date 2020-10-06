@@ -16,6 +16,7 @@ export enum CeloContract {
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   LockedGold = 'LockedGold',
+  MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
   MultiSig = 'MultiSig',
   Random = 'Random',
   Registry = 'Registry',
@@ -26,29 +27,7 @@ export enum CeloContract {
   Validators = 'Validators',
 }
 
-export const ProxyContracts = [
-  'AccountsProxy',
-  'AttestationsProxy',
-  'BlockchainParametersProxy',
-  'DoubleSigningSlasherProxy',
-  'DowntimeSlasherProxy',
-  'ElectionProxy',
-  'EpochRewardsProxy',
-  'EscrowProxy',
-  'ExchangeProxy',
-  'FeeCurrencyWhitelistProxy',
-  'FreezerProxy',
-  'GasPriceMinimumProxy',
-  'GoldTokenProxy',
-  'GovernanceApproverMultiSigProxy',
-  'GovernanceProxy',
-  'LockedGoldProxy',
-  'ReserveProxy',
-  'ReserveSpenderMultiSigProxy',
-  'StableTokenProxy',
-  'SortedOraclesProxy',
-  'RegistryProxy',
-]
+export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
 export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
 

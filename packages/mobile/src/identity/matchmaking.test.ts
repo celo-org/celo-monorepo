@@ -23,6 +23,7 @@ import {
 jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   ...jest.requireActual('../../__mocks__/@celo/contractkit/index'),
+  OdisUtils: jest.requireActual('@celo/contractkit').OdisUtils,
 }))
 
 describe('Fetch contact matches', () => {
@@ -89,13 +90,5 @@ describe('Fetch contact matches', () => {
       .withState(state)
       .put(addContactsMatches(expectedMatches))
       .run()
-  })
-})
-
-describe(OdisUtils.Matchmaking.obfuscateNumberForMatchmaking, () => {
-  it('Hashes sigs correctly', () => {
-    expect(OdisUtils.Matchmaking.obfuscateNumberForMatchmaking(mockE164Number2)).toBe(
-      'Fox23FU+SCdDPhk2I2h4e2UC63lyOWMygxc4wTAXu9w='
-    )
   })
 })
