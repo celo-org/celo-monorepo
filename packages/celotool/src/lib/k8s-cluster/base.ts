@@ -1,6 +1,6 @@
-import { createNamespaceIfNotExists } from 'src/lib/cluster'
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
+import { createNamespaceIfNotExists } from '../cluster'
+import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
+import { installAndEnableMetricsDeps, redeployTiller } from '../helm_deploy'
 
 export enum CloudProvider {
   AWS,
