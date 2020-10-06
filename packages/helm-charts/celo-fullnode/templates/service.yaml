@@ -4,18 +4,36 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" $ }}-{{ $index }}
   annotations:
+{{ if $.Values.azure }}
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+{{ end }}
   labels:
-{{ include "celo-fullnode.labels" $ | indent 4 }}
+{{ include "common.standard.labels" $ | indent 4 }}
+    component: celo-fullnode-protocol-traffic
 spec:
   type: {{ $.Values.geth.service_type }}
-{{- if $.Values.geth.use_static_ips }}
+  publishNotReadyAddresses: true
+{{- if (eq $.Values.geth.service_type "LoadBalancer") }}
   loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
 {{- end }}
   ports:
+{{- if $.Values.geth.service_node_port_per_full_node }}
+{{- $port := index $.Values.geth.service_node_port_per_full_node $index }}
+    - targetPort: {{ $port }}
+      port: {{ $port }}
+      nodePort: {{ $port }}
+      name: tcp
+      protocol: TCP
+    - targetPort: {{ $port }}
+      port: {{ $port }}
+      nodePort: {{ $port }}
+      name: udp
+      protocol: UDP
+{{- else }}
     - port: 30303
       targetPort: ethereum
       name: ethereum
+{{- end }}
 {{- if $.Values.geth.expose_rpc_externally }}
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
 {{- end }}
@@ -28,10 +46,12 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" . }}-rpc
   labels:
-{{ include "celo-fullnode.labels" .  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
+  component: celo-fullnode-rpc-traffic
 spec:
   type: ClusterIP
   ports:
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
   selector:
-{{ include "celo-fullnode.labels" .  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
+  component: celo-fullnode

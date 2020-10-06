@@ -6,7 +6,8 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-{{ include "celo-fullnode.labels" .  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
+  component: celo-fullnode-rpc-traffic-ing
 {{- with .Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
