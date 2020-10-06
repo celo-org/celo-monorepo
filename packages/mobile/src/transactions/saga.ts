@@ -28,14 +28,15 @@ import {
   standbyTransactionsSelector,
 } from 'src/transactions/reducer'
 import {
+  sendSignedTransactionPromises,
   sendTransactionPromises,
   signTransactionPromise,
   wrapSendTransactionWithRetry,
 } from 'src/transactions/send'
 import { StandbyTransaction, TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { reserveNonce } from 'src/web3/saga'
 import { fetchNonce } from 'src/web3/actions'
+import { reserveNonce } from 'src/web3/saga'
 
 const TAG = 'transactions/saga'
 
@@ -139,6 +140,44 @@ export function* sendAndMonitorTransaction<T>(
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
 }
+
+// MEDHA MEDHA MEDHA MEDHA MEDHA
+export function* sendAndMonitorSignedTransaction<T>(rawTx: string, context: TransactionContext) {
+  try {
+    Logger.debug(
+      TAG + '@sendAndMonitorSignedTransaction',
+      `Sending signed transaction with id: ${context.id}`
+    )
+
+    const sendSignedTxMethod = function*() {
+      const { transactionHash, confirmation }: TxPromises = yield call(
+        sendSignedTransactionPromises,
+        rawTx,
+        context
+      )
+      const hash = yield transactionHash
+      yield put(addHashToStandbyTransaction(context.id, hash))
+      // Update the cached nonce value, which may have been updated.
+      yield put(fetchNonce())
+      const result = yield confirmation
+      return result
+    }
+    // yield call(wrapSendTransactionWithRetry, sendSignedTxMethod, context)
+    yield call(sendSignedTxMethod)
+
+    yield put(transactionConfirmed(context.id))
+  } catch (error) {
+    Logger.error(
+      TAG + '@sendAndMonitorSignedTransaction',
+      `Error sending signed tx ${context.id}`,
+      error
+    )
+    yield put(removeStandbyTransaction(context.id))
+    yield put(transactionFailed(context.id))
+    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+  }
+}
+// MEDHA MEDHA MEDHA MEDHA MEDHA
 
 function* refreshRecentTxRecipients() {
   const addressToE164Number = yield select(addressToE164NumberSelector)
