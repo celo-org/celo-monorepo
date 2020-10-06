@@ -1,7 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Switch from '@celo/react-components/components/Switch'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -122,7 +121,7 @@ class BackupSocial extends React.Component<Props, State> {
               showCopy={true}
               mode={BackupPhraseContainerMode.READONLY}
               type={BackupPhraseType.SOCIAL_BACKUP}
-              style={componentStyles.marginTop20}
+              style={styles.backupContainer}
             />
           </View>
           {!socialBackupCompleted && (
@@ -137,7 +136,6 @@ class BackupSocial extends React.Component<Props, State> {
             disabled={!isConfirmChecked}
             onPress={this.onPressDone}
             text={t('global:done')}
-            standard={false}
             type={BtnTypes.PRIMARY}
           />
         )}
@@ -151,13 +149,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
+  backupContainer: {
+    marginTop: 20,
+  },
   scrollContainer: {
     flexGrow: 1,
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
   bodyText: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     marginBottom: 20,
   },
   confirmationSwitchContainer: {
@@ -165,8 +166,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   confirmationSwitchLabel: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.regular500,
     paddingTop: 5,
     paddingLeft: 8,
     paddingRight: 5,

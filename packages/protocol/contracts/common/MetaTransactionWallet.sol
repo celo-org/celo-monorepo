@@ -48,7 +48,7 @@ contract MetaTransactionWallet is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 1, 0, 1);
   }
 
   /**
@@ -56,6 +56,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function initialize(address _signer) external initializer {
+    _transferOwnership(msg.sender);
     setSigner(_signer);
     setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
@@ -100,6 +101,32 @@ contract MetaTransactionWallet is
   }
 
   /**
+   * @notice Returns the struct hash of the MetaTransaction
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @return The digest of the provided meta-transaction.
+   */
+  function _getMetaTransactionStructHash(
+    address destination,
+    uint256 value,
+    bytes memory data,
+    uint256 _nonce
+  ) internal view returns (bytes32) {
+    return
+      keccak256(
+        abi.encode(
+          EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
+          destination,
+          value,
+          keccak256(data),
+          _nonce
+        )
+      );
+  }
+
+  /**
    * @notice Returns the digest of the provided meta-transaction, to be signed by `sender`.
    * @param destination The address to which the meta-transaction is to be sent.
    * @param value The CELO value to be sent with the meta-transaction.
@@ -113,16 +140,8 @@ contract MetaTransactionWallet is
     bytes memory data,
     uint256 _nonce
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(
-        EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
-        destination,
-        value,
-        keccak256(data),
-        _nonce
-      )
-    );
-    return keccak256(abi.encodePacked("\x19\x01", eip712DomainSeparator, structHash));
+    bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
+    return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
   }
 
   /**
@@ -145,8 +164,8 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    bytes32 digest = getMetaTransactionDigest(destination, value, data, _nonce);
-    return Signatures.getSignerOfMessageHash(digest, v, r, s);
+    bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
+    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
   }
 
   /**

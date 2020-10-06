@@ -1,4 +1,5 @@
 // tslint:disable: max-classes-per-file
+import { stripMetadata } from '@celo/protocol/lib/bytecode'
 import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
@@ -33,12 +34,6 @@ enum StorageLocation {
 
 const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
-const CONTRACT_METADATA_REGEXPS = [
-  // 0.5.8
-  'a165627a7a72305820.*0029',
-  // 0.5.12
-  'a265627a7a72315820.*64736f6c6343.*0032'
-]
 
 // Exported classes
 
@@ -351,22 +346,6 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
   }
 }
 
-/*
- * The Solidity compiler appends a Swarm Hash of compilation metadata to the end
- * of bytecode. We find this hash based on the specification here:
- * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
- */
-const stripMetadataIfPresent = (bytecode: string): string => {
-  try {
-    const regexp = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
-    // TODO: use proper CBOR parser
-    const [, bytes] = bytecode.match(regexp)
-    return bytes
-  } catch (e) {
-    return bytecode
-  }
-}
-
 function doASTCompatibilityReport(
   contractName: string,
   oldAST: ContractAST,
@@ -441,7 +420,7 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  if (stripMetadataIfPresent(oldContract.schema.deployedBytecode) !== stripMetadataIfPresent(newContract.schema.deployedBytecode)) {
+  if (stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode)) {
     report.push(new DeployedBytecodeChange(contractName))
   }
   return report

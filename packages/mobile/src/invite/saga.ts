@@ -2,8 +2,9 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Clipboard, Linking, Platform } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -314,6 +315,7 @@ export function* redeemInviteSaga({ tempAccountPrivateKey }: RedeemInviteAction)
   if (result?.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
+    yield put(refreshAllBalances())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx

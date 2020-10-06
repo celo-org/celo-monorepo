@@ -2148,6 +2148,7 @@ exports[`Alliance renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2191,6 +2192,7 @@ exports[`Alliance renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2284,6 +2286,7 @@ exports[`Alliance renders 1`] = `
               aria-level="1"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2305,6 +2308,7 @@ exports[`Alliance renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2383,6 +2387,7 @@ exports[`Alliance renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(129,134,139,1.00)",
@@ -2402,15 +2407,13 @@ exports[`Alliance renders 1`] = `
                       autoCapitalize="sentences"
                       autoComplete="on"
                       autoCorrect="on"
-                      className="css-textinput-1cwyjr8"
+                      className="css-textinput-11aywtz"
                       data-focusable={true}
                       dir="auto"
-                      name="name"
                       onBlur={[Function]}
                       onChange={[Function]}
                       onFocus={[Function]}
                       onKeyDown={[Function]}
-                      onKeyPress={[Function]}
                       onSelect={[Function]}
                       readOnly={false}
                       spellCheck={true}
@@ -2439,6 +2442,7 @@ exports[`Alliance renders 1`] = `
                           "marginRight": "0px",
                           "marginTop": "0px",
                           "msFlexItemAlign": "center",
+                          "msGridRowAlign": "center",
                           "outlineWidth": "0px",
                           "paddingBottom": "15px",
                           "paddingLeft": "10px",
@@ -2470,6 +2474,7 @@ exports[`Alliance renders 1`] = `
                       <div
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "MozTransitionProperty": "opacity",
@@ -2530,6 +2535,7 @@ exports[`Alliance renders 1`] = `
                       <label
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(129,134,139,1.00)",
@@ -2549,15 +2555,13 @@ exports[`Alliance renders 1`] = `
                       autoCapitalize="sentences"
                       autoComplete="on"
                       autoCorrect="on"
-                      className="css-textinput-1cwyjr8"
+                      className="css-textinput-11aywtz"
                       data-focusable={true}
                       dir="auto"
-                      name="email"
                       onBlur={[Function]}
                       onChange={[Function]}
                       onFocus={[Function]}
                       onKeyDown={[Function]}
-                      onKeyPress={[Function]}
                       onSelect={[Function]}
                       readOnly={false}
                       spellCheck={true}
@@ -2586,6 +2590,7 @@ exports[`Alliance renders 1`] = `
                           "marginRight": "0px",
                           "marginTop": "0px",
                           "msFlexItemAlign": "center",
+                          "msGridRowAlign": "center",
                           "outlineWidth": "0px",
                           "paddingBottom": "15px",
                           "paddingLeft": "10px",
@@ -2617,6 +2622,7 @@ exports[`Alliance renders 1`] = `
                       <div
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "MozTransitionProperty": "opacity",
@@ -2678,6 +2684,7 @@ exports[`Alliance renders 1`] = `
                     <label
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(129,134,139,1.00)",
@@ -2697,15 +2704,13 @@ exports[`Alliance renders 1`] = `
                     autoCapitalize="sentences"
                     autoComplete="on"
                     autoCorrect="on"
-                    className="css-textinput-1cwyjr8"
+                    className="css-textinput-11aywtz"
                     data-focusable={true}
                     dir="auto"
-                    name="contribution"
                     onBlur={[Function]}
                     onChange={[Function]}
                     onFocus={[Function]}
                     onKeyDown={[Function]}
-                    onKeyPress={[Function]}
                     onSelect={[Function]}
                     readOnly={false}
                     spellCheck={true}
@@ -2734,6 +2739,7 @@ exports[`Alliance renders 1`] = `
                         "marginRight": "0px",
                         "marginTop": "0px",
                         "msFlexItemAlign": "center",
+                        "msGridRowAlign": "center",
                         "outlineWidth": "0px",
                         "paddingBottom": "15px",
                         "paddingLeft": "10px",
@@ -2803,6 +2809,7 @@ exports[`Alliance renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "MozTransitionProperty": "opacity",
@@ -2836,6 +2843,7 @@ exports[`Alliance renders 1`] = `
                   <div
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(129,134,139,1.00)",
@@ -2890,13 +2898,12 @@ exports[`Alliance renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
+                  onClick={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2967,6 +2974,7 @@ exports[`Alliance renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -3003,7 +3011,7 @@ exports[`Alliance renders 1`] = `
                 </svg>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "marginLeft": "10px",
@@ -3048,6 +3056,7 @@ exports[`Alliance renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -3094,6 +3103,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3123,6 +3133,7 @@ exports[`Alliance renders 1`] = `
           aria-level="3"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -3141,6 +3152,7 @@ exports[`Alliance renders 1`] = `
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -3174,6 +3186,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3211,6 +3224,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -3227,7 +3241,7 @@ exports[`Alliance renders 1`] = `
             We believe we have a lot to learn from 
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "fontStyle": "italic",
@@ -3266,7 +3280,6 @@ exports[`Alliance renders 1`] = `
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "contain",
@@ -3281,17 +3294,12 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               />
-              <img
-                alt=""
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3392,7 +3400,6 @@ exports[`Alliance renders 1`] = `
                       Object {
                         "WebkitFilter": "blur(20px)",
                         "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
                         "backgroundPosition": "center",
                         "backgroundRepeat": "no-repeat",
                         "backgroundSize": "cover",
@@ -3407,12 +3414,6 @@ exports[`Alliance renders 1`] = `
                         "zIndex": -1,
                       }
                     }
-                  />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
                   />
                 </div>
               </div>
@@ -3478,7 +3479,6 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
                           "backgroundPosition": "center",
                           "backgroundRepeat": "no-repeat",
                           "backgroundSize": "cover",
@@ -3492,12 +3492,6 @@ exports[`Alliance renders 1`] = `
                           "zIndex": -1,
                         }
                       }
-                    />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
                     />
                   </div>
                 </div>
@@ -3522,6 +3516,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3559,6 +3554,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -3575,7 +3571,7 @@ exports[`Alliance renders 1`] = `
             We believe in designing 
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "fontStyle": "italic",
@@ -3615,7 +3611,6 @@ exports[`Alliance renders 1`] = `
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "contain",
@@ -3630,17 +3625,12 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               />
-              <img
-                alt=""
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3660,8 +3650,6 @@ exports[`Alliance renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -3837,7 +3825,6 @@ exports[`Alliance renders 1`] = `
                       Object {
                         "WebkitFilter": "blur(20px)",
                         "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
                         "backgroundPosition": "center",
                         "backgroundRepeat": "no-repeat",
                         "backgroundSize": "cover",
@@ -3852,12 +3839,6 @@ exports[`Alliance renders 1`] = `
                         "zIndex": -1,
                       }
                     }
-                  />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
                   />
                 </div>
               </div>
@@ -3923,7 +3904,6 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
                           "backgroundPosition": "center",
                           "backgroundRepeat": "no-repeat",
                           "backgroundSize": "cover",
@@ -3937,12 +3917,6 @@ exports[`Alliance renders 1`] = `
                           "zIndex": -1,
                         }
                       }
-                    />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
                     />
                   </div>
                 </div>
@@ -3967,6 +3941,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4004,6 +3979,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -4020,7 +3996,7 @@ exports[`Alliance renders 1`] = `
             We believe systems are complex and require 
             <span
               className="css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "fontStyle": "italic",
@@ -4059,7 +4035,6 @@ exports[`Alliance renders 1`] = `
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "contain",
@@ -4074,17 +4049,12 @@ exports[`Alliance renders 1`] = `
                   }
                 }
               />
-              <img
-                alt=""
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -4104,8 +4074,6 @@ exports[`Alliance renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -4281,7 +4249,6 @@ exports[`Alliance renders 1`] = `
                       Object {
                         "WebkitFilter": "blur(20px)",
                         "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
                         "backgroundPosition": "center",
                         "backgroundRepeat": "no-repeat",
                         "backgroundSize": "cover",
@@ -4296,12 +4263,6 @@ exports[`Alliance renders 1`] = `
                         "zIndex": -1,
                       }
                     }
-                  />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
                   />
                 </div>
               </div>
@@ -4367,7 +4328,6 @@ exports[`Alliance renders 1`] = `
                       style={
                         Object {
                           "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
                           "backgroundPosition": "center",
                           "backgroundRepeat": "no-repeat",
                           "backgroundSize": "cover",
@@ -4381,12 +4341,6 @@ exports[`Alliance renders 1`] = `
                           "zIndex": -1,
                         }
                       }
-                    />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
                     />
                   </div>
                 </div>
@@ -4432,6 +4386,7 @@ exports[`Alliance renders 1`] = `
           "position": "absolute",
           "right": "0px",
           "top": "0px",
+          "width": "100%",
           "zIndex": -1,
         }
       }
@@ -4441,7 +4396,6 @@ exports[`Alliance renders 1`] = `
         style={
           Object {
             "backgroundColor": "rgba(0,0,0,0.00)",
-            "backgroundImage": "url(\\"image.png\\")",
             "backgroundPosition": "center",
             "backgroundRepeat": "no-repeat",
             "backgroundSize": "cover",
@@ -4456,16 +4410,11 @@ exports[`Alliance renders 1`] = `
           }
         }
       />
-      <img
-        alt=""
-        className="css-accessibilityImage-9pa8cd"
-        draggable={false}
-        src="image.png"
-      />
     </div>
     <div
       className="css-text-901oao"
       dir="auto"
+      onClick={[Function]}
       style={
         Object {
           "color": "rgba(255,255,255,1.00)",
@@ -4486,6 +4435,7 @@ exports[`Alliance renders 1`] = `
     <div
       className="css-text-901oao"
       dir="auto"
+      onClick={[Function]}
       style={
         Object {
           "color": "rgba(255,255,255,1.00)",
@@ -4500,7 +4450,7 @@ exports[`Alliance renders 1`] = `
     >
       <span
         className="css-text-901oao css-textHasAncestor-16my406"
-        dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "fontSize": "36px",
@@ -4529,6 +4479,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4558,6 +4509,7 @@ exports[`Alliance renders 1`] = `
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -4578,6 +4530,7 @@ exports[`Alliance renders 1`] = `
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -4594,7 +4547,7 @@ exports[`Alliance renders 1`] = `
           Member contributions, 
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontStyle": "italic",
@@ -4621,6 +4574,7 @@ exports[`Alliance renders 1`] = `
           "minHeight": "650px",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4657,6 +4611,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -4686,26 +4641,21 @@ exports[`Alliance renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
                     "MozUserSelect": "none",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "cursor": "pointer",
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -4764,6 +4714,7 @@ exports[`Alliance renders 1`] = `
                   <label
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(46,51,56,1.00)",
@@ -4841,10 +4792,8 @@ exports[`Alliance renders 1`] = `
               >
                 <div
                   className="css-text-901oao"
-                  data-focusable={true}
                   dir="auto"
                   onClick={[Function]}
-                  onKeyDown={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(251,204,92,0.40)",
@@ -4864,7 +4813,6 @@ exports[`Alliance renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
-                  tabIndex="0"
                 >
                   Show All
                 </div>
@@ -4876,10 +4824,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -4910,10 +4854,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -4944,10 +4884,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -4978,10 +4914,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5012,10 +4944,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5046,10 +4974,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5080,10 +5004,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5114,10 +5034,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5148,10 +5064,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5182,10 +5094,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5216,10 +5124,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5250,10 +5154,6 @@ exports[`Alliance renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onPressIn={[Function]}
-                  onPressOut={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                   style={
                     Object {
                       "backgroundColor": "rgba(255,255,255,1.00)",
@@ -5307,6 +5207,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5335,6 +5236,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5378,6 +5280,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5406,6 +5309,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5449,6 +5353,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5477,6 +5382,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5520,6 +5426,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5548,6 +5455,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5591,6 +5499,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5619,6 +5528,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5662,6 +5572,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5690,6 +5601,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5733,6 +5645,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5761,6 +5674,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5804,6 +5718,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5832,6 +5747,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5875,6 +5791,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5903,6 +5820,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5946,6 +5864,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -5974,6 +5893,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -6017,6 +5937,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -6045,6 +5966,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -6088,6 +6010,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -6116,6 +6039,7 @@ exports[`Alliance renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -6190,6 +6114,7 @@ exports[`Alliance renders 1`] = `
           "position": "absolute",
           "right": "0px",
           "top": "0px",
+          "width": "100%",
           "zIndex": -1,
         }
       }
@@ -6199,7 +6124,6 @@ exports[`Alliance renders 1`] = `
         style={
           Object {
             "backgroundColor": "rgba(0,0,0,0.00)",
-            "backgroundImage": "url(\\"image.png\\")",
             "backgroundPosition": "center",
             "backgroundRepeat": "no-repeat",
             "backgroundSize": "cover",
@@ -6214,16 +6138,11 @@ exports[`Alliance renders 1`] = `
           }
         }
       />
-      <img
-        alt=""
-        className="css-accessibilityImage-9pa8cd"
-        draggable={false}
-        src="image.png"
-      />
     </div>
     <div
       className="css-text-901oao"
       dir="auto"
+      onClick={[Function]}
       style={
         Object {
           "color": "rgba(46,51,56,1.00)",
@@ -6244,6 +6163,7 @@ exports[`Alliance renders 1`] = `
     <div
       className="css-text-901oao"
       dir="auto"
+      onClick={[Function]}
       style={
         Object {
           "color": "rgba(46,51,56,1.00)",
@@ -6258,7 +6178,7 @@ exports[`Alliance renders 1`] = `
     >
       <span
         className="css-text-901oao css-textHasAncestor-16my406"
-        dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "fontSize": "36px",
@@ -6288,6 +6208,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -6333,6 +6254,7 @@ exports[`Alliance renders 1`] = `
             aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -6375,6 +6297,7 @@ exports[`Alliance renders 1`] = `
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
           "msFlexWrap": "wrap",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -6574,6 +6497,7 @@ exports[`Alliance renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -6614,8 +6538,6 @@ exports[`Alliance renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -6748,6 +6670,7 @@ exports[`Alliance renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -6776,6 +6699,7 @@ exports[`Alliance renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -6792,6 +6716,7 @@ exports[`Alliance renders 1`] = `
         aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -6868,7 +6793,6 @@ exports[`Alliance renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
-                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -6883,16 +6807,11 @@ exports[`Alliance renders 1`] = `
                 }
               }
             />
-            <img
-              alt=""
-              className="css-accessibilityImage-9pa8cd"
-              draggable={false}
-              src="image.png"
-            />
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -6947,7 +6866,6 @@ exports[`Alliance renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
-                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -6962,16 +6880,11 @@ exports[`Alliance renders 1`] = `
                 }
               }
             />
-            <img
-              alt=""
-              className="css-accessibilityImage-9pa8cd"
-              draggable={false}
-              src="image.png"
-            />
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -7026,7 +6939,6 @@ exports[`Alliance renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
-                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -7041,16 +6953,11 @@ exports[`Alliance renders 1`] = `
                 }
               }
             />
-            <img
-              alt=""
-              className="css-accessibilityImage-9pa8cd"
-              draggable={false}
-              src="image.png"
-            />
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -7105,7 +7012,6 @@ exports[`Alliance renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
-                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -7120,16 +7026,11 @@ exports[`Alliance renders 1`] = `
                 }
               }
             />
-            <img
-              alt=""
-              className="css-accessibilityImage-9pa8cd"
-              draggable={false}
-              src="image.png"
-            />
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -7184,7 +7085,6 @@ exports[`Alliance renders 1`] = `
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
-                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -7199,16 +7099,11 @@ exports[`Alliance renders 1`] = `
                 }
               }
             />
-            <img
-              alt=""
-              className="css-accessibilityImage-9pa8cd"
-              draggable={false}
-              src="image.png"
-            />
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -7262,6 +7157,7 @@ exports[`Alliance renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -7347,6 +7243,7 @@ exports[`Alliance renders 1`] = `
             aria-level="1"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -7368,6 +7265,7 @@ exports[`Alliance renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -7437,6 +7335,7 @@ exports[`Alliance renders 1`] = `
                     <label
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(129,134,139,1.00)",
@@ -7456,15 +7355,13 @@ exports[`Alliance renders 1`] = `
                     autoCapitalize="sentences"
                     autoComplete="on"
                     autoCorrect="on"
-                    className="css-textinput-1cwyjr8"
+                    className="css-textinput-11aywtz"
                     data-focusable={true}
                     dir="auto"
-                    name="name"
                     onBlur={[Function]}
                     onChange={[Function]}
                     onFocus={[Function]}
                     onKeyDown={[Function]}
-                    onKeyPress={[Function]}
                     onSelect={[Function]}
                     readOnly={false}
                     spellCheck={true}
@@ -7493,6 +7390,7 @@ exports[`Alliance renders 1`] = `
                         "marginRight": "0px",
                         "marginTop": "0px",
                         "msFlexItemAlign": "center",
+                        "msGridRowAlign": "center",
                         "outlineWidth": "0px",
                         "paddingBottom": "15px",
                         "paddingLeft": "10px",
@@ -7524,6 +7422,7 @@ exports[`Alliance renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "MozTransitionProperty": "opacity",
@@ -7584,6 +7483,7 @@ exports[`Alliance renders 1`] = `
                     <label
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "color": "rgba(129,134,139,1.00)",
@@ -7603,15 +7503,13 @@ exports[`Alliance renders 1`] = `
                     autoCapitalize="sentences"
                     autoComplete="on"
                     autoCorrect="on"
-                    className="css-textinput-1cwyjr8"
+                    className="css-textinput-11aywtz"
                     data-focusable={true}
                     dir="auto"
-                    name="email"
                     onBlur={[Function]}
                     onChange={[Function]}
                     onFocus={[Function]}
                     onKeyDown={[Function]}
-                    onKeyPress={[Function]}
                     onSelect={[Function]}
                     readOnly={false}
                     spellCheck={true}
@@ -7640,6 +7538,7 @@ exports[`Alliance renders 1`] = `
                         "marginRight": "0px",
                         "marginTop": "0px",
                         "msFlexItemAlign": "center",
+                        "msGridRowAlign": "center",
                         "outlineWidth": "0px",
                         "paddingBottom": "15px",
                         "paddingLeft": "10px",
@@ -7671,6 +7570,7 @@ exports[`Alliance renders 1`] = `
                     <div
                       className="css-text-901oao"
                       dir="auto"
+                      onClick={[Function]}
                       style={
                         Object {
                           "MozTransitionProperty": "opacity",
@@ -7732,6 +7632,7 @@ exports[`Alliance renders 1`] = `
                   <label
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "color": "rgba(129,134,139,1.00)",
@@ -7751,15 +7652,13 @@ exports[`Alliance renders 1`] = `
                   autoCapitalize="sentences"
                   autoComplete="on"
                   autoCorrect="on"
-                  className="css-textinput-1cwyjr8"
+                  className="css-textinput-11aywtz"
                   data-focusable={true}
                   dir="auto"
-                  name="contribution"
                   onBlur={[Function]}
                   onChange={[Function]}
                   onFocus={[Function]}
                   onKeyDown={[Function]}
-                  onKeyPress={[Function]}
                   onSelect={[Function]}
                   readOnly={false}
                   spellCheck={true}
@@ -7788,6 +7687,7 @@ exports[`Alliance renders 1`] = `
                       "marginRight": "0px",
                       "marginTop": "0px",
                       "msFlexItemAlign": "center",
+                      "msGridRowAlign": "center",
                       "outlineWidth": "0px",
                       "paddingBottom": "15px",
                       "paddingLeft": "10px",
@@ -7857,6 +7757,7 @@ exports[`Alliance renders 1`] = `
                   <div
                     className="css-text-901oao"
                     dir="auto"
+                    onClick={[Function]}
                     style={
                       Object {
                         "MozTransitionProperty": "opacity",
@@ -7890,6 +7791,7 @@ exports[`Alliance renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -7944,13 +7846,12 @@ exports[`Alliance renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -8021,6 +7922,7 @@ exports[`Alliance renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "MozTransitionProperty": "opacity",
@@ -8057,7 +7959,7 @@ exports[`Alliance renders 1`] = `
               </svg>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "marginLeft": "10px",
@@ -8102,6 +8004,7 @@ exports[`Alliance renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
