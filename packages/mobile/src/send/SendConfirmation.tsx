@@ -280,7 +280,8 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { comment, modalVisible, buttonReset, encryptionDialogVisible } = this.state
     const {
       t,
-      appConnected,
+      // DO NOT MERGE: No need for app to be connected.
+      // appConnected,
       isSending,
       dollarBalance,
       confirmationInput,
@@ -293,7 +294,8 @@ export class SendConfirmation extends React.Component<Props, State> {
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
-    const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
+    const isPrimaryButtonDisabled =
+      isSending || !userHasEnough || /* !appConnected || */ !!asyncFee.error
 
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
