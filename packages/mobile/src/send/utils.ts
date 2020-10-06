@@ -176,9 +176,13 @@ export function* handleSendPaymentData(
   cachedRecipient?: RecipientWithContact,
   isOutgoingPaymentRequest?: true
 ) {
+  if (!data.address) {
+    Logger.warn(TAG, '@handleSendPaymentData address not specified in deeplink')
+    return
+  }
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
-    address: data.address,
+    address: data.address!,
     displayId: data.e164PhoneNumber,
     displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
     e164PhoneNumber: data.e164PhoneNumber,
@@ -227,5 +231,14 @@ export function* handlePaymentDeeplink(deeplink: string) {
     yield call(handleSendPaymentData, paymentData)
   } catch (e) {
     Logger.warn('handlePaymentDeepLink', `deeplink ${deeplink} failed with ${e}`)
+  }
+}
+
+export function* handleTxDeeplink(deeplink: string) {
+  try {
+    const data = uriDataFromUrl(deeplink)
+    Logger.debug('handleTxDeepLink got data', JSON.stringify(data))
+  } catch (e) {
+    Logger.warn('handleTxDeepLink', `deeplink ${deeplink} failed with ${e}`)
   }
 }

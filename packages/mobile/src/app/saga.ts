@@ -20,7 +20,7 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { handlePaymentDeeplink } from 'src/send/utils'
+import { handlePaymentDeeplink, handleTxDeeplink } from 'src/send/utils'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { parse } from 'url'
@@ -61,7 +61,6 @@ export function* appInit() {
     navigate(Screens.SetClock)
     return
   }
-
   if (deepLink) {
     // TODO: this should dispatch (put) but since this appInit
     // is called before the listener is set, we do it this way.
@@ -80,6 +79,8 @@ export function* handleDeepLink(action: OpenDeepLink) {
       yield put(receiveAttestationMessage(rawParams.path.substr(3), CodeInputType.DEEP_LINK))
     } else if (rawParams.path.startsWith('/pay')) {
       yield call(handlePaymentDeeplink, deepLink)
+    } else if (rawParams.path.startsWith('/tx')) {
+      yield call(handleTxDeeplink, deepLink)
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
     }
