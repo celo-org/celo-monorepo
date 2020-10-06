@@ -1,4 +1,4 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import React, { useMemo } from 'react'
@@ -72,7 +72,7 @@ function TransactionFeed({ kind, loading, error, data }: Props) {
   }
 
   const renderSectionHeader = (info: { section: SectionListData<FeedItem> }) => (
-    <SectionHeadNew text={info.section.title} />
+    <SectionHead text={info.section.title} />
   )
 
   const keyExtractor = (item: TransactionFeedFragment) => {

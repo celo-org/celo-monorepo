@@ -22,6 +22,10 @@ export const Counters = {
     name: 'attestation_requests_valid',
     help: 'Counter for the number of requests involving valid attestation requests',
   }),
+  attestationRequestsRerequest: new Counter({
+    name: 'attestation_requests_rerequest',
+    help: 'Counter for the number of requests that are re-requests',
+  }),
   attestationRequestsAttestationErrors: new Counter({
     name: 'attestation_requests_attestation_errors',
     help: 'Counter for the number of requests for which producing the attestation failed',
@@ -61,6 +65,11 @@ export const Counters = {
     labelNames: ['provider', 'country', 'code'],
     help: 'Counter for error code of each failed delivery attempt by provider and country',
   }),
+  attestationRequestsByNumberType: new Counter({
+    name: 'attestation_requests_number_type',
+    labelNames: ['country', 'type'],
+    help: 'Counter for requests by country and type of phone number',
+  }),
 }
 
 export const Gauges = {
@@ -68,5 +77,9 @@ export const Gauges = {
     name: 'attestation_provider_balance',
     labelNames: ['provider'],
     help: 'Gauge for provider outstanding account balance',
+  }),
+  healthy: new Gauge({
+    name: 'attestation_service_healthy',
+    help: 'Gauge for overall health check passing',
   }),
 }

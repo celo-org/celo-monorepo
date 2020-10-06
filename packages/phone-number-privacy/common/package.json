@@ -20,7 +20,10 @@
     "@celo/utils": "0.1.21-dev",
     "bignumber.js": "^9.0.0",
     "express": "^4.17.1",
-    "elliptic": "6.5.3"
+    "elliptic": "6.5.3",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "@types/btoa": "^1.2.3",
+    "web3": "1.2.4"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.12"
