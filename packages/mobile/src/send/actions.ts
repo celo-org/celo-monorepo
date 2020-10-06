@@ -18,6 +18,7 @@ export enum Actions {
   SEND_PAYMENT_OR_INVITE = 'SEND/SEND_PAYMENT_OR_INVITE',
   SEND_PAYMENT_OR_INVITE_SUCCESS = 'SEND/SEND_PAYMENT_OR_INVITE_SUCCESS',
   SEND_PAYMENT_OR_INVITE_FAILURE = 'SEND/SEND_PAYMENT_OR_INVITE_FAILURE',
+  SEND_SIGNED_TXN = 'SEND/SEND_SIGNED_TXN',
 }
 
 export interface HandleBarcodeDetectedAction {
@@ -49,6 +50,11 @@ export interface SendPaymentOrInviteAction {
   firebasePendingRequestUid: string | null | undefined
 }
 
+export interface SendSignedTxAction {
+  type: Actions.SEND_SIGNED_TXN
+  rawTx: string
+}
+
 export interface SendPaymentOrInviteSuccessAction {
   type: Actions.SEND_PAYMENT_OR_INVITE_SUCCESS
   amount: BigNumber
@@ -65,6 +71,7 @@ export type ActionTypes =
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
   | SendPaymentOrInviteFailureAction
+  | SendSignedTxAction
 
 export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
@@ -106,6 +113,11 @@ export const sendPaymentOrInvite = (
   recipientAddress,
   inviteMethod,
   firebasePendingRequestUid,
+})
+
+export const sendSignedTxn = (rawTx: string): SendSignedTxAction => ({
+  type: Actions.SEND_SIGNED_TXN,
+  rawTx,
 })
 
 export const sendPaymentOrInviteSuccess = (

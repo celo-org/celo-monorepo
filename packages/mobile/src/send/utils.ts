@@ -177,7 +177,7 @@ export function* handleSendPaymentData(
   isOutgoingPaymentRequest?: true
 ) {
   if (!data.address) {
-    Logger.warn(TAG, '@handleSendPaymentData address not specified in deeplink')
+    Logger.warn(TAG, '@handleSendSignedTxData address not specified in deeplink')
     return
   }
   const recipient: RecipientWithQrCode = {
@@ -225,6 +225,44 @@ export function* handleSendPaymentData(
   }
 }
 
+// MEDHA MEDHA MEDHA MEDHA MEDHA
+export function* handleSendSignedTxData(
+  data: UriData,
+  cachedRecipient?: RecipientWithContact,
+  isOutgoingPaymentRequest?: true
+) {
+  // DON'T MERGE: just a hacky way to signify a signed txn
+  const fakeRecipient: RecipientWithQrCode = {
+    kind: RecipientKind.QrCode,
+    address: data.address!,
+    displayId: data.e164PhoneNumber,
+    displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
+    e164PhoneNumber: data.e164PhoneNumber,
+    phoneNumberLabel: cachedRecipient?.phoneNumberLabel,
+    thumbnailPath: cachedRecipient?.thumbnailPath,
+    contactId: cachedRecipient?.contactId,
+  }
+
+  // TODO: idk if i need this
+  // yield put(storeLatestInRecents(recipient))
+
+  // DON'T MERGE: just a hacky way to signify a signed txn
+  const fakeAmount: BigNumber = new BigNumber(0)
+
+  const transactionData: TransactionDataInput = {
+    recipient: fakeRecipient,
+    amount: fakeAmount,
+    reason: data.comment,
+    type: TokenTransactionType.SendSignedTx,
+  }
+  navigate(Screens.SendConfirmation, {
+    transactionData,
+    isFromScan: true,
+    signedTx: data.rawSignedTransaction,
+  })
+}
+// MEDHA MEDHA MEDHA MEDHA MEDHA
+
 export function* handlePaymentDeeplink(deeplink: string) {
   try {
     const paymentData = uriDataFromUrl(deeplink)
@@ -238,6 +276,7 @@ export function* handleTxDeeplink(deeplink: string) {
   try {
     const data = uriDataFromUrl(deeplink)
     Logger.debug('handleTxDeepLink got data', JSON.stringify(data))
+    yield call(handleSendSignedTxData, data)
   } catch (e) {
     Logger.warn('handleTxDeepLink', `deeplink ${deeplink} failed with ${e}`)
   }

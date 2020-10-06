@@ -183,6 +183,7 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
     isFromScan?: boolean
+    signedTx?: string
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]:

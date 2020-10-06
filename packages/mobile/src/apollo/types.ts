@@ -160,6 +160,7 @@ export enum TokenTransactionType {
   PayRequest = 'PAY_REQUEST',
   PayPrefill = 'PAY_PREFILL',
   NetworkFee = 'NETWORK_FEE',
+  SendSignedTx = 'SEND_SIGNED_TX',
 }
 
 export type TokenTransfer = TokenTransaction & {

@@ -47,7 +47,7 @@ import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
-import { sendPaymentOrInvite } from 'src/send/actions'
+import { sendPaymentOrInvite, sendSignedTxn } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -70,10 +70,12 @@ interface StateProps {
   localCurrencyExchangeRate?: string | null
   isDekRegistered: boolean
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
+  signedTx: string | undefined
 }
 
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
+  sendSignedTx: typeof sendSignedTxn
   fetchDollarBalance: typeof fetchDollarBalance
   fetchDataEncryptionKey: typeof fetchDataEncryptionKey
 }
@@ -96,7 +98,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
-  const { transactionData, addressJustValidated } = route.params
+  const { transactionData, addressJustValidated, signedTx } = route.params
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -126,6 +128,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     localCurrencyExchangeRate,
     isDekRegistered: isDekRegisteredSelector(state) ?? false,
     addressToDataEncryptionKey: state.identity.addressToDataEncryptionKey,
+    signedTx: signedTx,
   }
 }
 
@@ -164,6 +167,8 @@ export class SendConfirmation extends React.Component<Props, State> {
     const { type } = this.props.confirmationInput
     if (type === TokenTransactionType.InviteSent) {
       this.showInviteModal()
+    } else if (type === TokenTransactionType.SendSignedTx) {
+      this.sendSigned()
     } else {
       this.sendOrInvite()
     }
@@ -208,6 +213,12 @@ export class SendConfirmation extends React.Component<Props, State> {
       inviteMethod,
       firebasePendingRequestUid
     )
+  }
+
+  sendSigned = () => {
+    if (this.props.signedTx) {
+      this.props.sendSignedTx(this.props.signedTx)
+    }
   }
 
   onEditAddressClick = () => {
