@@ -75,7 +75,7 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },
@@ -85,7 +85,10 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
             "textAlign": "center",
           },
           Object {
-            "fontFamily": "Hind-SemiBold",
+            "color": "#2E3338",
+            "fontFamily": "Inter-Medium",
+            "fontSize": 14,
+            "lineHeight": 18,
           },
         ]
       }
@@ -138,7 +141,7 @@ exports[`AlertBanner when message and title passed in renders title with message
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },
@@ -160,7 +163,10 @@ exports[`AlertBanner when message and title passed in renders title with message
               "textAlign": "center",
             },
             Object {
-              "fontFamily": "Hind-SemiBold",
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
             },
           ]
         }
@@ -217,7 +223,7 @@ exports[`AlertBanner when message passed in renders message 1`] = `
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },

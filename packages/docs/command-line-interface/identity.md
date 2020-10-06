@@ -83,6 +83,8 @@ OPTIONS
 
   --phoneNumber=+14152223333                         (required) The phone number to send the test message to
 
+  --provider=provider                                Test a specific provider (try "twilio" or "nexmo")
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
