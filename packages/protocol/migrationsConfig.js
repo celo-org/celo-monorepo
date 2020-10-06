@@ -17,7 +17,9 @@ const network = require('./truffle-config.js').networks[argv.network]
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
-BigNumber.config({ EXPONENTIAL_AT: 1e9 })
+BigNumber.config({
+  EXPONENTIAL_AT: 1e9,
+})
 
 const SECOND = 1
 const MINUTE = 60 * SECOND
@@ -255,6 +257,7 @@ const DefaultConfig = {
 
     // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
+    validatorGroupKeys: [],
     attestationKeys: [],
     groupName: 'cLabs',
     commission: 0.1,
@@ -268,7 +271,8 @@ const NetworkConfigs = {
       slashableDowntime: 60, // epoch length is 100 for unit tests
     },
     election: {
-      minElectableValidators: '10',
+      minElectableValidators: '3',
+      maxElectableValidators: '100',
       frozen: false,
     },
     epochRewards: {
@@ -506,6 +510,16 @@ const NetworkConfigs = {
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
+NetworkConfigs.loadtesting = NetworkConfigs.development
+NetworkConfigs.loadtesting.gasPriceMinimum = {
+  adjustmentSpeed: 0,
+  minimumFloor: 100000000,
+  targetDensity: 1 / 2,
+}
+NetworkConfigs.loadtesting.governance = {
+  skipSetConstitution: true,
+  skipTransferOwnership: true,
+}
 
 const linkedLibraries = {
   FixidityLib: [
@@ -538,9 +552,13 @@ const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 
+// TODO(jcortejoso): Now default config is development. Use the `ENV_TYPE` variable to get the config
+const networkOverride =
+  argv.network && argv.network in NetworkConfigs ? argv.network : `development`
+
 // Use lodash merge to deeply override defaults.
-if (argv.network && NetworkConfigs[argv.network]) {
-  lodash.merge(config, NetworkConfigs[argv.network])
+if (networkOverride && NetworkConfigs[networkOverride]) {
+  lodash.merge(config, NetworkConfigs[networkOverride])
 }
 lodash.merge(config, migrationOverride)
 

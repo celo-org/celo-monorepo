@@ -11,6 +11,7 @@ export interface LoadTestArgv extends CeloEnvArgv {
   blockscoutMeasurePercent: number
   delay: number
   replicas: number
+  threads: number
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -33,6 +34,12 @@ export const builder = (argv: yargs.Argv) => {
         'Number of load test clients to create, defaults to LOAD_TEST_CLIENTS in the .env file',
       default: -1,
     })
+    .option('threads', {
+      type: 'number',
+      description:
+        'Number of threads for each client, defaults to LOAD_TEST_THREADS in the .env file',
+      default: -1,
+    })
 }
 
 export function setArgvDefaults(argv: LoadTestArgv) {
@@ -44,11 +51,20 @@ export function setArgvDefaults(argv: LoadTestArgv) {
   if (argv.replicas < 0) {
     argv.replicas = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
   }
+  if (argv.threads < 0) {
+    argv.replicas = parseInt(fetchEnv(envVar.LOAD_TEST_THREADS), 1)
+  }
 }
 
 export const handler = async (argv: LoadTestArgv) => {
   await switchToClusterFromEnv()
   setArgvDefaults(argv)
 
-  await installHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
+  await installHelmChart(
+    argv.celoEnv,
+    argv.blockscoutMeasurePercent,
+    argv.delay,
+    argv.replicas,
+    argv.threads
+  )
 }
