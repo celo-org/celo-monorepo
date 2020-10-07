@@ -14,7 +14,7 @@ export default class Show extends BaseCommand {
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
     raw: flags.boolean({ required: false, description: 'Display proposal in raw bytes format' }),
-    jsonFile: flags.string({
+    jsonTransactions: flags.string({
       required: false,
       description: 'Output proposal JSON to provided file',
     }),
@@ -71,9 +71,11 @@ export default class Show extends BaseCommand {
           const jsonproposal = await proposalToJSON(this.kit, record.proposal)
           record.proposal = jsonproposal as any
 
-          if (res.flags.jsonFile) {
-            console.log(chalk.yellowBright(`Outputting proposal JSON to ${res.flags.jsonFile}`))
-            writeFileSync(res.flags.jsonFile, JSON.stringify(jsonproposal, null, 2))
+          if (res.flags.jsonTransactions) {
+            console.log(
+              chalk.yellowBright(`Outputting proposal JSON to ${res.flags.jsonTransactions}`)
+            )
+            writeFileSync(res.flags.jsonTransactions, JSON.stringify(jsonproposal, null, 2))
           }
         } catch (error) {
           console.warn(`Could not decode proposal, displaying raw data: ${error}`)

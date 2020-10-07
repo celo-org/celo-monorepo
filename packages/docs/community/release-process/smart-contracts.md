@@ -101,7 +101,7 @@ Using the following procedure, stakeholders can verify a contract release candid
 Fetch the upgrade proposal identified by <code>$UPGRADE_PROPOSAL_ID</code> and output the JSON encoded proposal contents to <code>$UPGRADE_PROPOSAL</code>.
 
 ```bash
-celocli governance:show <...> --proposalID $UPGRADE_PROPOSAL_ID --jsonFile $UPGRADE_PROPOSAL
+celocli governance:show <...> --proposalID $UPGRADE_PROPOSAL_ID --jsonTransactions $UPGRADE_PROPOSAL
 ```
 
 ### Verify Release Candidate
