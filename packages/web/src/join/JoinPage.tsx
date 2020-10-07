@@ -58,7 +58,10 @@ class JoinPage extends React.PureComponent<Props> {
               <View style={[standardStyles.centered, styles.cloud, styles.inside]}>
                 <Fade ssrReveal={true} bottom={true} delay={10} distance={'20px'}>
                   <View style={standardStyles.centered}>
-                    <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+                    <H1
+                      ariaLevel="2"
+                      style={[textStyles.center, standardStyles.elementalMarginBottom]}
+                    >
                       {t('workWithValue')}
                     </H1>
                     <H4 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
