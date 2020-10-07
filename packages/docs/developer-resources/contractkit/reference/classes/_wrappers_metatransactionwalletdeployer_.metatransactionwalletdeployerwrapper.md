@@ -2,7 +2,7 @@
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[MetaTransactionWalletDeployer](../enums/_base_.celocontract.md#metatransactionwalletdeployer)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹MetaTransactionWalletDeployer›
 
   ↳ **MetaTransactionWalletDeployerWrapper**
 
@@ -33,7 +33,7 @@
 
 ###  constructor
 
-\+ **new MetaTransactionWalletDeployerWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [MetaTransactionWalletDeployer](../enums/_base_.celocontract.md#metatransactionwalletdeployer)): *[MetaTransactionWalletDeployerWrapper](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)*
+\+ **new MetaTransactionWalletDeployerWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: MetaTransactionWalletDeployer): *[MetaTransactionWalletDeployerWrapper](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -44,7 +44,7 @@
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [MetaTransactionWalletDeployer](../enums/_base_.celocontract.md#metatransactionwalletdeployer) |
+`contract` | MetaTransactionWalletDeployer |
 
 **Returns:** *[MetaTransactionWalletDeployerWrapper](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)*
 
@@ -52,9 +52,19 @@ Name | Type |
 
 ###  canDeploy
 
-• **canDeploy**: *Object* = proxyCall(this.contract.methods.canDeploy, undefined, identity)
+• **canDeploy**: *function* = proxyCall(this.contract.methods.canDeploy, undefined, identity)
 
 *Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L8)*
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
 
 ___
 
