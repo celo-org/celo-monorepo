@@ -2,7 +2,15 @@ import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
 import LeaderBoard from 'src/dev/LeaderBoard'
 
-const leaders = new Array(12).fill({ points: 10, identity: 'annie', address: '0x1f3f' })
+const leaders = new Array(12)
+  .fill({ points: 10, identity: 'annie', address: '0x1f3f' })
+  .map((leader, index) => {
+    return {
+      points: leader.points + index,
+      identity: leader.identity + index,
+      address: leader.address + index,
+    }
+  })
 
 describe('LeaderBoard', () => {
   it('it displays an expand button, and when pressed a "collapse" button shows', () => {
