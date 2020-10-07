@@ -19,7 +19,7 @@ import { colors, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
 
 const DESCRIPTION =
-  'Join us in building monetary system that creates the conditions for prosperity for all. We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.'
+  'Join us in building financial system that creates the conditions for prosperity for all. We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.'
 
 interface OwnProps {
   positions: LeverJob[]
