@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Hamburger from 'src/header/Hamburger'
+import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import RingsGlyph from 'src/logos/RingsGlyph'
@@ -8,7 +9,6 @@ import links from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { useBooleanToggle } from 'src/utils/useBooleanToggle'
 interface Props {
   current: string
   kitName?: string

@@ -1,4 +1,4 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 

@@ -102,6 +102,7 @@
     "nodemailer": "^4.6.8",
     "targz": "^1.0.1",
     "tmp": "^0.1.0",
+    "ts-node": "8.3.0",
     "truffle-typings": "^1.0.6",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
