@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
+import { TestProvider } from 'src/_page-tests/test-utils'
 import ValidatorsList from 'src/dev/ValidatorsList'
 import { cleanData, ValidatorsListData } from 'src/utils/validators'
-import { TestProvider } from 'src/_page-tests/test-utils'
 
 const mock = {
   data: {
