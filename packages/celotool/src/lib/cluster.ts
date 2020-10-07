@@ -7,8 +7,8 @@ import {
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
+  installGCPSSDStorageClass,
   redeployTiller,
-  uploadStorageClass
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -111,7 +111,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
 
   console.info('Deploying Tiller and Cert Manager Helm chart...')
 
-  await uploadStorageClass()
+  await installGCPSSDStorageClass()
   await redeployTiller()
 
   await installCertManagerAndNginx()
@@ -182,8 +182,10 @@ export async function setClusterLabels(celoEnv: string) {
   await labelfn('envinstance', celoEnv)
 }
 
-export function getKubernetesClusterRegion(): string {
-  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+export function getKubernetesClusterRegion(zone?: string): string {
+  if (!zone) {
+    zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  }
   const matches = zone.match('^[a-z]+-[a-z]+[0-9]')
   if (matches) {
     return matches[0]
