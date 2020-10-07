@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
@@ -57,14 +57,17 @@ class DisconnectBanner extends React.PureComponent<Props> {
     if (!appConnected && DisconnectBanner.hasAppConnected) {
       return (
         <Text style={[styles.text, styles.textRed]}>
-          <Text style={fontStyles.bold}>{t('poorConnection.0')}</Text> {t('poorConnection.1')}
+          <Text style={fontStyles.regular600}>{t('poorConnection.0')}</Text> {t('poorConnection.1')}
         </Text>
       )
     }
 
     // App is connecting for first time, show grey banner
     return (
-      <Text style={[styles.text, styles.textGrey, fontStyles.bold]} testID="connectingToCeloBanner">
+      <Text
+        style={[styles.text, styles.textGrey, fontStyles.regular600]}
+        testID="connectingToCeloBanner"
+      >
         {t('connectingToCelo')}
       </Text>
     )
@@ -72,11 +75,8 @@ class DisconnectBanner extends React.PureComponent<Props> {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    opacity: 0.5,
-  },
   text: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     textAlign: 'center',
     // Unset explicit lineHeight set by fonts.tsx otherwise the text is not centered vertically
     lineHeight: undefined,

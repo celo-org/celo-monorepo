@@ -11,7 +11,7 @@ export function handleAttestationDeliveryStatus(providerType: string) {
       return
     }
 
-    await provider!.receiveDeliveryStatusReport(_req)
+    await provider!.receiveDeliveryStatusReport(_req, res.locals.logger)
     res.json({ success: true }).status(200)
   }
 }

@@ -1,7 +1,7 @@
 import SmallButton from '@celo/react-components/components/SmallButton'
 import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -154,8 +154,8 @@ function SmartTopAlert(props: Props) {
           ]}
         >
           {isError && <Error style={styles.errorIcon} />}
-          <Text style={[fontStyles.bodySmall, styles.text, isError && fontStyles.semiBold]}>
-            {!!title && <Text style={[styles.text, fontStyles.semiBold]}> {title} </Text>}
+          <Text style={[fontStyles.small, styles.text, isError && fontStyles.small500]}>
+            {!!title && <Text style={[styles.text, fontStyles.small500]}> {title} </Text>}
             {text}
           </Text>
           {buttonMessage && (
