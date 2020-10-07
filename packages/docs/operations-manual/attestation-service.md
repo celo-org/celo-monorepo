@@ -21,7 +21,8 @@ This guide steps you through setting up an Attestation Service:
 
 ## Recent releases
 
-* [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4) (most recent release)
+* [Attestation Service v1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5) (latest release for testnets)
+* [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4) (latest production release)
 * [Attestation Service v1.0.3](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-3)
 
 ## Deployment Architecture

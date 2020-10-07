@@ -38,7 +38,7 @@ export async function getVerificationPoolConfig(celoEnv: string) {
   }
 }
 
-export async function switchToProject(projectName: string) {
+export async function switchToGCPProject(projectName: string) {
   const [currentProject] = await execCmdWithExitOnFailure('gcloud config get-value project')
 
   if (currentProject !== projectName) {
@@ -48,7 +48,7 @@ export async function switchToProject(projectName: string) {
 
 export async function switchToProjectFromEnv() {
   const expectedProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  await switchToProject(expectedProject)
+  await switchToGCPProject(expectedProject)
 }
 
 export function addCeloGethMiddleware(argv: yargs.Argv) {
