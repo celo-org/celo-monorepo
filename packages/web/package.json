@@ -44,13 +44,13 @@
     "express-enforces-ssl": "^1.1.0",
     "express-rate-limit": "^5.1.1",
     "fast-xml-parser": "^3.15.1",
-    "fecha": "^3.0.3",
+    "fecha": "^4.2.0",
     "firebase": "^7.6.0",
     "front-matter": "^4.0.1",
     "fuzzy-search": "^3.2.1",
     "glob": "^7.1.6",
     "graphql": "^14.5.8",
-    "helmet": "^3.21.2",
+    "helmet": "^4.1.1",
     "hex-rgba": "^1.0.2",
     "html-to-formatted-text": "^2.7.0",
     "js-cookie": "^2.2.1",
@@ -90,7 +90,7 @@
     "stickyfilljs": "^2.1.0",
     "svgs": "^4.1.0",
     "tls": "^0.0.1",
-    "yiq": "^3.0.1"
+    "yiq": "^4.0.0"
   },
   "devDependencies": {
     "@firebase/app-types": "^0.6.0",
