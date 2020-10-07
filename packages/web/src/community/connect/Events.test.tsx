@@ -2,13 +2,18 @@ import { render } from '@testing-library/react'
 import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import Events from 'src/community/connect/Events'
+import { TestProvider } from 'src/_page-tests/test-utils'
 
 describe('Events', () => {
   describe('when pastEvents NOT given', () => {
     it('a button to view past events is shown', () => {
-      const { getByText } = render(<Events pastEvents={null} />)
+      const { getByText } = render(
+        <TestProvider>
+          <Events pastEvents={null} />
+        </TestProvider>
+      )
 
-      expect(getByText('events.pastEvents').getAttribute('href')).toEqual('/past-events')
+      expect(getByText('Past Events').getAttribute('href')).toEqual('/past-events')
     })
   })
   describe('when past Events are given', () => {
@@ -22,9 +27,13 @@ describe('Events', () => {
       },
     ]
     it('doesnt have a button to see events', () => {
-      const { getByText } = render(<Events pastEvents={pastEvents} />)
+      const { getByText } = render(
+        <TestProvider>
+          <Events pastEvents={pastEvents} />
+        </TestProvider>
+      )
 
-      expect(getByText('events.pastEvents').getAttribute('href')).toBeNull()
+      expect(getByText('Past Events').getAttribute('href')).toBeNull()
     })
   })
   describe('when upcoming Events are given', () => {
@@ -52,7 +61,11 @@ describe('Events', () => {
       },
     ]
     it('shows the event details', () => {
-      const { getByText } = render(<Events upcomingEvents={upcomingEvents} />)
+      const { getByText } = render(
+        <TestProvider>
+          <Events upcomingEvents={upcomingEvents} />
+        </TestProvider>
+      )
       expect(getByText('Gifts and Economies')).toBeTruthy()
       expect(getByText('Speaking')).toBeTruthy()
     })
@@ -67,7 +80,11 @@ describe('Events', () => {
   })
   describe('when no events are given and it is not loading', () => {
     it('it says there are no events found', () => {
-      const { getByText } = render(<Events loading={false} />)
+      const { getByText } = render(
+        <TestProvider>
+          <Events loading={false} />
+        </TestProvider>
+      )
 
       expect(getByText(/no events/)).toBeTruthy()
     })

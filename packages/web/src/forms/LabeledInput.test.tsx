@@ -1,36 +1,41 @@
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import { TestProvider } from 'src/_page-tests/test-utils'
 
 describe(LabeledInput, () => {
   describe('when there is an error', () => {
     it('displays error message', () => {
       const { getByText } = render(
-        <LabeledInput
-          allErrors={['machinereadable']}
-          name={'machinereadable'}
-          value={'no'}
-          label="Human Label"
-          onInput={jest.fn()}
-        />
+        <TestProvider>
+          <LabeledInput
+            allErrors={['machinereadable']}
+            name={'machinereadable'}
+            value={'no'}
+            label="Human Label"
+            onInput={jest.fn()}
+          />
+        </TestProvider>
       )
 
-      expect(getByText('common:validationErrors.generic')).toBeVisible()
+      expect(getByText('Oops I’m blank!')).toBeVisible()
     })
   })
   describe('when there is no error', () => {
     it('displays no message ', () => {
       const { queryByText } = render(
-        <LabeledInput
-          allErrors={['otherError']}
-          name={'machinereadable'}
-          value={'no'}
-          label="Human Label"
-          onInput={jest.fn()}
-        />
+        <TestProvider>
+          <LabeledInput
+            allErrors={['otherError']}
+            name={'machinereadable'}
+            value={'no'}
+            label="Human Label"
+            onInput={jest.fn()}
+          />
+        </TestProvider>
       )
 
-      expect(queryByText('common:validationErrors.generic')).not.toBeVisible()
+      expect(queryByText('Oops I’m blank!')).not.toBeVisible()
     })
   })
   describe('when typing', () => {
@@ -38,13 +43,15 @@ describe(LabeledInput, () => {
       const mockFunc = jest.fn()
 
       const { queryByLabelText } = render(
-        <LabeledInput
-          allErrors={[]}
-          name={'machinereadable'}
-          value={'begin'}
-          label="Human Label"
-          onInput={mockFunc}
-        />
+        <TestProvider>
+          <LabeledInput
+            allErrors={[]}
+            name={'machinereadable'}
+            value={'begin'}
+            label="Human Label"
+            onInput={mockFunc}
+          />
+        </TestProvider>
       )
 
       const el = queryByLabelText('Human Label')
