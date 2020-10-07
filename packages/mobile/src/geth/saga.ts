@@ -145,9 +145,8 @@ function pollGethSyncStatusAsync() {
         await sleep(500)
         continue
       }
-      // Calculate how long, in milliseconds, we have until this node may be out of sync
-      const expiration = (head.timestamp + BLOCK_AGE_LIMIT) * 1000 - Date.now()
-      if (expiration > 0) {
+
+      if (blockIsFresh(head)) {
         resolve()
       }
 
