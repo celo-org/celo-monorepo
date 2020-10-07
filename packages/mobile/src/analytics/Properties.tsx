@@ -610,7 +610,6 @@ interface GethEventsProperties {
   }
   [GethEvents.start_geth_start]: undefined
   [GethEvents.start_geth_finish]: undefined
-  [GethEvents.geth_sync_timeout]: undefined
 }
 
 interface NetworkEventsProperties {

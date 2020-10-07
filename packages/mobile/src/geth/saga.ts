@@ -130,7 +130,6 @@ export function* waitForGethSync() {
   })
 
   if (!result) {
-    ValoraAnalytics.track(GethEvents.geth_sync_timeout)
     throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
   }
 }
@@ -166,7 +165,6 @@ export async function waitForGethSyncAsync() {
   try {
     await pollGethSyncStatusAsync()
   } catch (error) {
-    ValoraAnalytics.track(GethEvents.geth_sync_timeout)
     throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
   }
 }
