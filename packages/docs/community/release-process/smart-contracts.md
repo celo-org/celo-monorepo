@@ -48,40 +48,44 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 
 ## Release Process
 
-Using the following procedure, a new contract release can be built, deployed, and proposed for upgrade automatically.
+Using the following procedure, a contract release tagged with <code>$RELEASE</code> can be built, deployed, and proposed for upgrade automatically on <code>$NETWORK</code>.
+
+```bash
+NETWORK=<baklava|alfajores|mainnet>
+RELEASE=celo-core-contracts-v${N}.${NETWORK}
+```
 
 ### Verify Current Deployment
 
-Compile the contracts in <code>$RELEASE_BRANCH</code> branch and verify that the deployed bytecode on <code>$NETWORK</code> matches compiled bytecode.
+Use the following script to compile the contracts in <code>$RELEASE</code> branch and verify that the deployed bytecode on <code>$NETWORK</code> matches the compiled bytecode.
 ```bash
-# TODO: command to pull source code from release N-1, compile and get the artifacts
-yarn verify-deployed -n $NETWORK -b $RELEASE_BRANCH
+yarn verify-deployed -n $NETWORK -b $RELEASE
 ```
 
 ### Check Backward Compatibility
 
-Compile the contracts in <code>$RELEASE_BRANCH</code> and <code>$BRANCH</code> branches and check backwards compatibility against a release, subject to the following exceptions:
+Use the following script to compile the contracts in <code>$RELEASE</code> and <code>$BRANCH</code> branches to check backwards compatibility against a release, subject to the following exceptions:
   1. If the STORAGE version has changed, do not perform backwards compatibility checks
   2. If the MAJOR version has changed, check storage layout is backwards compatible, but do not check contract ABI is backwards compatible
-
-For changed contracts, confirm that version number in <code>$BRANCH</code> is strictly greater than <code>$RELEASE_BRANCH</code> version number.
-For unchanged contracts, confirm that version number in <code>$BRANCH</code> is exactly the <code>$RELEASE_BRANCH</code> version number.
-Output a JSON backwards compatibility report to <code>$REPORT</code> file.
+Outputs a JSON backwards compatibility report to <code>$REPORT</code> file.
 
 ```bash
-# TODO: command to pull source code from current release branch
-yarn check-versions -a $RELEASE_BRANCH -b $BRANCH -r $REPORT
+yarn check-versions -a $RELEASE -b $BRANCH -r $REPORT
 ```
+
+For changed contracts, checks that version number in <code>$BRANCH</code> is strictly greater than <code>$RELEASE</code> version number.
+For unchanged contracts, checks that version number in <code>$BRANCH</code> is exactly the <code>$RELEASE</code> version number.
 
 ### Deploy New Contracts
 
-Build contracts on <code>$BRANCH</code> and, using corresponding backwards compatibility report <code>$REPORT</code>, deploy changed contracts to <code>$NETWORK</code>.
-STORAGE updates are adopted by deploying a new proxy/implementation pair. Initialize new contracts with values using <code>$INITIALIZE_DATA</code> when specified.
-Output a JSON upgrade governance proposal to <code>$PROPOSAL</code> file. The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Other storage compatible upgrades are encoded by repointing the existing proxy's implementation.
+Use the following script to build contracts on <code>$BRANCH</code> and, using the corresponding backwards compatibility report <code>$REPORT</code>, deploy changed contracts to <code>$NETWORK</code>.
+STORAGE updates are adopted by deploying a new proxy/implementation pair. These new contracts may need to be initialized, for which values can be provided via <code>$INITIALIZE_DATA</code>. Output a JSON upgrade governance proposal to <code>$PROPOSAL</code> file.
 
 ```bash
 yarn make-release -r $REPORT -b $BRANCH -n $NETWORK -i $INITIALIZE_DATA -p $PROPOSAL
 ```
+
+The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Other storage compatible upgrades are encoded by repointing the existing proxy's implementation.
 
 ### Submit Upgrade Proposal
 
@@ -94,7 +98,12 @@ celocli governance:propose <...> --jsonTransactions $PROPOSAL
 
 ## Verify Release Candidate
 
-Using the following procedure, stakeholders can verify a contract release candidate against the contents of a governance upgrade proposal.
+```bash
+RELEASE=celo-core-contracts-v${N}.rc${M}
+NETWORK=<baklava|alfajores|mainnet>
+```
+
+Using the following procedure, stakeholders can verify a contract release <code>$RELEASE</code> against the contents of a governance upgrade proposal on <code>$NETWORK</code>.
 
 ### Fetch Upgrade Proposal
 
@@ -104,12 +113,12 @@ Fetch the upgrade proposal identified by <code>$UPGRADE_PROPOSAL_ID</code> and o
 celocli governance:show <...> --proposalID $UPGRADE_PROPOSAL_ID --jsonTransactions $UPGRADE_PROPOSAL
 ```
 
-### Verify Release Candidate
+### Verify Proposed Release
 
-Verify that the <code>$UPGRADE_PROPOSAL</code> proposal performs an upgrade to contract addresses which match compiled bytecode from the release candidate <code>$BRANCH</code> branch exactly. Releases are tagged as `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
+Verify that the <code>$UPGRADE_PROPOSAL</code> proposal performs an upgrade to contract addresses which match compiled bytecode from the release candidate <code>$RELEASE</code> exactly.
 
 ```bash
-yarn verify-release -b $BRANCH -n $NETWORK -p $UPGRADE_PROPOSAL
+yarn verify-release -b $RELEASE -n $NETWORK -p $UPGRADE_PROPOSAL
 ```
 
 ## Testing
