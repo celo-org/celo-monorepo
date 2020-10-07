@@ -46,7 +46,7 @@ export default function SideBar({ isOpen }) {
               style={styles.chevronButton}
               kind={BTN.DARKNAKED}
               text="Read about the poem"
-              href="#poemlink"
+              href="https://medium.com/celoorg/a-celebration-of-heart-for-celo-44bbbba94a2c"
               size={SIZE.normal}
             />
             {/* <Button
