@@ -14,11 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { isProviderConnectionError } from 'src/geth/geth'
 import { GethNativeBridgeWallet } from 'src/geth/GethNativeBridgeWallet'
-import {
-  waitForGethConnectivity,
-  waitForGethConnectivityAsync,
-  waitForGethInitialized,
-} from 'src/geth/saga'
+import { waitForGethInitialized, waitForGethSync, waitForGethSyncAsync } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
@@ -147,7 +143,7 @@ export function* getContractKit() {
       yield call(initContractKit)
     }
   }
-  yield call(waitForGethConnectivity)
+  yield call(waitForGethSync)
   return contractKit
 }
 
@@ -158,7 +154,7 @@ export async function getContractKitAsync(): Promise<ContractKit> {
     Logger.warn(`${TAG}@getContractKitAsync`, 'contractKit is undefined')
     throw new Error('contractKit is undefined')
   }
-  await waitForGethConnectivityAsync()
+  await waitForGethSyncAsync()
   return contractKit
 }
 

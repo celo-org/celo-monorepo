@@ -33,7 +33,7 @@ import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { BLOCK_AGE_LIMIT } from 'src/web3/utils'
+import { BLOCK_AGE_LIMIT, blockIsFresh } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -42,6 +42,7 @@ const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000 // ms
 const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
+const GETH_SYNC_TIMEOUT = 30000 // ms
 
 export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -100,18 +101,74 @@ export function* waitForGethConnectivity() {
   }
 }
 
-export async function waitForGethConnectivityAsync() {
-  let connected = isGethConnectedSelector(store.getState())
-  if (connected) {
-    return
+function* pollGethStatusUntilSynced() {
+  let head: BlockHeader = yield select(chainHeadSelector)
+
+  // Head may be null on startup
+  if (!head) {
+    head = (yield take(Actions.SET_CHAIN_HEAD)).head
   }
 
   while (true) {
-    await sleep(500)
-    connected = isGethConnectedSelector(store.getState())
-    if (connected) {
-      return
+    if (blockIsFresh(head)) {
+      return true
     }
+
+    head = (yield take(Actions.SET_CHAIN_HEAD)).head
+  }
+}
+
+export function* waitForGethSync() {
+  const fornoEnabled = yield select(fornoSelector)
+  if (fornoEnabled) {
+    return
+  }
+
+  const { result } = yield race({
+    result: call(pollGethStatusUntilSynced),
+    timeout: delay(GETH_SYNC_TIMEOUT),
+  })
+
+  if (!result) {
+    ValoraAnalytics.track(GethEvents.geth_sync_timeout)
+    throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
+  }
+}
+
+function pollGethSyncStatusAsync() {
+  return new Promise(async (resolve, reject) => {
+    const dateLimit = Date.now() + GETH_SYNC_TIMEOUT
+
+    while (Date.now() <= dateLimit) {
+      const head = chainHeadSelector(store.getState())
+      if (!head) {
+        await sleep(500)
+        continue
+      }
+      // Calculate how long, in milliseconds, we have until this node may be out of sync
+      const expiration = (head.timestamp + BLOCK_AGE_LIMIT) * 1000 - Date.now()
+      if (expiration > 0) {
+        resolve()
+      }
+
+      await sleep(500)
+    }
+
+    reject()
+  })
+}
+
+export async function waitForGethSyncAsync() {
+  const fornoEnabled = fornoSelector(store.getState())
+  if (fornoEnabled) {
+    return
+  }
+
+  try {
+    await pollGethSyncStatusAsync()
+  } catch (error) {
+    ValoraAnalytics.track(GethEvents.geth_sync_timeout)
+    throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
   }
 }
 

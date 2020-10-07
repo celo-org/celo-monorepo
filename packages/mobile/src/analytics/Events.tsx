@@ -306,6 +306,7 @@ export enum GethEvents {
   create_geth_error = 'create_geth_error',
   start_geth_start = 'start_geth_start',
   start_geth_finish = 'start_geth_finish',
+  geth_sync_timeout = 'geth_sync_timeout',
 }
 
 export enum NetworkEvents {
