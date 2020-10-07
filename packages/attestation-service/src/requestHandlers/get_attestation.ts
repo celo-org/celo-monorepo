@@ -2,13 +2,13 @@ import { PhoneNumberUtils } from '@celo/utils'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
-import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger } from '../db'
-import { AttestationKey } from '../models/attestation'
-import { respondWithAttestation, respondWithError } from '../request'
+import { Transaction } from 'sequelize'
+import { findAttestationByKey, makeSequelizeLogger, sequelize, SequelizeLogger } from '../db'
+import { AttestationKey, AttestationModel } from '../models/attestation'
+import { ErrorWithResponse, respondWithAttestation, respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
 
-export const VERSION = process.env.npm_package_version as string
-export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
+const maxSecurityCodeAttempts = 5
 
 function obfuscateGetAttestationRequest(getRequest: GetAttestationRequest) {
   const obfuscatedRequest = { ...getRequest }
@@ -36,10 +36,47 @@ class GetAttestationRequestHandler {
     this.key = getAttestationKey(getRequest)
   }
 
-  async getAttestationRecord() {
-    return findAttestationByKey(this.key, {
+  async withAttestationAndSecurityCodeChecked(f: (attestation: AttestationModel) => any) {
+    const transaction = await sequelize!.transaction({
       logging: this.sequelizeLogger,
+      type: Transaction.TYPES.IMMEDIATE,
     })
+    try {
+      const attestation = await findAttestationByKey(this.key, {
+        transaction,
+        lock: Transaction.LOCK.UPDATE,
+      })
+
+      if (!attestation) {
+        throw new ErrorWithResponse('Attestation not found', 404)
+      }
+
+      // Check security code is supplied and attempts allow
+      if (!this.getRequest.securityCode) {
+        f(attestation)
+        await transaction.commit()
+        return
+      }
+
+      if (attestation.securityCodeAttempt >= maxSecurityCodeAttempts) {
+        throw new ErrorWithResponse('Security code attempts exceeded', 403)
+      }
+
+      if (this.getRequest.securityCode === attestation.securityCode) {
+        f(attestation)
+        await transaction.commit()
+        return
+      }
+
+      attestation.securityCodeAttempt += 1
+      await attestation.save({ transaction, logging: this.sequelizeLogger })
+      await transaction.commit()
+    } catch (error) {
+      transaction.rollback()
+      throw error
+    }
+
+    throw new ErrorWithResponse('Invalid security code', 403)
   }
 }
 
@@ -51,15 +88,15 @@ export async function handleGetAttestationRequest(
   try {
     const handler = new GetAttestationRequestHandler(getRequest, res.locals.logger)
 
-    const attestation = await handler.getAttestationRecord()
-    if (!attestation) {
-      respondWithError(res, 404, `Attestation not found`)
-      return
-    }
-
-    respondWithAttestation(res, attestation, true, undefined, getRequest.securityCode)
+    await handler.withAttestationAndSecurityCodeChecked((attestation) => {
+      respondWithAttestation(res, attestation, true, undefined, true)
+    })
   } catch (error) {
-    res.locals.logger.error(error)
-    respondWithError(res, 500, `${error.message ?? error}`)
+    if (!error.responseCode) {
+      res.locals.logger.error({ error })
+    } else {
+      res.locals.logger.info({ error })
+    }
+    respondWithError(res, error.responseCode ?? 500, `${error.message ?? error}`)
   }
 }

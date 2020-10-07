@@ -216,12 +216,13 @@ export async function startSendSms(
         countryCode,
         status: AttestationStatus.NotSent,
         message: messageToSend,
-        securityCode,
         attestationCode,
         providers: providersToCsv(providers),
         attempt: 0,
         errors: undefined,
         ongoingDeliveryId: null,
+        securityCode,
+        securityCodeAttempt: 0,
       },
       transaction
     )

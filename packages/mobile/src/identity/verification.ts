@@ -22,7 +22,8 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DEFAULT_TESTNET, SECURITY_CODE_PREFIX, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
+import { currentLanguageSelector } from 'src/app/reducers'
+import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
 import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
@@ -561,32 +562,32 @@ function attestationCodeReceiver(
     }
 
     try {
-      let code
+      let attestationCode = extractAttestationCodeFromMessage(action.message)
 
-      // See if this is a security code message. If so, retrieve the actual code from the matching Attestation Service.
-      if (action.message.startsWith(SECURITY_CODE_PREFIX)) {
-        const securityCodeIndex = parseInt(
-          action.message.slice(SECURITY_CODE_PREFIX.length, SECURITY_CODE_PREFIX.length + 1),
-          10
-        )
-        const securityCode = action.message.slice(SECURITY_CODE_PREFIX.length + 1)
-        if (securityCodeIndex < attestations.length) {
-          code = yield call(
-            getAttestationCodeFromSecurityCode,
-            account,
-            phoneHashDetails,
-            attestations[securityCodeIndex],
-            securityCode
-          )
+      // If it's not an attestation code, parse it as a security code
+      if (!attestationCode) {
+        const matches = action.message.match('(\\d)([\\d]{5,8})\\s+$')
+        if (matches && matches.length === 2) {
+          const securityCodeIndex = parseInt(matches[0], 10)
+          const securityCode = matches[1]
+          if (securityCodeIndex < attestations.length) {
+            // Try to recover the full attestation code from the matching issuer's attestation service
+            attestationCode = yield call(
+              getAttestationCodeFromSecurityCode,
+              account,
+              phoneHashDetails,
+              attestations[securityCodeIndex],
+              securityCode
+            )
+          }
         }
       }
 
-      code = code ?? extractAttestationCodeFromMessage(action.message)
-      if (!code) {
+      if (!attestationCode) {
         throw new Error('No code extracted from message')
       }
 
-      const existingCode = yield call(isCodeAlreadyAccepted, code)
+      const existingCode = yield call(isCodeAlreadyAccepted, attestationCode)
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
         ValoraAnalytics.track(VerificationEvents.verification_code_received, {
@@ -605,7 +606,7 @@ function attestationCodeReceiver(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
         phoneHashDetails.phoneHash,
         account,
-        code,
+        attestationCode,
         attestations.map((a) => a.issuer)
       )
       if (!issuer) {
@@ -620,7 +621,7 @@ function attestationCodeReceiver(
         phoneHashDetails.phoneHash,
         account,
         issuer,
-        code
+        attestationCode
       )
       ValoraAnalytics.track(VerificationEvents.verification_code_validate_complete, { issuer })
 
@@ -628,7 +629,7 @@ function attestationCodeReceiver(
         throw new Error('Code is not valid')
       }
 
-      yield put(inputAttestationCode({ code, issuer }))
+      yield put(inputAttestationCode({ code: attestationCode, issuer }))
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
@@ -824,7 +825,8 @@ function* tryRevealPhoneNumber(
       phoneNumber: phoneHashDetails.e164Number,
       salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
-      securityCodePrefix: `${SECURITY_CODE_PREFIX}${index}`, // TODO localize
+      securityCodePrefix: `${index}`,
+      language: yield select(currentLanguageSelector),
     }
 
     const { ok, status, body } = yield call(

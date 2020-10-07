@@ -32,6 +32,20 @@ function getAttestationKey(attestationRequest: AttestationRequest): AttestationK
   }
 }
 
+// TODO proper localization
+function getSecurityCodeText(language: string | undefined) {
+  switch (language) {
+    case 'es':
+    case 'es-419':
+    case 'es-LA': {
+      return 'Código de seguridad de Celo'
+    }
+    default: {
+      return 'Celo security code'
+    }
+  }
+}
+
 class AttestationRequestHandler {
   logger: Logger
   key: AttestationKey
@@ -139,27 +153,41 @@ class AttestationRequestHandler {
       // Re-request existing attestation. In this case, security code prefix is ignored (the message sent is the same as before)
       attestation = await rerequestAttestation(this.key, this.logger, this.sequelizeLogger)
     } else {
-      // New attestation: create text message, new delivery.
+      // New attestation: create new attestation code, new delivery.
       const attestationCode = await this.signAttestation()
       await this.validateAttestationCode(attestationCode)
-
-      let messageBase, securityCode
-
       const attestationCodeDeeplink = `celo://wallet/v/${toBase64(attestationCode)}`
+
+      // Determine if we're sending a security code, or the full deep link.
+      let messageBase, securityCode
       if (this.attestationRequest.securityCodePrefix) {
+        if (this.attestationRequest.securityCodePrefix.length !== 1) {
+          throw new ErrorWithResponse('Invalid securityCodePrefix', 422)
+        }
+
         // Client is requesting a security code SMS. Generate a challenge and just store the deeplink.
         securityCode = randomBytes(7)
           .map((x) => x % 10)
           .join('')
-        messageBase = `${this.attestationRequest.securityCodePrefix}${securityCode}`
+        messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${
+          this.attestationRequest.securityCodePrefix
+        }${securityCode}`
       } else {
         // Client is requesting direct SMS with the deeplink.
         messageBase = attestationCodeDeeplink
       }
 
-      const textMessage = this.attestationRequest.smsRetrieverAppSig
-        ? `<#> ${messageBase} ${this.attestationRequest.smsRetrieverAppSig}`
-        : messageBase
+      let textMessage
+
+      // Append with the retriever appsig.
+      if (this.attestationRequest.smsRetrieverAppSig) {
+        if (!this.attestationRequest.smsRetrieverAppSig.match('^[w+]{5,12}$')) {
+          throw new ErrorWithResponse('Invalid smsRetrieverAppSig', 422)
+        }
+        textMessage = `<#> ${messageBase} ${this.attestationRequest.smsRetrieverAppSig}`
+      } else {
+        textMessage = messageBase
+      }
 
       attestation = await startSendSms(
         this.key,

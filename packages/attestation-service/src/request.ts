@@ -83,7 +83,7 @@ export function respondWithAttestation(
   attestation: AttestationModel,
   alwaysSuccess?: boolean | undefined,
   salt?: string | undefined,
-  securityCode?: string | undefined
+  showAttestationCode?: boolean | undefined
 ) {
   res.status(alwaysSuccess ? 200 : attestation.failure() ? 422 : 200).json(
     AttestationResponseType.encode({
@@ -101,10 +101,7 @@ export function respondWithAttestation(
       duration: attestation.completedAt
         ? attestation.completedAt!.getTime() - attestation.createdAt.getTime()
         : undefined,
-      attestationCode:
-        securityCode === attestation.securityCode
-          ? attestation.attestationCode ?? undefined
-          : undefined,
+      attestationCode: showAttestationCode ? attestation.attestationCode ?? undefined : undefined,
     })
   )
 }
