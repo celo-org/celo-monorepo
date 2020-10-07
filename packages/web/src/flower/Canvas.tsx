@@ -33,7 +33,7 @@ export default function Canvas() {
                 About
               </Fade>
             </View>
-            <Fade duration={DURATION} opposite={true} when={isOpen}>
+            <Fade duration={DURATION} reverse={true} when={isOpen}>
               Close
             </Fade>
           </Text>
