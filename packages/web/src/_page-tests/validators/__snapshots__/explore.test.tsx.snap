@@ -855,6 +855,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -1617,6 +1670,59 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
           <div
             className="css-view-1dbjc4n"
             style={
@@ -2383,6 +2489,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -3145,6 +3304,59 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
           <div
             className="css-view-1dbjc4n"
             style={
@@ -3911,6 +4123,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -4673,6 +4938,59 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
           <div
             className="css-view-1dbjc4n"
             style={
