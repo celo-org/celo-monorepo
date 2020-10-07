@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'

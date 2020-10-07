@@ -55,7 +55,7 @@ export function HashingStatus({
       ]
         .filter((x) => !!x)
         .map((message) => (
-          <Fade key={message} when={!done} appear={true}>
+          <Fade key={message} when={!done}>
             <View style={isFaucet ? styles.ticker : styles.log}>
               <Text style={[fonts.h6, !isFaucet && textStyles.invert]}>
                 <Checkmark size={12} color={colors.primary} /> {message}

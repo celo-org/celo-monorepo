@@ -38,7 +38,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           <H4 style={[textStyles.center, textStyles.invert]}>{t('developerSDKsubtitle')}</H4>
         </Cell>
       </GridRow>
-      <Fade ssrReveal={true} delay={DELAY_2} duration={DURATION} direction="up" distance={'40px'}>
+      <Fade delay={DELAY_2} duration={DURATION} direction="up" distance={'40px'}>
         <View>
           <CoverActions />
         </View>

@@ -154,7 +154,7 @@ class Jobs extends React.Component<Props, State> {
           >
             <Cell span={Spans.fourth}>
               <View>
-                <Fade direction="up" distance="40px" wait={200}>
+                <Fade direction="up" distance="40px" delay={200}>
                   <View>
                     <Text style={[fonts.h3Mobile, textStyles.heading]}>
                       {t('careerOpportunities')}
