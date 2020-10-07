@@ -1,4 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -8,6 +9,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
+import AccountNumber from 'src/components/AccountNumber'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { noHeader } from 'src/navigator/Headers'
@@ -72,7 +74,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t, account, route } = this.props
+    const { t, account, phoneNumber, route } = this.props
     const { dappName } = route.params.dappKitRequest
     return (
       <SafeAreaView style={styles.container}>
@@ -88,8 +90,10 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
           <Text style={styles.share}>{t('shareInfo')}</Text>
 
           <View style={styles.sectionDivider}>
+            <Text style={styles.sectionHeaderText}>{t('phoneNumber')}</Text>
+            <PhoneNumberWithFlag e164PhoneNumber={phoneNumber || ''} />
             <Text style={styles.sectionHeaderText}>{t('address')}</Text>
-            <Text style={styles.bodyText}>{account}</Text>
+            <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />
           </View>
           <Button
             style={styles.button}
@@ -109,14 +113,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
-    flexGrow: 1,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: '15%',
   },
   header: {
     ...fontStyles.h1,
-    alignItems: 'center',
+    textAlign: 'center',
     paddingBottom: 16,
   },
   share: {
@@ -131,11 +134,7 @@ const styles = StyleSheet.create({
   sectionHeaderText: {
     ...fontStyles.label,
     marginTop: 16,
-  },
-  bodyText: {
-    ...fontStyles.regular,
-    color: colors.gray4,
-    textAlign: 'center',
+    marginBottom: 4,
   },
   button: {
     marginTop: 24,
