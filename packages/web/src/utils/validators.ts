@@ -136,7 +136,7 @@ export function togglePin(address: Address) {
  * Formats data into usable data for table
  * @param {ValidatorsListData}   data.celoValidatorGroups The validator groups data
  * @param {ValidatorsListData}   data.latestBlock The height of the latest block
- * @return {CeloGroup}           The group of validators with formatted data
+ * @return {CeloGroup[]}           The group of validators with formatted data
  */
 export function cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListData) {
   const totalVotes: BigNumber = celoValidatorGroups
