@@ -99,7 +99,6 @@ async function registerValidatorGroup(
   // encrypted with the private key of the first validator, so that the group private key
   // can be recovered.
   const account = mnemonicAccountOrUseFromGanache(valGroupKey)
-  // const account = { address: privateKeyToAddress(valGroupKey), privateKey: valGroupKey }
 
   // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
   // in the version we use elsewhere.

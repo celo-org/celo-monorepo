@@ -91,10 +91,9 @@ const DefaultConfig = {
     frozen: true,
   },
   gasPriceMinimum: {
-    minimumFloor: 1,
-    targetDensity: 1,
-    // adjustmentSpeed: 1 / 2,
-    adjustmentSpeed: 0,
+    minimumFloor: 100000000,
+    targetDensity: 1 / 2,
+    adjustmentSpeed: 1 / 2,
   },
   goldToken: {
     frozen: true,
@@ -111,8 +110,6 @@ const DefaultConfig = {
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
-    skipSetConstitution: true,
-    skipTransferOwnership: true,
   },
   governanceApproverMultiSig: {
     // 3/9 multsig, with 5/9 to make multisig changes.
@@ -274,8 +271,7 @@ const NetworkConfigs = {
       slashableDowntime: 60, // epoch length is 100 for unit tests
     },
     election: {
-      minElectableValidators: '3',
-      maxElectableValidators: '100',
+      minElectableValidators: '10',
       frozen: false,
     },
     epochRewards: {
