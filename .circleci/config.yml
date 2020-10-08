@@ -962,7 +962,7 @@ jobs:
           name: Fail if there are vulnerabilities in packages
           command: |
             generate_post_data() {
-              cat <<EOF
+              cat \<\<EOF
             {
               "summary": "Vulnerability found in CI during yarn audit",
               "details": "Please see CircleCI output:\n $1",
