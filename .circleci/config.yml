@@ -963,7 +963,7 @@ jobs:
           command: |
             alert_vulnerabilities_oncall()
             {
-              cat <<EOF
+              cat \<\<EOF
             {
               "summary": "Vulnerability found in CI during yarn audit",
               "details": "$1",
