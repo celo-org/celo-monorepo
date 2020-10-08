@@ -9,24 +9,24 @@ set -euo pipefail
 # -b: New branch containing smart contracts, on which version numbers may be updated.
 # -r: Path that the contract compatibility report should be written to.
 
-BRANCH_1=""
-BRANCH_2=""
+OLD_BRANCH=""
+NEW_BRANCH=""
 REPORT=""
 
 while getopts 'a:b:r:' flag; do
   case "${flag}" in
-    a) BRANCH_1="${OPTARG}" ;;
-    b) BRANCH_2="${OPTARG}" ;;
+    a) OLD_BRANCH="${OPTARG}" ;;
+    b) NEW_BRANCH="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
-[ -z "$BRANCH_1" ] && echo "Need to set the first branch via the -a flag" && exit 1;
-[ -z "$BRANCH_2" ] && echo "Need to set the second branch via the -b flag" && exit 1;
+[ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
+[ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
-BUILD_DIR_1=$(echo build/$(echo $BRANCH_1 | sed -e 's/\//_/g'))
-git checkout $BRANCH_1
+BUILD_DIR_1=$(echo build/$(echo $OLD_BRANCH | sed -e 's/\//_/g'))
+git checkout $OLD_BRANCH
 rm -rf build/contracts
 # TODO: Move to yarn build:sol after the next contract release.
 yarn build
@@ -34,8 +34,8 @@ rm -rf $BUILD_DIR_1 && mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
 
 
-BUILD_DIR_2=$(echo build/$(echo $BRANCH_2 | sed -e 's/\//_/g'))
-git checkout $BRANCH_2
+BUILD_DIR_2=$(echo build/$(echo $NEW_BRANCH | sed -e 's/\//_/g'))
+git checkout $NEW_BRANCH
 rm -rf build/contracts
 yarn build:sol
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2

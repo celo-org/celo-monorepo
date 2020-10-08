@@ -48,7 +48,7 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 
 ## Release Process
 
-The cLabs team has provided several scripts (under `packages/protocol` in [celo-org/celo-monorepo](https://github.com/celo-org/celo-monorepo) and via [celocli](../../command-line-interface/introduction.md)) for use in the release process and with contract upgrade governance proposals to give participating stakeholders increased confidence.
+There are several scripts provided (under `packages/protocol` in [celo-org/celo-monorepo](https://github.com/celo-org/celo-monorepo) and via [celocli](../../command-line-interface/introduction.md)) for use in the release process and with contract upgrade governance proposals to give participating stakeholders increased confidence.
 
 {% hint style="warning" %}​ 
 For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup. 
@@ -61,7 +61,7 @@ Using these tools, a contract release candidate can be built, deployed, and prop
 Use the following script to compile contracts at a release tag and verify that the deployed network bytecode matches the compiled bytecode.
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-RELEASE="celo-core-contracts-v${N}.${NETWORK}"
+RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
 # A -r boolean flag should be provided if this is the first release (before linked libraries were proxied)
 yarn verify-deployed -n $NETWORK -b $RELEASE -r -f
