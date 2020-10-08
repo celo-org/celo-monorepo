@@ -198,7 +198,7 @@ class HomeCarousel extends React.Component {
           {images.map((image, index) => (
             <View key={index}>
               {index < 2 ? (
-                <Fade direction="left" distance="40px" delay={200}>
+                <Fade direction="right" distance="-40px" delay={200}>
                   <Cell key={index} image={image} imageWidth={imageWidth} />
                 </Fade>
               ) : (

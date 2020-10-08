@@ -133,9 +133,16 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
               </LazyLoad>
             ))}
           <Axis max={maxPoints} isMobile={screen === ScreenSizes.MOBILE} />
-          <Fade delay={DELAY_MS} when={!isLoading}>
-            <Text style={[fonts.small, textStyles.invert]}>{t('unitOfMeasure')}</Text>
-          </Fade>
+          <Text
+            style={[
+              fonts.small,
+              textStyles.invert,
+              standardStyles.fadeInitial,
+              !isLoading && standardStyles.fadeIn,
+            ]}
+          >
+            {t('unitOfMeasure')}
+          </Text>
           {showExpandButton && (
             <Fade delay={DELAY_MS}>
               <View

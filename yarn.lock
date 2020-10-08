@@ -28922,10 +28922,9 @@ react-autowhatever@^10.1.2:
     react-themeable "^1.1.0"
     section-iterator "^2.0.0"
 
-react-awesome-reveal@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/react-awesome-reveal/-/react-awesome-reveal-3.3.1.tgz#b263c063f897516630eaa8dcf0b96fc3136706e3"
-  integrity sha512-+BGbNYOzMoUQ1dkhpQeXisnGOWkugGhSZRdrtG8N6nbd15eFdseRIWNM1wTd684W6t/MsFcKP7HWgyUBO10m6A==
+react-awesome-reveal@aaronmgdr/react-awesome-reveal#build:
+  version "3.4.0-test"
+  resolved "https://codeload.github.com/aaronmgdr/react-awesome-reveal/tar.gz/249ea0fb69b0cf31b5d6af77e1c1140ffe1ffb6e"
   dependencies:
     "@emotion/core" "^10.0.35"
     "@emotion/styled" "^10.0.27"

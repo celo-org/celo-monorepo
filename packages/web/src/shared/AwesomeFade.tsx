@@ -2,44 +2,34 @@ import { keyframes } from '@emotion/core'
 import * as React from 'react'
 import Reveal from 'react-awesome-reveal'
 
+type Direction = 'up' | 'right'
+
 interface Props {
   children: React.ReactNode
-  when?: boolean
   delay?: number
   distance?: number | string
   duration?: number
   fraction?: number
-  bottom?: boolean
   reverse?: boolean
-  direction?: 'up' | 'right' | 'left'
+  direction?: Direction
 }
 
-export default function AwesomeFade({
+export default React.memo(function AwesomeFade({
   children,
-  when,
-  bottom,
+  reverse,
   delay,
   distance,
   direction,
   duration,
-  reverse,
   fraction,
 }: Props) {
-  const fadeInUp = keyframes`
-    from {
-      opacity: 0;
-      transform: translate3d(0, ${distance}, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  `
-
   return (
     <Reveal
-      keyframes={fadeInUp}
-      triggerOnce={true}
+      keyframes={React.useMemo(() => getKeyFrames(distance, direction, reverse), [
+        direction,
+        distance,
+      ])}
+      triggerOnce={false}
       delay={delay}
       duration={duration}
       fraction={fraction}
@@ -47,4 +37,36 @@ export default function AwesomeFade({
       {children}
     </Reveal>
   )
+})
+
+function getKeyFrames(distance: number | string, direction: Direction, reverse: boolean) {
+  let from = `translate3d(0, ${distance}, 0)`
+
+  if (direction === 'right') {
+    from = `translate3d(${distance}, 0, 0)`
+  }
+
+  if (reverse) {
+    return keyframes`
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      opacity: 0;
+      transform: ${from}; 
+    }
+  `
+  }
+
+  return keyframes`
+    from {
+      opacity: 0;
+      transform: ${from};
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  `
 }

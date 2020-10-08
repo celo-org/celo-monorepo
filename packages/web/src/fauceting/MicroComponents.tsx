@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from 'react-native'
 import { EXAMPLE_ADDRESS, RequestState } from 'src/fauceting/utils'
 import { I18nProps } from 'src/i18n'
 import Checkmark from 'src/icons/Checkmark'
-import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles as std, textStyles } from 'src/styles'
@@ -55,13 +54,14 @@ export function HashingStatus({
       ]
         .filter((x) => !!x)
         .map((message) => (
-          <Fade key={message} when={!done}>
-            <View style={isFaucet ? styles.ticker : styles.log}>
-              <Text style={[fonts.h6, !isFaucet && textStyles.invert]}>
-                <Checkmark size={12} color={colors.primary} /> {message}
-              </Text>
-            </View>
-          </Fade>
+          <View
+            key={message}
+            style={[isFaucet ? styles.ticker : styles.log, std.fadeInitial, done && std.fadeIn]}
+          >
+            <Text style={[fonts.h6, !isFaucet && textStyles.invert]}>
+              <Checkmark size={12} color={colors.primary} /> {message}
+            </Text>
+          </View>
         ))}
     </View>
   )
