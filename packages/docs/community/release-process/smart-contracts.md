@@ -46,57 +46,84 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.mainnet`
 
 
-## Build and Release Process
+## Release Process
 
-Using the following scripts, new contracts can be built and deployed alongside a corresponding on-chain governance proposal. Run the following scripts from the branch with the new release contracts:
+There are several scripts provided (under `packages/protocol` in [celo-org/celo-monorepo](https://github.com/celo-org/celo-monorepo) and via [celocli](../../command-line-interface/introduction.md)) for use in the release process and with contract upgrade governance proposals to give participating stakeholders increased confidence.
 
+{% hint style="warning" %}​ 
+For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup. 
+{% endhint %}
+
+Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
+
+### Verify Release on Network
+
+Use the following script to compile contracts at a release tag and verify that the deployed network bytecode matches the compiled bytecode.
 ```bash
-## Script 1 ##
-# TODO: command to pull source code from release N-1, compile and get the artifacts
-# verify the current contract bytecode on the network matches the contracts currently on the RC1 branch
-yarn truffle exec --network $NETWORK ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
-
-## Script 2 ##
-# TODO: command to pull source code from current release branch
-# generate report on backwards compatibility between RC1 and current branch with new release contracts
-yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/rc1 -n build/contracts --output_file report.json
-
-## Script 3 ##
-# deploy new contracts and generate governance proposal for upgrade
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data example-initialize-data.json'
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
+# A -f boolean flag can be provided to use a forno full node to connect to the provided network
+# A -r boolean flag should be provided if this is the first release (before linked libraries were proxied)
+yarn verify-deployed -n $NETWORK -b $RELEASE -r -f
 ```
 
-These scripts do the following:
+### Check Backward Compatibility
 
-#### Script 1:
+Use the following script to compile candidate and current release contracts to check storage layout and ABI backwards compatibility, subject to the following exceptions:
+  1. If the STORAGE version has changed, does not perform backwards compatibility checks
+  2. If the MAJOR version has changed, checks storage layout compatibility but not ABI compatibility
 
-1. Compiles the contracts at <code>rc1</code> branch and confirms that the compiled bytecode matches what is currently deployed on the specified network.
-
-#### Script 2:
-
-1. Compiles the contracts in the current branch and checks backwards compatibility with what is currently deployed on the specified network, with the following exceptions:
-   1. If the STORAGE version has changed, does not perform backwards compatibility checks
-   2. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
-2. For contracts that have changed, confirms that the version number in the current branch is strictly greater than the deployed version number.
-3. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
-
-#### Script 3:
-
-1. For contracts that have changed, deploys those contracts to the specified network.
-2. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
-   1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Registry contract.
-   2. All other updates are adopted by updating the proxy contract’s implementation pointer.
-
-## Verify Release Process
-
-Using the following script, any stakeholders can verify that the release contracts deployed as a part of the upgrade proposal match the contracts from the release branch exactly. Run this script from the relevant release tag (`celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`) or release branch `release/celo-core-contracts/N`:
+For changed contracts, checks that new version number is strictly greater than previous release. For unchanged contracts, checks that version number exactly matches previous release. Outputs a JSON backwards compatibility report.
 
 ```bash
-# verify bytecode of upgrade deployment
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+yarn check-versions -a $PREVIOUS_RELEASE -b $RELEASE_CANDIDATE -r "report.json"
 ```
 
-This script compiles the contracts at the current branch and confirms that the compiled bytecode matches the bytecode of contracts deployed as a part of the ugrade propsal.
+This should be used in tandem with `verify-deployed -b $PREVIOUS_RELEASE -n $NETWORK` to ensure the compatibility checks compare the release candidate to what is actually active on the network.
+
+### Deploy New Contracts
+
+Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network.
+STORAGE updates are adopted by deploying a new proxy/implementation pair. These new contracts may need to be initialized, for which values can be provided. Outputs a JSON contract upgrade governance proposal.
+
+```bash
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+RELEASE="celo-core-contracts-v${N}.rc${X}"
+yarn make-release -b $RELEASE -n $NETWORK -r "report.json" -i "initialize_data.json" -p "proposal.json"
+```
+
+The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
+
+### Submit Upgrade Proposal
+
+Submit the autogenerated upgrade proposal to the Governance contract for review by voters, outputting a unique identifier.
+
+```bash
+# resultant proposal ID should be communicated publicly
+celocli governance:propose <...> --jsonTransactions "proposal.json"
+```
+
+### Fetch Upgrade Proposal
+
+Fetch the upgrade proposal and output the JSON encoded proposal contents.
+
+```bash
+celocli governance:show <...> --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
+```
+
+### Verify Proposed Release
+
+Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly.
+
+```bash
+RELEASE="celo-core-contracts-v${N}.rc${X}"
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+# A -f boolean flag can be provided to use a forno full node to connect to the provided network
+yarn verify-release -p "upgrade_proposal.json" -b $RELEASE -n $NETWORK -f
+```
 
 ## Testing
 
