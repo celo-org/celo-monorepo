@@ -222,13 +222,13 @@ const validateGethRPC = async (
   handleError: HandleErrorCallback
 ) => {
   const transaction = await kit.web3.eth.getTransaction(txHash)
-  handleError(!transaction || !transaction.from, {
-    location: '[GethRPC]',
-    error: `Contractkit did not return a valid transaction`,
-  })
-  if (transaction == null) {
-    return
-  }
+  // handleError(!transaction || !transaction.from, {
+  //   location: '[GethRPC]',
+  //   error: `Contractkit did not return a valid transaction`,
+  // })
+  // if (transaction == null) {
+  //   return
+  // }
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -527,7 +527,7 @@ export const simulateClient = async (
 
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
-    
+
     let feeCurrency, gasPrice, txOptions
     try {
       feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
@@ -542,7 +542,7 @@ export const simulateClient = async (
 
     feeCurrency = feeCurrency || ''
     baseLogMessage.feeCurrency = feeCurrency
-  
+
     try {
       if (!feeCurrencyGold) {
         const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
@@ -580,7 +580,6 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        // console.error('Load test transaction failed with error:', JSON.stringify(error))
         console.error('Load test transaction failed with error:', error)
         tracerLog({
           tag: LOG_TAG_TRANSACTION_ERROR,
@@ -595,7 +594,6 @@ export const simulateClient = async (
 }
 
 export const onLoadTestTxResult = async (
-  // @ts-ignore
   kit: ContractKit,
   senderAddress: string,
   txResult: TransactionResult,
@@ -604,7 +602,6 @@ export const onLoadTestTxResult = async (
   blockscoutUrl: string,
   blockscoutMeasurePercent: number
 ) => {
-  // return
   const txReceipt = await txResult.waitReceipt()
   const txHash = txReceipt.transactionHash
   baseLogMessage.txHash = txHash
