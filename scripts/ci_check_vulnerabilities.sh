@@ -6,7 +6,8 @@
 set -u
 
 set +e
-output=$(yarn audit --json --groups dependencies --level high)
+readable_output=$(yarn audit --groups dependencies --level high)
+json_output=$(yarn audit --json --groups dependencies --level high)
 result=$?
 set -e
 
@@ -15,9 +16,9 @@ if [ $result -eq 0 ]; then
 	exit 0
 fi
 
-if [ -f yarn-audit-known-issues ] && echo "$output" | grep auditAdvisory | diff -q yarn-audit-known-issues - > /dev/null 2>&1; then
+if [ -f yarn-audit-known-issues ] && echo "$json_output" | grep auditAdvisory | diff -q yarn-audit-known-issues - > /dev/null 2>&1; then
 	echo
-	echo Ignorning known vulnerabilities
+	echo Ignoring known vulnerabilities
 	exit 0
 fi
 
@@ -34,6 +35,6 @@ echo "yarn audit --json --groups dependencies --level high | grep auditAdvisory 
 echo
 echo and commit the yarn-audit-known-issues file
 echo
-echo "$output" | grep auditAdvisory | python -mjson.tool
+echo "$readable_output"
 
 exit "$result"

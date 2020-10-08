@@ -93,28 +93,7 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
-      - run:
-          name: Fail if there are vulnerabilities in packages
-          command: |
-            generate_post_data()
-            {
-              cat <<EOF
-            {
-              "summary": "Vulnerability found in CI during yarn audit",
-              "details": "$REPORT",
-              "targets": [{
-                "type": "EscalationPolicy",
-                "slug": "pol-bu0pGzGe3mMQ1W8D",
-              }]
-            }
-            EOF
-            }
-            REPORT=$(yarn audit --groups dependencies --level high)
-            if [[ $? -ge 8 ]]; then
-              curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' \
-              --header "X-VO-Api-Id: $VICTOROPS_API_ID" --header "X-VO-Api-Key: $VICTOROPS_API_KEY" \
-              -d "$(generate_post_data)" 'https://api.victorops.com/api-public/v1/incidents'
-            fi
+
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
       - run:
@@ -411,7 +390,14 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      - run: ./scripts/ci_check_vulnerabilities.sh
+      - run:
+          name: audit when dependencies have changed
+          command: /
+            if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
+              echo "Skipping dependency audit, dependencies haven't changed"
+              exit 0
+            fi
+            ./scripts/ci_check_vulnerabilities.sh
 
   general-test:
     <<: *defaults
@@ -967,6 +953,34 @@ jobs:
             cd packages/protocol
             certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond
 
+  yarn-audit-vulnerabilities:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Fail if there are vulnerabilities in packages
+          command: |
+            alert_vulnerabilities_oncall()
+            {
+              cat <<EOF
+            {
+              "summary": "Vulnerability found in CI during yarn audit",
+              "details": "$1",
+              "targets": [{
+                "type": "EscalationPolicy",
+                "slug": "pol-bu0pGzGe3mMQ1W8D",
+              }]
+            }
+            EOF
+            }
+
+            ./scripts/ci_check_vulnerabilities.sh
+            if [ $? -ne 0 ]
+            then
+              alert_vulnerabilities_oncall() $CIRCLE_BUILD_URL
+            fi
+
   flakey-test-summary:
     <<: *defaults
     steps:
@@ -1096,6 +1110,17 @@ workflows:
       - test-utils-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
+  yarn-audit-cron-workflow:
+    triggers:
+      - schedule:
+          # every 4 hours (6 times a day)
+          cron: '0 0,4,8,12,16,20 * * *'
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - yarn-audit-vulnerabilities
   protocol-testing-with-code-coverage-cron-workflow:
     triggers:
       - schedule:
