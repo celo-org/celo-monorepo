@@ -22,8 +22,8 @@ import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
 import BackupSocialIntro from 'src/backup/BackupSocialIntro'
-import BackButton from 'src/components/BackButton.v2'
-import CancelButton from 'src/components/CancelButton.v2'
+import BackButton from 'src/components/BackButton'
+import CancelButton from 'src/components/CancelButton'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -62,11 +62,11 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-} from 'src/navigator/Headers.v2'
+} from 'src/navigator/Headers'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'

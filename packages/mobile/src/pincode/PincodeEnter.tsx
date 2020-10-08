@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers.v2'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { checkPin } from 'src/pincode/authentication'
@@ -82,7 +82,7 @@ class PincodeEnter extends React.Component<Props, State> {
     const { t } = this.props
     const { pin, errorText } = this.state
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <Pincode
           title={t('confirmPin.title')}
           errorText={errorText}
@@ -95,7 +95,7 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',

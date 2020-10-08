@@ -1,5 +1,5 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -17,13 +17,13 @@ class FullscreenCTA extends React.PureComponent<Props> {
     const { title, subtitle, CTAText, CTAHandler } = this.props
 
     return (
-      <SafeAreaView style={style.container}>
-        <View style={style.header}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
           <Text style={fontStyles.h1}>{title}</Text>
           <Text style={fontStyles.h2}>{subtitle}</Text>
         </View>
         {this.props.children}
-        <View style={style.button}>
+        <View style={styles.button}>
           <Button
             onPress={CTAHandler}
             text={CTAText}
@@ -36,7 +36,7 @@ class FullscreenCTA extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     height: variables.height,
     width: variables.width,

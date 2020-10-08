@@ -12,8 +12,8 @@ import { H1, H2, H3, H4, Li, Ul } from 'src/fonts/Fonts'
 import Button, { BTN } from 'src/shared/Button.3'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { fonts, standardStyles } from 'src/styles'
+import { isExternalLink } from 'src/utils/utils'
 import { trackOpen, Types } from './eventkit/tracking'
-
 export interface Attributes {
   title: string
   description: string
@@ -21,6 +21,16 @@ export interface Attributes {
 
 function P({ children }) {
   return <Text style={[fonts.p, standardStyles.halfElement, styles.block]}>{children}</Text>
+}
+
+function SmartAnchor({ children, href }) {
+  const target = isExternalLink(href) ? '_blank' : undefined
+
+  return (
+    <InlineAnchor target={target} href={href}>
+      {children}
+    </InlineAnchor>
+  )
 }
 
 function PrimeButton({
@@ -85,7 +95,7 @@ const OPTIONS = {
     },
     p: P,
     span: P,
-    a: InlineAnchor,
+    a: SmartAnchor,
     DesignForAll,
     StrivingForBeauty,
     EmbodyHumility,
