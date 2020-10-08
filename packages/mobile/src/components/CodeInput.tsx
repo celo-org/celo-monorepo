@@ -15,6 +15,7 @@ import {
   ViewStyle,
 } from 'react-native'
 import ClipboardAwarePasteButton from 'src/components/ClipboardAwarePasteButton'
+import { isE2EEnv } from 'src/config'
 import { useClipboard } from 'src/utils/useClipboard'
 
 export enum CodeInputStatus {
@@ -54,7 +55,9 @@ export default function CodeInput({
 
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
-    LayoutAnimation.easeInEaseOut()
+    if (!isE2EEnv) {
+      LayoutAnimation.easeInEaseOut()
+    }
   }, [status === CodeInputStatus.INPUTTING])
 
   function shouldShowClipboardInternal() {

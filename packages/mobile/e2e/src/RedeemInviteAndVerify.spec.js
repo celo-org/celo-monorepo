@@ -35,34 +35,15 @@ describe('Redeem invite code and verify number', () => {
 
     await waitForElementId('VerificationEducationContinue', 100000)
     await expect(element(by.id('VerificationEducationContinue'))).toBeVisible()
-
-    await element(by.id('VerificationEducationSkipHeader')).tap()
-    await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
-
-    // Arrived to Home screen
-    await expect(element(by.id('SendOrRequestBar'))).toBeVisible()
   })
 
-  it('Start from home', async () => {
-    await element(by.id('Hamburguer')).tap()
-    await element(by.id('DrawerItem/Settings')).tap()
-
-    await waitForElementId('SettingsScrollView')
-    await sleep(2000)
-
-    await element(by.id('SettingsConfirmNumber')).tap()
-    await enterPinUiIfNecessary()
-
-    await sleep(2000)
-  })
-
-  it('Do verification', async () => {
+  it('Verify Phone Number', async () => {
     await element(by.id('VerificationEducationContinue')).tap()
 
     // Wait for the countdown to finish.
     await sleep(45000)
     await enterPinUiIfNecessary()
-    await waitForElementId('VerificationCode1', 90000)
+    await waitForElementId('VerificationCode0', 120000)
 
     const codes = await receiveSms()
     for (let i = 0; i < 3; i++) {

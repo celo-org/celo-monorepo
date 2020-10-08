@@ -2,6 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import React, { useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutAnimation } from 'react-native'
+import { isE2EEnv } from 'src/config'
 import { Namespaces } from 'src/i18n'
 
 interface Props {
@@ -18,7 +19,9 @@ export default function ClipboardAwarePasteButton({
   const { t } = useTranslation(Namespaces.global)
 
   useLayoutEffect(() => {
-    LayoutAnimation.easeInEaseOut()
+    if (!isE2EEnv) {
+      LayoutAnimation.easeInEaseOut()
+    }
   }, [shouldShow])
 
   async function onPressInternal() {
