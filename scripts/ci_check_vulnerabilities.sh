@@ -23,7 +23,9 @@ if [ -f yarn-audit-known-issues ] && echo "$json_output" | grep auditAdvisory | 
 fi
 
 echo
-echo Security vulnerabilities were found that were not ignored
+echo "$readable_output"
+echo 
+echo Security vulnerabilities were found that are not ignored
 echo
 echo Check to see if these vulnerabilities apply to production
 echo and/or if they have fixes available. If they do not have
@@ -35,6 +37,5 @@ echo "yarn audit --json --groups dependencies --level high | grep auditAdvisory 
 echo
 echo and commit the yarn-audit-known-issues file
 echo
-echo "$readable_output"
 
-exit "$result"
+exit $result

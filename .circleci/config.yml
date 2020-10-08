@@ -961,24 +961,26 @@ jobs:
       - run:
           name: Fail if there are vulnerabilities in packages
           command: |
-            alert_vulnerabilities_oncall()
-            {
-              cat \<\<EOF
+            generate_post_data() {
+              cat <<EOF
             {
               "summary": "Vulnerability found in CI during yarn audit",
-              "details": "$1",
+              "details": "Please see CircleCI output:\n $1",
+              "userName": "yorhodes",
               "targets": [{
                 "type": "EscalationPolicy",
-                "slug": "pol-bu0pGzGe3mMQ1W8D",
+                "slug": "pol-bu0pGzGe3mMQ1W8D"
               }]
             }
             EOF
             }
 
             ./scripts/ci_check_vulnerabilities.sh
-            if [ $? -ne 0 ]
-            then
-              alert_vulnerabilities_oncall() $CIRCLE_BUILD_URL
+            if [ $? -ne 0 ]; then
+              echo "Posting new incident to VictorOps"
+              curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' \
+                --header "X-VO-Api-Id: $VICTOROPS_API_ID" --header "X-VO-Api-Key: $VICTOROPS_API_KEY" \
+                -d "$(generate_post_data $CIRCLE_BUILD_URL)" 'https://api.victorops.com/api-public/v1/incidents'
             fi
 
   flakey-test-summary:
