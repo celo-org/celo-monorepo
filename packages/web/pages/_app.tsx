@@ -9,6 +9,7 @@ import analytics, { canTrack, initializeAnalytics } from 'src/analytics/analytic
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer'
+import pagePaths from 'src/shared/menu-items'
 import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
@@ -38,9 +39,13 @@ class MyApp extends App {
   }
 
   // there are a few pages we dont want the header on
-  // currently this is just the animation demo pages and BrandKit
+  // currently this is just the animation demo pages and experience kits and out art project
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
+    return (
+      this.props.router.asPath.startsWith('/animation') ||
+      this.isBrand() ||
+      this.props.router.asPath.startsWith(pagePaths.FLOWERS.link)
+    )
   }
 
   isBrand = () => {
