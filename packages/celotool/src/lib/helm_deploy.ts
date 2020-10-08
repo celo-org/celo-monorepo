@@ -1,7 +1,6 @@
 import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
-import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
@@ -921,13 +920,10 @@ export async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, 
   const genesisContent = useExistingGenesis
   ? await getGenesisBlockFromGoogleStorage(celoEnv)
   : generateGenesisFromEnv()
-  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
 
   const valueFileContent = `
 genesis:
   genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
-staticnodes:
-  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
 `
   fs.writeFileSync(valueFilePath, valueFileContent)
 }
