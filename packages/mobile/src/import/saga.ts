@@ -85,7 +85,6 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       yield put(setHasSeenVerificationNux(true))
       navigateHome()
     } else {
-      yield call(fetchVerificationState)
       navigate(Screens.VerificationEducationScreen)
     }
 
