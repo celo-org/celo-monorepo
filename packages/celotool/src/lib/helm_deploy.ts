@@ -753,7 +753,7 @@ export async function installGenericHelmChart(
   chartDir: string,
   parameters: string[]
 ) {
-  if (chartDir != 'stable/chaoskube') {
+  if (chartDir !== 'stable/chaoskube') {
     await buildHelmChartDependencies(chartDir)
   }
   console.info(`Installing helm release ${releaseName}`)
