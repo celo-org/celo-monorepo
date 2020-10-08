@@ -19,7 +19,6 @@ describe(Team, () => {
   it('displays an image for each contributor', async () => {
     const { getByText, getByAltText } = render(
       <TestProvider>
-        {' '}
         <Team contributors={CONTRIBUTORS} />
       </TestProvider>
     )
@@ -32,7 +31,6 @@ describe(Team, () => {
   it('displays company name', async () => {
     const { getByText } = render(
       <TestProvider>
-        {' '}
         <Team contributors={CONTRIBUTORS} />
       </TestProvider>
     )

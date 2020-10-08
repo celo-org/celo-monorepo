@@ -1,6 +1,7 @@
 import { waitFor } from '@testing-library/dom'
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
+import { act } from 'react-dom/test-utils'
 import { TestProvider } from 'src/_page-tests/test-utils'
 import Explorer from './Explorer'
 
@@ -64,7 +65,9 @@ describe(Explorer, () => {
         </TestProvider>
       )
       const { getByLabelText } = options
-      fireEvent.change(getByLabelText('search'), { target: { value: 'Stellar' } })
+      act(() => {
+        fireEvent.change(getByLabelText('search'), { target: { value: 'Stellar' } })
+      })
       return options
     }
     it('shows number of icons found', async () => {

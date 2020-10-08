@@ -1,5 +1,6 @@
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
+import { TestProvider } from 'src/_page-tests/test-utils'
 import LeaderBoard from 'src/dev/LeaderBoard'
 
 const leaders = new Array(12)
@@ -14,14 +15,22 @@ const leaders = new Array(12)
 
 describe('LeaderBoard', () => {
   it('it displays an expand button, and when pressed a "collapse" button shows', () => {
-    const { getByText } = render(<LeaderBoard isLoading={false} leaders={leaders} />)
+    const { getByText } = render(
+      <TestProvider>
+        <LeaderBoard isLoading={false} leaders={leaders} />
+      </TestProvider>
+    )
 
-    fireEvent.click(getByText(/expand/))
-    expect(getByText(/collapse/)).toBeTruthy()
+    fireEvent.click(getByText('Expand Leaderboard'))
+    expect(getByText('Collapse Leaderboard')).toBeTruthy()
   })
 
   it('displays a link to terms', () => {
-    const { getAllByText } = render(<LeaderBoard isLoading={false} leaders={leaders} />)
+    const { getAllByText } = render(
+      <TestProvider>
+        <LeaderBoard isLoading={false} leaders={leaders} />
+      </TestProvider>
+    )
     getAllByText(/Terms/i).map((el) => expect(el.getAttribute('href')).toEqual('/stake-off/terms'))
   })
 })
