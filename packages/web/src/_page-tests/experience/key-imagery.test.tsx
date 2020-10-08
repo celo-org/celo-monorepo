@@ -1,5 +1,7 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
+import { TestProvider } from 'src/_page-tests/test-utils'
+import KeyImagery from 'pages/experience/brand/key-imagery'
 
 const MOCK = [
   {
@@ -12,11 +14,15 @@ const MOCK = [
   },
 ]
 
-import KeyImagery from 'pages/experience/brand/key-imagery'
-
 describe('Experience/KeyImagery', () => {
   it('renders', () => {
-    const tree = renderer.create(<KeyImagery graphics={MOCK} illos={MOCK} />).toJSON()
+    const tree = renderer
+      .create(
+        <TestProvider>
+          <KeyImagery graphics={MOCK} illos={MOCK} />
+        </TestProvider>
+      )
+      .toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

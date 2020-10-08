@@ -2831,6 +2831,7 @@ exports[`Alliance renders 1`] = `
                       checked={false}
                       data-focusable={true}
                       name="subscribe"
+                      onChange={[Function]}
                       onClick={[Function]}
                       style={
                         Object {
@@ -2856,7 +2857,7 @@ exports[`Alliance renders 1`] = `
                     }
                   >
                     <label
-                      for="subscribe"
+                      htmlFor="subscribe"
                       name="subscribe"
                       onClick={[Function]}
                       style={
@@ -7779,6 +7780,7 @@ exports[`Alliance renders 1`] = `
                     checked={false}
                     data-focusable={true}
                     name="subscribe"
+                    onChange={[Function]}
                     onClick={[Function]}
                     style={
                       Object {
@@ -7804,7 +7806,7 @@ exports[`Alliance renders 1`] = `
                   }
                 >
                   <label
-                    for="subscribe"
+                    htmlFor="subscribe"
                     name="subscribe"
                     onClick={[Function]}
                     style={

@@ -22,7 +22,7 @@ class FeaturedVideo extends React.PureComponent<I18nProps> {
             <Fade direction="up" distance={'20px'}>
               <View style={standardStyles.centered}>
                 <H2 style={[textStyles.center, styles.heading]}>
-                  {this.props.t('buildAMonetarySys')}
+                  {this.props.t('buildAFinancialSys')}
                 </H2>
               </View>
             </Fade>

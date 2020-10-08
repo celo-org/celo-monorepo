@@ -1377,7 +1377,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.title
+                Color
               </h1>
             </div>
             <div
@@ -1406,7 +1406,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.primaries
+                Primary Brand Colors
               </div>
               <div
                 className="css-text-901oao"
@@ -1425,7 +1425,11 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.primariesText
+                Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.
+
+Celo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to CELO like validation, proof of stake, and governance.
+
+Celo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -2299,7 +2303,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.accents
+                Accent Colors
               </div>
               <div
                 className="css-text-901oao"
@@ -2318,7 +2322,11 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.accentsText
+                Accent colors include violet, red, cyan, and blue.
+
+Violet, red, and cyan are colors that often represent alternative coins, projects, and personas in the ecosystem.
+
+Blue represents help within digital experiences like websites and mobile applications.
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -3184,7 +3192,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.grays
+                Grays
               </div>
               <div
                 className="css-text-901oao"
@@ -3203,7 +3211,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.graysText
+                Grays are used when hierarchy needs to be established. Use grays to visually communicate intended ranking of importance in Typography or UI.
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -4081,7 +4089,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.backgroundTitle
+                Background Colors
               </h2>
             </div>
             <div
@@ -4109,7 +4117,7 @@ exports[`Experience/Color renders 1`] = `
                   }
                 }
               >
-                color.backgroundText
+                Background colors function as canvases in which accent and brand colors can punctuate layout compositions.
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -4975,7 +4983,7 @@ exports[`Experience/Color renders 1`] = `
                 }
               }
             >
-              color.contrast
+              Contrast
             </div>
             <div
               className="css-text-901oao"
@@ -4993,7 +5001,7 @@ exports[`Experience/Color renders 1`] = `
                 }
               }
             >
-              color.contrastText
+              For accessibility, choose high contrast color combinations when laying out text.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -5134,7 +5142,7 @@ exports[`Experience/Color renders 1`] = `
                 }
               }
             >
-              color.contrastText2
+              For best results, we recommend following these dos and don’ts:
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -6011,7 +6019,7 @@ exports[`Experience/Color renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -6030,6 +6038,7 @@ exports[`Experience/Color renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -6539,7 +6548,7 @@ exports[`Experience/Color renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -6787,7 +6796,7 @@ exports[`Experience/Color renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -7255,7 +7264,7 @@ exports[`Experience/Color renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -7903,7 +7912,7 @@ exports[`Experience/Color renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

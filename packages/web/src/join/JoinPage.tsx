@@ -19,7 +19,7 @@ import { colors, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
 
 const DESCRIPTION =
-  'Join us in building monetary system that creates the conditions for prosperity for all. We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.'
+  'Join us in building financial system that creates the conditions for prosperity for all. We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.'
 
 interface OwnProps {
   positions: LeverJob[]
@@ -58,7 +58,10 @@ class JoinPage extends React.PureComponent<Props> {
               <View style={[standardStyles.centered, styles.cloud, styles.inside]}>
                 <Fade direction="up" delay={10} distance={'20px'}>
                   <View style={standardStyles.centered}>
-                    <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+                    <H1
+                      ariaLevel="2"
+                      style={[textStyles.center, standardStyles.elementalMarginBottom]}
+                    >
                       {t('workWithValue')}
                     </H1>
                     <H4 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
