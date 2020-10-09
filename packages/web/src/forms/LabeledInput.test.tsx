@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
-import { LabeledInput } from 'src/forms/LabeledInput'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import { LabeledInput } from 'src/forms/LabeledInput'
 
 describe(LabeledInput, () => {
   describe('when there is an error', () => {

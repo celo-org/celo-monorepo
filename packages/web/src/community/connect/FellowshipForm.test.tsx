@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import * as React from 'react'
-import FellowshipForm from 'src/community/connect/FellowshipForm'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import FellowshipForm from 'src/community/connect/FellowshipForm'
 
 describe('FellowshipForm', () => {
   describe('when visitor tries submiting without filling out form', () => {

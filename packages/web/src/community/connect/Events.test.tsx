@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react'
 import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
-import Events from 'src/community/connect/Events'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import Events from 'src/community/connect/Events'
 
 describe('Events', () => {
   describe('when pastEvents NOT given', () => {
@@ -73,7 +73,11 @@ describe('Events', () => {
 
   describe('when it is loading', () => {
     it('A Loading graphic is displayed', () => {
-      const { getByLabelText } = render(<Events loading={true} />)
+      const { getByLabelText } = render(
+        <TestProvider>
+          <Events loading={true} />
+        </TestProvider>
+      )
 
       expect(getByLabelText('loading')).toBeTruthy()
     })

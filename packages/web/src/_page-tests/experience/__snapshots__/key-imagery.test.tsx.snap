@@ -1593,12 +1593,7 @@ Images have descriptions that act as guidelines for both accessibility and commu
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -1915,12 +1910,7 @@ Images have descriptions that act as guidelines for both accessibility and commu
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"

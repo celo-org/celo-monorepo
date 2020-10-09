@@ -1,9 +1,9 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import * as React from 'react'
 import { ApplicationFields, RecommendationFields } from 'src/../fullstack/EcoFundFields'
-import EcoFund from 'src/community/EcoFund'
 import { TestProvider } from 'src/_page-tests/test-utils'
-TestProvider
+import EcoFund from 'src/community/EcoFund'
+
 describe('EcoFund', () => {
   describe('on first render', () => {
     it('is all clear', async () => {

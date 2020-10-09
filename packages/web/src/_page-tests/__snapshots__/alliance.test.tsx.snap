@@ -2219,12 +2219,7 @@ exports[`Alliance renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -2327,12 +2322,7 @@ exports[`Alliance renders 1`] = `
           </div>
         </div>
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <form>
             <div
@@ -6244,12 +6234,7 @@ exports[`Alliance renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <h2
             aria-level="2"

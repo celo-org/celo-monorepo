@@ -1,8 +1,8 @@
 import { render, waitFor } from '@testing-library/react'
 import 'jest-fetch-mock'
 import * as React from 'react'
-import Team from 'src/about/Team'
 import { TestProvider } from 'src/_page-tests/test-utils'
+import Team from 'src/about/Team'
 
 const CONTRIBUTORS = [
   {
