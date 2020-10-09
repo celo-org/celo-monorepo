@@ -32,14 +32,14 @@ All releases should be tagged with the version number, e.g. contractkit-vX.Y.Z. 
 The community will be notified of package updates through the following channels: 
 
 For all releases: 
-Each package’s CHANGELOG.md file, as mentioned above
-Github releases page, as mentioned above
-[Discord](https://discord.gg/6yWMkgM): #developer-chat, #mainnet, and #sdk
+  * Each package’s CHANGELOG.md file, as mentioned above
+  * Github releases page, as mentioned above
+  * [Discord](https://discord.gg/6yWMkgM): #developer-chat, #mainnet, and #sdk
 
 For major releases: 
-Twitter: [@CeloDevs](https://twitter.com/CeloDev)
-Mailing list: cLabs’ Tech Sync
-[Celo Forum](https://forum.celo.org/)
+  * Twitter: [@CeloDevs](https://twitter.com/CeloDev)
+  * Mailing list: cLabs’ Tech Sync
+  * [Celo Forum](https://forum.celo.org/)
 
 
 
