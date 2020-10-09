@@ -25,7 +25,8 @@ RELEASE=false
 NET_DELAY="none"
 DEV_MODE=false
 FILE_TO_RUN=""
-while getopts 'p:t:frd' flag; do
+RUN_VERIFICATION_TEST=false
+while getopts 'p:t:fird' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
@@ -34,6 +35,7 @@ while getopts 'p:t:frd' flag; do
     n) NET_DELAY="$OPTARG" ;;
     d) DEV_MODE=true ;;
     t) FILE_TO_RUN=$OPTARG ;;
+    i) RUN_VERIFICATION_TEST=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -88,7 +90,9 @@ runTest() {
   if [[ $DEV_MODE == true ]]; then
     extra_param="--reuse"
   fi
-  export INVITE_CODE=$(../celotool/bin/celotooljs.sh account invite -e alfajores --phone +12057368924 --yesreally | grep "Invite code:" | awk '{print $3}')
+  if [[ $RUN_VERIFICATION_TEST == true ]]; then
+    export INVITE_CODE=$(../celotool/bin/celotooljs.sh account invite -e alfajores --phone +12057368924 --yesreally | grep "Invite code:" | awk '{print $3}')
+  fi
   yarn detox test \
     --configuration $CONFIG_NAME \
     "${FILE_TO_RUN}" \

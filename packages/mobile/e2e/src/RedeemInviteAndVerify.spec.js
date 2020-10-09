@@ -6,10 +6,15 @@ const VERIFICATION_COUNTRY = 'US'
 const VERIFICATION_PHONE_NUMBER = '2057368924'
 const EXAMPLE_NAME = 'Test Name'
 
+const RUN_VERIFICATION_TEST = !!process.env.INVITE_CODE
+
 describe('Redeem invite code and verify number', () => {
   beforeEach(dismissBanners)
 
-  it('Onboard and redeem invite code', async () => {
+  it('Redeem invite code and verify number', async () => {
+    if (!RUN_VERIFICATION_TEST) {
+      return
+    }
     for (let i = 0; i < 3; i++) {
       await element(by.id('Education/progressButton')).tap()
     }
@@ -31,13 +36,12 @@ describe('Redeem invite code and verify number', () => {
     await enterPinUi()
     await enterPinUi()
 
+    // Write invite code!
     await element(by.id('inviteCodeInput')).replaceText(process.env.INVITE_CODE)
 
+    // Wait for invite to finish and start verification.
     await waitForElementId('VerificationEducationContinue', 100000)
     await expect(element(by.id('VerificationEducationContinue'))).toBeVisible()
-  })
-
-  it('Verify Phone Number', async () => {
     await element(by.id('VerificationEducationContinue')).tap()
 
     // Wait for the countdown to finish.
@@ -45,14 +49,17 @@ describe('Redeem invite code and verify number', () => {
     await enterPinUiIfNecessary()
     await waitForElementId('VerificationCode0', 120000)
 
+    // Write the verification codes.
     const codes = await receiveSms()
     for (let i = 0; i < 3; i++) {
       await element(by.id(`VerificationCode${i}`)).replaceText(codes[i])
     }
 
+    // Skip contacts.
     await waitForElementId('ImportContactsSkip')
     await element(by.id('ImportContactsSkip')).tap()
 
+    // Arrived to the Home screen!
     await sleep(3000)
     await expect(element(by.id('SendOrRequestBar'))).toBeVisible()
   })
