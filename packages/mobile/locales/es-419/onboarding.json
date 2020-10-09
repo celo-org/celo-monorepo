@@ -51,8 +51,7 @@
     "doINeedToConfirm": "¿Necesito confirmar?",
     "skipForNow": "Saltar por ahora",
     "bodyInsufficientBalance": "Tu saldo actual no es lo suficientemente alto para completar el proceso de verificación.\n\nIntenta nuevamente cuando hayas agregado fondos a tu app.",
-    "bodyAlreadyVerified": "¡Tu número ya está confirmado!",
-    "receivedCodes": "Ya recibí tres códigos"
+    "bodyAlreadyVerified": "¡Tu número ya está confirmado!"
   },
   "verificationSkipDialog": {
     "title": "Estas seguro",
@@ -60,13 +59,14 @@
     "cancel": "Regresa",
     "confirm": "Saltar por ahora"
   },
+  "verificationPrematureRevealMessage": "Por favor espera 1 minuto antes de volver a enviar",
   "verificationLearnMoreDialog": {
-    "title": "Confirmación de número de teléfono",
-    "body": "La confirmación del número de teléfono funciona asociando tu cuenta con tu número de teléfono.\n\n<0>¿Necesito completar esto?</0>\n\nNo se requiere confirmación, sin embargo, las cuentas no confirmadas solo pueden enviar pagos utilizando direcciones Celo o códigos QR.\n\n<1>Seguridad y privacidad</1>\n\nPara proteger tu privacidad, solo una versión ofuscada de tu número de teléfono se almacena en la cadena de bloques de Celo.",
+    "title": "Números de teléfono y {{appName}}",
+    "body": "Confirmar facilita conectar con tus amigos al permitir enviar y recibir dinero usando tu número de teléfono.\n\n<0>¿Puedo hacerlo más tarde?</0>\n\nSi, pero cuentas sin confirmar solo pueden enviar dinero usando códigos QR o números de cuenta (direcciones).\n\n<1>Seguro y Privado</1>\n\nValora usa criptografía de vanguardia para mantener tu número de teléfono privado.",
     "dismiss": "Descartar"
   },
   "importExistingKey": {
-    "explanation": "La clave de tu cuenta es una frase de 24 palabras que escribiste y guardaste cuando configuraste tu cuenta. Por favor ingrésala aquí para restaurar tu cuenta.",
+    "explanation": "La clave de tu cuenta es una frase de 24 palabras que escribiste y guardaste cuando configuraste tu cuenta. Por favor ingrésala aquí para restaurar tu cuenta.\n\nRecuerda que tu elección de idioma debe coincidir con el lenguaje usado al crear la cuenta.",
     "keyPlaceholder": "horse leopard dog monkey ..."
   },
   "verificationInput": {
@@ -83,7 +83,10 @@
     "codePlaceholder3": "Copia el tercer mensaje",
     "codePlaceholder3_ios": "Toca o copia el tercer mensaje",
     "codePlaceholderWithCodeInClipboard": "¡Excelente! Péguelo aquí",
-    "typingTip": "¿Mecanografía? Intenta copiar y pegar"
+    "typingTip": "¿Mecanografía? Intenta copiar y pegar",
+    "resendMessages": "Reenviar el último mensaje",
+    "resendMessages_plural": "Reenviar {{count}} mensajes",
+    "resendMessages_all": "Reenviar todos los mensajes"
   },
   "verificationInputHelpDialog": {
     "title": "Ayuda",

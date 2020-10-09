@@ -1,5 +1,5 @@
 import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -54,10 +54,6 @@ const styles = StyleSheet.create({
   },
   containerList: {
     flex: 1,
-  },
-  contactUs: {
-    marginTop: 30,
-    paddingLeft: 30,
   },
   title: {
     ...fontStyles.h1,

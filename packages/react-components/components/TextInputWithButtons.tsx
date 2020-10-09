@@ -1,6 +1,6 @@
 // VIEW that contains a TextInput and shows the children right-indented to be used as buttons.
 
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import {
   Platform,

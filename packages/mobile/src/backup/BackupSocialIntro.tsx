@@ -1,5 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -49,20 +49,18 @@ class BackupSocialIntro extends React.Component<Props> {
           <SafeguardsPeopleIcon style={styles.logo} width={229} height={149} />
           <Text style={styles.h1}>{t('socialBackupIntro.header')}</Text>
           <Text style={styles.body}>{t('socialBackupIntro.body')}</Text>
-          <Text style={[styles.body, fontStyles.bold]}>{t('socialBackupIntro.warning')}</Text>
+          <Text style={[styles.body, fontStyles.regular500]}>{t('socialBackupIntro.warning')}</Text>
         </ScrollView>
         <>
           <Button
             onPress={this.onPressContinue}
             text={t('setUpSocialBackup')}
-            standard={false}
             type={BtnTypes.PRIMARY}
           />
           {this.isIncomingFromBackupFlow() && (
             <Button
               onPress={this.onPressSkip}
               text={t('socialBackupIntro.skip')}
-              standard={false}
               type={BtnTypes.SECONDARY}
             />
           )}
@@ -91,12 +89,9 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   body: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     textAlign: 'center',
     paddingBottom: 15,
-  },
-  loader: {
-    marginBottom: 20,
   },
 })
 

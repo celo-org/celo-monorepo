@@ -1,5 +1,10 @@
 import i18n from 'src/i18n'
-import { formatFeedDate, formatFeedTime, timeDeltaInDays } from 'src/utils/time'
+import {
+  formatFeedDate,
+  formatFeedSectionTitle,
+  formatFeedTime,
+  timeDeltaInDays,
+} from 'src/utils/time'
 
 const ONE_HOUR_MS = 60 * 60 * 1000
 const ONE_DAY_MS = 24 * ONE_HOUR_MS
@@ -33,6 +38,14 @@ describe('utils/time', () => {
     })
     it('works when number is in seconds', () => {
       expect(formatFeedDate(wedMarch132019at350pacific / 1000, i18n)).toEqual('Mar 13')
+    })
+  })
+  describe('formatFeedSectionTitle', () => {
+    it('returns date formatted as string and is accurate', () => {
+      expect(formatFeedSectionTitle(wedMarch132019at350pacific, i18n)).toEqual('March 2019')
+    })
+    it('works when number is in seconds', () => {
+      expect(formatFeedSectionTitle(wedMarch132019at350pacific / 1000, i18n)).toEqual('March 2019')
     })
   })
   describe('timeDeltaInDays', () => {
