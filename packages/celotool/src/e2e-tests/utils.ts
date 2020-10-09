@@ -197,6 +197,11 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
   const numValidators = validatorInstances.length
 
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const validatorGroupPrivateKeys = getPrivateKeysFor(
+    AccountType.VALIDATOR_GROUP,
+    mnemonic,
+    numValidators / 5
+  )
   const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
   const validators = getValidatorsInformation(mnemonic, numValidators)
 
@@ -302,6 +307,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       await migrateContracts(
         MonorepoRoot,
         validatorPrivateKeys,
+        validatorGroupPrivateKeys,
         attestationKeys,
         validators.map((x) => x.address),
         gethConfig.migrateTo,

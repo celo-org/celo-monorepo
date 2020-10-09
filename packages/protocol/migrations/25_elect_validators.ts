@@ -77,7 +77,8 @@ async function lockGold(
 }
 
 function mnemonicAccountOrUseFromGanache(valGroupKey: string) {
-  if (isGanache) {
+  console.info(`jcortejoso valGroupKey ${valGroupKey}`)
+  if (!valGroupKey) {
     const privateKey = extraKeys.pop()
     return { address: privateKeyToAddress(privateKey), privateKey }
   } else {

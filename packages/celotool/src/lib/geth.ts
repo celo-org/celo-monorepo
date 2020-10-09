@@ -1207,6 +1207,7 @@ export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
 export async function migrateContracts(
   monorepoRoot: string,
   validatorPrivateKeys: string[],
+  validatorGroupPrivateKeys: string[],
   attestationKeys: string[],
   validators: string[],
   to: number = 1000,
@@ -1224,6 +1225,7 @@ export async function migrateContracts(
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),
+        validatorGroupKeys: validatorGroupPrivateKeys.map(ensure0x),
         attestationKeys: attestationKeys.map(ensure0x),
       },
     },

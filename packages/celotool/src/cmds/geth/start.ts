@@ -190,6 +190,11 @@ export const handler = async (argv: StartArgv) => {
   const validators = getValidatorsInformation(mnemonic, instances)
 
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, instances)
+  const validatorGroupPrivateKeys = getPrivateKeysFor(
+    AccountType.VALIDATOR_GROUP,
+    mnemonic,
+    instances / 5
+  )
 
   const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, instances)
 
@@ -253,6 +258,7 @@ export const handler = async (argv: StartArgv) => {
     await migrateContracts(
       monorepoDir,
       validatorPrivateKeys,
+      validatorGroupPrivateKeys,
       attestationKeys,
       validators.map((x) => x.address),
       gethConfig.migrateTo,
