@@ -58,6 +58,12 @@ const freeGasConfig = {
 // Here to avoid recreating it each time
 let coverageProvider = null
 
+const fornoUrls = {
+  alfajores: 'https://alfajores-forno.celo-testnet.org',
+  baklava: 'https://baklava-forno.celo-testnet.org',
+  rc1: 'https://rc1-forno.celo-testnet.org',
+}
+
 const networks = {
   development: {
     ...defaultConfig,
@@ -191,6 +197,19 @@ if (argv.truffle_override || !(argv.network in networks)) {
       ...defaultConfig,
       ...configOverride,
     }
+  }
+}
+
+if (process.argv.includes('--forno')) {
+  if (!fornoUrls[argv.network]) {
+    console.log(`Forno URL for network ${argv.network} not known!`)
+    process.exit(1)
+  }
+
+  networks[argv.network].host = undefined
+  networks[argv.network].port = undefined
+  networks[argv.network].provider = function() {
+    return new Web3.providers.HttpProvider(fornoUrls[argv.network])
   }
 }
 
