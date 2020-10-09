@@ -8,7 +8,7 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 

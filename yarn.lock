@@ -6670,6 +6670,11 @@
     lodash.merge "^4.6.2"
     source-map-support "^0.5.16"
 
+"@truffle/blockchain-utils@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@truffle/blockchain-utils/-/blockchain-utils-0.0.11.tgz#9886f4cb7a9f20deded4451ac78f8567ae5c0d75"
+  integrity sha512-9MyQ/20M96clhIcC7fVFIckGSB8qMsmcdU6iYt98HXJ9GOLNKsCaJFz1OVsJncVreYwTUhoEXTrVBc8zrmPDJQ==
+
 "@truffle/blockchain-utils@^0.0.18":
   version "0.0.18"
   resolved "https://registry.yarnpkg.com/@truffle/blockchain-utils/-/blockchain-utils-0.0.18.tgz#69e40e380729cc41fd5bf468304f9e32af57e666"
@@ -6764,6 +6769,11 @@
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@truffle/error/-/error-0.0.7.tgz#e9db39885575647ef08bf624b0c13fe46d41a209"
   integrity sha512-UIfVKsXSXocKnn5+RNklUXNoGd/JVj7V8KmC48TQzmjU33HQI86PX0JDS7SpHMHasI3w9X//1q7Lu7nZtj3Zzg==
+
+"@truffle/error@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@truffle/error/-/error-0.0.6.tgz#75d499845b4b3a40537889e7d04c663afcaee85d"
+  integrity sha512-QUM9ZWiwlXGixFGpV18g5I6vua6/r+ZV9W/5DQA5go9A3eZUNPHPaTKMIQPJLYn6+ZV5jg5H28zCHq56LHF3yA==
 
 "@truffle/error@^0.0.8":
   version "0.0.8"
@@ -7700,6 +7710,11 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
   integrity sha512-l42BggppR6zLmpfU6fq9HEa2oGPEI8yrSPL3GITjfRInppYFahObbIQOQK3UGxEnyQpltZLaPe75046NOZQikw==
 
+"@types/string-hash@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@types/string-hash/-/string-hash-1.1.1.tgz#4c336e61d1e13ce2d3efaaa5910005fd080e106b"
+  integrity sha512-ijt3zdHi2DmZxQpQTmozXszzDo78V4R3EdvX0jFMfnMH2ZzQSmCbaWOMPGXFUYSzSIdStv78HDjg32m5dxc+tA==
+
 "@types/superagent@*":
   version "4.1.7"
   resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-4.1.7.tgz#a7d92d98c490ee0f802a127fdf149b9a114f77a5"
@@ -8287,6 +8302,11 @@
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
+
+"@yarnpkg/lockfile@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"
+  integrity sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==
 
 Base64@^1.0.1:
   version "1.0.1"
@@ -17113,6 +17133,14 @@ find-up@^4.0.0, find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
+find-yarn-workspace-root@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/find-yarn-workspace-root/-/find-yarn-workspace-root-1.2.1.tgz#40eb8e6e7c2502ddfaa2577c176f221422f860db"
+  integrity sha512-dVtfb0WuQG+8Ag2uWkbG79hOUzEsRrhBzgfn86g2sJPkzmcpGdghbNTfUKGTxymFrY/tLIodDzLoW9nOJ4FY8Q==
+  dependencies:
+    fs-extra "^4.0.3"
+    micromatch "^3.1.4"
+
 findup-sync@3.0.0, findup-sync@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-3.0.0.tgz#17b108f9ee512dfb7a5c7f3c8b27ea9e1a9c08d1"
@@ -17559,7 +17587,7 @@ fs-extra@^1.0.0:
     jsonfile "^2.1.0"
     klaw "^1.0.0"
 
-fs-extra@^4.0.1, fs-extra@^4.0.2:
+fs-extra@^4.0.1, fs-extra@^4.0.2, fs-extra@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.3.tgz#0d852122e5bc5beb453fb028e9c0c9bf36340c94"
   integrity sha512-q6rbdDd1o2mAnQreO7YADIxf/Whx4AHBiRf6d+/cVT8h44ss+lHgxf1FemcqDnQt9X3ct4McHr+JMGlYSsK7Cg==
@@ -22582,6 +22610,13 @@ kind-of@^6.0.0, kind-of@^6.0.1, kind-of@^6.0.2:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
+klaw-sync@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/klaw-sync/-/klaw-sync-6.0.0.tgz#1fd2cfd56ebb6250181114f0a581167099c2b28c"
+  integrity sha512-nIeuVSzdCCs6TDPTqI8w1Yre34sSq7AkZ4B3sfOBbI2CgVSB4Du4aLQijFU2+lhAFCwt9+42Hel6lQNIv6AntQ==
+  dependencies:
+    graceful-fs "^4.1.11"
+
 klaw@^1.0.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/klaw/-/klaw-1.3.1.tgz#4088433b46b3b1ba259d78785d8e96f73ba02439"
@@ -27272,6 +27307,24 @@ patch-package@^5.1.1:
     tmp "^0.0.31"
     update-notifier "^2.2.0"
 
+patch-package@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/patch-package/-/patch-package-6.2.2.tgz#71d170d650c65c26556f0d0fbbb48d92b6cc5f39"
+  integrity sha512-YqScVYkVcClUY0v8fF0kWOjDYopzIM8e3bj/RU1DPeEF14+dCGm6UeOYm4jvCyxqIEQ5/eJzmbWfDWnUleFNMg==
+  dependencies:
+    "@yarnpkg/lockfile" "^1.1.0"
+    chalk "^2.4.2"
+    cross-spawn "^6.0.5"
+    find-yarn-workspace-root "^1.2.1"
+    fs-extra "^7.0.1"
+    is-ci "^2.0.0"
+    klaw-sync "^6.0.0"
+    minimist "^1.2.0"
+    rimraf "^2.6.3"
+    semver "^5.6.0"
+    slash "^2.0.0"
+    tmp "^0.0.33"
+
 path-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/path-browserify/-/path-browserify-0.0.0.tgz#a0b870729aae214005b7d5032ec2cbbb0fb4451a"
@@ -28991,9 +29044,9 @@ react-native-clock-sync@^1.0.0:
   dependencies:
     react-native-ntp-client "0.5.5"
 
-"react-native-config@https://github.com/luggit/react-native-config#89a602b":
-  version "0.11.7"
-  resolved "https://github.com/luggit/react-native-config#89a602bf8be3808838403a97afaf915caeec76c2"
+"react-native-config@https://github.com/luggit/react-native-config#2f68b94":
+  version "1.3.3"
+  resolved "https://github.com/luggit/react-native-config#2f68b94065a0e1e1ddba8e860a696c6e8bc5912d"
 
 "react-native-contacts@https://github.com/celo-org/react-native-contacts#e473717":
   version "5.0.0"
@@ -31073,7 +31126,7 @@ seq-queue@^0.0.5:
   resolved "https://registry.yarnpkg.com/seq-queue/-/seq-queue-0.0.5.tgz#d56812e1c017a6e4e7c3e3a37a1da6d78dd3c93e"
   integrity sha1-1WgS4cAXpuTnw+Ojeh2m143TyT4=
 
-sequelize-cli@5.5.1:
+sequelize-cli@^5.5.1:
   version "5.5.1"
   resolved "https://registry.yarnpkg.com/sequelize-cli/-/sequelize-cli-5.5.1.tgz#0b9c2fc04d082cc8ae0a8fe270b96bb606152bab"
   integrity sha512-ZM4kUZvY3y14y+Rq3cYxGH7YDJz11jWHcN2p2x7rhAIemouu4CEXr5ebw30lzTBtyXV4j2kTO+nUjZOqzG7k+Q==
@@ -32122,7 +32175,7 @@ string-argv@^0.1.1:
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.1.1.tgz#66bd5ae3823708eaa1916fa5412703150d4ddfaf"
   integrity sha512-El1Va5ehZ0XTj3Ekw4WFidXvTmt9SrC0+eigdojgtJMVtPkF0qbBe9fyNSl9eQf+kUHnTSQxdQYzuHfZy8V+DQ==
 
-string-hash@1.1.3, string-hash@^1.1.1:
+string-hash@1.1.3, string-hash@^1.1.1, string-hash@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/string-hash/-/string-hash-1.1.3.tgz#e8aafc0ac1855b4666929ed7dd1275df5d6c811b"
   integrity sha1-6Kr8CsGFW0Zmkp7X3RJ1311sgRs=
@@ -33445,6 +33498,22 @@ truffle-artifactor@^4.0.30:
     fs-extra "6.0.1"
     lodash "^4.17.13"
 
+truffle-contract@^4.0.31:
+  version "4.0.31"
+  resolved "https://registry.yarnpkg.com/truffle-contract/-/truffle-contract-4.0.31.tgz#e43b7f648e2db352c857d1202d710029b107b68d"
+  integrity sha512-u3q+p1wiX5C2GpnluGx/d2iaJk7bcWshk2/TohiJyA2iQiTfkS7M4n9D9tY3JqpXR8PmD/TrA69RylO0RhITFA==
+  dependencies:
+    "@truffle/blockchain-utils" "^0.0.11"
+    "@truffle/contract-schema" "^3.0.14"
+    "@truffle/error" "^0.0.6"
+    bignumber.js "^7.2.1"
+    ethers "^4.0.0-beta.1"
+    truffle-interface-adapter "^0.2.5"
+    web3 "1.2.1"
+    web3-core-promievent "1.2.1"
+    web3-eth-abi "1.2.1"
+    web3-utils "1.2.1"
+
 truffle-flattener@^1.4.0:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/truffle-flattener/-/truffle-flattener-1.4.4.tgz#747a99204001f7d6dce43ea92771e1ff6ac3eafb"
@@ -33465,6 +33534,16 @@ truffle-hdwallet-provider@0.0.3:
     ethereumjs-wallet "^0.6.0"
     web3 "^0.18.2"
     web3-provider-engine "^8.4.0"
+
+truffle-interface-adapter@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/truffle-interface-adapter/-/truffle-interface-adapter-0.2.5.tgz#aa0bee635517b4a8e06adcdc99eacb993e68c243"
+  integrity sha512-EL39OpP8FcZ99ne1Rno3jImfb92Nectd4iVsZzoEUCBfbwHe7sr0k+i45guoruSoP8nMUE81Mov2s8I5pi6d9Q==
+  dependencies:
+    bn.js "^4.11.8"
+    ethers "^4.0.32"
+    lodash "^4.17.13"
+    web3 "1.2.1"
 
 "truffle-plugin-blockscout-verify@git+https://github.com/celo-org/truffle-plugin-blockscout-verify#91627b3":
   version "0.0.1"

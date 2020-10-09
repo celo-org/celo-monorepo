@@ -20,7 +20,7 @@ This is the Celo Foundation website, which is deployed to https://celo.org/
 
       `gcloud auth login`
 
-    * From the root of monorepo:
+   * From the root of monorepo:
 
       `yarn run keys:decrypt`  
 
