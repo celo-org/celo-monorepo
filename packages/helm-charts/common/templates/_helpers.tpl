@@ -309,7 +309,6 @@ data:
       cat /root/.celo/bootnodeEnode
 
       # Workaround adding txnode static-node file
-      # echo {{ .Values.staticnodes.staticnodesBase64 | b64dec | quote }} > /root/.celo/static-nodes.json
       txnode_key=$(celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType tx_node_private --index 0)
       echo "[\"enode://$txnode_key@$TX_NODES_PRIVATE_SERVICE_HOST:30303\"]" > /root/.celo/static-nodes.json
   env:
