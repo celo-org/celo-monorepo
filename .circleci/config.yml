@@ -242,7 +242,6 @@ jobs:
             yarn build \
               --scope @celo/mobile \
               --include-filtered-dependencies
-            yarn build --scope @celo/celotool
 
       - restore_cache:
           key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
@@ -307,7 +306,6 @@ jobs:
             yarn build \
               --scope @celo/mobile \
               --include-filtered-dependencies
-            yarn build --scope @celo/celotool
       - run:
           name: Install bundle
           command: |
