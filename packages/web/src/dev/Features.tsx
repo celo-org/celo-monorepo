@@ -22,7 +22,7 @@ export default withNamespaces('dev')(
   React.memo(function Features({ t }: Props) {
     return (
       <View style={styles.darkBackground}>
-        <Fade direction="up" distance={'40px'}>
+        <Fade distance={'40px'}>
           <View nativeID={hashNav.build.features}>
             <GridRow
               desktopStyle={standardStyles.sectionMarginTop}

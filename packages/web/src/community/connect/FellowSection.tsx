@@ -23,12 +23,12 @@ class FellowSection extends React.PureComponent<I18nProps> {
           mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
         >
           <Cell span={Spans.three4th} style={standardStyles.centered}>
-            <Fade direction="up" distance={'20px'}>
+            <Fade distance={'20px'}>
               <H2 style={textStyles.center}>{t('fellows.formTitle')}</H2>
             </Fade>
           </Cell>
         </GridRow>
-        <Fade direction="up" distance={'20px'}>
+        <Fade distance={'20px'}>
           <View>
             <FellowshipForm />
           </View>

@@ -77,7 +77,7 @@ class Events extends React.PureComponent<Props, State> {
 
   renderItem = ({ item, section }: SectionListRenderItemInfo<EventProps>) => {
     return (
-      <Fade direction="up" distance="20px">
+      <Fade distance="20px">
         <EventRow {...item} key={item.name} section={section.title} />
       </Fade>
     )

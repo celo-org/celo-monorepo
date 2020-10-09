@@ -29,7 +29,7 @@ class ArticlesSection extends React.PureComponent<Props> {
           mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
         >
           <Cell span={Spans.full} style={standardStyles.centered}>
-            <Fade direction="up" distance={'20px'}>
+            <Fade distance={'20px'}>
               <H2>{title}</H2>
             </Fade>
           </Cell>

@@ -42,7 +42,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
       {props.h3Text && <H3 style={standardStyles.elementalMarginBottom}>{props.h3Text}</H3>}
       {props.h4Text && <H4 style={standardStyles.elementalMarginBottom}>{props.h4Text}</H4>}
       <Text style={fonts.h6}>{props.network}</Text>
-      <Fade fraction={0.5} direction="up" distance={'10px'}>
+      <Fade fraction={0.5} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
           <Image style={styles.graphic} source={props.image} resizeMode="contain" />
         </AspectRatio>
@@ -89,7 +89,7 @@ const Aside = React.memo(function _Aside({
       ]}
     >
       <View style={styles.asideFrame}>
-        <Fade fraction={0.5} direction="up" distance={'10px'}>
+        <Fade fraction={0.5} distance={'10px'}>
           <AspectRatio style={styles.asideGraphic} ratio={1}>
             <Image source={image} style={styles.graphic} />
           </AspectRatio>

@@ -20,7 +20,7 @@ class HomeWork extends React.PureComponent<Props> {
         desktopStyle={[standardStyles.sectionMargin]}
       >
         <Cell span={Spans.half} style={styles.alignCenter}>
-          <Fade direction="up" duration={750} distance="20px">
+          <Fade duration={750} distance="20px">
             <View>
               <H1 ariaLevel="2" accessibilityRole={'heading'} style={textStyles.center}>
                 {this.props.t('workOnCelo')}

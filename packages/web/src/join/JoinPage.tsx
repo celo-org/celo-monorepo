@@ -56,7 +56,7 @@ class JoinPage extends React.PureComponent<Props> {
           <View style={styles.cover}>
             <View style={styles.heading}>
               <View style={[standardStyles.centered, styles.cloud, styles.inside]}>
-                <Fade direction="up" delay={10} distance={'20px'}>
+                <Fade delay={10} distance={'20px'}>
                   <View style={standardStyles.centered}>
                     <H1
                       ariaLevel="2"
@@ -71,7 +71,7 @@ class JoinPage extends React.PureComponent<Props> {
                 </Fade>
               </View>
               <View style={[styles.cloud]}>
-                <Fade direction="up" delay={20} distance={'20px'}>
+                <Fade delay={20} distance={'20px'}>
                   <Button
                     kind={BTN.PRIMARY}
                     text={t('exploreRoles')}

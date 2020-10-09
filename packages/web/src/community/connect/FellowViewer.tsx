@@ -76,7 +76,7 @@ class FellowViewer extends React.PureComponent<ScreenProps> {
             : standardStyles.sectionMarginTop
         }
       >
-        <Fade distance={'20px'} direction="up">
+        <Fade distance={'20px'}>
           <Carousel
             heightMode={'current'}
             autoplay={false}

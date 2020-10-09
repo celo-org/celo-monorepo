@@ -53,7 +53,7 @@ class Tenets extends React.PureComponent<Props> {
           desktopStyle={standardStyles.sectionMargin}
         >
           <Cell span={Spans.three4th}>
-            <Fade direction="up" distance={'20px'}>
+            <Fade distance={'20px'}>
               <View style={standardStyles.centered}>
                 <H2 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
                   {t('tenetTitle')}
@@ -63,7 +63,7 @@ class Tenets extends React.PureComponent<Props> {
             </Fade>
           </Cell>
         </GridRow>
-        <Fade direction="up" distance={'20px'}>
+        <Fade distance={'20px'}>
           <Carousel
             heightMode={'current'}
             autoplay={false}

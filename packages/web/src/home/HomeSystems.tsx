@@ -42,7 +42,7 @@ class HomeSystems extends React.PureComponent<Props> {
           mobileStyle={standardStyles.sectionMarginTopMobile}
         >
           <Cell span={Spans.three4th} tabletSpan={Spans.three4th}>
-            <Fade direction="up" distance="20px">
+            <Fade distance="20px">
               <View>
                 <H2
                   accessibilityRole={'heading'}
@@ -67,7 +67,7 @@ class HomeSystems extends React.PureComponent<Props> {
             <Cyclone />
           </Cell>
         </GridRow>
-        <Fade direction="up" distance="20px">
+        <Fade distance="20px">
           <View style={standardStyles.centered}>
             <GridRow
               desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
@@ -97,7 +97,7 @@ class HomeSystems extends React.PureComponent<Props> {
             </GridRow>
           </View>
         </Fade>
-        <Fade direction="up" distance="20px" delay={300}>
+        <Fade distance="20px" delay={300}>
           <View style={standardStyles.centered}>
             <GridRow
               desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
@@ -119,7 +119,7 @@ class HomeSystems extends React.PureComponent<Props> {
             </GridRow>
           </View>
         </Fade>
-        <Fade direction="up" distance="20px" delay={150}>
+        <Fade distance="20px" delay={150}>
           <View style={standardStyles.centered}>
             <GridRow
               desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
@@ -149,7 +149,7 @@ class HomeSystems extends React.PureComponent<Props> {
           allStyle={styles.fitContent}
         >
           <Cell span={Spans.half} style={styles.whitePaperCell}>
-            <Fade direction="up" distance="20px">
+            <Fade distance="20px">
               <Responsive medium={[styles.technicalPaper]}>
                 <View style={styles.technicalPaperMobile}>
                   <Responsive medium={[fonts.h3, textStyles.heading, styles.foreground]}>
@@ -179,7 +179,7 @@ class HomeSystems extends React.PureComponent<Props> {
             </Fade>
           </Cell>
           <Cell span={Spans.half} style={styles.whitePaperCell}>
-            <Fade direction="up" distance="20px">
+            <Fade distance="20px">
               <Responsive medium={[styles.technicalPaper, styles.technicalPaperEnd]}>
                 <View style={styles.technicalPaperMobile}>
                   <View>

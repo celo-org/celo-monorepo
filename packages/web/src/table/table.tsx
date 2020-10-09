@@ -42,7 +42,7 @@ export function SectionHeader({ section }) {
   const title = section.title
   return (
     <View style={[standardStyles.blockMarginTopMobile, standardStyles.elementalMarginBottom]}>
-      <Fade direction="up" distance="20px">
+      <Fade distance="20px">
         <Text style={fonts.h4}>{title}</Text>
         <View style={styles.line} />
       </Fade>
@@ -57,7 +57,7 @@ interface NotFoundProps {
 }
 export function NoneFound({ onPress, actionText, longText }: NotFoundProps) {
   return (
-    <Fade direction="up" distance="20px">
+    <Fade distance="20px">
       <View style={[standardStyles.centered, styles.noJobs]}>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom, textStyles.center]}>
           {longText}

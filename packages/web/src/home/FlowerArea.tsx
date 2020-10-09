@@ -22,7 +22,7 @@ export default function FlowerArea() {
       mobileStyle={[standardStyles.sectionMarginBottomMobile, styles.noPad]}
     >
       <Cell span={Spans.full} style={styles.noPad}>
-        <Fade distance="30px" duration={800} direction="up">
+        <Fade distance="30px" duration={800}>
           <AspectRatio ratio={isMobile ? 1 : 937 / 526}>
             <Image source={isMobile ? MistFlowerMobile : MistFlower} style={standardStyles.image} />
           </AspectRatio>

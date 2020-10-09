@@ -53,7 +53,7 @@ export class CommunityPage extends React.Component<Props> {
             mobileStyle={standardStyles.sectionMarginTopMobile}
           >
             <Cell span={Spans.full} style={standardStyles.centered}>
-              <Fade direction="up" distance={'20px'}>
+              <Fade distance={'20px'}>
                 <H2>{t('events.title')}</H2>
               </Fade>
             </Cell>

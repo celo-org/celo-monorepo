@@ -19,7 +19,7 @@ class FeaturedVideo extends React.PureComponent<I18nProps> {
           allStyle={[standardStyles.centered, standardStyles.elementalMarginBottom]}
         >
           <Cell span={Spans.three4th}>
-            <Fade direction="up" distance={'20px'}>
+            <Fade distance={'20px'}>
               <View style={standardStyles.centered}>
                 <H2 style={[textStyles.center, styles.heading]}>
                   {this.props.t('buildAFinancialSys')}

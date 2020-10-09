@@ -27,13 +27,13 @@ class JobsTable extends React.Component<OwnProps & ScreenProps> {
   renderItem = ({ item }: { item: LeverJob }) => {
     if (this.props.screen === ScreenSizes.MOBILE) {
       return (
-        <Fade direction="up" distance="20px">
+        <Fade distance="20px">
           <MobileJobRow {...item} key={item.id} />
         </Fade>
       )
     }
     return (
-      <Fade direction="up" distance="20px">
+      <Fade distance="20px">
         <JobRow {...item} key={item.id} screen={this.props.screen} />
       </Fade>
     )

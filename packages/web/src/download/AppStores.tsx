@@ -29,7 +29,7 @@ export default withNamespaces(NameSpaces.download)(
           allStyle={standardStyles.centered}
         >
           <Cell span={Spans.half}>
-            <Fade distance={'20px'} direction="up">
+            <Fade distance={'20px'}>
               <View style={standardStyles.centered}>
                 <H1 style={[textStyles.center, standardStyles.elementalMargin]} ariaLevel={'2'}>
                   {t('haveAccount')}

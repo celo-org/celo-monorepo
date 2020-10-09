@@ -35,7 +35,7 @@ const CodeofConduct: React.FunctionComponent<Props> = function CodeOfConduct({ t
           </View>
         </Cell>
         <Cell span={Spans.half}>
-          <Fade distance={'20px'} delay={400} duration={3300} direction="up">
+          <Fade distance={'20px'} delay={400} duration={3300}>
             <View>
               <H3 style={textStyles.invert}>{t('codeOfConduct.title')}</H3>
               <H4 style={[textStyles.invert, standardStyles.blockMarginTablet]}>
