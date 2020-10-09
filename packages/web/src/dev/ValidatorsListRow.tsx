@@ -9,45 +9,10 @@ import Checkmark from 'src/icons/Checkmark'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
+import { CeloGroup, isPinned, togglePin } from 'src/utils/validators'
 
 const unknownGroupName = 'Unnamed Group'
 const unknownValidatorName = 'Unnamed Validator'
-
-export const localStoragePinnedKey = 'pinnedValidators'
-
-export interface CeloGroup {
-  id: number
-  elected: number
-  online: number
-  total: number
-  uptime: number
-  attestation: number
-  name: string
-  address: string
-  usd: number
-  gold: number
-  receivableRaw: number
-  receivableVotes: string
-  votesRaw: number
-  votes: string
-  votesAbsolute: string
-  commission: number
-  rewards: number
-  rewardsStyle: any
-  numMembers: number
-  claims: string[]
-  validators: Array<{
-    name: string
-    address: string
-    usd: number
-    gold: number
-    elected: boolean
-    online: boolean
-    uptime: number
-    attestation: number
-    claims: string[]
-  }>
-}
 
 interface Props {
   group: CeloGroup
@@ -56,13 +21,11 @@ interface Props {
 }
 interface State {
   tooltip?: boolean
-  isPinned?: boolean
 }
 
 class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
   state = {
     tooltip: false,
-    isPinned: false,
   }
   tooltipRef = React.createRef<any>()
   removeDocumentListener: () => void
@@ -85,61 +48,45 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
       document.removeEventListener('click', onDocumentClick, false)
   }
 
-  componentDidMount() {
-    this.setState({ isPinned: this.isPinned() })
-  }
-
   componentWillUnmount() {
     this.removeDocumentListener()
   }
 
-  isPinned(toggle?: boolean) {
-    const { address } = this.props.group
-    let list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
-    let isPinned = list.includes(address)
-    if (toggle) {
-      if (!isPinned) {
-        list.push(address)
-      } else {
-        list = list.filter((_) => _ !== address)
-      }
-      isPinned = !isPinned
-      localStorage.setItem(localStoragePinnedKey, list.join(','))
-      this.props.onPinned()
-    }
-    return isPinned
-  }
-
-  stopPropagation = (event) => {
-    event.stopPropagation()
-  }
   toggleTooltip = (event) => {
     event.stopPropagation()
     this.setState({ tooltip: !this.state.tooltip })
   }
-  togglePinned: any = (event) => {
+
+  togglePin(event) {
     event.stopPropagation()
-    const is = this.isPinned(true)
-    this.setState({ isPinned: is })
+    togglePin(this.props.group.address)
+    this.props.onPinned()
+    this.forceUpdate()
   }
 
   render() {
     const { group, expanded } = this.props
-    const { tooltip, isPinned } = this.state
+    const { tooltip } = this.state
+    const pin = this.togglePin.bind(this)
+    const pinned = isPinned(group.address)
 
     return (
       <div style={tooltip ? { zIndex: 2 } : {}}>
         <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
-          <View
-            style={[styles.tableCell, styles.pinContainer, styles.sizeXXS]}
-            onClick={this.togglePinned}
-          >
-            <View style={[styles.pin, isPinned ? styles.pinned : {}]} />
+          <View style={[styles.tableCell, styles.pinContainer, styles.sizeXXS]} onClick={pin}>
+            <View style={[styles.pin, pinned && styles.pinned]} />
           </View>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
-            <Text style={[styles.defaultText, styles.tableCell, styles.tableCellTitleArrow]}>
+            <Text
+              style={[
+                styles.defaultText,
+                styles.tableCell,
+                styles.tableCellTitleArrow,
+                expanded && styles.tableCellTitleArrowExpanded,
+              ]}
+            >
               <Chevron
-                direction={expanded ? Direction.down : Direction.right}
+                direction={Direction.right}
                 opacity={expanded ? 1 : 0.4}
                 color={colors.white}
                 size={10}
@@ -160,32 +107,30 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
 
                 {!!group.claims.length && (
                   <Text style={[styles.defaultText, styles.checkmark]}>
-                    <div onClick={this.stopPropagation}>
-                      <div ref={this.tooltipRef} onClick={this.toggleTooltip}>
-                        <Checkmark color={colors.black} size={8} />
-                      </div>
-
-                      {tooltip && (
-                        <Text style={[styles.defaultText, styles.tooltip]}>
-                          {group.claims.map((domain, i) => (
-                            <Text key={domain} style={[styles.defaultText, styles.tooltipRow]}>
-                              {i + 1}.
-                              <Text
-                                accessibilityRole="link"
-                                target="_blank"
-                                href={`https://${domain}`}
-                                style={[styles.defaultText, styles.tooltipText]}
-                              >
-                                {domain}
-                              </Text>
-                              <Text style={[styles.defaultText, styles.checkmark]}>
-                                <Checkmark color={colors.black} size={8} />
-                              </Text>
-                            </Text>
-                          ))}
-                        </Text>
-                      )}
+                    <div ref={this.tooltipRef} onClick={this.toggleTooltip}>
+                      <Checkmark color={colors.black} size={8} />
                     </div>
+
+                    {tooltip && (
+                      <Text style={[styles.defaultText, styles.tooltip]}>
+                        {group.claims.map((domain, i) => (
+                          <Text key={domain} style={[styles.defaultText, styles.tooltipRow]}>
+                            {i + 1}.
+                            <Text
+                              accessibilityRole="link"
+                              target="_blank"
+                              href={`https://${domain}`}
+                              style={[styles.defaultText, styles.tooltipText]}
+                            >
+                              {domain}
+                            </Text>
+                            <Text style={[styles.defaultText, styles.checkmark]}>
+                              <Checkmark color={colors.black} size={8} />
+                            </Text>
+                          </Text>
+                        ))}
+                      </Text>
+                    )}
                   </Text>
                 )}
               </Text>
@@ -225,7 +170,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             ellipsizeMode="tail"
           >
             {formatNumber(+group.votesRaw, 0)}
-            {'\n'}({formatNumber((group.gold / group.votesRaw) * 100, 1) || 0}%)
+            {'\n'}({formatNumber((group.celo / group.votesRaw) * 100, 1) || 0}%)
           </Text>
           <Text
             style={[styles.defaultText, styles.tableCell, styles.tableCellCenter, styles.sizeM]}
@@ -233,14 +178,14 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
             ellipsizeMode="tail"
           >
             {formatNumber(+group.receivableRaw, 0)}
-            {'\n'}({formatNumber((group.gold / +group.receivableRaw) * 100, 1) || 0}%)
+            {'\n'}({formatNumber((group.celo / +group.receivableRaw) * 100, 1) || 0}%)
           </Text>
           <Text
             style={[styles.defaultText, styles.tableCell, styles.tableCellCenter, styles.sizeM]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {formatNumber(group.gold, 0)}
+            {formatNumber(group.celo, 0)}
           </Text>
           <Text
             style={[styles.defaultText, styles.tableCell, styles.tableCellCenter, styles.sizeM]}
@@ -351,7 +296,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {formatNumber(validator.gold, 0)}
+                  {formatNumber(validator.celo, 0)}
                 </Text>
                 <Text style={[styles.defaultText, styles.tableCell, styles.sizeM]} />
                 <Text style={[styles.defaultText, styles.tableCell, styles.sizeM]} />
@@ -379,7 +324,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {formatNumber(validator.attestation, 1)}%
+                  {validator.neverElected ? 'n/a' : `${formatNumber(validator.attestation, 1)}%`}
                 </Text>
               </View>
             ))}

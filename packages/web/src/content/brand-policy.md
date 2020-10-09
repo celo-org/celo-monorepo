@@ -12,13 +12,13 @@ The Celo technology and software is open source and free. This means that it is 
 
 The protocol package is released under the GNU Lesser General Public License v3, and other packages are released under the Apache License v2.0, unless otherwise specified in the “LICENSE” or similar file at the package's root.
 
-For more details, please read about our source code license and software licensing policy on Github (celo_monorepo - [here](https://github.com/celo-org/celo-monorepo/blob/master/LICENSE); celo_blockchain - [here](https://github.com/celo-org/celo-blockchain/blob/master/COPYING)).
+For more details, please read about our source code license and software licensing policy on Github ([Celo Monorepo](https://github.com/celo-org/celo-monorepo/blob/master/LICENSE) and [Celo Blockchain](https://github.com/celo-org/celo-blockchain/blob/master/COPYING)).
 
 ### Trademarks
 
 Although the Celo technology is open source and the code is free, it is very important that the Celo community strictly enforce its trademark rights, in order to be able to protect users against people who use the marks to commit fraud. This means that, while you have considerable freedom to redistribute and modify Celo technology and software, there are tight restrictions on your ability to use the Celo names and logos in ways which fall in the domain of trademark law.
 
-For more detail on our trademark licensing, see the Trademark Guidelines below. If you still have questions after reading the policy, please contact: **[brand@celo.org](brand@celo.org)**.
+For more detail on our trademark licensing, see the Trademark Guidelines below. If you still have questions after reading the policy, please contact: [brand@celo.org](mailto:brand@celo.org).
 
 ### Website Content
 
@@ -34,7 +34,8 @@ Celo is an open source community. Because the Celo code is available to download
 
 The wordmark “Celo” is a registered trademark of the Celo Foundation, held in service of the Celo community. However, this is not a complete list of Celo names, logos, and brand features, all of which are subject to these guidelines.
 
-If you want to report misuse of a Celo related trademark, please contact us here: **brand@celo.org**
+If you want to report misuse of a Celo related trademark, please contact us here: [brand@celo.org](mailto:brand@celo.org).
+
 
 You may do the following **without receiving specific permission** from the Celo Foundation (or its affiliates):
 
@@ -42,11 +43,11 @@ You may do the following **without receiving specific permission** from the Celo
 * Use Celo logos in visuals to truthfully refer to and/or to link to the applicable programs, products, services and technologies hosted on the Celo platform.
 * Use Celo wordmarks to explain that your software is based on Celo’s open source code, or is compatible with the Celo blockchain.
 * Describe a social media account, page, event, or community in accordance with the Social Media Guidelines below and the **[Community Code of Conduct](https://celo.org/code-of-conduct).
-* All other uses of a Celo trademark require our prior written permission. This includes any use of a Celo related trademark in a domain name. Contact **brand@celo.org** for more information.
+* All other uses of a Celo trademark require our prior written permission. This includes any use of a Celo related trademark in a domain name. Contact [brand@celo.org](mailto:brand@celo.org) for more information.
 
 **Do:**
 
-* Give a Celo logo adequate spacing from the other elements on the web page or document (see the [Celo Brand Kit](http://celo.org/brand) for guidelines).
+* Give a Celo logo adequate spacing from the other elements on the web page or document (see the [Celo Brand Kit](http://celo.org/experience/brand) for guidelines).
 * Use the Celo wordmark only as an adjective, never as a noun or verb. Do not use it in plural or possessive forms. Instead, use the generic term for the Celo product or service following the trademark. For example: “Celo block explorer”, “Celo app”.
 * Include a trademark attribution notice. Use a clearly visible notice to provide attribution, such as: “*the Celo trademark is a trademark of the Celo Foundation in the US and other countries.*” 
 

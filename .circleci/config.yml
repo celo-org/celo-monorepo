@@ -368,8 +368,6 @@ jobs:
           command: |
             set -euo pipefail
             cd packages/mobile
-            # Create dummy Google services plist
-            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.dev.plist
             yarn run test:e2e:ios
       - store_artifacts:
           path: packages/mobile/e2e/artifacts
@@ -477,11 +475,12 @@ jobs:
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against first commit to contain version numbers"
             git fetch --all
-            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
-            yarn --cwd packages/protocol check-versions -a $RELEASE_BRANCH -b $CIRCLE_BRANCH
+            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
+            yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
 
-            LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only packages/protocol/contracts/common/linkedlists)
+            LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
             if [[ $LIBRARIES_CHANGED ]]; then
               echo "Changing the linked list libraries is not currently supported."
               exit 0
@@ -501,11 +500,14 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Verify bytecodes between RC1 and current branch
+          name: Verify bytecodes between most recent release and current branch
           command: |
+            # TODO: remove once devchain can reproduce deployments after release 1
+            exit 0
+
             cd packages/protocol
 
-            # deploy RC1 contracts to ganache devchain
+            # deploy most recent release contracts to ganache devchain
             # We fetch via HTTPS instead of SSH to avoid the interactive "do you
             # trust the RSA key fingerprint" prompt.
             git remote add origin-https https://github.com/celo-org/celo-monorepo.git

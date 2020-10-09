@@ -6,7 +6,7 @@ The Attestation Service is part of the [Celo identity protocol](../celo-codebase
 
 ![](https://storage.googleapis.com/celo-website/docs/attestations-flow.jpg)
 
-Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, the Attestation Service will automatically claim and withdraw this fee.
+Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, validators will be able claim and withdraw this fee.
 
 ## Outline
 
@@ -21,10 +21,11 @@ This guide steps you through setting up an Attestation Service:
 
 ## Recent releases
 
-* [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4) (most recent release)
+* [Attestation Service v1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5) (latest release for testnets)
+* [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4) (latest production release)
 * [Attestation Service v1.0.3](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-3)
 
-## Network configuration
+## Deployment Architecture
 
 Attestation Service needs to expose a HTTP or HTTPS endpoint to the public Internet. This means it should not be deployed on the same physical host as a Validator, which should be firewalled to allow incoming connections only from its proxy.
 
@@ -34,7 +35,11 @@ Attestation Service exposes a HTTP endpoint, but it is strongly recommended that
 
 An Attestation Service is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
 
-Attestation Service currently does not support setups where multiple instances reside behind a load balancer. This will be addressed in a future release.
+Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers: one the attestation service, a Celo Blockchain node, and a single database instance.
+
+For a high availability setup, multiple instances can be deployed behind a load balancer and sharing a single database service. The load balancer should be configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can identify the matching record in the shared database and act on the receipt to resend if necessary.
+
+Every record in the database includes the issuer (i.e. validator) in its key, so a single setup like the above can be used to provide attestations for multiple validators.
 
 ## SMS Providers
 
@@ -150,10 +155,11 @@ Optional environment variables:
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
-| `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `3`.  |
+| `MAX_DELIVERY_ATTEMPTS`          | Number of total delivery attempts when sending SMS. Each attempt tries the next available provider in the order specified. If omitted, the deprecated `MAX_PROVIDER_RETRIES` option will be used. Default value is `3`.  |
+| `MAX_REREQUEST_MINS`       | Number of minutes during which the client can rerequest the same attestation. Default value is `55`.
 | `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
-| `TIMEOUT_CLEANUP_NO_RECEIPT_MIN` | If a delivery report appears to be supported but is not received within this number of minutes, assume delivery success                                               |
 | `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
+| `DB_RECORD_EXPIRY_MINS`          | Time in minutes before a record of an attestation in the database may be deleted. Default 60 minutes. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
 | `APP_SIGNATURE`                  | A value that is shown under the key `appSignature` field in the `/status` endpoint that you can use to identify multiple instances. |
@@ -250,10 +256,12 @@ Attestation Service provides a test endpoint.
 You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
 
 ```bash
-celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
+celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE> [--provider <PROVIDER>]
 ```
 
 You need the attestation signer key available and unlocked on your local machine.
+
+You may wish to do this once for each provider you have configured (`--provider=twilio` and `--provider=nexmo`). (If this option is not recognized, try upgrading `celocli`).
 
 Note that this does not use an identical code path to real attestations (since those require specific on-chain state) so this endpoint should not be used in place of monitoring logs and metrics.
 
@@ -271,7 +279,9 @@ The Attestation Service provides JSON-format structured logs.
 
 ### Healthcheck
 
-The `/healthz` endpoint will respond with status `200` when all of the following are true: the attestation signer key is available and unlocked, the node is not syncing, the latest block is recent, and the database is online. Otherwise it will respond with status `500`.
+The `/healthz` endpoint will respond with status `200` when all of the following are true: the attestation signer key is available and unlocked, the node is not syncing, the latest block is recent, and the database is accessible. Otherwise it will respond with status `500`.
+
+Use this endpoint when configuring a load balancer in front of multiple instances.  The results of the last healthcheck are reported via the `attestation_service_healthy` metric.
 
 Attestation Service also has a `/status` endpoint for configuration information.
 
@@ -281,7 +291,15 @@ Attestation Service exposes the following Prometheus format metrics at `/metrics
 
 Please note that monitoring endpoints including metrics are exposed as a path on the usual host port. This means they are public by default. If you want metrics to be internal only, you will need to configure a load balancer appropriately.
 
+Metrics for the service:
+
+- `attestation_service_healthy`: Gauge with value `0` or `1` indicating whether the instance failed or passed its last [healthcheck](#healthcheck). Calls to `/healthz` update this gauge, and the process also runs a background healthcheck every minute. It is strongly recommended that you monitor this metric.
+
+Metrics for attestation requests:
+
 - `attestation_requests_total`: Counter for the number of attestation requests.
+
+- `attestation_requests_rerequest`: Counter for the number of attestation re-requests. A client that rerequests the same attestation is similar to the service receiving a delivery failure notification.
 
 - `attestation_requests_already_sent`: Counter for the number of attestation requests that were received but dropped because the local database records that they have already been completed.
 
@@ -294,6 +312,8 @@ Please note that monitoring endpoints including metrics are exposed as a path on
 - `attestation_requests_attestation_errors`: Counter for the number of requests for which producing the attestation failed. This could be due to phone number or salt that does not match the hash, or the attestation was recorded fewer than 4 blocks ago.
 
 - `attestation_requests_unable_to_serve`: Counters for the number of requests that could not be served because no SMS provider was configured for the phone number in the request. Label `country` breaks down the count by country code.
+
+- `attestation_requests_number_type`: Counter for attestation requests by the type of the phone number. Label `country` breaks down the counny by country code. Label `type` has values including: `fixed_line`, `mobile`, `fixed_line_or_mobile`, `toll_free`, `premium_rate`, `shared_cost`, `voip`, `personal_number`, `pager`, `uan`, `voicemail`, `unknown`.
 
 - `attestation_requests_sent_sms`: Counter for the number of SMS successfully sent.
 
@@ -323,4 +343,6 @@ Administrative metrics:
 
 ### Blockchain
 
-The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen by entering the Validator's address on the [Celo Explorer](https://explorer.celo.org) and clicking the 'Celo Info' tab.  
+The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen at [Celo Explorer](https://explorer.celo.org): enter the Validator's address and click the 'Celo Info' tab.  
+
+[TheCelo](https://thecelo.com/?tab=attestations) tracks global attestation counts and success rates, and shows detailed information about recent attestation attempts.
