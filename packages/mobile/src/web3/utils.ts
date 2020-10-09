@@ -34,13 +34,13 @@ export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
 // Note: This returns Promise<Block>
 export async function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
-  const web3 = await getWeb3Async()
+  const web3 = await getWeb3Async(false)
   return web3.eth.getBlock('latest')
 }
 
 export async function getLatestBlockNumber() {
   Logger.debug(TAG, 'Getting latest block number')
-  const web3 = await getWeb3Async()
+  const web3 = await getWeb3Async(false)
   return web3.eth.getBlockNumber()
 }
 

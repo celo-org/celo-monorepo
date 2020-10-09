@@ -43,6 +43,7 @@ const INIT_GETH_TIMEOUT = 15000 // ms
 const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
 const GETH_SYNC_TIMEOUT = 30000 // ms
+const GETH_POLLING_INTERVAL = 500 // ms
 
 export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -141,7 +142,7 @@ function pollGethSyncStatusAsync() {
     while (Date.now() <= dateLimit) {
       const head = chainHeadSelector(store.getState())
       if (!head) {
-        await sleep(500)
+        await sleep(GETH_POLLING_INTERVAL)
         continue
       }
 
@@ -149,7 +150,7 @@ function pollGethSyncStatusAsync() {
         resolve()
       }
 
-      await sleep(500)
+      await sleep(GETH_POLLING_INTERVAL)
     }
 
     reject()
