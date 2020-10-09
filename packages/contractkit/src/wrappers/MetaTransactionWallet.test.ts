@@ -9,6 +9,7 @@ import {
   buildMetaTxTypedData,
   MetaTransactionWalletWrapper,
   RawTransaction,
+  toRawTransaction,
 } from './MetaTransactionWallet'
 
 const contract = require('@truffle/contract')
@@ -119,7 +120,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
       const onChainDigest = await wallet.getMetaTransactionDigest(metaTransfer, 0)
       const typedData = buildMetaTxTypedData(
         wallet.address,
-        wallet.toRawTransaction(metaTransfer),
+        toRawTransaction(metaTransfer),
         0,
         chainId
       )
@@ -201,7 +202,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
           gold.transfer(emptyAccounts[2], value.toFixed()).txo,
         ]).txo
         const signature = await wallet.signMetaTransaction(metaTx, 0)
-        const rawTx = wallet.toRawTransaction(metaTx)
+        const rawTx = toRawTransaction(metaTx)
         const payload = JSON.stringify({ rawTx, signature })
         // Now we're somewhere else:
         const resp: { rawTx: RawTransaction; signature: Signature } = JSON.parse(payload)

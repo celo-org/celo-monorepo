@@ -44,7 +44,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param tx a MTWTransaction
    */
   public executeTransaction(tx: TransactionInput<any>): CeloTransactionObject<string> {
-    const rawTx = this.toRawTransaction(tx)
+    const rawTx = toRawTransaction(tx)
     return toTransactionObject(
       this.kit,
       this.contract.methods.executeTransaction(rawTx.destination, rawTx.value, rawTx.data)
@@ -57,7 +57,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param txs An array of MTWTransactions
    */
   public executeTransactions(txs: Array<TransactionInput<any>>): CeloTransactionObject<void> {
-    const rawTxs: RawTransaction[] = txs.map(this.toRawTransaction)
+    const rawTxs: RawTransaction[] = txs.map(toRawTransaction)
     const destinations = rawTxs.map((rtx) => rtx.destination)
     const values = rawTxs.map((rtx) => rtx.value)
     const callData = ensureLeading0x(rawTxs.map((rtx) => trimLeading0x(rtx.data)).join(''))
@@ -78,7 +78,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     tx: TransactionInput<any>,
     signature: Signature
   ): CeloTransactionObject<string> {
-    const rawTx = this.toRawTransaction(tx)
+    const rawTx = toRawTransaction(tx)
 
     return toTransactionObject(
       this.kit,
@@ -105,7 +105,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     }
     const typedData = buildMetaTxTypedData(
       this.address,
-      this.toRawTransaction(tx),
+      toRawTransaction(tx),
       nonce,
       await this.chainId()
     )
@@ -152,7 +152,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     tx: TransactionInput<any>,
     nonce: number
   ): [string, string, string, number] => {
-    const rawTx = this.toRawTransaction(tx)
+    const rawTx = toRawTransaction(tx)
     return [rawTx.destination, rawTx.value, rawTx.data, nonce]
   }
 
@@ -167,7 +167,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     nonce: number,
     signature: Signature
   ): [string, string, string, number, number, string, string] => {
-    const rawTx = this.toRawTransaction(tx)
+    const rawTx = toRawTransaction(tx)
     return [
       rawTx.destination,
       rawTx.value,
@@ -227,31 +227,31 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     }
     return this._signer
   }
+}
 
-  /**
-   * Turns any possible way to pass in a transaction into the raw values
-   * that are actually required. This is used both internally to normalize
-   * ways in which transactions are passed in but also public in order
-   * for one instance of ContractKit to serialize a meta transaction to
-   * send over the wire and be consumed somewhere else.
-   * @param tx TransactionInput<any> union of all the ways we expect transactions
-   * @returns a RawTransactions that's serializable
-   */
-  public toRawTransaction(tx: TransactionInput<any>): RawTransaction {
-    if ('destination' in tx) {
-      return tx
-    } else if ('value' in tx) {
-      return {
-        destination: tx.txo._parent.options.address,
-        data: tx.txo.encodeABI(),
-        value: valueToString(tx.value),
-      }
-    } else {
-      return {
-        destination: tx._parent.options.address,
-        data: tx.encodeABI(),
-        value: '0',
-      }
+/**
+ * Turns any possible way to pass in a transaction into the raw values
+ * that are actually required. This is used both internally to normalize
+ * ways in which transactions are passed in but also public in order
+ * for one instance of ContractKit to serialize a meta transaction to
+ * send over the wire and be consumed somewhere else.
+ * @param tx TransactionInput<any> union of all the ways we expect transactions
+ * @returns a RawTransactions that's serializable
+ */
+export const toRawTransaction = (tx: TransactionInput<any>): RawTransaction => {
+  if ('destination' in tx) {
+    return tx
+  } else if ('value' in tx) {
+    return {
+      destination: tx.txo._parent.options.address,
+      data: tx.txo.encodeABI(),
+      value: valueToString(tx.value),
+    }
+  } else {
+    return {
+      destination: tx._parent.options.address,
+      data: tx.encodeABI(),
+      value: '0',
     }
   }
 }
