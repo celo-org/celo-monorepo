@@ -7,13 +7,13 @@ This package will follow the release process outlined [here](https://docs.celo.o
 ## Development (not published yet)
 ### **[0.4.15--dev]**
 Features
-- [one-line summary]  ( [link PR] )
+- [one-line summary] -  ( [link PR] )
 
 Bug Fixes
-- [one-line summary]  ( [link PR] )
+- [one-line summary] - ( [link PR] )
 
 Other Changes
-- [one-line summary]  ( [link PR] )
+- [one-line summary] - ( [link PR] )
 
 
 ## Published
