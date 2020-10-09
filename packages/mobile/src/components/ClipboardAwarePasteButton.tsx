@@ -20,6 +20,7 @@ export default function ClipboardAwarePasteButton({
 
   useLayoutEffect(() => {
     if (!isE2EEnv) {
+      // This line produces a warning on the verification screen that causes e2e tests to fail.
       LayoutAnimation.easeInEaseOut()
     }
   }, [shouldShow])

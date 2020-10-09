@@ -56,6 +56,7 @@ export default function CodeInput({
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
     if (!isE2EEnv) {
+      // This line produces a warning on the verification screen that causes e2e tests to fail.
       LayoutAnimation.easeInEaseOut()
     }
   }, [status === CodeInputStatus.INPUTTING])
