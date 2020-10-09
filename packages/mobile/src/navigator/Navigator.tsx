@@ -6,7 +6,6 @@ import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import GoldEducation from 'src/account/GoldEducation'
-import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
@@ -406,11 +405,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.SelectLocalCurrency}
       component={SelectLocalCurrency}
       options={headerWithBackButton}
-    />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.InviteReview}
-      component={InviteReview}
     />
     <Navigator.Screen
       options={Licenses.navigationOptions}

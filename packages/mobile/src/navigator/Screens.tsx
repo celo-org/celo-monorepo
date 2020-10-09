@@ -24,8 +24,6 @@ export enum Screens {
   ImportContacts = 'ImportContactsScreen',
   ImportWallet = 'ImportWallet',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
-  Invite = 'Invite',
-  InviteReview = 'InviteReview',
   LanguageModal = 'LanguageModal',
   Language = 'Language',
   Licenses = 'Licenses',
