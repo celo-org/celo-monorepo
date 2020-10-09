@@ -80,10 +80,15 @@ export const coerceMnemonicAccountType = (raw: string): AccountType => {
 }
 
 export const generatePrivateKey = (mnemonic: string, accountType: AccountType, index: number) => {
+  return generatePrivateKeyWithDerivations(mnemonic, [accountType, index])
+}
+
+export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
-  const newNode = node.derive(accountType).derive(index)
-
+  const newNode = derivations.reduce((n: bip32.BIP32Interface, derivation: number) => {
+    return n.derive(derivation)
+  }, node)
   return newNode.privateKey!.toString('hex')
 }
 
