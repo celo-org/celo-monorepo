@@ -15,8 +15,8 @@ import { hideAlert, showError } from 'src/alert/actions'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import { SecurityFeeIcon } from 'src/components/FeeIcon'
-import LineItemRow from 'src/components/LineItemRow.v2'
-import TotalLineItem from 'src/components/TotalLineItem.v2'
+import LineItemRow from 'src/components/LineItemRow'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
@@ -137,28 +137,23 @@ export class InviteReview extends React.Component<Props, State> {
           onPress={this.onInviteSMS}
           text={t('inviteWithSMS')}
           accessibilityLabel={t('inviteWithSMS')}
-          standard={false}
           type={BtnTypes.TERTIARY}
           disabled={inviteInProgress}
-        >
-          <SMSLogo />
-        </GethAwareButton>
+        />
+        <SMSLogo />
         <GethAwareButton
           testID={'inviteWhatsApp'}
           onPress={this.onInviteWhatsApp}
           text={t('inviteWithWhatsapp')}
           accessibilityLabel={t('inviteWithWhatsapp')}
-          standard={false}
           type={BtnTypes.TERTIARY}
           disabled={inviteInProgress}
-        >
-          <WhatsAppLogo />
-        </GethAwareButton>
+        />
+        <WhatsAppLogo />
         <Button
           onPress={this.onEdit}
           text={t('cancel')}
           accessibilityLabel={t('cancel')}
-          standard={false}
           type={BtnTypes.SECONDARY}
           disabled={inviteInProgress}
         />
@@ -254,9 +249,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     paddingBottom: 25,
-  },
-  editContainer: {
-    flexDirection: 'row',
   },
   bottomContainer: {
     marginTop: 5,

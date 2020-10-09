@@ -82,7 +82,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rateText: {
-    ...fontStyles.bodySecondary,
+    ...fontStyles.regular,
+    color: colors.gray3,
     textAlign: 'center',
   },
   ratio: {

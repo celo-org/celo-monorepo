@@ -75,8 +75,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -154,8 +152,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -228,8 +224,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -302,8 +296,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -376,8 +368,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -450,8 +440,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",
@@ -524,8 +512,6 @@ exports[`Main MobileMenu renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
         style={
           Object {
             "WebkitAlignItems": "center",

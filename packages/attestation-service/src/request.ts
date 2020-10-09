@@ -1,8 +1,10 @@
+import { AttestationResponseType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { rootLogger } from './logger'
+import { AttestationModel, AttestationStatus } from './models/attestation'
 
 export enum ErrorMessages {
   INVALID_SIGNATURE = 'Invalid signature provided',
@@ -76,6 +78,32 @@ export function respondWithError(res: express.Response, statusCode: number, erro
   res.status(statusCode).json({ success: false, error })
 }
 
+export function respondWithAttestation(
+  res: express.Response,
+  attestation: AttestationModel,
+  alwaysSuccess?: boolean | undefined,
+  salt?: string | undefined
+) {
+  res.status(alwaysSuccess ? 200 : attestation.failure() ? 422 : 200).json(
+    AttestationResponseType.encode({
+      success: alwaysSuccess ? true : !attestation.failure(),
+      identifier: attestation.identifier,
+      account: attestation.account,
+      issuer: attestation.issuer,
+      attempt: attestation.attempt,
+      countryCode: attestation.countryCode,
+      status: AttestationStatus[attestation.status],
+      salt,
+      provider: attestation.provider() ?? undefined,
+      errors: attestation.errors ?? undefined,
+      error: attestation.currentError(),
+      duration: attestation.completedAt
+        ? attestation.completedAt!.getTime() - attestation.createdAt.getTime()
+        : undefined,
+    })
+  )
+}
+
 export type Response = Omit<express.Response, 'locals'> & {
   locals: { logger: Logger } & Omit<any, 'logger'>
 }
@@ -93,4 +121,13 @@ export function loggerMiddleware(
   res.locals.logger = requestLogger
   requestLogger.info({ req })
   next()
+}
+
+export class ErrorWithResponse extends Error {
+  responseCode: number | undefined
+  constructor(message?: string, responseCode?: number) {
+    super(message)
+    Object.setPrototypeOf(this, new.target.prototype)
+    this.responseCode = responseCode
+  }
 }

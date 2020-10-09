@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ .Release.Name }}
@@ -132,7 +132,9 @@ spec:
         - |
           yarn db:migrate
           sleep 5
-          ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` exec yarn start
+          RID=`cat /root/.celo/replica_id`
+          NEXMO_APPLICATIONS={{- range $index, $application := .Values.attestation_service.nexmo.applications -}}{{ $application }},{{- end }}
+          NEXMO_APPLICATION=`echo -n $NEXMO_APPLICATIONS | cut -d ',' -f $((RID + 1))` ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` exec yarn start
         ports:
         - name: http
           containerPort: 3000

@@ -55,3 +55,7 @@ export function getAccountAddress() {
 
   return toChecksumAddress(process.env.CELO_VALIDATOR_ADDRESS)
 }
+
+export function isDevMode() {
+  return fetchEnvOrDefault('NODE_ENV', '').toLowerCase() === 'dev'
+}

@@ -1,5 +1,5 @@
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -85,10 +85,6 @@ const styles = StyleSheet.create({
   h1: {
     ...fontStyles.h1,
     marginTop: 20,
-    paddingHorizontal: 40,
-  },
-  h2: {
-    ...fontStyles.h2,
     paddingHorizontal: 40,
   },
 })

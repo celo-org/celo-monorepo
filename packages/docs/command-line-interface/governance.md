@@ -213,7 +213,10 @@ OPTIONS
   --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
                                                      'auto' which uses whatever feeCurrency is available)
 
-  --jsonTransactions=jsonTransactions                (required) Path to json transactions
+  --interactive                                      Form proposal using an interactive prompt for Celo registry
+                                                     contracts and functions
+
+  --jsonTransactions=jsonTransactions                Path to json transactions
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -281,6 +284,8 @@ OPTIONS
                                                  which uses whatever feeCurrency is available)
 
   --hotfix=hotfix                                Hash of hotfix proposal
+
+  --jsonTransactions=jsonTransactions            Output proposal JSON to provided file
 
   --nonwhitelisters                              If set, displays validators that have not whitelisted the hotfix.
 

@@ -186,7 +186,7 @@ export function* handleSendPaymentData(
 
   if (data.amount && data.currencyCode) {
     const currency = data.currencyCode as LocalCurrencyCode
-    const exchangeRate = yield call(fetchExchangeRate, currency)
+    const exchangeRate: string = yield call(fetchExchangeRate, currency)
     const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
     if (!dollarAmount) {
       Logger.warn(TAG, '@handleSendPaymentData null amount')

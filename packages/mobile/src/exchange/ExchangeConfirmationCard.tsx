@@ -1,6 +1,5 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import variables from '@celo/react-components/styles/variables'
+import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
@@ -9,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { MoneyAmount } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -119,8 +118,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 30,
-  },
-  buyBtn: {
-    padding: variables.contentPadding,
   },
 })

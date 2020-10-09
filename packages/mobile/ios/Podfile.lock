@@ -318,8 +318,10 @@ PODS:
     - React
   - react-native-camera/RN (3.23.1):
     - React
-  - react-native-config (0.11.7):
-    - React
+  - react-native-config (1.3.3):
+    - react-native-config/App (= 1.3.3)
+  - react-native-config/App (1.3.3):
+    - React-Core
   - react-native-contacts (5.0.0):
     - React
   - react-native-fast-crypto (1.8.3):
@@ -419,6 +421,8 @@ PODS:
     - Segment-Firebase
   - RNCAsyncStorage (1.9.0):
     - React
+  - RNCClipboard (1.2.3):
+    - React-Core
   - RNCMaskedView (0.1.10):
     - React
   - RNDeviceInfo (5.5.6):
@@ -546,6 +550,7 @@ DEPENDENCIES:
   - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
   - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-community/async-storage`)"
+  - "RNCClipboard (from `../../../node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNExitApp (from `../../../node_modules/react-native-exit-app`)
@@ -697,6 +702,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@segment/analytics-react-native-firebase"
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-community/async-storage"
+  RNCClipboard:
+    :path: "../../../node_modules/@react-native-community/clipboard"
   RNCMaskedView:
     :path: "../../../node_modules/@react-native-community/masked-view"
   RNDeviceInfo:
@@ -786,7 +793,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-blind-threshold-bls: 86068a0a8890b04b5492a4a8787b53dbde1aea8d
   react-native-camera: 1b52abea404d04e040edb3e74b7c5523c01a3089
-  react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
+  react-native-config: e8c71f602c92ddd2f5c24b0b7a90d239ecab8d9f
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
   react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
   react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
@@ -814,6 +821,7 @@ SPEC CHECKSUMS:
   RNAnalytics: bf9743995acee035396822c40bcdd1b87e90ba76
   RNAnalyticsIntegration-Firebase: 87b33dc507fd78b2f1f97d65fe022442ba0c367b
   RNCAsyncStorage: 453cd7c335ec9ba3b877e27d02238956b76f3268
+  RNCClipboard: 546484405eaa1c8a3eccce77b8c8871242e73b20
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNDeviceInfo: 722dc13c269b9dbf305aa4b790d36731602e99b7
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3

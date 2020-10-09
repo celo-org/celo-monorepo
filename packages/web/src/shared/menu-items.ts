@@ -82,6 +82,10 @@ export const pagePaths = {
     link: '/developers',
     isDark: true,
   },
+  FLOWERS: {
+    name: 'For Value Flowers',
+    link: '/flowers',
+  },
   FAQ: {
     name: 'FAQ',
     link: '/faq',
@@ -179,6 +183,7 @@ export enum CeloLinks {
   reserve = 'https://www.celoreserve.org',
   instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
+  kuneco = 'https://app.livestorm.co/clabs/kuneco',
   medium = 'https://medium.com/celoOrg',
   mediumUser = 'https://medium.com/@celoorg',
   mediumPublication = 'https://medium.com/celoOrg',

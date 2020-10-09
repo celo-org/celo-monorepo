@@ -25,6 +25,7 @@ exports[`PastEventsPage renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -62,6 +63,7 @@ exports[`PastEventsPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -78,26 +80,21 @@ exports[`PastEventsPage renders 1`] = `
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -177,6 +174,7 @@ exports[`PastEventsPage renders 1`] = `
             <label
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -194,26 +192,21 @@ exports[`PastEventsPage renders 1`] = `
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -293,6 +286,7 @@ exports[`PastEventsPage renders 1`] = `
             <label
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -311,6 +305,7 @@ exports[`PastEventsPage renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -328,6 +323,7 @@ exports[`PastEventsPage renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -347,8 +343,6 @@ exports[`PastEventsPage renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -358,7 +352,6 @@ exports[`PastEventsPage renders 1`] = `
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="mailto:community@celo.org"
             onClick={[Function]}
             role="link"
@@ -401,17 +394,8 @@ exports[`PastEventsPage renders 1`] = `
     >
       <div
         className="css-view-1dbjc4n"
-        onResponderGrant={[Function]}
-        onResponderReject={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminationRequest={[Function]}
         onScroll={[Function]}
-        onScrollShouldSetResponder={[Function]}
-        onStartShouldSetResponder={[Function]}
-        onStartShouldSetResponderCapture={[Function]}
-        onTouchEnd={[Function]}
         onTouchMove={[Function]}
-        onTouchStart={[Function]}
         onWheel={[Function]}
         style={
           Object {
@@ -446,42 +430,38 @@ exports[`PastEventsPage renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxPack": "center",
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "height": "90vh",
+                "justifyContent": "center",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+              }
+            }
           >
             <div
+              aria-label="loading"
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "height": "90vh",
-                  "justifyContent": "center",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "height": "50px",
+                  "width": "50px",
                 }
               }
             >
-              <div
-                aria-label="loading"
-                className="css-view-1dbjc4n"
+              <span
                 style={
                   Object {
-                    "height": "50px",
-                    "width": "50px",
+                    "height": "100%",
+                    "width": "100%",
                   }
                 }
-              >
-                <span
-                  style={
-                    Object {
-                      "height": "100%",
-                      "width": "100%",
-                    }
-                  }
-                />
-              </div>
+              />
             </div>
           </div>
         </div>
