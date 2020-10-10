@@ -3,7 +3,7 @@ import { enterPinUi, enterPinUiIfNecessary, sleep, waitForElementId } from './ut
 import { receiveSms } from './utils/twilio'
 
 const VERIFICATION_COUNTRY = 'US'
-const VERIFICATION_PHONE_NUMBER = '2057368924'
+const VERIFICATION_PHONE_NUMBER = '4698442277'
 const EXAMPLE_NAME = 'Test Name'
 
 const RUN_VERIFICATION_TEST = !!process.env.INVITE_CODE
