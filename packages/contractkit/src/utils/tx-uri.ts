@@ -97,7 +97,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
 
   uri += '?'
   if (functionArgs) {
-    uri += `args=${functionArgs}`;
+    uri += `args=${functionArgs}`
   }
   const params = txQueryParams as { [key: string]: string }
   if (txQueryParams.value instanceof BN) {
