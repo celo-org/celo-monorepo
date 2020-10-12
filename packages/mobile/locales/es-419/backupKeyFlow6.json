@@ -8,7 +8,6 @@
   "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y CELO. Nadie, ni siquiera {{appName}}, podrá ayudarte a recuperar tu cuenta sin tu clave. Guárdala en un lugar seguro y no la compartas",
   "postSetupCTA": "Conoce más sobre la Clave de Cuenta",
   "getBackupKey": "Obtener Clave de Cuenta",
-  "setUpSocialBackup": "Configurar Salvaguardas",
   "failedFetchMnemonic": "No se pudo obtener tu Clave de Cuenta",
   "backupAndRecovery": "Respaldo y recuperación",
   "writeDownKey": "Por favor, anota tu clave",
@@ -29,19 +28,7 @@
     "1": "Ahora puede configurar las salvaguardas.",
     "2": "¡Está todo configurado!"
   },
-  "socialBackupIntro": {
-    "header": "Cómo incluir salvaguardas",
-    "body": "Las salvaguardas son una capa adicional de resguardo para tu cuenta en el caso de que pierda la clave de cuenta. Una vez configuradas las salvaguardas, podrá restaurar tu cuenta con la ayuda de dos amigos o miembros de tu familia. ",
-    "warning": "NO DEBE REVELARLE A NADIE LAS IDENTIDADES DE SUS SALVAGUARDAS.",
-    "skip": "Omitir por ahora"
-  },
-  "socialBackupPhraseHeader": "Frase de protección {{index}}",
   "backupQuizWordCount": "¿Cuál es la palabra <0>{{{ordinal}}</0> de tu Clave de Cuenta?",
-  "socialBackup": {
-    "body": "Comparta cada frase que aparece a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",
-    "confirmation": "He enviado cada una de las salvaguardas a un amigo de confianza.",
-    "yourSafeguards": "Tus salvaguardas"
-  },
   "cancelDialog": {
     "title": "Termina de configurar tu Clave de Cuenta",
     "body": "Las claves de la cuenta son extremadamente importantes. Sin una clave, puedes perder el acceso a tu app para siempre. Estarás bloqueado para enviar cualquier transacción hasta que termines de configurar tu Clave de Cuenta",
