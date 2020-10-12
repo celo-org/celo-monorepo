@@ -13,7 +13,7 @@ const ADDRESS_REGEX_STR = '(?<address>0x[a-fA-F0-9]{40})'
 const CHAIN_ID_REGEX = '(?<chainId>\\d+)'
 const TX_PARAMS = ['feeCurrency', 'gas', 'gasPrice', 'value', 'gatewayFee', 'gatewayFeeRecipient']
 const PARAM_REGEX = `(${TX_PARAMS.join('|')})=\\w+`
-const ARGS_REGEX = 'args=([a-zA-Z0-9=])*'
+const ARGS_REGEX = 'args=\\[([a-zA-Z0-9=,])*\\]'
 const QUERY_REGEX = `(?<query>(&?(${PARAM_REGEX}|${ARGS_REGEX}))+)`
 
 // URI scheme mostly borrowed from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-681.md
@@ -45,8 +45,15 @@ export function parseUri(uri: string): Tx {
 
       if (namedGroups.inputTypes !== undefined) {
         const abiTypes = namedGroups.inputTypes.split(',')
-        const builtArgs = JSON.parse(Buffer.from(parsedQuery.args, 'base64').toString('utf8'))
-        const callSig = abi.encodeParameters(abiTypes, builtArgs)
+        let callSig
+        if (parsedQuery.args[parsedQuery.args.length-2] === '=') {
+          const builtArgs = JSON.parse(Buffer.from(parsedQuery.args.slice(1, parsedQuery.args.length - 1), 'base64').toString('utf8'))
+          callSig = abi.encodeParameters(abiTypes, builtArgs)
+        } else {
+          const rawArgs = (parsedQuery.args || '[]') as string
+          const builtArgs = rawArgs.slice(1, rawArgs.length - 1).split(',')
+          callSig = abi.encodeParameters(abiTypes, builtArgs)
+        }
 
         tx.data += trimLeading0x(callSig)
       }
@@ -97,7 +104,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
 
   uri += '?'
   if (functionArgs) {
-    uri += `args=${functionArgs}`
+    uri += `args=[${functionArgs}]`
   }
   const params = txQueryParams as { [key: string]: string }
   if (txQueryParams.value instanceof BN) {
