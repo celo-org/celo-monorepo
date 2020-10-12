@@ -7,17 +7,17 @@ import abi from 'web3-eth-abi'
 import { zeroRange } from '../utils/array'
 
 // see https://solidity.readthedocs.io/en/v0.5.3/abi-spec.html#function-selector-and-argument-encoding
-const ABI_TYPE_REGEX = '(u?int(8|16|32|64|128|256)|address|bool|bytes(4|32)?|string)(\\[\\])?'
+const ABI_TYPE_REGEX = '(u?int(8|16|32|64|128|256)|address|bool|bytes(4|32)?|string)(\\[([0-9]*)\\])?'
 const FUNCTION_REGEX = `(?<function>\\w+\\((?<inputTypes>(,?${ABI_TYPE_REGEX})*)\\))`
 const ADDRESS_REGEX_STR = '(?<address>0x[a-fA-F0-9]{40})'
 const CHAIN_ID_REGEX = '(?<chainId>\\d+)'
 const TX_PARAMS = ['feeCurrency', 'gas', 'gasPrice', 'value', 'gatewayFee', 'gatewayFeeRecipient']
 const PARAM_REGEX = `(${TX_PARAMS.join('|')})=\\w+`
-const ARGS_REGEX = 'args=\\[(,?\\w+)*\\]'
+const ARGS_REGEX = 'args=([a-zA-Z0-9=])*'
 const QUERY_REGEX = `(?<query>(&?(${PARAM_REGEX}|${ARGS_REGEX}))+)`
 
 // URI scheme mostly borrowed from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-681.md
-const URI_REGEX_STR = `^celo:${ADDRESS_REGEX_STR}(@${CHAIN_ID_REGEX})?(/${FUNCTION_REGEX})?(\\?${QUERY_REGEX})?$`
+const URI_REGEX_STR = `^celo:${ADDRESS_REGEX_STR}(@${CHAIN_ID_REGEX})?(\\/${FUNCTION_REGEX})?(\\?${QUERY_REGEX})?$`
 
 const uriRegexp = new RegExp(URI_REGEX_STR)
 
@@ -45,8 +45,7 @@ export function parseUri(uri: string): Tx {
 
       if (namedGroups.inputTypes !== undefined) {
         const abiTypes = namedGroups.inputTypes.split(',')
-        const rawArgs = (parsedQuery.args || '[]') as string
-        const builtArgs = rawArgs.slice(1, rawArgs.length - 1).split(',')
+        const builtArgs = JSON.parse(Buffer.from(parsedQuery.args, 'base64').toString('utf8'))
         const callSig = abi.encodeParameters(abiTypes, builtArgs)
 
         tx.data += trimLeading0x(callSig)
@@ -90,7 +89,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
     if (txData.length > 8) {
       const argsEncoded = txData.slice(8)
       const decoded = abi.decodeParameters(abiTypes, argsEncoded)
-      functionArgs = zeroRange(decoded.__length__).map((idx) => decoded[idx].toLowerCase())
+      functionArgs = Buffer.from(JSON.stringify(zeroRange(decoded.__length__).map((idx) => decoded[idx]))).toString('base64')
     }
   }
 
@@ -98,7 +97,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
 
   uri += '?'
   if (functionArgs) {
-    uri += `args=[${functionArgs.join(',')}]`
+    uri += `args=${functionArgs}`;
   }
   const params = txQueryParams as { [key: string]: string }
   if (txQueryParams.value instanceof BN) {
