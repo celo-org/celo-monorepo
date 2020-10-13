@@ -113,11 +113,11 @@
       "lockedgold": {
         "description": "View and manage locked CELO"
       },
+      "network": {
+        "description": "View details about the network, like contracts and parameters"
+      },
       "node": {
         "description": "Manage your Celo node"
-      },
-      "registry": {
-        "description": "Interact with the contract registry"
       },
       "releasegold": {
         "description": "View and manage Release Gold contracts"
