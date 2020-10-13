@@ -45,7 +45,7 @@ export function parseUri(uri: string): Tx {
 
       if (namedGroups.inputTypes !== undefined) {
         const abiTypes = namedGroups.inputTypes.split(',')
-        let callSig
+        let callSig = null
         if (parsedQuery.args[parsedQuery.args.length-2] === '=') {
           const builtArgs = JSON.parse(Buffer.from(parsedQuery.args.slice(1, parsedQuery.args.length - 1), 'base64').toString('utf8'))
           callSig = abi.encodeParameters(abiTypes, builtArgs)
