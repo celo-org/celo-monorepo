@@ -5,6 +5,30 @@ import { ProxyInstance, RegistryInstance } from 'types'
 
 import fs = require('fs')
 
+/*
+ * This script verifies that a given set of smart contract bytecodes corresponds
+ * to a Celo system deployed to a given network. It uses the Registry constract
+ * as its source of truth, potentially modified by an optional contract upgrade
+ * proposal description.
+ *
+ * Expects the following flags:
+ *   build_artifacts: The directory in which smart contract build artifacts can
+ *   be found.
+ *   proposal (optional): The JSON file containing a Governance proposal that
+ *   repoints the Registry to newly deployed Proxies and/or repoints existing
+ *   Proxies to new implementation addresses.
+ *   before_release_1 (optional): a temporary feature flag needed before the
+ *   first contracts upgrades establishes new conventions around how smart
+ *   contracts are handled on chain. Specifically, after the first release,
+ *   linked libraries will be proxied, so libraries before this release have to
+ *   be handled differently by this script.
+ *
+ * Run using truffle exec, e.g.:
+ * truffle exec scripts/truffle/verify-bytecode \
+ *   --network alfajores --build_directory build/alfajores/contracts --proposal proposal.json \
+ *   --before_release_1
+ */
+
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
