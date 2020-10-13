@@ -503,6 +503,25 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     })
   }
 
+  getRevealStatus(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string,
+    pepper?: string
+  ) {
+    const urlParams = new URLSearchParams({
+      phoneNumber,
+      salt: pepper ?? '',
+      issuer,
+      account,
+    })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   /**
    * Validates a given code by the issuer on-chain
    * @param identifier Attestation identifier (e.g. phone hash)
