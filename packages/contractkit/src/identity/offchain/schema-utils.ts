@@ -36,8 +36,9 @@ export class UnknownCiphertext extends RootError<SchemaErrorTypes.UnknownCiphert
 }
 
 export class UnavailableKey extends RootError<SchemaErrorTypes.UnavailableKey> {
-  constructor() {
+  constructor(readonly account: string) {
     super(SchemaErrorTypes.UnavailableKey)
+    this.message = `Unable to find account ${account}`
   }
 }
 
@@ -276,12 +277,12 @@ const readEncrypted = async (
   ])
 
   if (readerPubKey === null) {
-    return Err(new UnavailableKey())
+    return Err(new UnavailableKey(senderAddress))
   }
   const readerPublicKeyAddress = publicKeyToAddress(readerPubKey)
 
   if (!wallet.hasAccount(readerPublicKeyAddress)) {
-    return Err(new UnavailableKey())
+    return Err(new UnavailableKey(readerPublicKeyAddress))
   }
 
   const sharedSecret = await wallet.computeSharedSecret(readerPublicKeyAddress, senderPubKey)
