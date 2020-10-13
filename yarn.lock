@@ -29054,9 +29054,9 @@ react-native-clock-sync@^1.0.0:
   dependencies:
     react-native-ntp-client "0.5.5"
 
-"react-native-config@https://github.com/luggit/react-native-config#89a602b":
-  version "0.11.7"
-  resolved "https://github.com/luggit/react-native-config#89a602bf8be3808838403a97afaf915caeec76c2"
+"react-native-config@https://github.com/luggit/react-native-config#2f68b94":
+  version "1.3.3"
+  resolved "https://github.com/luggit/react-native-config#2f68b94065a0e1e1ddba8e860a696c6e8bc5912d"
 
 "react-native-contacts@https://github.com/celo-org/react-native-contacts#e473717":
   version "5.0.0"
