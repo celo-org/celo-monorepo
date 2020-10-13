@@ -1,16 +1,13 @@
+import { Address } from '@celo/base'
 import { Err, makeAsyncThrowable } from '@celo/base/lib/result'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
-import { Address } from '../../base'
-import OffchainDataWrapper from '../offchain-data-wrapper'
-import {
-  BinarySchema,
-  buildEIP712TypedData,
-  deserialize,
-  OffchainError,
-  SimpleSchema,
-} from './schema-utils'
+import OffchainDataWrapper from '../../offchain-data-wrapper'
+import BinarySchema from './binary'
+import { OffchainError } from './errors'
+import SimpleSchema from './simple'
+import { buildEIP712TypedData, deserialize } from './utils'
 
 const NameSchema = t.type({
   name: t.string,

@@ -1,5 +1,4 @@
-import { makeAsyncThrowable } from '@celo/base/lib/result'
-import { Err, Ok, parseJsonAsResult, Result, RootError, trimLeading0x } from '@celo/base/src'
+import { Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base/src'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { Encrypt } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
@@ -8,184 +7,18 @@ import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypt
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import OffchainDataWrapper, { OffchainErrors, OffchainErrorTypes } from '../offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrorTypes } from '../../offchain-data-wrapper'
+import {
+  InvalidDataError,
+  InvalidKey,
+  OffchainError,
+  SchemaErrors,
+  SchemaErrorTypes,
+  UnavailableKey,
+} from './errors'
 
-export enum SchemaErrorTypes {
-  InvalidDataError = 'InvalidDataError',
-  OffchainError = 'OffchainError',
-  UnknownCiphertext = 'UnknownCiphertext',
-  UnavailableKey = 'UnavailableKey',
-}
-
-export class InvalidDataError extends RootError<SchemaErrorTypes.InvalidDataError> {
-  constructor() {
-    super(SchemaErrorTypes.InvalidDataError)
-  }
-}
-
-export class OffchainError extends RootError<SchemaErrorTypes.OffchainError> {
-  constructor(readonly error: OffchainErrors) {
-    super(SchemaErrorTypes.OffchainError)
-  }
-}
-
-export class UnknownCiphertext extends RootError<SchemaErrorTypes.UnknownCiphertext> {
-  constructor() {
-    super(SchemaErrorTypes.UnknownCiphertext)
-  }
-}
-
-export class UnavailableKey extends RootError<SchemaErrorTypes.UnavailableKey> {
-  constructor(readonly account: string) {
-    super(SchemaErrorTypes.UnavailableKey)
-    this.message = `Unable to find account ${account}`
-  }
-}
-
-type SchemaErrors = InvalidDataError | OffchainError | UnknownCiphertext | UnavailableKey
-
-const ioTsToSolidityTypeMapping: { [x: string]: string } = {
-  [t.string._tag]: 'string',
-  [t.number._tag]: 'uint256',
-  [t.boolean._tag]: 'bool',
-}
-export type EIP712Schema = Array<{ name: string; type: string }>
-const binaryEIP712Schema: EIP712Schema = [
-  { name: 'path', type: 'string' },
-  { name: 'hash', type: 'string' },
-]
-
-export class SimpleSchema<DataType> {
-  constructor(
-    readonly wrapper: OffchainDataWrapper,
-    readonly type: t.Type<DataType>,
-    readonly dataPath: string
-  ) {}
-
-  private serialize(data: DataType) {
-    return Buffer.from(JSON.stringify(data))
-  }
-
-  private deserialize(buf: Buffer): Result<DataType, SchemaErrors> {
-    return deserialize(this.type, buf)
-  }
-
-  private async sign(data: DataType) {
-    const typedData = await buildEIP712TypedData(this.wrapper, this.type, this.dataPath, data)
-    const wallet = this.wrapper.kit.getWallet()
-    return wallet.signTypedData(this.wrapper.self, typedData)
-  }
-
-  async write(data: DataType) {
-    if (!this.type.is(data)) {
-      return new InvalidDataError()
-    }
-
-    return this.wrapper.writeDataTo(this.serialize(data), await this.sign(data), this.dataPath)
-  }
-
-  async writeEncrypted(data: DataType, toAddress: string) {
-    if (!this.type.is(data)) {
-      return new InvalidDataError()
-    }
-
-    return writeEncrypted(this.wrapper, this.dataPath, this.serialize(data), toAddress)
-  }
-
-  async writeWithSymmetric(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
-    if (!this.type.is(data)) {
-      return new InvalidDataError()
-    }
-
-    return writeEncryptedWithSymmetric(
-      this.wrapper,
-      this.dataPath,
-      this.serialize(data),
-      toAddresses,
-      symmetricKey
-    )
-  }
-
-  async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
-    const rawData = await this.wrapper.readDataFromAsResult(
-      account,
-      (buf) =>
-        buildEIP712TypedData(this.wrapper, this.type, this.dataPath, JSON.parse(buf.toString())),
-      this.dataPath
-    )
-
-    if (!rawData.ok) {
-      return this.readEncrypted(account)
-    }
-
-    const deserializedResult = this.deserialize(rawData.result)
-
-    if (deserializedResult.ok) {
-      return deserializedResult
-    }
-
-    const encryptedResult = await this.readEncrypted(account)
-
-    if (encryptedResult.ok) {
-      return encryptedResult
-    }
-
-    return deserializedResult
-  }
-
-  read = makeAsyncThrowable(this.readAsResult.bind(this))
-
-  private async readEncrypted(account: string): Promise<Result<DataType, SchemaErrors>> {
-    const encryptedResult = await resolveEncrypted(this.wrapper, this.dataPath, account)
-
-    if (encryptedResult.ok) {
-      return this.deserialize(encryptedResult.result)
-    }
-
-    return encryptedResult
-  }
-}
-
-export class BinarySchema {
-  constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
-
-  async write(data: Buffer) {
-    const signature = await signBuffer(this.wrapper, this.dataPath, data)
-    return this.wrapper.writeDataTo(data, signature, this.dataPath)
-  }
-
-  async writeEncrypted(data: Buffer, toAddress: string) {
-    return writeEncrypted(this.wrapper, this.dataPath, data, toAddress)
-  }
-
-  async writeWithSymmetric(data: Buffer, toAddresses: string[], symmetricKey?: Buffer) {
-    return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
-  }
-
-  async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
-    const rawData = await this.wrapper.readDataFromAsResult(
-      account,
-      (buf) => buildBinaryEIP712TypedData(this.wrapper, this.dataPath, buf),
-      this.dataPath
-    )
-    if (!rawData.ok) {
-      return this.readEncrypted(account)
-    }
-
-    const encryptedResult = await this.readEncrypted(account)
-
-    if (encryptedResult.ok) {
-      return encryptedResult
-    }
-    return Ok(rawData.result)
-  }
-
-  read = makeAsyncThrowable(this.readAsResult.bind(this))
-
-  private async readEncrypted(account: string) {
-    return resolveEncrypted(this.wrapper, this.dataPath, account)
-  }
-}
+const KEY_LENGTH = 16
+const IV_LENGTH = 16
 
 // label = PRF(ECDH(A, B), A || B || data path)
 // ciphertext path = "/cosmetic path/" || base64(label)
@@ -257,7 +90,7 @@ async function fetchOrGenerateKey(
   return Err(existingKey.error)
 }
 
-const writeEncryptedWithSymmetric = async (
+export const writeEncryptedWithSymmetric = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
@@ -285,7 +118,7 @@ const writeEncryptedWithSymmetric = async (
   )
 }
 
-const readEncrypted = async (
+export const readEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   senderAddress: string
@@ -323,7 +156,7 @@ const readEncrypted = async (
   return Ok(payload)
 }
 
-const resolveEncrypted = async (
+export const resolveEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   senderAddress: string
@@ -344,9 +177,13 @@ const resolveEncrypted = async (
 
   if (encryptedPayload.ok && keyOrPayload.ok) {
     const key = keyOrPayload.result
+    if (key.length !== KEY_LENGTH) {
+      return Err(new InvalidKey())
+    }
+
     const payload = encryptedPayload.result
-    const iv = payload.slice(0, 16)
-    const encryptedData = payload.slice(16)
+    const iv = payload.slice(0, IV_LENGTH)
+    const encryptedData = payload.slice(IV_LENGTH)
     const decipher = createDecipheriv('aes-128-ctr', key, iv)
 
     return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
@@ -408,6 +245,12 @@ export const buildEIP712TypedData = async <DataType>(
   }
 }
 
+export type EIP712Schema = Array<{ name: string; type: string }>
+const binaryEIP712Schema: EIP712Schema = [
+  { name: 'path', type: 'string' },
+  { name: 'hash', type: 'string' },
+]
+
 export const buildBinaryEIP712TypedData = async (
   wrapper: OffchainDataWrapper,
   path: string,
@@ -442,6 +285,12 @@ export const buildBinaryEIP712TypedData = async (
 export const signBuffer = async (wrapper: OffchainDataWrapper, dataPath: string, buf: Buffer) => {
   const typedData = await buildBinaryEIP712TypedData(wrapper, dataPath, buf)
   return wrapper.kit.getWallet().signTypedData(wrapper.self, typedData)
+}
+
+const ioTsToSolidityTypeMapping: { [x: string]: string } = {
+  [t.string._tag]: 'string',
+  [t.number._tag]: 'uint256',
+  [t.boolean._tag]: 'bool',
 }
 
 export const buildEIP712Schema = <DataType>(type: t.Type<DataType>): EIP712Schema => {

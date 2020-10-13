@@ -1,6 +1,6 @@
 import { execSync } from 'child_process'
 import { mkdirSync, writeFile } from 'fs'
-import { parse } from 'path'
+import { normalize, parse } from 'path'
 
 export abstract class StorageWriter {
   abstract write(_data: Buffer, _dataPath: string): Promise<void>
@@ -38,6 +38,23 @@ export class GitStorageWriter extends LocalStorageWriter {
     execSync(`git commit --message "Upload ${dataPath}"`, { cwd: this.root })
     execSync(`git push origin master`, { cwd: this.root })
     return
+  }
+}
+
+export class GoogleStorageWriter extends LocalStorageWriter {
+  private readonly bucket: string
+
+  constructor(readonly local: string, bucket: string) {
+    super(local)
+    this.bucket = bucket
+  }
+
+  async write(data: Buffer, dataPath: string): Promise<void> {
+    await this.writeToFs(data, dataPath)
+    execSync(`gsutil cp ${normalize(this.root + '/' + dataPath)} gs://${this.bucket}${dataPath}`, {
+      cwd: this.root,
+    })
+    await new Promise((resolve) => setTimeout(resolve, 2000))
   }
 }
 
