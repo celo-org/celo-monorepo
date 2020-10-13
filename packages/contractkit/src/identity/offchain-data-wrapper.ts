@@ -75,18 +75,22 @@ export default class OffchainDataWrapper {
 
   readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
-  async writeDataTo(data: Buffer, signature: string, dataPath: string) {
+  async writeDataTo(data: Buffer, signature: string, dataPath: string): Promise<Error | void> {
     if (this.storageWriter === undefined) {
-      throw new Error('no storage writer')
+      return new Error('No storage writer')
     }
 
-    await Promise.all([
-      this.storageWriter.write(data, dataPath),
-      await this.storageWriter.write(
-        Buffer.from(trimLeading0x(signature), 'hex'),
-        dataPath + '.signature'
-      ),
-    ])
+    try {
+      await Promise.all([
+        this.storageWriter.write(data, dataPath),
+        await this.storageWriter.write(
+          Buffer.from(trimLeading0x(signature), 'hex'),
+          dataPath + '.signature'
+        ),
+      ])
+    } catch (e) {
+      return new FetchError()
+    }
   }
 }
 

@@ -8,7 +8,7 @@ import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypt
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import OffchainDataWrapper, { OffchainErrors } from '../offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrors, OffchainErrorTypes } from '../offchain-data-wrapper'
 
 export enum SchemaErrorTypes {
   InvalidDataError = 'InvalidDataError',
@@ -78,15 +78,15 @@ export class SimpleSchema<DataType> {
 
   async write(data: DataType) {
     if (!this.type.is(data)) {
-      return
+      return new InvalidDataError()
     }
 
-    await this.wrapper.writeDataTo(this.serialize(data), await this.sign(data), this.dataPath)
+    return this.wrapper.writeDataTo(this.serialize(data), await this.sign(data), this.dataPath)
   }
 
   async writeEncrypted(data: DataType, toAddress: string) {
     if (!this.type.is(data)) {
-      return
+      return new InvalidDataError()
     }
 
     return writeEncrypted(this.wrapper, this.dataPath, this.serialize(data), toAddress)
@@ -94,7 +94,7 @@ export class SimpleSchema<DataType> {
 
   async writeWithSymmetric(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
     if (!this.type.is(data)) {
-      return
+      return new InvalidDataError()
     }
 
     return writeEncryptedWithSymmetric(
@@ -151,7 +151,7 @@ export class BinarySchema {
 
   async write(data: Buffer) {
     const signature = await signBuffer(this.wrapper, this.dataPath, data)
-    await this.wrapper.writeDataTo(data, signature, this.dataPath)
+    return this.wrapper.writeDataTo(data, signature, this.dataPath)
   }
 
   async writeEncrypted(data: Buffer, toAddress: string) {
@@ -211,7 +211,7 @@ export const writeEncrypted = async (
   dataPath: string,
   data: Buffer,
   toAddress: string
-) => {
+): Promise<void | Error> => {
   const accounts = await wrapper.kit.contracts.getAccounts()
   const [fromPubKey, toPubKey] = await Promise.all([
     accounts.getDataEncryptionKey(wrapper.self),
@@ -227,10 +227,36 @@ export const writeEncrypted = async (
   )
 
   const signature = await signBuffer(wrapper, computedDataPath, encryptedData)
-  await wrapper.writeDataTo(encryptedData, signature, computedDataPath)
+  return wrapper.writeDataTo(encryptedData, signature, computedDataPath)
 }
 
-//  file_ciphertext = IV || E(message key, IV, data)
+// if explicitly passing in a symmetric key, use that.
+// else check for existing key
+// otherwise generate new one
+async function fetchOrGenerateKey(
+  wrapper: OffchainDataWrapper,
+  dataPath: string,
+  symmetricKey?: Buffer
+) {
+  if (symmetricKey) {
+    return Ok(symmetricKey)
+  }
+
+  const existingKey = await readEncrypted(wrapper, dataPath, wrapper.self)
+  if (existingKey.ok) {
+    return Ok(existingKey.result)
+  }
+
+  if (
+    existingKey.error.errorType === SchemaErrorTypes.OffchainError &&
+    existingKey.error.error.errorType === OffchainErrorTypes.NoStorageRootProvidedData
+  ) {
+    return Ok(randomBytes(16))
+  }
+
+  return Err(existingKey.error)
+}
+
 const writeEncryptedWithSymmetric = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
@@ -238,19 +264,14 @@ const writeEncryptedWithSymmetric = async (
   toAddresses: string[],
   symmetricKey?: Buffer
 ) => {
-  // if explicitly passing in a symmetric key, use that.
-  // else check for existing key
-  // otherwise generate new one
-  let key: Buffer
-  if (symmetricKey) {
-    key = symmetricKey
-  } else {
-    const response = await readEncrypted(wrapper, dataPath, wrapper.self)
-    key = response.ok ? response.result : randomBytes(16)
+  const fetchKey = await fetchOrGenerateKey(wrapper, dataPath, symmetricKey)
+  if (!fetchKey.ok) {
+    return fetchKey.error
   }
 
+  //  file_ciphertext = IV || E(message key, IV, data)
   const iv = randomBytes(16)
-  const cipher = createCipheriv('aes-128-ctr', key, iv)
+  const cipher = createCipheriv('aes-128-ctr', fetchKey.result, iv)
   const payload = Buffer.concat([iv, cipher.update(data), cipher.final()])
 
   const signature = await signBuffer(wrapper, `${dataPath}.enc`, payload)
@@ -259,7 +280,7 @@ const writeEncryptedWithSymmetric = async (
   await Promise.all(
     // here we encrypt the key to ourselves so we can retrieve it later
     [wrapper.self, ...toAddresses].map(async (toAddress) =>
-      writeEncrypted(wrapper, dataPath, key, toAddress)
+      writeEncrypted(wrapper, dataPath, fetchKey.result, toAddress)
     )
   )
 }
