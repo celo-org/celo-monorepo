@@ -63,8 +63,8 @@ export default class OffchainDataWrapper {
     }
 
     const item = (
-      await Promise.all(storageRoots.map((_) => _.readAndVerifySignature(dataPath, buildTypedData)))
-    ).find((_) => _.ok)
+      await Promise.all(storageRoots.map((s) => s.readAndVerifySignature(dataPath, buildTypedData)))
+    ).find((s) => s.ok)
 
     if (item === undefined) {
       return Err(new NoStorageRootProvidedData())

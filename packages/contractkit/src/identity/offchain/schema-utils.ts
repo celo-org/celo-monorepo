@@ -135,7 +135,7 @@ export class SimpleSchema<DataType> {
   read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   private async readEncrypted(account: string): Promise<Result<DataType, SchemaErrors>> {
-    const encryptedResult = await readEncrypted(this.wrapper, this.dataPath, account)
+    const encryptedResult = await resolveEncrypted(this.wrapper, this.dataPath, account)
 
     if (encryptedResult.ok) {
       return this.deserialize(encryptedResult.result)
@@ -182,13 +182,13 @@ export class BinarySchema {
   read = makeAsyncThrowable(this.readAsResult.bind(this))
 
   private async readEncrypted(account: string) {
-    return readEncrypted(this.wrapper, this.dataPath, account)
+    return resolveEncrypted(this.wrapper, this.dataPath, account)
   }
 }
 
 // label = PRF(ECDH(A, B), A || B || data path)
 // ciphertext path = "/cosmetic path/" || base64(label)
-export function getDataPath(
+function getCiphertextLabel(
   path: string,
   sharedSecret: Buffer,
   senderPublicKey: string,
@@ -197,9 +197,10 @@ export function getDataPath(
   const senderPublicKeyBuffer = Buffer.from(trimLeading0x(senderPublicKey), 'hex')
   const receiverPublicKeyBuffer = Buffer.from(trimLeading0x(receiverPublicKey), 'hex')
 
-  return createHmac('sha3-256', sharedSecret)
+  const label = createHmac('blake2s256', sharedSecret)
     .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
     .digest('base64')
+  return '/ciphertexts/' + label
 }
 
 // Assumes that the wallet has the dataEncryptionKey of wrapper.self available
@@ -218,19 +219,18 @@ export const writeEncrypted = async (
   const wallet = wrapper.kit.getWallet()
   const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
-  const computedDataPath = getDataPath(dataPath, sharedSecret, fromPubKey, toPubKey)
+  const computedDataPath = getCiphertextLabel(dataPath, sharedSecret, fromPubKey, toPubKey)
   const encryptedData = Encrypt(
     Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'),
     Buffer.from(data)
   )
 
-  const prefixedDataPath = '/ciphertexts/' + computedDataPath
-  const signature = await signBuffer(wrapper, prefixedDataPath, encryptedData)
-  await wrapper.writeDataTo(encryptedData, signature, prefixedDataPath)
+  const signature = await signBuffer(wrapper, computedDataPath, encryptedData)
+  await wrapper.writeDataTo(encryptedData, signature, computedDataPath)
 }
 
 //  file_ciphertext = IV || E(message key, IV, data)
-export const writeEncryptedWithSymmetric = async (
+const writeEncryptedWithSymmetric = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
@@ -244,8 +244,8 @@ export const writeEncryptedWithSymmetric = async (
   if (symmetricKey) {
     key = symmetricKey
   } else {
-    const keyResult = await readEncrypted(wrapper, `${dataPath}.enc`, wrapper.self)
-    key = keyResult.ok ? keyResult.result : randomBytes(16)
+    const response = await readEncrypted(wrapper, dataPath, wrapper.self)
+    key = response.ok ? response.result : randomBytes(16)
   }
 
   const iv = randomBytes(16)
@@ -256,7 +256,10 @@ export const writeEncryptedWithSymmetric = async (
   await wrapper.writeDataTo(payload, signature, `${dataPath}.enc`)
 
   await Promise.all(
-    toAddresses.map(async (toAddress) => writeEncrypted(wrapper, dataPath, key, toAddress))
+    // here we encrypt the key to ourselves so we can retrieve it later
+    [wrapper.self, ...toAddresses].map(async (toAddress) =>
+      writeEncrypted(wrapper, dataPath, key, toAddress)
+    )
   )
 }
 
@@ -283,32 +286,42 @@ const readEncrypted = async (
 
   const sharedSecret = await wallet.computeSharedSecret(readerPublicKeyAddress, senderPubKey)
 
-  const computedDataPath = getDataPath(dataPath, sharedSecret, senderPubKey, readerPubKey)
+  const computedDataPath = getCiphertextLabel(dataPath, sharedSecret, senderPubKey, readerPubKey)
+  const encryptedPayload = await wrapper.readDataFromAsResult(
+    senderAddress,
+    (buf) => buildBinaryEIP712TypedData(wrapper, computedDataPath, buf),
+    computedDataPath
+  )
 
+  if (!encryptedPayload.ok) {
+    return Err(new OffchainError(encryptedPayload.error))
+  }
+
+  const payload = await wallet.decrypt(readerPublicKeyAddress, encryptedPayload.result)
+  return Ok(payload)
+}
+
+const resolveEncrypted = async (
+  wrapper: OffchainDataWrapper,
+  dataPath: string,
+  senderAddress: string
+): Promise<Result<Buffer, SchemaErrors>> => {
   const encryptedPayloadPath = `${dataPath}.enc`
-  const encryptedPayloadOrKeyPath = '/ciphertexts/' + computedDataPath
-  const [encryptedPayload, encryptedPayloadOrKey] = await Promise.all([
+  const [encryptedPayload, keyOrPayload] = await Promise.all([
     wrapper.readDataFromAsResult(
       senderAddress,
       (buf) => buildBinaryEIP712TypedData(wrapper, encryptedPayloadPath, buf),
       encryptedPayloadPath
     ),
-    wrapper.readDataFromAsResult(
-      senderAddress,
-      (buf) => buildBinaryEIP712TypedData(wrapper, encryptedPayloadOrKeyPath, buf),
-      encryptedPayloadOrKeyPath
-    ),
+    readEncrypted(wrapper, dataPath, senderAddress),
   ])
 
-  if (!encryptedPayloadOrKey.ok) {
-    return Err(new OffchainError(encryptedPayloadOrKey.error))
+  if (!keyOrPayload.ok) {
+    return Err(keyOrPayload.error)
   }
 
-  const payloadOrKey = await wallet.decrypt(readerPublicKeyAddress, encryptedPayloadOrKey.result)
-
-  // encrypted with symmetric key
-  if (encryptedPayload.ok) {
-    const key = payloadOrKey
+  if (encryptedPayload.ok && keyOrPayload.ok) {
+    const key = keyOrPayload.result
     const payload = encryptedPayload.result
     const iv = payload.slice(0, 16)
     const encryptedData = payload.slice(16)
@@ -317,7 +330,7 @@ const readEncrypted = async (
     return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
   }
 
-  return Ok(payloadOrKey)
+  return keyOrPayload
 }
 
 export const deserialize = <DataType>(
