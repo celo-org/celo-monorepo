@@ -104,7 +104,7 @@ exports[`About renders 1`] = `
       }
     >
       <style>
-        
+
             .ReactModal__Body--open {
               position: fixed;
             }
@@ -120,7 +120,7 @@ exports[`About renders 1`] = `
             .ReactModal__Overlay {
               transition: transform 1000ms ease-in-out;
             }
-            
+
             .ReactModal__Overlay--after-open{
               transform: translateY(0);
             }
@@ -128,7 +128,7 @@ exports[`About renders 1`] = `
             .ReactModal__Overlay--before-close {
               transform: translateY(-100vh);
             }
-          
+
       </style>
       <div
         className="css-view-1dbjc4n"
@@ -641,7 +641,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        Celo, pronounced 
+        Celo, pronounced
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           onClick={[Function]}
@@ -653,7 +653,7 @@ exports[`About renders 1`] = `
         >
           /ˈtselo/
         </span>
-         
+
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
@@ -724,7 +724,7 @@ exports[`About renders 1`] = `
             />
           </audio>
         </div>
-        
+
 means ‘purpose’ in Esperanto.
       </h2>
       <div
@@ -887,7 +887,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
           }
         }
       >
-        Celo is founded on two core values: 
+        Celo is founded on two core values:
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           onClick={[Function]}
@@ -899,7 +899,7 @@ More importantly, we are driven by purpose – to solve real-world problems such
         >
           unique purpose
         </span>
-         and 
+         and
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           onClick={[Function]}
@@ -1875,7 +1875,7 @@ Change the story.
           }
         }
       >
-        Celo’s philosophy is grounded in the work of Charles Eisenstein’s 
+        Celo’s philosophy is grounded in the work of Charles Eisenstein’s
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -2238,7 +2238,7 @@ Change the story.
           }
         >
           Meet the contributors working on Celo from around the world. Our collective experience ranges from public and private sector, technology, nonprofits, and NGOs.
-           
+
         </div>
       </div>
     </div>
@@ -4211,7 +4211,7 @@ Change the story.
         }
       >
         For media inquiries, please contact us at
-         
+
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}

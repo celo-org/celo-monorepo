@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
@@ -162,7 +162,6 @@ library SortedLinkedList {
     return list.list.headN(n);
   }
 
-  // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.
    * @param list A storage pointer to the underlying list.
