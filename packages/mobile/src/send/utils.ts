@@ -188,7 +188,7 @@ export function* handleSendPaymentData(
     contactId: cachedRecipient?.contactId,
   }
 
-  yield call(addAddressToDisplayName, recipient.address, recipient.displayName)
+  yield put(addAddressToDisplayName(recipient.address, recipient.displayName))
   yield put(storeLatestInRecents(recipient))
 
   if (data.currencyCode) {
