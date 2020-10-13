@@ -6,7 +6,7 @@ import {
   parseDecodedParams,
 } from '@celo/communication'
 import { ContractKit } from '@celo/contractkit'
-import { PROXY_ABI } from '../governance/proxy'
+import { PROXY_ABI, PROXY_SET_IMPLEMENTATION_SIGNATURE } from '../governance/proxy'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {
@@ -112,12 +112,17 @@ export class BlockExplorer {
       return null
     }
 
+    const contract =
+      matchedAbi.signature === PROXY_SET_IMPLEMENTATION_SIGNATURE
+        ? contractMapping.details.name + 'Proxy'
+        : contractMapping.details.name
+
     const { args, params } = parseDecodedParams(
       this.kit.communication.getAbiCoder().decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
     return {
-      contract: contractMapping.details.name,
+      contract,
       function: matchedAbi.name!,
       paramMap: params,
       argList: args,

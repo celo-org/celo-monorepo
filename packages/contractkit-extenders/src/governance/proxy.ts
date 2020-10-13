@@ -34,6 +34,8 @@ export const PROXY_ABI: ABIDefinition[] = [
   },
 ]
 
+export const PROXY_SET_IMPLEMENTATION_SIGNATURE = PROXY_ABI[1].signature
+
 export const getImplementationOfProxy = async (
   web3: Web3,
   proxyContractAddress: string

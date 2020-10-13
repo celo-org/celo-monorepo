@@ -1,6 +1,6 @@
 import TextInputWithButtons from '@celo/react-components/components/TextInputWithButtons'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TextInputProps, TouchableOpacity, ViewStyle } from 'react-native'

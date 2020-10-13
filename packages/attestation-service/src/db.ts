@@ -1,25 +1,44 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { eqAddress } from '@celo/utils/lib/address'
-import 'cross-fetch/polyfill'
-import { FindOptions, Sequelize } from 'sequelize'
+import Logger from 'bunyan'
+import moment from 'moment'
+import { FindOptions, Op, Sequelize, Transaction } from 'sequelize'
 import Web3 from 'web3'
-import { fetchEnv, getAccountAddress, getAttestationSignerAddress } from './env'
+import { fetchEnv, fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from './env'
 import { rootLogger } from './logger'
-import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
+import { Gauges } from './metrics'
+import Attestation, {
+  AttestationKey,
+  AttestationModel,
+  AttestationStatic,
+} from './models/attestation'
+import { ErrorMessages } from './request'
 
 export let sequelize: Sequelize | undefined
 
-export function initializeDB() {
+let dbRecordExpiryMins: number | null
+
+export type SequelizeLogger = boolean | ((sql: string, timing?: number) => void)
+
+export function makeSequelizeLogger(logger: Logger): SequelizeLogger {
+  return (msg: string, sequelizeLogArgs: any) =>
+    logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+}
+
+export async function initializeDB() {
   if (sequelize === undefined) {
     sequelize = new Sequelize(fetchEnv('DATABASE_URL'), {
-      logging: (msg: string, sequelizeLogArgs: any) =>
-        rootLogger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg),
+      logging: makeSequelizeLogger(rootLogger),
     })
     rootLogger.info('Initializing Database')
-    return sequelize.authenticate() as Promise<void>
+    await sequelize.authenticate()
+
+    // Check four times every `dbRecordExpiryMins` period to delete records older than dbRecordExpiryMins
+    dbRecordExpiryMins = parseInt(fetchEnvOrDefault('DB_RECORD_EXPIRY_MINS', '60'), 10)
+    const dbRecordExpiryCheckEveryMs = dbRecordExpiryMins * 15 * 1000
+    setInterval(purgeExpiredRecords, dbRecordExpiryCheckEveryMs)
   }
-  return Promise.resolve()
 }
 
 export function isDBOnline() {
@@ -114,9 +133,14 @@ export async function initializeKit() {
   }
 }
 
+export async function startPeriodicHealthCheck() {
+  await tryHealthCheck()
+  setInterval(tryHealthCheck, 60 * 1000)
+}
+
 let AttestationTable: AttestationStatic
 
-export async function getAttestationTable() {
+async function getAttestationTable() {
   if (AttestationTable) {
     return AttestationTable
   }
@@ -124,14 +148,127 @@ export async function getAttestationTable() {
   return AttestationTable
 }
 
-export async function existingAttestationRequestRecord(
-  identifier: string,
-  account: string,
-  issuer: string,
+export async function findAttestationByKey(
+  key: AttestationKey,
   options: FindOptions = {}
 ): Promise<AttestationModel | null> {
   return (await getAttestationTable()).findOne({
-    where: { identifier, account, issuer },
+    where: { ...key },
     ...options,
   })
+}
+
+export async function findAttestationByDeliveryId(
+  ongoingDeliveryId: string,
+  options: FindOptions = {}
+): Promise<AttestationModel | null> {
+  return (await getAttestationTable()).findOne({
+    where: { ongoingDeliveryId },
+    ...options,
+  })
+}
+
+export async function findOrCreateAttestation(
+  key: AttestationKey,
+  defaults: object | undefined,
+  transaction: Transaction
+): Promise<AttestationModel> {
+  const attestationTable = await getAttestationTable()
+  await attestationTable.findOrCreate({
+    where: {
+      ...key,
+    },
+    defaults,
+    transaction,
+  })
+
+  // Query to lock the record
+  const attestationRecord = await findAttestationByKey(
+    {
+      ...key,
+    },
+    { transaction, lock: Transaction.LOCK.UPDATE }
+  )
+
+  if (!attestationRecord) {
+    // This should never happen
+    throw new Error(`Somehow we did not get an attestation record`)
+  }
+
+  return attestationRecord
+}
+
+async function purgeExpiredRecords() {
+  try {
+    const sequelizeLogger = makeSequelizeLogger(rootLogger)
+    const transaction = await sequelize!.transaction({ logging: sequelizeLogger })
+    try {
+      const table = await getAttestationTable()
+      const rowsDeleted = await table.destroy({
+        where: {
+          createdAt: {
+            [Op.lte]: moment()
+              .subtract(dbRecordExpiryMins!, 'minutes')
+              .toDate(),
+          },
+        },
+        transaction,
+      })
+      await transaction.commit()
+      if (rowsDeleted) {
+        rootLogger.info({ rowsDeleted }, 'Purged expired records')
+      }
+    } catch (err) {
+      rootLogger.error({ err }, 'Cannot purge expired records')
+      await transaction.rollback()
+    }
+  } catch (err) {
+    rootLogger.error({ err }, 'Cannot purge expired records')
+  }
+}
+
+// Do the health check to update the gauge
+async function tryHealthCheck() {
+  try {
+    const failureReason = await doHealthCheck()
+    if (failureReason) {
+      rootLogger.warn(`Health check failed: ${failureReason}`)
+    }
+  } catch {
+    rootLogger.warn(`Health check failed`)
+  }
+}
+
+// Check health and return failure reason, null on success.
+export async function doHealthCheck(): Promise<string | null> {
+  try {
+    if (!(await isAttestationSignerUnlocked())) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.ATTESTATION_SIGNER_CANNOT_SIGN
+    }
+
+    if (await isNodeSyncing()) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.NODE_IS_SYNCING
+    }
+
+    const { ageOfLatestBlock } = await getAgeOfLatestBlock()
+    if (ageOfLatestBlock > 15) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.NODE_IS_STUCK
+    }
+
+    try {
+      await isDBOnline()
+    } catch (error) {
+      Gauges.healthy.set(0)
+      return ErrorMessages.DATABASE_IS_OFFLINE
+    }
+
+    Gauges.healthy.set(1)
+    return null
+  } catch (error) {
+    Gauges.healthy.set(0)
+    return ErrorMessages.UNKNOWN_ERROR
+  }
 }

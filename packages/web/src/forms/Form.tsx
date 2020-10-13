@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { NativeSyntheticEvent, TextInputChangeEventData } from 'react-native'
 import { ErrorKeys } from 'src/forms/ErrorDisplay'
 interface State {
   isComplete: boolean
@@ -19,7 +18,7 @@ interface NativeEvent {
 
 interface ChildArguments {
   onSubmit: (any?: any) => Promise<void>
-  onInput: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void
+  onInput: ({ name, newValue }) => void
   onCheck: (event: { nativeEvent: NativeEvent }) => void
   onSelect: (key: string) => (event) => void
   formState: State
@@ -86,6 +85,7 @@ export default class Form extends React.Component<Props, State> {
     }
 
     const errors = this.props.validateWith(this.form())
+
     this.setState({ errors, isComplete: false, isLoading: false })
     return errors.length === 0
   }
@@ -100,9 +100,9 @@ export default class Form extends React.Component<Props, State> {
     return { ...this.state.form }
   }
 
-  onInput = ({ nativeEvent }) => {
-    const { name, value } = nativeEvent.target
+  onInput = ({ name, newValue: value }) => {
     this.clearError(name)
+
     this.updateForm(name, value)
   }
 

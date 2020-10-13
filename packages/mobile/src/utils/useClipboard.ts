@@ -1,10 +1,19 @@
+import { deviceIsIos14OrNewer } from '@celo/react-components/components/utils/IosVersionUtils'
+import Clipboard from '@react-native-community/clipboard'
 import { useEffect, useState } from 'react'
-import { AppState, Clipboard } from 'react-native'
+import { AppState } from 'react-native'
 import Logger from 'src/utils/Logger'
 
 const CLIPBOARD_CHECK_INTERVAL = 1000 // 1sec
 
-export function useClipboard(): string {
+// Return values:
+// - forceShowingPasteIcon: boolean -> true if we can't read the clipboard continuously so we should show
+//      any pasting indicators without checking the string content.
+// - clipboardContent: string -> Latest read from the clipboard we have. Will be empty on iOS 14 and above.
+// - getFreshClipboardContent: () => Promise<string> -> Fetches the content from the clipboard. It will show
+//      a notification to the user on iOS 14 and above.
+export function useClipboard(): [boolean, string, () => Promise<string>] {
+  const [forceShowingPasteIcon, setForceShowingPasteIcon] = useState(false)
   const [clipboardContent, setClipboardContent] = useState('')
 
   useEffect(() => {
@@ -12,6 +21,11 @@ export function useClipboard(): string {
 
     async function checkClipboardContent() {
       try {
+        if (deviceIsIos14OrNewer()) {
+          setForceShowingPasteIcon(await Clipboard.hasString())
+          return
+        }
+
         const newClipboardContent = await Clipboard.getString()
         if (!isMounted) {
           return
@@ -38,5 +52,5 @@ export function useClipboard(): string {
     }
   }, [])
 
-  return clipboardContent
+  return [forceShowingPasteIcon, clipboardContent, Clipboard.getString]
 }

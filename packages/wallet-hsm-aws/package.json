@@ -18,7 +18,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/utils": "0.1.20-dev",
+    "@celo/utils": "0.1.22-dev",
     "@celo/wallet-base": "0.0.1-dev",
     "@celo/wallet-remote": "0.0.1-dev",
     "@celo/wallet-hsm": "0.0.1-dev",

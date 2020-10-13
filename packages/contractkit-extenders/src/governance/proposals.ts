@@ -1,8 +1,11 @@
+import { isHexString } from '@celo/base/lib/address'
 import { concurrentMap } from '@celo/base/lib/async'
 import {
+  ABIDefinition,
   CeloTransactionObject,
   CeloTxObject,
   CeloTxPending,
+  Contract,
   getAbiTypes,
 } from '@celo/communication'
 import { CeloContract, ContractKit } from '@celo/contractkit'
@@ -13,7 +16,9 @@ import {
   Proposal,
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
+import { isValidAddress } from '@celo/utils/lib/address'
 import { keccak256 } from 'ethereumjs-util'
+import * as inquirer from 'inquirer'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { setImplementationOnProxy } from './proxy'
@@ -144,25 +149,127 @@ export class ProposalBuilder {
     this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
-  /**
-   * Adds a JSON encoded proposal transaction to the builder list.
-   * @param tx A JSON encoded proposal transaction.
-   */
-  addJsonTx = (tx: ProposalTransactionJSON) =>
-    this.builders.push(async () => {
-      const contract = await this.kit._web3Contracts.getContract(tx.contract)
-      const methodName = tx.function
-      const method = (contract.methods as any)[methodName]
-      if (!method) {
-        throw new Error(`Method ${methodName} not found on ${tx.contract}`)
+  fromJsonTx = async (tx: ProposalTransactionJSON) => {
+    const contract = await this.kit._web3Contracts.getContract(tx.contract)
+    const methodName = tx.function
+    const method = (contract.methods as Contract['methods'])[methodName]
+    if (!method) {
+      throw new Error(`Method ${methodName} not found on ${tx.contract}`)
+    }
+    const txo = method(...tx.args)
+    if (!txo) {
+      throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
+    }
+    const address = await this.kit.registry.addressFor(tx.contract)
+    return this.fromWeb3tx(txo, { to: address, value: tx.value })
+  }
+
+  addJsonTx = (tx: ProposalTransactionJSON) => this.builders.push(async () => this.fromJsonTx(tx))
+}
+
+const DONE_CHOICE = '✔ done'
+
+export class InteractiveProposalBuilder {
+  constructor(private readonly builder: ProposalBuilder) {}
+
+  async outputTransactions() {
+    const transactionList = this.builder.build()
+    console.log(JSON.stringify(transactionList, null, 2))
+  }
+
+  async promptTransactions() {
+    const transactions: ProposalTransactionJSON[] = []
+    while (true) {
+      console.log(`Transaction #${transactions.length + 1}:`)
+
+      // prompt for contract
+      const contractPromptName = 'Celo Contract'
+      const contractAnswer = await inquirer.prompt({
+        name: contractPromptName,
+        type: 'list',
+        choices: [DONE_CHOICE, ...Object.keys(CeloContract)],
+      })
+
+      const choice = contractAnswer[contractPromptName]
+      if (choice === DONE_CHOICE) {
+        break
       }
-      const txo = method(...tx.args)
-      if (!txo) {
-        throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
+
+      const contractName = choice as CeloContract
+      const contractABI = require('@celo/contractkit/lib/generated/' + contractName)
+        .ABI as ABIDefinition[]
+
+      const txMethods = contractABI.filter(
+        (def) => def.type === 'function' && def.stateMutability !== 'view'
+      )
+      const txMethodNames = txMethods.map((def) => def.name!)
+
+      // prompt for function
+      const functionPromptName = contractName + ' Function'
+      const functionAnswer = await inquirer.prompt({
+        name: functionPromptName,
+        type: 'list',
+        choices: txMethodNames,
+      })
+      const functionName = functionAnswer[functionPromptName] as string
+      const idx = txMethodNames.findIndex((m) => m === functionName)
+      const txDefinition = txMethods[idx]
+
+      // prompt individually for each argument
+      const args = []
+      for (const functionInput of txDefinition.inputs!) {
+        const inputAnswer = await inquirer.prompt({
+          name: functionInput.name,
+          type: 'input',
+          validate: async (input: string) => {
+            switch (functionInput.type) {
+              case 'uint256':
+                const parsed = parseInt(input, 10)
+                return !isNaN(parsed)
+              case 'boolean':
+                return input === 'true' || input === 'false'
+              case 'address':
+                return isValidAddress(input)
+              case 'bytes':
+                return isHexString(input)
+              default:
+                return true
+            }
+          },
+        })
+        args.push(inputAnswer[functionInput.name])
       }
-      if (tx.value === undefined) {
-        tx.value = '0'
+
+      // prompt for value only when tx is payable
+      let value: string
+      if (txDefinition.payable) {
+        const valuePromptName = 'Value'
+        const valueAnswer = await inquirer.prompt({
+          name: valuePromptName,
+          type: 'input',
+        })
+        value = valueAnswer[valuePromptName]
+      } else {
+        value = '0'
       }
-      return this.fromWeb3tx(txo, { to: contract.options.address, value: tx.value })
-    })
+
+      const tx: ProposalTransactionJSON = {
+        contract: contractName,
+        function: functionName,
+        args,
+        value,
+      }
+
+      try {
+        // use fromJsonTx as well-formed tx validation
+        await this.builder.fromJsonTx(tx)
+        transactions.push(tx)
+      } catch (error) {
+        console.error(error)
+        console.error('Please retry forming this transaction')
+      }
+    }
+
+    return transactions
+  }
 }

@@ -1,27 +1,20 @@
-import { BigNumber } from 'bignumber.js'
-import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
-import { Text as RNText, View } from 'react-native'
-import ValidatorsListRow, { CeloGroup, localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
+import { Text, View } from 'react-native'
+import ValidatorsListRow from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import Hoverable from 'src/shared/Hoverable'
 import { colors } from 'src/styles'
-import { weiToDecimal } from 'src/utils/utils'
-
-class Text extends RNText {
-  render() {
-    return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
-  }
-}
+import { Address, CeloGroup, orderAccessors, sortData } from 'src/utils/validators'
 
 interface HeaderCellProps {
   style: any[]
-  name: string
-  order: boolean | null
-  tooltip?: string
-  onClick: () => void
+  name: string // title of the header cell
+  ordered: boolean // is this column determining order of table?
+  asc: boolean // is it ordered ascending?
+  tooltip?: string // text for the tooltip, no tooltip if left empty
+  orderFn: () => void // function executed when header cell is clicked, used to order table
 }
 
 class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }> {
@@ -33,27 +26,27 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
   onHoverOut = () => this.setState({ hover: false })
 
   render() {
-    const { style, name, order, onClick, tooltip } = this.props
+    const { asc, style, name, ordered, orderFn, tooltip } = this.props
     const { hover } = this.state
     return (
-      <Hoverable onHoverIn={this.onHoverIn} onHoverOut={this.onHoverOut}>
-        <View onClick={onClick} style={[styles.tableHeaderCell, ...((style || []) as any)]}>
-          <Text>{name}</Text>
+      <Hoverable onHoverIn={this.onHoverIn} onHoverOut={this.onHoverOut} onPress={orderFn}>
+        <View style={[styles.tableHeaderCell, style]}>
+          <Text style={styles.defaultText}>{name}</Text>
           <Text
             style={[
+              styles.defaultText,
               styles.tableHeaderCellArrow,
-              ...(order !== null ? [styles.tableHeaderCellArrowVisible] : []),
+              ordered && styles.tableHeaderCellArrowVisible,
+              ordered && !asc && styles.tableHeaderCellArrowDesc,
             ]}
           >
-            <Chevron
-              direction={order ? Direction.up : Direction.down}
-              color={colors.white}
-              size={10}
-            />
+            <Chevron direction={Direction.up} color={colors.white} size={10} />
           </Text>
 
           {tooltip && hover && (
-            <Text style={[styles.tooltip, styles.tooltipHeader]}>{tooltip}</Text>
+            <Text style={[styles.defaultText, styles.tooltip, styles.tooltipHeader]}>
+              {tooltip}
+            </Text>
           )}
         </View>
       </Hoverable>
@@ -61,340 +54,170 @@ class HeaderCell extends React.PureComponent<HeaderCellProps, { hover: boolean }
   }
 }
 
-interface Edges<T> {
-  edges: Array<{
-    node: T
-  }>
-}
-
-interface CeloValidatorGroup {
-  account: {
-    address: string
-    lockedGold: string
-    name: string
-    usd: string
-    claims: Edges<{
-      verified: boolean
-      element: string
-    }>
-  }
-  accumulatedActive: string
-  accumulatedRewards: string
-  affiliates: Edges<{
-    account: {
-      claims: Edges<{
-        verified: boolean
-        element: string
-      }>
-    }
-    address: string
-    attestationsFulfilled: number
-    attestationsRequested: number
-    lastElected: number
-    lastOnline: number
-    lockedGold: string
-    name: string
-    score: string
-    usd: string
-  }>
-  commission: string
-  numMembers: number
-  receivableVotes: string
-  rewardsRatio: string
-  votes: string
-}
-
-interface ValidatorsListProps {
-  router: Router
-  data: {
-    celoValidatorGroups: CeloValidatorGroup[]
-    latestBlock: number
-  }
+export interface ValidatorsListProps {
+  data: CeloGroup[]
   isLoading: boolean
 }
 
 type Props = ValidatorsListProps & I18nProps
 
 type orderByTypes =
+  | 'order'
   | 'name'
   | 'total'
   | 'votes'
   | 'rawVotes'
   | 'votesAvailables'
-  | 'gold'
-  | 'commision'
+  | 'celo'
+  | 'commission'
   | 'rewards'
   | 'uptime'
   | 'attestation'
 
 export interface State {
-  expanded: number | undefined
-  orderBy: orderByTypes
+  expanded: Address | undefined
+  orderKey: orderByTypes
   orderAsc: boolean
+  sortedData: CeloGroup[]
 }
 
-// tslint:disable-next-line
 class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
-    orderBy: undefined,
+    orderKey: 'order' as orderByTypes,
     orderAsc: true,
+    sortedData: [],
   }
-  private orderAccessors = {
-    order: (_) => _.order,
-    name: (_) => (_.name || '').toLowerCase() || null,
-    total: (_) => _.numMembers * 1000 + _.elected,
-    votes: (_) => +_.votesAbsolute || 0,
-    rawVotes: (_) => _.votesRaw || 0,
-    votesAvailables: (_) => _.receivableRaw || 0,
-    gold: (_) => _.gold || 0,
-    commision: (_) => _.commission || 0,
-    rewards: (_) => _.rewards || 0,
-    uptime: (_) => _.uptime || 0,
-    attestation: (_) => _.attestation || 0,
-  }
-  private defaultOrderAccessor = 'order'
-  private cachedCleanData: CeloGroup[]
   private orderByFn: { [by: string]: any } = {}
 
   constructor(...args) {
     super(args[0], args[1])
 
-    Object.keys(this.orderAccessors).forEach(
+    Object.keys(orderAccessors).forEach(
       (orderType: any) => (this.orderByFn[orderType] = () => this.orderBy(orderType))
     )
+
+    const { data } = this.props
+    const { orderAsc, orderKey } = this.state
+    this.state.sortedData = sortData(data, orderAsc, orderKey)
   }
 
-  expand(expanded: number) {
+  setData = () => {
+    const { orderAsc, orderKey } = this.state
+    const sortedData = sortData(this.props.data, orderAsc, orderKey)
+    this.setState({ sortedData })
+    this.forceUpdate()
+  }
+
+  expand(expanded: Address) {
     if (this.state.expanded === expanded) {
-      this.setState({ expanded: undefined })
-    } else {
-      this.setState({ expanded })
+      return this.setState({ expanded: undefined })
     }
+    this.setState({ expanded })
   }
 
-  orderBy(orderBy: orderByTypes) {
-    let orderAsc = true
-    if (orderBy === this.state.orderBy) {
-      orderAsc = !this.state.orderAsc
-    }
-    this.setState({ orderBy, orderAsc })
-  }
-
-  cleanData({ celoValidatorGroups, latestBlock }: ValidatorsListProps['data']) {
-    if (this.cachedCleanData) {
-      return this.cachedCleanData
-    }
-    const totalVotes: BigNumber = celoValidatorGroups
-      .map(({ receivableVotes }) => new BigNumber(receivableVotes))
-      .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
-
-    const getClaims = (claims: CeloValidatorGroup['account']['claims'] = {} as any): string[] =>
-      (claims.edges || [])
-        .map(({ node }) => node)
-        .filter(({ verified }) => verified)
-        .map(({ element }) => element)
-
-    const cleanData = celoValidatorGroups
-      .map(
-        ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
-          const group = account
-          const rewards = rewardsRatio === null ? null : Math.round(+rewardsRatio * 100 * 10) / 10
-          const rewardsStyle =
-            rewards < 70 ? styles.barKo : rewards < 90 ? styles.barWarn : styles.barOk
-          const receivableVotesPer = new BigNumber(receivableVotes)
-            .dividedBy(totalVotes)
-            .multipliedBy(100)
-          const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
-          const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
-          const totalFulfilled = affiliates.edges.reduce((acc, obj) => {
-            return acc + (obj.node.attestationsFulfilled || 0)
-          }, 0)
-          const totalRequested = affiliates.edges.reduce((acc, obj) => {
-            return acc + (obj.node.attestationsRequested || 0)
-          }, 0)
-          return {
-            attestation: Math.max(0, totalFulfilled / (totalRequested || -1)) * 100,
-            order: Math.random(),
-            pinned: this.isPinned(group.address),
-            name: group.name,
-            address: group.address,
-            usd: weiToDecimal(+group.usd),
-            gold: weiToDecimal(+group.lockedGold),
-            receivableRaw: weiToDecimal(+receivableVotes),
-            receivableVotes: receivableVotesPer.toString(),
-            votesRaw: weiToDecimal(+votes),
-            votes: votesPer.toString(),
-            votesAbsolute: votesAbsolutePer.toString(),
-            commission: (+commission * 100) / 10 ** 24,
-            rewards,
-            rewardsStyle,
-            numMembers,
-            claims: getClaims(group.claims),
-            validators: affiliates.edges.map(({ node: validator }) => {
-              const {
-                address,
-                lastElected,
-                lastOnline,
-                name,
-                usd,
-                lockedGold,
-                score,
-                attestationsFulfilled,
-                attestationsRequested,
-              } = validator
-              return {
-                name,
-                address,
-                usd: weiToDecimal(+usd),
-                gold: weiToDecimal(+lockedGold),
-                elected: lastElected >= latestBlock,
-                online: lastOnline >= latestBlock,
-                uptime: (+score * 100) / 10 ** 24,
-                attestation:
-                  Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
-                claims: getClaims(validator.account.claims),
-              }
-            }),
-          }
-        }
-      )
-      .map((group, id) => {
-        const data = group.validators.reduce(
-          ({ elected, online, total, uptime }, validator) => ({
-            elected: elected + +validator.elected,
-            online: online + +validator.online,
-            total: total + 1,
-            uptime: uptime + validator.uptime,
-          }),
-          { elected: 0, online: 0, total: 0, uptime: 0 }
-        )
-        data.uptime = data.uptime / group.validators.length
-        return {
-          id,
-          ...group,
-          ...data,
-        }
-      })
-    this.cachedCleanData = cleanData
-    return cleanData
-  }
-
-  sortData<T extends any & { id: number }>(data: T[]): T[] {
-    const { orderBy, orderAsc } = this.state
-    const accessor = this.orderAccessors[orderBy] || (() => 0)
-    const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
-    const dir = orderAsc ? 1 : -1
-
-    const compare = (a, b): number => {
-      if (a === null) {
-        return 1
-      }
-      if (b === null) {
-        return -1
-      }
-      return a > b ? 1 : -1
-    }
-
-    return (data || [])
-      .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
-      .sort((a, b) => dir * compare(accessor(a), accessor(b)))
-      .sort((a, b) => this.isPinned(b) - this.isPinned(a))
-  }
-
-  isPinned({ address }: any) {
-    const list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
-    return +list.includes(address)
-  }
-
-  onPinned() {
-    this.setState({ update: Math.random() } as any)
+  orderBy = async (key: orderByTypes) => {
+    const { orderAsc, orderKey } = this.state
+    const asc = key === orderKey && orderAsc ? false : true
+    await this.setState({ orderKey: key, orderAsc: asc, expanded: undefined })
+    this.setData()
   }
 
   render() {
-    const { expanded, orderBy, orderAsc } = this.state
-    const { data } = this.props
-    const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
-    const onPinned = () => this.onPinned()
+    const { expanded, orderAsc, orderKey, sortedData: validatorGroups } = this.state
     return (
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
             <View style={[styles.tableHeaderCell, styles.sizeXXS]}>
-              <Text>Pin</Text>
+              <Text style={styles.defaultText}>Pin</Text>
             </View>
             <HeaderCell
-              onClick={this.orderByFn.name}
+              orderFn={this.orderByFn.name}
               style={[styles.tableHeaderCellPadding]}
               name="Name"
-              order={orderBy === 'name' ? orderAsc : null}
+              ordered={orderKey === 'name'}
+              asc={orderAsc}
               tooltip="Name of validator group and validators in it"
             />
             <HeaderCell
-              onClick={this.orderByFn.total}
+              orderFn={this.orderByFn.total}
               style={[styles.sizeM]}
               name="Elected/ Total"
-              order={orderBy === 'total' ? orderAsc : null}
+              ordered={orderKey === 'total'}
+              asc={orderAsc}
               tooltip="Number of validators in the group"
             />
             <HeaderCell
-              onClick={this.orderByFn.votes}
+              orderFn={this.orderByFn.votes}
               style={[styles.sizeXL]}
               name="Votes Available"
-              order={orderBy === 'votes' ? orderAsc : null}
-              tooltip="% of total locked gold votes received"
+              ordered={orderKey === 'votes'}
+              asc={orderAsc}
+              tooltip="% of total locked CELO votes received"
             />
             <HeaderCell
-              onClick={this.orderByFn.rawVotes}
+              orderFn={this.orderByFn.rawVotes}
               style={[styles.sizeM]}
               name="Votes"
-              order={orderBy === 'rawVotes' ? orderAsc : null}
+              ordered={orderKey === 'rawVotes'}
+              asc={orderAsc}
               tooltip="Votes received as a percentage of capacity"
             />
             <HeaderCell
-              onClick={this.orderByFn.votesAvailables}
+              orderFn={this.orderByFn.votesAvailables}
               style={[styles.sizeM]}
               name="Votes Available"
-              order={orderBy === 'votesAvailables' ? orderAsc : null}
-              tooltip="Vote capacity as a percentage of total locked gold"
+              ordered={orderKey === 'votesAvailables'}
+              asc={orderAsc}
+              tooltip="Vote capacity as a percentage of total locked CELO"
             />
             <HeaderCell
-              onClick={this.orderByFn.gold}
+              orderFn={this.orderByFn.celo}
               style={[styles.sizeM]}
-              name="Locked Celo Gold"
-              order={orderBy === 'gold' ? orderAsc : null}
+              name="Locked CELO"
+              ordered={orderKey === 'celo'}
+              asc={orderAsc}
             />
             <HeaderCell
-              onClick={this.orderByFn.commision}
+              orderFn={this.orderByFn.commission}
               style={[styles.sizeM]}
               name="Group Share"
-              order={orderBy === 'commision' ? orderAsc : null}
-              tooltip="Amount of Celo Gold locked by group/validator"
+              ordered={orderKey === 'commission'}
+              asc={orderAsc}
+              tooltip="Amount of CELO locked by group/validator"
             />
             <HeaderCell
-              onClick={this.orderByFn.rewards}
+              orderFn={this.orderByFn.rewards}
               style={[styles.sizeM]}
               name="Voter Rewards"
-              order={orderBy === 'rewards' ? orderAsc : null}
+              ordered={orderKey === 'rewards'}
+              asc={orderAsc}
               tooltip="% of max possible rewards received"
             />
             {/* <HeaderCell
               onClick={this.orderByFn.uptime}
               style={[styles.sizeS]}
               name="Uptime"
-              order={orderBy === 'uptime' ? orderAsc : null}
+              ordered={orderKey === 'uptime'}
+              asc={orderAsc}
               tooltip="Validator performance score"
             /> */}
             <HeaderCell
-              onClick={this.orderByFn.attestation}
+              orderFn={this.orderByFn.attestation}
               style={[styles.sizeS]}
               name="Attestation"
-              order={orderBy === 'attestation' ? orderAsc : null}
+              ordered={orderKey === 'attestation'}
+              asc={orderAsc}
             />
           </View>
           {validatorGroups.map((group, i) => (
-            <div key={group.id} onClick={this.expand.bind(this, i)}>
-              <ValidatorsListRow onPinned={onPinned} group={group} expanded={expanded === i} />
+            <div key={i} onClick={this.expand.bind(this, group.address)}>
+              <ValidatorsListRow
+                group={group}
+                expanded={expanded === group.address}
+                onPinned={this.setData}
+              />
             </div>
           ))}
         </View>

@@ -12,8 +12,7 @@ export enum VerificationStatus {
   Prepping = 1,
   GettingStatus = 2,
   RequestingAttestations = 3,
-  RevealingNumber = 4,
-  RevealAttemptFailed = 5,
+  CompletingAttestations = 4,
   Done = 6,
 }
 
