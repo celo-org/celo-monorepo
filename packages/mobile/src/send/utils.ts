@@ -9,7 +9,6 @@ import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { FeeType } from 'src/fees/actions'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { addAddressToDisplayName } from 'src/identity/actions'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
@@ -188,7 +187,6 @@ export function* handleSendPaymentData(
     contactId: cachedRecipient?.contactId,
   }
 
-  yield put(addAddressToDisplayName(recipient.address, recipient.displayName))
   yield put(storeLatestInRecents(recipient))
 
   if (data.currencyCode) {

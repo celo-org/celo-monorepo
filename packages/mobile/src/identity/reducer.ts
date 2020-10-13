@@ -20,6 +20,7 @@ import {
 } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { Actions as SendActions, StoreLatestInRecentsAction } from 'src/send/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { timeDeltaInSeconds } from 'src/utils/time'
 
@@ -43,7 +44,7 @@ export interface AddressToDataEncryptionKeyType {
 }
 
 export interface AddressToDisplayNameType {
-  [address: string]: string
+  [address: string]: string | undefined
 }
 
 export interface ImportContactProgress {
@@ -94,6 +95,7 @@ export interface State {
   e164NumberToSalt: E164NumberToSaltType
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
   // Doesn't contain all known addresses, use only as a fallback.
+  // TODO: Remove if unused after CIP-8 implementation.
   addressToDisplayName: AddressToDisplayNameType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
@@ -149,7 +151,7 @@ const initialState: State = {
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction | StoreLatestInRecentsAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -215,12 +217,15 @@ export const reducer = (
         ...state,
         e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
       }
-    case Actions.ADD_ADDRESS_TO_DISPLAY_NAME:
+    case SendActions.STORE_LATEST_IN_RECENTS:
+      if (!action.recipient.address) {
+        return state
+      }
       return {
         ...state,
         addressToDisplayName: {
           ...state.addressToDisplayName,
-          [action.address]: action.displayName,
+          [action.recipient.address]: action.recipient.displayName,
         },
       }
     case Actions.IMPORT_CONTACTS:
