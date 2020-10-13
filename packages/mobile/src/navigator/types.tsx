@@ -51,10 +51,6 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
-  [Screens.BackupSocial]: undefined
-  [Screens.BackupSocialIntro]: {
-    incomingFromBackupFlow: boolean
-  }
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -87,6 +83,7 @@ export type StackParamList = {
       makerTokenBalance: string
     }
   }
+  [Screens.ExternalExchanges]: undefined
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeAmount]: {
     isAddFunds: boolean
@@ -107,7 +104,7 @@ export type StackParamList = {
         showZeroBalanceModal?: boolean
       }
     | undefined
-  [Screens.ImportWalletSocial]: undefined
+
   [Screens.ImportContacts]:
     | undefined
     | {
@@ -115,10 +112,6 @@ export type StackParamList = {
         importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.Invite]: undefined
-  [Screens.InviteReview]: {
-    recipient: Recipient
-  }
   [Screens.NameAndNumber]:
     | {
         selectedCountryCodeAlpha2: string

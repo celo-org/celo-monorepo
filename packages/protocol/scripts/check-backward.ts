@@ -17,7 +17,7 @@ const argv = yargs
   )
   .option('exclude', {
     alias: 'e',
-    description: 'Contract name exclusion pattern',
+    description: 'Contract name exclusion regex',
     type: 'string',
   })
   .option('old_contracts', {

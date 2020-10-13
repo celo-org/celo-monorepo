@@ -26,6 +26,11 @@ export function LabeledInput({
   isDarkMode,
 }: LabelProps) {
   const hasError = React.useMemo(() => allErrors && allErrors.includes(name), [allErrors, name])
+
+  const onChange = (newValue) => {
+    return onInput({ name, newValue })
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.labelBox}>
@@ -47,7 +52,7 @@ export function LabeledInput({
         focusStyle={isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused}
         name={name}
         value={value}
-        onChange={onInput}
+        onChangeText={onChange}
       />
       {allErrors && (
         <ErrorDisplay isShowing={hasError} field={getErrorTransKey(displayErrorAs || name)} />

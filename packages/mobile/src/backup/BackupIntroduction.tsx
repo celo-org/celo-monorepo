@@ -1,8 +1,8 @@
-import Button from '@celo/react-components/components/Button.v2'
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import Button from '@celo/react-components/components/Button'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -15,9 +15,9 @@ import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
-import Logo from 'src/icons/Logo.v2'
+import Logo from 'src/icons/Logo'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers.v2'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -95,7 +95,7 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
       <Logo height={32} />
       <Text style={styles.h1}>{t('introTitle')}</Text>
       <Text style={styles.body}>{t('introBody')}</Text>
-      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} />
+      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} testID="SetUpAccountKey" />
     </ScrollView>
   )
 }
