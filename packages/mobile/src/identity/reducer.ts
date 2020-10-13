@@ -364,10 +364,10 @@ export const reducer = (
 }
 
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
-  const { attestationCodes } = state
+  const { attestationCodes, acceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
   for (let i = 0; i < numCompleteAttestations; i++) {
-    attestationCodes[i] = attestationCodes[i] || {
+    attestationCodes[i] = acceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
       issuer: ATTESTATION_ISSUER_PLACEHOLDER,
     }
