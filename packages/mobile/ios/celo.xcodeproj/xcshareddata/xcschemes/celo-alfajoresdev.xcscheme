@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "&quot;$SRCROOT/../scripts/xcode_scheme_build_pre_action.sh&quot; &quot;${ENVFILE:-.env.integration}&quot;&#10;">
+               scriptText = "&quot;$SRCROOT/../scripts/xcode_scheme_build_pre_action.sh&quot; &quot;${ENVFILE:-.env.alfajoresdev}&quot;&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
