@@ -9,7 +9,7 @@ import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
-import { VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { ATTESTATION_REVEAL_TIMEOUT_SECONDS, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
@@ -106,6 +106,7 @@ export interface State {
     isLoading: boolean
     lastFetch: number | null
   } & UpdatableVerificationState
+  lastRevealAttempt: number | null
 }
 
 const initialState: State = {
@@ -143,6 +144,7 @@ const initialState: State = {
     },
     lastFetch: null,
   },
+  lastRevealAttempt: null,
 }
 
 export const reducer = (
@@ -346,6 +348,11 @@ export const reducer = (
           ...action.state,
         },
       }
+    case Actions.SET_LAST_REVEAL_ATTEMPT:
+      return {
+        ...state,
+        lastRevealAttempt: action.time,
+      }
     default:
       return state
   }
@@ -420,5 +427,12 @@ export const isVerificationStateExpiredSelector = (state: RootState) => {
     !state.identity.verificationState.lastFetch ||
     timeDeltaInSeconds(Date.now(), state.identity.verificationState.lastFetch) >
       VERIFICATION_STATE_EXPIRY_SECONDS
+  )
+}
+
+export const isRevealAllowed = ({ identity: { lastRevealAttempt } }: RootState) => {
+  return (
+    !lastRevealAttempt ||
+    timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
   )
 }

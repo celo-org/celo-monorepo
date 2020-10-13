@@ -5,6 +5,10 @@
 replicaCount: 1
 fullnameOverride: false
 
+aws: false
+azure: false
+gcp: false
+
 ingress:
   enabled: false
   annotations: {}
@@ -40,6 +44,7 @@ storage:
   # AKS default storageclasses:
   #   - default for Azure Standard storage (HDD)
   #   - managed-premium for Azure Premium Disks (SSD)
+  # AWS does not have 'default' storage class by default, has "gp2"
   storageClass: default
   accessModes: ReadWriteOnce
   size: 20Gi
@@ -62,16 +67,20 @@ geth:
   ping_ip_from_packet: false
   in_memory_discovery_table: false
   verbosity: 2
-  # Azure static ips
-  public_ips:
+  # static ips
+  public_ip_per_node:
   - 1.2.3.4
   - 5.6.7.8
   service_type: LoadBalancer
+  service_protocols:
+  - TCP
+  - UDP
   expose_rpc_externally: false
   azure_mixed_protocols: true
   use_static_ips: true
   readiness_probe_max_block_age_seconds: 30
   rpc_apis: eth,net,rpc,web3
+  create_network_endpoint_group: false
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:

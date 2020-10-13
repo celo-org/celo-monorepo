@@ -5,6 +5,7 @@
 ### Variables
 
 * [PROXY_ABI](_governance_proxy_.md#const-proxy_abi)
+* [PROXY_SET_IMPLEMENTATION_SIGNATURE](_governance_proxy_.md#const-proxy_set_implementation_signature)
 
 ### Functions
 
@@ -50,13 +51,21 @@
 
 *Defined in [packages/contractkit/src/governance/proxy.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L4)*
 
+___
+
+### `Const` PROXY_SET_IMPLEMENTATION_SIGNATURE
+
+• **PROXY_SET_IMPLEMENTATION_SIGNATURE**: *string* = PROXY_ABI[1].signature
+
+*Defined in [packages/contractkit/src/governance/proxy.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L37)*
+
 ## Functions
 
 ### `Const` getImplementationOfProxy
 
 ▸ **getImplementationOfProxy**(`web3`: Web3, `proxyContractAddress`: string): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L37)*
+*Defined in [packages/contractkit/src/governance/proxy.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L39)*
 
 **Parameters:**
 
@@ -73,7 +82,7 @@ ___
 
 ▸ **setImplementationOnProxy**(`address`: string): *any*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L45)*
+*Defined in [packages/contractkit/src/governance/proxy.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L47)*
 
 **Parameters:**
 

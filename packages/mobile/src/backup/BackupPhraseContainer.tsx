@@ -1,12 +1,13 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
+import Clipboard from '@react-native-community/clipboard'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
-import { isValidBackupPhrase, isValidSocialBackupPhrase } from 'src/backup/utils'
+import { isValidBackupPhrase } from 'src/backup/utils'
 import { Namespaces, withTranslation } from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
@@ -19,7 +20,6 @@ export enum BackupPhraseContainerMode {
 
 export enum BackupPhraseType {
   BACKUP_KEY = 'BACKUP_KEY',
-  SOCIAL_BACKUP = 'SOCIAL_BACKUP',
 }
 
 type Props = {
@@ -66,7 +66,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   render() {
-    const { t, value: words, showCopy, style, mode, type, index, testID } = this.props
+    const { t, value: words, showCopy, style, mode, type, testID } = this.props
 
     return (
       <View style={style}>
@@ -80,9 +80,6 @@ export class BackupPhraseContainer extends React.Component<Props> {
             ) : (
               <Text style={styles.headerText}>{t('yourAccountKey')}</Text>
             ))}
-          {type === BackupPhraseType.SOCIAL_BACKUP && (
-            <Text style={styles.headerText}>{t('socialBackupPhraseHeader', { index })}</Text>
-          )}
           {showCopy && (
             <Touchable borderless={true} onPress={this.onPressCopy}>
               <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
@@ -101,18 +98,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
         {mode === BackupPhraseContainerMode.INPUT && (
           <View style={styles.phraseInputContainer}>
             <PhraseInput
-              style={[
-                styles.phraseInputText,
-                type === BackupPhraseType.SOCIAL_BACKUP && styles.socialPhraseInputText,
-              ]}
+              style={[styles.phraseInputText]}
               value={words || ''}
               placeholder={t('backupPhrasePlaceholder')}
               onChangeText={this.onPhraseInputChange}
-              shouldShowClipboard={
-                type === BackupPhraseType.BACKUP_KEY
-                  ? isValidBackupPhrase
-                  : isValidSocialBackupPhrase
-              }
+              shouldShowClipboard={isValidBackupPhrase}
               underlineColorAndroid="transparent"
               placeholderTextColor={colors.gray4}
               enablesReturnKeyAutomatically={true}
@@ -171,9 +161,6 @@ const styles = StyleSheet.create({
     padding: 14,
     paddingTop: 16,
     textAlignVertical: 'top',
-  },
-  socialPhraseInputText: {
-    minHeight: 90,
   },
 })
 

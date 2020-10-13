@@ -338,6 +338,6 @@ function millisecondsSinceEpoch(timestamp: number) {
 
 function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
   return format(millisecondsSinceEpoch(timestamp), formatRule, {
-    locale: i18next?.language.includes('es') ? es : enUS,
+    locale: i18next?.language?.includes('es') ? es : enUS,
   })
 }
