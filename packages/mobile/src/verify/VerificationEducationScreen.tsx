@@ -56,10 +56,8 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   useFocusEffect(
     // useCallback is needed here: https://bit.ly/2G0WKTJ
     useCallback(() => {
-      if (!partOfOnboarding) {
-        dispatch(fetchVerificationState())
-      }
-    }, [partOfOnboarding])
+      dispatch(fetchVerificationState())
+    }, [])
   )
 
   const onPressStart = (withoutRevealing: boolean) => {
