@@ -115,8 +115,12 @@ class StorageRoot {
       return Err(new InvalidSignature())
     }
 
-    const body = Buffer.from(dataResponse.body || [])
-    const signature = ensureLeading0x(Buffer.from(signatureResponse.body || []).toString('hex'))
+    const [dataBody, signatureBody] = await Promise.all([
+      dataResponse.arrayBuffer(),
+      signatureResponse.arrayBuffer(),
+    ])
+    const body = Buffer.from(dataBody)
+    const signature = ensureLeading0x(Buffer.from(signatureBody).toString('hex'))
 
     const typedData = await buildTypedData(body)
     const guessedSigner = guessEIP712TypedDataSigner(typedData, signature)
