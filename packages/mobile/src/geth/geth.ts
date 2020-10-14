@@ -1,5 +1,6 @@
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
+import * as RNLocalize from 'react-native-localize'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
@@ -204,9 +205,30 @@ export function isProviderConnectionError(error: any) {
 }
 
 async function getStaticNodes(): Promise<string[]> {
+  const tz = RNLocalize.getTimeZone()
+  const region = StaticNodeUtils.getStaticNodeRegion(DEFAULT_TESTNET, tz)
+  Logger.debug(
+    `Fetching static nodes file for ${DEFAULT_TESTNET} in region ${region}, resolved from timezone ${tz}`
+  )
+
+  // If a non-default (i.e. non-empty) region string was returned. Try fetching the regional static nodes file.
+  if (region) {
+    try {
+      const enodes = await StaticNodeUtils.getRegionalStaticNodesAsync(DEFAULT_TESTNET, region)
+      return JSON.parse(enodes)
+    } catch (error) {
+      Logger.error(
+        `Failed to get static nodes for network ${DEFAULT_TESTNET} in region "${region}". ` +
+          `Retrying with no specified region`,
+        error
+      )
+    }
+  }
+
+  // Fetch the default (i.e. non-region specific) static nodes file.
   try {
-    const enodesStr = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
-    return JSON.parse(enodesStr)
+    const enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
+    return JSON.parse(enodes)
   } catch (error) {
     Logger.error(
       `Failed to get static nodes for network ${DEFAULT_TESTNET},` +

@@ -39,58 +39,35 @@ function inRegion(coords: Coordinates, region: Region): boolean {
  * Region names for groups of static nodes deployed around the world for each network.
  * Used as a suffix to the blob name when fetching to get region specific nodes.
  */
+const mainnetRegions = [
+  {
+    name: 'gcp-asia-east1',
+    longitude: { min: 60, max: -170 },
+  },
+  {
+    name: 'gcp-europe-west1',
+    longitude: { min: -25, max: 60 },
+  },
+  {
+    name: 'gcp-southamerica-east1',
+    lattitude: { min: -90, max: 0 },
+    longitude: { min: -170, max: -25 },
+  },
+  {
+    name: 'gcp-us-east1',
+    lattitude: { min: 0, max: 90 },
+    longitude: { min: -105, max: -25 },
+  },
+  {
+    name: 'gcp-us-west1',
+    lattitude: { min: 0, max: 90 },
+    longitude: { min: -170, max: -105 },
+  },
+]
 const StaticNodeRegions: { [network: string]: Region[] } = {
-  mainnet: [
-    {
-      name: 'gcp-asia-east1',
-      longitude: { min: 60, max: -170 },
-    },
-    {
-      name: 'gcp-europe-west1',
-      longitude: { min: -25, max: 60 },
-    },
-    {
-      name: 'gcp-southamerica-east1',
-      lattitude: { min: -90, max: 0 },
-      longitude: { min: -170, max: -25 },
-    },
-    {
-      name: 'gcp-us-east1',
-      lattitude: { min: 0, max: 90 },
-      longitude: { min: -105, max: -25 },
-    },
-    {
-      name: 'gcp-us-west1',
-      lattitude: { min: 0, max: 90 },
-      longitude: { min: -170, max: -105 },
-    },
-  ],
+  mainnet: mainnetRegions,
   // Alias for mainnet
-  rc1: [
-    {
-      name: 'gcp-asia-east1',
-      longitude: { min: 60, max: -170 },
-    },
-    {
-      name: 'gcp-europe-west1',
-      longitude: { min: -25, max: 60 },
-    },
-    {
-      name: 'gcp-southamerica-east1',
-      lattitude: { min: -90, max: 0 },
-      longitude: { min: -170, max: -25 },
-    },
-    {
-      name: 'gcp-us-east1',
-      lattitude: { min: 0, max: 90 },
-      longitude: { min: -105, max: -25 },
-    },
-    {
-      name: 'gcp-us-west1',
-      lattitude: { min: 0, max: 90 },
-      longitude: { min: -170, max: -105 },
-    },
-  ],
+  rc1: mainnetRegions,
 }
 
 export class StaticNodeUtils {
@@ -108,18 +85,18 @@ export class StaticNodeUtils {
    * may route them to suboptimal set of static nodes. The resolution method
    * may be replaced in the future.
    */
-  static getStaticNodeRegion(networkName: string): string {
+  static getStaticNodeRegion(networkName: string, tz?: string): string {
     // Get the lattitude and longitude of the timezone locations.
     // Note: This is the location of the city that the user has the timzone set to.
-    const tz = timezone()
-    const coords = tz.coordinates
+    const tzInfo = timezone(tz)
+    const coords = tzInfo?.coordinates
     if (coords === undefined) {
-      debug('Could not resolve region from timezone %s', tz.name)
+      debug('Could not resolve region from timezone %s', tzInfo?.name)
       return '' // Use the default region of static nodes
     }
     const regions = StaticNodeRegions[networkName] ?? []
     const result = regions.find((region) => inRegion(coords, region))?.name ?? ''
-    debug('Resolved region %q from timezone %s', result, tz.name)
+    debug('Resolved region %q from timezone %s', result, tzInfo?.name)
     return result
   }
 
@@ -144,12 +121,6 @@ export class StaticNodeUtils {
    * @param networkName Name of the network to fetch config for
    */
   static async getStaticNodesAsync(networkName: string): Promise<string> {
-    // Try to get a region-specific set of static nodes or fallback to the default.
-    try {
-      return await this.getRegionalStaticNodesAsync(networkName)
-    } catch {
-      debug('Failed to fetch regional static nodes for %s', networkName)
-      return this.getRegionalStaticNodesAsync(networkName, '')
-    }
+    return this.getRegionalStaticNodesAsync(networkName, '')
   }
 }

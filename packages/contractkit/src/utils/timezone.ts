@@ -14,7 +14,7 @@ export interface Coordinates {
 }
 
 // Timezone information from the IANA timezone database.
-// https://data.iana.org/time-zones/tzdb/zone1970.tab
+// https://data.iana.org/time-zones/tzdb/zone.tab
 export interface Timezone {
   name: string
   countryCodes?: string[]
@@ -22,12 +22,30 @@ export interface Timezone {
   comments?: string
 }
 
-function resolveTimezoneName(): string {
-  return _testTimezoneOverride ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+function resolveTimezoneName(): string | undefined {
+  try {
+    return _testTimezoneOverride ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  } catch {
+    // Intl is not defined in some environments, such as react-native.
+    return undefined
+  }
 }
 
-// Return the current timezone.
-export function timezone(): Timezone {
-  const name = resolveTimezoneName()
-  return timezones[name] ?? { name }
+// Extract a normalized timezone name from the given string. (e.g. remove trailing slashes)
+function normalize(tz: string): string | undefined {
+  return tz.match(/((?:[a-zA-Z_]+)(?:\/[a-zA-Z_]+)*)/)?.[1] ?? undefined
+}
+
+// Return the current timezone, or the timezone with the given name.
+// If the current timezone cannot be resolved, undefined is returned.
+export function timezone(tz?: string): Timezone | undefined {
+  const name = tz ?? resolveTimezoneName()
+  if (name === undefined) {
+    return undefined
+  }
+  const key = normalize(name)
+  if (key === undefined) {
+    return undefined
+  }
+  return timezones[key]
 }

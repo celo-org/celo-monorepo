@@ -28,23 +28,6 @@ describe(StaticNodeUtils, () => {
       fetchMock.mock(testEndpoint('churro'), 404)
       await expect(StaticNodeUtils.getStaticNodesAsync('churro')).rejects.toEqual(new Error())
     })
-
-    it('should retrieve the regional static nodes file for mainnet', async () => {
-      _testSetTimezoneOverride('Asia/Jakarta')
-      fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), mockStaticNodes)
-      const nodes = await StaticNodeUtils.getStaticNodesAsync('mainnet')
-      // Expect that the mocked data was returned.
-      expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
-    })
-
-    it('should fallback to the default static nodes file for mainnet when region is unavailable', async () => {
-      _testSetTimezoneOverride('Asia/Jakarta')
-      fetchMock.mock(testEndpoint('mainnet.gcp-asia-east1'), 404)
-      fetchMock.mock(testEndpoint('mainnet'), mockStaticNodes)
-      const nodes = await StaticNodeUtils.getStaticNodesAsync('mainnet')
-      // Expect that the mocked data was returned.
-      expect(JSON.parse(nodes)).toEqual(mockStaticNodes)
-    })
   })
 
   describe(StaticNodeUtils.getRegionalStaticNodesAsync, () => {
@@ -169,6 +152,13 @@ describe(StaticNodeUtils, () => {
         expect(StaticNodeUtils.getStaticNodeRegion('rc1')).toEqual(region)
       })
     }
+
+    it(`should always select the region based on given timezone when provided`, () => {
+      for (const { timezone, region } of cases) {
+        _testSetTimezoneOverride('Unknown')
+        expect(StaticNodeUtils.getStaticNodeRegion('mainnet', timezone)).toEqual(region)
+      }
+    })
 
     it(`should always select the default baklava region`, () => {
       for (const { timezone } of cases) {

@@ -169,6 +169,8 @@ const networks = {
   },
   baklava: {
     ...defaultConfig,
+    provider: ipcProvider('/Users/victor/nodes/baklava/geth.ipc'),
+    // provider: new Web3.providers.HttpProvider('https://baklava-forno.celo-testnet.org'),
     from: BAKLAVA_FROM,
     network_id: BAKLAVA_NETWORKID,
   },
