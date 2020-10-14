@@ -9,7 +9,7 @@ export function _testSetTimezoneOverride(zone: string | undefined) {
 }
 
 export interface Coordinates {
-  lattitude: number
+  latitude: number
   longitude: number
 }
 

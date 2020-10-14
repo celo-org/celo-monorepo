@@ -12,16 +12,16 @@ interface Range {
   max: number
 }
 
-// Represents a region as a box, specified in degrees of lattitude and longitude.
+// Represents a region as a box, specified in degrees of latitude and longitude.
 interface Region {
   name: string
-  lattitude?: Range
+  latitude?: Range
   longitude?: Range
 }
 
 /**
  * Checks whether the given coordinates are in the given region.
- * @remarks Lattitudes are assumed to be normalized to the range [-90, 90],
+ * @remarks Latitudes are assumed to be normalized to the range [-90, 90],
  * and longitudes to the range [-180, 180].
  */
 function inRegion(coords: Coordinates, region: Region): boolean {
@@ -31,7 +31,7 @@ function inRegion(coords: Coordinates, region: Region): boolean {
     (range.min <= range.max ? range.min <= x && x < range.max : range.min <= x || x < range.max)
 
   return (
-    rangeCheck(coords.lattitude, region.lattitude) && rangeCheck(coords.longitude, region.longitude)
+    rangeCheck(coords.latitude, region.latitude) && rangeCheck(coords.longitude, region.longitude)
   )
 }
 
@@ -50,17 +50,17 @@ const mainnetRegions = [
   },
   {
     name: 'gcp-southamerica-east1',
-    lattitude: { min: -90, max: 0 },
+    latitude: { min: -90, max: 0 },
     longitude: { min: -170, max: -25 },
   },
   {
     name: 'gcp-us-east1',
-    lattitude: { min: 0, max: 90 },
+    latitude: { min: 0, max: 90 },
     longitude: { min: -105, max: -25 },
   },
   {
     name: 'gcp-us-west1',
-    lattitude: { min: 0, max: 90 },
+    latitude: { min: 0, max: 90 },
     longitude: { min: -170, max: -105 },
   },
 ]
@@ -86,7 +86,7 @@ export class StaticNodeUtils {
    * may be replaced in the future.
    */
   static getStaticNodeRegion(networkName: string, tz?: string): string {
-    // Get the lattitude and longitude of the timezone locations.
+    // Get the latitude and longitude of the timezone locations.
     // Note: This is the location of the city that the user has the timzone set to.
     const tzInfo = timezone(tz)
     const coords = tzInfo?.coordinates

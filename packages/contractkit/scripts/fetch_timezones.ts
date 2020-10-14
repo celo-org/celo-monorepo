@@ -6,11 +6,11 @@ import { Timezone } from '../src/utils/timezone'
 const TZ_URL = 'https://data.iana.org/time-zones/tzdb/zone.tab'
 const OUTPUT_PATH = path.normalize(path.join(__dirname, '..', 'src', 'utils', 'timezones.json'))
 
-// Parse a lattitude coordinate as encoded in the zone.tab file.
-function parseLattitude(lat: string): number {
+// Parse a latitude coordinate as encoded in the zone.tab file.
+function parseLatitude(lat: string): number {
   const match = lat.match(/^([+-])(\d{2})(\d{2})(\d{2})?/)
   if (!match) {
-    throw new Error(`Cannot parse ${lat} as lattitude`)
+    throw new Error(`Cannot parse ${lat} as latitude`)
   }
   const [sign, degrees, minutes, seconds] = match.slice(1)
   return Number(sign + '1') * (Number(degrees) + Number(minutes) / 60 + Number(seconds ?? 0) / 60)
@@ -58,7 +58,7 @@ async function main() {
     if (!coordinates) {
       throw new Error(`Could not parse ${row[1]} as coordinates`)
     }
-    const [lattitude, longitude] = [parseLattitude(coordinates[0]), parseLongitude(coordinates[1])]
+    const [latitude, longitude] = [parseLatitude(coordinates[0]), parseLongitude(coordinates[1])]
 
     const [name, comments] = row.slice(2)
     if (!name) {
@@ -68,7 +68,7 @@ async function main() {
     return {
       countryCodes,
       coordinates: {
-        lattitude,
+        latitude,
         longitude,
       },
       name,
