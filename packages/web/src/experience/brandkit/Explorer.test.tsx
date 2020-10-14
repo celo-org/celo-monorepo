@@ -1,4 +1,4 @@
-import { wait, waitFor } from '@testing-library/dom'
+import { waitFor } from '@testing-library/dom'
 import { act, fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
 import { TestProvider } from 'src/_page-tests/test-utils'
