@@ -32,8 +32,14 @@ ___
 
 ###  timezone
 
-▸ **timezone**(): *[Timezone](../interfaces/_utils_timezone_.timezone.md)*
+▸ **timezone**(`tz?`: undefined | string): *[Timezone](../interfaces/_utils_timezone_.timezone.md) | undefined*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L30)*
+*Defined in [packages/contractkit/src/utils/timezone.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L41)*
 
-**Returns:** *[Timezone](../interfaces/_utils_timezone_.timezone.md)*
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`tz?` | undefined &#124; string |
+
+**Returns:** *[Timezone](../interfaces/_utils_timezone_.timezone.md) | undefined*

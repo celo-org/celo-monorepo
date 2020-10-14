@@ -8,14 +8,14 @@
 
 ### Properties
 
-* [lattitude](_utils_timezone_.coordinates.md#lattitude)
+* [latitude](_utils_timezone_.coordinates.md#latitude)
 * [longitude](_utils_timezone_.coordinates.md#longitude)
 
 ## Properties
 
-###  lattitude
+###  latitude
 
-• **lattitude**: *number*
+• **latitude**: *number*
 
 *Defined in [packages/contractkit/src/utils/timezone.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L12)*
 
