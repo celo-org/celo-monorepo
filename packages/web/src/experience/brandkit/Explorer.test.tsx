@@ -1,7 +1,6 @@
-import { waitFor } from '@testing-library/dom'
-import { fireEvent, render } from '@testing-library/react'
+import { wait, waitFor } from '@testing-library/dom'
+import { act, fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
-import { act } from 'react-dom/test-utils'
 import { TestProvider } from 'src/_page-tests/test-utils'
 import Explorer from './Explorer'
 
@@ -58,20 +57,22 @@ const ICONS = [
 
 describe(Explorer, () => {
   describe('when typing in search box', () => {
-    function search() {
+    async function search() {
       const options = render(
         <TestProvider>
           <Explorer icons={ICONS} />
         </TestProvider>
       )
-      const { getByLabelText } = options
+      const { getByText, getByLabelText } = options
+      // Add a waitfor because there is useEffect
+      await waitFor(() => getByText('6 Matching Icons'))
       act(() => {
         fireEvent.change(getByLabelText('search'), { target: { value: 'Stellar' } })
       })
       return options
     }
     it('shows number of icons found', async () => {
-      const { container, getByText } = search()
+      const { container, getByText } = await search()
       await waitFor(
         () => {
           expect(getByText('3 Matching Icons')).toBeVisible()
@@ -81,7 +82,7 @@ describe(Explorer, () => {
     })
 
     it('hides non matching icons', async () => {
-      const { container, getByText } = search()
+      const { container, getByText } = await search()
       await waitFor(
         () => {
           expect(getByText('human')).not.toBeVisible()
@@ -96,7 +97,7 @@ describe(Explorer, () => {
     // If you comment out the <Fade> element, these tests pass
 
     it.skip('finds by description', async () => {
-      const { container, getByText } = search()
+      const { container, getByText } = await search()
       await waitFor(
         () => {
           expect(getByText('star')).toBeVisible()
@@ -106,7 +107,7 @@ describe(Explorer, () => {
     })
 
     it.skip('finds by name', async () => {
-      const { container, getByText } = search()
+      const { container, getByText } = await search()
       await waitFor(
         () => {
           expect(getByText('Stellar Nebula')).toBeVisible()
@@ -116,7 +117,7 @@ describe(Explorer, () => {
     })
 
     it.skip('finds by tag', async () => {
-      const { container, getByText } = search()
+      const { container, getByText } = await search()
       await waitFor(
         () => {
           expect(getByText('Orion')).toBeVisible()
