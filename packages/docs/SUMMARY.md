@@ -20,6 +20,7 @@
 - [Glossary](GLOSSARY.md)
 
 ## CELO Holder Guide
+
 - [Quick Start](celo-holder-guide/quick-start.md)
 - [cUSD Holder Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
@@ -41,6 +42,7 @@
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 
 ## Developer Guide
+
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
@@ -48,7 +50,7 @@
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
-- [Overview]()
+- [Overview](developer-resources/overview.md)
   <!-- - [The Celo Protocol]()
     - [Architecture]()
     - [Similarities with Ethereum]()
@@ -70,7 +72,6 @@
       - [Using Web3 from the Kit](developer-resources/contractkit/notes-web3-with-contractkit.md)
       - [Celo Core Contracts. Wrappers / Registry](developer-resources/contractkit/contracts-wrappers-registry.md)
       - [Querying on-chain identifiers with ODIS](developer-resources/contractkit/odis.md)
-    - [Forno](developer-resources/forno/README.md)
       <!-- - [Example of querying (web3, kit)]()
       - [Example of sending tx (kit)]() -->
     <!-- - [Using Truffle]()
@@ -84,6 +85,7 @@
         - [Expo]() -->
       - [Usage](developer-resources/dappkit/usage.md)
     <!-- - [Guide to Asset Custody]() -->
+  - [Forno](developer-resources/forno/README.md)
   - [Celo for Ethereum Developers](developer-resources/celo-for-eth-devs.md)
   - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
   - [Integrations](developer-resources/integrations/integrations.md)
@@ -111,6 +113,7 @@
       - [explorer/log-explorer](developer-resources/contractkit/reference/modules/_explorer_log_explorer_.md)
       - [LogExplorer](developer-resources/contractkit/reference/classes/_explorer_log_explorer_.logexplorer.md)
       - [governance/proposals](developer-resources/contractkit/reference/modules/_governance_proposals_.md)
+      - [InteractiveProposalBuilder](developer-resources/contractkit/reference/classes/_governance_proposals_.interactiveproposalbuilder.md)
       - [ProposalBuilder](developer-resources/contractkit/reference/classes/_governance_proposals_.proposalbuilder.md)
       - [ProposalTransactionJSON](developer-resources/contractkit/reference/interfaces/_governance_proposals_.proposaltransactionjson.md)
       - [governance/proxy](developer-resources/contractkit/reference/modules/_governance_proxy_.md)
@@ -295,6 +298,8 @@
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
       - [PendingWithdrawal](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)
       - [VotingDetails](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.votingdetails.md)
+      - [wrappers/MetaTransactionWalletDeployer](developer-resources/contractkit/reference/modules/_wrappers_metatransactionwalletdeployer_.md)
+      - [MetaTransactionWalletDeployerWrapper](developer-resources/contractkit/reference/classes/_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)
       - [wrappers/MultiSig](developer-resources/contractkit/reference/modules/_wrappers_multisig_.md)
       - [MultiSigWrapper](developer-resources/contractkit/reference/classes/_wrappers_multisig_.multisigwrapper.md)
       - [TransactionData](developer-resources/contractkit/reference/interfaces/_wrappers_multisig_.transactiondata.md)
@@ -331,6 +336,7 @@
       - [WrapperCache](developer-resources/contractkit/reference/classes/_contract_cache_.wrappercache.md)
       - [BlockExplorer](developer-resources/contractkit/reference/classes/_explorer_block_explorer_.blockexplorer.md)
       - [LogExplorer](developer-resources/contractkit/reference/classes/_explorer_log_explorer_.logexplorer.md)
+      - [InteractiveProposalBuilder](developer-resources/contractkit/reference/classes/_governance_proposals_.interactiveproposalbuilder.md)
       - [ProposalBuilder](developer-resources/contractkit/reference/classes/_governance_proposals_.proposalbuilder.md)
       - [IdentityMetadataWrapper](developer-resources/contractkit/reference/classes/_identity_metadata_.identitymetadatawrapper.md)
       - [WasmBlsBlindingClient](developer-resources/contractkit/reference/classes/_identity_odis_bls_blinding_client_.wasmblsblindingclient.md)
@@ -382,6 +388,7 @@
       - [GoldTokenWrapper](developer-resources/contractkit/reference/classes/_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
       - [GovernanceWrapper](developer-resources/contractkit/reference/classes/_wrappers_governance_.governancewrapper.md)
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
+      - [MetaTransactionWalletDeployerWrapper](developer-resources/contractkit/reference/classes/_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)
       - [MultiSigWrapper](developer-resources/contractkit/reference/classes/_wrappers_multisig_.multisigwrapper.md)
       - [ReleaseGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_releasegold_.releasegoldwrapper.md)
       - [ReserveWrapper](developer-resources/contractkit/reference/classes/_wrappers_reserve_.reservewrapper.md)

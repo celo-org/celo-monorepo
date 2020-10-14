@@ -7,7 +7,7 @@
     "build": "yarn tsc",
     "prepare": "next build",
     "deploy": "yarn run kill-dev; yarn run clean-next-cache; yarn run prepare; gcloud app deploy $MANIFEST",
-    "deploy:dev": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy && yarn view -s dev",
+    "deploy:stage": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=development MANIFEST=stage.yaml yarn run deploy && yarn view -s stage",
     "deploy:prod": "gcloud config set project celo-reserve-site-281118; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy && yarn view",
     "view": "gcloud app browse",
     "kill-dev": "kill -9 $(lsof -ti :3000)",

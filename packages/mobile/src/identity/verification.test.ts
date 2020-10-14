@@ -2,40 +2,43 @@ import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestatio
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
-import { call, delay, select } from 'redux-saga/effects'
+import { all, call, delay, race, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { AppEvents, VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import {
+  Actions,
   cancelVerification,
   completeAttestationCode,
   setCompletedCodes,
   setVerificationStatus,
   udpateVerificationState,
 } from 'src/identity/actions'
-import {
-  balanceSufficientForSigRetrieval,
-  fetchPhoneHashPrivate,
-} from 'src/identity/privateHashing'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   attestationCodesSelector,
+  isBalanceSufficientForSigRetrievalSelector,
   isVerificationStateExpiredSelector,
+  VerificationState,
   verificationStateSelector,
 } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
-  balanceSufficientForAttestations,
+  BALANCE_CHECK_TIMEOUT,
   doVerificationFlow,
   fetchVerificationState,
+  MAX_ACTIONABLE_ATTESTATIONS,
   NUM_ATTESTATIONS_REQUIRED,
-  requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
+import { waitFor } from 'src/redux/sagas-helpers'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
@@ -47,10 +50,6 @@ import {
   mockE164NumberPepper,
   mockPrivateDEK,
   mockPublicDEK,
-  mockVerificationStateInsufficientBalance,
-  mockVerificationStatePartlyVerified,
-  mockVerificationStateUnverified,
-  mockVerificationStateVerified,
 } from 'test/values'
 
 const MockedAnalytics = ValoraAnalytics as any
@@ -140,7 +139,7 @@ const mockAttestationsWrapperUnverified = {
   selectIssuers: jest.fn(() => mockContractKitTxObject),
   findMatchingIssuer: jest.fn(() => 'mockIssuer'),
   validateAttestationCode: jest.fn(() => true),
-  revealPhoneNumberToIssuer: jest.fn(() => ({ ok: true })),
+  revealPhoneNumberToIssuer: jest.fn(() => ({ ok: true, statusCode: 'good', json: () => ({}) })),
   complete: jest.fn(() => mockContractKitTxObject),
 }
 
@@ -161,6 +160,96 @@ const mockAttestationsWrapperPartlyVerified = {
 const mockAccountsWrapper = {
   getWalletAddress: jest.fn(() => Promise.resolve(mockAccount)),
   getDataEncryptionKey: jest.fn(() => Promise.resolve(mockPublicDEK)),
+}
+
+const mockVerificationStateUnverified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 3,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+const mockVerificationStateUnverifiedWithActionableAttestations: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: mockActionableAttestations,
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 3,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+const mockVerificationStatePartlyVerified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 1,
+    total: 3,
+    completed: 2,
+  },
+  isBalanceSufficient: true,
+}
+
+const mockVerificationStateVerified: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: true,
+}
+
+const mockVerificationStateInsufficientBalance: VerificationState = {
+  isLoading: false,
+  lastFetch: 1,
+  phoneHashDetails: {
+    e164Number: mockE164Number,
+    phoneHash: mockE164NumberHash,
+    pepper: mockE164NumberPepper,
+  },
+  actionableAttestations: [],
+  status: {
+    isVerified: false,
+    numAttestationsRemaining: 0,
+    total: 0,
+    completed: 0,
+  },
+  isBalanceSufficient: false,
 }
 
 describe(startVerification, () => {
@@ -244,12 +333,27 @@ describe(fetchVerificationState, () => {
             pepper: mockE164NumberPepper,
           },
         ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
-        [call(balanceSufficientForSigRetrieval), true],
-        [call(balanceSufficientForAttestations, 3), true],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
       ])
       .put(setVerificationStatus(VerificationStatus.GettingStatus))
-      .put(udpateVerificationState(mockVerificationStateUnverified))
+      .put(
+        udpateVerificationState({
+          phoneHashDetails: mockVerificationStateUnverified.phoneHashDetails,
+          actionableAttestations: mockVerificationStateUnverified.actionableAttestations,
+          status: mockVerificationStateUnverified.status,
+        })
+      )
       .run()
   })
 
@@ -272,15 +376,25 @@ describe(fetchVerificationState, () => {
             pepper: mockE164NumberPepper,
           },
         ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
-        [call(balanceSufficientForSigRetrieval), true],
-        [call(balanceSufficientForAttestations, 0), true],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
       ])
       .put(setVerificationStatus(VerificationStatus.GettingStatus))
       .put(
         udpateVerificationState({
-          ...mockVerificationStatePartlyVerified,
+          phoneHashDetails: mockVerificationStatePartlyVerified.phoneHashDetails,
           actionableAttestations: [mockActionableAttestations[0]],
+          status: mockVerificationStatePartlyVerified.status,
         })
       )
       .run()
@@ -301,16 +415,49 @@ describe(fetchVerificationState, () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
         [select(dataEncryptionKeySelector), mockPrivateDEK],
-        [call(balanceSufficientForSigRetrieval), false],
-        [select(verificationStateSelector), mockVerificationStateUnverified],
+        [select(isBalanceSufficientForSigRetrievalSelector), false],
       ])
-      .put(
-        udpateVerificationState({
-          ...mockVerificationStateUnverified,
-          isBalanceSufficient: false,
-        })
-      )
+      .not.put.like({ action: { type: Actions.UPDATE_VERIFICATION_STATE } })
+      .run()
+  })
+  it('catches when balances are not fetched', async () => {
+    const contractKit = await getContractKitAsync()
+    await expectSaga(fetchVerificationState)
+      .provide([
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperUnverified,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
+        ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: true },
+        ],
+      ])
+      .not.put.like({ action: { type: Actions.UPDATE_VERIFICATION_STATE } })
       .run()
   })
 })
@@ -322,6 +469,10 @@ describe(doVerificationFlow, () => {
       .provide([
         [select(verificationStateSelector), mockVerificationStateUnverified],
         [call(getConnectedUnlockedAccount), mockAccount],
+        // TODO (i1skn): remove next two lines when
+        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -332,8 +483,7 @@ describe(doVerificationFlow, () => {
       ])
       .put(setVerificationStatus(VerificationStatus.Prepping))
       .put(setCompletedCodes(0))
-      .put(setVerificationStatus(VerificationStatus.RequestingAttestations))
-      .put(setVerificationStatus(VerificationStatus.RevealingNumber))
+      .put(setVerificationStatus(VerificationStatus.CompletingAttestations))
       .put(completeAttestationCode(attestationCode0))
       .put(completeAttestationCode(attestationCode1))
       .put(completeAttestationCode(attestationCode2))
@@ -349,6 +499,10 @@ describe(doVerificationFlow, () => {
       .provide([
         [select(verificationStateSelector), mockVerificationStatePartlyVerified],
         [call(getConnectedUnlockedAccount), mockAccount],
+        // TODO (i1skn): remove next two lines when
+        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperPartlyVerified,
@@ -390,16 +544,10 @@ describe(doVerificationFlow, () => {
   })
 
   it('shows error on unexpected failure', async () => {
-    const contractKit = await getContractKitAsync()
     await expectSaga(doVerificationFlow)
       .provide([
         [select(verificationStateSelector), mockVerificationStateUnverified],
-        [call(getConnectedUnlockedAccount), mockAccount],
-        [
-          call([contractKit.contracts, contractKit.contracts.getAttestations]),
-          mockAttestationsWrapperUnverified,
-        ],
-        [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
+        [matchers.call.fn(getConnectedUnlockedAccount), throwError(new Error('fake error'))],
       ])
       .put(showError(ErrorMessages.VERIFICATION_FAILURE))
       .put(setVerificationStatus(VerificationStatus.Failed))
@@ -407,29 +555,41 @@ describe(doVerificationFlow, () => {
       .run()
   })
 
-  it('shows error on reveal failure', async () => {
-    const mockAttestationsWrapperRevealFailure = {
-      ...mockAttestationsWrapperPartlyVerified,
-      revealPhoneNumberToIssuer: jest.fn(() => {
-        throw new Error('Reveal error')
-      }),
+  it(`fails if more than ${MAX_ACTIONABLE_ATTESTATIONS} actionable attestaions exceeded`, async () => {
+    const mockAttestationsWrapperRevealFailed = {
+      ...mockAttestationsWrapperUnverified,
+      revealPhoneNumberToIssuer: jest.fn(() => ({
+        ok: false,
+        statusCode: 'bad',
+        json: () => ({}),
+      })),
+
       getActionableAttestations: jest.fn(() => mockActionableAttestations),
     }
+
     const contractKit = await getContractKitAsync()
 
     await expectSaga(doVerificationFlow)
       .provide([
-        [select(verificationStateSelector), mockVerificationStateUnverified],
+        [
+          select(verificationStateSelector),
+          mockVerificationStateUnverifiedWithActionableAttestations,
+        ],
         [call(getConnectedUnlockedAccount), mockAccount],
+        // TODO (i1skn): remove next two lines when
+        // https://github.com/celo-org/celo-labs/issues/578 is resolved
+        [delay(5000), true],
+        [delay(10000), true],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
-          mockAttestationsWrapperRevealFailure,
+          mockAttestationsWrapperRevealFailed,
         ],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
         [select(attestationCodesSelector), attestationCodes],
       ])
-      .put(setVerificationStatus(VerificationStatus.RevealAttemptFailed))
+      .put(setVerificationStatus(VerificationStatus.Failed))
+      .returns(ErrorMessages.MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED)
       .run()
   })
 })

@@ -2,13 +2,25 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Clipboard, Linking, Platform } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import { all, call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  put,
+  race,
+  spawn,
+  take,
+  TakeEffect,
+  takeLeading,
+} from 'redux-saga/effects'
+import { Actions as AccountActions } from 'src/account/actions'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -34,6 +46,8 @@ import {
   sendInviteFailure,
   sendInviteSuccess,
   SENTINEL_INVITE_COMMENT,
+  skipInviteFailure,
+  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
@@ -280,31 +294,38 @@ function* sendInviteSaga(action: SendInviteAction) {
   }
 }
 
-export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
+export function* redeemInviteSaga({ tempAccountPrivateKey }: RedeemInviteAction) {
   yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
   const {
     result,
+    cancel,
     timeout,
   }: {
-    result: { success: true; newAccount: string } | { success: false }
-    timeout: true
+    result: { success: true; newAccount: string } | { success: false } | undefined
+    cancel: TakeEffect | undefined
+    timeout: true | undefined
   } = yield race({
-    result: call(doRedeemInvite, inviteCode),
+    result: call(doRedeemInvite, tempAccountPrivateKey),
+    cancel: take(AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  if (result.success === true) {
+  if (result?.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
+    yield put(refreshAllBalances())
     navigate(Screens.VerificationEducationScreen)
     // Note: We are ok with this succeeding or failing silently in the background,
     // user will have another chance to register DEK when sending their first tx
     yield spawn(registerAccountDek, result.newAccount)
-  } else if (result.success === false) {
+  } else if (result?.success === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
     yield put(redeemInviteFailure())
+  } else if (cancel) {
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_cancel)
+    Logger.debug(TAG, 'Redeem Invite cancelled')
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_timeout)
@@ -313,16 +334,16 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   }
 }
 
-export function* doRedeemInvite(inviteCode: string) {
+export function* doRedeemInvite(tempAccountPrivateKey: string) {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
-    const tempAccount = privateKeyToAddress(inviteCode)
+    const tempAccount = privateKeyToAddress(tempAccountPrivateKey)
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
 
     const [tempAccountBalanceWei, newAccount]: [BigNumber, string] = yield all([
       call(fetchTokenBalanceInWeiWithRetry, CURRENCY_ENUM.DOLLAR, tempAccount),
       call(getOrCreateAccount),
-      call(addTempAccountToWallet, inviteCode),
+      call(addTempAccountToWallet, tempAccountPrivateKey),
     ])
 
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
@@ -365,29 +386,34 @@ export function* skipInvite() {
   try {
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
     yield call(getOrCreateAccount)
+    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
+    // (`setHasSeenVerificationNux` though the user hasn't seen it),
+    // we should prefer a more atomic approach with a meaningful action type
     yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
     navigateHome()
+    yield put(skipInviteSuccess())
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
+    yield put(skipInviteFailure())
   }
 }
 
-function* addTempAccountToWallet(inviteCode: string) {
+function* addTempAccountToWallet(tempAccountPrivateKey: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
     const wallet: UnlockableWallet = yield call(getWallet)
-    const account = privateKeyToAddress(inviteCode)
+    const account = privateKeyToAddress(tempAccountPrivateKey)
     const password: string = yield call(getPasswordSaga, account, false, true)
-    const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, password)
+    const tempAccount = yield call([wallet, wallet.addAccount], tempAccountPrivateKey, password)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
-    if (e.toString().includes('account already exists')) {
+    if (e.message === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
       return
     }
@@ -442,7 +468,14 @@ export function* moveAllFundsFromAccount(
 
   const context = newTransactionContext(TAG, 'Transfer from temp wallet')
   // Temporarily hardcoding gas estimate to save time on estimation
-  yield call(sendTransaction, tx.txo, account, context, SEND_TOKEN_GAS_ESTIMATE)
+  yield call(
+    sendTransaction,
+    tx.txo,
+    account,
+    context,
+    SEND_TOKEN_GAS_ESTIMATE,
+    AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
+  )
   Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 

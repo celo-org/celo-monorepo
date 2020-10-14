@@ -2,7 +2,7 @@
 
 Celo uses a formal on-chain governance mechanism to manage and upgrade the protocol such as for upgrading smart contracts, adding new stable currencies, or modifying the reserve target asset allocation. All changes must be agreed upon by CELO holders. A quorum threshold model is used to determine the number of votes needed for a proposal to pass.
 
-## How it works
+## Stakeholder Proposal Process
 
 Changes are managed via the Celo `Governance` smart contract. This contract acts as an "owner" for making modifications to other protocol smart contracts. Such smart contracts are termed **governable**. The `Governance` contract will at first be owned by a multi-signature wallet. In the future, when the community's experience of DAOs \(Distributed Autonomous Organizations\) has evolved and when the platform has proven to be stable and secure, it will be owned by CELO holders effectively acting as a DAO.
 
@@ -17,17 +17,17 @@ The change procedure happens in the following phases:
 **Note:** the timings mentioned in the rest of this section are for the Alfajores Testnet. It is expected that mainnet timings will be much longer to allow for proper proposal review and engagement.
 {% endhint %}
 
-## Proposal
+### Proposal
 
 Any user may submit a “Proposal” to the `Governance` smart contract, along with a small deposit of CELO. This deposit is required to avoid spam proposals, and is refunded to the proposer if the community decides the proposal is worthy of voting on. A “Proposal” consists of a timestamp and the information needed to the “call” the operation code that will run if the proposal is accepted. This information includes an address, data, and value. Submitted proposals are added to the queue of proposals and expire from this list after one week.
 
 Once added to the queue, a proposal needs to get voted on by CELO holders to pass to the next “Approval” phase. Every CELO holder with a Locked Gold account may vote for at most one proposal and in order to be eligible to do so, the account must put up a commitment, which involves sending CELO to a smart contract and specifying a notice period to wait once the withdrawal is requested. This Locked Gold commitment can be the same as the funds used for validator elections and earning epoch rewards. The list of proposals is sorted by the weight of the votes they have received.
 
-## Approval
+### Approval
 
 Every day the top three proposals at the head of the queue are popped off and move to the approval phase. At this time, the original proposers are eligible to reclaim their Locked Gold commitment. In this phase graduated proposals need to be approved by the approver within the current approval phase of a day. The approver is initially a multi-signature address and will move to a DAO in the future. If a proposal is not approved within this phase, it is considered expired and does not move on to the “Referendum” phase.
 
-## Referendum
+### Referendum
 
 Once the Approval phase is over, approved proposals graduate to the referendum phase. Any user may vote yes, no, or abstain on these proposals. Their vote's weight is determined by the weight of their Locked Gold commitment. After the Referendum phase is over, which lasts two days, each proposal is marked as passed or failed as a function of the votes and the corresponding passing function parameters.
 
@@ -36,11 +36,27 @@ In order for a proposal to pass, it must meet a minimum threshold for **particip
 * Participation is the minimum portion of Locked Gold which must cast a vote for a proposal to pass. It exists to prevent proposals passing with very low participation. The participation requirement is calculated as a governable portion of the participation baseline, which is an exponential moving average of final participation in past governance proposals.
 * Agreement is the portion of votes cast that must be "yes" votes for a proposal to pass. Each contract and function can define a required level of agreement, and the required agreement for a proposal is the maximum requirement among its constituent transactions.
 
-## Execution
+### Execution
 
 Proposals that graduate from the Referendum phase to the execution phase may be executed by anyone, triggering a “call” operation code with the arguments defined in the proposal, originating from the `Governance` smart contract. Proposals expire from this phase after two days.
 
-## Hotfix
+## Smart Contract Upgradeability
+​
+Smart contracts deployed to an EVM blockchain like Celo are immutable. To allow
+for improvements, new features, and bug fixes, the Celo codebase uses the
+[Proxy Upgrade Pattern](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies). All of the core contracts owned by Governance are proxied. Thus, a smart contract implementation can be upgraded using the standard on-chain governance process.
+​
+### Upgrade risks
+​
+The core contracts define critical behavior of the Celo network such as CELO and Celo Dollar asset management or validator elections and rewards. Malicious or inadvertent contract bugs could compromise user balances or cause potentially irreversible harm without a blockchain hard fork.
+
+Great care must be taken to ensure that any Governance proposal that modifies smart contract code will not break the existing system. To this end, the contracts have a well defined [release process](../../community/release-process/smart-contracts.md), which includes soliciting security audits from reputable third-party auditors.
+
+As Celo is a decentralized network, all Celo network participants are invited to
+participate in the  governance proposals discussions on the [forum](https://forum.celo.org/c/governance/12).
+
+
+## Validator Hotfix Process
 
 The cadence and transparency of the standard on-chain governance protocol make it poorly suited for proposals that patch issues that may compromise the security of the network, especially when the patch would reveal an exploitable bug in one of the core contracts. Instead, these sorts of changes are better suited for the more responsive, and less transparent, hotfix protocol.
 
@@ -50,5 +66,4 @@ Note that this means the validators may not always know the contents of the prop
 
 ## Celo Blockchain Software Upgrades
 
-Some changes cannot be made through the on-chain governance process alone. Examples include changes to the underlying consensus protocol and changes which would result in a hard-fork. When Celo Blockchain software upgrades are required to continue operating correctly on the network, a "Minimum Client Version" parameter is set to indicate the minimum version that it required.
-
+Some changes cannot be made through the on-chain governance process (via proposal or hotfix) alone. Examples include changes to the underlying consensus protocol and changes which would result in a hard-fork. When Celo Blockchain software upgrades are required to continue operating correctly on the network, a "Minimum Client Version" parameter is set to indicate the minimum version that it required.

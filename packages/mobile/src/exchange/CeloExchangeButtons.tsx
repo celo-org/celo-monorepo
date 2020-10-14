@@ -1,6 +1,6 @@
 // VIEW which contains buy and sell buttons for CELO.
 
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import { CURRENCY_ENUM } from '@celo/utils'
 import { StackNavigationProp } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
@@ -65,6 +65,7 @@ export default function CeloExchangeButtons({ navigation }: Props) {
           onPress={goToBuyGold}
           style={styles.button}
           type={BtnTypes.TERTIARY}
+          testID="BuyCelo"
         />
       )}
       {hasGold && (
@@ -74,6 +75,7 @@ export default function CeloExchangeButtons({ navigation }: Props) {
           onPress={goToBuyDollars}
           style={styles.button}
           type={BtnTypes.TERTIARY}
+          testID="SellCelo"
         />
       )}
     </View>

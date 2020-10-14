@@ -110,3 +110,20 @@ GenesisBlockUtils.getChainIdFromGenesis = jest.fn()
 export const StaticNodeUtils = jest.fn().mockImplementation()
 StaticNodeUtils.getStaticNodesAsync = jest.fn()
 StaticNodeUtils.getStaticNodesGoogleStorageBucketName = jest.fn()
+
+export const OdisUtils = {
+  Query: {
+    ODIS_ALFAJORESSTAGING_CONTEXT: {
+      odisUrl: 'alfajoresstaging',
+      odisPubKey: 'alfajoresstaging',
+    },
+    ODIS_ALFAJORES_CONTEXT: {
+      odisUrl: 'alfajores',
+      odisPubKey: 'alfajores',
+    },
+    ODIS_MAINNET_CONTEXT: {
+      odisUrl: 'mainnet',
+      odisPubKey: 'mainnet',
+    },
+  },
+}

@@ -2,15 +2,15 @@ import { generateKeys, validateMnemonic } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import * as bip39 from 'react-native-bip39'
-import { call, put, spawn, takeLeading } from 'redux-saga/effects'
+import { call, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { storeMnemonic } from 'src/backup/utils'
+import { currentLanguageSelector } from 'src/app/reducers'
+import { getWordlist, storeMnemonic } from 'src/backup/utils'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
-import { fetchVerificationState } from 'src/identity/verification'
 import {
   Actions,
   ImportBackupPhraseAction,
@@ -30,7 +30,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
   Logger.debug(TAG + '@importBackupPhraseSaga', 'Importing backup phrase')
   yield call(waitWeb3LastBlock)
   try {
-    if (!validateMnemonic(phrase, undefined, bip39)) {
+    const wordlist = getWordlist(yield select(currentLanguageSelector))
+    if (!validateMnemonic(phrase, wordlist, bip39)) {
       Logger.error(TAG + '@importBackupPhraseSaga', 'Invalid mnemonic')
       yield put(showError(ErrorMessages.INVALID_BACKUP_PHRASE))
       yield put(importBackupPhraseFailure())
@@ -83,7 +84,6 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       yield put(setHasSeenVerificationNux(true))
       navigateHome()
     } else {
-      yield call(fetchVerificationState)
       navigate(Screens.VerificationEducationScreen)
     }
 

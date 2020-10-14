@@ -33,6 +33,7 @@ exports[`HomePage renders 1`] = `
         "minHeight": "100vh",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "paddingTop": "75px",
@@ -167,6 +168,7 @@ exports[`HomePage renders 1`] = `
             aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -195,6 +197,7 @@ exports[`HomePage renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -216,6 +219,7 @@ exports[`HomePage renders 1`] = `
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -236,6 +240,7 @@ exports[`HomePage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -267,19 +272,16 @@ exports[`HomePage renders 1`] = `
             autoCapitalize="sentences"
             autoComplete="on"
             autoCorrect="on"
-            className="css-textinput-1cwyjr8 r-placeholderTextColor-tf24u1"
+            className="css-textinput-11aywtz r-placeholderTextColor-tf24u1"
             data-focusable={true}
             dir="auto"
-            name="email"
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
             onKeyDown={[Function]}
-            onKeyPress={[Function]}
             onSelect={[Function]}
             placeholder="saluton@celo.org"
             readOnly={false}
-            required={true}
             spellCheck={true}
             style={
               Object {
@@ -344,6 +346,7 @@ exports[`HomePage renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -372,13 +375,12 @@ exports[`HomePage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -465,6 +467,7 @@ exports[`HomePage renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "MozTransitionProperty": "opacity",
@@ -499,7 +502,7 @@ exports[`HomePage renders 1`] = `
               </svg>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "marginLeft": "10px",
@@ -527,6 +530,7 @@ exports[`HomePage renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -618,7 +622,6 @@ exports[`HomePage renders 1`] = `
                   style={
                     Object {
                       "backgroundColor": "rgba(0,0,0,0.00)",
-                      "backgroundImage": "url(\\"image.png\\")",
                       "backgroundPosition": "center",
                       "backgroundRepeat": "no-repeat",
                       "backgroundSize": "cover",
@@ -633,18 +636,13 @@ exports[`HomePage renders 1`] = `
                     }
                   }
                 />
-                <img
-                  alt=""
-                  className="css-accessibilityImage-9pa8cd"
-                  draggable={false}
-                  src="image.png"
-                />
               </div>
             </div>
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -726,7 +724,6 @@ exports[`HomePage renders 1`] = `
                   style={
                     Object {
                       "backgroundColor": "rgba(0,0,0,0.00)",
-                      "backgroundImage": "url(\\"image.png\\")",
                       "backgroundPosition": "center",
                       "backgroundRepeat": "no-repeat",
                       "backgroundSize": "cover",
@@ -741,18 +738,13 @@ exports[`HomePage renders 1`] = `
                     }
                   }
                 />
-                <img
-                  alt=""
-                  className="css-accessibilityImage-9pa8cd"
-                  draggable={false}
-                  src="image.png"
-                />
               </div>
             </div>
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -854,7 +846,6 @@ exports[`HomePage renders 1`] = `
                   style={
                     Object {
                       "backgroundColor": "rgba(0,0,0,0.00)",
-                      "backgroundImage": "url(\\"image.png\\")",
                       "backgroundPosition": "center",
                       "backgroundRepeat": "no-repeat",
                       "backgroundSize": "cover",
@@ -869,18 +860,13 @@ exports[`HomePage renders 1`] = `
                     }
                   }
                 />
-                <img
-                  alt=""
-                  className="css-accessibilityImage-9pa8cd"
-                  draggable={false}
-                  src="image.png"
-                />
               </div>
             </div>
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -920,6 +906,7 @@ exports[`HomePage renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -949,6 +936,7 @@ exports[`HomePage renders 1`] = `
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -969,6 +957,7 @@ exports[`HomePage renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -1012,8 +1001,6 @@ exports[`HomePage renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1111,8 +1098,6 @@ exports[`HomePage renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1221,8 +1206,325 @@ exports[`HomePage renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "100px",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "100px",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "contain",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Global Impact
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          A mobile-first approach that provides the opportunity to positively impact 5.6B smartphone owners globally
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "100px",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "100px",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "contain",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Solving Community Needs
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Supported by a mission-aligned network of technologists, international NGOs, and organizations committed to building an inclusive financial system
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitFlexBasis": "auto",
+              "flexBasis": "auto",
+              "height": "100px",
+              "msFlexPreferredSize": "auto",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+              "width": "100px",
+              "zIndex": 0,
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "backgroundPosition": "center",
+                "backgroundRepeat": "no-repeat",
+                "backgroundSize": "contain",
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "right": "0px",
+                "top": "0px",
+                "width": "100%",
+                "zIndex": -1,
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "marginBottom": "20px",
+              "marginTop": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Usability-focused tech innovations
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Technology innovations allow Celo to truly work across devices, carriers, & countries
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "50px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
+        "paddingLeft": "0px",
+        "paddingRight": "0px",
         "width": "100%",
       }
     }
@@ -1239,25 +1541,18 @@ exports[`HomePage renders 1`] = `
           "msFlexNegative": 0,
           "msFlexPositive": 0,
           "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
+          "paddingLeft": "0px",
+          "paddingRight": "0px",
           "paddingTop": "10px",
           "width": "100%",
         }
       }
     >
       <div
-        className="css-view-1dbjc4n"
+        className="react-reveal"
         style={
           Object {
-            "WebkitFlexBasis": "auto",
-            "flexBasis": "auto",
-            "height": "100px",
-            "msFlexPreferredSize": "auto",
-            "overflowX": "hidden",
-            "overflowY": "hidden",
-            "width": "100px",
-            "zIndex": 0,
+            "opacity": undefined,
           }
         }
       >
@@ -1265,251 +1560,332 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
-              "backgroundPosition": "center",
-              "backgroundRepeat": "no-repeat",
-              "backgroundSize": "contain",
-              "bottom": "0px",
-              "height": "100%",
-              "left": "0px",
-              "position": "absolute",
-              "right": "0px",
-              "top": "0px",
-              "width": "100%",
-              "zIndex": -1,
+              "display": "block",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
             }
           }
-        />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
+        >
+          <div
+            style={
+              Object {
+                "display": "block",
+                "paddingBottom": "56.136606189967985%",
+                "width": "100%",
+              }
+            }
+          />
+          <div
+            style={
+              Object {
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "top": "0px",
+                "width": "100%",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitFlexBasis": "auto",
+                  "flexBasis": "auto",
+                  "height": "100%",
+                  "msFlexPreferredSize": "auto",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "100%",
+                  "zIndex": 0,
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "backgroundPosition": "center",
+                    "backgroundRepeat": "no-repeat",
+                    "backgroundSize": "cover",
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "right": "0px",
+                    "top": "0px",
+                    "width": "100%",
+                    "zIndex": -1,
+                  }
+                }
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "16px",
-            "fontWeight": "500",
-            "lineHeight": "18px",
-            "marginBottom": "20px",
-            "marginTop": "20px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Global Impact
-      </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        A mobile-first approach that provides the opportunity to positively impact 5.6B smartphone owners globally
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
       <div
         className="css-view-1dbjc4n"
         style={
           Object {
-            "WebkitFlexBasis": "auto",
-            "flexBasis": "auto",
-            "height": "100px",
-            "msFlexPreferredSize": "auto",
-            "overflowX": "hidden",
-            "overflowY": "hidden",
-            "width": "100px",
-            "zIndex": 0,
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxPack": "center",
+            "WebkitJustifyContent": "center",
+            "alignItems": "center",
+            "justifyContent": "center",
+            "msFlexAlign": "center",
+            "msFlexPack": "center",
           }
         }
       >
+        <h2
+          aria-level="2"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "28px",
+              "lineHeight": "32px",
+              "marginTop": "20px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          A Gift of Heart: For Value Flowers
+        </h2>
+        <h4
+          aria-level="4"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          onClick={[Function]}
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "marginBottom": "20px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          Art inspired by the spirit and mission of Celo
+        </h4>
         <div
           className="css-view-1dbjc4n"
           style={
             Object {
-              "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
-              "backgroundPosition": "center",
-              "backgroundRepeat": "no-repeat",
-              "backgroundSize": "contain",
-              "bottom": "0px",
-              "height": "100%",
-              "left": "0px",
-              "position": "absolute",
-              "right": "0px",
-              "top": "0px",
-              "width": "100%",
-              "zIndex": -1,
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "flexDirection": "row",
+              "msFlexDirection": "row",
             }
           }
-        />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
-      </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "16px",
-            "fontWeight": "500",
-            "lineHeight": "18px",
-            "marginBottom": "20px",
-            "marginTop": "20px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Solving Community Needs
-      </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Supported by a mission-aligned network of technologists, international NGOs, and organizations committed to building an inclusive financial system
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitFlexBasis": "auto",
-            "flexBasis": "auto",
-            "height": "100px",
-            "msFlexPreferredSize": "auto",
-            "overflowX": "hidden",
-            "overflowY": "hidden",
-            "width": "100px",
-            "zIndex": 0,
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
-              "backgroundPosition": "center",
-              "backgroundRepeat": "no-repeat",
-              "backgroundSize": "contain",
-              "bottom": "0px",
-              "height": "100%",
-              "left": "0px",
-              "position": "absolute",
-              "right": "0px",
-              "top": "0px",
-              "width": "100%",
-              "zIndex": -1,
-            }
-          }
-        />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
-      </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "16px",
-            "fontWeight": "500",
-            "lineHeight": "18px",
-            "marginBottom": "20px",
-            "marginTop": "20px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Usability-focused tech innovations
-      </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Technology innovations allow Celo to truly work across devices, carriers, & countries
+        >
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitJustifyContent": "center",
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "borderBottomColor": "rgba(0,0,0,0.00)",
+                  "borderLeftColor": "rgba(0,0,0,0.00)",
+                  "borderRightColor": "rgba(0,0,0,0.00)",
+                  "borderTopColor": "rgba(0,0,0,0.00)",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "justifyContent": "center",
+                  "msFlexDirection": "row",
+                  "msFlexPack": "center",
+                  "msFlexPositive": 0,
+                  "opacity": 1,
+                  "outlineColor": "transparent",
+                  "width": "fit-content",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/flowers"
+                onClick={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "alignItems": "center",
+                    "color": "rgba(53,208,127,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "16px",
+                    "marginRight": "30px",
+                    "msFlexAlign": "center",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                For Value Flowers
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingLeft": "0.4em",
+                      "paddingTop": "0.185em",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height="0.75em"
+                    style={Object {}}
+                    transform="rotate(0)"
+                    viewBox="0 0 8 12"
+                    width="0.75em"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                      fill="#35D07F"
+                      fillRule="evenodd"
+                      opacity={1}
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexDirection": "row",
+                  "WebkitFlexGrow": 0,
+                  "WebkitJustifyContent": "center",
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "borderBottomColor": "rgba(0,0,0,0.00)",
+                  "borderLeftColor": "rgba(0,0,0,0.00)",
+                  "borderRightColor": "rgba(0,0,0,0.00)",
+                  "borderTopColor": "rgba(0,0,0,0.00)",
+                  "flexDirection": "row",
+                  "flexGrow": 0,
+                  "justifyContent": "center",
+                  "msFlexDirection": "row",
+                  "msFlexPack": "center",
+                  "msFlexPositive": 0,
+                  "opacity": 1,
+                  "outlineColor": "transparent",
+                  "width": "fit-content",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://app.livestorm.co/clabs/kuneco"
+                onClick={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "alignItems": "center",
+                    "color": "rgba(53,208,127,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "16px",
+                    "msFlexAlign": "center",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Kuneco
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingLeft": "0.4em",
+                      "paddingTop": "0.185em",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height="0.75em"
+                    style={Object {}}
+                    transform="rotate(0)"
+                    viewBox="0 0 8 12"
+                    width="0.75em"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                      fill="#35D07F"
+                      fillRule="evenodd"
+                      opacity={1}
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1543,6 +1919,7 @@ exports[`HomePage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1603,6 +1980,7 @@ exports[`HomePage renders 1`] = `
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -1637,6 +2015,7 @@ exports[`HomePage renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1738,6 +2117,7 @@ exports[`HomePage renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1755,6 +2135,7 @@ exports[`HomePage renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(221,221,221,1.00)",
@@ -1789,8 +2170,6 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <div
                 className="css-view-1dbjc4n"
@@ -1986,6 +2365,7 @@ exports[`HomePage renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2003,6 +2383,7 @@ exports[`HomePage renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(221,221,221,1.00)",
@@ -2037,8 +2418,6 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <div
                 className="css-view-1dbjc4n"
@@ -2132,8 +2511,6 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <div
                 className="css-view-1dbjc4n"
@@ -2247,6 +2624,7 @@ exports[`HomePage renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2558,8 +2936,6 @@ exports[`HomePage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -2673,6 +3049,7 @@ exports[`HomePage renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2752,13 +3129,12 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2861,13 +3237,12 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2938,13 +3313,12 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3015,13 +3389,12 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3092,13 +3465,12 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3169,13 +3541,12 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3232,6 +3603,7 @@ exports[`HomePage renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -3277,6 +3649,7 @@ exports[`HomePage renders 1`] = `
             aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -3294,6 +3667,7 @@ exports[`HomePage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(255,255,255,1.00)",
@@ -3336,8 +3710,6 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3403,8 +3775,6 @@ exports[`HomePage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <div
                 className="css-view-1dbjc4n"
@@ -3573,7 +3943,6 @@ exports[`HomePage renders 1`] = `
                     Object {
                       "WebkitFilter": "blur(20px)",
                       "backgroundColor": "rgba(0,0,0,0.00)",
-                      "backgroundImage": "url(\\"image.png\\")",
                       "backgroundPosition": "center",
                       "backgroundRepeat": "no-repeat",
                       "backgroundSize": "cover",
@@ -3588,12 +3957,6 @@ exports[`HomePage renders 1`] = `
                       "zIndex": -1,
                     }
                   }
-                />
-                <img
-                  alt=""
-                  className="css-accessibilityImage-9pa8cd"
-                  draggable={false}
-                  src="image.png"
                 />
               </div>
             </div>
@@ -3683,2989 +4046,6 @@ exports[`HomePage renders 1`] = `
   </div>
   <div
     className="css-view-1dbjc4n"
-    id="timeline"
-    style={
-      Object {
-        "WebkitAlignSelf": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitFlexDirection": "column",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "marginLeft": "10px",
-        "marginTop": "50px",
-        "maxWidth": "100vw",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitFlexBasis": "auto",
-            "flexBasis": "auto",
-            "height": "55px",
-            "msFlexPreferredSize": "auto",
-            "overflowX": "hidden",
-            "overflowY": "hidden",
-            "width": "75px",
-            "zIndex": 0,
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
-              "backgroundPosition": "center",
-              "backgroundRepeat": "no-repeat",
-              "backgroundSize": "contain",
-              "bottom": "0px",
-              "height": "100%",
-              "left": "0px",
-              "position": "absolute",
-              "right": "0px",
-              "top": "0px",
-              "width": "100%",
-              "zIndex": -1,
-            }
-          }
-        />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
-      </div>
-      <h3
-        aria-level="3"
-        className="css-reset-4rbku5 css-text-901oao"
-        dir="auto"
-        role="heading"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "24px",
-            "lineHeight": "32px",
-            "marginTop": "15px",
-            "textRendering": "geometricPrecision",
-            "textTransform": "none",
-          }
-        }
-      >
-        Milestones
-      </h3>
-      <h2
-        aria-level="2"
-        className="css-reset-4rbku5 css-text-901oao"
-        dir="auto"
-        role="heading"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "36px",
-            "lineHeight": "40px",
-            "marginBottom": "30px",
-            "textRendering": "geometricPrecision",
-            "textTransform": "none",
-          }
-        }
-      >
-        Celo's Journey
-      </h2>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "20px",
-            "lineHeight": "28px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        The Celo Community's past and upcoming milestones.
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitAlignSelf": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitFlexDirection": "column",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "marginLeft": "10px",
-        "maxWidth": "100vw",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "16px",
-            "fontWeight": "500",
-            "lineHeight": "18px",
-            "marginBottom": "20px",
-            "marginTop": "20px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Previous Milestones
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              April 2020
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Validator Elections Start
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              With validators and groups registered and staked, validator elections and epoch rewards enabled via on-chain governance proposal
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              April 2020
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Mainnet Release Candidate 1
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Validators stand up release candidate network with production-ready software
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              April 2020
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Security Audits Complete
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Resolve any outstanding issues to harden codebase
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              April 2020
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              New Baklava Testnet
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Validators stand up new testnet with feature complete software
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Feb 2020
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              SDK Release
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              ContractKit and DAppKit simplify development of dApps
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Nov 2019 - Feb 2020
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Baklava Testnet – The Great Celo Stake Off
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Sep 2019
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              100th Community Event
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              100 events hosted in 100 days in more than 35 countries
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              July 2019
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Alfajores Testnet Release
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              First full network release for protocol and app developers
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Feb 2019
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              MIT Stability Challenge
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Stability Protocol tested and improved
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Dec 2018
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Mobile Wallet in Market Testing Begins
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Ongoing research in emerging markets
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitTransform": "translateY(10px)",
-              "background": "linear-gradient(#FBCC5C, #FFFFFF)",
-              "backgroundColor": "rgba(251,204,92,1.00)",
-              "transform": "translateY(10px)",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-36px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-36px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 83 98"
-                width={18}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
-                    fill="#FBCC5C"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Aug 2018
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              First User Research Trip
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Field research on mobile money adoption in Kenya
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "16px",
-            "fontWeight": "500",
-            "lineHeight": "18px",
-            "marginBottom": "20px",
-            "marginTop": "20px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Milestone Key
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxLines": "multiple",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "WebkitFlexWrap": "wrap",
-            "flexDirection": "row",
-            "flexWrap": "wrap",
-            "msFlexDirection": "row",
-            "msFlexWrap": "wrap",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginLeft": "5px",
-              "marginRight": "15px",
-              "msFlexDirection": "row",
-            }
-          }
-        >
-          <svg
-            fill="none"
-            height={18}
-            style={Object {}}
-            viewBox="0 0 12 15"
-            width={15.84}
-          >
-            <path
-              d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-              stroke="#FBCC5C"
-            />
-            <path
-              d="M0.205748 7.93311H11.6464C10.6896 11.5534 7.99538 14.4869 5.08425 14.9436C3.67491 15.155 2.37395 14.7675 1.43439 13.7811C0.133461 12.4424 -0.300169 10.2934 0.205748 7.93311Z"
-              fill="#FBCC5C"
-            />
-          </svg>
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "16px",
-                "lineHeight": "20px",
-                "marginBottom": "10px",
-                "marginLeft": "20px",
-                "marginRight": "20px",
-                "textRendering": "geometricPrecision",
-              }
-            }
-          >
-            In Progress
-          </div>
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "horizontal",
-              "WebkitFlexDirection": "row",
-              "flexDirection": "row",
-              "marginLeft": "5px",
-              "marginRight": "15px",
-              "msFlexDirection": "row",
-            }
-          }
-        >
-          <svg
-            fill="none"
-            height={18}
-            style={Object {}}
-            viewBox="0 0 12 15"
-            width={15.84}
-          >
-            <g
-              style={
-                Object {
-                  "mixBlendMode": "normal",
-                }
-              }
-            >
-              <path
-                d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                stroke="#FBCC5C"
-                strokeWidth="1"
-              />
-            </g>
-          </svg>
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "16px",
-                "lineHeight": "20px",
-                "marginBottom": "10px",
-                "marginLeft": "20px",
-                "marginRight": "20px",
-                "textRendering": "geometricPrecision",
-              }
-            }
-          >
-            Pending
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-text-901oao"
-        dir="auto"
-        style={
-          Object {
-            "color": "rgba(46,51,56,1.00)",
-            "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "16px",
-            "fontWeight": "500",
-            "lineHeight": "18px",
-            "marginBottom": "20px",
-            "marginTop": "20px",
-            "textRendering": "geometricPrecision",
-          }
-        }
-      >
-        Upcoming Milestones
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                    stroke="#FBCC5C"
-                    strokeWidth="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Celo Gold Voter Rewards Activate
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Voter rewards enabled via on-chain governance proposal
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                    stroke="#FBCC5C"
-                    strokeWidth="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Mainnet Release Candidate X
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Possible additional release candidates in the event critical issues are discovered
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                    stroke="#FBCC5C"
-                    strokeWidth="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Celo Gold Live
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                    stroke="#FBCC5C"
-                    strokeWidth="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Celo Dollars Live
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                    stroke="#FBCC5C"
-                    strokeWidth="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Mainnet Mobile Wallet Release
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              The Mainnet Mobile Wallet will be fully available for download on iOS and Android
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
     style={
       Object {
         "WebkitAlignSelf": "center",
@@ -6678,6 +4058,7 @@ exports[`HomePage renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -7003,8 +4384,6 @@ exports[`HomePage renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -7059,7 +4438,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              Backers
+              Early Backers
               <div
                 className="css-view-1dbjc4n"
                 style={

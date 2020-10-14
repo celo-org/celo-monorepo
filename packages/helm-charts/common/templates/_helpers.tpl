@@ -100,11 +100,12 @@ release: {{ .Release.Name }}
       NAT_IP=$(cat /root/.celo/ipAddress)
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
+
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
     if [[ -f /root/.celo/pkey ]]; then
       NODE_KEY=$(cat /root/.celo/pkey)
       if [[ ! -z ${NODE_KEY} ]]; then
-        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey" && echo "Node key: ${NODE_KEY}"
+        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey"
       fi
     fi
     {{ if .proxy | default false }}
@@ -134,7 +135,14 @@ release: {{ .Release.Name }}
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    {{- if .proxy | default false }}
+    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- else }}
+    {{- if not (.proxied | default false) }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- end }}
+    {{- end }}
     {{- end }}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -142,8 +150,16 @@ release: {{ .Release.Name }}
     {{- if .pprof | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
     {{- end }}
+    PORT=30303
+    {{- if .ports }}
+    PORTS_PER_RID={{ join "," .ports }}
+    PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
+    {{- end }}
+
+{{ .extra_setup }}
 
     exec geth \
+      --port $PORT  \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
@@ -170,6 +186,12 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
+{{- if .Values.aws }}
+  - name: HOST_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+{{- end }}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:
@@ -178,39 +200,26 @@ release: {{ .Release.Name }}
       - /bin/sh
       - "-c"
       - |
-        # fail if any wgets fail
-        set -euo pipefail
-        RPC_URL=http://localhost:8545
-        # first check if it's syncing
-        SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
-        NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-        if [ ! $NOT_SYNCING ]; then
-          echo "Node is syncing: $SYNCING"
-          exit 1
-        fi
-
-        # then make sure that the latest block is new
-        MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
-        LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
-        BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-        BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
-        CURRENT_TIMESTAMP=$(date +%s)
-        BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
-        # if the most recent block is too old, then indicate the node is not ready
-        if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
-          echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
-          exit 1
-        fi
-        exit 0
+{{ include "common.node-health-check" . | indent 8 }}
     initialDelaySeconds: 20
     periodSeconds: 10
 {{- end }}
   ports:
+{{- if .ports }}
+{{- range $index, $port := .ports }}
+  - name: discovery-{{ $port }}
+    containerPort: {{ $port }}
+    protocol: UDP
+  - name: ethereum-{{ $port }}
+    containerPort: {{ $port }}
+{{- end }}
+{{- else }}
   - name: discovery
     containerPort: 30303
     protocol: UDP
   - name: ethereum
     containerPort: 30303
+{{- end }}
 {{- if .expose }}
   - name: rpc
     containerPort: 8545
@@ -328,6 +337,33 @@ data:
     mountPath: /root/.celo
 {{- end -}}
 
+{{- define "common.node-health-check" -}}
+# fail if any wgets fail
+set -euo pipefail
+RPC_URL=http://localhost:8545
+# first check if it's syncing
+SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
+NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
+if [ ! $NOT_SYNCING ]; then
+  echo "Node is syncing: $SYNCING"
+  exit 1
+fi
+
+# then make sure that the latest block is new
+MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
+LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
+BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
+BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
+CURRENT_TIMESTAMP=$(date +%s)
+BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
+# if the most recent block is too old, then indicate the node is not ready
+if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
+  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
+  exit 1
+fi
+exit 0
+{{- end -}}
+
 {{- define "common.geth-exporter-container" -}}
 - name: geth-exporter
   image: "{{ .Values.gethexporter.image.repository }}:{{ .Values.gethexporter.image.tag }}"
@@ -394,4 +430,3 @@ prometheus.io/scrape: "true"
 prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}
-

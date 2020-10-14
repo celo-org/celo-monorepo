@@ -9,7 +9,7 @@ import { StyleSheet, View } from 'react-native'
 import Animated from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
-import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { shareQRCode, SVG } from 'src/send/actions'
 
 type Props = MaterialTopTabBarProps & {

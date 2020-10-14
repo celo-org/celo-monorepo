@@ -4,7 +4,7 @@ import {
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
-  VerificationState,
+  UpdatableVerificationState,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -39,6 +39,8 @@ export enum Actions {
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
   FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
+  RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
+  SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
 }
 
 export interface StartVerificationAction {
@@ -183,7 +185,16 @@ export interface FetchVerificationState {
 
 export interface UpdateVerificationState {
   type: Actions.UPDATE_VERIFICATION_STATE
-  state: VerificationState
+  state: UpdatableVerificationState
+}
+
+export interface ResendAttestations {
+  type: Actions.RESEND_ATTESTATIONS
+}
+
+export interface SetLastRevealAttempt {
+  type: Actions.SET_LAST_REVEAL_ATTEMPT
+  time: number
 }
 
 export type ActionTypes =
@@ -213,6 +224,8 @@ export type ActionTypes =
   | UpdateAddressDekMapAction
   | FetchVerificationState
   | UpdateVerificationState
+  | ResendAttestations
+  | SetLastRevealAttempt
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -385,7 +398,18 @@ export const fetchVerificationState = (): FetchVerificationState => ({
   type: Actions.FETCH_VERIFICATION_STATE,
 })
 
-export const udpateVerificationState = (state: VerificationState): UpdateVerificationState => ({
+export const udpateVerificationState = (
+  state: UpdatableVerificationState
+): UpdateVerificationState => ({
   type: Actions.UPDATE_VERIFICATION_STATE,
   state,
+})
+
+export const resendAttestations = (): ResendAttestations => ({
+  type: Actions.RESEND_ATTESTATIONS,
+})
+
+export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
+  type: Actions.SET_LAST_REVEAL_ATTEMPT,
+  time,
 })
