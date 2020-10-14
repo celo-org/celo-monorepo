@@ -47,7 +47,7 @@ Name | Type |
 
 ▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L78)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L75)*
 
 **Parameters:**
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L74)*
+*Defined in [packages/contractkit/src/wallets/signers/azure-hsm-signer.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L71)*
 
 **Returns:** *string*
 
