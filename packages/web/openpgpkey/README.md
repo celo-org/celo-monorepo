@@ -12,7 +12,7 @@ Keys are added to this directory by PR on Github. Verifying that only the correc
 
 #### Confirm that the added key is valid
 
-1. Conform that the PR includes a single binary file, for example a PR to include a new key for `mariano@clabs.co` will add:
+1. Confirm that the PR includes a single binary file, for example a PR to include a new key for `mariano@clabs.co` will add:
 
 ```bash
 $ git diff --name-only origin/master...
