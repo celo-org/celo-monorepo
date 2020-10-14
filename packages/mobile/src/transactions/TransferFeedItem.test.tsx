@@ -1,5 +1,6 @@
 import * as React from 'react'
 import 'react-native'
+import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -11,6 +12,7 @@ import {
   mockAccount2,
   mockAddressToE164Number,
   mockComment,
+  mockE164Number,
   mockInviteDetails,
   mockInviteDetails2,
   mockPrivateDEK,
@@ -402,5 +404,58 @@ describe('transfer feed item renders correctly', () => {
       </Provider>
     )
     expect(tree).toMatchSnapshot()
+  })
+  const renderFeedItemForSendWithoutCaches = (address: string) => (
+    <TransferFeedItem
+      __typename="TokenTransfer"
+      status={TransactionStatus.Complete}
+      comment={''}
+      type={TokenTransactionType.Sent}
+      hash={'0x'}
+      amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
+      address={address}
+      timestamp={1}
+      commentKey={null}
+      addressToE164Number={mockAddressToE164Number}
+      recipientCache={{}}
+      recentTxRecipientsCache={{}}
+      invitees={[]}
+    />
+  )
+  it('for known address display name show stored name on feed item', () => {
+    const contactName = 'Some name'
+    const tree = render(
+      <Provider
+        store={createMockStore({
+          identity: {
+            addressToDisplayName: {
+              [mockAccount]: contactName,
+            },
+          },
+        })}
+      >
+        {renderFeedItemForSendWithoutCaches(mockAccount)}
+      </Provider>
+    )
+    expect(tree.queryByText(contactName)).toBeTruthy()
+    expect(tree.queryByText(mockE164Number)).toBeFalsy()
+  })
+  it('for unknown address display name show phone number on feed item', () => {
+    const contactName = 'Some name'
+    const tree = render(
+      <Provider
+        store={createMockStore({
+          identity: {
+            addressToDisplayName: {
+              [mockAccount2]: contactName,
+            },
+          },
+        })}
+      >
+        {renderFeedItemForSendWithoutCaches(mockAccount)}
+      </Provider>
+    )
+    expect(tree.queryByText(contactName)).toBeFalsy()
+    expect(tree.queryByText(mockE164Number)).toBeTruthy()
   })
 })
