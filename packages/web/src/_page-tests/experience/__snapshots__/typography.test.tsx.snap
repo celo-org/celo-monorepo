@@ -3102,7 +3102,8 @@ Use Jost* for call to actions, diagrams, instructions, and infographics.
                     }
                   }
                 >
-                  Subtitle / larger text that is one size larger than the body, lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
+                  Subtitle / larger text that is one size larger than the body 
+ lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
                 </h4>
                 <div
                   className="css-text-901oao"

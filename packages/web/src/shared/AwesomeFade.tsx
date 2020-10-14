@@ -2,7 +2,10 @@ import { keyframes } from '@emotion/core'
 import * as React from 'react'
 import Reveal from 'react-awesome-reveal'
 
-type Direction = 'up' | 'right'
+export enum Direction {
+  X,
+  Y,
+}
 
 interface Props {
   children: React.ReactNode
@@ -42,31 +45,18 @@ export default React.memo(function AwesomeFade({
 function getKeyFrames(distance: number | string, direction: Direction, reverse: boolean) {
   let from = `translate3d(0, ${distance}, 0)`
 
-  if (direction === 'right') {
+  if (direction === Direction.X) {
     from = `translate3d(${distance}, 0, 0)`
   }
-
-  if (reverse) {
-    return keyframes`
-    from {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      opacity: 0;
-      transform: ${from}; 
-    }
-  `
-  }
+  const to = `translate3d(0, 0, 0)`
 
   return keyframes`
-    from {
-      opacity: 0;
-      transform: ${from};
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
+      from {
+        opacity: ${+reverse};
+        transform: ${reverse ? to : from};
+      } to {
+        opacity: ${+!reverse};
+        transform: ${reverse ? from : to};
+      }
   `
 }

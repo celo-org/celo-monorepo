@@ -2,7 +2,7 @@ import Dynamic from 'next/dynamic'
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
-import Fade from 'src/shared/AwesomeFade'
+import Fade, { Direction } from 'src/shared/AwesomeFade'
 import Responsive from 'src/shared/Responsive'
 import Spinner from 'src/shared/Spinner'
 import { DESKTOP_BREAKPOINT, TABLET_BREAKPOINT } from 'src/shared/Styles'
@@ -198,7 +198,7 @@ class HomeCarousel extends React.Component {
           {images.map((image, index) => (
             <View key={index}>
               {index < 2 ? (
-                <Fade direction="right" distance="-40px" delay={200}>
+                <Fade direction={Direction.X} distance="-40px" delay={200}>
                   <Cell key={index} image={image} imageWidth={imageWidth} />
                 </Fade>
               ) : (
