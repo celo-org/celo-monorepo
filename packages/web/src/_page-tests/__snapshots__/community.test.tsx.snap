@@ -2142,40 +2142,213 @@ We believe that many of these features have great potential for positive impact,
         >
           <div
             className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitAlignItems": "center",
-                "WebkitBoxAlign": "center",
-                "WebkitBoxPack": "center",
-                "WebkitJustifyContent": "center",
-                "alignItems": "center",
-                "height": "90vh",
-                "justifyContent": "center",
-                "msFlexAlign": "center",
-                "msFlexPack": "center",
-              }
-            }
           >
             <div
-              aria-label="loading"
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "height": "50px",
-                  "width": "50px",
+                  "marginBottom": "20px",
+                  "marginTop": "30px",
                 }
               }
             >
-              <span
-                style={
-                  Object {
-                    "height": "100%",
-                    "width": "100%",
+              <div
+                className="css-q7lffx"
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "color": "rgba(46,51,56,1.00)",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "28px",
+                      "lineHeight": "36px",
+                      "textRendering": "geometricPrecision",
+                    }
                   }
-                }
-              />
+                >
+                  Highlight Event
+                </div>
+              </div>
+              <div
+                className="css-q7lffx"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "borderTopColor": "rgba(221,221,221,1.00)",
+                      "borderTopWidth": "1px",
+                      "height": "1px",
+                      "marginTop": "10px",
+                      "maxHeight": "1px",
+                      "width": "100%",
+                    }
+                  }
+                />
+              </div>
             </div>
           </div>
+          <div
+            className="css-view-1dbjc4n"
+          >
+            <div
+              className="css-q7lffx"
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "marginBottom": "25px",
+                    "marginTop": "25px",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "WebkitBoxFlex": 1,
+                      "WebkitFlexBasis": "0%",
+                      "WebkitFlexGrow": 1,
+                      "WebkitFlexShrink": 1,
+                      "flexBasis": "0%",
+                      "flexGrow": 1,
+                      "flexShrink": 1,
+                      "msFlexNegative": 1,
+                      "msFlexPositive": 1,
+                      "msFlexPreferredSize": "0%",
+                    }
+                  }
+                >
+                  <a
+                    target="_external"
+                  >
+                    <div
+                      className="css-view-1dbjc4n"
+                      data-focusable={true}
+                      onClick={[Function]}
+                      onContextMenu={[Function]}
+                      onKeyDown={[Function]}
+                      style={
+                        Object {
+                          "MozTransitionProperty": "opacity",
+                          "MozUserSelect": "none",
+                          "WebkitAlignItems": "center",
+                          "WebkitBoxAlign": "center",
+                          "WebkitBoxDirection": "normal",
+                          "WebkitBoxOrient": "horizontal",
+                          "WebkitFlexDirection": "row",
+                          "WebkitTransitionDuration": "0s",
+                          "WebkitTransitionProperty": "opacity",
+                          "WebkitUserSelect": "none",
+                          "alignItems": "center",
+                          "cursor": "pointer",
+                          "flexDirection": "row",
+                          "msFlexAlign": "center",
+                          "msFlexDirection": "row",
+                          "msTouchAction": "manipulation",
+                          "msUserSelect": "none",
+                          "touchAction": "manipulation",
+                          "transitionDuration": "0s",
+                          "transitionProperty": "opacity",
+                          "userSelect": "none",
+                        }
+                      }
+                      tabIndex="0"
+                    >
+                      <div
+                        className="css-text-901oao css-textOneLine-bfa6kz"
+                        dir="auto"
+                        onClick={[Function]}
+                        style={
+                          Object {
+                            "color": "rgba(46,51,56,1.00)",
+                            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                            "fontSize": "16px",
+                            "fontWeight": "500",
+                            "lineHeight": "18px",
+                            "marginRight": "3px",
+                            "textRendering": "geometricPrecision",
+                          }
+                        }
+                      />
+                    </div>
+                  </a>
+                  <div
+                    className="css-text-901oao"
+                    dir="auto"
+                    onClick={[Function]}
+                    style={
+                      Object {
+                        "color": "rgba(46,51,56,1.00)",
+                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                        "fontSize": "20px",
+                        "lineHeight": "28px",
+                        "marginBottom": "20px",
+                        "textRendering": "geometricPrecision",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxDirection": "normal",
+                      "WebkitBoxLines": "multiple",
+                      "WebkitBoxOrient": "horizontal",
+                      "WebkitBoxPack": "justify",
+                      "WebkitFlexDirection": "row",
+                      "WebkitFlexWrap": "wrap",
+                      "WebkitJustifyContent": "space-between",
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "flexWrap": "wrap",
+                      "justifyContent": "space-between",
+                      "msFlexAlign": "center",
+                      "msFlexDirection": "row",
+                      "msFlexPack": "justify",
+                      "msFlexWrap": "wrap",
+                    }
+                  }
+                >
+                  <div
+                    className="css-text-901oao"
+                    dir="auto"
+                    onClick={[Function]}
+                    style={
+                      Object {
+                        "color": "rgba(46,51,56,1.00)",
+                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                        "fontSize": "20px",
+                        "lineHeight": "28px",
+                        "textRendering": "geometricPrecision",
+                      }
+                    }
+                  >
+                     — 
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+          />
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "height": "0px",
+              }
+            }
+          />
         </div>
       </div>
       <div
@@ -3128,6 +3301,7 @@ We believe that many of these features have great potential for positive impact,
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
+                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -3141,6 +3315,12 @@ We believe that many of these features have great potential for positive impact,
                   "zIndex": -1,
                 }
               }
+            />
+            <img
+              alt="Polychain"
+              className="css-accessibilityImage-9pa8cd"
+              draggable={false}
+              src="image.png"
             />
           </div>
         </div>
@@ -3236,6 +3416,7 @@ We believe that many of these features have great potential for positive impact,
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
+                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "contain",
@@ -3249,6 +3430,12 @@ We believe that many of these features have great potential for positive impact,
                     "zIndex": -1,
                   }
                 }
+              />
+              <img
+                alt="a16z"
+                className="css-accessibilityImage-9pa8cd"
+                draggable={false}
+                src="image.png"
               />
             </div>
           </div>
