@@ -178,7 +178,7 @@ export function* handleSendPaymentData(
 ) {
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
-    address: data.address,
+    address: data.address.toLowerCase(),
     displayId: data.e164PhoneNumber,
     displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
     e164PhoneNumber: data.e164PhoneNumber,
@@ -186,6 +186,7 @@ export function* handleSendPaymentData(
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
   }
+
   yield put(storeLatestInRecents(recipient))
 
   if (data.currencyCode) {
