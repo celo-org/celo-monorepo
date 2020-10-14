@@ -179,10 +179,6 @@ export function isValidBackupPhrase(phrase: string) {
   return isValidMnemonic(phrase, 24)
 }
 
-export function isValidSocialBackupPhrase(phrase: string) {
-  return isValidMnemonic(phrase, 13)
-}
-
 export async function encryptMnemonic(phrase: string, account: string) {
   const password = await getPassword(account)
   return CryptoJS.AES.encrypt(phrase, password).toString()

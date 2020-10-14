@@ -44,8 +44,6 @@ describe('Testnet banner', () => {
           callToActNotification={false}
           numberVerified={true}
           importContacts={jest.fn()}
-          migrateAccount={jest.fn()}
-          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -72,8 +70,6 @@ describe('Testnet banner', () => {
           callToActNotification={false}
           numberVerified={true}
           importContacts={jest.fn()}
-          migrateAccount={jest.fn()}
-          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -98,8 +94,6 @@ describe('Testnet banner', () => {
           callToActNotification={false}
           numberVerified={true}
           importContacts={jest.fn()}
-          migrateAccount={jest.fn()}
-          needsToMigrateToNewBip39={false}
           {...getMockI18nProps()}
         />
       </Provider>
