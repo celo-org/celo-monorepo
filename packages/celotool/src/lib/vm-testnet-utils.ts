@@ -141,7 +141,7 @@ export async function deploy(
   await uploadTestnetInfoToGoogleStorage(celoEnv, !useExistingGenesis)
 }
 
-async function deployModule(
+export async function deployModule(
   celoEnv: string,
   terraformModule: string,
   vars: TerraformVars,
@@ -190,7 +190,7 @@ export async function destroy(celoEnv: string) {
   }
 }
 
-async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+export async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
   const envType = fetchEnv(envVar.ENV_TYPE)
@@ -279,7 +279,7 @@ export async function getInternalTxNodeIPs(celoEnv: string) {
   return outputs.tx_node_internal_ip_addresses.value
 }
 
-function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
+export function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     bucket: stateBucketName(),
     prefix: `${celoEnv}/${terraformModule}`,

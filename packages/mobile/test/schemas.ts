@@ -382,6 +382,7 @@ export const v5Schema = {
   },
   identity: {
     ...v3Schema.identity,
+    lastRevealAttempt: null,
     verificationState: {
       isLoading: false,
       phoneHashDetails: {
@@ -398,6 +399,7 @@ export const v5Schema = {
       },
       lastFetch: null,
     },
+    addressToDisplayName: {},
   },
 }
 

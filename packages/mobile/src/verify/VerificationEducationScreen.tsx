@@ -1,8 +1,8 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import { useFocusEffect } from '@react-navigation/native'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -12,15 +12,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import i18n, { Namespaces } from 'src/i18n'
-import { fetchVerificationState, setHasSeenVerificationNux } from 'src/identity/actions'
+import {
+  fetchVerificationState,
+  setHasSeenVerificationNux,
+  startVerification,
+} from 'src/identity/actions'
 import { verificationStateSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
 import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
@@ -52,16 +56,14 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   useFocusEffect(
     // useCallback is needed here: https://bit.ly/2G0WKTJ
     useCallback(() => {
-      if (!partOfOnboarding) {
-        dispatch(fetchVerificationState())
-      }
-    }, [partOfOnboarding])
+      dispatch(fetchVerificationState())
+    }, [])
   )
 
   const onPressStart = (withoutRevealing: boolean) => {
     return () => {
       dispatch(setHasSeenVerificationNux(true))
-      navigation.navigate(Screens.VerificationLoadingScreen, { withoutRevealing })
+      dispatch(startVerification(withoutRevealing))
     }
   }
 
@@ -101,7 +103,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
 
   let bodyText
   let firstButton
-  let secondButton
 
   if (numberVerified) {
     // Already verified
@@ -117,6 +118,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     )
   } else if (isBalanceSufficient) {
     // Sufficient balance
+    const withoutRevealing = actionableAttestations.length >= numAttestationsRemaining
     bodyText = t('verificationEducation.body')
     firstButton = (
       <Button
@@ -125,23 +127,12 @@ function VerificationEducationScreen({ route, navigation }: Props) {
             ? t('verificationEducation.resume')
             : t('verificationEducation.start')
         }
-        onPress={onPressStart(false)}
+        onPress={onPressStart(withoutRevealing)}
         type={BtnTypes.ONBOARDING}
         style={styles.startButton}
         testID="VerificationEducationContinue"
       />
     )
-    if (actionableAttestations.length === numAttestationsRemaining) {
-      secondButton = (
-        <Button
-          text={t('verificationEducation.receivedCodes')}
-          onPress={onPressStart(true)}
-          type={BtnTypes.ONBOARDING_SECONDARY}
-          style={styles.startButton}
-          testID="VerificationEducationAlready"
-        />
-      )
-    }
   } else {
     // Insufficient balance
     bodyText = t('verificationEducation.bodyInsufficientBalance')
@@ -167,7 +158,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         </Text>
         <Text style={styles.body}>{bodyText}</Text>
         {firstButton}
-        {secondButton}
         <View style={styles.spacer} />
         <TextButton style={styles.doINeedToConfirmButton} onPress={onPressLearnMore}>
           {t('verificationEducation.doINeedToConfirm')}
