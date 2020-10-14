@@ -285,7 +285,7 @@ export const buildBinaryEIP712TypedData = async (
 
 export const signBuffer = async (wrapper: OffchainDataWrapper, dataPath: string, buf: Buffer) => {
   const typedData = await buildBinaryEIP712TypedData(wrapper, dataPath, buf)
-  return wrapper.kit.getWallet().signTypedData(wrapper.self, typedData)
+  return wrapper.kit.getWallet().signTypedData(wrapper.signer, typedData)
 }
 
 const ioTsToSolidityTypeMapping: { [x: string]: string } = {

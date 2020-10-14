@@ -94,7 +94,8 @@ testWithGanache('Offchain Data', (web3) => {
       const nameAccessor = new NameAccessor(wrapper)
       await nameAccessor.write(testPayload)
 
-      const resp = await nameAccessor.readAsResult(writerAddress)
+      const readerNameAccessor = new NameAccessor(readerWrapper)
+      const resp = await readerNameAccessor.readAsResult(writerAddress)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       } else {
@@ -155,17 +156,19 @@ testWithGanache('Offchain Data', (web3) => {
   })
 
   describe('with a different key being authorized to sign off-chain', () => {
+    let signerWrapper: OffchainDataWrapper
+
     beforeEach(async () => {
-      wrapper = new OffchainDataWrapper(writerAddress, kit)
-      wrapper.storageWriter = new MockStorageWriter(
+      const pop = await accounts.generateProofOfKeyPossession(writerAddress, signerAddress)
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
+      await authorizedSignerAccessor.write(signerAddress, serializeSignature(pop), '.*')
+
+      signerWrapper = new OffchainDataWrapper(writerAddress, kit, signerAddress)
+      signerWrapper.storageWriter = new MockStorageWriter(
         WRITER_LOCAL_STORAGE_ROOT,
         WRITER_STORAGE_ROOT,
         fetchMock
       )
-
-      const pop = await accounts.generateProofOfKeyPossession(writerAddress, signerAddress)
-      const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      await authorizedSignerAccessor.write(signerAddress, serializeSignature(pop), '.*')
 
       kit.addAccount(signerPrivate)
     })
@@ -175,7 +178,7 @@ testWithGanache('Offchain Data', (web3) => {
     })
 
     it('can read the authorization', async () => {
-      const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(readerWrapper)
       const authorization = await authorizedSignerAccessor.readAsResult(
         writerAddress,
         signerAddress
@@ -184,10 +187,11 @@ testWithGanache('Offchain Data', (web3) => {
     })
 
     it('can write a name', async () => {
-      const nameAccessor = new NameAccessor(wrapper)
+      const nameAccessor = new NameAccessor(signerWrapper)
       await nameAccessor.write(testPayload)
 
-      const resp = await nameAccessor.readAsResult(writerAddress)
+      const readerNameAccessor = new NameAccessor(readerWrapper)
+      const resp = await readerNameAccessor.readAsResult(writerAddress)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       }

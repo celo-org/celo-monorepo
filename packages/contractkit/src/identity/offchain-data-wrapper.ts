@@ -4,10 +4,10 @@ import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { guessEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
-import { toChecksumAddress } from 'web3-utils'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
+import { AuthorizedSignerAccessor } from './offchain/schemas/custom'
 import { StorageWriter } from './offchain/storage-writers'
 
 const debug = debugFactory('offchaindata')
@@ -40,8 +40,11 @@ export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvid
 
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
+  signer: string
 
-  constructor(readonly self: string, readonly kit: ContractKit) {}
+  constructor(readonly self: string, readonly kit: ContractKit, signer?: string) {
+    this.signer = signer || self
+  }
 
   async readDataFromAsResult(
     account: string,
@@ -55,7 +58,7 @@ export default class OffchainDataWrapper {
     // TODO: Filter StorageRoots with the datapath glob
     const storageRoots = metadata
       .filterClaims(ClaimTypes.STORAGE)
-      .map((_) => new StorageRoot(account, _.address))
+      .map((_) => new StorageRoot(this, account, _.address))
     debug({ account, storageRoots })
 
     if (storageRoots.length === 0) {
@@ -95,7 +98,11 @@ export default class OffchainDataWrapper {
 }
 
 class StorageRoot {
-  constructor(readonly account: string, readonly address: string) {}
+  constructor(
+    readonly wrapper: OffchainDataWrapper,
+    readonly account: string,
+    readonly address: string
+  ) {}
 
   async readAndVerifySignature(
     dataPath: string,
@@ -128,15 +135,20 @@ class StorageRoot {
 
     const typedData = await buildTypedData(body)
     const guessedSigner = guessEIP712TypedDataSigner(typedData, signature)
+
     if (eqAddress(guessedSigner, this.account)) {
       return Ok(body)
     }
 
-    // The signer might be authorized off-chain
-    // TODO: Only if the signer is authorized with an on-chain key
-    return this.readAndVerifySignature(
-      `/account/authorizedSigners/${toChecksumAddress(guessedSigner)}`,
-      buildTypedData
+    const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
+    const authorizedSigner = await authorizedSignerAccessor.readAsResult(
+      this.account,
+      guessedSigner
     )
+    if (authorizedSigner.ok) {
+      return Ok(body)
+    }
+
+    return Err(new InvalidSignature())
   }
 }

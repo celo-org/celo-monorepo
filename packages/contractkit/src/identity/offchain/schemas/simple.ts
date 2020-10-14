@@ -28,7 +28,7 @@ export default class SimpleSchema<DataType> {
   private async sign(data: DataType) {
     const typedData = await buildEIP712TypedData(this.wrapper, this.type, this.dataPath, data)
     const wallet = this.wrapper.kit.getWallet()
-    return wallet.signTypedData(this.wrapper.self, typedData)
+    return wallet.signTypedData(this.wrapper.signer, typedData)
   }
 
   async write(data: DataType) {
