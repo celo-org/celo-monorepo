@@ -145,7 +145,7 @@ export const readEncrypted = async (
   const computedDataPath = getCiphertextLabel(dataPath, sharedSecret, senderPubKey, readerPubKey)
   const encryptedPayload = await wrapper.readDataFromAsResult(
     senderAddress,
-    (buf) => buildBinaryEIP712TypedData(wrapper, computedDataPath, buf),
+    (buf) => buildEIP712TypedData(wrapper, computedDataPath, buf),
     computedDataPath
   )
 
@@ -166,7 +166,7 @@ export const resolveEncrypted = async (
   const [encryptedPayload, keyOrPayload] = await Promise.all([
     wrapper.readDataFromAsResult(
       senderAddress,
-      (buf) => buildBinaryEIP712TypedData(wrapper, encryptedPayloadPath, buf),
+      (buf) => buildEIP712TypedData(wrapper, encryptedPayloadPath, buf),
       encryptedPayloadPath
     ),
     readEncrypted(wrapper, dataPath, senderAddress),
@@ -212,9 +212,9 @@ export const deserialize = <DataType>(
 
 export const buildEIP712TypedData = async <DataType>(
   wrapper: OffchainDataWrapper,
-  type: t.Type<DataType>,
   path: string,
-  data: DataType
+  data: DataType | Buffer,
+  type?: t.Type<DataType>
 ): Promise<EIP712TypedData> => {
   const chainId = await wrapper.kit.web3.eth.getChainId()
   const EIP712Domain = [
@@ -222,69 +222,55 @@ export const buildEIP712TypedData = async <DataType>(
     { name: 'version', type: 'string' },
     { name: 'chainId', type: 'uint256' },
   ]
-  const Claim = buildEIP712Schema(type)
 
-  return {
-    types: {
-      EIP712Domain,
+  let types = {}
+  let message = {}
+  if (Buffer.isBuffer(data)) {
+    types = {
+      ClaimWithPath: [
+        { name: 'path', type: 'string' },
+        { name: 'hash', type: 'string' },
+      ],
+    }
+    message = {
+      hash: keccak256(data).toString('hex'),
+    }
+  } else {
+    const Claim = buildEIP712Schema(type!)
+    types = {
       Claim,
       ClaimWithPath: [
         { name: 'path', type: 'string' },
         { name: 'payload', type: 'Claim' },
       ],
+    }
+    message = {
+      payload: (data as unknown) as EIP712Object,
+    }
+  }
+
+  return {
+    types: {
+      EIP712Domain,
+      ...types,
     },
     domain: {
       name: 'CIP8 Claim',
       version: '1.0.0',
       chainId,
     },
-    primaryType: 'Claim',
+    primaryType: 'ClaimWithPath',
     message: {
       path,
-      payload: (data as unknown) as EIP712Object,
+      ...message,
     },
   }
 }
 
 export type EIP712Schema = Array<{ name: string; type: string }>
-const binaryEIP712Schema: EIP712Schema = [
-  { name: 'path', type: 'string' },
-  { name: 'hash', type: 'string' },
-]
-
-export const buildBinaryEIP712TypedData = async (
-  wrapper: OffchainDataWrapper,
-  path: string,
-  buf: Buffer
-): Promise<EIP712TypedData> => {
-  const EIP712Domain = [
-    { name: 'name', type: 'string' },
-    { name: 'version', type: 'string' },
-    { name: 'chainId', type: 'uint256' },
-  ]
-  const Hash = binaryEIP712Schema
-
-  const chainId = await wrapper.kit.web3.eth.getChainId()
-  return {
-    types: {
-      EIP712Domain,
-      Hash,
-    },
-    domain: {
-      name: 'CIP8 Claim',
-      version: '1.0.0',
-      chainId,
-    },
-    primaryType: 'Hash',
-    message: {
-      path,
-      hash: keccak256(buf).toString('hex'),
-    },
-  }
-}
 
 export const signBuffer = async (wrapper: OffchainDataWrapper, dataPath: string, buf: Buffer) => {
-  const typedData = await buildBinaryEIP712TypedData(wrapper, dataPath, buf)
+  const typedData = await buildEIP712TypedData(wrapper, dataPath, buf)
   return wrapper.kit.getWallet().signTypedData(wrapper.signer, typedData)
 }
 

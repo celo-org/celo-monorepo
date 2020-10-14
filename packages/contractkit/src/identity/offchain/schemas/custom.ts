@@ -43,9 +43,9 @@ export class AuthorizedSignerAccessor {
       (buf) =>
         buildEIP712TypedData(
           this.wrapper,
-          AuthorizedSignerSchema,
           dataPath,
-          JSON.parse(buf.toString())
+          JSON.parse(buf.toString()),
+          AuthorizedSignerSchema
         ),
       dataPath
     )
@@ -67,9 +67,9 @@ export class AuthorizedSignerAccessor {
     const dataPath = this.basePath + '/' + toChecksumAddress(signer)
     const typedData = await buildEIP712TypedData(
       this.wrapper,
-      AuthorizedSignerSchema,
       dataPath,
-      payload
+      payload,
+      AuthorizedSignerSchema
     )
     const signature = await this.wrapper.kit.getWallet().signTypedData(this.wrapper.self, typedData)
     await this.wrapper.writeDataTo(Buffer.from(JSON.stringify(payload)), signature, dataPath)
