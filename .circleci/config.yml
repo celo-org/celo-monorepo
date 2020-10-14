@@ -983,7 +983,7 @@ jobs:
             sudo apt-get install -y software-properties-common
             sudo apt-get install python3-pip
             pip3 install certora-cli==0.1.1
-            wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
+            wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
             chmod +x solc-static-linux
             sudo mv solc-static-linux /usr/bin/solc
       - run:

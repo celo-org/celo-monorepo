@@ -161,6 +161,31 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
+  describe('fallback function', () => {
+    describe('when receiving celo', () => {
+      it('emits Deposit event with correct parameters', async () => {
+        const value = 100
+        // @ts-ignore
+        const res = await wallet.send(value)
+        assertLogMatches2(res.logs[0], {
+          event: 'Deposit',
+          args: {
+            sender: accounts[0],
+            value,
+          },
+        })
+      })
+    })
+
+    describe('when receiving 0 value', () => {
+      it('does not emit an event', async () => {
+        // @ts-ignore
+        const res = await wallet.send(0)
+        assert.equal(res.logs, 0)
+      })
+    })
+  })
+
   describe('#setSigner()', () => {
     const newSigner = accounts[3]
 
@@ -288,33 +313,54 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
       const value = 100
       let transactions: any[]
       beforeEach(async () => {
-        transactions = []
-        // CELO transfer
-        transactions.push({
-          destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
-          value,
-          data: '0x',
-        })
-        // No-op transfer ownership
-        transactions.push({
-          destination: wallet.address,
-          value: 0,
-          // @ts-ignore
-          data: wallet.contract.methods.transferOwnership(wallet.address).encodeABI(),
-        })
-        // CELO transfer
-        transactions.push({
-          destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
-          value,
-          data: '0x',
-        })
-        // Change signer
-        transactions.push({
-          destination: wallet.address,
-          value: 0,
-          // @ts-ignore
-          data: wallet.contract.methods.setSigner(nonSigner).encodeABI(),
-        })
+        transactions = [
+          // CELO transfer
+          {
+            destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
+            value,
+            data: '0x',
+          },
+
+          // No-op transfer ownership
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.transferOwnership(wallet.address).encodeABI(),
+          },
+
+          // CELO transfer
+          {
+            destination: web3.utils.toChecksumAddress(web3.utils.randomHex(20)),
+            value,
+            data: '0x',
+          },
+
+          // view signer (to test return values)
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.signer().encodeABI(),
+          },
+
+          // view isOwner (to test return values)
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.isOwner().encodeABI(),
+          },
+
+          // Change signer
+          {
+            destination: wallet.address,
+            value: 0,
+            // @ts-ignore
+            data: wallet.contract.methods.setSigner(nonSigner).encodeABI(),
+          },
+        ]
+
         await web3.eth.sendTransaction({
           from: accounts[0],
           to: wallet.address,
@@ -324,24 +370,82 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
 
       describe('when the caller is the signer', () => {
         describe('when the transactions are executed directly', () => {
-          beforeEach(async () => {
-            await wallet.executeTransactions(
+          describe('', () => {
+            beforeEach(async () => {
+              await wallet.executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
+                transactions.map((t) => trimLeading0x(t.data).length / 2),
+                { from: signer }
+              )
+            })
+
+            it('should execute the transactions', async () => {
+              assert.equal(await web3.eth.getBalance(transactions[0].destination), value)
+              assert.equal(await web3.eth.getBalance(transactions[2].destination), value)
+              assert.equal(await wallet.signer(), nonSigner)
+            })
+
+            it('should not increment the nonce', async () => {
+              assertEqualBN(await wallet.nonce(), 0)
+            })
+          })
+
+          it('returns the proper values', async () => {
+            const boolTrueReturned: string = '01'
+            const signerAddrReturned: string = trimLeading0x(signer).toLowerCase()
+            const viewSignerTxIndex: number = 3
+            const isOwnerTxIndex: number = 4
+
+            const returnValues = await wallet.executeTransactions.call(
               transactions.map((t) => t.destination),
               transactions.map((t) => t.value),
               ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('')),
               transactions.map((t) => trimLeading0x(t.data).length / 2),
               { from: signer }
             )
-          })
 
-          it('should execute the transactions', async () => {
-            assert.equal(await web3.eth.getBalance(transactions[0].destination), value)
-            assert.equal(await web3.eth.getBalance(transactions[2].destination), value)
-            assert.equal(await wallet.signer(), nonSigner)
+            assert.equal(
+              returnValues[0],
+              // return values are padded to have a length of 32 bytes
+              `0x${signerAddrReturned.padStart(64, '0')}${boolTrueReturned.padStart(64, '0')}`
+            )
+            for (const i of returnValues[1].keys()) {
+              if (i === viewSignerTxIndex || i === isOwnerTxIndex) {
+                assert.equal(web3.utils.hexToNumber(returnValues[1][i]), 32)
+              } else {
+                assert.equal(web3.utils.hexToNumber(returnValues[1][i]), 0)
+              }
+            }
           })
+        })
 
-          it('should not increment the nonce', async () => {
-            assertEqualBN(await wallet.nonce(), 0)
+        describe('when the data parameter has extra bytes appended', () => {
+          it('reverts', async () => {
+            await assertRevert(
+              wallet.executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('deadbeef')),
+                transactions.map((t) => trimLeading0x(t.data).length / 2),
+                { from: signer }
+              )
+            )
+          })
+        })
+
+        describe('when dataLengths has erroneous lengths', () => {
+          it('reverts', async () => {
+            await assertRevert(
+              wallet.executeTransactions(
+                transactions.map((t) => t.destination),
+                transactions.map((t) => t.value),
+                ensureLeading0x(transactions.map((t) => trimLeading0x(t.data)).join('deadbeef')),
+                transactions.map((t) => trimLeading0x(t.data).length), // invalid lengths without /2
+                { from: signer }
+              )
+            )
           })
         })
 
