@@ -86,7 +86,7 @@ if [ "$PLATFORM" = "android" ]; then
   esac
 
   # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
-  yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager &
+  yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
   startPackager
 
 elif [ "$PLATFORM" = "ios" ]; then
