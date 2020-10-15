@@ -10,6 +10,9 @@ import {
   writeEncrypted,
 } from './utils'
 
+/**
+ * Schema for writing any generic binary data
+ */
 export class BinarySchema implements Schema<Buffer> {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
@@ -37,6 +40,9 @@ export class BinarySchema implements Schema<Buffer> {
   read = makeAsyncThrowable(this.readAsResult.bind(this))
 }
 
+/**
+ * Schema for writing any encrypted binary data.
+ */
 export class EncryptedBinarySchema implements EncryptedSchema<Buffer> {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 

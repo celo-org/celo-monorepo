@@ -15,34 +15,10 @@ function serialize<DataType>(data: DataType) {
   return Buffer.from(JSON.stringify(data))
 }
 
-export class EncryptedSimpleSchema<DataType> implements EncryptedSchema<DataType> {
-  constructor(
-    readonly wrapper: OffchainDataWrapper,
-    readonly type: t.Type<DataType>,
-    readonly dataPath: string
-  ) {}
-
-  write(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
-    if (!this.type.is(data)) {
-      return Promise.resolve(new InvalidDataError())
-    }
-
-    return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
-  }
-
-  async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
-    const encryptedResult = await readEncrypted(this.wrapper, this.dataPath, account)
-
-    if (encryptedResult.ok) {
-      return deserialize(this.type, encryptedResult.result)
-    }
-
-    return encryptedResult
-  }
-
-  read = makeAsyncThrowable(this.readAsResult.bind(this))
-}
-
+/**
+ * A generic schema for reading and writing objects to and from storage. Passing
+ * in a type parameter is supported for runtime type safety.
+ */
 export class SimpleSchema<DataType> implements Schema<DataType> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
@@ -89,6 +65,38 @@ export class SimpleSchema<DataType> implements Schema<DataType> {
     }
 
     return deserializedResult
+  }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
+}
+
+/**
+ * A generic schema for writing and reading encrypted objects to and from storage. Passing
+ * in a type parameter is supported for runtime type safety.
+ */
+export class EncryptedSimpleSchema<DataType> implements EncryptedSchema<DataType> {
+  constructor(
+    readonly wrapper: OffchainDataWrapper,
+    readonly type: t.Type<DataType>,
+    readonly dataPath: string
+  ) {}
+
+  write(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
+    if (!this.type.is(data)) {
+      return Promise.resolve(new InvalidDataError())
+    }
+
+    return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
+  }
+
+  async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
+    const encryptedResult = await readEncrypted(this.wrapper, this.dataPath, account)
+
+    if (encryptedResult.ok) {
+      return deserialize(this.type, encryptedResult.result)
+    }
+
+    return encryptedResult
   }
 
   read = makeAsyncThrowable(this.readAsResult.bind(this))
