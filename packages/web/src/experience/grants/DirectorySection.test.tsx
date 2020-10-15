@@ -11,7 +11,9 @@ it('renders a collection of Grant Recipients', () => {
       description: 'Something like this',
       website: 'https://www.example.test',
       repo: 'github.com/celo-org/celo-monorepo',
-      logo: 'ok',
+      logo: 'image.gif',
+      logoWidth: 300,
+      logoHeight: 200,
     },
   ]
   const { getByText } = render(
