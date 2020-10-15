@@ -66,7 +66,7 @@ export const distributeSymmetricKey = async (
   const wallet = wrapper.kit.getWallet()
   const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
-  const computedDataPath = getCiphertextLabel(dataPath, sharedSecret, fromPubKey, toPubKey)
+  const computedDataPath = getCiphertextLabel(`${dataPath}.key`, sharedSecret, fromPubKey, toPubKey)
   const encryptedData = Encrypt(
     Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'),
     Buffer.from(data)
@@ -153,7 +153,12 @@ const readSymmetricKey = async (
   }
 
   const sharedSecret = await wallet.computeSharedSecret(readerPublicKeyAddress, senderPubKey)
-  const computedDataPath = getCiphertextLabel(dataPath, sharedSecret, senderPubKey, readerPubKey)
+  const computedDataPath = getCiphertextLabel(
+    `${dataPath}.key`,
+    sharedSecret,
+    senderPubKey,
+    readerPubKey
+  )
   const encryptedPayload = await wrapper.readDataFromAsResult(
     senderAddress,
     (buf) => buildEIP712TypedData(wrapper, computedDataPath, buf),
