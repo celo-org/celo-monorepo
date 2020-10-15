@@ -132,11 +132,9 @@ export function parseSignatureWithoutPrefix(
 
 export function guessEIP712TypedDataSigner(typedData: EIP712TypedData, signature: string): string {
   const dataBuff = generateTypedDataHash(typedData)
-  const msgHashBuff = ethjsutil.hashPersonalMessage(dataBuff)
-
   const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
   const publicKey = ethjsutil.ecrecover(
-    ethjsutil.toBuffer(msgHashBuff),
+    ethjsutil.toBuffer(dataBuff),
     v,
     ethjsutil.toBuffer(r),
     ethjsutil.toBuffer(s)
