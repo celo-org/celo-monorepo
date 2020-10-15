@@ -187,6 +187,35 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
               
             </Text>
           </View>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                undefined,
+              ]
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              
+              1
+            </Text>
+          </Text>
         </View>
       </View>
     </View>
