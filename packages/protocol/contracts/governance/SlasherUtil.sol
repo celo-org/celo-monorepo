@@ -8,13 +8,7 @@ import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract SlasherUtil is
-  ICeloVersionedContract,
-  Ownable,
-  Initializable,
-  UsingRegistry,
-  UsingPrecompiles
-{
+contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
   using SafeMath for uint256;
 
   struct SlashingIncentives {
