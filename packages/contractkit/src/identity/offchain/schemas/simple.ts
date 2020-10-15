@@ -24,7 +24,7 @@ export class EncryptedSimpleSchema<DataType> implements EncryptedSchema<DataType
 
   write(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
     if (!this.type.is(data)) {
-      return new InvalidDataError()
+      return Promise.resolve(new InvalidDataError())
     }
 
     return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
@@ -61,7 +61,14 @@ export class SimpleSchema<DataType> implements Schema<DataType> {
       return new InvalidDataError()
     }
 
-    return this.wrapper.writeDataTo(serialize(data), await this.sign(data), this.dataPath)
+    const error = await this.wrapper.writeDataTo(
+      serialize(data),
+      await this.sign(data),
+      this.dataPath
+    )
+    if (error) {
+      return new OffchainError(error)
+    }
   }
 
   async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {

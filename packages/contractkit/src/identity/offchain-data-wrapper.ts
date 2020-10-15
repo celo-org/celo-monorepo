@@ -16,6 +16,7 @@ export enum OffchainErrorTypes {
   FetchError = 'FetchError',
   InvalidSignature = 'InvalidSignature',
   NoStorageRootProvidedData = 'NoStorageRootProvidedData',
+  NoStorageProvider = 'NoStorageProvider',
 }
 
 class FetchError extends RootError<OffchainErrorTypes.FetchError> {
@@ -36,7 +37,17 @@ class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRo
   }
 }
 
-export type OffchainErrors = FetchError | InvalidSignature | NoStorageRootProvidedData
+class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
+  constructor() {
+    super(OffchainErrorTypes.NoStorageProvider)
+  }
+}
+
+export type OffchainErrors =
+  | FetchError
+  | InvalidSignature
+  | NoStorageRootProvidedData
+  | NoStorageProvider
 
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
@@ -78,9 +89,13 @@ export default class OffchainDataWrapper {
 
   readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
-  async writeDataTo(data: Buffer, signature: string, dataPath: string): Promise<Error | void> {
+  async writeDataTo(
+    data: Buffer,
+    signature: string,
+    dataPath: string
+  ): Promise<OffchainErrors | void> {
     if (this.storageWriter === undefined) {
-      return new Error('No storage writer')
+      return new NoStorageProvider()
     }
 
     try {

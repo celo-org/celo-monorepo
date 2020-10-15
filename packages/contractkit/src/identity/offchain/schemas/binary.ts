@@ -1,6 +1,6 @@
-import { Err, makeAsyncThrowable, Ok, Result } from '@celo/base/lib/result'
+import { Err, makeAsyncThrowable, Ok } from '@celo/base/lib/result'
 import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { OffchainError, SchemaErrors } from './errors'
+import { OffchainError } from './errors'
 import {
   buildEIP712TypedData,
   EncryptedSchema,
@@ -15,10 +15,13 @@ export class BinarySchema implements Schema<Buffer> {
 
   async write(data: Buffer) {
     const signature = await signBuffer(this.wrapper, this.dataPath, data)
-    return this.wrapper.writeDataTo(data, signature, this.dataPath)
+    const error = await this.wrapper.writeDataTo(data, signature, this.dataPath)
+    if (error) {
+      return new OffchainError(error)
+    }
   }
 
-  async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
+  async readAsResult(account: string) {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
       (buf) => buildEIP712TypedData(this.wrapper, this.dataPath, buf),
@@ -41,7 +44,7 @@ export class EncryptedBinarySchema implements EncryptedSchema<Buffer> {
     return writeEncrypted(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
   }
 
-  async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
+  async readAsResult(account: string) {
     return readEncrypted(this.wrapper, this.dataPath, account)
   }
 

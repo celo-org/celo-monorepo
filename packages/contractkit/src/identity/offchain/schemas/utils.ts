@@ -19,15 +19,15 @@ import {
 } from './errors'
 
 export interface Schema<DataType> {
-  write: (data: DataType) => void
-  read: (from: string) => void
-  readAsResult: (from: string) => void
+  write: (data: DataType) => Promise<SchemaErrors | void>
+  read: (from: string) => Promise<DataType>
+  readAsResult: (from: string) => Promise<Result<DataType, SchemaErrors>>
 }
 
 export interface EncryptedSchema<DataType> {
-  write: (data: DataType, to: string[], symmetricKey?: Buffer) => void
-  readAsResult: (from: string) => Promise<Result<DataType, SchemaErrors>>
+  write: (data: DataType, to: string[], symmetricKey?: Buffer) => Promise<SchemaErrors | void>
   read: (from: string) => Promise<DataType>
+  readAsResult: (from: string) => Promise<Result<DataType, SchemaErrors>>
 }
 
 const KEY_LENGTH = 16
@@ -52,10 +52,20 @@ function getCiphertextLabel(
 
 // Assumes that the wallet has the dataEncryptionKey of wrapper.self available
 // TODO: Should check and throw a more meaningful error if not
-export const distributeSymmetricKey = async (
+
+/**
+ * Encrypts the symmetric key `key` to `toAddress`'s data encryption key and uploads it
+ * to the computed storage path.
+ *
+ * @param wrapper the offchain data wrapper
+ * @param dataPath path to where the encrypted data is stored. Used to derive the key location
+ * @param key the symmetric key to distribute
+ * @param toAddress address to encrypt symmetric key to
+ */
+const distributeSymmetricKey = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
-  data: Buffer,
+  key: Buffer,
   toAddress: string
 ): Promise<void | Error> => {
   const accounts = await wrapper.kit.contracts.getAccounts()
@@ -67,18 +77,22 @@ export const distributeSymmetricKey = async (
   const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
   const computedDataPath = getCiphertextLabel(`${dataPath}.key`, sharedSecret, fromPubKey, toPubKey)
-  const encryptedData = Encrypt(
-    Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'),
-    Buffer.from(data)
-  )
+  const encryptedData = Encrypt(Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'), Buffer.from(key))
 
   const signature = await signBuffer(wrapper, computedDataPath, encryptedData)
   return wrapper.writeDataTo(encryptedData, signature, computedDataPath)
 }
 
-// if explicitly passing in a symmetric key, use that.
-// else check for existing key
-// otherwise generate new one
+/**
+ * Handles choosing the symmetric key to use.
+ * If we're explicitly passing in a key, use that,
+ * If a key has already been generated for this dataPath, use that,
+ * Else generate a new one
+ *
+ * @param wrapper the offchain data wrapper
+ * @param dataPath path to where the encrypted data is stored. Used to derive the key location
+ * @param symmetricKey
+ */
 async function fetchOrGenerateKey(
   wrapper: OffchainDataWrapper,
   dataPath: string,
@@ -103,6 +117,16 @@ async function fetchOrGenerateKey(
   return Err(existingKey.error)
 }
 
+/**
+ * Handles encrypting the data with a symmetric key, then distributing said key to each address
+ * in the `toAddresses` array.
+ *
+ * @param wrapper the offchain data wrapper
+ * @param dataPath path to where the encrypted data is stored. Used to derive the key location
+ * @param data the data to encrypt
+ * @param toAddresses the addresses to distribute the symmetric key to
+ * @param symmetricKey the symmetric key to use to encrypt the data. One will be found or generated if not provided
+ */
 export const writeEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
@@ -131,6 +155,14 @@ export const writeEncrypted = async (
   )
 }
 
+/**
+ * Reads and decrypts a symmetric key that has been encrypted to your
+ * data encryption key.
+ *
+ * @param wrapper the offchain data wrapper
+ * @param dataPath path to where the encrypted data is stored. Used to derive the key location
+ * @param senderAddress the address that encrypted this key to you
+ */
 const readSymmetricKey = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
@@ -173,6 +205,14 @@ const readSymmetricKey = async (
   return Ok(payload)
 }
 
+/**
+ * Reads and decrypts a payload that has been encrypted to your data encryption key. Will
+ * resolving the symmetric key used to encrypt the payload.
+ *
+ * @param wrapper the offchain data wrapper
+ * @param dataPath path to where the encrypted data is stored. Used to derive the key location
+ * @param senderAddress the address that encrypted this key to you
+ */
 export const readEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
@@ -280,8 +320,6 @@ export const buildEIP712TypedData = async <DataType>(
   }
 }
 
-export type EIP712Schema = Array<{ name: string; type: string }>
-
 export const signBuffer = async (wrapper: OffchainDataWrapper, dataPath: string, buf: Buffer) => {
   const typedData = await buildEIP712TypedData(wrapper, dataPath, buf)
   return wrapper.kit.getWallet().signTypedData(wrapper.signer, typedData)
@@ -293,7 +331,8 @@ const ioTsToSolidityTypeMapping: { [x: string]: string } = {
   [t.boolean._tag]: 'bool',
 }
 
-export const buildEIP712Schema = <DataType>(type: t.Type<DataType>): EIP712Schema => {
+type EIP712Schema = Array<{ name: string; type: string }>
+const buildEIP712Schema = <DataType>(type: t.Type<DataType>): EIP712Schema => {
   // @ts-ignore
   const shape = type.props
   // @ts-ignore
