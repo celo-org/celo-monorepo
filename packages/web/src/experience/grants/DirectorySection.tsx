@@ -26,12 +26,15 @@ export default function DirectorySection({ name, items, description }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: {},
+  root: {
+    paddingTop: 30,
+  },
   grid: {
     display: 'grid',
-    gridRowGap: 55,
-    gridColumnGap: 40,
-    gridTemplateColumns: `repeat(3, 1fr)`,
+    gridRowGap: 40,
+    gridColumnGap: 80,
+    gridTemplateColumns: `repeat(auto-fit, minmax(150px, 1fr))`,
+    marginTop: 20,
   },
   line: {
     height: 1,

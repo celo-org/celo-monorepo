@@ -1,9 +1,9 @@
-import { Asset, Entry } from 'contentful'
+import { Asset } from 'contentful'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import AspectRatio from 'src/shared/AspectRatio'
+import Octocat from 'src/icons/Octocat'
 import Outbound from 'src/shared/Outbound'
-import { fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 export interface Props {
   name: string
@@ -16,7 +16,7 @@ export interface Props {
   logoWidth: number
 }
 
-interface ContentFulItem {
+export interface ContentFulItem {
   name: string
   headline: string
   description: string
@@ -25,8 +25,8 @@ interface ContentFulItem {
   logo: Asset
 }
 
-function useWidth() {
-  const [width, setWidth] = React.useState()
+function useWidth(): [number, (e) => void] {
+  const [width, setWidth] = React.useState(0)
   function onLayout(event) {
     setWidth(event.nativeEvent.layout.width)
   }
@@ -48,30 +48,40 @@ export default React.memo(function DirectoryItem(props: Props) {
       </View>
       <Text style={nameStyle}>{props.name}</Text>
       <Text style={headlineStyle}>{props.headline}</Text>
-      <Text style={fonts.legal}>{props.description}</Text>
+      <Text style={[fonts.legal, standardStyles.elementalMarginBottom]}>{props.description}</Text>
+      {props.repo && (
+        <a href={props.repo} target="_blank" rel="noopener">
+          {' '}
+          <Octocat color={colors.dark} size={20} />
+        </a>
+      )}
     </View>
   )
 })
 
 function ContentfulImage({ image, maxHeight, maxWidth }) {
-  const [realWidth, onLayout] = useWidth()
+  const [potentialWidth, onLayout] = useWidth()
+  const ratio = maxWidth / maxHeight
+  const realHeight = Math.round(Math.min(potentialWidth / ratio, 100))
+  const realWidth = Math.round(Math.min(potentialWidth, realHeight * ratio))
   return (
-    <AspectRatio
-      style={{ width: '100%', maxWidth }}
+    <View
+      style={{
+        width: potentialWidth ? realWidth : '100%',
+        maxWidth,
+        height: 100,
+        justifyContent: 'center',
+      }}
       onLayout={onLayout}
-      ratio={maxWidth / maxHeight}
     >
-      {realWidth && (
-        <Image source={{ uri: `${image}?w=${realWidth}` }} style={standardStyles.image} />
+      {potentialWidth && (
+        <Image
+          source={{ uri: `${image}?w=${realWidth}&h=${realHeight}` }}
+          style={{ width: realWidth, height: realHeight }}
+        />
       )}
-    </AspectRatio>
+    </View>
   )
-}
-
-export function contentfullToProps({ fields }: Entry<ContentFulItem>): Props {
-  const file = fields.logo.fields.file
-  const image = file.details.image
-  return { ...fields, logo: file.url, logoHeight: image.height, logoWidth: image.width }
 }
 
 const styles = StyleSheet.create({
