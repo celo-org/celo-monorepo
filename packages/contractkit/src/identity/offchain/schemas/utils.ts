@@ -18,6 +18,18 @@ import {
   UnavailableKey,
 } from './errors'
 
+export interface Schema<DataType> {
+  write: (data: DataType) => void
+  read: (from: string) => void
+  readAsResult: (from: string) => void
+}
+
+export interface EncryptedSchema<DataType> {
+  write: (data: DataType, to: string[], symmetricKey?: Buffer) => void
+  readAsResult: (from: string) => Promise<Result<DataType, SchemaErrors>>
+  read: (from: string) => Promise<DataType>
+}
+
 const KEY_LENGTH = 16
 const IV_LENGTH = 16
 
@@ -40,7 +52,7 @@ function getCiphertextLabel(
 
 // Assumes that the wallet has the dataEncryptionKey of wrapper.self available
 // TODO: Should check and throw a more meaningful error if not
-export const writeEncrypted = async (
+export const distributeSymmetricKey = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
@@ -76,7 +88,7 @@ async function fetchOrGenerateKey(
     return Ok(symmetricKey)
   }
 
-  const existingKey = await readEncrypted(wrapper, dataPath, wrapper.self)
+  const existingKey = await readSymmetricKey(wrapper, dataPath, wrapper.self)
   if (existingKey.ok) {
     return Ok(existingKey.result)
   }
@@ -91,7 +103,7 @@ async function fetchOrGenerateKey(
   return Err(existingKey.error)
 }
 
-export const writeEncryptedWithSymmetric = async (
+export const writeEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
@@ -114,12 +126,12 @@ export const writeEncryptedWithSymmetric = async (
   await Promise.all(
     // here we encrypt the key to ourselves so we can retrieve it later
     [wrapper.self, ...toAddresses].map(async (toAddress) =>
-      writeEncrypted(wrapper, dataPath, fetchKey.result, toAddress)
+      distributeSymmetricKey(wrapper, dataPath, fetchKey.result, toAddress)
     )
   )
 }
 
-export const readEncrypted = async (
+const readSymmetricKey = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   senderAddress: string
@@ -134,14 +146,13 @@ export const readEncrypted = async (
   if (readerPubKey === null) {
     return Err(new UnavailableKey(senderAddress))
   }
-  const readerPublicKeyAddress = publicKeyToAddress(readerPubKey)
 
+  const readerPublicKeyAddress = publicKeyToAddress(readerPubKey)
   if (!wallet.hasAccount(readerPublicKeyAddress)) {
     return Err(new UnavailableKey(readerPublicKeyAddress))
   }
 
   const sharedSecret = await wallet.computeSharedSecret(readerPublicKeyAddress, senderPubKey)
-
   const computedDataPath = getCiphertextLabel(dataPath, sharedSecret, senderPubKey, readerPubKey)
   const encryptedPayload = await wrapper.readDataFromAsResult(
     senderAddress,
@@ -157,40 +168,37 @@ export const readEncrypted = async (
   return Ok(payload)
 }
 
-export const resolveEncrypted = async (
+export const readEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   senderAddress: string
 ): Promise<Result<Buffer, SchemaErrors>> => {
   const encryptedPayloadPath = `${dataPath}.enc`
-  const [encryptedPayload, keyOrPayload] = await Promise.all([
+  const [payload, key] = await Promise.all([
     wrapper.readDataFromAsResult(
       senderAddress,
       (buf) => buildEIP712TypedData(wrapper, encryptedPayloadPath, buf),
       encryptedPayloadPath
     ),
-    readEncrypted(wrapper, dataPath, senderAddress),
+    readSymmetricKey(wrapper, dataPath, senderAddress),
   ])
 
-  if (!keyOrPayload.ok) {
-    return Err(keyOrPayload.error)
+  if (!payload.ok) {
+    return Err(new OffchainError(payload.error))
+  }
+  if (!key.ok) {
+    return Err(key.error)
   }
 
-  if (encryptedPayload.ok && keyOrPayload.ok) {
-    const key = keyOrPayload.result
-    if (key.length !== KEY_LENGTH) {
-      return Err(new InvalidKey())
-    }
-
-    const payload = encryptedPayload.result
-    const iv = payload.slice(0, IV_LENGTH)
-    const encryptedData = payload.slice(IV_LENGTH)
-    const decipher = createDecipheriv('aes-128-ctr', key, iv)
-
-    return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
+  if (key.result.length !== KEY_LENGTH) {
+    return Err(new InvalidKey())
   }
 
-  return keyOrPayload
+  const iv = payload.result.slice(0, IV_LENGTH)
+  const encryptedData = payload.result.slice(IV_LENGTH)
+  const decipher = createDecipheriv('aes-128-ctr', key.result, iv)
+
+  return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
 }
 
 export const deserialize = <DataType>(

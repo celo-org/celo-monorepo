@@ -1,28 +1,21 @@
-import { makeAsyncThrowable, Ok, Result } from '@celo/base/lib/result'
+import { Err, makeAsyncThrowable, Ok, Result } from '@celo/base/lib/result'
 import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { SchemaErrors } from './errors'
+import { OffchainError, SchemaErrors } from './errors'
 import {
   buildEIP712TypedData,
-  resolveEncrypted,
+  EncryptedSchema,
+  readEncrypted,
+  Schema,
   signBuffer,
   writeEncrypted,
-  writeEncryptedWithSymmetric,
 } from './utils'
 
-export default class BinarySchema {
+export class BinarySchema implements Schema<Buffer> {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
   async write(data: Buffer) {
     const signature = await signBuffer(this.wrapper, this.dataPath, data)
     return this.wrapper.writeDataTo(data, signature, this.dataPath)
-  }
-
-  async writeEncrypted(data: Buffer, toAddress: string) {
-    return writeEncrypted(this.wrapper, this.dataPath, data, toAddress)
-  }
-
-  async writeWithSymmetric(data: Buffer, toAddresses: string[], symmetricKey?: Buffer) {
-    return writeEncryptedWithSymmetric(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
   }
 
   async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
@@ -32,20 +25,25 @@ export default class BinarySchema {
       this.dataPath
     )
     if (!rawData.ok) {
-      return this.readEncrypted(account)
+      return Err(new OffchainError(rawData.error))
     }
 
-    const encryptedResult = await this.readEncrypted(account)
-
-    if (encryptedResult.ok) {
-      return encryptedResult
-    }
     return Ok(rawData.result)
   }
 
   read = makeAsyncThrowable(this.readAsResult.bind(this))
+}
 
-  private async readEncrypted(account: string) {
-    return resolveEncrypted(this.wrapper, this.dataPath, account)
+export class EncryptedBinarySchema implements EncryptedSchema<Buffer> {
+  constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
+
+  async write(data: Buffer, toAddresses: string[], symmetricKey?: Buffer) {
+    return writeEncrypted(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
   }
+
+  async readAsResult(account: string): Promise<Result<Buffer, SchemaErrors>> {
+    return readEncrypted(this.wrapper, this.dataPath, account)
+  }
+
+  read = makeAsyncThrowable(this.readAsResult.bind(this))
 }

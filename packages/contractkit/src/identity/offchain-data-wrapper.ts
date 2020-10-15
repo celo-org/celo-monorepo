@@ -7,7 +7,7 @@ import debugFactory from 'debug'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
-import { AuthorizedSignerAccessor } from './offchain/schemas/custom'
+import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
 import { StorageWriter } from './offchain/storage-writers'
 
 const debug = debugFactory('offchaindata')
