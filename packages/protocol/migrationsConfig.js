@@ -348,6 +348,11 @@ const NetworkConfigs = {
     exchange: {
       frozen: false,
     },
+    downtimeSlasher: {
+      reward: '10000000000000000000', // 10 cGLD
+      penalty: '100000000000000000000', // 100 cGLD
+      slashableDowntime: (12 * HOUR) / 5, // ~12 hours
+    },
     goldToken: {
       frozen: false,
     },
@@ -508,17 +513,6 @@ NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
-  FixidityLib: [
-    'LockedGold',
-    'Exchange',
-    'GasPriceMinimum',
-    'Governance',
-    'GovernanceTest',
-    'Proposals',
-    'SortedOracles',
-    'StableToken',
-    'Validators',
-  ],
   Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],
