@@ -78,7 +78,7 @@ describe(waitForWeb3Sync, () => {
 
 describe(checkWeb3SyncProgress, () => {
   it('reports web3 status correctly', async () => {
-    const web3 = await getWeb3Async()
+    const web3 = await getWeb3Async(false)
     web3.eth.isSyncing
       // @ts-ignore
       .mockReturnValueOnce(false)
