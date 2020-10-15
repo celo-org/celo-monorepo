@@ -1,8 +1,9 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IGovernance.sol";
 import "./Proposals.sol";
@@ -16,7 +17,6 @@ import "../common/UsingPrecompiles.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-// TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
@@ -34,6 +34,7 @@ contract Governance is
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
+  using Address for address payable; // prettier-ignore
 
   uint256 private constant FIXED_HALF = 500000000000000000000000;
 
@@ -506,8 +507,6 @@ contract Governance is
     nonReentrant
     returns (bool)
   {
-    // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
-    // and return false?
     dequeueProposalsIfReady();
     // If acting on an expired proposal, expire the proposal and take no action.
     if (removeIfQueuedAndExpired(proposalId)) {
@@ -562,7 +561,6 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
-    // TODO(yorke): clean up redundant computation
     require(proposalId != 0, "Account has no historical upvote");
     removeIfQueuedAndExpired(proposalId);
     if (queue.contains(proposalId)) {
@@ -578,8 +576,6 @@ contract Governance is
     return true;
   }
 
-  // TODO(asa): Consider allowing approval to be revoked.
-  // TODO(asa): Everywhere we use an index, require it's less than the array length
   /**
    * @notice Approves a proposal in the approval stage.
    * @param proposalId The ID of the proposal to approve.
@@ -754,7 +750,7 @@ contract Governance is
     require(value > 0, "Nothing to withdraw");
     require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
-    msg.sender.transfer(value);
+    msg.sender.sendValue(value);
     return true;
   }
 
@@ -999,7 +995,6 @@ contract Governance is
         if (emptyIndices.length > 0) {
           uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
-          // TODO(asa): We can save gas by not deleting here
           delete emptyIndices[indexOfLastEmptyIndex];
           emptyIndices.length = indexOfLastEmptyIndex;
         } else {
