@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/src/async'
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
@@ -27,11 +28,12 @@ import {
 } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { store } from 'src/redux/store'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { BLOCK_AGE_LIMIT } from 'src/web3/utils'
+import { BLOCK_AGE_LIMIT, blockIsFresh } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -40,6 +42,8 @@ const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000 // ms
 const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
+const GETH_SYNC_TIMEOUT = 30000 // ms
+const GETH_POLLING_INTERVAL = 500 // ms
 
 export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -95,6 +99,74 @@ export function* waitForGethConnectivity() {
     if (action.connected) {
       return
     }
+  }
+}
+
+function* pollGethStatusUntilSynced() {
+  let head: BlockHeader = yield select(chainHeadSelector)
+
+  // Head may be null on startup
+  if (!head) {
+    head = (yield take(Actions.SET_CHAIN_HEAD)).head
+  }
+
+  while (true) {
+    if (blockIsFresh(head)) {
+      return true
+    }
+
+    head = (yield take(Actions.SET_CHAIN_HEAD)).head
+  }
+}
+
+export function* waitForGethSync() {
+  const fornoEnabled = yield select(fornoSelector)
+  if (fornoEnabled) {
+    return
+  }
+
+  const { result } = yield race({
+    result: call(pollGethStatusUntilSynced),
+    timeout: delay(GETH_SYNC_TIMEOUT),
+  })
+
+  if (!result) {
+    throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
+  }
+}
+
+function pollGethSyncStatusAsync() {
+  return new Promise(async (resolve, reject) => {
+    const dateLimit = Date.now() + GETH_SYNC_TIMEOUT
+
+    while (Date.now() <= dateLimit) {
+      const head = chainHeadSelector(store.getState())
+      if (!head) {
+        await sleep(GETH_POLLING_INTERVAL)
+        continue
+      }
+
+      if (blockIsFresh(head)) {
+        resolve()
+      }
+
+      await sleep(GETH_POLLING_INTERVAL)
+    }
+
+    reject()
+  })
+}
+
+export async function waitForGethSyncAsync() {
+  const fornoEnabled = fornoSelector(store.getState())
+  if (fornoEnabled) {
+    return
+  }
+
+  try {
+    await pollGethSyncStatusAsync()
+  } catch (error) {
+    throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
   }
 }
 

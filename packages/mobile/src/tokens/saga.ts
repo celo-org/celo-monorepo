@@ -47,7 +47,7 @@ export function* convertToContractDecimals(value: BigNumber, token: CURRENCY_ENU
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  const contractKit = await getContractKitAsync()
+  const contractKit = await getContractKitAsync(false)
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -209,7 +209,7 @@ export function tokenTransferFactory({
 }
 
 export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
-  const contractKit = await getContractKitAsync()
+  const contractKit = await getContractKitAsync(false)
   switch (currency) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.registry.addressFor(CeloContract.GoldToken)

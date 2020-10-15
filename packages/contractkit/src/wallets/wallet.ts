@@ -1,5 +1,5 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
@@ -113,11 +113,8 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
       throw Error('wallet@signTypedData: TypedData Missing')
     }
 
-    const dataBuff = generateTypedDataHash(typedData)
-    const trimmedData = dataBuff.toString('hex')
-
     const signer = this.getSigner(address)
-    const sig = await signer.signPersonalMessage(trimmedData)
+    const sig = await signer.signTypedData(typedData)
 
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }

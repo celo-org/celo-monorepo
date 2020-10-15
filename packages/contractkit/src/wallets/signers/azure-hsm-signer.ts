@@ -1,4 +1,5 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { AzureKeyVaultClient } from '../../utils/azure-key-vault-client'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
@@ -46,6 +47,20 @@ export class AzureHSMSigner implements Signer {
     // https://bitcoin.stackexchange.com/questions/38351/ecdsa-v-r-s-what-is-v
     const sigV = signature.v + 27
 
+    return {
+      v: sigV,
+      r: signature.r,
+      s: signature.s,
+    }
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const dataBuff = generateTypedDataHash(typedData)
+    const signature = await AzureHSMSigner.keyVaultClient.signMessage(dataBuff, this.keyName)
+
+    // Recovery ID should be a byte prefix
+    // https://bitcoin.stackexchange.com/questions/38351/ecdsa-v-r-s-what-is-v
+    const sigV = signature.v + 27
     return {
       v: sigV,
       r: signature.r,
