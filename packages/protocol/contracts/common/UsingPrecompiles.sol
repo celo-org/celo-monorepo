@@ -18,14 +18,6 @@ contract UsingPrecompiles is ICeloVersionedContract {
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
    * @param aNumerator Numerator of first fraction
    * @param aDenominator Denominator of first fraction

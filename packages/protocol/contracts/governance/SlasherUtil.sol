@@ -29,14 +29,6 @@ contract SlasherUtil is
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
 
   /**
-  * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
-  */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice Sets slashing incentives.
    * @param penalty Penalty for the slashed signer.
    * @param reward Reward that the observer gets.
