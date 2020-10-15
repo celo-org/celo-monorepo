@@ -1,6 +1,7 @@
 import TextInputWithButtons from '@celo/react-components/components/TextInputWithButtons'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TextInputProps, TouchableOpacity, ViewStyle } from 'react-native'
@@ -14,6 +15,7 @@ interface Props {
   celo: string
   onCeloChanged: (address: string) => void
   color?: string
+  feeEstimate: BigNumber
 }
 
 export default function CeloAmountInput({
@@ -22,13 +24,15 @@ export default function CeloAmountInput({
   celo,
   onCeloChanged,
   color = colors.goldUI,
+  feeEstimate,
 }: Props) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   const goldBalance = useSelector((state: RootState) => state.goldToken.balance)
 
   const setMaxAmount = () => {
     if (goldBalance) {
-      onCeloChanged(goldBalance)
+      const maxValue = new BigNumber(goldBalance).minus(feeEstimate).toString()
+      onCeloChanged(maxValue)
     }
   }
 

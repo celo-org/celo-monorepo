@@ -213,7 +213,7 @@ exports[`ExchangeReview renders correctly 1`] = `
                       }
                     }
                   >
-                    feeActual
+                    feeEstimate
                   </Text>
                   <View
                     style={
@@ -305,6 +305,24 @@ exports[`ExchangeReview renders correctly 1`] = `
                       0
                     </Text>
                   </Text>
+                  <View
+                    style={
+                      Object {
+                        "transform": Array [
+                          Object {
+                            "scale": 0.7,
+                          },
+                        ],
+                      }
+                    }
+                  >
+                    <ActivityIndicator
+                      animating={true}
+                      color="#42D689"
+                      hidesWhenStopped={true}
+                      size="small"
+                    />
+                  </View>
                 </View>
               </View>
             </View>

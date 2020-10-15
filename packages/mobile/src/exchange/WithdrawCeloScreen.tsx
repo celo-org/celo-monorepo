@@ -9,7 +9,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -25,14 +25,20 @@ import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Head
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
+import { getSendFee } from 'src/send/saga'
 import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { divideByWei } from 'src/utils/formatting'
+import Logger from 'src/utils/Logger'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
+
+const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
   const [celoInput, setCeloToTransfer] = useState('')
+  const [feeEstimate, setFeeEstimate] = useState(new BigNumber(0))
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
@@ -51,6 +57,25 @@ function WithdrawCeloScreen({ navigation }: Props) {
     CURRENCY_ENUM.GOLD
   )
 
+  useEffect(() => {
+    getSendFee(
+      accountAddress,
+      CURRENCY_ENUM.GOLD,
+      {
+        recipientAddress: RANDOM_ADDRESS,
+        amount: goldBalanceNumber,
+        comment: '',
+      },
+      false
+    )
+      .then((estimate: BigNumber) => {
+        setFeeEstimate(divideByWei(estimate))
+      })
+      .catch((error) => {
+        Logger.warn('WithdrawCeloScreen', `Error found while estimating gas fee: ${error}`)
+      })
+  }, [])
+
   const onConfirm = async () => {
     if (isTransferLimitReached) {
       showLimitReachedBanner()
@@ -63,6 +88,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     navigation.navigate(Screens.WithdrawCeloReviewScreen, {
       amount: celoToTransfer,
       recipientAddress: accountAddress,
+      feeEstimate,
     })
   }
 
@@ -86,6 +112,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
           inputStyle={styles.input}
           onCeloChanged={setCeloToTransfer}
           celo={celoInput}
+          feeEstimate={feeEstimate}
         />
       </KeyboardAwareScrollView>
       <Button
