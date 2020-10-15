@@ -81,7 +81,6 @@ interface DispatchProps {
 interface State {
   modalVisible: boolean
   encryptionDialogVisible: boolean
-  buttonReset: boolean
   comment: string
 }
 
@@ -138,7 +137,6 @@ export class SendConfirmation extends React.Component<Props, State> {
   state: State = {
     modalVisible: false,
     encryptionDialogVisible: false,
-    buttonReset: false,
     comment: '',
   }
 
@@ -244,9 +242,7 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   cancelModal = () => {
-    this.setState({ modalVisible: false, buttonReset: true }, () => {
-      this.setState({ buttonReset: false })
-    })
+    this.setState({ modalVisible: false })
   }
 
   sendWhatsApp = () => {
@@ -277,7 +273,7 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { comment, modalVisible, buttonReset, encryptionDialogVisible } = this.state
+    const { comment, modalVisible, encryptionDialogVisible } = this.state
     const {
       t,
       appConnected,
@@ -383,7 +379,6 @@ export class SendConfirmation extends React.Component<Props, State> {
           FooterComponent={FeeContainer}
           LabelAboveKeyboard={EncryptionWarningLabel}
           confirmButton={primaryBtnInfo}
-          shouldReset={buttonReset}
           isSending={this.props.isSending}
         >
           <View style={styles.transferContainer}>

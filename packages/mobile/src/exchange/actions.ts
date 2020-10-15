@@ -11,6 +11,8 @@ export enum Actions {
   FETCH_TOBIN_TAX = 'EXCHANGE/FETCH_TOBIN_TAX',
   SET_TOBIN_TAX = 'EXCHANGE/SET_TOBIN_TAX',
   WITHDRAW_CELO = 'EXCHANGE/WITHDRAW_CELO',
+  WITHDRAW_CELO_SUCCESS = 'EXCHANGE/WITHDRAW_CELO_SUCCESS',
+  WITHDRAW_CELO_FAILED = 'EXCHANGE/WITHDRAW_CELO_FAILED',
 }
 
 export interface FetchExchangeRateAction {
@@ -51,6 +53,14 @@ export interface WithdrawCeloAction {
   type: Actions.WITHDRAW_CELO
   amount: BigNumber
   recipientAddress: string
+}
+
+export interface WithdrawCeloFailureAction {
+  type: Actions.WITHDRAW_CELO_FAILED
+}
+
+export interface WithdrawCeloSuccessAction {
+  type: Actions.WITHDRAW_CELO_SUCCESS
 }
 
 export const fetchExchangeRate = (
@@ -102,8 +112,19 @@ export const withdrawCelo = (amount: BigNumber, recipientAddress: string): Withd
   recipientAddress,
 })
 
+export const withdrawCeloFailed = (): WithdrawCeloFailureAction => ({
+  type: Actions.WITHDRAW_CELO_FAILED,
+})
+
+export const withdrawCeloSuccess = (): WithdrawCeloSuccessAction => ({
+  type: Actions.WITHDRAW_CELO_SUCCESS,
+})
+
 export type ActionTypes =
   | SetExchangeRateAction
   | ExchangeTokensAction
   | SetTobinTaxAction
   | UpdateCeloGoldExchangeRateHistory
+  | WithdrawCeloAction
+  | WithdrawCeloFailureAction
+  | WithdrawCeloSuccessAction
