@@ -100,7 +100,7 @@ export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
   context: TransactionContext,
-  feeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
+  preferredFeeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
   nonce?: number,
   staticGas?: number
 ) {
@@ -114,6 +114,15 @@ export function* sendTransactionPromises(
 
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
+
+  // If stableToken is prefered to pay fee, use it unless its balance is Zero,
+  // in that case use CELO to pay fee.
+  // TODO: Make it transparent for the user.
+  // TODO: Check for balance should be more than fee instead of zero.
+  const feeCurrency =
+    preferredFeeCurrency === CURRENCY_ENUM.DOLLAR && stableTokenBalance.isGreaterThan(0)
+      ? CURRENCY_ENUM.DOLLAR
+      : CURRENCY_ENUM.GOLD
 
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
@@ -130,9 +139,8 @@ export function* sendTransactionPromises(
     gasPrice = yield getGasPrice(feeCurrency)
   }
 
-  // TODO: check for balance should be more than fee instead of zero
   const feeCurrencyAddress =
-    feeCurrency === CURRENCY_ENUM.DOLLAR && stableTokenBalance.isGreaterThan(0)
+    feeCurrency === CURRENCY_ENUM.DOLLAR
       ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
       : undefined
   const transactionPromises = yield call(
@@ -155,7 +163,8 @@ export function* sendTransaction(
   account: string,
   context: TransactionContext,
   staticGas?: number,
-  cancelAction?: string
+  cancelAction?: string,
+  feeCurrency?: CURRENCY_ENUM
 ) {
   const sendTxMethod = function*(nonce?: number) {
     const { confirmation } = yield call(
@@ -163,7 +172,7 @@ export function* sendTransaction(
       tx,
       account,
       context,
-      CURRENCY_ENUM.DOLLAR,
+      feeCurrency,
       nonce,
       staticGas
     )

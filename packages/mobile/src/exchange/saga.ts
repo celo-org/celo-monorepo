@@ -282,7 +282,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       sendTransaction,
       approveTx.txo,
       account,
-      newTransactionContext(TAG, `Approve exchange of ${makerToken}`)
+      newTransactionContext(TAG, `Approve exchange of ${makerToken}`),
+      undefined, // staticGas
+      undefined, // cancelAction
+      makerToken
     )
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 
