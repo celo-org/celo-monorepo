@@ -22,6 +22,7 @@
 ## CELO Holder Guide
 
 - [Quick Start](celo-holder-guide/quick-start.md)
+- [cUSD Holder Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
