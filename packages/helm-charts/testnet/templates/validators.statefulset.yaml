@@ -176,7 +176,6 @@ spec:
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
           if [ "$PROXY_COUNT" -gt 0 ]; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
-            #ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxycelostats=$(cat /root/.celo/proxyEnodeUrlPairs  | cut -d';' -f1)"
           else
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
           fi
@@ -208,7 +207,6 @@ spec:
             --wsapi=eth,net,web3,debug \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --etherbase=${ACCOUNT_ADDRESS} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \

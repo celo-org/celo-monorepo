@@ -128,15 +128,18 @@ release: {{ .Release.Name }}
     {{ end -}}
     {{- if .proxy_allow_private_ip_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.allowprivateip"
-    {{ end -}}
-    {{- if .ethstats | default false -}}
+    {{- end }}
+    {{- if .ethstats | default false }}
+    ACCOUNT_ADDRESS=$(cat /root/.celo/address)
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
     {{- if .proxy | default false }}
-    if [ "$RID" -eq "0" ]; then
-      ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
-    fi
-    {{ end -}}
-    {{- end -}}
+    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- else }}
+    {{- if not (.proxied | default false) }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- end }}
+    {{- end }}
+    {{- end }}
     {{- if .metrics | default true }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
     {{- end }}
