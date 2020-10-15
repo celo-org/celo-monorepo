@@ -1,5 +1,5 @@
 /* tslint:disable no-console */
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { sleep } from '@celo/utils/lib/async'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
@@ -70,8 +70,8 @@ export const handler = async (argv: FaucetArgv) => {
   const addresses = argv.account
 
   const cb = async () => {
-    const web3: Web3 = new Web3('http://localhost:8545')
-    const kit: ContractKit = newKitFromWeb3(web3)
+    const web3 = new Web3('http://localhost:8545')
+    const kit = newKitFromWeb3(web3)
     const account = (await kit.communication.getAccounts())[0]
     console.log(`Using account: ${account}`)
     kit.communication.defaultAccount = account
