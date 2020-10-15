@@ -41,7 +41,6 @@ Class that wraps the MetaTransactionWallet
 * [signAndExecuteMetaTransaction](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#signandexecutemetatransaction)
 * [signMetaTransaction](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#signmetatransaction)
 * [signer](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#signer)
-* [toRawTransaction](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md#torawtransaction)
 
 ## Constructors
 
@@ -393,27 +392,3 @@ ___
 *Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L224)*
 
 **Returns:** *Promise‹string›*
-
-___
-
-###  toRawTransaction
-
-▸ **toRawTransaction**(`tx`: [TransactionInput](../modules/_wrappers_metatransactionwallet_.md#transactioninput)‹any›): *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
-
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L240)*
-
-Turns any possible way to pass in a transaction into the raw values
-that are actually required. This is used both internally to normalize
-ways in which transactions are passed in but also public in order
-for one instance of ContractKit to serialize a meta transaction to
-send over the wire and be consumed somewhere else.
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`tx` | [TransactionInput](../modules/_wrappers_metatransactionwallet_.md#transactioninput)‹any› | TransactionInput<any> union of all the ways we expect transactions |
-
-**Returns:** *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
-
-a RawTransactions that's serializable

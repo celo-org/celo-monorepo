@@ -18,6 +18,7 @@
 ### Functions
 
 * [buildMetaTxTypedData](_wrappers_metatransactionwallet_.md#const-buildmetatxtypeddata)
+* [toRawTransaction](_wrappers_metatransactionwallet_.md#const-torawtransaction)
 
 ## Type aliases
 
@@ -45,3 +46,27 @@ Name | Type |
 `chainId` | number |
 
 **Returns:** *EIP712TypedData*
+
+___
+
+### `Const` toRawTransaction
+
+▸ **toRawTransaction**(`tx`: [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any›): *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
+
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L241)*
+
+Turns any possible way to pass in a transaction into the raw values
+that are actually required. This is used both internally to normalize
+ways in which transactions are passed in but also public in order
+for one instance of ContractKit to serialize a meta transaction to
+send over the wire and be consumed somewhere else.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`tx` | [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any› | TransactionInput<any> union of all the ways we expect transactions |
+
+**Returns:** *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
+
+a RawTransactions that's serializable
