@@ -100,6 +100,7 @@ export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
   context: TransactionContext,
+  feeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
   nonce?: number,
   staticGas?: number
 ) {
@@ -126,19 +127,19 @@ export function* sendTransactionPromises(
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
 
-    gasPrice = yield getGasPrice(CURRENCY_ENUM.DOLLAR)
+    gasPrice = yield getGasPrice(feeCurrency)
   }
+
+  // TODO: check for balance should be more than fee instead of zero
+  const feeCurrencyAddress =
+    feeCurrency === CURRENCY_ENUM.DOLLAR && stableTokenBalance.isGreaterThan(0)
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined
   const transactionPromises = yield call(
     sendTransactionAsync,
     tx,
     account,
-    // Use stableToken to pay fee, unless its balance is Zero
-    // then use Celo (goldToken) to pay fee (pass undefined)
-    // TODO: make it transparent for a user
-    // TODO: check for balance should be more than fee instead of zero
-    stableTokenBalance.isGreaterThan(0)
-      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
-      : undefined,
+    feeCurrencyAddress,
     getLogger(context, fornoMode),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,
@@ -162,6 +163,7 @@ export function* sendTransaction(
       tx,
       account,
       context,
+      CURRENCY_ENUM.DOLLAR,
       nonce,
       staticGas
     )

@@ -395,7 +395,14 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       }
     )
 
-    yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
+    yield call(
+      sendAndMonitorTransaction,
+      tx,
+      account,
+      context,
+      CURRENCY_ENUM.GOLD,
+      CURRENCY_ENUM.GOLD
+    )
 
     const dollarAmount = yield call(celoToDollarAmount, amount)
     yield put(sendPaymentOrInviteSuccess(dollarAmount))

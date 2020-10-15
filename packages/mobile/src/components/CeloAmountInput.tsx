@@ -31,8 +31,8 @@ export default function CeloAmountInput({
 
   const setMaxAmount = () => {
     if (goldBalance) {
-      const maxValue = new BigNumber(goldBalance).minus(feeEstimate).toString()
-      onCeloChanged(maxValue)
+      const maxValue = new BigNumber(goldBalance).minus(feeEstimate)
+      onCeloChanged(maxValue.isPositive() ? maxValue.toString() : '0')
     }
   }
 
