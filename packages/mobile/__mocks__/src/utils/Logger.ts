@@ -38,6 +38,8 @@ class Logger {
   }
 
   createCombinedLogs = createCombinedLogs
+  getGethLogFilePath = jest.fn(() => 'geth_logs.txt')
+  getReactNativeLogsFilePath = jest.fn(() => 'rn_logs.txt')
 }
 
 export default new Logger()

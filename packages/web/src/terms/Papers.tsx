@@ -7,7 +7,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { HelpfullLink } from './HelpfullLink'
+import { HelpfulLink } from './HelpfulLink'
 
 class Papers extends React.PureComponent<I18nProps> {
   static getInitialProps() {
@@ -32,17 +32,20 @@ class Papers extends React.PureComponent<I18nProps> {
           <SideTitledSection span={Spans.three4th} title={t('protocol')}>
             <Text style={fonts.p}>{t('whitepaperTitle')}</Text>
             <View style={styles.links}>
-              <HelpfullLink text={t('download')} href={'/papers/whitepaper'} />
-              <HelpfullLink text={'阅读'} href={'/papers/celo-wp-simplified-chinese.pdf'} />
+              <HelpfulLink text={t('download')} href={'/papers/whitepaper'} />
+              <HelpfulLink text={'阅读'} href={'/papers/whitepaper/chinese'} />
             </View>
           </SideTitledSection>
           <SideTitledSection span={Spans.three4th} title={t('economics')}>
             <Text style={fonts.p}>{t('stabilityTitle')}</Text>
-            <HelpfullLink text={t('download')} href={'/papers/stability'} />
+            <HelpfulLink text={t('download')} href={'/papers/stability'} />
           </SideTitledSection>
           <SideTitledSection span={Spans.three4th} title={''}>
             <Text style={fonts.p}>{t('velocityTitle')}</Text>
-            <HelpfullLink text={t('download')} href={'/papers/cbdc-velocity'} />
+            <View style={styles.links}>
+              <HelpfulLink text={t('download')} href={'/papers/cbdc-velocity'} />
+              <HelpfulLink text={'Lee el informe'} href={'/papers/cbdc-velocity/spanish'} />
+            </View>
           </SideTitledSection>
         </View>
       </>

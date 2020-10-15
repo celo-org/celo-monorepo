@@ -1,10 +1,10 @@
-import colorsV2 from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import CancelButton from 'src/components/CancelButton.v2'
+import CancelButton from 'src/components/CancelButton'
 import Dialog from 'src/components/Dialog'
 import { Namespaces } from 'src/i18n'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -55,6 +55,6 @@ export default function CancelConfirm({ screen }: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    color: colorsV2.gray4,
+    color: colors.gray4,
   },
 })

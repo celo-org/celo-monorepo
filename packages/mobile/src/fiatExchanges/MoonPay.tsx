@@ -8,10 +8,10 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -62,7 +62,7 @@ function FiatExchangeWeb({ route }: Props) {
   return (
     <View style={styles.container}>
       {uri === '' ? (
-        <ActivityIndicator size="large" color={colors.celoGreen} />
+        <ActivityIndicator size="large" color={colors.greenBrand} />
       ) : (
         <WebView style={styles.exchangeWebView} source={{ uri }} />
       )}

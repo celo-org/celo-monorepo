@@ -1,10 +1,10 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -16,21 +16,20 @@ import { connect } from 'react-redux'
 import { FeeEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import FeeDrawer from 'src/components/FeeDrawer'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import ShortenedAddress from 'src/components/ShortenedAddress'
-import TotalLineItem from 'src/components/TotalLineItem.v2'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
   CalculateFeeChildren,
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
-import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
 import { fetchDataEncryptionKey } from 'src/identity/actions'
@@ -41,7 +40,7 @@ import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -76,8 +75,6 @@ interface StateProps {
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
   fetchDollarBalance: typeof fetchDollarBalance
-  declinePaymentRequest: typeof declinePaymentRequest
-  completePaymentRequest: typeof completePaymentRequest
   fetchDataEncryptionKey: typeof fetchDataEncryptionKey
 }
 
@@ -94,8 +91,6 @@ type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
-  declinePaymentRequest,
-  completePaymentRequest,
   fetchDataEncryptionKey,
 }
 
@@ -181,15 +176,20 @@ export class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
+      reason,
     } = this.props.confirmationInput
-    const { comment } = this.state
+
+    const comment =
+      type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill
+        ? reason || ''
+        : this.state.comment
 
     const localCurrencyAmount = convertDollarsToLocalAmount(
       amount,
       this.props.localCurrencyExchangeRate
     )
 
-    ValoraAnalytics.track(SendEvents.send_confim_send, {
+    ValoraAnalytics.track(SendEvents.send_confirm_send, {
       isScan: !!this.props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       isRequest: type === TokenTransactionType.PayRequest,
@@ -197,7 +197,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       localCurrency: this.props.localCurrencyCode,
       dollarAmount: amount.toString(),
       localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
-      commentLength: this.state.comment.length,
+      commentLength: comment.length,
     })
 
     this.props.sendPaymentOrInvite(
@@ -304,7 +304,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     let primaryBtnInfo
-    if (type === TokenTransactionType.PayRequest) {
+    if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('global:pay'),
@@ -318,7 +318,7 @@ export class SendConfirmation extends React.Component<Props, State> {
       }
     }
 
-    const paymentRequestComment = reason || ''
+    const paymentComment = reason || ''
 
     const FeeContainer = () => {
       let securityFee
@@ -370,7 +370,7 @@ export class SendConfirmation extends React.Component<Props, State> {
         <View style={styles.encryptionWarningLabelContainer}>
           <Text style={styles.encryptionWarningLabel}>{t('encryption.warningLabel')}</Text>
           <Touchable onPress={this.onShowEncryptionModal} borderless={true} hitSlop={iconHitslop}>
-            <InfoIcon size={12} tintColor={colors.gray3} />
+            <InfoIcon size={12} />
           </Touchable>
         </View>
       ) : null
@@ -420,9 +420,10 @@ export class SendConfirmation extends React.Component<Props, State> {
               style={styles.amount}
               amount={subtotalAmount}
             />
-            {type === TokenTransactionType.PayRequest ? (
+            {type === TokenTransactionType.PayRequest ||
+            type === TokenTransactionType.PayPrefill ? (
               <View>
-                <Text style={styles.paymentRequestComment}>{paymentRequestComment}</Text>
+                <Text style={styles.paymentComment}>{paymentComment}</Text>
               </View>
             ) : (
               <CommentTextInput
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     ...fontStyles.largeNumber,
   },
-  paymentRequestComment: {
+  paymentComment: {
     ...fontStyles.large,
     color: colors.gray5,
   },

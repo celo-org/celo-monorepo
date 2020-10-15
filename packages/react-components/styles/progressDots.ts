@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { StyleSheet } from 'react-native'
 
 const CIRCLE_SIZE = 5
@@ -14,7 +14,7 @@ const circle = {
 export default StyleSheet.create({
   circlePassive: {
     ...circle,
-    backgroundColor: colors.inactive,
+    backgroundColor: colors.gray4,
   },
   circleActive: {
     ...circle,

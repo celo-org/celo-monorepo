@@ -1,5 +1,6 @@
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -9,25 +10,27 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
   backupCompleted: boolean
-  socialBackupCompleted: boolean
 }
 
 interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.BackupComplete>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     backupCompleted: state.account.backupCompleted,
-    socialBackupCompleted: state.account.socialBackupCompleted,
   }
 }
 
@@ -36,11 +39,11 @@ class BackupComplete extends React.Component<Props> {
 
   componentDidMount() {
     // Show success check for a while before leaving screen
-    const { backupCompleted, socialBackupCompleted } = this.props
+    const { backupCompleted } = this.props
     setTimeout(() => {
-      if (socialBackupCompleted) {
-        this.props.exitBackupFlow()
-        navigateHome()
+      const navigatedFromSettings = this.props.route.params?.navigatedFromSettings ?? false
+      if (navigatedFromSettings) {
+        navigate(Screens.Settings, { promptConfirmRemovalModal: true })
       } else if (backupCompleted) {
         ValoraAnalytics.track(OnboardingEvents.backup_complete)
         navigate(Screens.BackupIntroduction)
@@ -51,14 +54,12 @@ class BackupComplete extends React.Component<Props> {
   }
 
   render() {
-    const { t, backupCompleted, socialBackupCompleted } = this.props
+    const { t, backupCompleted } = this.props
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          {backupCompleted && !socialBackupCompleted && <Checkmark height={32} />}
-          {backupCompleted && socialBackupCompleted && (
-            <Text style={styles.h1}>{t('backupComplete.2')}</Text>
-          )}
+          {backupCompleted && <Checkmark height={32} />}
+          {backupCompleted && <Text style={styles.h1}>{t('backupComplete.2')}</Text>}
         </View>
       </SafeAreaView>
     )
@@ -77,10 +78,6 @@ const styles = StyleSheet.create({
   h1: {
     ...fontStyles.h1,
     marginTop: 20,
-    paddingHorizontal: 40,
-  },
-  h2: {
-    ...fontStyles.h2,
     paddingHorizontal: 40,
   },
 })

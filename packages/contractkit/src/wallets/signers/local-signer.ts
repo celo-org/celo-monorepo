@@ -1,4 +1,6 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { Decrypt } from '@celo/utils/lib/ecies'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
@@ -42,5 +44,26 @@ export class LocalSigner implements Signer {
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const dataBuff = generateTypedDataHash(typedData)
+    const trimmedKey = trimLeading0x(this.privateKey)
+    const pkBuffer = Buffer.from(trimmedKey, 'hex')
+
+    const sig = ethUtil.ecsign(dataBuff, pkBuffer)
+    return {
+      v: parseInt(sig.v, 10),
+      r: Buffer.from(sig.r),
+      s: Buffer.from(sig.s),
+    }
+  }
+
+  decrypt(ciphertext: Buffer) {
+    const decryptedPlaintext = Decrypt(
+      Buffer.from(trimLeading0x(this.privateKey), 'hex'),
+      ciphertext
+    )
+    return Promise.resolve(decryptedPlaintext)
   }
 }

@@ -1,8 +1,8 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import FormInput from '@celo/react-components/components/FormInput'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { Countries } from '@celo/utils/src/countries'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -173,7 +173,10 @@ export class NameAndNumber extends React.Component<Props, State> {
     }
 
     this.props.setPromptForno(true) // Allow forno prompt after Welcome screen
-    ValoraAnalytics.track(OnboardingEvents.phone_number_set, { countryCode: countryCallingCode })
+    ValoraAnalytics.track(OnboardingEvents.phone_number_set, {
+      country: this.props.route.params?.country,
+      countryCode: countryCallingCode,
+    })
     this.props.setPhoneNumber(e164Number, countryCallingCode)
     this.props.setName(name)
     this.goToNextScreen()

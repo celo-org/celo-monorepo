@@ -17,17 +17,16 @@ class FullscreenCTA extends React.PureComponent<Props> {
     const { title, subtitle, CTAText, CTAHandler } = this.props
 
     return (
-      <SafeAreaView style={style.container}>
-        <View style={style.header}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
           <Text style={fontStyles.h1}>{title}</Text>
           <Text style={fontStyles.h2}>{subtitle}</Text>
         </View>
         {this.props.children}
-        <View style={style.button}>
+        <View style={styles.button}>
           <Button
             onPress={CTAHandler}
             text={CTAText}
-            standard={true}
             type={BtnTypes.PRIMARY}
             testID="ErrorContinueButton"
           />
@@ -37,18 +36,21 @@ class FullscreenCTA extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     height: variables.height,
     width: variables.width,
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 55,
     paddingBottom: 30,
     paddingHorizontal: 20,
   },
-  header: {},
+  header: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 120,
+  },
   button: { alignItems: 'center' },
 })
 

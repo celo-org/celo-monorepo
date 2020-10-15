@@ -1,9 +1,9 @@
 import Card from '@celo/react-components/components/Card'
-import TextInput from '@celo/react-components/components/TextInput.v2'
+import TextInput from '@celo/react-components/components/TextInput'
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Shadow, Spacing } from '@celo/react-components/styles/styles.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Shadow, Spacing } from '@celo/react-components/styles/styles'
 import React, { useLayoutEffect } from 'react'
 import {
   ActivityIndicator,
@@ -50,17 +50,20 @@ export default function CodeInput({
   testID,
   style,
 }: Props) {
-  const clipboardContent = useClipboard()
+  const [forceShowingPasteIcon, clipboardContent, getFreshClipboardContent] = useClipboard()
 
   // LayoutAnimation when switching to/from input
   useLayoutEffect(() => {
     LayoutAnimation.easeInEaseOut()
   }, [status === CodeInputStatus.INPUTTING])
 
-  function shouldShowClipboardInternal(clipboard: string) {
+  function shouldShowClipboardInternal() {
+    if (forceShowingPasteIcon) {
+      return true
+    }
     return (
-      !inputValue.toLowerCase().startsWith(clipboard.toLowerCase()) &&
-      shouldShowClipboard(clipboard)
+      !inputValue.toLowerCase().startsWith(clipboardContent.toLowerCase()) &&
+      shouldShowClipboard(clipboardContent)
     )
   }
 
@@ -84,8 +87,7 @@ export default function CodeInput({
               <TextInput
                 value={inputValue}
                 placeholder={
-                  inputPlaceholderWithClipboardContent &&
-                  shouldShowClipboardInternal(clipboardContent)
+                  inputPlaceholderWithClipboardContent && shouldShowClipboardInternal()
                     ? inputPlaceholderWithClipboardContent
                     : inputPlaceholder
                 }
@@ -108,8 +110,8 @@ export default function CodeInput({
         </View>
         {showInput && (
           <ClipboardAwarePasteButton
-            clipboardContent={clipboardContent}
-            shouldShow={shouldShowClipboardInternal}
+            getClipboardContent={getFreshClipboardContent}
+            shouldShow={shouldShowClipboardInternal()}
             onPress={onInputChange}
           />
         )}

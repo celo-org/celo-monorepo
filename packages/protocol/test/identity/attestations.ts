@@ -32,6 +32,7 @@ import {
 } from 'types'
 import Web3 from 'web3'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
+import { beforeEachWithRetries } from '../customHooks'
 // tslint:disable-next-line: ordered-imports
 import Web3X = require('web3')
 
@@ -135,7 +136,7 @@ contract('Attestations', (accounts: string[]) => {
     })
   }
 
-  beforeEach(async () => {
+  beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
     accountsInstance = await Accounts.new()
     mockStableToken = await MockStableToken.new()
     otherMockStableToken = await MockStableToken.new()

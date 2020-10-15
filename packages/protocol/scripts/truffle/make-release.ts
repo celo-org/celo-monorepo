@@ -178,7 +178,11 @@ const deployProxy = async (
   return proxy
 }
 
+<<<<<<< HEAD
 interface ProposalTx {
+=======
+export interface ProposalTx {
+>>>>>>> master
   contract: string
   function: string
   args: string[]

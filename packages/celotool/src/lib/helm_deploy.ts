@@ -1,12 +1,12 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
-import { AzureClusterConfig } from './azure'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import { BaseClusterConfig } from './k8s-cluster/base'
+import { getServerVersion, getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
 import {
   getGenesisBlockFromGoogleStorage,
@@ -163,9 +163,21 @@ export function getServiceAccountName(prefix: string) {
   return `${prefix}-${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`.slice(0, 30)
 }
 
-export async function uploadStorageClass() {
-  // TODO: allow this to run from anywhere
-  await execCmdWithExitOnFailure(`kubectl apply -f ../helm-charts/testnet/ssdstorageclass.yaml`)
+export async function installGCPSSDStorageClass() {
+  // A previous version installed this directly with `kubectl` instead of helm.
+  // To be backward compatible, we don't install the chart if the storage class
+  // already exists.
+  const storageClassExists = await outputIncludes(
+    `kubectl get storageclass`,
+    `ssd`,
+    `SSD StorageClass exists, skipping install`
+  )
+  if (!storageClassExists) {
+    const gcpSSDHelmChartPath = '../helm-charts/gcp-ssd'
+    await execCmdWithExitOnFailure(
+      `helm upgrade -i gcp-ssd ${gcpSSDHelmChartPath}`
+    )
+  }
 }
 
 export async function redeployTiller() {
@@ -175,11 +187,24 @@ export async function redeployTiller() {
     `Tiller service account exists, skipping creation`
   )
   if (!tillerServiceAccountExists) {
+    const serviceAccountName = 'tiller'
     await execCmdWithExitOnFailure(
-      `kubectl create serviceaccount tiller --namespace=kube-system && kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller && helm init --service-account=tiller`
+      `kubectl create serviceaccount ${serviceAccountName} --namespace=kube-system && kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:${serviceAccountName}`
     )
+    await initHelm(serviceAccountName)
     await sleep(20000)
   }
+}
+
+async function initHelm(serviceAccountName: string) {
+  // If the server version is >= 1.16, we need to modify the helm init command.
+  // See https://github.com/helm/helm/issues/6374#issuecomment-533427268
+  let cmd = `helm init --service-account=${serviceAccountName}`
+  const kubeServerVersion = await getServerVersion()
+  if (kubeServerVersion.major >= 1 && kubeServerVersion.minor >= 16) {
+    cmd = `${cmd} --override spec.selector.matchLabels.'name'='tiller',spec.selector.matchLabels.'app'='helm' --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | kubectl apply -f -`
+  }
+  return execCmdWithExitOnFailure(cmd)
 }
 
 export async function installCertManagerAndNginx() {
@@ -219,7 +244,7 @@ export async function installCertManager() {
 
 export async function installAndEnableMetricsDeps(
   installPrometheus: boolean,
-  clusterConfig?: AzureClusterConfig
+  clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
@@ -303,11 +328,11 @@ export async function resetCloudSQLInstance(instanceName: string) {
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 }
 
-async function registerIPAddress(name: string) {
+export async function registerIPAddress(name: string, zone?: string) {
   console.info(`Registering IP address ${name}`)
   try {
     await execCmd(
-      `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion()}`
+      `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion(zone)}`
     )
   } catch (error) {
     if (!error.toString().includes('already exists')) {
@@ -317,11 +342,11 @@ async function registerIPAddress(name: string) {
   }
 }
 
-async function deleteIPAddress(name: string) {
+export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
     await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion()} -q`
+      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
     )
   } catch (error) {
     if (!error.toString().includes('was not found')) {
@@ -331,9 +356,9 @@ async function deleteIPAddress(name: string) {
   }
 }
 
-export async function retrieveIPAddress(name: string) {
+export async function retrieveIPAddress(name: string, zone?: string) {
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses describe ${name}  --region ${getKubernetesClusterRegion()} --format="value(address)"`
+    `gcloud compute addresses describe ${name}  --region ${getKubernetesClusterRegion(zone)} --format="value(address)"`
   )
   return address.replace(/\n*$/, '')
 }
@@ -857,7 +882,7 @@ export function makeHelmParameters(map: { [key: string]: string }) {
   return entries(map).map(([key, value]) => `--set ${key}=${value}`)
 }
 
-function setHelmArray(paramName: string, arr: any[]) {
+export function setHelmArray(paramName: string, arr: any[]) {
   return arr.map((value, i) => `--set ${paramName}[${i}]="${value}"`)
 }
 

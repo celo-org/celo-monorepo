@@ -1,6 +1,6 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
-import colorsV2 from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import TextButton from '@celo/react-components/components/TextButton'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'src/components/Modal'
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   secondary: {
-    color: colorsV2.gray4,
+    color: colors.gray4,
     paddingTop: 16,
   },
   primary: {

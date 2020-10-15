@@ -1,9 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import TextButton from '@celo/react-components/components/TextButton'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -14,17 +14,17 @@ import { SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
 import HamburgerCard from 'src/icons/HamburgerCard'
-import InfoIcon from 'src/icons/InfoIcon.v2'
+import InfoIcon from 'src/icons/InfoIcon'
 import { validateRecipientAddress, validateRecipientAddressReset } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -204,6 +204,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
             inputPlaceholder={placeholderValue}
             // tslint:disable-next-line:jsx-no-lambda
             onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+            testID={`SingleDigitInput/digit${index}`}
           />
         </View>
       )

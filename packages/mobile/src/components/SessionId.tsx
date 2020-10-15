@@ -1,7 +1,8 @@
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
+import Clipboard from '@react-native-community/clipboard'
 import React from 'react'
-import { Clipboard, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import Logger from 'src/utils/Logger'
 
 interface Props {

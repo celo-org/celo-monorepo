@@ -73,7 +73,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -308,7 +308,7 @@ exports[`renders correctly with giant numbers 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -342,9 +342,9 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": "#2E3338",
@@ -363,9 +363,9 @@ exports[`renders correctly with giant numbers 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
                     "color": "#2E3338",
@@ -421,17 +421,20 @@ exports[`renders correctly with giant numbers 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                   ]
                 }
               >
-                Celo Dollars (@
+                Celo Dollars @
                  
                 <Text
                   numberOfLines={1}
@@ -448,7 +451,6 @@ exports[`renders correctly with giant numbers 1`] = `
                   $
                   0.75
                 </Text>
-                )
               </Text>
             </View>
             <Text
@@ -456,12 +458,15 @@ exports[`renders correctly with giant numbers 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
-                    "color": "#81868B",
+                    "color": "#9CA4A9",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   },
                 ]
               }
@@ -562,7 +567,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -797,7 +802,7 @@ exports[`renders correctly with no exchange rate 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -831,9 +836,9 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": "#2E3338",
@@ -852,9 +857,9 @@ exports[`renders correctly with no exchange rate 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
                     "color": "#2E3338",
@@ -910,17 +915,20 @@ exports[`renders correctly with no exchange rate 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                   ]
                 }
               >
-                Celo Dollars (@
+                Celo Dollars @
                  
                 <Text
                   numberOfLines={1}
@@ -937,7 +945,6 @@ exports[`renders correctly with no exchange rate 1`] = `
                   $
                   0.75
                 </Text>
-                )
               </Text>
             </View>
             <Text
@@ -945,12 +952,15 @@ exports[`renders correctly with no exchange rate 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
-                    "color": "#81868B",
+                    "color": "#9CA4A9",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   },
                 ]
               }

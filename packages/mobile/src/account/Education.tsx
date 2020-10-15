@@ -1,8 +1,8 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
-import BackChevron from '@celo/react-components/icons/BackChevron.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import BackChevron from '@celo/react-components/icons/BackChevron'
 import Times from '@celo/react-components/icons/Times'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import progressDots from '@celo/react-components/styles/progressDots'
 import * as React from 'react'
 import {
@@ -21,7 +21,7 @@ import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
 
 export enum EmbeddedNavBar {
   Close = 'Close',

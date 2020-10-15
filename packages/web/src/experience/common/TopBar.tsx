@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Hamburger from 'src/header/Hamburger'
+import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import RingsGlyph from 'src/logos/RingsGlyph'
@@ -8,17 +9,16 @@ import links from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { useBooleanToggle } from 'src/utils/useBooleanToggle'
 interface Props {
   current: string
+  kitName?: string
 }
 
 const KITS = [links.BRAND, links.EVENTS_KIT, links.MERCHANTS]
 
-export default function TopBar({ current }: Props) {
+export default function TopBar({ current, kitName }: Props) {
   const { isMobile } = useScreenSize()
   const [showingKits, toggleKits] = useBooleanToggle()
-  const name = current === links.BRAND.link ? links.BRAND.name : links.EVENTS_KIT.name
 
   return (
     <View style={standardStyles.centered}>
@@ -35,7 +35,7 @@ export default function TopBar({ current }: Props) {
                 // @ts-ignore -- added initial to the aug but it still isnt liking it
                 style={[fonts.h3, styles.title]}
               >
-                {name}
+                {kitName}
               </Text>
             </TouchableOpacity>
           </a>

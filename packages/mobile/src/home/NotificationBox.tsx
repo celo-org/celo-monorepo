@@ -5,12 +5,11 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { NativeScrollEvent, ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
-import { dismissGetVerified, dismissInviteFriends } from 'src/account/actions'
-import { getIncomingPaymentRequests, getOutgoingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequest } from 'src/account/types'
+import { dismissGetVerified, dismissGoldEducation, dismissInviteFriends } from 'src/account/actions'
 import { HomeEvents } from 'src/analytics/Events'
 import { ScrollDirection } from 'src/analytics/types'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { verificationPossibleSelector } from 'src/app/selectors'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentReminderSummaryNotification from 'src/escrow/EscrowedPaymentReminderSummaryNotification'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
@@ -23,6 +22,11 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import IncomingPaymentRequestSummaryNotification from 'src/paymentRequest/IncomingPaymentRequestSummaryNotification'
 import OutgoingPaymentRequestSummaryNotification from 'src/paymentRequest/OutgoingPaymentRequestSummaryNotification'
+import {
+  getIncomingPaymentRequests,
+  getOutgoingPaymentRequests,
+} from 'src/paymentRequest/selectors'
+import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 
@@ -52,6 +56,8 @@ interface StateProps {
   goldEducationCompleted: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  verificationPossible: boolean
+  dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
@@ -62,6 +68,7 @@ interface StateProps {
 interface DispatchProps {
   dismissInviteFriends: typeof dismissInviteFriends
   dismissGetVerified: typeof dismissGetVerified
+  dismissGoldEducation: typeof dismissGoldEducation
 }
 
 type Props = DispatchProps & StateProps & WithTranslation
@@ -74,6 +81,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
   outgoingPaymentRequests: getOutgoingPaymentRequests(state),
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   dismissedGetVerified: state.account.dismissedGetVerified,
+  verificationPossible: verificationPossibleSelector(state),
+  dismissedGoldEducation: state.account.dismissedGoldEducation,
   backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
   invitees: inviteesSelector(state),
@@ -82,6 +91,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const mapDispatchToProps = {
   dismissInviteFriends,
   dismissGetVerified,
+  dismissGoldEducation,
 }
 
 interface State {
@@ -135,12 +145,14 @@ export class NotificationBox extends React.Component<Props, State> {
       goldEducationCompleted,
       dismissedInviteFriends,
       dismissedGetVerified,
+      verificationPossible,
+      dismissedGoldEducation,
     } = this.props
     const actions = []
 
     if (!backupCompleted) {
       actions.push({
-        title: t('backupKeyFlow6:yourBackupKey'),
+        title: t('backupKeyFlow6:yourAccountKey'),
         text: t('backupKeyFlow6:backupKeyNotification'),
         icon: backupKey,
         callToActions: [
@@ -158,7 +170,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!dismissedGetVerified && !numberVerified) {
+    if (!dismissedGetVerified && !numberVerified && verificationPossible) {
       actions.push({
         title: t('nuxVerification2:notification.title'),
         text: t('nuxVerification2:notification.body'),
@@ -171,11 +183,13 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.verification_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.VerificationEducationScreen)
+              navigate(Screens.VerificationEducationScreen, {
+                hideOnboardingStep: true,
+              })
             },
           },
           {
-            text: t('global:remind'),
+            text: t('global:dismiss'),
             onPress: () => {
               ValoraAnalytics.track(HomeEvents.notification_select, {
                 notificationType: NotificationBannerTypes.verification_prompt,
@@ -188,7 +202,7 @@ export class NotificationBox extends React.Component<Props, State> {
       })
     }
 
-    if (!goldEducationCompleted) {
+    if (!dismissedGoldEducation && !goldEducationCompleted) {
       actions.push({
         title: t('global:celoGold'),
         text: t('exchangeFlow9:whatIsGold'),
@@ -211,6 +225,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.celo_asset_education,
                 selectedAction: NotificationBannerCTATypes.decline,
               })
+              this.props.dismissGoldEducation()
             },
           },
         ],
@@ -231,7 +246,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.invite_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.Invite)
+              // TODO: navigate to relevant invite flow
             },
           },
           {

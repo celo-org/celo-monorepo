@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import Svg, { Circle, Path } from 'svgs'
 
@@ -10,7 +10,7 @@ interface Props {
 export default class QuestionIcon extends React.PureComponent<Props> {
   static defaultProps = {
     size: 32,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   }
 
   render() {

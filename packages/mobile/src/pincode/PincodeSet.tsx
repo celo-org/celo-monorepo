@@ -1,7 +1,7 @@
 /**
  * This is a reactnavigation SCREEN, which we use to set a PIN.
  */
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -120,7 +120,7 @@ export class PincodeSet extends React.Component<Props, State> {
     const { pin1, pin2, errorText } = this.state
 
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <DevSkipButton nextScreen={this.getNextScreen()} />
         {isVerifying ? (
           // Verify
@@ -144,7 +144,7 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.onboardingBackground,

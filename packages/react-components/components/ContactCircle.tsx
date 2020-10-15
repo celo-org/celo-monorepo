@@ -1,6 +1,6 @@
 import { unknownUserIcon } from '@celo/react-components/images/Images'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { getContactNameHash } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
@@ -39,7 +39,10 @@ export default class ContactCircle extends React.PureComponent<Props> {
       return (
         <Image
           source={{ uri: resolvedThumbnail }}
-          style={[style.image, { height: iconSize, width: iconSize, borderRadius: iconSize / 2.0 }]}
+          style={[
+            styles.image,
+            { height: iconSize, width: iconSize, borderRadius: iconSize / 2.0 },
+          ]}
           resizeMode={'cover'}
         />
       )
@@ -58,7 +61,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
     return (
       <Image
         source={unknownUserIcon}
-        style={[style.image, { height: iconSize, width: iconSize }]}
+        style={[styles.image, { height: iconSize, width: iconSize }]}
       />
     )
   }
@@ -72,10 +75,10 @@ export default class ContactCircle extends React.PureComponent<Props> {
       contactIconColors[0]
 
     return (
-      <View style={[style.container, this.props.style]}>
+      <View style={[styles.container, this.props.style]}>
         <View
           style={[
-            style.icon,
+            styles.icon,
             {
               backgroundColor: iconColor,
               height: iconSize,
@@ -91,7 +94,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

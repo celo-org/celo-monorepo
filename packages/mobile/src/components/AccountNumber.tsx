@@ -1,9 +1,10 @@
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { getAddressChunks } from '@celo/utils/src/address'
+import Clipboard from '@react-native-community/clipboard'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Clipboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
@@ -69,6 +70,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   bottomText: {
-    textAlign: 'right',
+    textAlign: 'center',
   },
 })

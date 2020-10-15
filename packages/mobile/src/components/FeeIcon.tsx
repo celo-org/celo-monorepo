@@ -1,5 +1,4 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +11,6 @@ interface Props {
   title: string | React.ReactElement
   description: string | React.ReactElement
   dismissText: string
-  tintColor?: string
 }
 
 interface State {
@@ -21,10 +19,6 @@ interface State {
 
 // /* tslint:disable:max-classes-per-file */
 class FeeIcon extends React.Component<Props, State> {
-  static defaultProps = {
-    tintColor: colors.lightGray,
-  }
-
   state = {
     isOpen: false,
   }
@@ -48,7 +42,7 @@ class FeeIcon extends React.Component<Props, State> {
           borderless={true}
           hitSlop={iconHitslop}
         >
-          <InfoIcon size={12} tintColor={this.props.tintColor} />
+          <InfoIcon size={12} />
         </Touchable>
         <Dialog
           title={title}
@@ -63,38 +57,35 @@ class FeeIcon extends React.Component<Props, State> {
   }
 }
 
-export const ExchangeFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
+export const ExchangeFeeIcon = () => {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   return (
     <FeeIcon
       title={t('exchangeFee')}
       description={t('feeExchangeEducation')}
       dismissText={t('global:dismiss')}
-      tintColor={tintColor}
     />
   )
 }
 
-export const SecurityFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
+export const SecurityFeeIcon = () => {
   const { t } = useTranslation(Namespaces.sendFlow7)
   return (
     <FeeIcon
       title={t('securityFee')}
       description={t('feeEducation')}
       dismissText={t('global:dismiss')}
-      tintColor={tintColor}
     />
   )
 }
 
-export const EncryptionFeeIcon = ({ tintColor }: Pick<Props, 'tintColor'>) => {
+export const EncryptionFeeIcon = () => {
   const { t } = useTranslation(Namespaces.sendFlow7)
   return (
     <FeeIcon
       title={t('encryption.feeLabel')}
       description={t('encryption.feeModalBody')}
       dismissText={t('global:dismiss')}
-      tintColor={tintColor}
     />
   )
 }

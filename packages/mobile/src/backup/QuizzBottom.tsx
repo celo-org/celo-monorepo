@@ -1,6 +1,6 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import colors from '@celo/react-components/styles/colors.v2'
-import fonts from '@celo/react-components/styles/fonts.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   incorrect: {
-    ...fonts.regular500,
+    ...fontStyles.regular500,
     textAlign: 'center',
     color: colors.warning,
   },

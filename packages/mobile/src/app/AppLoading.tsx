@@ -48,7 +48,6 @@ export class AppLoading extends React.Component<Props, State> {
             <Button
               onPress={deleteChainDataAndRestartApp}
               text={t(RESTART_APP_I18N_KEY)}
-              standard={false}
               type={BtnTypes.PRIMARY}
               testID="RestartButton"
             />
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     width: '100%',
-    backgroundColor: colors.celoGreen,
+    backgroundColor: colors.greenBrand,
   },
 
   button: {

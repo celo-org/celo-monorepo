@@ -56,7 +56,7 @@ function PincodeLock() {
   }, [])
 
   return (
-    <SafeAreaView style={style.container}>
+    <SafeAreaView style={styles.container}>
       <Pincode
         title={t('confirmPin.title')}
         errorText={errorText}
@@ -68,11 +68,11 @@ function PincodeLock() {
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
 })
 

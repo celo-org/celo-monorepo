@@ -10,7 +10,6 @@ import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
-import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces } from 'src/i18n'
@@ -18,16 +17,17 @@ import { fetchAddressesAndValidate } from 'src/identity/actions'
 import { AddressValidationType, SecureSendDetails } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { declinePaymentRequest } from 'src/paymentRequest/actions'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 interface Props {
+  id: string
   requester: Recipient
   amount: string
-  comment: string
-  id: string
+  comment?: string
 }
 
 export default function IncomingPaymentRequestListItem({ id, amount, comment, requester }: Props) {

@@ -1,6 +1,6 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
@@ -13,7 +13,7 @@ import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -81,9 +81,9 @@ export class ExchangeReview extends React.Component<Props, State> {
       CURRENCY_ENUM.DOLLAR
     )
     const goldAmount = isDollarToGold ? makerAmount : inputAmount
-    const dollarsAmount = isDollarToGold ? inputAmount : makerAmount
+    const dollarAmount = isDollarToGold ? inputAmount : makerAmount
     const localCurrencyAmount = convertDollarsToLocalAmount(
-      dollarsAmount,
+      dollarAmount,
       this.props.localCurrencyExchangeRate
     )
     ValoraAnalytics.track(
@@ -93,6 +93,7 @@ export class ExchangeReview extends React.Component<Props, State> {
           ? localCurrencyAmount.toString()
           : localCurrencyAmount,
         goldAmount: goldAmount.toString(),
+        dollarAmount: dollarAmount.toString(),
         inputToken,
         goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
       }
@@ -246,6 +247,7 @@ export class ExchangeReview extends React.Component<Props, State> {
           style={styles.buyBtn}
           disabled={!appConnected || exchangeRate.isZero()}
           type={BtnTypes.TERTIARY}
+          testID="ConfirmExchange"
         />
       </SafeAreaView>
     )

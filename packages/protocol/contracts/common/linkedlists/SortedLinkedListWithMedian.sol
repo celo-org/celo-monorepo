@@ -121,6 +121,12 @@ library SortedLinkedListWithMedian {
     bytes32 lesserKey,
     bytes32 greaterKey
   ) internal {
+<<<<<<< HEAD
+=======
+    // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
+    // don't change.
+    // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
+>>>>>>> master
     remove(list, key);
     insert(list, key, value, lesserKey, greaterKey);
   }

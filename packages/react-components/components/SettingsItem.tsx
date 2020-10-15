@@ -1,8 +1,8 @@
 import ListItem from '@celo/react-components/components/ListItem'
-import TextInput from '@celo/react-components/components/TextInput.v2'
+import TextInput from '@celo/react-components/components/TextInput'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Switch, Text, View } from 'react-native'
 
@@ -30,24 +30,24 @@ type BaseProps = {
 
 type SettingsItemTextValueProps = {
   value?: string
+  showChevron?: boolean
 } & BaseProps
 
 export function SettingsItemTextValue({
   testID,
   title,
   value,
+  showChevron,
   onPress,
 }: SettingsItemTextValueProps) {
   return (
     <Wrapper testID={testID} onPress={onPress}>
       <View style={styles.container}>
         <Title value={title} />
-        {value && (
-          <View style={styles.right}>
-            <Text style={styles.value}>{value}</Text>
-            <ForwardChevron />
-          </View>
-        )}
+        <View style={styles.right}>
+          {value && <Text style={styles.value}>{value}</Text>}
+          {(value || showChevron) && <ForwardChevron />}
+        </View>
       </View>
     </Wrapper>
   )
@@ -71,6 +71,30 @@ export function SettingsItemSwitch({
       <View style={styles.container}>
         <Title value={title} />
         <Switch testID={testID} value={value} onValueChange={onValueChange} />
+      </View>
+      {details && (
+        <View>
+          <Text style={styles.details}>{details}</Text>
+        </View>
+      )}
+    </Wrapper>
+  )
+}
+
+type SettingsExpandedItemProps = {
+  details?: string
+} & BaseProps
+
+export function SettingsExpandedItem({
+  testID,
+  title,
+  details,
+  onPress,
+}: SettingsExpandedItemProps) {
+  return (
+    <Wrapper testID={testID} onPress={onPress}>
+      <View style={styles.container}>
+        <Title value={title} />
       </View>
       {details && (
         <View>

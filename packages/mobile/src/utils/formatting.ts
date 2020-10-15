@@ -107,18 +107,18 @@ export function roundUp(
 export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
   switch (currencyType) {
     case CURRENCY_ENUM.DOLLAR:
-      return colors.celoGreen
+      return colors.greenBrand
     case CURRENCY_ENUM.GOLD:
-      return colors.celoGold
+      return colors.goldBrand
   }
 }
 
 export const getBalanceColor = (accountBalance: BigNumber): string => {
   if (accountBalance.isGreaterThan(0)) {
-    return colors.celoGreen
+    return colors.greenBrand
   }
   if (accountBalance.isLessThan(0)) {
-    return colors.errorRed
+    return colors.warning
   }
   return colors.dark
 }

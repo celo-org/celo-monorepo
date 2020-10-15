@@ -1,6 +1,6 @@
 import ListItem from '@celo/react-components/components/ListItem'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { NavigationProp, RouteProp } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -11,7 +11,7 @@ import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-n
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import { MOONPAY_RATE_API } from 'src/config'
@@ -22,9 +22,9 @@ import QuestionIcon from 'src/icons/QuestionIcon'
 import { moonpayLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
-import { emptyHeader, HeaderTitleWithSubtitle } from 'src/navigator/Headers.v2'
+import { emptyHeader, HeaderTitleWithSubtitle } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 
@@ -174,10 +174,6 @@ function FiatExchangeOptions({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: variables.contentPadding,
-  },
-  optionTitle: {
-    ...fontStyles.regular,
-    paddingLeft: variables.contentPadding,
   },
   pleaseSelectProvider: {
     ...fontStyles.regular,

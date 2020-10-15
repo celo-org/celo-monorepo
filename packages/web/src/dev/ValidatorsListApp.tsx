@@ -17,6 +17,7 @@ import menuItems from 'src/shared/menu-items'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles, textStyles } from 'src/styles'
+import { cleanData } from 'src/utils/validators'
 
 const networkMenu = [
   ['Mainnet', menuItems.VALIDATORS_LIST.link],
@@ -172,7 +173,7 @@ class ValidatorsListApp extends React.PureComponent<Props> {
                     </View>
                   )
                 }
-                return <ValidatorsList data={data} isLoading={loading} />
+                return <ValidatorsList data={cleanData(data)} isLoading={loading} />
               }}
             </Query>
           </ApolloProvider>

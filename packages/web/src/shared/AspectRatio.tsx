@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { createElement, StyleSheet, View, ViewStyle } from 'react-native'
+import {
+  StyleSheet,
+  unstable_createElement as createElement,
+  View,
+  ViewStyle,
+} from 'react-native-web'
 
 interface Props {
   onLayout?: () => void

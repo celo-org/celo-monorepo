@@ -27,7 +27,10 @@ const flakeTrackerID = 71131 // This is the FlakeTracker GitHub App ID.
 
 // shouldTrackFlakes => tests are retried `numRetries` times and flakey results are logged w/ test output
 const shouldTrackFlakes =
-  (process.env.CIRCLECI && process.env.FLAKEY !== 'false') || process.env.FLAKEY === 'true'
+  (process.env.CIRCLECI &&
+    process.env.CIRCLE_PROJECT_REPONAME !== 'celo-blockchain' &&
+    process.env.FLAKEY !== 'false') ||
+  process.env.FLAKEY === 'true'
 
 // shouldLogRetryErrorsOnFailure => log raw test error immediately after every retry.
 const shouldLogRetryErrorsOnFailure = shouldTrackFlakes && process.env.LOG_ALL_RETRY_ERRORS
@@ -37,17 +40,24 @@ const numRetries = process.env.NUM_RETRIES ? Number(process.env.NUM_RETRIES) : d
 
 // shouldSkipKnownFlakes => flakey test issues are fetched from github and corresponding tests are skipped
 const shouldSkipKnownFlakes =
-  shouldTrackFlakes && process.env.CIRCLECI && process.env.SKIP_KNOWN_FLAKES !== 'false'
+  shouldTrackFlakes &&
+  process.env.CIRCLECI &&
+  process.env.FLAKE_TRACKER_SECRET &&
+  process.env.SKIP_KNOWN_FLAKES !== 'false'
 
 // shouldAddCheckToPR => GitHub Check added to PR
-const shouldAddCheckToPR = shouldTrackFlakes && process.env.CIRCLECI
+const shouldAddCheckToPR =
+  shouldTrackFlakes && process.env.CIRCLECI && process.env.FLAKE_TRACKER_SECRET
 
 // newFlakesShouldFailCheckSuite => determines whether GitHub Check has status 'failure' or 'neutral' when new flakey tests are found.
 const newFlakesShouldFailCheckSuite = shouldAddCheckToPR && process.env.FLAKES_FAIL_CHECK_SUITE
 
 // shouldCreateIssues => GitHub Issues created for new flakey tests
 const shouldCreateIssues =
-  shouldTrackFlakes && process.env.CIRCLECI && process.env.CIRCLE_BRANCH === 'master'
+  shouldTrackFlakes &&
+  process.env.CIRCLECI &&
+  process.env.FLAKE_TRACKER_SECRET &&
+  process.env.CIRCLE_BRANCH === 'master'
 
 // For convenience...
 const shouldReportFlakes = shouldAddCheckToPR || shouldCreateIssues

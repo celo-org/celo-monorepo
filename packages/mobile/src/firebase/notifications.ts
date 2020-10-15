@@ -1,17 +1,17 @@
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
-import {
-  NotificationReceiveState,
-  NotificationTypes,
-  PaymentRequest,
-  TransferNotificationData,
-} from 'src/account/types'
 import { showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
-import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import {
+  NotificationReceiveState,
+  NotificationTypes,
+  TransferNotificationData,
+} from 'src/notifications/types'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
@@ -36,8 +36,13 @@ function* handlePaymentRequested(
     return
   }
 
+  const addressToE164Number = yield select(addressToE164NumberSelector)
   const recipientCache = yield select(recipientCacheSelector)
-  const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
+  const targetRecipient = getRequesterFromPaymentRequest(
+    paymentRequest,
+    addressToE164Number,
+    recipientCache
+  )
 
   navigateToRequestedPaymentReview({
     firebasePendingRequestUid: paymentRequest.uid,

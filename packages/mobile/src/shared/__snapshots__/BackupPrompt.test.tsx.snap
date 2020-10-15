@@ -23,7 +23,7 @@ exports[`BackupPrompt renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "column",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -42,7 +42,7 @@ exports[`BackupPrompt renders correctly 1`] = `
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },
@@ -110,7 +110,7 @@ exports[`BackupPrompt renders correctly 1`] = `
           Array [
             Object {
               "color": "#81868B",
-              "fontFamily": "Hind-SemiBold",
+              "fontFamily": "Inter-Medium",
               "fontSize": 13,
               "lineHeight": 20,
               "textAlign": "center",

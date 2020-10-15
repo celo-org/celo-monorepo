@@ -8,7 +8,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Screens } from 'src/navigator/Screens'
 
 interface Props {
-  backAnalyticsEvent: keyof AnalyticsPropertiesList
+  backAnalyticsEvents: [keyof AnalyticsPropertiesList]
 }
 
 // This hook is meant to be used in a navigation screen, during onboarding.
@@ -16,7 +16,7 @@ interface Props {
 // so that navigating back will go to the Welcome screen,
 // even if there were intermediary screens in between.
 // It also dispatches an action when the screen is removed (hardware back button, swipe, or simply navigate back)
-export function useBackToWelcomeScreen({ backAnalyticsEvent }: Props) {
+export function useBackToWelcomeScreen({ backAnalyticsEvents }: Props) {
   const didResetStackRef = useRef(false)
   const navigation = useNavigation()
   const dispatch = useDispatch()
@@ -52,16 +52,21 @@ export function useBackToWelcomeScreen({ backAnalyticsEvent }: Props) {
     // Check if this screen is removed while focused (hardware back button, swipe, or simply navigate back)
     // so we can reset some state
     // See https://reactnavigation.org/docs/preventing-going-back
-    const cancelBeforeRemove = navigation.addListener('beforeRemove', (e) => {
-      ValoraAnalytics.track(backAnalyticsEvent)
-      dispatch(cancelCreateOrRestoreAccount())
+    const cancelBeforeRemove = navigation.addListener('beforeRemove', (event) => {
+      const resetScreenName = (event?.data?.action?.payload as any)?.routes?.[0]?.name
+      if (resetScreenName !== Screens.DrawerNavigator) {
+        backAnalyticsEvents.forEach((analyticsEvent) => {
+          ValoraAnalytics.track(analyticsEvent)
+        })
+        dispatch(cancelCreateOrRestoreAccount())
+      }
     })
 
     return () => {
       resetStackTask.cancel()
       cancelBeforeRemove()
     }
-  }, [backAnalyticsEvent])
+  }, [backAnalyticsEvents])
 
   useFocusEffect(onFocus)
 }
