@@ -6,7 +6,7 @@ import { publicKeyFromAsn1 } from '../utils/ber-utils'
 import { bigNumberToBuffer, bufferToBigNumber } from '../utils/signature-utils'
 import { getAddressFromPublicKey, publicKeyPrefix, sixtyFour } from '../utils/signing-utils'
 import { RemoteWallet } from './remote-wallet'
-import AwsHsmSigner from './signers/aws-hsm-signer'
+import { AwsHsmSigner } from './signers/aws-hsm-signer'
 import { ReadOnlyWallet } from './wallet'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
@@ -22,7 +22,7 @@ const defaultCredentials: KMS.ClientConfiguration = {
  * When using the default credentials, it's expected to set the
  * aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
  */
-export default class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnlyWallet {
+export class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnlyWallet {
   private kms: KMS | undefined
   private credentials: KMS.ClientConfiguration
 
