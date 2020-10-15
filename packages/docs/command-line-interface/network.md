@@ -1,12 +1,12 @@
 ---
-description: Prints Celo contract addesses.
+description: View details about the network, like contracts and parameters
 ---
 
 ## Commands
 
 ### Contracts
 
-Prints Celo contract addesses.
+Lists Celo core contracts and their addesses.
 
 ```
 USAGE
