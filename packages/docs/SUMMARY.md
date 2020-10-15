@@ -22,6 +22,7 @@
 ## CELO Holder Guide
 
 - [Quick Start](celo-holder-guide/quick-start.md)
+- [cUSD Holder Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
@@ -253,6 +254,8 @@
       - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
       - [wrappers/BlockchainParameters](developer-resources/contractkit/reference/modules/_wrappers_blockchainparameters_.md)
       - [BlockchainParametersWrapper](developer-resources/contractkit/reference/classes/_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
+      - [BlockchainParametersConfig](developer-resources/contractkit/reference/interfaces/_wrappers_blockchainparameters_.blockchainparametersconfig.md)
+      - [ClientVersion](developer-resources/contractkit/reference/interfaces/_wrappers_blockchainparameters_.clientversion.md)
       - [wrappers/DoubleSigningSlasher](developer-resources/contractkit/reference/modules/_wrappers_doublesigningslasher_.md)
       - [DoubleSigningSlasherWrapper](developer-resources/contractkit/reference/classes/_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)
       - [wrappers/DowntimeSlasher](developer-resources/contractkit/reference/modules/_wrappers_downtimeslasher_.md)
@@ -448,6 +451,8 @@
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
       - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
+      - [BlockchainParametersConfig](developer-resources/contractkit/reference/interfaces/_wrappers_blockchainparameters_.blockchainparametersconfig.md)
+      - [ClientVersion](developer-resources/contractkit/reference/interfaces/_wrappers_blockchainparameters_.clientversion.md)
       - [DowntimeSlasherConfig](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)
       - [DowntimeWindow](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimewindow.md)
       - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
