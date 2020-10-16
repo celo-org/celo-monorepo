@@ -45,4 +45,12 @@ yarn build
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 
-yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_directory $BUILD_DIR/contracts --report $REPORT --proposal $PROPOSAL --initialize_data $INITIALIZE_DATA $DRYRUN
+git checkout -
+yarn build
+
+yarn run truffle exec ./scripts/truffle/make-release.js \
+  --network $NETWORK \
+  --build_directory $BUILD_DIR \
+  --report $REPORT \
+  --proposal $PROPOSAL \
+  --initialize_data $INITIALIZE_DATA $DRYRUN
