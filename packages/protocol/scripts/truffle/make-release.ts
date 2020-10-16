@@ -87,6 +87,8 @@ const ensureAllContractsThatLinkLibrariesHaveChanges = (
     const hasChanges = report.contracts[contract]
     const isTest = contract.endsWith('Test')
 
+    // This check goes over all contracts, so we again have to exclude the
+    // contracts that were ignored in the version check.
     if (hasDependency && !hasChanges && !isTest && !exclude.test(contract)) {
       console.log(
         `${contract} links ${dependencies.get(
