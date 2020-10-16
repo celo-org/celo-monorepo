@@ -401,6 +401,10 @@ export const v5Schema = {
     },
     addressToDisplayName: {},
   },
+  exchange: {
+    ...v3Schema.exchange,
+    isLoading: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
