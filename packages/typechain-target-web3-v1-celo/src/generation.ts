@@ -14,7 +14,7 @@ import {
 
 export function codegen(contract: Contract, abi: RawAbiDefinition[]) {
   const template = `
-  import { AbiItem, Callback, CeloTxObject, Contract, EventLog } from '@celo/communication'
+  import { AbiItem, Callback, CeloTxObject, Contract, EventLog } from '@celo/connect'
   import { EventEmitter } from 'events'
   import Web3 from 'web3'
   import { ContractEvent, EventOptions } from './types'

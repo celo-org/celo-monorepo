@@ -17,8 +17,8 @@ export class CeloAdapter {
     this.privateKey = ensureLeading0x(pk)
     this.defaultAddress = privateKeyToAddress(this.privateKey)
     console.info(`Using address ${this.defaultAddress} to send transactions`)
-    this.kit.communication.addAccount(this.privateKey)
-    this.kit.communication.defaultAccount = this.defaultAddress
+    this.kit.connection.addAccount(this.privateKey)
+    this.kit.connection.defaultAccount = this.defaultAddress
   }
 
   async transferGold(to: string, amount: string) {
@@ -63,6 +63,6 @@ export class CeloAdapter {
   }
 
   stop() {
-    this.kit.communication.stop()
+    this.kit.connection.stop()
   }
 }

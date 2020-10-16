@@ -1,4 +1,4 @@
-import { Address, CeloTransactionParams } from '@celo/communication'
+import { Address, CeloTransactionParams } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   ActionableAttestation,
@@ -89,7 +89,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     )
     const clientAddress = privateKeyToAddress(clientKey)
     logger = logger.child({ address: clientAddress })
-    kit.communication.addAccount(clientKey)
+    kit.connection.addAccount(clientKey)
 
     const twilioClient = twilio(
       fetchEnv(envVar.TWILIO_ACCOUNT_SID),

@@ -1,4 +1,4 @@
-import { Address, BlockHeader } from '@celo/communication'
+import { Address, BlockHeader } from '@celo/connect'
 import { eqAddress } from '@celo/utils/lib/address'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 

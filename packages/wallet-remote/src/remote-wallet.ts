@@ -1,4 +1,4 @@
-import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/communication'
+import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/connect'
 import { sleep } from '@celo/utils/lib/async'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { WalletBase } from '@celo/wallet-base'

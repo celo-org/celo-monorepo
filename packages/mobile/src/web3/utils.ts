@@ -1,4 +1,4 @@
-import { BlockHeader, CeloTx, CeloTxObject } from '@celo/communication'
+import { BlockHeader, CeloTx, CeloTxObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
@@ -22,11 +22,11 @@ export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
     // @ts-ignore missing _parent property from TransactionObject type.
     return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
   }
-  const caller = (_tx: CeloTx) => contractKit.communication.web3.eth.call(getCallTx(_tx))
+  const caller = (_tx: CeloTx) => contractKit.connection.web3.eth.call(getCallTx(_tx))
 
-  contractKit.communication.defaultGasInflationFactor = GAS_INFLATION_FACTOR
+  contractKit.connection.defaultGasInflationFactor = GAS_INFLATION_FACTOR
   const gas = new BigNumber(
-    await contractKit.communication.estimateGasWithInflationFactor(txParams, gasEstimator, caller)
+    await contractKit.connection.estimateGasWithInflationFactor(txParams, gasEstimator, caller)
   )
   return gas
 }

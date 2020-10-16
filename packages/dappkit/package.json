@@ -12,7 +12,7 @@
     "libphonenumber-js": "^1.7.22"
   },
   "devDependencies": {
-    "@celo/communication": "0.0.1-dev"
+    "@celo/connect": "0.0.2-dev"
   },
   "main": "./lib/index.js",
   "files": ["src/**/*", "lib/**/*"]

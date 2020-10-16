@@ -18,7 +18,7 @@ export class AddressRegistry {
 
   constructor(private readonly kit: ContractKit) {
     this.cache.set(CeloContract.Registry, REGISTRY_CONTRACT_ADDRESS)
-    this.registry = newRegistry(kit.communication.web3, REGISTRY_CONTRACT_ADDRESS)
+    this.registry = newRegistry(kit.connection.web3, REGISTRY_CONTRACT_ADDRESS)
   }
 
   /**
@@ -28,7 +28,7 @@ export class AddressRegistry {
     if (!this.cache.has(contract)) {
       const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const hash = this.kit.communication.web3.utils.soliditySha3({
+      const hash = this.kit.connection.web3.utils.soliditySha3({
         type: 'string',
         value: proxyStrippedContract,
       })

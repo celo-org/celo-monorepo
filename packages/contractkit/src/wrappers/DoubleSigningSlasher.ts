@@ -1,5 +1,5 @@
 import { findAddressIndex } from '@celo/base/lib/address'
-import { Address, CeloTransactionObject, toTransactionObject } from '@celo/communication'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { DoubleSigningSlasher } from '../generated/DoubleSigningSlasher'
 import { BaseWrapper, proxyCall, valueToBigNumber, valueToInt } from './BaseWrapper'
@@ -102,7 +102,7 @@ export class DoubleSigningSlasherWrapper extends BaseWrapper<DoubleSigningSlashe
     )
 
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.slash(
         signer,
         signerIndex,

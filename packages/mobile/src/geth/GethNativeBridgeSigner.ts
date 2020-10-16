@@ -1,5 +1,5 @@
 import { ensureLeading0x } from '@celo/base/lib/address'
-import { CeloTx, RLPEncodedTx, Signer } from '@celo/communication'
+import { CeloTx, RLPEncodedTx, Signer } from '@celo/connect'
 import { normalizeAddressWith0x } from '@celo/utils/src/address'
 import { encodeTransaction, extractSignature, rlpEncodedTx } from '@celo/wallet-base'
 import * as ethUtil from 'ethereumjs-util'

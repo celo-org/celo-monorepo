@@ -1,4 +1,4 @@
-import { ContractSendMethod } from '@celo/communication'
+import { ContractSendMethod } from '@celo/connect'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import {
   AccountAuthRequest,
@@ -128,7 +128,7 @@ export async function requestTxSig(
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
-  const baseNonce = await kit.communication.nonce(txParams[0].from)
+  const baseNonce = await kit.connection.nonce(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
       const feeCurrency = txParam.feeCurrency ? txParam.feeCurrency : FeeCurrency.cGLD

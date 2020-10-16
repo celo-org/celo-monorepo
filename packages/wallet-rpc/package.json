@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/communication": "0.0.1-dev",
+    "@celo/connect": "0.0.2-dev",
     "@celo/contractkit": "0.4.16-dev"
   },
   "engines": {

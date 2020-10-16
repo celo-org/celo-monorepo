@@ -52,12 +52,12 @@ export function isDBOnline() {
 export let kit: ContractKit
 
 export async function isNodeSyncing() {
-  const syncProgress = await kit.communication.isSyncing()
+  const syncProgress = await kit.connection.isSyncing()
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
 export async function getAgeOfLatestBlock() {
-  const latestBlock = await kit.communication.getBlock('latest')
+  const latestBlock = await kit.connection.getBlock('latest')
   const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
   return {
     ageOfLatestBlock,
@@ -68,7 +68,7 @@ export async function getAgeOfLatestBlock() {
 export async function isAttestationSignerUnlocked() {
   // The only way to see if a key is unlocked is to try to sign something
   try {
-    await kit.communication.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress())
+    await kit.connection.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress())
     return true
   } catch {
     return false

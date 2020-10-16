@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/communication'
+import { CeloTransactionObject } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { UnlockableWallet } from '@celo/wallet-base'

@@ -7,7 +7,7 @@ import {
   EventLog,
   PastEventOptions,
   toTransactionObject,
-} from '@celo/communication'
+} from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { ContractKit } from '../kit'
@@ -226,9 +226,9 @@ export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[]
     const methodFn = sendArgs[0]
     const preParse = sendArgs[1]
     return (...args: InputArgs) =>
-      toTransactionObject(kit.communication, methodFn(...preParse(...args)))
+      toTransactionObject(kit.connection, methodFn(...preParse(...args)))
   } else {
     const methodFn = sendArgs[0]
-    return (...args: InputArgs) => toTransactionObject(kit.communication, methodFn(...args))
+    return (...args: InputArgs) => toTransactionObject(kit.connection, methodFn(...args))
   }
 }

@@ -82,8 +82,8 @@ export const handler = async function simulateVoting(argv: SimulateVotingArgv) {
     for (const key of botKeysVotingThisRound) {
       const botAccount = ensureLeading0x(privateKeyToAddress(key))
 
-      kit.communication.addAccount(key)
-      kit.communication.defaultAccount = botAccount
+      kit.connection.addAccount(key)
+      kit.connection.defaultAccount = botAccount
 
       console.info(`Voting as: ${botAccount}.`)
       try {
@@ -284,7 +284,7 @@ async function activatePendingVotes(kit: ContractKit, botKeys: string[]): Promis
   const election = await kit.contracts.getElection()
 
   await concurrentMap(10, botKeys, async (key) => {
-    kit.communication.addAccount(key)
+    kit.connection.addAccount(key)
     const account = ensureLeading0x(privateKeyToAddress(key))
     if (!(await election.hasActivatablePendingVotes(account))) {
       try {

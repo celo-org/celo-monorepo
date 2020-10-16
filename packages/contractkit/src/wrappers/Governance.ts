@@ -7,7 +7,7 @@ import {
 } from '@celo/base/lib/address'
 import { concurrentMap } from '@celo/base/lib/async'
 import { zeroRange, zip } from '@celo/base/lib/collections'
-import { Address, CeloTxPending, toTransactionObject } from '@celo/communication'
+import { Address, CeloTxPending, toTransactionObject } from '@celo/connect'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Governance } from '../generated/Governance'
@@ -615,7 +615,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async upvote(proposalID: BigNumber.Value, upvoter: Address) {
     const { lesserID, greaterID } = await this.lesserAndGreaterAfterUpvote(upvoter, proposalID)
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.upvote(
         valueToString(proposalID),
         valueToString(lesserID),
@@ -631,7 +631,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async revokeUpvote(upvoter: Address) {
     const { lesserID, greaterID } = await this.lesserAndGreaterAfterRevoke(upvoter)
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.revokeUpvote(valueToString(lesserID), valueToString(greaterID))
     )
   }
@@ -644,7 +644,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async approve(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.approve(valueToString(proposalID), proposalIndex)
     )
   }
@@ -658,7 +658,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const voteNum = Object.keys(VoteValue).indexOf(vote)
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
     )
   }
@@ -681,7 +681,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async execute(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.execute(valueToString(proposalID), proposalIndex)
     )
   }

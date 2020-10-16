@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/communication'
+import { CeloTransactionObject } from '@celo/connect'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { StableToken } from '../generated/StableToken'

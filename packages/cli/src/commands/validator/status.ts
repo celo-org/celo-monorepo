@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication'
+import { Address } from '@celo/connect'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'

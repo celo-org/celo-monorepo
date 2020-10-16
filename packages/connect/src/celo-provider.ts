@@ -1,7 +1,7 @@
 import { Lock } from '@celo/base/lib/lock'
 import debugFactory from 'debug'
-import { NodeCommunicationWrapper } from '.'
-import { Callback, EncodedTransaction, JsonRpcPayload, JsonRpcResponse, Provider } from './commons'
+import { Connection } from './connection'
+import { Callback, EncodedTransaction, JsonRpcPayload, JsonRpcResponse, Provider } from './types'
 import { hasProperty, stopProvider } from './utils/provider-utils'
 import { rpcCallHandler } from './utils/rpc-caller'
 
@@ -36,26 +36,23 @@ export class CeloProvider implements Provider {
   // relation to other sign and send operations.
   private nonceLock: Lock = new Lock()
 
-  constructor(
-    readonly existingProvider: Provider,
-    readonly communication: NodeCommunicationWrapper
-  ) {
+  constructor(readonly existingProvider: Provider, readonly connection: Connection) {
     this.addProviderDelegatedFunctions()
   }
 
-  // Used for backwards compatibility. Use the `addAccount` from the NodeCommunicationWrapper
+  // Used for backwards compatibility. Use the `addAccount` from the Connection
   addAccount(privateKey: string) {
-    this.communication.addAccount(privateKey)
+    this.connection.addAccount(privateKey)
   }
 
-  // Used for backwards compatibility. Use the `getAccounts` from the NodeCommunicationWrapper
+  // Used for backwards compatibility. Use the `getAccounts` from the Connection
   async getAccounts(): Promise<string[]> {
-    return this.communication.getAccounts()
+    return this.connection.getAccounts()
   }
 
-  // Used for backwards compatibility. Use the `getAccounts` from the NodeCommunicationWrapper
+  // Used for backwards compatibility. Use the `getAccounts` from the Connection
   isLocalAccount(address?: string): boolean {
-    return this.communication.wallet != null && this.communication.wallet.hasAccount(address)
+    return this.connection.wallet != null && this.connection.wallet.hasAccount(address)
   }
 
   /**
@@ -85,7 +82,7 @@ export class CeloProvider implements Provider {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
-        if (this.communication.isLocalAccount(txParams.from)) {
+        if (this.connection.isLocalAccount(txParams.from)) {
           rpcCallHandler(payload, this.handleSendTransaction.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -96,7 +93,7 @@ export class CeloProvider implements Provider {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         txParams = payload.params[0]
 
-        if (this.communication.isLocalAccount(txParams.from)) {
+        if (this.connection.isLocalAccount(txParams.from)) {
           rpcCallHandler(payload, this.handleSignTransaction.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -112,7 +109,7 @@ export class CeloProvider implements Provider {
         }
         address = payload.method === InterceptedMethods.sign ? payload.params[0] : payload.params[1]
 
-        if (this.communication.isLocalAccount(address)) {
+        if (this.connection.isLocalAccount(address)) {
           rpcCallHandler(payload, this.handleSignPersonalMessage.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -124,7 +121,7 @@ export class CeloProvider implements Provider {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         address = payload.params[0]
 
-        if (this.communication.isLocalAccount(address)) {
+        if (this.connection.isLocalAccount(address)) {
           rpcCallHandler(payload, this.handleSignTypedData.bind(this), decoratedCallback)
         } else {
           this.forwardSend(payload, callback)
@@ -157,22 +154,22 @@ export class CeloProvider implements Provider {
 
   private async handleSignTypedData(payload: JsonRpcPayload): Promise<any> {
     const [address, typedData] = payload.params
-    const signature = this.communication.wallet!.signTypedData(address, typedData)
+    const signature = this.connection.wallet!.signTypedData(address, typedData)
     return signature
   }
 
   private async handleSignPersonalMessage(payload: JsonRpcPayload): Promise<any> {
     const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     const data = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
-    const ecSignatureHex = this.communication.wallet!.signPersonalMessage(address, data)
+    const ecSignatureHex = this.connection.wallet!.signPersonalMessage(address, data)
     return ecSignatureHex
   }
 
   private async handleSignTransaction(payload: JsonRpcPayload): Promise<EncodedTransaction> {
     const txParams = payload.params[0]
-    const filledParams = await this.communication.paramsPopulator.populate(txParams)
+    const filledParams = await this.connection.paramsPopulator.populate(txParams)
     debugTxToSend('%O', filledParams)
-    const signedTx = await this.communication.wallet!.signTransaction(filledParams)
+    const signedTx = await this.connection.wallet!.signTransaction(filledParams)
     debugEncodedTx('%O', signedTx)
     return signedTx
   }
@@ -181,7 +178,7 @@ export class CeloProvider implements Provider {
     await this.nonceLock.acquire()
     try {
       const signedTx = await this.handleSignTransaction(payload)
-      const response = await this.communication.rpcCaller.call('eth_sendRawTransaction', [
+      const response = await this.connection.rpcCaller.call('eth_sendRawTransaction', [
         signedTx.raw,
       ])
       return response.result
@@ -191,7 +188,7 @@ export class CeloProvider implements Provider {
   }
 
   private forwardSend(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {
-    this.communication.rpcCaller.send(payload, callback)
+    this.connection.rpcCaller.send(payload, callback)
   }
 
   private checkPayloadWithAtLeastNParams(payload: JsonRpcPayload, n: number) {

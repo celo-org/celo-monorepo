@@ -17,7 +17,7 @@ testWithGanache('Account claims', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(
       createAccountClaim(otherAddress),
-      NativeSigner(kit.communication.web3.eth.sign, address)
+      NativeSigner(kit.connection.web3.eth.sign, address)
     )
   })
 
@@ -26,7 +26,7 @@ testWithGanache('Account claims', (web3) => {
     const otherKey = ACCOUNT_PRIVATE_KEYS[1]
     await metadata.addClaim(
       createAccountClaim(privateKeyToAddress(otherKey), privateKeyToPublicKey(otherKey)),
-      NativeSigner(kit.communication.web3.eth.sign, address)
+      NativeSigner(kit.connection.web3.eth.sign, address)
     )
   })
 
@@ -35,7 +35,7 @@ testWithGanache('Account claims', (web3) => {
     await expect(
       metadata.addClaim(
         createAccountClaim(address),
-        NativeSigner(kit.communication.web3.eth.sign, address)
+        NativeSigner(kit.connection.web3.eth.sign, address)
       )
     ).rejects.toEqual(new Error("Can't claim self"))
   })
@@ -76,7 +76,7 @@ testWithGanache('Account claims', (web3) => {
 
       const metadata = IdentityMetadataWrapper.fromEmpty(address)
       claim = createAccountClaim(otherAddress)
-      await metadata.addClaim(claim, NativeSigner(kit.communication.web3.eth.sign, address))
+      await metadata.addClaim(claim, NativeSigner(kit.connection.web3.eth.sign, address))
     })
 
     afterEach(() => {
@@ -105,7 +105,7 @@ testWithGanache('Account claims', (web3) => {
       beforeEach(async () => {
         await otherMetadata.addClaim(
           createAccountClaim(address),
-          NativeSigner(kit.communication.web3.eth.sign, otherAddress)
+          NativeSigner(kit.connection.web3.eth.sign, otherAddress)
         )
       })
 

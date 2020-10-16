@@ -41,7 +41,7 @@ export const handler = async (argv: InviteArgv) => {
   const cb = async () => {
     const web3: Web3 = new Web3('http://localhost:8545')
     const kit: ContractKit = newKitFromWeb3(web3)
-    const account = (await kit.communication.getAccounts())[0]
+    const account = (await kit.connection.getAccounts())[0]
     console.log(`Using account: ${account}`)
     kit.defaultAccount = account
 
@@ -69,7 +69,7 @@ export const handler = async (argv: InviteArgv) => {
     const stableTokenInviteAmount = attestationFee.times(10).toString()
     const stableTokenEscrowAmount = (await convertToContractDecimals(5, stableToken)).toString()
 
-    const phoneHash: string = kit.communication.web3.utils.soliditySha3({
+    const phoneHash: string = kit.connection.web3.utils.soliditySha3({
       type: 'string',
       value: phone,
     })!

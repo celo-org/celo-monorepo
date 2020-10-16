@@ -1,4 +1,4 @@
-import { CeloTx } from '@celo/communication'
+import { CeloTx } from '@celo/connect'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,

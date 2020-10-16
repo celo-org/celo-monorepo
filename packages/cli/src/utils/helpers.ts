@@ -1,4 +1,4 @@
-import { Block } from '@celo/communication'
+import { Block } from '@celo/connect'
 import Web3 from 'web3'
 import { failWith } from './cli'
 

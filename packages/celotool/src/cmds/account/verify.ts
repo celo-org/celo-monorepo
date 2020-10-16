@@ -53,7 +53,7 @@ export const handler = async (argv: VerifyArgv) => {
 async function verifyCmd(argv: VerifyArgv) {
   const web3: Web3 = new Web3('http://localhost:8545')
   const kit: ContractKit = newKitFromWeb3(web3)
-  const account = (await kit.communication.getAccounts())[0]
+  const account = (await kit.connection.getAccounts())[0]
   kit.defaultAccount = account
 
   const attestations = await kit.contracts.getAttestations()

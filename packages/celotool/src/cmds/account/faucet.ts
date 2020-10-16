@@ -72,9 +72,9 @@ export const handler = async (argv: FaucetArgv) => {
   const cb = async () => {
     const web3 = new Web3('http://localhost:8545')
     const kit = newKitFromWeb3(web3)
-    const account = (await kit.communication.getAccounts())[0]
+    const account = (await kit.connection.getAccounts())[0]
     console.log(`Using account: ${account}`)
-    kit.communication.defaultAccount = account
+    kit.connection.defaultAccount = account
 
     const [goldToken, stableToken, reserve] = await Promise.all([
       kit.contracts.getGoldToken(),

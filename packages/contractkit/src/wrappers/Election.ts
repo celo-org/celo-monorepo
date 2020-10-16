@@ -1,7 +1,7 @@
 import { eqAddress, findAddressIndex, normalizeAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/base/lib/async'
 import { zeroRange, zip } from '@celo/base/lib/collections'
-import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/communication'
+import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { Election } from '../generated/Election'
 import {
@@ -339,7 +339,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -354,7 +354,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -386,14 +386,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param value The amount of gold to use to vote.
    */
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.communication.defaultAccount == null) {
+    if (this.kit.connection.defaultAccount == null) {
       throw new Error(`missing kit.defaultAccount`)
     }
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.vote(validatorGroup, value.toFixed(), lesser, greater)
     )
   }

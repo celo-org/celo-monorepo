@@ -1,4 +1,4 @@
-import { RLPEncodedTx, Signer } from '@celo/communication'
+import { RLPEncodedTx, Signer } from '@celo/connect'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { Decrypt } from '@celo/utils/lib/ecies'
 import { decodeSig, getHashFromEncoded } from '@celo/wallet-base'

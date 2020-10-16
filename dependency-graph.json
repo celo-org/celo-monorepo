@@ -33,7 +33,7 @@
     "location": "packages/celotool",
     "dependencies": [
       "@celo/base",
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/contractkit-extenders",
       "@celo/dev-utils",
@@ -55,8 +55,8 @@
       "@celo/wallet-local"
     ]
   },
-  "@celo/communication": {
-    "location": "packages/communication",
+  "@celo/connect": {
+    "location": "packages/connect",
     "dependencies": [
       "@celo/flake-tracker",
       "@celo/utils"
@@ -66,7 +66,7 @@
     "location": "packages/contractkit-extenders",
     "dependencies": [
       "@celo/base",
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
@@ -77,7 +77,7 @@
     "location": "packages/contractkit",
     "dependencies": [
       "@celo/base",
-      "@celo/communication",
+      "@celo/connect",
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/protocol",
@@ -87,7 +87,7 @@
   "@celo/dappkit": {
     "location": "packages/dappkit",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
@@ -103,7 +103,7 @@
   "@celo/faucet-app": {
     "location": "packages/faucet",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
@@ -115,7 +115,7 @@
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
@@ -123,7 +123,7 @@
   "@celo/mobile": {
     "location": "packages/mobile",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/contractkit-extenders",
       "@celo/flake-tracker",
@@ -170,7 +170,7 @@
   "@celo/typechain-target-web3-v1-celo": {
     "location": "packages/typechain-target-web3-v1-celo",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/typescript"
     ]
   },
@@ -190,14 +190,14 @@
     "location": "packages/wallet-base",
     "dependencies": [
       "@celo/base",
-      "@celo/communication",
+      "@celo/connect",
       "@celo/utils"
     ]
   },
   "@celo/wallet-hsm-aws": {
     "location": "packages/wallet-hsm-aws",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base",
       "@celo/wallet-hsm",
@@ -207,7 +207,7 @@
   "@celo/wallet-hsm-azure": {
     "location": "packages/wallet-hsm-azure",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base",
       "@celo/wallet-hsm",
@@ -218,13 +218,13 @@
     "location": "packages/wallet-hsm",
     "dependencies": [
       "@celo/base",
-      "@celo/communication"
+      "@celo/connect"
     ]
   },
   "@celo/wallet-ledger": {
     "location": "packages/wallet-ledger",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base",
       "@celo/wallet-remote"
@@ -233,7 +233,7 @@
   "@celo/wallet-local": {
     "location": "packages/wallet-local",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base"
     ]
@@ -241,7 +241,7 @@
   "@celo/wallet-remote": {
     "location": "packages/wallet-remote",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/utils",
       "@celo/wallet-base"
     ]
@@ -249,7 +249,7 @@
   "@celo/wallet-rpc": {
     "location": "packages/wallet-rpc",
     "dependencies": [
-      "@celo/communication",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/utils",

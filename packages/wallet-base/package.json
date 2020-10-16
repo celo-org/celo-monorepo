@@ -27,7 +27,7 @@
     "web3-core-helpers": "1.2.11"
   },
   "devDependencies": {
-    "@celo/communication": "0.0.1-dev"
+    "@celo/connect": "0.0.2-dev"
   },
   "engines": {
     "node": ">=8.13.0"

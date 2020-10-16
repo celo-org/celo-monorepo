@@ -19,11 +19,11 @@ export default class AccountList extends BaseCommand {
     const res = this.parse(AccountList)
 
     // Retreive accounts from the connected Celo node.
-    const allAddresses = !res.flags.local ? await this.kit.communication.getAccounts() : []
+    const allAddresses = !res.flags.local ? await this.kit.connection.getAccounts() : []
 
     // Get addresses from the local wallet.
     const localAddresses =
-      res.flags.local ?? true ? await this.kit.communication.getLocalAccounts() : []
+      res.flags.local ?? true ? await this.kit.connection.getLocalAccounts() : []
 
     // Display the addresses.
     const localName = res.flags.useLedger ? 'Ledger' : 'Local'

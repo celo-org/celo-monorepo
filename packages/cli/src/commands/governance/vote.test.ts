@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication'
+import { Address } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { ProposalBuilder } from '@celo/contractkit-extenders/lib/governance'
 import { GovernanceWrapper, Proposal } from '@celo/contractkit/lib/wrappers/Governance'

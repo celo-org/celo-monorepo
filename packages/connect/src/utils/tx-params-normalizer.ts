@@ -1,5 +1,5 @@
-import { NodeCommunicationWrapper } from '..'
-import { CeloTx } from '../commons'
+import { Connection } from '../connection'
+import { CeloTx } from '../types'
 
 function isEmpty(value: string | undefined) {
   return (
@@ -15,7 +15,7 @@ export class TxParamsNormalizer {
   private chainId: number | null = null
   private gatewayFeeRecipient: string | null = null
 
-  constructor(readonly communication: NodeCommunicationWrapper) {}
+  constructor(readonly connection: Connection) {}
 
   public async populate(celoTxParams: CeloTx): Promise<CeloTx> {
     const txParams = { ...celoTxParams }
@@ -25,15 +25,15 @@ export class TxParamsNormalizer {
     }
 
     if (txParams.nonce == null) {
-      txParams.nonce = await this.communication.nonce(txParams.from!.toString())
+      txParams.nonce = await this.connection.nonce(txParams.from!.toString())
     }
 
     if (!txParams.gas || isEmpty(txParams.gas.toString())) {
-      txParams.gas = await this.communication.estimateGas(txParams)
+      txParams.gas = await this.connection.estimateGas(txParams)
     }
 
     if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
-      txParams.gasPrice = await this.communication.gasPrice(txParams.feeCurrency)
+      txParams.gasPrice = await this.connection.gasPrice(txParams.feeCurrency)
     }
 
     return txParams
@@ -41,7 +41,7 @@ export class TxParamsNormalizer {
 
   private async getChainId(): Promise<number> {
     if (this.chainId === null) {
-      this.chainId = await this.communication.chainId()
+      this.chainId = await this.connection.chainId()
     }
     return this.chainId
   }
@@ -49,7 +49,7 @@ export class TxParamsNormalizer {
   // @ts-ignore - see comment above
   private async getCoinbase(): Promise<string> {
     if (this.gatewayFeeRecipient === null) {
-      this.gatewayFeeRecipient = await this.communication.coinbase()
+      this.gatewayFeeRecipient = await this.connection.coinbase()
     }
     if (this.gatewayFeeRecipient == null) {
       throw new Error(

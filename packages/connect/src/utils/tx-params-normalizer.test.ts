@@ -1,6 +1,6 @@
 import Web3 from 'web3'
-import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse } from '../commons'
-import { NodeCommunicationWrapper } from '../node-communication-wrapper'
+import { Connection } from '../connection'
+import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse } from '../types'
 import { RpcCaller } from './rpc-caller'
 import { TxParamsNormalizer } from './tx-params-normalizer'
 
@@ -38,9 +38,9 @@ describe('TxParamsNormalizer class', () => {
       // tslint:disable-next-line: no-empty
       send: (_payload: JsonRpcPayload, _callback: Callback<JsonRpcResponse>): void => {},
     }
-    const communication = new NodeCommunicationWrapper(new Web3('http://localhost:8545'))
-    communication.rpcCaller = rpcMock
-    populator = new TxParamsNormalizer(communication)
+    const connection = new Connection(new Web3('http://localhost:8545'))
+    connection.rpcCaller = rpcMock
+    populator = new TxParamsNormalizer(connection)
   })
 
   describe('when missing parameters', () => {

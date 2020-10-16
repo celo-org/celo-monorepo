@@ -39,7 +39,7 @@ export const handler = async (argv: EthstatsArgv) => {
 
     console.info('Add keys to ContractKit')
     for (const key of keys) {
-      kit.communication.addAccount(key)
+      kit.connection.addAccount(key)
     }
 
     // Here you'll want to assert the current state

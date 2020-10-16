@@ -77,7 +77,7 @@ describe('attestations tests', () => {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
-    await contractKit.communication.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
+    await contractKit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
     Attestations = await contractKit.contracts.getAttestations()
   }
 

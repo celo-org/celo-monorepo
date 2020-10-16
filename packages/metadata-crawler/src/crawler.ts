@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication'
+import { Address } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import {
@@ -210,7 +210,7 @@ async function processAttestationServices() {
   const attestationsWrapper = await kit.contracts.getAttestations()
   const validators = await validatorsWrapper.getRegisteredValidators()
 
-  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.communication.getBlockNumber())
+  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.connection.getBlockNumber())
   const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
   const electedValidatorsSet: Set<Address> = new Set()
   electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))

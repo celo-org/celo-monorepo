@@ -68,7 +68,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     // Approve a transfer of funds to the Escrow contract.
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = contractKit.communication.web3.utils.toWei(amount.toString())
+    const convertedAmount = contractKit.connection.web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(
@@ -148,14 +148,14 @@ function* withdrawFromEscrow() {
       return
     }
 
-    const msgHash = contractKit.communication.web3.utils.soliditySha3({
+    const msgHash = contractKit.connection.web3.utils.soliditySha3({
       type: 'address',
       value: account,
     })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // use the temporary key to sign a message. The message is the current account.
-    let signature: string = (yield contractKit.communication.web3.eth.accounts.sign(
+    let signature: string = (yield contractKit.connection.web3.eth.accounts.sign(
       msgHash,
       tmpWalletPrivateKey
     )).signature
@@ -163,7 +163,7 @@ function* withdrawFromEscrow() {
     signature = trimLeading0x(signature)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = contractKit.communication.web3.utils.hexToNumber(
+    const v = contractKit.connection.web3.utils.hexToNumber(
       ensureLeading0x(signature.slice(128, 130))
     )
 

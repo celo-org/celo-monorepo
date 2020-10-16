@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '../commons'
+import { Callback, JsonRpcPayload, JsonRpcResponse, Provider } from '../types'
 
 const debugRpcPayload = debugFactory('rpc:payload')
 const debugRpcResponse = debugFactory('rpc:response')

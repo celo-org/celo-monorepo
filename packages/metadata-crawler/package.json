@@ -22,7 +22,7 @@
     "web3": "1.2.11"
   },
   "devDependencies": {
-    "@celo/communication": "0.0.1-dev",
+    "@celo/connect": "0.0.2-dev",
     "@types/bunyan": "1.8.4",
     "@types/dotenv": "^8.2.0",
     "bunyan-debug-stream": "^2.0.0"

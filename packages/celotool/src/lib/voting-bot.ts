@@ -39,7 +39,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
       continue
     }
 
-    kit.communication.addAccount(key)
+    kit.connection.addAccount(key)
 
     if (!(await accounts.isAccount(botAccount))) {
       const registerTx = await accounts.createAccount()
@@ -64,7 +64,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
   }
   console.info('Finished/confirmed setup of voting bot accounts')
 
-  kit.communication.stop()
+  kit.connection.stop()
 }
 
 function helmParameters(celoEnv: string, excludedGroups?: string[]) {

@@ -1,4 +1,4 @@
-import { ReadOnlyWallet } from '@celo/communication'
+import { ReadOnlyWallet } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
 import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
@@ -124,12 +124,12 @@ export abstract class BaseCommand extends LocalCommand {
   get kit() {
     if (!this._kit) {
       this._kit = newKitFromWeb3(this.web3)
-      this._kit.communication.wallet = this._wallet
+      this._kit.connection.wallet = this._wallet
     }
 
     const res: ParserOutput<any, any> = this.parse()
     if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
-      this._kit.communication.addAccount(res.flags.privateKey)
+      this._kit.connection.addAccount(res.flags.privateKey)
     }
     return this._kit
   }
@@ -188,7 +188,7 @@ export abstract class BaseCommand extends LocalCommand {
 
     const setUsdGas = async () => {
       await this.kit.setFeeCurrency(CeloContract.StableToken)
-      await this.kit.updateGasPriceInCommunicationLayer(CeloContract.StableToken)
+      await this.kit.updateGasPriceInConnectionLayer(CeloContract.StableToken)
     }
     if (gasCurrencyConfig === GasOptions.cUSD) {
       await setUsdGas()
@@ -202,7 +202,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      this.kit.communication.stop()
+      this.kit.connection.stop()
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

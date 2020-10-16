@@ -8,7 +8,7 @@ const cwd = path.resolve(__dirname)
 const root = path.resolve(cwd, '../..')
 const escapedRoot = escapeStringRegexp(root)
 const celoRegex = new RegExp(
-  `${escapedRoot}\/packages\/(?!mobile|utils|base|contractkit|react-components|communication|contractkit-extenders|wallet-rpc|wallet-remote|wallet-base).*`
+  `${escapedRoot}\/packages\/(?!mobile|utils|base|contractkit|react-components|connect|contractkit-extenders|wallet-rpc|wallet-remote|wallet-base).*`
 )
 const nestedRnRegex = new RegExp(`.*\/node_modules\/.*\/node_modules\/(react-native)\/.*`)
 const componentsRnRegex = new RegExp(`.*react-components\/node_modules\/(react-native)\/.*`)

@@ -19,7 +19,7 @@ function produceSignature(message: string | undefined) {
     return undefined
   }
 
-  return kit.communication.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
+  return kit.connection.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
 }
 
 export async function handleStatusRequest(

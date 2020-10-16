@@ -1,7 +1,7 @@
 import { toChecksumAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { AbiCoder } from './abi'
+import { AbiCoder } from './abi-types'
 import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import {
   Address,
@@ -12,7 +12,7 @@ import {
   CeloTxPending,
   CeloTxReceipt,
   Provider,
-} from './commons'
+} from './types'
 import { decodeStringParameter } from './utils/abi-utils'
 import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'
@@ -20,17 +20,17 @@ import { TxParamsNormalizer } from './utils/tx-params-normalizer'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { ReadOnlyWallet } from './wallet'
 
-const debugGasEstimation = debugFactory('communication:gas-estimation')
+const debugGasEstimation = debugFactory('connection:gas-estimation')
 
-export interface CommunicationOptions {
+export interface ConnectionOptions {
   gasInflationFactor: number
   gasPrice: string
   feeCurrency?: Address
   from?: Address
 }
 
-export class NodeCommunicationWrapper {
-  private config: CommunicationOptions
+export class Connection {
+  private config: ConnectionOptions
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 

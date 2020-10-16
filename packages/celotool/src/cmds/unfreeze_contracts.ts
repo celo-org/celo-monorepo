@@ -53,9 +53,9 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
   const cb = async () => {
     const web3: Web3 = new Web3('http://localhost:8545')
     const kit: ContractKit = newKitFromWeb3(web3)
-    const account = (await kit.communication.getAccounts())[0]
+    const account = (await kit.connection.getAccounts())[0]
     console.log(`Using account: ${account}`)
-    kit.communication.defaultAccount = account
+    kit.connection.defaultAccount = account
 
     const [exchange, epochRewards] = await Promise.all([
       argv.exchange ? kit._web3Contracts.getExchange() : null,

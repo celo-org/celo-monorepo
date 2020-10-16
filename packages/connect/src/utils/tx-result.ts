@@ -1,8 +1,8 @@
 import { Future } from '@celo/base/lib/future'
 import debugFactory from 'debug'
-import { CeloTxReceipt, PromiEvent } from '../commons'
+import { CeloTxReceipt, PromiEvent } from '../types'
 
-const debug = debugFactory('communication:tx:result')
+const debug = debugFactory('connection:tx:result')
 
 /**
  * Transforms a `PromiEvent` to a `TransactionResult`.

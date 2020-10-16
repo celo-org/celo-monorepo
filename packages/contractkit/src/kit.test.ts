@@ -1,4 +1,4 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/communication'
+import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/connect'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from './kit'
@@ -44,7 +44,7 @@ describe('kit.sendTransactionObject()', () => {
   test('should send transaction on simple case', async () => {
     const txo = txoStub()
     txo.estimateGasMock.mockResolvedValue(1000)
-    const txRes = await kit.communication.sendTransactionObject(txo)
+    const txRes = await kit.connection.sendTransactionObject(txo)
 
     txo.resolveHash('HASH')
     txo.resolveReceipt('Receipt' as any)
@@ -55,15 +55,15 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should not estimateGas if gas is provided', async () => {
     const txo = txoStub()
-    await kit.communication.sendTransactionObject(txo, { gas: 555 })
+    await kit.connection.sendTransactionObject(txo, { gas: 555 })
     expect(txo.estimateGasMock).not.toBeCalled()
   })
 
   test('should use inflation factor on gas', async () => {
     const txo = txoStub()
     txo.estimateGasMock.mockResolvedValue(1000)
-    kit.communication.defaultGasInflationFactor = 2
-    await kit.communication.sendTransactionObject(txo)
+    kit.connection.defaultGasInflationFactor = 2
+    await kit.connection.sendTransactionObject(txo)
     expect(txo.send).toBeCalledWith(
       expect.objectContaining({
         gas: 1000 * 2,
@@ -80,9 +80,9 @@ describe('kit.sendTransactionObject()', () => {
       },
     }))
     kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
-    await kit.updateGasPriceInCommunicationLayer('XXX')
+    await kit.updateGasPriceInConnectionLayer('XXX')
     const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
-    await kit.communication.sendTransactionObject(txo, options)
+    await kit.connection.sendTransactionObject(txo, options)
     expect(txo.send).toBeCalledWith({
       gasPrice: `${gasPrice * 5}`,
       ...options,
@@ -91,7 +91,7 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should forward txoptions to txo.send()', async () => {
     const txo = txoStub()
-    await kit.communication.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
+    await kit.connection.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
     expect(txo.send).toBeCalledWith({
       gasPrice: '0',
       gas: 555,

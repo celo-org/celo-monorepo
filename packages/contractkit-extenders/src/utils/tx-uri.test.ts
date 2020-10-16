@@ -1,4 +1,4 @@
-import { CeloTx } from '@celo/communication'
+import { CeloTx } from '@celo/connect'
 import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { buildUri, parseUri } from './tx-uri'

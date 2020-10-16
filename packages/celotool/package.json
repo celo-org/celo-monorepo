@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@celo/base": "0.0.4-dev",
-    "@celo/communication": "0.0.1-dev",
+    "@celo/connect": "0.0.2-dev",
     "@celo/contractkit": "0.4.16-dev",
     "@celo/contractkit-extenders": "0.0.1-dev",
     "@celo/utils": "0.1.22-dev",

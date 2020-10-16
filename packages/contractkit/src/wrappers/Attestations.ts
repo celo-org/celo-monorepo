@@ -3,7 +3,7 @@ import { concurrentMap, sleep } from '@celo/base/lib/async'
 import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
-import { Address, toTransactionObject } from '@celo/communication'
+import { Address, toTransactionObject } from '@celo/connect'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
@@ -141,7 +141,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   isAttestationExpired = async (attestationRequestBlockNumber: number) => {
     // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
     const attestationExpiryBlocks = await this.attestationExpiryBlocks()
-    const blockNumber = await this.kit.communication.getBlockNumber()
+    const blockNumber = await this.kit.connection.getBlockNumber()
     return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
   }
 
@@ -166,7 +166,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // Technically should use subscriptions here but not all providers support it.
     // TODO: Use subscription if provider supports
     while (Date.now() - startTime < timeoutSeconds * 1000) {
-      const blockNumber = await this.kit.communication.getBlockNumber()
+      const blockNumber = await this.kit.connection.getBlockNumber()
       if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
         return
       }
@@ -348,7 +348,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationSigner
     )
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.complete(identifier, v, r, s)
     )
   }
@@ -449,7 +449,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async request(identifier: string, attestationsRequested: number) {
     const tokenAddress = await this.kit.registry.addressFor(CeloContract.StableToken)
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.request(identifier, attestationsRequested, tokenAddress)
     )
   }
@@ -459,10 +459,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param identifier Attestation identifier (e.g. phone hash)
    */
   selectIssuers(identifier: string) {
-    return toTransactionObject(
-      this.kit.communication,
-      this.contract.methods.selectIssuers(identifier)
-    )
+    return toTransactionObject(this.kit.connection, this.contract.methods.selectIssuers(identifier))
   }
 
   /**
@@ -656,7 +653,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     if (idx < 0) {
       throw new Error("Account not found in identifier's accounts")
     }
-    return toTransactionObject(this.kit.communication, this.contract.methods.revoke(identifer, idx))
+    return toTransactionObject(this.kit.connection, this.contract.methods.revoke(identifer, idx))
   }
 }
 

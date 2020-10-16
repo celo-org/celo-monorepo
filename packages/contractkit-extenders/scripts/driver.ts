@@ -60,8 +60,8 @@ async function main() {
   // )
 
   // console.log(JSON.stringify(genEvents, null, 2))
-  // ;(kit.communication.web3.currentProvider as any).disconnect()
-  kit.communication.stop()
+  // ;(kit.connection.web3.currentProvider as any).disconnect()
+  kit.connection.stop()
 }
 
 main().catch((err) => {

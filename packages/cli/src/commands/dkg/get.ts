@@ -29,7 +29,7 @@ export default class DKGGet extends BaseCommand {
 
   async run() {
     const res = this.parse(DKGGet)
-    const web3 = this.kit.communication.web3
+    const web3 = this.kit.connection.web3
 
     const dkg = new web3.eth.Contract(DKG.abi, res.flags.address)
 

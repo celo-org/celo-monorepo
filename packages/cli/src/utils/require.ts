@@ -1,4 +1,4 @@
-import { CeloTxObject } from '@celo/communication'
+import { CeloTxObject } from '@celo/connect'
 import { failWith } from './cli'
 
 export enum Op {

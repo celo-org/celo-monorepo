@@ -185,7 +185,7 @@ describe('slashing tests', function(this: any) {
     it('should parse blockNumber from test header', async () => {
       this.timeout(0)
       const contract = await kit._web3Contracts.getElection()
-      const header = kit.communication.web3.utils.hexToBytes(headerHex)
+      const header = kit.connection.web3.utils.hexToBytes(headerHex)
 
       const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
       assert.equal(blockNumber, '1')
@@ -193,8 +193,8 @@ describe('slashing tests', function(this: any) {
 
     it('should parse blockNumber from current header', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const current = await kit.communication.getBlockNumber()
-      const block = await kit.communication.getBlock(current)
+      const current = await kit.connection.getBlockNumber()
+      const block = await kit.connection.getBlock(current)
       const header = headerFromBlock(block)
       const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
       assert.equal(blockNumber, current.toString())
@@ -202,15 +202,15 @@ describe('slashing tests', function(this: any) {
 
     it('should hash test header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const header = kit.communication.web3.utils.hexToBytes(headerHex)
+      const header = kit.connection.web3.utils.hexToBytes(headerHex)
       const hash = await contract.methods.hashHeader(header).call()
       assert.equal(hash, '0x2e14ef428293e41c5f81a108b5d36f892b2bee3e34aec4223474c4a31618ea69')
     })
 
     it('should hash current header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const current = await kit.communication.getBlockNumber()
-      const block = await kit.communication.getBlock(current)
+      const current = await kit.connection.getBlockNumber()
+      const block = await kit.connection.getBlock(current)
       const header = headerFromBlock(block)
       const blockHash = await contract.methods.hashHeader(header).call()
       assert.equal(blockHash, block.hash)
@@ -229,16 +229,16 @@ describe('slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDowntimeSlasher()
       const slashableDowntime = new BigNumber(await slasher.methods.slashableDowntime().call())
-      const blockNumber = await kit.communication.getBlockNumber()
+      const blockNumber = await kit.connection.getBlockNumber()
       await waitForBlock(web3, blockNumber + slashableDowntime.toNumber() + 2 * safeMarginBlocks)
 
       // Store this block for testing double signing
-      doubleSigningBlock = await kit.communication.getBlock(blockNumber + 2 * safeMarginBlocks)
+      doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
 
       const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber).call()
 
-      const validator = (await kit.communication.getAccounts())[0]
-      await kit.communication.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
       const lockedGold = await kit.contracts.getLockedGold()
 
       const validatorsContract = await kit._web3Contracts.getValidators()
@@ -295,13 +295,13 @@ describe('slashing tests', function(this: any) {
     it('slash for downtime with contractkit', async function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDowntimeSlasher()
-      const blockNumber = await kit.communication.getBlockNumber()
+      const blockNumber = await kit.connection.getBlockNumber()
       const slashableDowntime = await slasher.slashableDowntime()
 
       await waitForBlock(web3, blockNumber + slashableDowntime + 2 * safeMarginBlocks)
 
-      const user = (await kit.communication.getAccounts())[0]
-      await kit.communication.web3.eth.personal.unlockAccount(user, '', 1000000)
+      const user = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(user, '', 1000000)
 
       const startBlock = blockNumber + safeMarginBlocks
       const endBlock = startBlock + slashableDowntime - 1
@@ -357,12 +357,12 @@ describe('slashing tests', function(this: any) {
 
       const num = await slasher.methods.getBlockNumberFromHeader(other).call()
 
-      const header = headerFromBlock(await kit.communication.getBlock(num))
+      const header = headerFromBlock(await kit.connection.getBlock(num))
 
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await slasher.methods.validatorSignerAddressFromSet(signerIdx, num).call()
-      const validator = (await kit.communication.getAccounts())[0]
-      await kit.communication.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
       const lockedGold = await kit.contracts.getLockedGold()
       const validatorsContract = await kit._web3Contracts.getValidators()
@@ -405,12 +405,12 @@ describe('slashing tests', function(this: any) {
 
       const other = headerFromBlock(doubleSigningBlock)
       const num = await slasher.getBlockNumberFromHeader(other)
-      const header = headerFromBlock(await kit.communication.getBlock(num))
+      const header = headerFromBlock(await kit.connection.getBlock(num))
       const signerIdx = await findDoubleSignerIndex(kit, header, other)
       const signer = await election.validatorSignerAddressFromSet(signerIdx, num)
 
-      const validator = (await kit.communication.getAccounts())[0]
-      await kit.communication.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
       const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })

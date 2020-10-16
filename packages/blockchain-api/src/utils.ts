@@ -74,7 +74,7 @@ export async function getContractAddresses() {
 
 let contractKit: ContractKit
 export async function getContractKit(): Promise<ContractKit> {
-  if (contractKit && (await contractKit.communication.isListening())) {
+  if (contractKit && (await contractKit.connection.isListening())) {
     // Already connected
     return contractKit
   }

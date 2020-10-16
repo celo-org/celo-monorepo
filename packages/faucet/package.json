@@ -30,7 +30,7 @@
     "web3": "1.2.11"
   },
   "devDependencies": {
-    "@celo/communication": "0.0.1-dev",
+    "@celo/connect": "0.0.2-dev",
     "@types/debug": "^4.1.4",
     "@types/twilio": "^0.0.10",
     "@types/yargs": "^13.0.2",

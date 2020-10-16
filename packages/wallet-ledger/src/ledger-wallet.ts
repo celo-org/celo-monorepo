@@ -1,6 +1,6 @@
 import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
 import { zeroRange } from '@celo/base/lib/collections'
-import { Address, ReadOnlyWallet } from '@celo/communication'
+import { Address, ReadOnlyWallet } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'

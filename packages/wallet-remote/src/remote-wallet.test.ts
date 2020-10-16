@@ -1,4 +1,4 @@
-import { Address, CeloTx, Signer } from '@celo/communication'
+import { Address, CeloTx, Signer } from '@celo/connect'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { RemoteWallet } from './remote-wallet'

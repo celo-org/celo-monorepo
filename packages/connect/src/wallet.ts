@@ -1,5 +1,5 @@
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import { Address, CeloTx, EncodedTransaction, RLPEncodedTx } from './commons'
+import { Address, CeloTx, EncodedTransaction, RLPEncodedTx } from './types'
 
 export interface ReadOnlyWallet {
   getAccounts: () => Address[]

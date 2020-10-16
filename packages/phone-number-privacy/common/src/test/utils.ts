@@ -29,11 +29,11 @@ export function createMockContractKit(
     registry: {
       addressFor: async () => 1000,
     },
-    communication: createMockCommunication(mockWeb3),
+    connection: createMockConnection(mockWeb3),
   }
 }
 
-export function createMockCommunication(mockWeb3?: any) {
+export function createMockConnection(mockWeb3?: any) {
   mockWeb3 = mockWeb3 ?? new Web3()
   return {
     web3: mockWeb3,

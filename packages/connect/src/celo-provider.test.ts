@@ -1,5 +1,6 @@
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'
+import { Connection } from './connection'
 import {
   Address,
   Callback,
@@ -8,8 +9,7 @@ import {
   JsonRpcPayload,
   JsonRpcResponse,
   Provider,
-} from './commons'
-import { NodeCommunicationWrapper } from './node-communication-wrapper'
+} from './types'
 import { ReadOnlyWallet } from './wallet'
 
 const ACCOUNT_ADDRESS1 = '0x1234567890123456789012345678901234567890'
@@ -91,8 +91,8 @@ describe('CeloProvider', () => {
 
     const web3 = new Web3()
     web3.setProvider(mockProvider as any)
-    const communication = new NodeCommunicationWrapper(web3, new MockWallet())
-    celoProvider = (communication.web3.currentProvider as any) as CeloProvider
+    const connection = new Connection(web3, new MockWallet())
+    celoProvider = (connection.web3.currentProvider as any) as CeloProvider
   })
 
   describe("when celo provider don't have any local account", () => {

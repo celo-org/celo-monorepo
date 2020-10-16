@@ -1,5 +1,5 @@
 // tslint:disable:no-console
-import { CeloTxReceipt, TransactionResult } from '@celo/communication'
+import { CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
@@ -218,7 +218,7 @@ const validateGethRPC = async (
   from: string,
   handleError: HandleErrorCallback
 ) => {
-  const transaction = await kit.communication.getTransaction(txHash)
+  const transaction = await kit.connection.getTransaction(txHash)
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -639,7 +639,7 @@ export const transferERC20Token = async (
   onError?: (error: any) => void
 ) => {
   txParams.from = from
-  await unlockAccount(kit.communication.web3, 0, password, from)
+  await unlockAccount(kit.connection.web3, 0, password, from)
 
   const convertedAmount = await convertToContractDecimals(amount, token)
 

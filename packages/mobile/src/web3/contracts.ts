@@ -199,11 +199,11 @@ export async function getWalletAsync() {
 // Convinience util for getting the kit's web3 instance
 export function* getWeb3(waitForSync: boolean = true) {
   const kit: ContractKit = yield call(getContractKit, waitForSync)
-  return kit.communication.web3
+  return kit.connection.web3
 }
 
 // Used for cases where the kit's web3 must be accessed outside a saga
 export async function getWeb3Async(waitForSync: boolean = true): Promise<Web3> {
   const kit = await getContractKitAsync(waitForSync)
-  return kit.communication.web3
+  return kit.connection.web3
 }

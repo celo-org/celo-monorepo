@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@celo/base": "0.0.4-dev",
-    "@celo/communication": "0.0.1-dev",
+    "@celo/connect": "0.0.2-dev",
     "@celo/utils": "0.1.22-dev",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",

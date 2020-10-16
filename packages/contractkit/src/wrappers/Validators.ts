@@ -1,7 +1,7 @@
 import { eqAddress, findAddressIndex, NULL_ADDRESS } from '@celo/base/lib/address'
 import { concurrentMap } from '@celo/base/lib/async'
 import { zeroRange, zip } from '@celo/base/lib/collections'
-import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/communication'
+import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@celo/connect'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Validators } from '../generated/Validators'
@@ -410,10 +410,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     if (idx < 0) {
       throw new Error(`${validatorAddress} is not a registered validator`)
     }
-    return toTransactionObject(
-      this.kit.communication,
-      this.contract.methods.deregisterValidator(idx)
-    )
+    return toTransactionObject(this.kit.connection, this.contract.methods.deregisterValidator(idx))
   }
 
   /**
@@ -425,7 +422,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async registerValidatorGroup(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.registerValidatorGroup(toFixed(commission).toFixed())
     )
   }
@@ -442,7 +439,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`${validatorGroupAddress} is not a registered validator`)
     }
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.deregisterValidatorGroup(idx)
     )
   }
@@ -492,11 +489,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       const { lesser, greater } = await election.findLesserAndGreaterAfterVote(group, voteWeight)
 
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.addFirstMember(validator, lesser, greater)
       )
     } else {
-      return toTransactionObject(this.kit.communication, this.contract.methods.addMember(validator))
+      return toTransactionObject(this.kit.connection, this.contract.methods.addMember(validator))
     }
   }
 
@@ -539,7 +536,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const prevMember = newIndex === 0 ? NULL_ADDRESS : group.members[newIndex - 1]
 
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.reorderMember(validator, nextMember, prevMember)
     )
   }
@@ -603,7 +600,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
     const blockEpoch = await this.kit.getEpochNumberOfBlock(
-      blockNumber || (await this.kit.communication.getBlockNumber())
+      blockNumber || (await this.kit.connection.getBlockNumber())
     )
     const account = await this.validatorSignerToAccount(validator.signer)
     const membershipHistory = await this.getValidatorMembershipHistory(account)

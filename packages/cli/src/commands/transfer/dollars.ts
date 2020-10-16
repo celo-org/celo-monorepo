@@ -28,7 +28,7 @@ export default class TransferDollars extends BaseCommand {
     const value = new BigNumber(res.flags.value)
 
     const stableToken = await this.kit.contracts.getStableToken()
-    await this.kit.updateGasPriceInCommunicationLayer(stableToken.address)
+    await this.kit.updateGasPriceInConnectionLayer(stableToken.address)
 
     const tx = res.flags.comment
       ? stableToken.transferWithComment(to, value.toFixed(), res.flags.comment)
@@ -38,11 +38,11 @@ export default class TransferDollars extends BaseCommand {
       .hasEnoughUsd(from, value)
       .addConditionalCheck(
         'Account can afford transfer and gas paid in cUSD',
-        this.kit.communication.defaultFeeCurrency === stableToken.address,
+        this.kit.connection.defaultFeeCurrency === stableToken.address,
         async () => {
           const gas = await tx.txo.estimateGas({ feeCurrency: stableToken.address })
           // TODO: replace with gasPrice rpc once supported by min client version
-          const { gasPrice } = await this.kit.communication.fillGasPrice({
+          const { gasPrice } = await this.kit.connection.fillGasPrice({
             gasPrice: '0',
             feeCurrency: stableToken.address,
           })

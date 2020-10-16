@@ -1,5 +1,5 @@
 import { findAddressIndex } from '@celo/base/lib/address'
-import { Address, CeloTransactionObject, toTransactionObject } from '@celo/communication'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
@@ -288,7 +288,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     )
 
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.slash(
         startBlocks,
         endBlocks,
@@ -354,7 +354,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     }
 
     // Use the latest grandparent because that is the most recent block eligible for inclusion.
-    const latest = (await this.kit.communication.getBlockNumber()) - 2
+    const latest = (await this.kit.connection.getBlockNumber()) - 2
     return {
       start: latest - length + 1,
       end: latest,

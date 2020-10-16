@@ -1,4 +1,4 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/communication'
+import { CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/connect'
 import { values } from 'lodash'
 import { estimateGas } from 'src/web3/utils'
 

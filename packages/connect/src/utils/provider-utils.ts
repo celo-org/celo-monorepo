@@ -1,4 +1,4 @@
-import { Provider } from '../commons'
+import { Provider } from '../types'
 
 export function hasProperty<T>(object: any, property: string): object is T {
   return property in object

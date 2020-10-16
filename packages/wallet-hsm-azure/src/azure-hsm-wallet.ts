@@ -1,4 +1,4 @@
-import { ReadOnlyWallet } from '@celo/communication'
+import { ReadOnlyWallet } from '@celo/connect'
 import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { RemoteWallet } from '@celo/wallet-remote'
 import debugFactory from 'debug'

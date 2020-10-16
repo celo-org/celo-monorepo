@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/communication'
+import { CeloTransactionObject } from '@celo/connect'
 import { CeloContract } from '@celo/contractkit'
 import { retryAsync } from '@celo/utils/src/async'
 import BigNumber from 'bignumber.js'

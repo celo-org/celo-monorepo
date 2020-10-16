@@ -1,9 +1,4 @@
-import {
-  Address,
-  CeloTransactionObject,
-  CeloTxObject,
-  toTransactionObject,
-} from '@celo/communication'
+import { Address, CeloTransactionObject, CeloTxObject, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { MultiSig } from '../generated/MultiSig'
 import {
@@ -52,13 +47,13 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
         !transaction.executed
       ) {
         return toTransactionObject(
-          this.kit.communication,
+          this.kit.connection,
           this.contract.methods.confirmTransaction(transactionId)
         )
       }
     }
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.submitTransaction(destination, value, data)
     )
   }

@@ -1,4 +1,4 @@
-import { newCommunicationWrapperFromWeb3 } from '@celo/communication'
+import { Connection } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 
@@ -40,7 +40,7 @@ const Reserve = {
 
 const web3 = new Web3()
 
-const communication = newCommunicationWrapperFromWeb3(web3)
+const connection = new Connection(web3)
 
 const kit = {
   contracts: {
@@ -54,7 +54,7 @@ const kit = {
   registry: {
     addressFor: async (address: string) => 1000,
   },
-  communication,
+  connection,
 }
 
 export const newKitFromWeb3 = () => kit

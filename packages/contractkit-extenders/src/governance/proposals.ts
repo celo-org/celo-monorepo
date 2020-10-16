@@ -7,7 +7,7 @@ import {
   CeloTxPending,
   Contract,
   getAbiTypes,
-} from '@celo/communication'
+} from '@celo/connect'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
@@ -26,7 +26,7 @@ import { setImplementationOnProxy } from './proxy'
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
 export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  kit.communication.web3.eth.abi.encodeParameters(
+  kit.connection.web3.eth.abi.encodeParameters(
     HOTFIX_PARAM_ABI_TYPES,
     hotfixToParams(proposal, salt)
   )
@@ -117,7 +117,7 @@ export class ProposalBuilder {
     this.builders.push(async () => {
       const proxy = await this.kit._web3Contracts.getContract(contract)
       return this.fromWeb3tx(
-        setImplementationOnProxy(newImplementationAddress, this.kit.communication.web3),
+        setImplementationOnProxy(newImplementationAddress, this.kit.connection.web3),
         {
           to: proxy.options.address,
           value: '0',

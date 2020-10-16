@@ -15,7 +15,7 @@ testWithGanache('Metadata', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(
       createNameClaim(name),
-      NativeSigner(kit.communication.web3.eth.sign, address)
+      NativeSigner(kit.connection.web3.eth.sign, address)
     )
     const serializedMetadata = metadata.toString()
     const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
@@ -50,7 +50,7 @@ testWithGanache('Metadata', (web3) => {
       }
       await metadata.addClaim(
         createNameClaim(name),
-        NativeSigner(kit.communication.web3.eth.sign, signer)
+        NativeSigner(kit.connection.web3.eth.sign, signer)
       )
       const serializedMetadata = metadata.toString()
       const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
@@ -69,7 +69,7 @@ testWithGanache('Metadata', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(
       createNameClaim(name),
-      NativeSigner(kit.communication.web3.eth.sign, otherAddress)
+      NativeSigner(kit.connection.web3.eth.sign, otherAddress)
     )
     const serializedMetadata = metadata.toString()
     try {

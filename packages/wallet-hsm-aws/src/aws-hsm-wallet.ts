@@ -1,4 +1,4 @@
-import { Address, ReadOnlyWallet } from '@celo/communication'
+import { Address, ReadOnlyWallet } from '@celo/connect'
 import {
   bigNumberToBuffer,
   bufferToBigNumber,

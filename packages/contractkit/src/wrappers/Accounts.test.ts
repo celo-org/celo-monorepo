@@ -50,10 +50,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
 
   const setupValidator = async (validatorAccount: string) => {
     await registerAccountWithLockedGold(validatorAccount)
-    const ecdsaPublicKey = await addressToPublicKey(
-      validatorAccount,
-      kit.communication.web3.eth.sign
-    )
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.connection.web3.eth.sign)
     await validators
       // @ts-ignore
       .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)

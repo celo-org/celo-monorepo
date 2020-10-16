@@ -31,7 +31,7 @@ const carbonOffsettingPartnerAddress = '0x12345678123456781234567812345678123456
 
 async function newMemberSwapper(kit: ContractKit, members: string[]): Promise<MemberSwapper> {
   let index = 0
-  const group = (await kit.communication.getAccounts())[0]
+  const group = (await kit.connection.getAccounts())[0]
   await Promise.all(members.slice(1).map((member) => removeMember(member)))
 
   async function removeMember(member: string) {
@@ -77,7 +77,7 @@ async function newKeyRotator(
   privateKeys: string[]
 ): Promise<KeyRotator> {
   let index = 0
-  const validator = (await kit.communication.getAccounts())[0]
+  const validator = (await kit.connection.getAccounts())[0]
   const accountsWrapper = await kit.contracts.getAccounts()
 
   async function authorizeValidatorSigner(
@@ -122,7 +122,7 @@ async function calculateUptime(
 ): Promise<BigNumber[]> {
   // The parentAggregateSeal is not counted for the first or last blocks of the epoch
   const blocks = await concurrentMap(10, [...Array(epochSize - 2).keys()], (i) =>
-    kit.communication.getBlock(lastBlockNumberOfEpoch - epochSize + 2 + i)
+    kit.connection.getBlock(lastBlockNumberOfEpoch - epochSize + 2 + i)
   )
   const lastSignedBlock: number[] = new Array(validatorSetSize).fill(0)
   const tally: number[] = new Array(validatorSetSize).fill(0)
@@ -1005,7 +1005,7 @@ describe('governance tests', () => {
         }
       }
 
-      const subscription = groupKit.communication.web3.eth.subscribe('newBlockHeaders')
+      const subscription = groupKit.connection.web3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
 
       // Wait for a few epochs while changing the validator set.
@@ -1039,13 +1039,13 @@ describe('governance tests', () => {
     before(async function(this: any) {
       this.timeout(0)
       await restart()
-      const validator = (await kit.communication.getAccounts())[0]
-      await kit.communication.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const validator = (await kit.connection.getAccounts())[0]
+      await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
       const freezer = await kit._web3Contracts.getFreezer()
       await freezer.methods.freeze(epochRewards.options.address).send({ from: validator })
       blockFrozen = await web3.eth.getBlockNumber()
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
-      await waitForBlock(kit.communication.web3, blockFrozen + epoch * 2)
+      await waitForBlock(kit.connection.web3, blockFrozen + epoch * 2)
       latestBlock = await web3.eth.getBlockNumber()
     })
 

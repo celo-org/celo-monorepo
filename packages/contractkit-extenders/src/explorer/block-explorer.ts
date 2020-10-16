@@ -1,10 +1,4 @@
-import {
-  ABIDefinition,
-  Address,
-  Block,
-  CeloTxPending,
-  parseDecodedParams,
-} from '@celo/communication'
+import { ABIDefinition, Address, Block, CeloTxPending, parseDecodedParams } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import { PROXY_ABI, PROXY_SET_IMPLEMENTATION_SIGNATURE } from '../governance/proxy'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
@@ -55,10 +49,10 @@ export class BlockExplorer {
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {
-    return this.kit.communication.getBlock(blockHash)
+    return this.kit.connection.getBlock(blockHash)
   }
   async fetchBlock(blockNumber: number): Promise<Block> {
-    return this.kit.communication.getBlock(blockNumber)
+    return this.kit.connection.getBlock(blockNumber)
   }
 
   async fetchBlockRange(from: number, to: number): Promise<Block[]> {
@@ -118,7 +112,7 @@ export class BlockExplorer {
         : contractMapping.details.name
 
     const { args, params } = parseDecodedParams(
-      this.kit.communication.getAbiCoder().decodeParameters(matchedAbi.inputs!, encodedParameters)
+      this.kit.connection.getAbiCoder().decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
     return {

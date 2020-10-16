@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/communication'
+import { CeloTransactionObject } from '@celo/connect'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { call, put, select } from 'redux-saga/effects'

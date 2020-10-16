@@ -1,4 +1,4 @@
-import { Address } from '@celo/communication'
+import { Address } from '@celo/connect'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import { CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'

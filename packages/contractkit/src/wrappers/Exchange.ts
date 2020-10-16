@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/communication'
+import { CeloTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { Exchange } from '../generated/Exchange'
 import {

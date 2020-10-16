@@ -1,5 +1,5 @@
 import { AbiInput, AbiItem } from 'web3-utils'
-import { EventLog } from './commons'
+import { EventLog } from './types'
 
 export type ABIType = 'uint256' | 'boolean' | 'string' | 'bytes' | string // TODO complete list
 

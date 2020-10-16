@@ -15,7 +15,7 @@ export function getContractKit() {
 
 export async function getBlockNumber(): Promise<number> {
   return retryAsyncWithBackOff(
-    () => getContractKit().communication.getBlockNumber(),
+    () => getContractKit().connection.getBlockNumber(),
     RETRY_COUNT,
     [],
     RETRY_DELAY_IN_MS

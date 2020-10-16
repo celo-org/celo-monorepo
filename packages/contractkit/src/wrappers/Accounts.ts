@@ -1,5 +1,5 @@
 import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
-import { Address, CeloTransactionObject, toTransactionObject } from '@celo/communication'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import {
   hashMessageWithPrefix,
   LocalSigner,
@@ -159,7 +159,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.authorizeAttestationSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -179,7 +179,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.authorizeVoteSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -201,9 +201,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): Promise<CeloTransactionObject<void>> {
     const validators = await this.kit.contracts.getValidators()
     const account =
-      this.kit.communication.defaultAccount || (await this.kit.communication.getAccounts())[0]
+      this.kit.connection.defaultAccount || (await this.kit.connection.getAccounts())[0]
     if (await validators.isValidator(account)) {
-      const message = this.kit.communication.web3.utils.soliditySha3({
+      const message = this.kit.connection.web3.utils.soliditySha3({
         type: 'address',
         value: account,
       })
@@ -215,7 +215,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
         proofOfSigningKeyPossession.s
       )
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
           proofOfSigningKeyPossession.v,
@@ -226,7 +226,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
     } else {
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.authorizeValidatorSigner(
           signer,
           proofOfSigningKeyPossession.v,
@@ -254,8 +254,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     blsPop: string
   ): Promise<CeloTransactionObject<void>> {
     const account =
-      this.kit.communication.defaultAccount || (await this.kit.communication.getAccounts())[0]
-    const message = this.kit.communication.web3.utils.soliditySha3({
+      this.kit.connection.defaultAccount || (await this.kit.connection.getAccounts())[0]
+    const message = this.kit.connection.web3.utils.soliditySha3({
       type: 'address',
       value: account,
     })
@@ -267,7 +267,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       proofOfSigningKeyPossession.s
     )
     return toTransactionObject(
-      this.kit.communication,
+      this.kit.connection,
       this.contract.methods.authorizeValidatorSignerWithKeys(
         signer,
         proofOfSigningKeyPossession.v,
@@ -284,7 +284,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     return this.getParsedSignatureOfAddress(
       account,
       signer,
-      NativeSigner(this.kit.communication.web3.eth.sign, signer)
+      NativeSigner(this.kit.connection.web3.eth.sign, signer)
     )
   }
 
@@ -346,7 +346,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): CeloTransactionObject<void> {
     if (proofOfPossession) {
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.setAccount(
           name,
           // @ts-ignore
@@ -359,7 +359,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
     } else {
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.setAccount(
           name,
           // @ts-ignore
@@ -395,7 +395,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): CeloTransactionObject<void> {
     if (proofOfPossession) {
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.setWalletAddress(
           walletAddress,
           proofOfPossession.v,
@@ -405,19 +405,19 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
     } else {
       return toTransactionObject(
-        this.kit.communication,
+        this.kit.connection,
         this.contract.methods.setWalletAddress(walletAddress, '0x0', '0x0', '0x0')
       )
     }
   }
 
   parseSignatureOfAddress(address: Address, signer: string, signature: string) {
-    const hash = this.kit.communication.web3.utils.soliditySha3({ type: 'address', value: address })
+    const hash = this.kit.connection.web3.utils.soliditySha3({ type: 'address', value: address })
     return parseSignature(hash!, signature, signer)
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
-    const hash = this.kit.communication.web3.utils.soliditySha3({ type: 'address', value: address })
+    const hash = this.kit.connection.web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = await signerFn.sign(hash!)
     return parseSignature(hash!, signature, signer)
   }

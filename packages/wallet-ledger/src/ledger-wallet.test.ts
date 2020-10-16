@@ -1,5 +1,5 @@
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/base/lib/address'
-import { CeloTx, EncodedTransaction } from '@celo/communication'
+import { CeloTx, EncodedTransaction } from '@celo/connect'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import {

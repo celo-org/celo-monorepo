@@ -1,4 +1,4 @@
-import { ABIDefinition, Address, CeloTxReceipt, EventLog, Log } from '@celo/communication'
+import { ABIDefinition, Address, CeloTxReceipt, EventLog, Log } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
@@ -45,7 +45,7 @@ export class LogExplorer {
   }
 
   async fetchTxReceipt(txhash: string): Promise<CeloTxReceipt> {
-    return this.kit.communication.getTransactionReceipt(txhash)
+    return this.kit.connection.getTransactionReceipt(txhash)
   }
 
   getKnownLogs(tx: CeloTxReceipt): EventLog[] {
@@ -74,7 +74,7 @@ export class LogExplorer {
       return null
     }
 
-    const returnValues = this.kit.communication
+    const returnValues = this.kit.connection
       .getAbiCoder()
       .decodeLog(matchedAbi.inputs || [], log.data || '', log.topics.slice(1))
     delete (returnValues as any).__length__

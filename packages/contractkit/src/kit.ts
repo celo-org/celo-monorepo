@@ -1,4 +1,4 @@
-import { Address, NodeCommunicationWrapper, ReadOnlyWallet } from '@celo/communication'
+import { Address, Connection, ReadOnlyWallet } from '@celo/connect'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
@@ -25,7 +25,7 @@ export function newKitFromWeb3(web3: Web3, wallet?: ReadOnlyWallet) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
-  return new ContractKit(new NodeCommunicationWrapper(web3, wallet))
+  return new ContractKit(new Connection(web3, wallet))
 }
 
 export interface NetworkConfig {
@@ -60,7 +60,7 @@ export class ContractKit {
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
   gasPriceSuggestionMultiplier = 5
 
-  constructor(readonly communication: NodeCommunicationWrapper) {
+  constructor(readonly connection: Connection) {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
@@ -138,7 +138,7 @@ export class ContractKit {
 
   // For backwards compatibility
   set defaultAccount(address: Address | undefined) {
-    this.communication.defaultAccount = address
+    this.connection.defaultAccount = address
   }
 
   /**
@@ -148,15 +148,15 @@ export class ContractKit {
   async setFeeCurrency(token: CeloToken): Promise<void> {
     const address =
       token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
-    await this.communication.setFeeCurrency(address)
+    await this.connection.setFeeCurrency(address)
   }
 
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  async updateGasPriceInCommunicationLayer(currency: Address) {
+  async updateGasPriceInConnectionLayer(currency: Address) {
     const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
     const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
     const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
-    await this.communication.setGasPriceForCurrency(currency, gasPrice)
+    await this.connection.setGasPriceForCurrency(currency, gasPrice)
   }
 
   async getEpochSize(): Promise<number> {

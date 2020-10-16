@@ -1,4 +1,4 @@
-import { CeloTransactionObject } from '@celo/communication'
+import { CeloTransactionObject } from '@celo/connect'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 import { call, put, select, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects'

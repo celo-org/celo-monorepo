@@ -1,4 +1,4 @@
-import { Address, CeloTransactionParams } from '@celo/communication'
+import { Address, CeloTransactionParams } from '@celo/connect'
 import {
   ActionableAttestation,
   AttestationsWrapper

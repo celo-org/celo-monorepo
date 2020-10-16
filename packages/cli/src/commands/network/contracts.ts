@@ -40,7 +40,7 @@ export default class Contracts extends BaseCommand {
       lst.map(async (name) => {
         try {
           const contract = await this.kit._web3Contracts.getContract(name)
-          const proxy = new this.kit.communication.web3.eth.Contract(PROXY_ABI)
+          const proxy = new this.kit.connection.web3.eth.Contract(PROXY_ABI)
           proxy.options.address = contract.options.address
           return {
             name,

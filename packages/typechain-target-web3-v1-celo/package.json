@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/lodash": "~4.14.158",
-    "@celo/communication": "0.0.1-dev",
+    "@celo/connect": "0.0.2-dev",
     "@celo/typescript": "0.0.1",
     "web3-core": "^1.2.11"
   },

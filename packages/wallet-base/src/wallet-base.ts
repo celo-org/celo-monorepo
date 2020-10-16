@@ -1,5 +1,5 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/communication'
+import { Address, CeloTx, EncodedTransaction, ReadOnlyWallet, Signer } from '@celo/connect'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { chainIdTransformationForSigning, encodeTransaction, rlpEncodedTx } from './signing-utils'

@@ -106,7 +106,7 @@ class AttestationRequestHandler {
     )
 
     try {
-      return await kit.communication.web3.eth.sign(message, getAttestationSignerAddress())
+      return await kit.connection.web3.eth.sign(message, getAttestationSignerAddress())
     } catch (error) {
       if (isDevMode()) {
         return randomBytes(65).toString('hex')

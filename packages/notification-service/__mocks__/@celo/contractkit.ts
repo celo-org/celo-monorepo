@@ -23,7 +23,7 @@ export enum CeloContract {
 }
 
 export const newKitFromWeb3 = jest.fn(() => ({
-  communication: {
+  connection: {
     isListening() {
       return true
     },

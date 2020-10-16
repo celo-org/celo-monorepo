@@ -55,7 +55,7 @@ describe('Blockchain parameters tests', function(this: any) {
 
     kit = newKitFromWeb3(new Web3(rpcURL))
 
-    await kit.communication.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
+    await kit.connection.web3.eth.personal.unlockAccount(validatorAddress, '', 1000)
     parameters = await kit.contracts.getBlockchainParameters()
   }
 
@@ -85,7 +85,7 @@ describe('Blockchain parameters tests', function(this: any) {
       await sleep(120, true)
       try {
         // It should have exited by now, call RPC to trigger error
-        await kit.communication.getBlockNumber()
+        await kit.connection.getBlockNumber()
       } catch (_) {
         return
       }

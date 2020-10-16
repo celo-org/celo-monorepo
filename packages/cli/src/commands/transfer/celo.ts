@@ -34,7 +34,7 @@ export default class TransferCelo extends BaseCommand {
       .hasEnoughCelo(from, value)
       .runChecks()
 
-    await this.kit.communication
+    await this.kit.connection
       .sendTransaction({
         from,
         to,
