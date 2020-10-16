@@ -1374,7 +1374,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              composition.title
+              Composition
             </h1>
             <h4
               aria-level="4"
@@ -1393,7 +1393,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              composition.headline
+              Digital and print compositions fit within a grid that designers seldom break.
             </h4>
           </div>
           <div
@@ -1421,7 +1421,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              composition.alignmentTitle
+              Alignment
             </div>
             <div
               className="css-text-901oao"
@@ -1437,7 +1437,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              composition.alignmentText
+              Though there are many permutations of ways to organize typography and visual elements, we recommend the following alignment styles.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1500,7 +1500,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleTitle
+                  What we care about
                 </h4>
                 <div
                   className="css-view-1dbjc4n"
@@ -1552,7 +1552,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleSubtitle
+                  Innovating on Money
                 </div>
                 <div
                   className="css-text-901oao"
@@ -1568,7 +1568,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleText
+                  We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society.
                 </div>
               </div>
               <div
@@ -1614,7 +1614,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleTitle
+                  What we care about
                 </h4>
                 <div
                   className="css-view-1dbjc4n"
@@ -1667,7 +1667,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleSubtitle
+                  Innovating on Money
                 </div>
                 <div
                   className="css-text-901oao"
@@ -1684,7 +1684,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleText
+                  We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society.
                 </div>
               </div>
               <div
@@ -1726,7 +1726,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleTitle
+                  What we care about
                 </h4>
                 <div
                   className="css-view-1dbjc4n"
@@ -1808,7 +1808,7 @@ exports[`Experience/Composition renders 1`] = `
                         }
                       }
                     >
-                      composition.alignmentExampleSubtitle
+                      Innovating on Money
                     </div>
                     <div
                       className="css-text-901oao"
@@ -1824,7 +1824,7 @@ exports[`Experience/Composition renders 1`] = `
                         }
                       }
                     >
-                      composition.alignmentExampleText
+                      We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society.
                     </div>
                   </div>
                 </div>
@@ -1868,7 +1868,7 @@ exports[`Experience/Composition renders 1`] = `
                     }
                   }
                 >
-                  composition.alignmentExampleTitle
+                  What we care about
                 </h4>
                 <div
                   className="css-view-1dbjc4n"
@@ -1900,7 +1900,7 @@ exports[`Experience/Composition renders 1`] = `
                       }
                     }
                   >
-                    composition.alignmentExampleSubtitle
+                    Innovating on Money
                   </div>
                   <div
                     className="css-view-1dbjc4n"
@@ -1953,7 +1953,7 @@ exports[`Experience/Composition renders 1`] = `
                       }
                     }
                   >
-                    composition.alignmentExampleText
+                    We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society.
                   </div>
                 </div>
               </div>
@@ -1991,7 +1991,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              composition.gridTitle
+              The Grid
             </h2>
             <div
               className="css-text-901oao"
@@ -2007,7 +2007,9 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              composition.gridText
+              Celo’s Design is anchored around a 4 part grid system where labels, titles, form UI and visual elements exist on the left while large bodies of content exist on the right.
+
+Between each section of the grid, there is a gutter that organizes the hierarchy and comprehension of content.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2717,7 +2719,7 @@ exports[`Experience/Composition renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -2736,6 +2738,7 @@ exports[`Experience/Composition renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -3245,7 +3248,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3493,7 +3496,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3961,7 +3964,7 @@ exports[`Experience/Composition renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4609,7 +4612,7 @@ exports[`Experience/Composition renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>
