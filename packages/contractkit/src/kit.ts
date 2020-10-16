@@ -13,6 +13,7 @@ import { estimateGas } from './utils/web3-utils'
 import { ReadOnlyWallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
@@ -70,6 +71,7 @@ export interface NetworkConfig {
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
+  blockchainParameters: BlockchainParametersConfig
 }
 
 export interface KitOptions {
@@ -155,6 +157,7 @@ export class ContractKit {
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
+      this.contracts.getBlockchainParameters(),
     ]
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
@@ -169,6 +172,7 @@ export class ContractKit {
       contracts[8].getConfig(),
       contracts[9].getConfig(),
       contracts[10].getConfig(),
+      contracts[11].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -182,6 +186,7 @@ export class ContractKit {
       stableToken: res[8],
       validators: res[9],
       downtimeSlasher: res[10],
+      blockchainParameters: res[11],
     }
   }
 

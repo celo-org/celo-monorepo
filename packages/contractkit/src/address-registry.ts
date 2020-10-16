@@ -45,11 +45,16 @@ export class AddressRegistry {
    * Get the address for all possible `CeloContract`
    */
 
-  async allAddresses(): Promise<Record<CeloContract, Address>> {
-    const res: Partial<Record<CeloContract, Address>> = {}
+  async allAddresses(): Promise<Record<CeloContract, Address | null>> {
+    const res: Partial<Record<CeloContract, Address | null>> = {}
     for (const contract of AllContracts) {
-      res[contract] = await this.addressFor(contract)
+      try {
+        res[contract] = await this.addressFor(contract)
+      } catch (error) {
+        res[contract] = null
+        debug(`Failed to find address for ${contract}: ${error.message}`)
+      }
     }
-    return res as Record<CeloContract, Address>
+    return res as Record<CeloContract, Address | null>
   }
 }

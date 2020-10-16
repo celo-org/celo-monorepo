@@ -12,16 +12,16 @@ Keys are added to this directory by PR on Github. Verifying that only the correc
 
 #### Confirm that the added key is valid
 
-A PR to add a key will include a single binary file, for example a PR to include a new key for `mariano@clabs.co` will add:
+1. Confirm that the PR includes a single binary file, for example a PR to include a new key for `mariano@clabs.co` will add:
 
-```
+```bash
 $ git diff --name-only origin/master...
 packages/web/openpgpkey/clabs.co/hu/qu8o7gthfqer78nrk7ah5ufuh58dhup8
 ```
 
-Running `gpg --show-keys` will show the key and verify the self-signature on the file, which confirms the key is a valid key.
+2. Verify the self-signature on the file by running `gpg --show-keys`.
 
-```
+```bash
 $ gpg packages/web/openpgpkey/clabs.co/hu/qu8o7gthfqer78nrk7ah5ufuh58dhup8
 pub   rsa2048 2020-07-16 [SC] [expires: 2022-07-16]
       C32F530123A87FF9FDF8FAB70C108219CB5052F9
@@ -30,4 +30,12 @@ sub   rsa2048 2020-07-16 [A] [expires: 2022-07-16]
 sub   rsa2048 2020-07-16 [E] [expires: 2022-07-16]
 ```
 
-Confirm that the author of the Github PR owns the email listed in the key.
+3. Confirm that the author of the Github PR owns the email listed in the key.
+
+4. Confirm that the hash of the email uid on the key, as outputted by the following command,  matches the file name of the added key.
+
+```bash
+$ $(gpgconf --list-dirs libexecdir)/gpg-wks-client --print-wkd-hash mariano@clabs.co
+qu8o7gthfqer78nrk7ah5ufuh58dhup8 mariano@clabs.co
+# qu8o7gthfqer78nrk7ah5ufuh58dhup8 matches the file name of the added key. 
+```

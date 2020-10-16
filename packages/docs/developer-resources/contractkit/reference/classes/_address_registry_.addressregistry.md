@@ -55,10 +55,10 @@ ___
 
 ###  allAddresses
 
-▸ **allAddresses**(): *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address)››*
+▸ **allAddresses**(): *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address) | null››*
 
 *Defined in [packages/contractkit/src/address-registry.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L48)*
 
 Get the address for all possible `CeloContract`
 
-**Returns:** *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address)››*
+**Returns:** *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address) | null››*
