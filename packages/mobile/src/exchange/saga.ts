@@ -47,7 +47,7 @@ import * as util from 'util'
 
 const TAG = 'exchange/saga'
 
-const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
+const EXCHANGE_DIFFERENCE_PERCENT_TOLERATED = 0.01 // Maximum % difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
   try {
@@ -230,7 +230,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
     const minimumTakerAmount = BigNumber.maximum(
-      getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
+      getTakerAmount(makerAmount, exchangeRate).multipliedBy(
+        1 - EXCHANGE_DIFFERENCE_PERCENT_TOLERATED
+      ),
       0
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
