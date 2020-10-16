@@ -224,201 +224,197 @@ function SendConfirmation(props: Props) {
 
   const onShowEncryptionModal = () => {
     setEncryptionDialogVisible(true)
+  }
 
-    const onDismissEncryptionModal = () => {
-      setEncryptionDialogVisible(false)
+  const onDismissEncryptionModal = () => {
+    setEncryptionDialogVisible(false)
+  }
+
+  const renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
+    const fee = getFeeDollars(asyncFee.result)
+    const amountWithFee = amount.plus(fee || 0)
+    const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
+    const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
+
+    const isInvite = type === TokenTransactionType.InviteSent
+    const inviteFee = getInvitationVerificationFeeInDollars()
+
+    const subtotalAmount = {
+      value: amount || inviteFee,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
-    const renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-      const fee = getFeeDollars(asyncFee.result)
-      const amountWithFee = amount.plus(fee || 0)
-      const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
-      const isPrimaryButtonDisabled =
-        isSending || !userHasEnough || !appConnected || !!asyncFee.error
+    let primaryBtnInfo
+    if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
+      primaryBtnInfo = {
+        action: sendOrInvite,
+        text: i18n.t('global:pay'),
+        disabled: isPrimaryButtonDisabled,
+      }
+    } else {
+      primaryBtnInfo = {
+        action: onSendClick,
+        text: t('global:send'),
+        disabled: isPrimaryButtonDisabled,
+      }
+    }
 
-      const isInvite = type === TokenTransactionType.InviteSent
-      const inviteFee = getInvitationVerificationFeeInDollars()
+    const paymentComment = reason || ''
 
-      const subtotalAmount = {
-        value: amount || inviteFee,
+    const FeeContainer = () => {
+      let securityFee
+      let dekFee
+      if (isInvite && fee) {
+        // 'fee' already contains the invitation fee for invites
+        // so we adjust it here
+        securityFee = fee.minus(inviteFee)
+      } else if (!isDekRegistered && fee) {
+        // 'fee' contains cost for both DEK registration and
+        // send payment so we adjust it here
+        securityFee = fee.dividedBy(2)
+        dekFee = fee.dividedBy(2)
+      }
+
+      ValoraAnalytics.track(FeeEvents.fee_rendered, {
+        feeType: 'Security',
+        fee: securityFee ? securityFee.toString() : securityFee,
+      })
+      const totalAmount = {
+        value: amountWithFee,
         currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
       }
 
-      let primaryBtnInfo
-      if (type === TokenTransactionType.PayRequest || type === TokenTransactionType.PayPrefill) {
-        primaryBtnInfo = {
-          action: sendOrInvite,
-          text: i18n.t('global:pay'),
-          disabled: isPrimaryButtonDisabled,
-        }
-      } else {
-        primaryBtnInfo = {
-          action: onSendClick,
-          text: t('global:send'),
-          disabled: isPrimaryButtonDisabled,
-        }
-      }
-
-      const paymentComment = reason || ''
-
-      const FeeContainer = () => {
-        let securityFee
-        let dekFee
-        if (isInvite && fee) {
-          // 'fee' already contains the invitation fee for invites
-          // so we adjust it here
-          securityFee = fee.minus(inviteFee)
-        } else if (!isDekRegistered && fee) {
-          // 'fee' contains cost for both DEK registration and
-          // send payment so we adjust it here
-          securityFee = fee.dividedBy(2)
-          dekFee = fee.dividedBy(2)
-        }
-
-        ValoraAnalytics.track(FeeEvents.fee_rendered, {
-          feeType: 'Security',
-          fee: securityFee ? securityFee.toString() : securityFee,
-        })
-        const totalAmount = {
-          value: amountWithFee,
-          currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-        }
-
-        return (
-          <View style={styles.feeContainer}>
-            <FeeDrawer
-              testID={'feeDrawer/SendConfirmation'}
-              isEstimate={true}
-              currency={CURRENCY_ENUM.DOLLAR}
-              inviteFee={inviteFee}
-              isInvite={isInvite}
-              securityFee={securityFee}
-              showDekfee={!isDekRegistered}
-              dekFee={dekFee}
-              feeLoading={asyncFee.loading}
-              feeHasError={!!asyncFee.error}
-              totalFee={fee}
-              currencyInfo={currencyInfo}
-            />
-            <TotalLineItem amount={totalAmount} currencyInfo={currencyInfo} />
-          </View>
-        )
-      }
-
-      const EncryptionWarningLabel = () => {
-        const showLabel = !recipientAddress || addressToDataEncryptionKey[recipientAddress] === null
-
-        return showLabel ? (
-          <View style={styles.encryptionWarningLabelContainer}>
-            <Text style={styles.encryptionWarningLabel}>{t('encryption.warningLabel')}</Text>
-            <Touchable onPress={onShowEncryptionModal} borderless={true} hitSlop={iconHitslop}>
-              <InfoIcon size={12} />
-            </Touchable>
-          </View>
-        ) : null
-      }
-
       return (
-        <SafeAreaView style={styles.container} edges={['bottom']}>
-          <DisconnectBanner />
-          <ReviewFrame
-            FooterComponent={FeeContainer}
-            LabelAboveKeyboard={EncryptionWarningLabel}
-            confirmButton={primaryBtnInfo}
-            shouldReset={buttonReset}
-            isSending={isSending}
-          >
-            <View style={styles.transferContainer}>
-              {isInvite && <Text style={styles.inviteText}>{t('inviteMoneyEscrow')}</Text>}
-              <View style={styles.headerContainer}>
-                <ContactCircle
-                  name={transactionData.recipient.displayName}
-                  thumbnailPath={getRecipientThumbnail(recipient)}
-                  address={recipientAddress || ''}
-                />
-                <View style={styles.recipientInfoContainer}>
-                  <Text style={styles.headerText} testID="HeaderText">
-                    {t('sending')}
-                  </Text>
-                  <Text style={styles.displayName}>
-                    {getDisplayName({ recipient, recipientAddress, t })}
-                  </Text>
-                  {validatedRecipientAddress && (
-                    <View style={styles.editContainer}>
-                      <ShortenedAddress
-                        style={styles.address}
-                        address={validatedRecipientAddress}
-                      />
-                      <TextButton
-                        style={styles.editButton}
-                        testID={'accountEditButton'}
-                        onPress={onEditAddressClick}
-                      >
-                        {t('edit')}
-                      </TextButton>
-                    </View>
-                  )}
-                </View>
-              </View>
-              <CurrencyDisplay
-                type={DisplayType.Default}
-                style={styles.amount}
-                amount={subtotalAmount}
-                currencyInfo={currencyInfo}
-              />
-              {type === TokenTransactionType.PayRequest ||
-              type === TokenTransactionType.PayPrefill ? (
-                <View>
-                  <Text style={styles.paymentComment}>{paymentComment}</Text>
-                </View>
-              ) : (
-                <CommentTextInput
-                  testID={'send'}
-                  onCommentChange={setComment}
-                  comment={comment}
-                  onBlur={onBlur}
-                />
-              )}
-            </View>
-            <InviteOptionsModal
-              isVisible={modalVisible}
-              onWhatsApp={sendWhatsApp}
-              onSMS={sendSMS}
-              onCancel={cancelModal}
-            />
-            {/** Encryption warning dialog */}
-            <Dialog
-              title={t('encryption.warningModalHeader')}
-              isVisible={encryptionDialogVisible}
-              actionText={t('global:dismiss')}
-              actionPress={onDismissEncryptionModal}
-            >
-              {t('encryption.warningModalBody')}
-            </Dialog>
-          </ReviewFrame>
-        </SafeAreaView>
+        <View style={styles.feeContainer}>
+          <FeeDrawer
+            testID={'feeDrawer/SendConfirmation'}
+            isEstimate={true}
+            currency={CURRENCY_ENUM.DOLLAR}
+            inviteFee={inviteFee}
+            isInvite={isInvite}
+            securityFee={securityFee}
+            showDekfee={!isDekRegistered}
+            dekFee={dekFee}
+            feeLoading={asyncFee.loading}
+            feeHasError={!!asyncFee.error}
+            totalFee={fee}
+            currencyInfo={currencyInfo}
+          />
+          <TotalLineItem amount={totalAmount} currencyInfo={currencyInfo} />
+        </View>
       )
     }
 
-    if (!account) {
-      throw Error('Account is required')
+    const EncryptionWarningLabel = () => {
+      const showLabel = !recipientAddress || addressToDataEncryptionKey[recipientAddress] === null
+
+      return showLabel ? (
+        <View style={styles.encryptionWarningLabelContainer}>
+          <Text style={styles.encryptionWarningLabel}>{t('encryption.warningLabel')}</Text>
+          <Touchable onPress={onShowEncryptionModal} borderless={true} hitSlop={iconHitslop}>
+            <InfoIcon size={12} />
+          </Touchable>
+        </View>
+      ) : null
     }
-    const feeProps: CalculateFeeProps = recipientAddress
-      ? {
-          feeType: FeeType.SEND,
-          account,
-          recipientAddress,
-          amount,
-          includeDekFee: !isDekRegistered,
-        }
-      : { feeType: FeeType.INVITE, account, amount }
 
     return (
-      // Note: intentionally passing a new child func here otherwise
-      // it doesn't re-render on state change since CalculateFee is a pure component
-      <CalculateFee {...feeProps}>{(asyncFee) => renderWithAsyncFee(asyncFee)}</CalculateFee>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <DisconnectBanner />
+        <ReviewFrame
+          FooterComponent={FeeContainer}
+          LabelAboveKeyboard={EncryptionWarningLabel}
+          confirmButton={primaryBtnInfo}
+          shouldReset={buttonReset}
+          isSending={isSending}
+        >
+          <View style={styles.transferContainer}>
+            {isInvite && <Text style={styles.inviteText}>{t('inviteMoneyEscrow')}</Text>}
+            <View style={styles.headerContainer}>
+              <ContactCircle
+                name={transactionData.recipient.displayName}
+                thumbnailPath={getRecipientThumbnail(recipient)}
+                address={recipientAddress || ''}
+              />
+              <View style={styles.recipientInfoContainer}>
+                <Text style={styles.headerText} testID="HeaderText">
+                  {t('sending')}
+                </Text>
+                <Text style={styles.displayName}>
+                  {getDisplayName({ recipient, recipientAddress, t })}
+                </Text>
+                {validatedRecipientAddress && (
+                  <View style={styles.editContainer}>
+                    <ShortenedAddress style={styles.address} address={validatedRecipientAddress} />
+                    <TextButton
+                      style={styles.editButton}
+                      testID={'accountEditButton'}
+                      onPress={onEditAddressClick}
+                    >
+                      {t('edit')}
+                    </TextButton>
+                  </View>
+                )}
+              </View>
+            </View>
+            <CurrencyDisplay
+              type={DisplayType.Default}
+              style={styles.amount}
+              amount={subtotalAmount}
+              currencyInfo={currencyInfo}
+            />
+            {type === TokenTransactionType.PayRequest ||
+            type === TokenTransactionType.PayPrefill ? (
+              <View>
+                <Text style={styles.paymentComment}>{paymentComment}</Text>
+              </View>
+            ) : (
+              <CommentTextInput
+                testID={'send'}
+                onCommentChange={setComment}
+                comment={comment}
+                onBlur={onBlur}
+              />
+            )}
+          </View>
+          <InviteOptionsModal
+            isVisible={modalVisible}
+            onWhatsApp={sendWhatsApp}
+            onSMS={sendSMS}
+            onCancel={cancelModal}
+          />
+          {/** Encryption warning dialog */}
+          <Dialog
+            title={t('encryption.warningModalHeader')}
+            isVisible={encryptionDialogVisible}
+            actionText={t('global:dismiss')}
+            actionPress={onDismissEncryptionModal}
+          >
+            {t('encryption.warningModalBody')}
+          </Dialog>
+        </ReviewFrame>
+      </SafeAreaView>
     )
   }
+
+  if (!account) {
+    throw Error('Account is required')
+  }
+  const feeProps: CalculateFeeProps = recipientAddress
+    ? {
+        feeType: FeeType.SEND,
+        account,
+        recipientAddress,
+        amount,
+        includeDekFee: !isDekRegistered,
+      }
+    : { feeType: FeeType.INVITE, account, amount }
+
+  return (
+    // Note: intentionally passing a new child func here otherwise
+    // it doesn't re-render on state change since CalculateFee is a pure component
+    <CalculateFee {...feeProps}>{(asyncFee) => renderWithAsyncFee(asyncFee)}</CalculateFee>
+  )
 }
 
 const styles = StyleSheet.create({
