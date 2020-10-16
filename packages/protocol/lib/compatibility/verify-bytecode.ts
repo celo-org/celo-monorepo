@@ -81,7 +81,7 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     proxyAddress = context.libraryAddresses.addresses[contract]
     // Before the first contracts upgrade libraries are not proxied.
     if (context.isBeforeRelease1) {
-      return proxyAddress
+      return `0x${proxyAddress}`
     }
   } else {
     // contract is registered but we need to check if the proxy is affected by the proposal
