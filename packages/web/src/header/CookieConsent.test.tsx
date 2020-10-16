@@ -1,4 +1,4 @@
-import { fireEvent, render, wait, waitForDomChange } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import * as React from 'react'
 import { TestProvider } from 'src/_page-tests/test-utils'
 import { agree, disagree } from 'src/analytics/analytics'
@@ -16,27 +16,27 @@ jest.mock('src/analytics/analytics', () => {
 describe('CookieConsent', () => {
   describe('when press agree', () => {
     it('initializes Sentry', async () => {
-      const { getByText } = render(
+      const { getByText, queryByText } = render(
         <TestProvider>
           <CookieConsent />
         </TestProvider>
       )
-      await waitForDomChange()
+      await waitFor(() => queryByText('Agree'))
       fireEvent.click(getByText('Agree'))
 
       expect(agree).toHaveBeenCalled()
-      await wait()
+      await waitFor(() => true)
       expect(initSentry).toHaveBeenCalled()
     })
   })
   describe('when disagree', () => {
     it('does calls disagree', async () => {
-      const { getByText } = render(
+      const { getByText, queryByText } = render(
         <TestProvider>
           <CookieConsent />
         </TestProvider>
       )
-      await waitForDomChange()
+      await waitFor(() => queryByText('Disagree'))
       fireEvent.click(getByText('Disagree'))
       expect(disagree).toHaveBeenCalled()
     })
