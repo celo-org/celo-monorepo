@@ -56,6 +56,7 @@ module.exports = async (callback: (error?: any) => number) => {
       beforeRelease1
     )
 
+    // tslint:disable-next-line: no-console
     console.log('Success, no bytecode mismatches found!')
   } catch (error) {
     callback(error)
