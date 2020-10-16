@@ -1,9 +1,9 @@
 import { Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base/src'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
-import { Encrypt } from '@celo/utils/lib/ecies'
+import { AES128Decrypt, Encrypt } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
-import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto'
+import { createCipheriv, createHmac, randomBytes } from 'crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
@@ -239,11 +239,9 @@ export const readEncrypted = async (
     return Err(new InvalidKey())
   }
 
-  const iv = payload.result.slice(0, IV_LENGTH)
-  const encryptedData = payload.result.slice(IV_LENGTH)
-  const decipher = createDecipheriv('aes-128-ctr', key.result, iv)
-
-  return Ok(Buffer.concat([decipher.update(encryptedData), decipher.final()]))
+  return Ok(
+    AES128Decrypt(key.result, payload.result.slice(0, IV_LENGTH), payload.result.slice(IV_LENGTH))
+  )
 }
 
 export const deserialize = <DataType>(

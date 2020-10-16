@@ -223,7 +223,7 @@ testWithGanache('Offchain Data', (web3) => {
         kit.removeAccount(publicKeyToAddress(readerEncryptionKeyPublic))
       })
 
-      it("the writer can encrypt data directly to the reader's dataEncryptionKey", async () => {
+      it('encrypted data can be read and written', async () => {
         const nameAccessor = new EncryptedNameAccessor(wrapper)
         await nameAccessor.write(testPayload, [readerAddress])
 

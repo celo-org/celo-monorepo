@@ -78,6 +78,21 @@ export function AES128EncryptAndHMAC(
 }
 
 /**
+ * AES-128 CTR decrypt
+ * @param {Buffer} encryptionKey
+ * @param {Buffer} iv
+ * @param {Buffer} ciphertext
+ * @returns {Buffer} plaintext
+ */
+export function AES128Decrypt(encryptionKey: Buffer, iv: Buffer, ciphertext: Buffer) {
+  const cipher = createDecipheriv('aes-128-ctr', encryptionKey, iv)
+  const firstChunk = cipher.update(ciphertext)
+  const secondChunk = cipher.final()
+
+  return Buffer.concat([firstChunk, secondChunk])
+}
+
+/**
  * AES-128 CTR decrypt with message authentication
  * @param {Buffer} encryptionKey
  * @param {Buffer} macKey
@@ -99,11 +114,8 @@ export function AES128DecryptAndHMAC(
   if (!mac.equals(computedMac)) {
     throw new Error('MAC mismatch')
   }
-  const cipher = createDecipheriv('aes-128-ctr', encryptionKey, iv)
-  const firstChunk = cipher.update(message)
-  const secondChunk = cipher.final()
 
-  return Buffer.concat([firstChunk, secondChunk])
+  return AES128Decrypt(encryptionKey, iv, message)
 }
 
 /**
