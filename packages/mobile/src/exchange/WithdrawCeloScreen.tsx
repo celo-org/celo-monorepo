@@ -9,7 +9,8 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import { useAsync } from 'react-async-hook'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -38,7 +39,7 @@ const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
   const [celoInput, setCeloToTransfer] = useState('')
-  const [feeEstimate, setFeeEstimate] = useState(new BigNumber(0))
+  const [feeEstimate, setFeeEstimate] = useState<BigNumber | undefined>()
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
@@ -57,23 +58,22 @@ function WithdrawCeloScreen({ navigation }: Props) {
     CURRENCY_ENUM.GOLD
   )
 
-  useEffect(() => {
-    getSendFee(
-      accountAddress,
-      CURRENCY_ENUM.GOLD,
-      {
-        recipientAddress: RANDOM_ADDRESS,
-        amount: goldBalanceNumber,
-        comment: '',
-      },
-      false
-    )
-      .then((estimate: BigNumber) => {
-        setFeeEstimate(divideByWei(estimate))
-      })
-      .catch((error) => {
-        Logger.warn('WithdrawCeloScreen', `Error found while estimating gas fee: ${error}`)
-      })
+  useAsync(async () => {
+    try {
+      const estimate = await getSendFee(
+        accountAddress,
+        CURRENCY_ENUM.GOLD,
+        {
+          recipientAddress: RANDOM_ADDRESS,
+          amount: goldBalanceNumber,
+          comment: '',
+        },
+        false
+      )
+      setFeeEstimate(divideByWei(estimate))
+    } catch (error) {
+      Logger.warn('WithdrawCeloScreen', `Error found while estimating gas fee: ${error}`)
+    }
   }, [])
 
   const onConfirm = async () => {
@@ -88,7 +88,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     navigation.navigate(Screens.WithdrawCeloReviewScreen, {
       amount: celoToTransfer,
       recipientAddress: accountAddress,
-      feeEstimate,
+      feeEstimate: feeEstimate || new BigNumber(0),
     })
   }
 

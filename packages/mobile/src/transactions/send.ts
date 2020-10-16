@@ -142,7 +142,7 @@ export function* sendTransactionPromises(
   const feeCurrencyAddress =
     feeCurrency === CURRENCY_ENUM.DOLLAR
       ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
-      : undefined
+      : undefined // Pass undefined to use CELO to pay for gas.
   const transactionPromises = yield call(
     sendTransactionAsync,
     tx,

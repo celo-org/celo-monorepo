@@ -4,7 +4,15 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, TextInputProps, TouchableOpacity, ViewStyle } from 'react-native'
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextInputProps,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native'
 import { useSelector } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
@@ -15,7 +23,7 @@ interface Props {
   celo: string
   onCeloChanged: (address: string) => void
   color?: string
-  feeEstimate: BigNumber
+  feeEstimate: BigNumber | undefined
 }
 
 export default function CeloAmountInput({
@@ -30,7 +38,7 @@ export default function CeloAmountInput({
   const goldBalance = useSelector((state: RootState) => state.goldToken.balance)
 
   const setMaxAmount = () => {
-    if (goldBalance) {
+    if (goldBalance && feeEstimate) {
       const maxValue = new BigNumber(goldBalance).minus(feeEstimate)
       onCeloChanged(maxValue.isPositive() ? maxValue.toString() : '0')
     }
@@ -47,13 +55,20 @@ export default function CeloAmountInput({
       value={celo}
       testID={'CeloAmount'}
     >
-      <TouchableOpacity testID={'MaxAmount'} onPress={setMaxAmount}>
-        <Text style={[styles.maxAmount, { color }]}>{t('maxSymbol')}</Text>
-      </TouchableOpacity>
+      {feeEstimate ? (
+        <TouchableOpacity testID={'MaxAmount'} onPress={setMaxAmount}>
+          <Text style={[styles.maxAmount, { color }]}>{t('maxSymbol')}</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.goldUI} />
+        </View>
+      )}
     </TextInputWithButtons>
   )
 }
 
 const styles = StyleSheet.create({
   maxAmount: fontStyles.small600,
+  loadingContainer: {},
 })
