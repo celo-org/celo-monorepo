@@ -14,7 +14,7 @@ interface Props {
   kitName?: string
 }
 
-const KITS = [links.BRAND, links.EVENTS_KIT, links.MERCHANTS]
+const KITS = [links.BRAND, links.EVENTS_KIT, links.GRANT_KIT, links.MERCHANTS]
 
 export default function TopBar({ current, kitName }: Props) {
   const { isMobile } = useScreenSize()
