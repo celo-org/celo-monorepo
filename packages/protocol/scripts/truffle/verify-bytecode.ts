@@ -23,7 +23,6 @@ import fs = require('fs')
  *   libraries will be proxied, so libraries before this release have to be
  *   handled differently by this script.
  *   TODO: remove --before_release_1 after the first release
- *   --quiet: suppresses output.
  *
  * Run using truffle exec, e.g.:
  * truffle exec scripts/truffle/verify-bytecode \
@@ -36,13 +35,12 @@ const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal'],
-  boolean: ['before_release_1, quiet'],
+  boolean: ['before_release_1'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
 const proposal = argv.proposal ? JSON.parse(fs.readFileSync(argv.proposal).toString()) : []
 const beforeRelease1 = argv.before_release_1
-const quiet = argv.quiet
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -55,8 +53,7 @@ module.exports = async (callback: (error?: any) => number) => {
       proposal,
       Proxy,
       web3,
-      beforeRelease1,
-      quiet
+      beforeRelease1
     )
   } catch (error) {
     callback(error)

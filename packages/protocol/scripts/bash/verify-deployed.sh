@@ -12,13 +12,11 @@ set -euo pipefail
 #     TODO: remove -r in the future.
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 # the network
-# -q: Suppress positive output
 
 BRANCH=""
 NETWORK=""
 RELEASE_1=""
 FORNO=""
-QUIET=""
 
 while getopts 'b:n:rfq' flag; do
   case "${flag}" in
@@ -26,7 +24,6 @@ while getopts 'b:n:rfq' flag; do
     n) NETWORK="${OPTARG}" ;;
     r) RELEASE_1="--before_release_1" ;;
     f) FORNO="--forno" ;;
-    q) QUIET="--quiet" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -45,4 +42,4 @@ mv build/contracts $BUILD_DIR
 git checkout -
 
 yarn build
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $RELEASE_1 $FORNO $QUIET
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $RELEASE_1 $FORNO
