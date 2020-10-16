@@ -19,7 +19,7 @@ INITIALIZE_DATA=""
 REPORT=""
 DRYRUN=""
 
-while getopts 'a:b:n:p:i:r:d' flag; do
+while getopts 'b:n:p:i:r:d' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
