@@ -511,17 +511,6 @@ NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
-  FixidityLib: [
-    'LockedGold',
-    'Exchange',
-    'GasPriceMinimum',
-    'Governance',
-    'GovernanceTest',
-    'Proposals',
-    'SortedOracles',
-    'StableToken',
-    'Validators',
-  ],
   Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],

@@ -92,7 +92,7 @@ ___
 
 ▸ **getAddressFromKeyId**(`keyId`: string): *Promise‹[Address](../modules/_base_.md#address)›*
 
-*Defined in [packages/contractkit/src/wallets/aws-hsm-wallet.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L86)*
+*Defined in [packages/contractkit/src/wallets/aws-hsm-wallet.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/aws-hsm-wallet.ts#L88)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName
