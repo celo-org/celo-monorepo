@@ -72,7 +72,8 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   /**
    * Execute a signed meta transaction
    * Reverts if meta-tx signer is not a signer for the wallet
-   * @param mtx a MTWSignedMetaTransaction
+   * @param tx a TransactionInput
+   * @param signature a Signature
    */
   public executeMetaTransaction(
     tx: TransactionInput<any>,
@@ -139,7 +140,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   /**
    * Execute a signed meta transaction
    * Reverts if meta-tx signer is not a signer for the wallet
-   * @param mtx a MTWSignedMetaTransaction
+   * @param tx a TransactionInput
    */
   public async signAndExecuteMetaTransaction(
     tx: TransactionInput<any>
