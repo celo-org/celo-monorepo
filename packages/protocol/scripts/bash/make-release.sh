@@ -48,9 +48,11 @@ mv build/contracts $BUILD_DIR
 git checkout -
 yarn build
 
+# TODO: remove the truffle_override
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \
   --build_directory $BUILD_DIR \
   --report $REPORT \
   --proposal $PROPOSAL \
+  --truffle_override '{"gasLimit": 13000000, "gas": 13000000 }' \
   --initialize_data $INITIALIZE_DATA $DRYRUN
