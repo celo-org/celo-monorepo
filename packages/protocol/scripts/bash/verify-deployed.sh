@@ -18,7 +18,7 @@ NETWORK=""
 RELEASE_1=""
 FORNO=""
 
-while getopts 'b:n:rfq' flag; do
+while getopts 'b:n:rf' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
