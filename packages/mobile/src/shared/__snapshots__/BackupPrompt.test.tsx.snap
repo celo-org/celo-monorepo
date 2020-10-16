@@ -36,6 +36,7 @@ exports[`BackupPrompt renders correctly 1`] = `
         ],
       }
     }
+    testID="SmartTopAlertTouchable"
   >
     <Text
       style={
@@ -46,12 +47,12 @@ exports[`BackupPrompt renders correctly 1`] = `
             "fontSize": 14,
             "lineHeight": 18,
           },
+          false,
           Object {
             "color": "white",
             "lineHeight": undefined,
             "textAlign": "center",
           },
-          false,
         ]
       }
     >
