@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 /**
  * @title This interface describes the non- ERC20 shared interface for all Celo Tokens, and

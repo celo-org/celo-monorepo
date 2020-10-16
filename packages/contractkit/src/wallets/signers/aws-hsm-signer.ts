@@ -21,7 +21,7 @@ import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
 
-export default class AwsHsmSigner implements Signer {
+export class AwsHsmSigner implements Signer {
   private kms: KMS
   private keyId: string
   private publicKey: BigNumber

@@ -10,20 +10,23 @@ set -euo pipefail
 # -p: Path that the governance proposal should be written to.
 # -i: Path to the data needed to initialize contracts.
 # -r: Path to the contract compatibility report.
+# -d: Whether to dry-run this deploy
 
 NETWORK=""
 PROPOSAL=""
 BRANCH=""
 INITIALIZE_DATA=""
 REPORT=""
+DRYRUN=""
 
-while getopts 'a:b:n:p:i:r:' flag; do
+while getopts 'a:b:n:p:i:r:d' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
     p) PROPOSAL="${OPTARG}" ;;
     i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
+    d) DRYRUN="--dry_run"
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -42,4 +45,4 @@ yarn build
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 
-yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --report $REPORT --proposal $PROPOSAL --initialize_data $INITIALIZE_DATA
+yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_directory $BUILD_DIR/contracts --report $REPORT --proposal $PROPOSAL --initialize_data $INITIALIZE_DATA $DRYRUN
