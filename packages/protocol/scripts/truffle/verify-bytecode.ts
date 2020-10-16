@@ -12,16 +12,18 @@ import fs = require('fs')
  * proposal description.
  *
  * Expects the following flags:
- *   build_artifacts: The directory in which smart contract build artifacts can
- *   be found.
- *   proposal (optional): The JSON file containing a Governance proposal that
+ *   --build_artifacts: The directory in which smart contract build artifacts
+ *   can be found (defaults to ./build/contracts/)
+ *   --proposal: The JSON file containing a Governance proposal that
  *   repoints the Registry to newly deployed Proxies and/or repoints existing
  *   Proxies to new implementation addresses.
- *   before_release_1 (optional): a temporary feature flag needed before the
- *   first contracts upgrades establishes new conventions around how smart
- *   contracts are handled on chain. Specifically, after the first release,
- *   linked libraries will be proxied, so libraries before this release have to
- *   be handled differently by this script.
+ *   --before_release_1: a temporary feature flag needed before the first
+ *   contracts upgrade establishes new conventions around how smart contracts
+ *   are handled on chain. Specifically, after the first release, linked
+ *   libraries will be proxied, so libraries before this release have to be
+ *   handled differently by this script.
+ *   TODO: remove --before_release_1 after the first release
+ *   --quiet: suppresses output.
  *
  * Run using truffle exec, e.g.:
  * truffle exec scripts/truffle/verify-bytecode \
