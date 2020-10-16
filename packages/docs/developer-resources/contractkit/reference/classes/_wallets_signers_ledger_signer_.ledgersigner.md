@@ -58,7 +58,7 @@ Name | Type |
 
 ▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [packages/contractkit/src/wallets/signers/ledger-signer.ts:185](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L185)*
+*Defined in [packages/contractkit/src/wallets/signers/ledger-signer.ts:191](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L191)*
 
 **Parameters:**
 

@@ -1,6 +1,15 @@
 import { AppState, Linking } from 'react-native'
 import { eventChannel } from 'redux-saga'
-import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import {
+  call,
+  cancelled,
+  put,
+  select,
+  spawn,
+  take,
+  takeEvery,
+  takeLatest,
+} from 'redux-saga/effects'
 import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
@@ -8,6 +17,7 @@ import {
   appLock,
   OpenDeepLink,
   openDeepLink,
+  OpenUrlAction,
   SetAppState,
   setAppState,
   setLanguage,
@@ -21,6 +31,7 @@ import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handlePaymentDeeplink } from 'src/send/utils'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { parse } from 'url'
@@ -87,6 +98,16 @@ export function* watchDeepLinks() {
   yield takeLatest(Actions.OPEN_DEEP_LINK, handleDeepLink)
 }
 
+export function* handleOpenUrl(action: OpenUrlAction) {
+  const { url } = action
+  Logger.debug(TAG, 'Handling url', url)
+  yield call(navigateToURI, url)
+}
+
+export function* watchOpenUrl() {
+  yield takeEvery(Actions.OPEN_URL, handleOpenUrl)
+}
+
 function createAppStateChannel() {
   return eventChannel((emit: any) => {
     AppState.addEventListener('change', emit)
@@ -130,6 +151,7 @@ export function* handleSetAppState(action: SetAppState) {
 
 export function* appSaga() {
   yield spawn(watchDeepLinks)
+  yield spawn(watchOpenUrl)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)
 }
