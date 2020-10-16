@@ -34,7 +34,7 @@
 
 ▸ **buildMetaTxTypedData**(`walletAddress`: [Address](_base_.md#address), `tx`: [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md), `nonce`: number, `chainId`: number): *EIP712TypedData*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:259](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L259)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:262](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L262)*
 
 **Parameters:**
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **toRawTransaction**(`tx`: [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any›): *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L241)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L244)*
 
 Turns any possible way to pass in a transaction into the raw values
 that are actually required. This is used both internally to normalize
