@@ -89,8 +89,8 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   return props.children(asyncResult) as React.ReactElement
 }
 
-const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
-  const asyncResult = useAsyncShowError(
+export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<BigNumber> => {
+  return useAsyncShowError(
     (
       account: string,
       recipientAddress: string,
@@ -118,6 +118,10 @@ const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
       props.currency,
     ]
   )
+}
+
+const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
+  const asyncResult = useSendFee(props)
   return props.children(asyncResult) as React.ReactElement
 }
 

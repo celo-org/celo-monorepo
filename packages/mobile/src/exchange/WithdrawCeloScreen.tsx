@@ -9,8 +9,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useState } from 'react'
-import { useAsync } from 'react-async-hook'
+import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -20,17 +19,17 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
+import { FeeType } from 'src/fees/actions'
+import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
-import { getSendFee } from 'src/send/saga'
 import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { divideByWei } from 'src/utils/formatting'
-import Logger from 'src/utils/Logger'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
@@ -39,10 +38,9 @@ const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
   const [celoInput, setCeloToTransfer] = useState('')
-  const [feeEstimate, setFeeEstimate] = useState<BigNumber | undefined>()
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
-  const goldBalanceNumber = new BigNumber(goldBalance || 0)
+  const goldBalanceNumber = useMemo(() => new BigNumber(goldBalance || 0), [goldBalance])
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
   const celoToTransfer = new BigNumber(celoInput)
@@ -58,23 +56,15 @@ function WithdrawCeloScreen({ navigation }: Props) {
     CURRENCY_ENUM.GOLD
   )
 
-  useAsync(async () => {
-    try {
-      const estimate = await getSendFee(
-        accountAddress,
-        CURRENCY_ENUM.GOLD,
-        {
-          recipientAddress: RANDOM_ADDRESS,
-          amount: goldBalanceNumber,
-          comment: '',
-        },
-        false
-      )
-      setFeeEstimate(divideByWei(estimate))
-    } catch (error) {
-      Logger.warn('WithdrawCeloScreen', `Error found while estimating gas fee: ${error}`)
-    }
-  }, [])
+  const { result } = useSendFee({
+    feeType: FeeType.SEND,
+    account: RANDOM_ADDRESS,
+    currency: CURRENCY_ENUM.GOLD,
+    recipientAddress: RANDOM_ADDRESS,
+    amount: goldBalanceNumber,
+    includeDekFee: false,
+  })
+  const feeEstimate = result && divideByWei(result)
 
   const onConfirm = async () => {
     if (isTransferLimitReached) {
