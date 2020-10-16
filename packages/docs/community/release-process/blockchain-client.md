@@ -22,8 +22,10 @@ gpg --auto-key-locate wkd --locate-keys $EMAIL
 ```
 
 Currently hosted core developer keys include:
+
 * victor@clabs.co
 * mariano@clabs.co
+* joshua@clabs.co
 
 ## Documentation
 

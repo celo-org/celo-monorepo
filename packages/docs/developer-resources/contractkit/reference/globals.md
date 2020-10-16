@@ -43,6 +43,7 @@
 * ["utils/rpc-caller"](modules/_utils_rpc_caller_.md)
 * ["utils/signature-utils"](modules/_utils_signature_utils_.md)
 * ["utils/signing-utils"](modules/_utils_signing_utils_.md)
+* ["utils/timezone"](modules/_utils_timezone_.md)
 * ["utils/tx-params-normalizer"](modules/_utils_tx_params_normalizer_.md)
 * ["utils/tx-result"](modules/_utils_tx_result_.md)
 * ["utils/tx-uri"](modules/_utils_tx_uri_.md)

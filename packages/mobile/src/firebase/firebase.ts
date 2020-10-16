@@ -138,14 +138,13 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   })
   yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
-  const initialNotification = yield call([app.messaging(), 'getInitialNotification'])
+  // Manual type checking because yield calls can't infer return type yet :'(
+  const initialNotification: Awaited<ReturnType<
+    FirebaseMessagingTypes.Module['getInitialNotification']
+  >> = yield call([app.messaging(), 'getInitialNotification'])
   if (initialNotification) {
-    Logger.info(TAG, 'App opened fresh via a notification')
-    yield call(
-      handleNotification,
-      initialNotification.notification,
-      NotificationReceiveState.APP_OPENED_FRESH
-    )
+    Logger.info(TAG, 'App opened fresh via a notification', JSON.stringify(initialNotification))
+    yield call(handleNotification, initialNotification, NotificationReceiveState.APP_OPENED_FRESH)
   }
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
