@@ -12,6 +12,7 @@ set -euo pipefail
 #     TODO: remove -r in the future.
 # -f: Boolean flag to indicate if the Forno service should be used to connect to
 # the network
+# -q: Suppress positive output
 
 BRANCH=""
 NETWORK=""
