@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { scaleResource } from 'src/lib/kubernetes'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
@@ -30,7 +31,8 @@ export async function installHelmChart(
       celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName
+      blockscoutDBConnectionName,
+      true
     )
   )
 }
@@ -44,7 +46,8 @@ export async function upgradeHelmChart(
   helmReleaseName: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBConnectionName: string,
+  blockscoutResetDB: boolean
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
   const params = (
@@ -52,7 +55,8 @@ export async function upgradeHelmChart(
       celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName
+      blockscoutDBConnectionName,
+      blockscoutResetDB
     )
   ).join(' ')
   if (process.env.CELOTOOL_VERBOSE === 'true') {
@@ -70,7 +74,8 @@ async function helmParameters(
   celoEnv: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBConnectionName: string,
+  blockscoutResetDB: boolean
 ) {
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const useMetadataCrawler = fetchEnvOrFallback(
@@ -84,7 +89,7 @@ async function helmParameters(
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
-    `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
+    `--set blockscout.db.drop="${blockscoutResetDB}"`,
     `--set blockscout.replicas=${fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS)}`,
     `--set blockscout.subnetwork="${fetchEnvOrFallback(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
@@ -101,9 +106,9 @@ async function helmParameters(
     `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
     )}`,
-    `--set blockscout.metadata_crawler.schedule=${fetchEnv(
+    `--set blockscout.metadata_crawler.schedule='${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-    )}`,
+    )}'`,
     )
   }
   if (isVmBased()) {
@@ -163,4 +168,14 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   const command = `kubectl patch --namespace=${celoEnv} ing/${celoEnv}-blockscout-web-ingress --type=json\
    -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
   await execCmdWithExitOnFailure(command)
+}
+
+export async function scaleDownBlockscout(celoEnv: string, releaseName: string) {
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-web`, 0)
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-indexer`, 0)
+}
+
+export async function scaleUpBlockscout(celoEnv: string, releaseName: string) {
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-web`, parseInt(fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS), 10))
+  await scaleResource(celoEnv, `deployment`, `${releaseName}-indexer`, 1)
 }

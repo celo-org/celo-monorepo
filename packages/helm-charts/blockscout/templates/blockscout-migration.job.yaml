@@ -20,8 +20,8 @@ spec:
         - -c
         args:
         - |
-           [ ${DROP_DB} == "true" ] && mix do ecto.drop, ecto.create
-           mix do ecto.migrate
+           [ ${DROP_DB} = "true" ] && mix do ecto.drop
+           mix do ecto.create, ecto.migrate
         resources:
           requests:
             memory: 250M
