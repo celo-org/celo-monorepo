@@ -26,7 +26,7 @@ while getopts 'a:b:n:p:i:r:d' flag; do
     p) PROPOSAL="${OPTARG}" ;;
     i) INITIALIZE_DATA="${OPTARG}" ;;
     r) REPORT="${OPTARG}" ;;
-    d) DRYRUN="--dry_run"
+    d) DRYRUN="--dry_run" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
