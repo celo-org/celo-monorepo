@@ -56,7 +56,9 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * Reverts if the caller is not a signer
    * @param txs An array of MTWTransactions
    */
-  public executeTransactions(txs: Array<TransactionInput<any>>): CeloTransactionObject<void> {
+  public executeTransactions(
+    txs: Array<TransactionInput<any>>
+  ): CeloTransactionObject<{ 0: string; 1: string[] }> {
     const rawTxs: RawTransaction[] = txs.map(toRawTransaction)
     const destinations = rawTxs.map((rtx) => rtx.destination)
     const values = rawTxs.map((rtx) => rtx.value)
