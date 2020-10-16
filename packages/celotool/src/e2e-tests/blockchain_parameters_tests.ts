@@ -72,14 +72,14 @@ describe('Blockchain parameters tests', function(this: any) {
     it('block limit should have been set using governance', async () => {
       this.timeout(0)
       const res = await parameters.getBlockGasLimit()
-      assert.equal(res, 10000000)
+      assert.equal(0, res.comparedTo(10000000))
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)
       await parameters.setBlockGasLimit(23000000).send({ from: validatorAddress })
       await sleep(5)
       const res = await parameters.getBlockGasLimit()
-      assert.equal(res, 23000000)
+      assert.equal(0, res.comparedTo(23000000))
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)
