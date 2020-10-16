@@ -55,6 +55,8 @@ module.exports = async (callback: (error?: any) => number) => {
       web3,
       beforeRelease1
     )
+
+    console.log('Success, no bytecode mismatches found!')
   } catch (error) {
     callback(error)
   }
