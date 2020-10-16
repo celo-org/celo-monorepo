@@ -97,7 +97,7 @@ const getImplementationAddress = async (contract: string, context: VerificationC
   return proxy._getImplementation()
 }
 
-const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
+const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext, quiet = false) => {
   const contract = queue.pop()
   // mark current DFS node as visited
   visited.add(contract)
@@ -124,6 +124,9 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+  } else if (!quiet) {
+    console.log(
+      `${isLibrary(contract, context) ? 'Library' : 'Contract'} deployed at ${implementationAddress} matches ${contract}`)
   }
 
   // push unvisited libraries to DFS queue
@@ -144,7 +147,8 @@ export const verifyBytecodes = async (
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
   web3: Web3,
-  isBeforeRelease1: boolean = false
+  isBeforeRelease1: boolean = false,
+  quiet: boolean = false
 ) => {
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
@@ -160,6 +164,6 @@ export const verifyBytecodes = async (
   }
 
   while (queue.length > 0) {
-    await dfsStep(queue, visited, context)
+    await dfsStep(queue, visited, context, quiet)
   }
 }

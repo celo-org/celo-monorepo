@@ -34,12 +34,13 @@ const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal'],
-  boolean: ['before_release_1'],
+  boolean: ['before_release_1, quiet'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
 const proposal = argv.proposal ? JSON.parse(fs.readFileSync(argv.proposal).toString()) : []
 const beforeRelease1 = argv.before_release_1
+const quiet = argv.quiet
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -52,7 +53,8 @@ module.exports = async (callback: (error?: any) => number) => {
       proposal,
       Proxy,
       web3,
-      beforeRelease1
+      beforeRelease1,
+      quiet
     )
   } catch (error) {
     callback(error)
