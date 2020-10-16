@@ -1,6 +1,6 @@
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { RLPEncodedTx, Signer } from '@celo/connect'
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712TypedData, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { TransportStatusError } from '@ledgerhq/errors'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
@@ -102,11 +102,17 @@ export class LedgerSigner implements Signer {
 
   async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
-      const dataBuff = generateTypedDataHash(typedData)
-      const trimmedData = trimLeading0x(dataBuff.toString('hex'))
-      const sig = await this.ledger!.signPersonalMessage(
+      const domainSeparator = structHash('EIP712Domain', typedData.domain, typedData.types)
+      const hashStructMessage = structHash(
+        typedData.primaryType,
+        typedData.message,
+        typedData.types
+      )
+
+      const sig = await this.ledger!.signEIP712HashedMessage(
         await this.getValidatedDerivationPath(),
-        trimmedData
+        domainSeparator,
+        hashStructMessage
       )
 
       return {

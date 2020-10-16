@@ -12,6 +12,8 @@ describe(initGethSaga, () => {
   })
 
   beforeEach(() => {
+    const getStaticNodeRegion = StaticNodeUtils.getStaticNodeRegion as jest.Mock
+    getStaticNodeRegion.mockReturnValue('')
     const getStaticNodesAsync = StaticNodeUtils.getStaticNodesAsync as jest.Mock
     getStaticNodesAsync.mockReturnValue(Promise.resolve('["enode://foo"]'))
     const getGenesisBlockAsync = GenesisBlockUtils.getGenesisBlockAsync as jest.Mock

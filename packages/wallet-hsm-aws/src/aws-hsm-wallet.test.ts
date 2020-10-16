@@ -12,8 +12,7 @@ import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
-import AwsHsmWallet from './aws-hsm-wallet'
-
+import { AwsHsmWallet } from './aws-hsm-wallet'
 require('dotenv').config()
 
 export const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'

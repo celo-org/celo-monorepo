@@ -1,5 +1,6 @@
+import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/base/lib/address'
 import { CeloTx, EncodedTransaction, RpcCaller, Signer } from '@celo/connect'
-import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { decodeSig } from '@celo/wallet-base'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
@@ -23,6 +24,7 @@ enum RpcSignerEndpoint {
   UnlockAccount = 'personal_unlockAccount',
   SignTransaction = 'eth_signTransaction',
   SignBytes = 'eth_sign',
+  SignTypedData = 'eth_signTypedData',
   Decrypt = 'personal_decrypt',
 }
 
@@ -32,6 +34,7 @@ type RpcSignerEndpointInputs = {
   personal_unlockAccount: [string, string, number]
   eth_signTransaction: [any] // RpcTx doesn't match Tx because of nonce as string instead of number
   eth_sign: [string, string]
+  eth_signTypedData: [string, EIP712TypedData]
   personal_decrypt: [string, string]
 }
 
@@ -41,6 +44,7 @@ type RpcSignerEndpointResult = {
   personal_unlockAccount: boolean
   eth_signTransaction: EncodedTransaction
   eth_sign: string
+  eth_signTypedData: string
   personal_decrypt: string
 }
 
@@ -92,6 +96,15 @@ export class RpcSigner implements Signer {
 
   async signTransaction(): Promise<{ v: number; r: Buffer; s: Buffer }> {
     throw new Error('signTransaction unimplemented; use signRawTransaction')
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const result = await this.callAndCheckResponse(RpcSignerEndpoint.SignTypedData, [
+      this.account,
+      typedData,
+    ])
+
+    return decodeSig(result)
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {

@@ -1,6 +1,6 @@
-import { ensureLeading0x } from '@celo/base/lib/address'
+import { ensureLeading0x, normalizeAddressWith0x } from '@celo/base/lib/address'
 import { CeloTx, RLPEncodedTx, Signer } from '@celo/connect'
-import { normalizeAddressWith0x } from '@celo/utils/src/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { encodeTransaction, extractSignature, rlpEncodedTx } from '@celo/wallet-base'
 import * as ethUtil from 'ethereumjs-util'
 import { GethNativeModule } from 'react-native-geth'
@@ -61,6 +61,15 @@ export class GethNativeBridgeSigner implements Signer {
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
     Logger.info(`${TAG}@signPersonalMessage`, `Signing ${data}`)
     const hash = ethUtil.hashPersonalMessage(Buffer.from(data.replace('0x', ''), 'hex'))
+    const signatureBase64 = await this.geth.signHash(hash.toString('base64'), this.account)
+    return ethUtil.fromRpcSig(this.base64ToHex(signatureBase64))
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    // TODO: Not sure if it makes more sense to expose a `signTypedData` function on the RN Bridge
+    // or just construct the hash here.
+    Logger.info(`${TAG}@signTypedData`, `Signing typed data`)
+    const hash = generateTypedDataHash(typedData)
     const signatureBase64 = await this.geth.signHash(hash.toString('base64'), this.account)
     return ethUtil.fromRpcSig(this.base64ToHex(signatureBase64))
   }

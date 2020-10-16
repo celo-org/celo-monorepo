@@ -11,7 +11,7 @@ import { RemoteWallet } from '@celo/wallet-remote'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
-import AwsHsmSigner from './aws-hsm-signer'
+import { AwsHsmSigner } from './aws-hsm-signer'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
@@ -26,7 +26,7 @@ const defaultCredentials: KMS.ClientConfiguration = {
  * When using the default credentials, it's expected to set the
  * aws_access_key_id and aws_secret_access_key in ~/.aws/credentials
  */
-export default class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnlyWallet {
+export class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnlyWallet {
   private kms: KMS | undefined
   private credentials: KMS.ClientConfiguration
 
@@ -56,10 +56,12 @@ export default class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements 
         addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId, publicKey))
       } catch (e) {
         // Safely ignore non-secp256k1 keys
-        if (!e.name || e.name !== 'UnsupportedOperationException') {
-          throw e
-        } else {
+        if (e.name === 'UnsupportedOperationException') {
           debug(`Ignoring non-secp256k1 key ${KeyId}`)
+        } else if (e.name === 'AccessDeniedException') {
+          debug(`Ignoring key that user does not have DescribeKey access for: ${KeyId}`)
+        } else {
+          throw e
         }
       }
     }

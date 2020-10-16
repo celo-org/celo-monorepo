@@ -5,6 +5,6 @@
     "outDir": "lib",
     "resolveJsonModule": true,
   },
-  "include": ["src"],
+  "include": ["src/**/*", "types/**/*"],
   "references": [{ "path": "../utils" }]
 }

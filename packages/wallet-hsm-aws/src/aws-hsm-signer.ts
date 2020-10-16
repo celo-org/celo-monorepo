@@ -1,5 +1,6 @@
 import { RLPEncodedTx, Signer } from '@celo/connect'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { getHashFromEncoded } from '@celo/wallet-base'
 import {
   bigNumberToBuffer,
@@ -17,7 +18,7 @@ import * as ethUtil from 'ethereumjs-util'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
 
-export default class AwsHsmSigner implements Signer {
+export class AwsHsmSigner implements Signer {
   private kms: KMS
   private keyId: string
   private publicKey: BigNumber
@@ -82,6 +83,17 @@ export default class AwsHsmSigner implements Signer {
     const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff) as Buffer
     const { v, r, s } = await this.sign(msgHashBuff)
+
+    return {
+      v: v + 27,
+      r,
+      s,
+    }
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<Signature> {
+    const typedDataHashBuff = generateTypedDataHash(typedData)
+    const { v, r, s } = await this.sign(typedDataHashBuff)
 
     return {
       v: v + 27,

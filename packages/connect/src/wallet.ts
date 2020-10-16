@@ -21,6 +21,7 @@ export interface Signer {
     encodedTx: RLPEncodedTx
   ) => Promise<{ v: number; r: Buffer; s: Buffer }>
   signPersonalMessage: (data: string) => Promise<{ v: number; r: Buffer; s: Buffer }>
+  signTypedData: (typedData: EIP712TypedData) => Promise<{ v: number; r: Buffer; s: Buffer }>
   getNativeKey: () => string
   decrypt: (ciphertext: Buffer) => Promise<Buffer>
 }

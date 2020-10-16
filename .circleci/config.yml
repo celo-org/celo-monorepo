@@ -480,9 +480,8 @@ jobs:
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against first commit to contain version numbers"
             git fetch --all
-            RELEASE_TAG=8a8b82252e2da9a4afc743b1e27260d521729f74
+            RELEASE_TAG=celo-core-contracts-v1.rc1
             yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
-
             LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
             if [[ $LIBRARIES_CHANGED ]]; then
               echo "Changing the linked list libraries is not currently supported."
@@ -986,7 +985,7 @@ jobs:
             sudo apt-get install -y software-properties-common
             sudo apt-get install python3-pip
             pip3 install certora-cli==0.1.1
-            wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
+            wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
             chmod +x solc-static-linux
             sudo mv solc-static-linux /usr/bin/solc
       - run:

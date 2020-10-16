@@ -1,7 +1,7 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/connect'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
@@ -221,8 +221,20 @@ export function verifyEIP712TypedDataSigner(
 ): boolean {
   const dataBuff = generateTypedDataHash(typedData)
   const trimmedData = dataBuff.toString('hex')
-  const valid = verifySignature(ensureLeading0x(trimmedData), signedData, expectedAddress)
-  return valid
+  return verifySignatureWithoutPrefix(ensureLeading0x(trimmedData), signedData, expectedAddress)
+}
+
+export function verifySignatureWithoutPrefix(
+  messageHash: string,
+  signature: string,
+  signer: string
+) {
+  try {
+    parseSignatureWithoutPrefix(messageHash, signature, signer)
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 export function decodeSig(sig: any) {

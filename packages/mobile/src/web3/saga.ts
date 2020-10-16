@@ -81,7 +81,9 @@ export function* checkWeb3SyncProgress() {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
           if (status !== SyncStatus.WAITING) {
             status = SyncStatus.WAITING
-            ValoraAnalytics.track(NetworkEvents.network_sync_waiting)
+            ValoraAnalytics.track(NetworkEvents.network_sync_waiting, {
+              latestBlock: latestBlock?.number,
+            })
           }
         }
       } else if (typeof syncProgress === 'object') {

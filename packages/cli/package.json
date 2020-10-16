@@ -99,6 +99,9 @@
       "config": {
         "description": "Configure CLI options which persist across commands"
       },
+      "dkg": {
+        "description": "Publish your locally computed DKG results to the blockchain"
+      },
       "election": {
         "description": "Participate in and view the state of Validator Elections"
       },
@@ -114,8 +117,14 @@
       "lockedgold": {
         "description": "View and manage locked CELO"
       },
+      "network": {
+        "description": "View details about the network, like contracts and parameters"
+      },
       "node": {
         "description": "Manage your Celo node"
+      },
+      "releasegold": {
+        "description": "View and manage Release Gold contracts"
       },
       "transfer": {
         "description": "Transfer CELO and Celo Dollars"
@@ -125,12 +134,6 @@
       },
       "validatorgroup": {
         "description": "View and manage Validator Groups"
-      },
-      "releasegold": {
-        "description": "View and manage Release Gold contracts"
-      },
-      "dkg": {
-        "description": "Publish your locally computed DKG results to the blockchain"
       }
     },
     "bin": "celocli",
