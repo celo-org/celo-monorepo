@@ -29,7 +29,6 @@ import { storeLatestInRecents } from 'src/send/actions'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { getRateForMakerToken, goldToDollarAmount } from 'src/utils/currencyExchange'
 import Logger from 'src/utils/Logger'
 import { timeDeltaInHours } from 'src/utils/time'
@@ -198,15 +197,11 @@ export function* handleSendPaymentData(
       reason: data.comment,
       type: TokenTransactionType.PayPrefill,
     }
-    const currencyInfo: CurrencyInfo = {
-      currencyCode: currency,
-      exchangeRate,
-    }
 
     navigate(Screens.SendConfirmation, {
       transactionData,
       isFromScan: true,
-      currencyInfo,
+      currencyCode: currency,
     })
   } else {
     navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })

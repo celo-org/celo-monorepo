@@ -1,12 +1,12 @@
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -24,8 +24,8 @@ export default function TotalLineItem({ title, amount, hideSign, currencyInfo }:
   let localCurrencyCode = useLocalCurrencyCode()
   let localCurrencyExchangeRate = useExchangeRate()
   if (currencyInfo) {
-    localCurrencyCode = currencyInfo.currencyCode
-    localCurrencyExchangeRate = currencyInfo.exchangeRate
+    localCurrencyCode = currencyInfo.localCurrencyCode
+    localCurrencyExchangeRate = currencyInfo.localExchangeRate
   }
 
   const { t } = useTranslation(Namespaces.global)

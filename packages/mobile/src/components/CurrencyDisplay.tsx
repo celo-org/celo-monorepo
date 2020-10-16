@@ -138,8 +138,8 @@ export default function CurrencyDisplay({
   let localCurrencyCode = useLocalCurrencyCode()
   let dollarToLocalRate = useDollarToLocalRate()
   if (currencyInfo) {
-    localCurrencyCode = currencyInfo.currencyCode
-    dollarToLocalRate = currencyInfo.exchangeRate
+    localCurrencyCode = currencyInfo.localCurrencyCode
+    dollarToLocalRate = currencyInfo.localExchangeRate
   }
   const goldToDollarRate = useGoldToDollarRate()
 

@@ -363,6 +363,8 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
+export const addressToDataEncryptionKeySelector = (state: RootState) =>
+  state.identity.addressToDataEncryptionKey
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
   state.identity.secureSendPhoneNumberMapping
