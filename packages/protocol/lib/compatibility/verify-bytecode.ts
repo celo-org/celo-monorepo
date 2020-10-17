@@ -81,7 +81,7 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     proxyAddress = context.libraryAddresses.addresses[contract]
     // Before the first contracts upgrade libraries are not proxied.
     if (context.isBeforeRelease1) {
-      return proxyAddress
+      return `0x${proxyAddress}`
     }
   } else {
     // contract is registered but we need to check if the proxy is affected by the proposal
@@ -124,6 +124,10 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+  } else {
+    // tslint:disable-next-line: no-console
+    console.log(
+      `${isLibrary(contract, context) ? 'Library' : 'Contract'} deployed at ${implementationAddress} matches ${contract}`)
   }
 
   // push unvisited libraries to DFS queue
@@ -144,7 +148,7 @@ export const verifyBytecodes = async (
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
   web3: Web3,
-  isBeforeRelease1: boolean = false
+  isBeforeRelease1: boolean = false,
 ) => {
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
