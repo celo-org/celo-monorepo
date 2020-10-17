@@ -44,16 +44,15 @@ export function parseUri(uri: string): Tx {
       tx.data = functionSig
 
       if (namedGroups.inputTypes !== undefined) {
-        const abiTypes = namedGroups.inputTypes.split(',')
-        let callSig = null
-        if (parsedQuery.args[parsedQuery.args.length-2] === '=') {
-          const builtArgs = JSON.parse(Buffer.from(parsedQuery.args.slice(1, parsedQuery.args.length - 1), 'base64').toString('utf8'))
-          callSig = abi.encodeParameters(abiTypes, builtArgs)
+        let builtArgs = null
+        if (parsedQuery.args[parsedQuery.args.length-1] === '=') {
+          builtArgs = JSON.parse(Buffer.from(parsedQuery.args.slice(1, parsedQuery.args.length - 1), 'base64').toString('utf8'))
         } else {
           const rawArgs = (parsedQuery.args || '[]') as string
-          const builtArgs = rawArgs.slice(1, rawArgs.length - 1).split(',')
-          callSig = abi.encodeParameters(abiTypes, builtArgs)
+          builtArgs = rawArgs.slice(1, rawArgs.length - 1).split(',')
         }
+        const abiTypes = namedGroups.inputTypes.split(',')
+        const callSig = abi.encodeParameters(abiTypes, builtArgs)
 
         tx.data += trimLeading0x(callSig)
       }
@@ -104,7 +103,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
 
   uri += '?'
   if (functionArgs) {
-    uri += `args=[${functionArgs}]`
+    uri += `args=${functionArgs}`
   }
   const params = txQueryParams as { [key: string]: string }
   if (txQueryParams.value instanceof BN) {
