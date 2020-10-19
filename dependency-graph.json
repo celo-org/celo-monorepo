@@ -48,14 +48,6 @@
       "@celo/wallet-local"
     ]
   },
-  "@celo/dappkit": {
-    "location": "packages/dappkit",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/utils"
-    ]
-  },
   "@celo/dev-utils": {
     "location": "packages/dev-utils",
     "dependencies": []
@@ -201,6 +193,14 @@
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/protocol",
+      "@celo/utils"
+    ]
+  },
+  "@celo/dappkit": {
+    "location": "packages/sdk/dappkit",
+    "dependencies": [
+      "@celo/connect",
+      "@celo/contractkit",
       "@celo/utils"
     ]
   },
