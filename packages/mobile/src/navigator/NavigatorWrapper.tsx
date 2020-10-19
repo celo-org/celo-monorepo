@@ -7,7 +7,7 @@ import DeviceInfo from 'react-native-device-info'
 import { useDispatch } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { setRequiredVersion } from 'src/app/actions'
+import { minAppVersionDetermined } from 'src/app/actions'
 import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
@@ -124,7 +124,7 @@ export const NavigatorWrapper = () => {
     const version = DeviceInfo.getVersion()
     updateRequired = isVersionBelowMinimum(version, minRequiredVersion)
     if (!updateRequired) {
-      dispatch(setRequiredVersion(null))
+      dispatch(minAppVersionDetermined(null))
     }
   }
 

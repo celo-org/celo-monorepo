@@ -15,13 +15,13 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
   appLock,
+  minAppVersionDetermined,
   OpenDeepLink,
   openDeepLink,
   OpenUrlAction,
   SetAppState,
   setAppState,
   setLanguage,
-  setRequiredVersion,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
@@ -53,7 +53,7 @@ export function* appInit() {
 
   if (isDeprecated) {
     Logger.warn(TAG, 'App version is deprecated')
-    yield put(setRequiredVersion(minVersion))
+    yield put(minAppVersionDetermined(minVersion))
     replace(Screens.UpgradeScreen)
     return
   } else {
