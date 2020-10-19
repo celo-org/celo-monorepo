@@ -25,6 +25,7 @@ export enum Actions {
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
   SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
 }
 
 export interface SetAppState {
@@ -87,6 +88,11 @@ export interface SetSessionId {
   sessionId: string
 }
 
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -101,6 +107,7 @@ export type ActionTypes =
   | Lock
   | Unlock
   | SetSessionId
+  | OpenUrlAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -168,4 +175,9 @@ export const appUnlock = (): Unlock => ({
 export const setSessionId = (sessionId: string) => ({
   type: Actions.SET_SESSION_ID,
   sessionId,
+})
+
+export const openUrl = (url: string): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
 })

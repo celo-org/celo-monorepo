@@ -3,7 +3,6 @@ import getConfig from 'next/config'
 import Head from 'next/head'
 import * as React from 'react'
 import { View } from 'react-native'
-import config from 'react-reveal/globals'
 import scrollIntoView from 'scroll-into-view'
 import analytics, { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
@@ -14,8 +13,6 @@ import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
-
-config({ ssrReveal: true })
 
 class MyApp extends App {
   async componentDidMount() {
