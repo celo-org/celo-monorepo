@@ -15,5 +15,6 @@
     "@celo/connect": "0.0.2-dev"
   },
   "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "files": ["src/**/*", "lib/**/*"]
 }

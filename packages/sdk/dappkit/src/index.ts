@@ -18,7 +18,7 @@ export {
   DappKitRequestMeta,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
-} from '@celo/utils/'
+} from '@celo/utils'
 
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
