@@ -155,13 +155,25 @@ class StorageRoot {
       return Ok(body)
     }
 
-    const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
-    const authorizedSigner = await authorizedSignerAccessor.readAsResult(
-      this.account,
-      guessedSigner
-    )
-    if (authorizedSigner.ok) {
-      return Ok(body)
+    const accounts = await this.wrapper.kit.contracts.getAccounts()
+    if (await accounts.isAccount(this.account)) {
+      const signers = await Promise.all([
+        accounts.getVoteSigner(this.account),
+        accounts.getValidatorSigner(this.account),
+        accounts.getAttestationSigner(this.account),
+      ])
+      if (signers.some((signer) => signer === guessedSigner)) {
+        return Ok(body)
+      }
+
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
+      const authorizedSigner = await authorizedSignerAccessor.readAsResult(
+        this.account,
+        guessedSigner
+      )
+      if (authorizedSigner.ok) {
+        return Ok(body)
+      }
     }
 
     return Err(new InvalidSignature())
