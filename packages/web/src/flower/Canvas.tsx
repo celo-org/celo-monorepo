@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Body from 'src/flower/Body'
 import preview from 'src/flower/open-graph.jpg'
 import SideBar from 'src/flower/SideBar'
@@ -28,14 +27,18 @@ export default function Canvas() {
       <View style={styles.root}>
         <View style={styles.nav}>
           <Text onPress={toggleSidebar} style={[fonts.p, textStyles.heavy, styles.navText]}>
-            <View style={styles.about}>
-              <Fade duration={DURATION} when={!isOpen}>
-                About
-              </Fade>
-            </View>
-            <Fade duration={DURATION} opposite={true} when={isOpen}>
+            <Text
+              style={[
+                styles.about,
+                styles.transition,
+                isOpen ? styles.transitionOut : styles.transitionIn,
+              ]}
+            >
+              About
+            </Text>
+            <Text style={[styles.transition, isOpen ? styles.transitionIn : styles.transitionOut]}>
               Close
-            </Fade>
+            </Text>
           </Text>
         </View>
         <View style={styles.container}>
@@ -65,4 +68,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   about: { position: 'absolute' },
+  transition: {
+    transitionDuration: `${DURATION}ms`,
+    transitionProperty: 'opacity',
+  },
+  transitionOut: {
+    opacity: 0,
+  },
+  transitionIn: {
+    opacity: 1,
+    transitionDelay: `${DURATION / 3}ms`,
+  },
 })
