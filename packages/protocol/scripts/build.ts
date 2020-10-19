@@ -1,6 +1,4 @@
 /* tslint:disable no-console */
-// tslint:disable-next-line: no-reference
-/// <reference path="../../typechain-target-web3-v1-celo/lib/index.d.ts" />
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import * as fs from 'fs'

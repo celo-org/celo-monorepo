@@ -150,7 +150,6 @@
     "dependencies": [
       "@celo/base",
       "@celo/flake-tracker",
-      "@celo/typechain-target-web3-v1-celo",
       "@celo/typescript",
       "@celo/utils"
     ]
@@ -166,13 +165,6 @@
   "@celo/reserve-web": {
     "location": "packages/reserve-site",
     "dependencies": []
-  },
-  "@celo/typechain-target-web3-v1-celo": {
-    "location": "packages/typechain-target-web3-v1-celo",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/typescript"
-    ]
   },
   "@celo/typescript": {
     "location": "packages/typescript",

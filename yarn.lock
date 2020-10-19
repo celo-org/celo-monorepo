@@ -2752,6 +2752,16 @@
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
 
+"@celo/typechain-target-web3-v1-celo@0.1.0-beta2":
+  version "0.1.0-beta2"
+  resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.1.0-beta2.tgz#08673e58dee4816828c4c04956f1ae7979ae0fc7"
+  integrity sha512-tJqO1hqOJ17JBE5ZsbsaQw4dE7bYsH97Ko6SOCOmvZBtwwSG1ubEOqBzwN260UG3lMKlSMpA+w7N2dhLKvJJTQ==
+  dependencies:
+    elliptic "~6.5.3"
+    lodash "~4.17.19"
+    minimist "~0.2.1"
+    typechain "2.0.0"
+
 "@celo/utils@0.1.8":
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.8.tgz#a9259f6f9a915da0f50c7f884cf2931f68627076"
@@ -7133,11 +7143,6 @@
   version "4.14.136"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.136.tgz#413e85089046b865d960c9ff1d400e04c31ab60f"
   integrity sha512-0GJhzBdvsW2RUccNHOBkabI8HZVdOXmXbXhuKlDEd5Vv12P7oAVGfomGp3Ne21o5D/qu1WmthlNKFaoZJJeErA==
-
-"@types/lodash@~4.14.158":
-  version "4.14.160"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.160.tgz#2f1bba6500bc3cb9a732c6d66a083378fb0b0b29"
-  integrity sha512-aP03BShJoO+WVndoVj/WNcB/YBPt+CIU1mvaao2GRAHy2yg4pT/XS4XnVHEQBjPJGycWf/9seKEO9vopTJGkvA==
 
 "@types/long@*", "@types/long@^4.0.0", "@types/long@^4.0.1":
   version "4.0.1"
@@ -35948,7 +35953,7 @@ web3-core@1.2.1:
     web3-core-requestmanager "1.2.1"
     web3-utils "1.2.1"
 
-web3-core@1.2.11, web3-core@^1.2.11:
+web3-core@1.2.11:
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/web3-core/-/web3-core-1.2.11.tgz#1043cacc1becb80638453cc5b2a14be9050288a7"
   integrity sha512-CN7MEYOY5ryo5iVleIWRE3a3cZqVaLlIbIzDPsvQRUfzYnvzZQRZBm9Mq+ttDi2STOOzc1MKylspz/o3yq/LjQ==

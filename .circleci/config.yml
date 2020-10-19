@@ -151,7 +151,6 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/base
             yarn build --scope @celo/utils
-            yarn build --scope @celo/typechain-target-web3-v1-celo
             yarn build --scope @celo/dev-utils
             yarn build --scope @celo/connect
             yarn build --scope @celo/protocol
