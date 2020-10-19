@@ -107,6 +107,7 @@ function SendConfirmation(props: Props) {
   )
   const account = useSelector(currentAccountSelector)
   const isSending = useSelector(isSendingSelector)
+  // tslint:disable-next-line: react-hooks-nesting
   const dollarBalance = useSelector(stableTokenBalanceSelector) || '0'
   const appConnected = useSelector(isAppConnected)
   const isDekRegistered = useSelector(isDekRegisteredSelector) ?? false
@@ -114,6 +115,7 @@ function SendConfirmation(props: Props) {
 
   let newCurrencyInfo: CurrencyInfo = {
     localCurrencyCode: useSelector(getLocalCurrencyCode),
+    // tslint:disable-next-line: react-hooks-nesting
     localExchangeRate: useSelector(getLocalCurrencyExchangeRate) || '',
   }
   if (currencyInfo) {
