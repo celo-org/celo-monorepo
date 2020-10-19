@@ -28,7 +28,7 @@ import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handlePaymentDeeplink } from 'src/send/utils'
 import { navigateToURI } from 'src/utils/linking'
@@ -52,7 +52,7 @@ export function* appInit() {
 
   if (isDeprecated) {
     Logger.warn(TAG, 'App version is deprecated')
-    navigate(Screens.UpgradeScreen)
+    replace(Screens.UpgradeScreen)
     return
   } else {
     Logger.debug(TAG, 'App version is valid')
