@@ -154,6 +154,7 @@
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/contractkit-extenders",
       "@celo/utils"
     ]
   },
