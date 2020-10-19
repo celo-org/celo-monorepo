@@ -15,6 +15,7 @@ export interface State {
   locked: boolean
   lastTimeBackgrounded: number
   sessionId: string
+  minVersion: string | null
 }
 
 const initialState = {
@@ -29,6 +30,7 @@ const initialState = {
   locked: false,
   lastTimeBackgrounded: 0,
   sessionId: '',
+  minVersion: null,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language || i18n.language
@@ -127,6 +129,11 @@ export const appReducer = (
       return {
         ...state,
         sessionId: action.sessionId,
+      }
+    case Actions.SET_REQUIRED_VERSION:
+      return {
+        ...state,
+        minVersion: action.minVersion,
       }
     default:
       return state

@@ -21,6 +21,7 @@ import {
   SetAppState,
   setAppState,
   setLanguage,
+  setRequiredVersion,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
@@ -48,10 +49,11 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
+  const [isDeprecated, minVersion]: [boolean, string] = yield call(isAppVersionDeprecated)
 
   if (isDeprecated) {
     Logger.warn(TAG, 'App version is deprecated')
+    yield put(setRequiredVersion(minVersion))
     replace(Screens.UpgradeScreen)
     return
   } else {

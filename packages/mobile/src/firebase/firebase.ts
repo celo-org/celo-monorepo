@@ -195,7 +195,7 @@ Firebase DB Format:
 */
 export async function isAppVersionDeprecated() {
   if (!FIREBASE_ENABLED) {
-    return false
+    return [false, null]
   }
 
   Logger.info(TAG, 'Checking version info')
@@ -208,10 +208,11 @@ export async function isAppVersionDeprecated() {
       .once('value')
   ).val()
   if (!versionsInfo || !versionsInfo.minVersion) {
-    return false
+    return [false, null]
   }
   const minVersion: string = versionsInfo.minVersion
-  return isVersionBelowMinimum(version, minVersion)
+
+  return [isVersionBelowMinimum(version, minVersion), minVersion]
 }
 
 export async function setUserLanguage(address: string, language: string) {
