@@ -19,7 +19,7 @@ INITIALIZE_DATA=""
 REPORT=""
 DRYRUN=""
 
-while getopts 'a:b:n:p:i:r:d' flag; do
+while getopts 'b:n:p:i:r:d' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
@@ -45,4 +45,14 @@ yarn build
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 
-yarn run truffle exec ./scripts/truffle/make-release.js --network $NETWORK --build_directory $BUILD_DIR/contracts --report $REPORT --proposal $PROPOSAL --initialize_data $INITIALIZE_DATA $DRYRUN
+git checkout -
+yarn build
+
+# TODO: remove the truffle_override
+yarn run truffle exec ./scripts/truffle/make-release.js \
+  --network $NETWORK \
+  --build_directory $BUILD_DIR \
+  --report $REPORT \
+  --proposal $PROPOSAL \
+  --truffle_override '{"gasLimit": 13000000, "gas": 13000000 }' \
+  --initialize_data $INITIALIZE_DATA $DRYRUN

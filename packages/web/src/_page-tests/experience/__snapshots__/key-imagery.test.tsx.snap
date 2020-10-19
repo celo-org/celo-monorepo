@@ -1376,7 +1376,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                   }
                 }
               >
-                keyImagery.title
+                Key Imagery
               </h1>
               <h4
                 aria-level="4"
@@ -1395,7 +1395,9 @@ exports[`Experience/KeyImagery renders 1`] = `
                   }
                 }
               >
-                keyImagery.headline
+                Used to tell a story, key images are visual tools that bring the text to life. These images help the user comprehend the material multidimensionally.
+
+Images have descriptions that act as guidelines for both accessibility and communication clarity. Most images can have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.
               </h4>
             </div>
             <div
@@ -1416,7 +1418,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              licenseTitle
+              Usage & License Note
             </div>
             <div
               className="css-text-901oao"
@@ -1436,6 +1438,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
+              You may copy and redistribute illustrations and abstract graphics as long as you are abiding by the 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1466,9 +1469,10 @@ exports[`Experience/KeyImagery renders 1`] = `
                     }
                   }
                 >
-                  Code of Conduct
+                  Community Code of Conduct
                 </a>
               </div>
+               and 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1502,6 +1506,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                   Brand Policy
                 </a>
               </div>
+              . You may not remix or transform them.
             </div>
           </div>
         </div>
@@ -1537,7 +1542,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.illoTitle
+              Illustrations
             </h2>
             <div
               className="css-text-901oao"
@@ -1555,7 +1560,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.illoText
+              Illustrations show concrete ways that humans interact with an idea. They utilize current mental models to simplify a concept.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1588,12 +1593,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -1785,7 +1785,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                           }
                         }
                       >
-                        downloadAssetBtn
+                        Download
                         <div
                           className="css-view-1dbjc4n"
                           style={
@@ -1862,7 +1862,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.abstractTitle
+              Abstract Graphics
             </h2>
             <div
               className="css-text-901oao"
@@ -1880,7 +1880,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.abstractText
+              Abstract Graphics are visual tools that use coins to animate an idea. They can be dynamic or static.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1910,12 +1910,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -2107,7 +2102,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                           }
                         }
                       >
-                        downloadAssetBtn
+                        Download
                         <div
                           className="css-view-1dbjc4n"
                           style={
@@ -2265,7 +2260,7 @@ exports[`Experience/KeyImagery renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -2284,6 +2279,7 @@ exports[`Experience/KeyImagery renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -2793,7 +2789,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3041,7 +3037,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3509,7 +3505,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4157,7 +4153,7 @@ exports[`Experience/KeyImagery renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>
