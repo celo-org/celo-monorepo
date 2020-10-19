@@ -73,10 +73,13 @@ class ContractAddresses {
 
 const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
+// TODO: handle `exclude` better - probably shouldn't be a regexp, but an
+// explicit list of ignored contracts/subdirectories.
 const ensureAllContractsThatLinkLibrariesHaveChanges = (
   dependencies: ContractDependencies,
   report: ASTDetailedVersionedReport,
-  contracts: string[]
+  contracts: string[],
+  exclude: RegExp
 ) => {
   let anyContractViolates = false
   contracts.map((contract) => {
@@ -84,7 +87,9 @@ const ensureAllContractsThatLinkLibrariesHaveChanges = (
     const hasChanges = report.contracts[contract]
     const isTest = contract.endsWith('Test')
 
-    if (hasDependency && !hasChanges && !isTest) {
+    // This check goes over all contracts, so we again have to exclude the
+    // contracts that were ignored in the version check.
+    if (hasDependency && !hasChanges && !isTest && !exclude.test(contract)) {
       console.log(
         `${contract} links ${dependencies.get(
           contract
@@ -192,7 +197,9 @@ module.exports = async (callback: (error?: any) => number) => {
       string: ['report', 'network', 'proposal', 'libraries', 'initialize_data', 'build_directory'],
       boolean: ['dry_run'],
     })
-    const report: ASTDetailedVersionedReport = readJsonSync(argv.report).report
+    const fullReport = readJsonSync(argv.report)
+    const exclude = new RegExp(fullReport.exclude.slice(1, fullReport.exclude.length - 1))
+    const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = new ContractDependencies(linkedLibraries)
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
@@ -208,7 +215,7 @@ module.exports = async (callback: (error?: any) => number) => {
     // To ensure this actually happens, we check that all contracts that link libraries are marked
     // as needing to be redeployed.
     // TODO(asa): Remove this check after release 1.
-    ensureAllContractsThatLinkLibrariesHaveChanges(dependencies, report, contracts)
+    ensureAllContractsThatLinkLibrariesHaveChanges(dependencies, report, contracts, exclude)
 
     const release = async (contractName: string) => {
       if (released.has(contractName)) {
