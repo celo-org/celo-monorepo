@@ -27,7 +27,6 @@ export default function TotalLineItem({ title, amount, hideSign, currencyInfo }:
     localCurrencyCode = currencyInfo.localCurrencyCode
     localCurrencyExchangeRate = currencyInfo.localExchangeRate
   }
-
   const { t } = useTranslation(Namespaces.global)
 
   const exchangeRate = amount.localAmount?.exchangeRate || localCurrencyExchangeRate

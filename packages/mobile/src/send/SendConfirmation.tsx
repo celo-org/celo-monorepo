@@ -42,8 +42,7 @@ import { InviteBy } from 'src/invite/actions'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import { fetchExchangeRate } from 'src/localCurrency/saga'
-import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -64,8 +63,6 @@ export interface CurrencyInfo {
   localExchangeRate: string
 }
 
-const TAG = 'send/SendConfirmation'
-
 type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
 type Props = OwnProps
 
@@ -79,12 +76,11 @@ function SendConfirmation(props: Props) {
   const [encryptionDialogVisible, setEncryptionDialogVisible] = useState(false)
   const [buttonReset, setButtonReset] = useState(false)
   const [comment, setComment] = useState('')
-  const [localExchangeRate, setLocalExchangeRate] = useState('')
 
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.sendFlow7)
 
-  const { transactionData, addressJustValidated, currencyCode } = props.route.params
+  const { transactionData, addressJustValidated, currencyInfo } = props.route.params
   const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const confirmationInput = getConfirmationInput(
@@ -116,23 +112,13 @@ function SendConfirmation(props: Props) {
   const isDekRegistered = useSelector(isDekRegisteredSelector) ?? false
   const addressToDataEncryptionKey = useSelector(addressToDataEncryptionKeySelector)
 
-  let localCurrencyCode = useSelector(getLocalCurrencyCode)
-  if (currencyCode) {
-    localCurrencyCode = currencyCode
+  let newCurrencyInfo: CurrencyInfo = {
+    localCurrencyCode: useSelector(getLocalCurrencyCode),
+    localExchangeRate: useSelector(getLocalCurrencyExchangeRate) || '',
   }
-
-  useEffect(() => {
-    const getExchangeRate = async () => {
-      const rate = await fetchExchangeRate(localCurrencyCode)
-      setLocalExchangeRate(rate)
-    }
-    getExchangeRate().catch((error) => {
-      Logger.error(TAG, `Failed to fetch exchange rate for ${localCurrencyCode}`, error)
-      // dispatch(showError(ErrorMessages.PROVIDER_RATE_FETCH_FAILED))
-    })
-  }, [localCurrencyCode])
-
-  const currencyInfo: CurrencyInfo = { localCurrencyCode, localExchangeRate }
+  if (currencyInfo) {
+    newCurrencyInfo = currencyInfo
+  }
 
   useEffect(() => {
     dispatch(fetchDollarBalance())
@@ -163,14 +149,17 @@ function SendConfirmation(props: Props) {
         ? reason || ''
         : comment
 
-    const localCurrencyAmount = convertDollarsToLocalAmount(amount, localExchangeRate)
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      amount,
+      newCurrencyInfo.localExchangeRate
+    )
 
     ValoraAnalytics.track(SendEvents.send_confirm_send, {
       isScan: !!props.route.params?.isFromScan,
       isInvite: !recipientAddress,
       isRequest: type === TokenTransactionType.PayRequest,
-      localCurrencyExchangeRate: localExchangeRate,
-      localCurrency: localCurrencyCode,
+      localCurrencyExchangeRate: newCurrencyInfo.localExchangeRate,
+      localCurrency: newCurrencyInfo.localCurrencyCode,
       dollarAmount: amount.toString(),
       localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
       commentLength: finalComment.length,
@@ -298,9 +287,9 @@ function SendConfirmation(props: Props) {
             feeLoading={asyncFee.loading}
             feeHasError={!!asyncFee.error}
             totalFee={fee}
-            currencyInfo={currencyInfo}
+            currencyInfo={newCurrencyInfo}
           />
-          <TotalLineItem amount={totalAmount} currencyInfo={currencyInfo} />
+          <TotalLineItem amount={totalAmount} currencyInfo={newCurrencyInfo} />
         </View>
       )
     }
@@ -361,7 +350,7 @@ function SendConfirmation(props: Props) {
               type={DisplayType.Default}
               style={styles.amount}
               amount={subtotalAmount}
-              currencyInfo={currencyInfo}
+              currencyInfo={newCurrencyInfo}
             />
             {type === TokenTransactionType.PayRequest ||
             type === TokenTransactionType.PayPrefill ? (

@@ -202,7 +202,7 @@ export function* handleSendPaymentData(
     navigate(Screens.SendConfirmation, {
       transactionData,
       isFromScan: true,
-      currencyCode: currency,
+      currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
     })
   } else {
     navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
