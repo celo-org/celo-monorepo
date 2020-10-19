@@ -72,7 +72,7 @@ spec:
                   name: {{ .Release.Name }}
                   key: DATABASE_PASSWORD
             - name: DISCORD_WEBHOOK_URL
-              value: {{ .Values.blockscout.discord_webhook_url }}
+              value: {{ .Values.blockscout.metadata_crawler.discord_webhook_url }}
             - name: CLUSTER_NAME
               value: {{ .Release.Name }}
             volumeMounts:

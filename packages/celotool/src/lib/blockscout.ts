@@ -90,7 +90,6 @@ async function helmParameters(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
-    `--set blockscout.discord_webhook_url=${fetchEnvOrFallback(envVar.METADATA_CRAWLER_DISCORD_WEBHOOK, '')}`,
     `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
     `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
   ]
@@ -104,6 +103,10 @@ async function helmParameters(
     )}`,
     `--set blockscout.metadata_crawler.schedule=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+    )}`,
+    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+      ''
     )}`,
     )
   }
