@@ -56,14 +56,14 @@ Work in progress
 {% endhint %}
 
 ## Promotion process 
-  * For a patch release: The first commit of this process should change the version number encoded in the source from `x.y.z` to `x.y.z+1-dev` and the final commit should change the published version number from `x.y.z-1`  to `x.y.z`.
+  * For a patch release: The first step of this process should be a commit that changes the version number encoded in the source from `x.y.z-dev` to `x.y.z+1-dev` and the final step should change the published version number from `x.y.z-1`  to `x.y.z`.
   * For minor releases, the same process should be followed, except the `y` value would increment, and the `z` value would become 0. 
   * For major releases, the same process should be followed, except the `x` value would increment, and `y` and `z` values would become 0. 
 
 Only one commit should ever have a non-dev tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or changes.
 
 ### Emergency patches
-Bugs which affect the security, stability, or core functionality of the network may need to be released outside the standard release cycle. In this case, an emergency patch release should be created on top of all supported minor releases which contains the minimal change and corresponding test for the fix.
+Bugs which affect the security, stability, or core functionality of the network may need to be released outside the standard release cycle. In this case, an emergency patch release should be created on top of all supported minor releases which contains the minimal change and corresponding test for the fix. An emergency patch retro will also be published, and will include information such as why the patch was necessary and what code changes it includes. 
 
 ## Vulnerability Disclosure
 
