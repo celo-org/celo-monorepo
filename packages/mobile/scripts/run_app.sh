@@ -26,14 +26,16 @@ done
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 
 # Get machine type (needed later)
-unameOut="$(uname -s)"
-case "${unameOut}" in
+if [ -z "${MACHINE-}" ]; then
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
     Linux*)     MACHINE=Linux;;
     Darwin*)    MACHINE=Mac;;
     CYGWIN*)    MACHINE=Cygwin;;
     MINGW*)     MACHINE=MinGw;;
     *)          MACHINE="UNKNOWN:${unameOut}"
-esac
+  esac
+fi
 
 # Read values from the .env file and put them in env vars
 ENV_FILENAME=".env.${ENV_NAME}"
@@ -84,8 +86,8 @@ if [ "$PLATFORM" = "android" ]; then
   esac
 
   # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
-  startPackager
   yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
+  startPackager
 
 elif [ "$PLATFORM" = "ios" ]; then
 
