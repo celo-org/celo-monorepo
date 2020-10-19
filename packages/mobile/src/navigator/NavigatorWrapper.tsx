@@ -4,10 +4,8 @@ import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navig
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { useDispatch } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { minAppVersionDetermined } from 'src/app/actions'
 import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
@@ -53,18 +51,13 @@ export const NavigatorWrapper = () => {
   const appLocked = useTypedSelector(getAppLocked)
   const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
   const routeNameRef = React.useRef()
-  const dispatch = useDispatch()
 
   const updateRequired = React.useMemo(() => {
     if (!minRequiredVersion) {
       return false
     }
     const version = DeviceInfo.getVersion()
-    const versionBelowMinimum = isVersionBelowMinimum(version, minRequiredVersion)
-    if (!versionBelowMinimum) {
-      dispatch(minAppVersionDetermined(null))
-    }
-    return versionBelowMinimum
+    return isVersionBelowMinimum(version, minRequiredVersion)
   }, [minRequiredVersion])
 
   React.useEffect(() => {
