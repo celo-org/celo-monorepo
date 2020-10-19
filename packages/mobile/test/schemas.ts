@@ -401,6 +401,10 @@ export const v5Schema = {
     },
     addressToDisplayName: {},
   },
+  app: {
+    ...v3Schema.app,
+    minVersion: null,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
