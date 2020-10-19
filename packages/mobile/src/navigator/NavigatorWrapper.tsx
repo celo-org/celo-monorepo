@@ -55,6 +55,18 @@ export const NavigatorWrapper = () => {
   const routeNameRef = React.useRef()
   const dispatch = useDispatch()
 
+  const updateRequired = React.useMemo(() => {
+    if (!minRequiredVersion) {
+      return false
+    }
+    const version = DeviceInfo.getVersion()
+    const versionBelowMinimum = isVersionBelowMinimum(version, minRequiredVersion)
+    if (!versionBelowMinimum) {
+      dispatch(minAppVersionDetermined(null))
+    }
+    return versionBelowMinimum
+  }, [minRequiredVersion])
+
   React.useEffect(() => {
     if (navigationRef && navigationRef.current) {
       const state = navigationRef.current.getRootState()
@@ -117,15 +129,6 @@ export const NavigatorWrapper = () => {
 
     // Save the current route name for later comparision
     routeNameRef.current = currentRouteName
-  }
-
-  let updateRequired = false
-  if (minRequiredVersion) {
-    const version = DeviceInfo.getVersion()
-    updateRequired = isVersionBelowMinimum(version, minRequiredVersion)
-    if (!updateRequired) {
-      dispatch(minAppVersionDetermined(null))
-    }
   }
 
   return (
