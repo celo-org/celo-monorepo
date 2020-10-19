@@ -1,9 +1,9 @@
 {
-  "extends": "../typescript/tsconfig.library.json",
+  "extends": "../../../typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib"
   },
   "include": ["src", "src/test-utils"],
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../../utils" }]
 }

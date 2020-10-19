@@ -5,5 +5,5 @@
     "outDir": "lib"
   },
   "include": ["src", "types/", "index.d.ts"],
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../sdk/utils" }]
 }

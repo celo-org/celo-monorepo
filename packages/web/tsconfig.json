@@ -28,7 +28,7 @@
   "exclude": ["dist"],
   "references": [
     {
-      "path": "../utils"
+      "path": "../sdk/utils"
     }
   ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]

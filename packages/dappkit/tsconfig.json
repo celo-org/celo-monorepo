@@ -5,5 +5,5 @@
     "outDir": "lib"
   },
   "include": ["src", "types/"],
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../sdk/utils" }]
 }

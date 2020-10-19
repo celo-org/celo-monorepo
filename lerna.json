@@ -1,6 +1,11 @@
 {
   "lerna": "2.10.1",
-  "packages": ["packages/*"],
+  "packages": [
+    "packages/*",
+    "packages/phone-number-privacy/*",
+    "packages/sdk/*",
+    "packages/sdk/wallets/*"
+  ],
   "npmClient": "yarn",
   "useWorkspaces": true,
   "version": "independent"

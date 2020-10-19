@@ -7,5 +7,5 @@
     "target": "es6"
   },
   "include": ["src", "../contractkit/types", "types/hw-transport-node-hid.d.ts"],
-  "references": [{ "path": "../utils" }, { "path": "../contractkit" }]
+  "references": [{ "path": "../sdk/utils" }, { "path": "../sdk/contractkit" }]
 }

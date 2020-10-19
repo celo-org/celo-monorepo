@@ -38,7 +38,9 @@
   "workspaces": {
     "packages": [
       "packages/*",
-      "packages/phone-number-privacy/*"
+      "packages/phone-number-privacy/*",
+      "packages/sdk/*",
+      "packages/sdk/wallets/*"
     ],
     "nohoist": [
       "**/openzeppelin-solidity",
@@ -70,7 +72,6 @@
     "typescript": "^3.8.3",
     "typescript-tslint-plugin": "^0.5.4"
   },
-  "dependencies": {},
   "resolutions": {
     "**/truffle/mocha": "^6.2.2",
     "**/truffle-security/mocha": "^6.2.2",

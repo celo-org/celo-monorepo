@@ -14,5 +14,5 @@
   },
   "include": ["src", "../contractkit/types"],
   "exclude": ["node_modules/"],
-  "references": [{ "path": "../utils" }, { "path": "../contractkit" }]
+  "references": [{ "path": "../sdk/utils" }, { "path": "../sdk/contractkit" }]
 }

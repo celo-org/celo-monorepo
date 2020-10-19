@@ -12,7 +12,7 @@
 /packages/blockchain-api/ @jmrossy @cmcewen @i1skn @jeanregisser
 /packages/celotool/ @asaj
 /packages/cli/ @mcortesi @gastonponti
-/packages/contractkit/ @mcortesi @gastonponti
+/packages/sdk/ @mcortesi @gastonponti
 /packages/dappkit/ @cmcewen
 /packages/dev-utils/ @mcortesi
 /packages/docs/ @timmoreton
@@ -29,7 +29,7 @@
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/typescript/ @cmcewen
-/packages/utils/ @jmrossy
+/packages/sdk/utils/ @jmrossy
 /packages/web/validator-badges @cla-bel @bohan-zhang @pranaymohan
 /packages/web/openpgpkey @nategraf
 /packages/web/ @aaronmgdr
