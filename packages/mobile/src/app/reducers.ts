@@ -130,7 +130,7 @@ export const appReducer = (
         ...state,
         sessionId: action.sessionId,
       }
-    case Actions.SET_REQUIRED_VERSION:
+    case Actions.MIN_APP_VERSION_DETERMINED:
       return {
         ...state,
         minVersion: action.minVersion,
