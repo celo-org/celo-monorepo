@@ -41,7 +41,7 @@ spec:
               name: tmp-pod
               readOnly: true
           - name: metadata-crawler
-            image: {{ .Values.blockscout.metadata_crawler.image.repository }}:{{ .Values.blockscout.metadata_crawler.image.tag }}
+            image: {{ .Values.blockscout.metadata_crawler.image.repository }}:{{ .Values.blockscout.metadata_crawler.repository.tag }}
             imagePullPolicy: IfNotPresent
             command:
             - /bin/sh
@@ -74,7 +74,7 @@ spec:
             - name: DISCORD_WEBHOOK_URL
               value: {{ .Values.blockscout.metadata_crawler.discord_webhook_url }}
             - name: CLUSTER_NAME
-              value: {{ .Release.Name }}
+              value: {{ .Values.blockscout.metadata_crawler.discord_cluster_name }}
             volumeMounts:
             - mountPath: /tmp/pod
               name: tmp-pod
