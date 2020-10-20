@@ -1,7 +1,7 @@
 import { Entry } from 'contentful'
 import { ContentFulItem, Props } from './DirectoryItem'
 
-export function contentfullToProps({ fields }: Entry<ContentFulItem>): Props {
+export function contentfulToProps({ fields }: Entry<ContentFulItem>): Props {
   const file = fields?.logo?.fields?.file
   const image = file?.details?.image
   return {

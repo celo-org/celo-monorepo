@@ -7,7 +7,7 @@ import YouTube from 'react-youtube'
 import { AssetTypes } from 'src/experience/brandkit/tracking'
 import { brandStyles } from 'src/experience/common/constants'
 import Showcase from 'src/experience/common/Showcase'
-import { contentfullToProps } from 'src/experience/grants/contentfullToProps'
+import { contentfulToProps } from 'src/experience/grants/contentfulToProps'
 import DirectorySection from 'src/experience/grants/DirectorySection'
 import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
@@ -81,7 +81,7 @@ function embedded(node) {
         <DirectorySection
           name={fields.name}
           description={fields.categoryDescription}
-          items={fields.items.map(contentfullToProps)}
+          items={fields.items.map(contentfulToProps)}
         />
       )
     default:
