@@ -7,7 +7,7 @@ import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { asn1FromPublicKey } from '../utils/ber-utils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
-import AwsHsmWallet from './aws-hsm-wallet'
+import { AwsHsmWallet } from './aws-hsm-wallet'
 import {
   ACCOUNT_ADDRESS1,
   ACCOUNT_ADDRESS2,

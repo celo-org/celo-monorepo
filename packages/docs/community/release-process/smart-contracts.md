@@ -86,7 +86,7 @@ This should be used in tandem with `verify-deployed -b $PREVIOUS_RELEASE -n $NET
 
 ### Deploy New Contracts
 
-Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network.
+Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network. (Use `-d` to dry-run the deploy).
 STORAGE updates are adopted by deploying a new proxy/implementation pair. These new contracts may need to be initialized, for which values can be provided. Outputs a JSON contract upgrade governance proposal.
 
 ```bash
