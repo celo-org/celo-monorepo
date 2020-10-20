@@ -100,6 +100,7 @@ export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
   context: TransactionContext,
+  preferredFeeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
   nonce?: number,
   staticGas?: number
 ) {
@@ -114,6 +115,15 @@ export function* sendTransactionPromises(
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
 
+  // If stableToken is prefered to pay fee, use it unless its balance is Zero,
+  // in that case use CELO to pay fee.
+  // TODO: Make it transparent for the user.
+  // TODO: Check for balance should be more than fee instead of zero.
+  const feeCurrency =
+    preferredFeeCurrency === CURRENCY_ENUM.DOLLAR && stableTokenBalance.isGreaterThan(0)
+      ? CURRENCY_ENUM.DOLLAR
+      : CURRENCY_ENUM.GOLD
+
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
     `Sending tx ${context.id} in ${fornoMode ? 'forno' : 'geth'} mode`
@@ -126,19 +136,18 @@ export function* sendTransactionPromises(
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
 
-    gasPrice = yield getGasPrice(CURRENCY_ENUM.DOLLAR)
+    gasPrice = yield getGasPrice(feeCurrency)
   }
+
+  const feeCurrencyAddress =
+    feeCurrency === CURRENCY_ENUM.DOLLAR
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined // Pass undefined to use CELO to pay for gas.
   const transactionPromises = yield call(
     sendTransactionAsync,
     tx,
     account,
-    // Use stableToken to pay fee, unless its balance is Zero
-    // then use Celo (goldToken) to pay fee (pass undefined)
-    // TODO: make it transparent for a user
-    // TODO: check for balance should be more than fee instead of zero
-    stableTokenBalance.isGreaterThan(0)
-      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
-      : undefined,
+    feeCurrencyAddress,
     getLogger(context, fornoMode),
     staticGas,
     gasPrice ? gasPrice.toString() : gasPrice,
@@ -154,7 +163,8 @@ export function* sendTransaction(
   account: string,
   context: TransactionContext,
   staticGas?: number,
-  cancelAction?: string
+  cancelAction?: string,
+  feeCurrency?: CURRENCY_ENUM
 ) {
   const sendTxMethod = function*(nonce?: number) {
     const { confirmation } = yield call(
@@ -162,6 +172,7 @@ export function* sendTransaction(
       tx,
       account,
       context,
+      feeCurrency,
       nonce,
       staticGas
     )

@@ -45,12 +45,15 @@ export async function getSendTxGas(
   try {
     Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
     const tx = await createTokenTransferTransaction(currency, params)
-    const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
+    const txParams = {
+      from: account,
+      feeCurrency: currency === CURRENCY_ENUM.GOLD ? undefined : await getCurrencyAddress(currency),
+    }
     const gas = await estimateGas(tx.txo, txParams)
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
   } catch (error) {
-    throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    throw Error(ErrorMessages.CALCULATE_FEE_FAILED)
   }
 }
 
