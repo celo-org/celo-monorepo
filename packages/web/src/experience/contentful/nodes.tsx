@@ -4,14 +4,16 @@ import { Asset, Sys } from 'contentful'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import YouTube from 'react-youtube'
+import { AssetTypes } from 'src/experience/brandkit/tracking'
 import { brandStyles } from 'src/experience/common/constants'
 import Showcase from 'src/experience/common/Showcase'
+import { contentfulToProps } from 'src/experience/grants/contentfulToProps'
+import DirectorySection from 'src/experience/grants/DirectorySection'
 import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import Button from 'src/shared/Button.3'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { fonts, standardStyles } from 'src/styles'
-import { AssetTypes } from '../brandkit/tracking'
 
 export const renderNode: RenderNode = {
   [BLOCKS.HEADING_1]: (_, children: string) => {
@@ -74,7 +76,16 @@ function embedded(node) {
       return <iframe src={url} height="500px" />
     case 'video':
       return <YouTube videoId={fields.youtubeID} />
+    case 'grantDirectorySection':
+      return (
+        <DirectorySection
+          name={fields.name}
+          description={fields.categoryDescription}
+          items={fields.items.map(contentfulToProps)}
+        />
+      )
     default:
+      console.info(node.data?.target?.sys?.contentType?.sys?.id)
       return null
   }
 }
