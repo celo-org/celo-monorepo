@@ -659,14 +659,14 @@ jobs:
       - run:
           name: Generate DevChain
           command: |
-            (cd packages/contractkit && yarn test:reset)
+            (cd packages/sdk/contractkit && yarn test:reset)
       - run:
           name: Run Tests
-          command: yarn --cwd=packages/contractkit test
+          command: yarn --cwd=packages/sdk/contractkit test
       - run:
           name: Fail if someone forgot to commit contractkit docs
           command: |
-            yarn --cwd=packages/contractkit docs
+            yarn --cwd=packages/sdk/contractkit docs
             if [[ $(git status packages/docs/developer-resources/contractkit --porcelain) ]]; then
               git --no-pager diff packages/docs/developer-resources/contractkit
               echo "There are git differences after generating contractkit docs"
@@ -745,10 +745,10 @@ jobs:
           name: Install and test the npm package
           command: |
             set -euo pipefail
-            cd packages/base
+            cd packages/sdk/base
             yarn pack
             cd /tmp
-            npm install ~/app/packages/base/*.tgz
+            npm install ~/app/packages/sdk/base/*.tgz
 
   utils-test:
     <<: *defaults
@@ -763,13 +763,13 @@ jobs:
           name: Install and test the npm package
           command: |
             set -euo pipefail
-            cd packages/base
+            cd packages/sdk/base
             yarn pack
             cd ../utils
             yarn pack
             cd /tmp
-            npm install ~/app/packages/base/*.tgz
-            npm install ~/app/packages/utils/*.tgz
+            npm install ~/app/packages/sdk/base/*.tgz
+            npm install ~/app/packages/sdk/utils/*.tgz
 
   end-to-end-geth-transfer-test:
     <<: *e2e-defaults
