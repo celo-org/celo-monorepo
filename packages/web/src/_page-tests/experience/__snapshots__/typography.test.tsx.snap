@@ -1454,7 +1454,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.title
+                Typography
               </h1>
               <h4
                 aria-level="4"
@@ -1473,7 +1473,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.headline
+                The Celo fonts were intentionally chosen to speak to Celo’s Approachable and Academic brand principles. To honor both energies and compliment a broader range of expression, a serif and a sans serif font were chosen.
               </h4>
             </div>
             <div
@@ -1500,7 +1500,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.facesTitle
+                Typefaces
               </div>
               <div
                 className="css-text-901oao"
@@ -1518,6 +1518,9 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
+                Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.
+
+Refer to the 
                 <div
                   className="css-view-1dbjc4n"
                   onClick={[Function]}
@@ -1551,6 +1554,7 @@ exports[`Experience/Typography renders 1`] = `
                     philosophy
                   </a>
                 </div>
+                 and guidelines below when building a project on Celo
               </div>
               <h2
                 aria-level="2"
@@ -1573,7 +1577,8 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.mainFontTitle
+                This is Garamond,
+the Celo brand typeface.
               </h2>
               <div
                 className="css-text-901oao"
@@ -1590,7 +1595,9 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.mainFontText
+                EB Garamond represents our Academic brand principle described as timeless and professional. It is an appropriate formal visual tone for education and declaration.
+
+Use EB Garamond for the majority of titles and paragraphs
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -1648,7 +1655,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadAssetBtn
+                  Download
                   <div
                     className="css-view-1dbjc4n"
                     style={
@@ -1716,7 +1723,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.subFontTitle
+                  This is Jost*, our supporting font.
                 </h3>
                 <div
                   className="css-text-901oao"
@@ -1733,7 +1740,9 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.subFontText
+                  Jost*’s geometric form functions as an approachable compliment to EB Garamond. It is used more sparingly and speaks to the typography found in the logo and the round shapes in the illustrations.
+
+Use Jost* for call to actions, diagrams, instructions, and infographics.
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -1791,7 +1800,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                     target="_blank"
                   >
-                    downloadAssetBtn
+                    Download
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -1870,7 +1879,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.typescaleTitle
+                Type Scale
               </h2>
             </div>
             <div
@@ -1889,7 +1898,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              typography.typescaleText
+              For typographic hierarchy, we recommend the following type scale.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3071,7 +3080,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.examplesTitle
+                Usage Examples
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -3110,7 +3119,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h1Example
+                  Main Title
                 </h1>
                 <h2
                   aria-level="2"
@@ -3130,7 +3139,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h2Example
+                  Article Title
                 </h2>
                 <h3
                   aria-level="3"
@@ -3150,7 +3159,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h3Example
+                  Section Title
                 </h3>
                 <h4
                   aria-level="4"
@@ -3170,7 +3179,8 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h4Example
+                  Subtitle / larger text that is one size larger than the body 
+ lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
                 </h4>
                 <div
                   className="css-text-901oao"
@@ -3188,7 +3198,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h5Example
+                  Sub-section Title
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3205,7 +3215,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.bodyExample
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3223,7 +3233,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h5Example
+                  Sub-section Title
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3239,7 +3249,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.smallExample
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.
                 </div>
               </div>
             </div>
@@ -3358,7 +3368,7 @@ exports[`Experience/Typography renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -3377,6 +3387,7 @@ exports[`Experience/Typography renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -3886,7 +3897,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4134,7 +4145,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4657,7 +4668,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -5305,7 +5316,7 @@ exports[`Experience/Typography renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

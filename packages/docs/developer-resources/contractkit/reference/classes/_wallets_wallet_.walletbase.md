@@ -33,7 +33,7 @@
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L133)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L130)*
 
 **Parameters:**
 

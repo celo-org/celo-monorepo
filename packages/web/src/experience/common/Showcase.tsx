@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import DownloadButton from 'src/experience/brandkit/DownloadButton'
 import { AssetTypes } from 'src/experience/brandkit/tracking'
 import { brandStyles } from 'src/experience/common/constants'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
 

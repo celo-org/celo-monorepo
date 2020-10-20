@@ -1459,7 +1459,7 @@ exports[`Experience/Icons renders 1`] = `
                   }
                 }
               >
-                icons.title
+                Icons
               </h1>
               <h4
                 aria-level="4"
@@ -1478,7 +1478,9 @@ exports[`Experience/Icons renders 1`] = `
                   }
                 }
               >
-                icons.headline
+                Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text cannot.
+
+Celo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.
               </h4>
             </div>
             <div
@@ -1499,7 +1501,7 @@ exports[`Experience/Icons renders 1`] = `
                 }
               }
             >
-              licenseTitle
+              Usage & License Note
             </div>
             <div
               className="css-text-901oao"
@@ -1519,6 +1521,7 @@ exports[`Experience/Icons renders 1`] = `
                 }
               }
             >
+              You may copy and redistribute icons as long as you are abiding by the 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1549,9 +1552,10 @@ exports[`Experience/Icons renders 1`] = `
                     }
                   }
                 >
-                  Code of Conduct
+                  Community Code of Conduct
                 </a>
               </div>
+               and 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1585,6 +1589,7 @@ exports[`Experience/Icons renders 1`] = `
                   Brand Policy
                 </a>
               </div>
+              . You may not remix or transform the icons.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1621,7 +1626,7 @@ exports[`Experience/Icons renders 1`] = `
                     }
                   }
                 >
-                  icons.searchLabel
+                  Explore Icons
                 </div>
                 <input
                   aria-label="search"
@@ -1636,7 +1641,7 @@ exports[`Experience/Icons renders 1`] = `
                   onFocus={[Function]}
                   onKeyDown={[Function]}
                   onSelect={[Function]}
-                  placeholder="icons.searchPlaceholder"
+                  placeholder="Ex. Stable Coin"
                   readOnly={false}
                   spellCheck={true}
                   style={
@@ -1701,7 +1706,7 @@ exports[`Experience/Icons renders 1`] = `
                   }
                 }
               >
-                icons.matching
+                2 Matching Icons
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -1735,12 +1740,7 @@ exports[`Experience/Icons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -1932,7 +1932,7 @@ exports[`Experience/Icons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -1991,12 +1991,7 @@ exports[`Experience/Icons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2188,7 +2183,7 @@ exports[`Experience/Icons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2348,7 +2343,7 @@ exports[`Experience/Icons renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -2367,6 +2362,7 @@ exports[`Experience/Icons renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -2876,7 +2872,7 @@ exports[`Experience/Icons renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3124,7 +3120,7 @@ exports[`Experience/Icons renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3647,7 +3643,7 @@ exports[`Experience/Icons renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4295,7 +4291,7 @@ exports[`Experience/Icons renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

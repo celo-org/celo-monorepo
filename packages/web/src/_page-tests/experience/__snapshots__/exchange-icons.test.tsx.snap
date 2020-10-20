@@ -1553,7 +1553,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   }
                 >
-                  logo.overviewBtn
+                  Download Logo Package
                 </a>
               </div>
             </div>
@@ -1575,7 +1575,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              licenseTitle
+              Usage & License Note
             </div>
             <div
               className="css-text-901oao"
@@ -1595,6 +1595,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
+              These assets may only be used to represent Celo assets on exchanges. The use of the Celo Exchange Icons requires following the Celo Community Code of Conduct as provided 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1625,9 +1626,10 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   }
                 >
-                  Code of Conduct
+                  here
                 </a>
               </div>
+               and 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1658,7 +1660,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   }
                 >
-                  Brand Policy
+                  Brand Policy.
                 </a>
               </div>
             </div>
@@ -1701,12 +1703,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -1903,7 +1900,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -1961,12 +1958,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2163,7 +2155,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2230,12 +2222,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2433,7 +2420,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2491,12 +2478,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2694,7 +2676,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -2752,12 +2734,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -2955,7 +2932,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -3013,12 +2990,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     }
                   >
                     <div
-                      className="react-reveal"
-                      style={
-                        Object {
-                          "opacity": undefined,
-                        }
-                      }
+                      className="css-q7lffx"
                     >
                       <div
                         className="css-view-1dbjc4n"
@@ -3216,7 +3188,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                               }
                             }
                           >
-                            downloadAssetBtn
+                            Download
                             <div
                               className="css-view-1dbjc4n"
                               style={
@@ -3376,7 +3348,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -3395,6 +3367,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -3904,7 +3877,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4152,7 +4125,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4675,7 +4648,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -5323,7 +5296,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

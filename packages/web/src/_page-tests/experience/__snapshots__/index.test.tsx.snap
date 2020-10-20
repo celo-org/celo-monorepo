@@ -1450,7 +1450,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              home.title
+              Welcome to the Celo BrandKit
             </h1>
             <h4
               aria-level="4"
@@ -1470,7 +1470,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              home.introduction
+              The Celo BrandKit includes resources to visually represent Celo and the mission of prosperity for all. The kit offers instructions and assets for community contributors to appropriately communicate Celo brand affiliation. By using the Celo brand consistently, we can connect in our shared purpose.
             </h4>
             <div
               className="css-text-901oao"
@@ -1488,7 +1488,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              home.useageTitle
+              How to use this guide?
             </div>
             <div
               className="css-text-901oao"
@@ -1505,6 +1505,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
+              Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1535,7 +1536,7 @@ exports[`Experience/Brandkit renders 1`] = `
                     }
                   }
                 >
-                  Code Of Conduct
+                  Celo’s Code of Conduct.
                 </a>
               </div>
             </div>
@@ -1556,7 +1557,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              home.importantRemember
+              Important things to remember
             </div>
             <div
               className="css-text-901oao"
@@ -1572,7 +1573,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              home.celoOwner
+              Celo is the owner of all the brand assets and derivatives. You may not:
               <ul
                 className="css-reset-4rbku5 css-view-1dbjc4n"
                 role="list"
@@ -1601,7 +1602,9 @@ exports[`Experience/Brandkit renders 1`] = `
                       "textRendering": "geometricPrecision",
                     }
                   }
-                />
+                >
+                  Register the trademark, domain, Celo Brand Asset, or derivative
+                </li>
                 <li
                   className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
                   onClick={[Function]}
@@ -1618,7 +1621,9 @@ exports[`Experience/Brandkit renders 1`] = `
                       "textRendering": "geometricPrecision",
                     }
                   }
-                />
+                >
+                  Modify Celo Brand Assets in any way such as by changing a design or color or adding words or elements
+                </li>
               </ul>
             </div>
           </div>
@@ -1663,7 +1668,7 @@ exports[`Experience/Brandkit renders 1`] = `
                   }
                 }
               >
-                home.brandVoice
+                Brand Voice
               </h2>
             </div>
             <div
@@ -1680,6 +1685,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
+              Words matter. Celo’s brand voice sounds as if you are writing or speaking to a friend. When writing and talking about Celo, please review the 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1711,7 +1717,9 @@ exports[`Experience/Brandkit renders 1`] = `
                     }
                   }
                   target="_blank"
-                />
+                >
+                  Celo Brand Voice.
+                </a>
               </div>
             </div>
           </div>
@@ -1829,7 +1837,7 @@ exports[`Experience/Brandkit renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -1848,6 +1856,7 @@ exports[`Experience/Brandkit renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -2357,7 +2366,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2605,7 +2614,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3128,7 +3137,7 @@ exports[`Experience/Brandkit renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3776,7 +3785,7 @@ exports[`Experience/Brandkit renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>
