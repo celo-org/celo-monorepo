@@ -102,7 +102,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    * @param nonce Optional -- will query contract state if not passed
    * @returns signature a Signature
    */
-  async signMetaTransaction(tx: TransactionInput<any>, nonce?: number): Promise<Signature> {
+  public async signMetaTransaction(tx: TransactionInput<any>, nonce?: number): Promise<Signature> {
     if (nonce === undefined) {
       nonce = await this.nonce()
     }
