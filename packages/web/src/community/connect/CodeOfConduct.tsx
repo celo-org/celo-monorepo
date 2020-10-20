@@ -1,11 +1,11 @@
 import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { StyleSheet, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { G, Path } from 'src/shared/svg'
@@ -35,7 +35,7 @@ const CodeofConduct: React.FunctionComponent<Props> = function CodeOfConduct({ t
           </View>
         </Cell>
         <Cell span={Spans.half}>
-          <Fade distance={'20px'} delay={400} duration={3300} bottom={true}>
+          <Fade distance={'20px'} delay={400} duration={3300}>
             <View>
               <H3 style={textStyles.invert}>{t('codeOfConduct.title')}</H3>
               <H4 style={[textStyles.invert, standardStyles.blockMarginTablet]}>
