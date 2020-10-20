@@ -1,38 +1,39 @@
 import Web3 from 'web3'
 import { ABIDefinition } from 'web3-eth-abi'
 
-export const PROXY_ABI: ABIDefinition[] = [
-  {
-    constant: true,
-    inputs: [],
-    name: '_getImplementation',
-    outputs: [
-      {
-        name: 'implementation',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-    signature: '0x42404e07',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'implementation',
-        type: 'address',
-      },
-    ],
-    name: '_setImplementation',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-    signature: '0xbb913f41',
-  },
-]
+export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
+  constant: true,
+  inputs: [],
+  name: '_getImplementation',
+  outputs: [
+    {
+      name: 'implementation',
+      type: 'address',
+    },
+  ],
+  payable: false,
+  stateMutability: 'view',
+  type: 'function',
+  signature: '0x42404e07',
+}
+
+export const SET_IMPLEMENTATION_ABI: ABIDefinition = {
+  constant: false,
+  inputs: [
+    {
+      name: 'implementation',
+      type: 'address',
+    },
+  ],
+  name: '_setImplementation',
+  outputs: [],
+  payable: false,
+  stateMutability: 'nonpayable',
+  type: 'function',
+  signature: '0xbb913f41',
+}
+
+export const PROXY_ABI: ABIDefinition[] = [GET_IMPLEMENTATION_ABI, SET_IMPLEMENTATION_ABI]
 
 export const PROXY_SET_IMPLEMENTATION_SIGNATURE = PROXY_ABI[1].signature
 
