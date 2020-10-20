@@ -96,6 +96,11 @@ export const pagePaths = {
     link: '/developers/faucet',
     isDark: false,
   },
+  GRANT_KIT: {
+    name: 'GrantKit',
+    link: '/experience/grants',
+    isDark: false,
+  },
   JOBS: {
     name: 'Join',
     link: '/jobs',
