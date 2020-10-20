@@ -176,6 +176,7 @@ export function* handleSendPaymentData(
   cachedRecipient?: RecipientWithContact,
   isOutgoingPaymentRequest?: true
 ) {
+  console.log('in handleSendPaymentData')
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
     address: data.address.toLowerCase(),
@@ -188,6 +189,23 @@ export function* handleSendPaymentData(
   }
 
   yield put(storeLatestInRecents(recipient))
+
+  if (data.isCELO == 'true') {
+    console.log('isCELO 1: ', data.isCELO)
+    if (data.amount) {
+      const exchangeRate = yield select(getLocalCurrencyExchangeRate)
+      const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
+      console.log('isCELO 2: ', data.isCELO)
+      if (!amount) {
+        Logger.warn(TAG, '@handleSendPaymentData null amount')
+        return
+      }
+      navigate(Screens.WithdrawCeloReviewScreen, {
+        amount,
+        recipientAddress: data.address.toLowerCase(),
+      })
+    }
+  }
 
   if (data.currencyCode) {
     yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
@@ -202,24 +220,24 @@ export function* handleSendPaymentData(
     }
   }
 
-  if (data.amount) {
-    // TODO: integrate with SendConfirmation component
-    const exchangeRate = yield select(getLocalCurrencyExchangeRate)
-    const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
-    if (!amount) {
-      Logger.warn(TAG, '@handleSendPaymentData null amount')
-      return
-    }
-    const transactionData: TransactionDataInput = {
-      recipient,
-      amount,
-      reason: data.comment,
-      type: TokenTransactionType.PayPrefill,
-    }
-    navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
-  } else {
-    navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
-  }
+  // if (data.amount) {
+  //   // TODO: integrate with SendConfirmation component
+  //   const exchangeRate = yield select(getLocalCurrencyExchangeRate)
+  //   const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
+  //   if (!amount) {
+  //     Logger.warn(TAG, '@handleSendPaymentData null amount')
+  //     return
+  //   }
+  //   const transactionData: TransactionDataInput = {
+  //     recipient,
+  //     amount,
+  //     reason: data.comment,
+  //     type: TokenTransactionType.PayPrefill,
+  //   }
+  //   navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
+  // } else {
+  //   navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+  // }
 }
 
 export function* handlePaymentDeeplink(deeplink: string) {
