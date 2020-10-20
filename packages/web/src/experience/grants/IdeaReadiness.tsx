@@ -13,7 +13,7 @@ interface Props {
 export default function IdeaReadiness({ title, caption, stages }: Props) {
   const { isDesktop } = useScreenSize()
   return (
-    <View style={isDesktop && styles.root}>
+    <View style={[standardStyles.blockMarginTablet, isDesktop && styles.root]}>
       <View style={styles.caption}>
         <Text style={[fonts.h5, standardStyles.halfElement]}>{title}</Text>
         <Text style={fonts.legal}>{caption}</Text>
