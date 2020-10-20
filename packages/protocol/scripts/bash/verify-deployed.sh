@@ -20,7 +20,7 @@ RELEASE_1=""
 FORNO=""
 LOG_FILE="/dev/null"
 
-while getopts 'b:n:rf' flag; do
+while getopts 'b:n:rfl:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
