@@ -47,6 +47,9 @@ async function helmParameters(celoEnv: string) {
       envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY
     )}`,
     `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
+    `--set attestation_service.twilio.accountSid="${fetchEnv(envVar.TWILIO_ACCOUNT_SID)}"`,
+    `--set attestation_service.twilio.authToken="${fetchEnv(envVar.TWILIO_ACCOUNT_AUTH_TOKEN)}"`,
+    `--set attestation_service.twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
     ...setHelmArray('attestation_service.nexmo.applications', fetchEnv(envVar.NEXMO_APPLICATIONS).split(',')),
