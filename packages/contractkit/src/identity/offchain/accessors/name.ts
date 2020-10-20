@@ -1,6 +1,6 @@
 import * as t from 'io-ts'
 import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { EncryptedSimpleSchema, SimpleSchema } from '../schemas'
+import { PrivateSimpleAccessor, PublicSimpleAccessor } from './simple'
 
 const NameSchema = t.type({
   name: t.string,
@@ -8,13 +8,13 @@ const NameSchema = t.type({
 
 export type NameType = t.TypeOf<typeof NameSchema>
 
-export class NameAccessor extends SimpleSchema<NameType> {
+export class PublicNameAccessor extends PublicSimpleAccessor<NameType> {
   constructor(readonly wrapper: OffchainDataWrapper) {
     super(wrapper, NameSchema, '/account/name')
   }
 }
 
-export class EncryptedNameAccessor extends EncryptedSimpleSchema<NameType> {
+export class PrivateNameAccessor extends PrivateSimpleAccessor<NameType> {
   constructor(readonly wrapper: OffchainDataWrapper) {
     super(wrapper, NameSchema, '/account/name')
   }

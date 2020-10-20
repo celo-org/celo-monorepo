@@ -1,11 +1,11 @@
-import { Address } from '@celo/base'
+import { Address, trimLeading0x } from '@celo/base'
 import { Err, makeAsyncThrowable } from '@celo/base/lib/result'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
-import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { OffchainError } from '../schemas/errors'
-import { buildEIP712TypedData, deserialize } from '../schemas/utils'
+import OffchainDataWrapper, { OffchainErrors } from '../../offchain-data-wrapper'
+import { buildEIP712TypedData, deserialize } from '../utils'
+import { OffchainError } from './errors'
 
 const AuthorizedSignerSchema = t.type({
   address: AddressType,
@@ -39,7 +39,11 @@ export class AuthorizedSignerAccessor {
 
   read = makeAsyncThrowable(this.readAsResult.bind(this))
 
-  async write(signer: Address, proofOfPossession: string, filteredDataPaths: string) {
+  async write(
+    signer: Address,
+    proofOfPossession: string,
+    filteredDataPaths: string
+  ): Promise<OffchainErrors | void> {
     const payload = {
       address: toChecksumAddress(signer),
       proofOfPossession,
@@ -53,6 +57,10 @@ export class AuthorizedSignerAccessor {
       AuthorizedSignerSchema
     )
     const signature = await this.wrapper.kit.getWallet().signTypedData(this.wrapper.self, typedData)
-    await this.wrapper.writeDataTo(Buffer.from(JSON.stringify(payload)), signature, dataPath)
+    return this.wrapper.writeDataTo(
+      Buffer.from(JSON.stringify(payload)),
+      Buffer.from(trimLeading0x(signature), 'hex'),
+      dataPath
+    )
   }
 }

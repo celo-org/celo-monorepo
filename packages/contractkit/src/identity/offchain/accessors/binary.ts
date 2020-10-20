@@ -1,30 +1,29 @@
+import { Address, trimLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok } from '@celo/base/lib/result'
 import OffchainDataWrapper from '../../offchain-data-wrapper'
+import { buildEIP712TypedData, readEncrypted, signBuffer, writeEncrypted } from '../utils'
 import { OffchainError } from './errors'
-import {
-  buildEIP712TypedData,
-  EncryptedSchema,
-  readEncrypted,
-  Schema,
-  signBuffer,
-  writeEncrypted,
-} from './utils'
+import { PrivateAccessor, PublicAccessor } from './interfaces'
 
 /**
  * Schema for writing any generic binary data
  */
-export class BinarySchema implements Schema<Buffer> {
+export class PublicBinaryAccessor implements PublicAccessor<Buffer> {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
   async write(data: Buffer) {
     const signature = await signBuffer(this.wrapper, this.dataPath, data)
-    const error = await this.wrapper.writeDataTo(data, signature, this.dataPath)
+    const error = await this.wrapper.writeDataTo(
+      data,
+      Buffer.from(trimLeading0x(signature), 'hex'),
+      this.dataPath
+    )
     if (error) {
       return new OffchainError(error)
     }
   }
 
-  async readAsResult(account: string) {
+  async readAsResult(account: Address) {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
       (buf) => buildEIP712TypedData(this.wrapper, this.dataPath, buf),
@@ -43,14 +42,14 @@ export class BinarySchema implements Schema<Buffer> {
 /**
  * Schema for writing any encrypted binary data.
  */
-export class EncryptedBinarySchema implements EncryptedSchema<Buffer> {
+export class PrivateBinaryAccessor implements PrivateAccessor<Buffer> {
   constructor(readonly wrapper: OffchainDataWrapper, readonly dataPath: string) {}
 
-  async write(data: Buffer, toAddresses: string[], symmetricKey?: Buffer) {
+  async write(data: Buffer, toAddresses: Address[], symmetricKey?: Buffer) {
     return writeEncrypted(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
   }
 
-  async readAsResult(account: string) {
+  async readAsResult(account: Address) {
     return readEncrypted(this.wrapper, this.dataPath, account)
   }
 

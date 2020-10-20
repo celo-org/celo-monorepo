@@ -130,7 +130,10 @@ export function parseSignatureWithoutPrefix(
   throw new Error(`Unable to parse signature (expected signer ${signer})`)
 }
 
-export function guessEIP712TypedDataSigner(typedData: EIP712TypedData, signature: string): string {
+export function recoverEIP712TypedDataSigner(
+  typedData: EIP712TypedData,
+  signature: string
+): string {
   const dataBuff = generateTypedDataHash(typedData)
   const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
   const publicKey = ethjsutil.ecrecover(

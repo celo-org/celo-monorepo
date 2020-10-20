@@ -1,14 +1,14 @@
 import { Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base/src'
-import { publicKeyToAddress } from '@celo/utils/lib/address'
-import { AES128Decrypt, Encrypt } from '@celo/utils/lib/ecies'
+import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
+import { AES128Decrypt, AES128Encrypt, Encrypt, IV_LENGTH } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
-import { createCipheriv, createHmac, randomBytes } from 'crypto'
+import { createHmac, randomBytes } from 'crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { join, normalize } from 'path'
-import OffchainDataWrapper, { OffchainErrorTypes } from '../../offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrors, OffchainErrorTypes } from '../offchain-data-wrapper'
 import {
   InvalidDataError,
   InvalidKey,
@@ -16,22 +16,9 @@ import {
   SchemaErrors,
   SchemaErrorTypes,
   UnavailableKey,
-} from './errors'
-
-export interface Schema<DataType> {
-  write: (data: DataType) => Promise<SchemaErrors | void>
-  read: (from: string) => Promise<DataType>
-  readAsResult: (from: string) => Promise<Result<DataType, SchemaErrors>>
-}
-
-export interface EncryptedSchema<DataType> {
-  write: (data: DataType, to: string[], symmetricKey?: Buffer) => Promise<SchemaErrors | void>
-  read: (from: string) => Promise<DataType>
-  readAsResult: (from: string) => Promise<Result<DataType, SchemaErrors>>
-}
+} from './accessors/errors'
 
 const KEY_LENGTH = 16
-const IV_LENGTH = 16
 
 // label = PRF(ECDH(A, B), A || B || data path)
 // ciphertext path = "/cosmetic path/" || base64(label)
@@ -45,7 +32,9 @@ function getCiphertextLabel(
   const receiverPublicKeyBuffer = Buffer.from(trimLeading0x(receiverPublicKey), 'hex')
 
   const label = createHmac('blake2s256', sharedSecret)
-    .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
+    .update(
+      Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(normalize(path))])
+    )
     .digest('base64')
   return normalize(join('ciphertexts', label))
 }
@@ -58,7 +47,7 @@ function getCiphertextLabel(
  * to the computed storage path.
  *
  * @param wrapper the offchain data wrapper
- * @param dataPath path to where the encrypted data is stored. Used to derive the key location
+ * @param dataPath logical path for the data. Used to derive the key location
  * @param key the symmetric key to distribute
  * @param toAddress address to encrypt symmetric key to
  */
@@ -66,8 +55,8 @@ const distributeSymmetricKey = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   key: Buffer,
-  toAddress: string
-): Promise<void | Error> => {
+  toAddress: Address
+): Promise<void | OffchainErrors> => {
   const accounts = await wrapper.kit.contracts.getAccounts()
   const [fromPubKey, toPubKey] = await Promise.all([
     accounts.getDataEncryptionKey(wrapper.self),
@@ -77,10 +66,14 @@ const distributeSymmetricKey = async (
   const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
   const computedDataPath = getCiphertextLabel(`${dataPath}.key`, sharedSecret, fromPubKey, toPubKey)
-  const encryptedData = Encrypt(Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'), Buffer.from(key))
+  const encryptedData = Encrypt(Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'), key)
 
   const signature = await signBuffer(wrapper, computedDataPath, encryptedData)
-  return wrapper.writeDataTo(encryptedData, signature, computedDataPath)
+  return wrapper.writeDataTo(
+    encryptedData,
+    Buffer.from(trimLeading0x(signature), 'hex'),
+    computedDataPath
+  )
 }
 
 /**
@@ -131,28 +124,38 @@ export const writeEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
   data: Buffer,
-  toAddresses: string[],
+  toAddresses: Address[],
   symmetricKey?: Buffer
-) => {
+): Promise<SchemaErrors | void> => {
   const fetchKey = await fetchOrGenerateKey(wrapper, dataPath, symmetricKey)
   if (!fetchKey.ok) {
     return fetchKey.error
   }
 
-  //  file_ciphertext = IV || E(message key, IV, data)
   const iv = randomBytes(16)
-  const cipher = createCipheriv('aes-128-ctr', fetchKey.result, iv)
-  const payload = Buffer.concat([iv, cipher.update(data), cipher.final()])
-
+  const payload = AES128Encrypt(fetchKey.result, iv, data)
   const signature = await signBuffer(wrapper, `${dataPath}.enc`, payload)
-  await wrapper.writeDataTo(payload, signature, `${dataPath}.enc`)
 
-  await Promise.all(
-    // here we encrypt the key to ourselves so we can retrieve it later
-    [wrapper.self, ...toAddresses].map(async (toAddress) =>
-      distributeSymmetricKey(wrapper, dataPath, fetchKey.result, toAddress)
-    )
+  const writeError = await wrapper.writeDataTo(
+    payload,
+    Buffer.from(trimLeading0x(signature), 'hex'),
+    `${dataPath}.enc`
   )
+  if (writeError) {
+    return new OffchainError(writeError)
+  }
+
+  const firstWriteError = (
+    await Promise.all(
+      // here we encrypt the key to ourselves so we can retrieve it later
+      [wrapper.self, ...toAddresses].map(async (toAddress) =>
+        distributeSymmetricKey(wrapper, dataPath, fetchKey.result, toAddress)
+      )
+    )
+  ).find(Boolean)
+  if (firstWriteError) {
+    return new OffchainError(firstWriteError)
+  }
 }
 
 /**
@@ -166,7 +169,7 @@ export const writeEncrypted = async (
 const readSymmetricKey = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
-  senderAddress: string
+  senderAddress: Address
 ): Promise<Result<Buffer, SchemaErrors>> => {
   const accounts = await wrapper.kit.contracts.getAccounts()
   const wallet = wrapper.kit.getWallet()
@@ -176,6 +179,9 @@ const readSymmetricKey = async (
   ])
 
   if (readerPubKey === null) {
+    return Err(new UnavailableKey(wrapper.self))
+  }
+  if (senderPubKey === null) {
     return Err(new UnavailableKey(senderAddress))
   }
 
@@ -207,7 +213,7 @@ const readSymmetricKey = async (
 
 /**
  * Reads and decrypts a payload that has been encrypted to your data encryption key. Will
- * resolving the symmetric key used to encrypt the payload.
+ * resolve the symmetric key used to encrypt the payload.
  *
  * @param wrapper the offchain data wrapper
  * @param dataPath path to where the encrypted data is stored. Used to derive the key location
@@ -216,7 +222,7 @@ const readSymmetricKey = async (
 export const readEncrypted = async (
   wrapper: OffchainDataWrapper,
   dataPath: string,
-  senderAddress: string
+  senderAddress: Address
 ): Promise<Result<Buffer, SchemaErrors>> => {
   const encryptedPayloadPath = `${dataPath}.enc`
   const [payload, key] = await Promise.all([
@@ -237,6 +243,9 @@ export const readEncrypted = async (
 
   if (key.result.length !== KEY_LENGTH) {
     return Err(new InvalidKey())
+  }
+  if (payload.result.length < IV_LENGTH) {
+    return Err(new InvalidDataError())
   }
 
   return Ok(

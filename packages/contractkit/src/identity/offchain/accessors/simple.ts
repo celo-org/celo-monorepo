@@ -1,15 +1,10 @@
+import { Address, trimLeading0x } from '@celo/base'
 import { Err, makeAsyncThrowable, Result } from '@celo/base/lib/result'
 import * as t from 'io-ts'
 import OffchainDataWrapper from '../../offchain-data-wrapper'
+import { buildEIP712TypedData, deserialize, readEncrypted, writeEncrypted } from '../utils'
 import { InvalidDataError, OffchainError, SchemaErrors } from './errors'
-import {
-  buildEIP712TypedData,
-  deserialize,
-  EncryptedSchema,
-  readEncrypted,
-  Schema,
-  writeEncrypted,
-} from './utils'
+import { PrivateAccessor, PublicAccessor } from './interfaces'
 
 function serialize<DataType>(data: DataType) {
   return Buffer.from(JSON.stringify(data))
@@ -19,7 +14,7 @@ function serialize<DataType>(data: DataType) {
  * A generic schema for reading and writing objects to and from storage. Passing
  * in a type parameter is supported for runtime type safety.
  */
-export class SimpleSchema<DataType> implements Schema<DataType> {
+export class PublicSimpleAccessor<DataType> implements PublicAccessor<DataType> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
     readonly type: t.Type<DataType>,
@@ -37,9 +32,10 @@ export class SimpleSchema<DataType> implements Schema<DataType> {
       return new InvalidDataError()
     }
 
+    const signature = await this.sign(data)
     const error = await this.wrapper.writeDataTo(
       serialize(data),
-      await this.sign(data),
+      Buffer.from(trimLeading0x(signature), 'hex'),
       this.dataPath
     )
     if (error) {
@@ -47,7 +43,7 @@ export class SimpleSchema<DataType> implements Schema<DataType> {
     }
   }
 
-  async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
+  async readAsResult(account: Address): Promise<Result<DataType, SchemaErrors>> {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
       (buf) =>
@@ -74,14 +70,14 @@ export class SimpleSchema<DataType> implements Schema<DataType> {
  * A generic schema for writing and reading encrypted objects to and from storage. Passing
  * in a type parameter is supported for runtime type safety.
  */
-export class EncryptedSimpleSchema<DataType> implements EncryptedSchema<DataType> {
+export class PrivateSimpleAccessor<DataType> implements PrivateAccessor<DataType> {
   constructor(
     readonly wrapper: OffchainDataWrapper,
     readonly type: t.Type<DataType>,
     readonly dataPath: string
   ) {}
 
-  write(data: DataType, toAddresses: string[], symmetricKey?: Buffer) {
+  write(data: DataType, toAddresses: Address[], symmetricKey?: Buffer) {
     if (!this.type.is(data)) {
       return Promise.resolve(new InvalidDataError())
     }
@@ -89,7 +85,7 @@ export class EncryptedSimpleSchema<DataType> implements EncryptedSchema<DataType
     return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
   }
 
-  async readAsResult(account: string): Promise<Result<DataType, SchemaErrors>> {
+  async readAsResult(account: Address): Promise<Result<DataType, SchemaErrors>> {
     const encryptedResult = await readEncrypted(this.wrapper, this.dataPath, account)
 
     if (encryptedResult.ok) {

@@ -1,13 +1,13 @@
 import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { BinarySchema, EncryptedBinarySchema } from '../schemas'
+import { PrivateBinaryAccessor, PublicBinaryAccessor } from './binary'
 
-export class ProfilePicture extends BinarySchema {
+export class PublicPictureAccessor extends PublicBinaryAccessor {
   constructor(readonly wrapper: OffchainDataWrapper) {
     super(wrapper, '/account/picture')
   }
 }
 
-export class EncryptedProfilePicture extends EncryptedBinarySchema {
+export class PrivatePictureAccessor extends PrivateBinaryAccessor {
   constructor(readonly wrapper: OffchainDataWrapper) {
     super(wrapper, '/account/picture')
   }

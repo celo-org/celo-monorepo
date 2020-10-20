@@ -1,9 +1,10 @@
-import { ensureLeading0x, eqAddress, trimLeading0x } from '@celo/base/lib/address'
+import { Address, ensureLeading0x, eqAddress } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import { guessEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
+import { recoverEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
+import { resolve } from 'url'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
@@ -20,8 +21,9 @@ export enum OffchainErrorTypes {
 }
 
 class FetchError extends RootError<OffchainErrorTypes.FetchError> {
-  constructor() {
+  constructor(error: Error) {
     super(OffchainErrorTypes.FetchError)
+    this.message = error.message
   }
 }
 
@@ -58,7 +60,7 @@ export default class OffchainDataWrapper {
   }
 
   async readDataFromAsResult(
-    account: string,
+    account: Address,
     buildTypedData: (x: Buffer) => Promise<EIP712TypedData>,
     dataPath: string
   ): Promise<Result<Buffer, OffchainErrors>> {
@@ -91,7 +93,7 @@ export default class OffchainDataWrapper {
 
   async writeDataTo(
     data: Buffer,
-    signature: string,
+    signature: Buffer,
     dataPath: string
   ): Promise<OffchainErrors | void> {
     if (this.storageWriter === undefined) {
@@ -101,13 +103,10 @@ export default class OffchainDataWrapper {
     try {
       await Promise.all([
         this.storageWriter.write(data, dataPath),
-        await this.storageWriter.write(
-          Buffer.from(trimLeading0x(signature), 'hex'),
-          dataPath + '.signature'
-        ),
+        await this.storageWriter.write(signature, `${dataPath}.signature`),
       ])
     } catch (e) {
-      return new FetchError()
+      return new FetchError(e)
     }
   }
 }
@@ -115,8 +114,8 @@ export default class OffchainDataWrapper {
 class StorageRoot {
   constructor(
     readonly wrapper: OffchainDataWrapper,
-    readonly account: string,
-    readonly address: string
+    readonly account: Address,
+    readonly root: string
   ) {}
 
   async readAndVerifySignature(
@@ -127,18 +126,18 @@ class StorageRoot {
 
     try {
       ;[dataResponse, signatureResponse] = await Promise.all([
-        fetch(this.address + dataPath),
-        fetch(this.address + dataPath + '.signature'),
+        fetch(resolve(this.root, dataPath)),
+        fetch(resolve(this.root, `${dataPath}.signature`)),
       ])
     } catch (error) {
-      return Err(new FetchError())
+      return Err(new FetchError(error))
     }
 
     if (!dataResponse.ok) {
-      return Err(new FetchError())
+      return Err(new FetchError(new Error(dataResponse.statusText)))
     }
     if (!signatureResponse.ok) {
-      return Err(new InvalidSignature())
+      return Err(new FetchError(new Error(signatureResponse.statusText)))
     }
 
     const [dataBody, signatureBody] = await Promise.all([
@@ -149,7 +148,7 @@ class StorageRoot {
     const signature = ensureLeading0x(Buffer.from(signatureBody).toString('hex'))
 
     const typedData = await buildTypedData(body)
-    const guessedSigner = guessEIP712TypedDataSigner(typedData, signature)
+    const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
 
     if (eqAddress(guessedSigner, this.account)) {
       return Ok(body)

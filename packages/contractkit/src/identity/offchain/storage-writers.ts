@@ -1,6 +1,9 @@
 import { execSync } from 'child_process'
-import { mkdirSync, writeFile } from 'fs'
-import { normalize, parse } from 'path'
+import { promises } from 'fs'
+import { join, normalize, parse } from 'path'
+import { resolve } from 'url'
+
+const { writeFile, mkdir } = promises
 
 export abstract class StorageWriter {
   abstract write(_data: Buffer, _dataPath: string): Promise<void>
@@ -15,17 +18,9 @@ export class LocalStorageWriter extends StorageWriter {
   }
 
   protected async writeToFs(data: string | Buffer, dataPath: string): Promise<void> {
-    await new Promise((resolve, reject) => {
-      const directory = parse(dataPath).dir
-      mkdirSync(this.root + directory, { recursive: true })
-      writeFile(this.root + dataPath, data, (error) => {
-        if (error) {
-          reject(error)
-        }
-
-        resolve()
-      })
-    })
+    const directory = parse(dataPath).dir
+    await mkdir(normalize(join(this.root, directory)), { recursive: true })
+    await writeFile(normalize(join(this.root, dataPath)), data)
   }
 }
 
@@ -54,7 +49,6 @@ export class GoogleStorageWriter extends LocalStorageWriter {
     execSync(`gsutil cp ${normalize(this.root + '/' + dataPath)} gs://${this.bucket}${dataPath}`, {
       cwd: this.root,
     })
-    await new Promise((resolve) => setTimeout(resolve, 2000))
   }
 }
 
@@ -64,7 +58,7 @@ export class MockStorageWriter extends LocalStorageWriter {
   }
   async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    this.fetchMock.mock(this.mockedStorageRoot + dataPath, data, {
+    this.fetchMock.mock(resolve(this.mockedStorageRoot, dataPath), data, {
       sendAsJson: false,
       overwriteRoutes: true,
     })

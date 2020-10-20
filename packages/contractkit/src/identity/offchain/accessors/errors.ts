@@ -1,3 +1,4 @@
+import { Address } from '@celo/base'
 import { RootError } from '@celo/base/lib/result'
 import { OffchainErrors } from '../../offchain-data-wrapper'
 
@@ -28,7 +29,7 @@ export class UnknownCiphertext extends RootError<SchemaErrorTypes.UnknownCiphert
 }
 
 export class UnavailableKey extends RootError<SchemaErrorTypes.UnavailableKey> {
-  constructor(readonly account: string) {
+  constructor(readonly account: Address) {
     super(SchemaErrorTypes.UnavailableKey)
     this.message = `Unable to find account ${account}`
   }
