@@ -60,7 +60,7 @@ export default function CeloAmountInput({
           <Text style={[styles.maxAmount, { color }]}>{t('maxSymbol')}</Text>
         </TouchableOpacity>
       ) : (
-        <View style={styles.loadingContainer}>
+        <View>
           <ActivityIndicator size="small" color={colors.goldUI} />
         </View>
       )}
@@ -70,5 +70,4 @@ export default function CeloAmountInput({
 
 const styles = StyleSheet.create({
   maxAmount: fontStyles.small600,
-  loadingContainer: {},
 })
