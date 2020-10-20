@@ -190,9 +190,6 @@ function SendConfirmation(props: Props) {
   const cancelModal = () => {
     setButtonReset(true)
     setModalVisible(false)
-    // this.setState({ modalVisible: false, buttonReset: true }, () => {
-    //   this.setState({ buttonReset: false })
-    // })
   }
   useEffect(() => {
     setButtonReset(false)
