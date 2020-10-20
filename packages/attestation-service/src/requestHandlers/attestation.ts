@@ -37,6 +37,7 @@ function getSecurityCodeText(language: string | undefined) {
   switch (language) {
     case 'es':
     case 'es-419':
+    case 'es-US':
     case 'es-LA': {
       return 'Código de seguridad de Celo'
     }
