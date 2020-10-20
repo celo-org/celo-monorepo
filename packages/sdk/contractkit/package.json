@@ -11,8 +11,7 @@
   "keywords": [
     "celo",
     "blockchain",
-    "contractkit",
-    "defi"
+    "contractkit"
   ],
   "scripts": {
     "build": "tsc -b .",

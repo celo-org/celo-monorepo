@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 
-const debug = debugFactory('kit:network-utils:google-storage-utils')
+const debug = debugFactory('network-utils:google-storage-utils')
 
 const TAG = 'google-storage-utils'
 

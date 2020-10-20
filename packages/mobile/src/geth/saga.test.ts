@@ -1,4 +1,4 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit-extenders'
+import { GenesisBlockUtils, StaticNodeUtils } from '@celo/network-utils'
 import GethBridge from 'react-native-geth'
 import { expectSaga } from 'redux-saga-test-plan'
 import { InitializationState } from 'src/geth/reducer'

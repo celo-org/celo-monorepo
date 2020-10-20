@@ -1,8 +1,8 @@
+import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
 import {
   isBalanceSufficientForSigRetrieval,
   PhoneNumberHashDetails,
-} from '@celo/contractkit-extenders/lib/identity/odis/phone-number-identifier'
-import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
+} from '@celo/identity/lib/odis/phone-number-identifier'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import dotProp from 'dot-prop-immutable'

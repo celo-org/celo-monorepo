@@ -1,4 +1,4 @@
-import { NameAccessor } from '@celo/contractkit-extenders/lib/identity/offchain/schemas'
+import { NameAccessor } from '@celo/identity/lib/offchain/schemas'
 import { flags } from '@oclif/command'
 import { OffchainDataCommand } from '../../utils/off-chain-data'
 

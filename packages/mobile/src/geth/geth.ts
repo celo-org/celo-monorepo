@@ -1,4 +1,4 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit-extenders'
+import { GenesisBlockUtils, StaticNodeUtils } from '@celo/network-utils'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'

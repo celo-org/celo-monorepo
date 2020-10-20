@@ -1,8 +1,4 @@
-import {
-  hotfixToHash,
-  ProposalBuilder,
-  ProposalTransactionJSON,
-} from '@celo/contractkit-extenders/lib/governance/proposals'
+import { hotfixToHash, ProposalBuilder, ProposalTransactionJSON } from '@celo/governance'
 import { hexToBuffer } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { readFileSync } from 'fs-extra'

@@ -1,8 +1,8 @@
-import { PhoneNumberHashDetails } from '@celo/contractkit-extenders/lib/identity/odis/phone-number-identifier'
 import {
   AttestationsWrapper,
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { isValidAddress } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'

@@ -1,8 +1,8 @@
 import debugFactory from 'debug'
-import { Coordinates, timezone } from '../utils/timezone'
 import { GoogleStorageUtils } from './google-storage-utils'
+import { Coordinates, timezone } from './utils/timezone'
 
-const debug = debugFactory('kit:network-utils:static-node-utils')
+const debug = debugFactory('network-utils:static-node-utils')
 
 // The bucket where we store static_nodes information for all the networks.
 const StaticNodesGoogleStorageBucketName = `static_nodes`

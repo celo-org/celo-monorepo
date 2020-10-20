@@ -1,6 +1,5 @@
 import { ABIDefinition, Address, Block, CeloTxPending, parseDecodedParams } from '@celo/connect'
-import { ContractKit } from '@celo/contractkit'
-import { PROXY_ABI, PROXY_SET_IMPLEMENTATION_SIGNATURE } from '../governance/proxy'
+import { ContractKit, PROXY_ABI, PROXY_SET_IMPLEMENTATION_SIGNATURE } from '@celo/contractkit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {

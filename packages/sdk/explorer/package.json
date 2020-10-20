@@ -1,0 +1,34 @@
+{
+  "name": "@celo/explorer",
+  "version": "0.0.1-dev",
+  "description": "Celo's block explorer consumer",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/explorer",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/explorer",
+  "keywords": [
+    "celo",
+    "blockchain",
+    "contractkit"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "test": "jest --runInBand --passWithNoTests",
+    "lint": "tslint -c tslint.json --project ."
+  },
+  "dependencies": {
+    "@celo/base": "0.0.4-dev",
+    "@celo/connect": "0.0.2-dev",
+    "@celo/contractkit": "0.4.16-dev"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "web3": "1.2.11"
+  },
+  "engines": {
+    "node": ">=8.13.0"
+  }
+}

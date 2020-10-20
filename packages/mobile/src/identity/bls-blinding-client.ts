@@ -1,4 +1,4 @@
-import { BlsBlindingClient } from '@celo/contractkit-extenders/lib/identity/odis/bls-blinding-client'
+import { BlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 
 /**

@@ -1,5 +1,5 @@
-import { newBlockExplorer } from '@celo/contractkit-extenders/lib/explorer/block-explorer'
 import { TransactionData } from '@celo/contractkit/lib/wrappers/MultiSig'
+import { newBlockExplorer } from '@celo/explorer/lib/block-explorer'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'

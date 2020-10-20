@@ -28,9 +28,11 @@
       "@celo/base",
       "@celo/connect",
       "@celo/contractkit",
-      "@celo/contractkit-extenders",
       "@celo/dev-utils",
+      "@celo/explorer",
       "@celo/flake-tracker",
+      "@celo/governance",
+      "@celo/network-utils",
       "@celo/protocol",
       "@celo/utils"
     ]
@@ -39,9 +41,11 @@
     "location": "packages/cli",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/contractkit-extenders",
       "@celo/dev-utils",
+      "@celo/explorer",
       "@celo/flake-tracker",
+      "@celo/governance",
+      "@celo/identity",
       "@celo/utils",
       "@celo/wallet-hsm-azure",
       "@celo/wallet-ledger",
@@ -81,8 +85,9 @@
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",
-      "@celo/contractkit-extenders",
       "@celo/flake-tracker",
+      "@celo/identity",
+      "@celo/network-utils",
       "@celo/react-components",
       "@celo/typescript",
       "@celo/utils",
@@ -146,7 +151,7 @@
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
       "@celo/contractkit",
-      "@celo/contractkit-extenders",
+      "@celo/identity",
       "@celo/utils"
     ]
   },
@@ -174,17 +179,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/contractkit-extenders": {
-    "location": "packages/sdk/contractkit-extenders",
-    "dependencies": [
-      "@celo/base",
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/dev-utils",
-      "@celo/flake-tracker",
-      "@celo/utils"
-    ]
-  },
   "@celo/contractkit": {
     "location": "packages/sdk/contractkit",
     "dependencies": [
@@ -202,6 +196,51 @@
       "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
+    ]
+  },
+  "@celo/explorer": {
+    "location": "packages/sdk/explorer",
+    "dependencies": [
+      "@celo/base",
+      "@celo/connect",
+      "@celo/contractkit"
+    ]
+  },
+  "@celo/governance": {
+    "location": "packages/sdk/governance",
+    "dependencies": [
+      "@celo/base",
+      "@celo/connect",
+      "@celo/contractkit",
+      "@celo/explorer",
+      "@celo/utils"
+    ]
+  },
+  "@celo/identity": {
+    "location": "packages/sdk/identity",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/dev-utils",
+      "@celo/flake-tracker",
+      "@celo/utils"
+    ]
+  },
+  "@celo/network-utils": {
+    "location": "packages/sdk/network-utils",
+    "dependencies": [
+      "@celo/dev-utils",
+      "@celo/flake-tracker"
+    ]
+  },
+  "@celo/transactions-uri": {
+    "location": "packages/sdk/transactions-uri",
+    "dependencies": [
+      "@celo/base",
+      "@celo/connect",
+      "@celo/contractkit",
+      "@celo/dev-utils",
+      "@celo/flake-tracker"
     ]
   },
   "@celo/utils": {

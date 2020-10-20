@@ -1,12 +1,12 @@
 import { Address } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { ProposalBuilder } from '@celo/contractkit-extenders/lib/governance'
 import {
   GovernanceWrapper,
   Proposal,
   ProposalStage,
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
+import { ProposalBuilder } from '@celo/governance'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import Approve from './approve'

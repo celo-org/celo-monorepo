@@ -32,7 +32,9 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.4.16-dev",
-    "@celo/contractkit-extenders": "0.0.1-dev",
+    "@celo/explorer": "0.0.1-dev",
+    "@celo/identity": "0.0.1-dev",
+    "@celo/governance": "0.0.1-dev",
     "@celo/utils": "0.1.22-dev",
     "@celo/wallet-local": "0.0.1-dev",
     "@celo/wallet-hsm-azure": "0.0.1-dev",

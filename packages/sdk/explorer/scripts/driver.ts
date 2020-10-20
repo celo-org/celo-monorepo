@@ -1,6 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import Web3 from 'web3'
-import { newBlockExplorer } from '../src/explorer/block-explorer'
+import { newBlockExplorer } from '../src/block-explorer'
 
 const kit = newKitFromWeb3(new Web3('ws://localhost:8545'))
 

@@ -1,4 +1,4 @@
-import { proposalToJSON } from '@celo/contractkit-extenders/lib/governance/proposals'
+import { proposalToJSON } from '@celo/governance'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'

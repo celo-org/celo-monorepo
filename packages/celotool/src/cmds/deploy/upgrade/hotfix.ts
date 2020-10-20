@@ -1,11 +1,7 @@
 // This is a more unusual Celotool command. It basically helps you to execute Hotfixes on testnets. Because constructing proposals is difficult to do via a CLI, you should define them here in code. There are two examples below that you can start from.
 
 import { newKitFromWeb3 } from '@celo/contractkit'
-import {
-  hotfixToHash,
-  ProposalBuilder,
-  proposalToJSON,
-} from '@celo/contractkit-extenders/lib/governance/proposals'
+import { hotfixToHash, ProposalBuilder, proposalToJSON } from '@celo/governance'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { randomBytes } from 'crypto'

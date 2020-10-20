@@ -1,5 +1,5 @@
-import { OdisUtils } from '@celo/contractkit-extenders'
-import { PhoneNumberHashDetails } from '@celo/contractkit-extenders/lib/identity/odis/phone-number-identifier'
+import { OdisUtils } from '@celo/identity'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
@@ -22,10 +22,10 @@ jest.mock('react-native-blind-threshold-bls', () => ({
   unblindMessage: jest.fn(() => 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'),
 }))
 
-jest.mock('@celo/contractkit-extenders', () => ({
-  ...jest.requireActual('@celo/contractkit-extenders'),
-  ...jest.requireActual('../../__mocks__/@celo/contractkit-extenders/index'),
-  OdisUtils: jest.requireActual('@celo/contractkit-extenders').OdisUtils,
+jest.mock('@celo/identity', () => ({
+  ...jest.requireActual('@celo/identity'),
+  ...jest.requireActual('../../__mocks__/@celo/identity/index'),
+  OdisUtils: jest.requireActual('@celo/identity').OdisUtils,
 }))
 
 describe('Fetch phone hash details', () => {

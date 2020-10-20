@@ -7492,13 +7492,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/secp256k1@^3.5.3":
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/@types/secp256k1/-/secp256k1-3.5.3.tgz#57ebfdd19d476de3ff13758cf7b6d9e420d54c19"
-  integrity sha512-NGcsPDR0P+Q71O63e2ayshmiZGAwCOa/cLJzOIuhOiDvmbvrCIiVtEpqdCJGogG92Bnr6tw/6lqVBsRMEl15OQ==
-  dependencies:
-    "@types/node" "*"
-
 "@types/secp256k1@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/secp256k1/-/secp256k1-4.0.1.tgz#fb3aa61a1848ad97d7425ff9dcba784549fca5a4"

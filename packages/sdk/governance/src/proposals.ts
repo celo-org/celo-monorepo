@@ -8,7 +8,7 @@ import {
   Contract,
   getAbiTypes,
 } from '@celo/connect'
-import { CeloContract, ContractKit } from '@celo/contractkit'
+import { CeloContract, ContractKit, setImplementationOnProxy } from '@celo/contractkit'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
 import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import {
@@ -16,12 +16,10 @@ import {
   Proposal,
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
+import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
-import { obtainKitContractDetails } from '../explorer/base'
-import { BlockExplorer } from '../explorer/block-explorer'
-import { setImplementationOnProxy } from './proxy'
 
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
