@@ -31,7 +31,7 @@ interface SendProps extends CommonProps {
   feeType: FeeType.SEND
   account: string
   recipientAddress: string
-  amount: BigNumber
+  amount: string
   comment?: string
   includeDekFee: boolean
   currency?: CURRENCY_ENUM
@@ -94,7 +94,7 @@ export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<B
     (
       account: string,
       recipientAddress: string,
-      amount: BigNumber,
+      amount: string,
       comment: string = MAX_PLACEHOLDER_COMMENT,
       includeDekFee: boolean = false,
       currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
@@ -104,7 +104,7 @@ export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<B
         currency,
         {
           recipientAddress,
-          amount: amount.valueOf(),
+          amount,
           comment,
         },
         includeDekFee

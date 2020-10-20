@@ -9,7 +9,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -40,7 +40,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
   const [celoInput, setCeloToTransfer] = useState('')
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
-  const goldBalanceNumber = useMemo(() => new BigNumber(goldBalance || 0), [goldBalance])
+  const goldBalanceNumber = new BigNumber(goldBalance || 0)
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
   const celoToTransfer = new BigNumber(celoInput)
@@ -61,7 +61,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     account: RANDOM_ADDRESS,
     currency: CURRENCY_ENUM.GOLD,
     recipientAddress: RANDOM_ADDRESS,
-    amount: goldBalanceNumber,
+    amount: goldBalance || '0',
     includeDekFee: false,
   })
   const feeEstimate = result && divideByWei(result)
