@@ -213,7 +213,7 @@ exports[`WithdrawCeloSummary renders correctly 1`] = `
             >
               
               
-              0
+              1
             </Text>
           </Text>
         </View>
