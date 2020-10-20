@@ -36,7 +36,9 @@ spec:
 {{ if .Values.oracle.metrics.enabled }}
 {{ include "metric-annotations" . | indent 8 }}
 {{ end }}
+        iam.amazonaws.com/role: arn:aws:iam::243983831780:role/trevor-oracledev-sign-test-ecc-keys
     spec:
+{{ if .Values.kube.serviceAccountSecretNames }}
       initContainers:
       - name: set-label
         image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
@@ -71,6 +73,7 @@ spec:
               key: token
               name: {{ $e }}
         {{ end }}
+{{ end }}
       containers:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}

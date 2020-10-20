@@ -5,8 +5,71 @@ import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInte
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { getAKSClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
+import { getAKSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues } from './context-utils'
 import { AKSClusterConfig } from './k8s-cluster/aks'
+import { CloudProvider } from './k8s-cluster/base'
+import { AKSOracleDeployer, AKSOracleDeploymentConfig } from './k8s-oracle/aks'
+import { BaseOracleDeployer } from './k8s-oracle/base'
+import { getAzureHsmOracleIdentities } from './k8s-oracle/utils'
+import { AWSOracleDeploymentConfig, AWSOracleDeployer } from './k8s-oracle/aws'
+
+/**
+ * Maps each cloud provider to the correct function to get the appropriate full
+ * node deployment config
+ */
+const deployerGetterByCloudProvider: {
+  [key in CloudProvider]?: (celoEnv: string, context: string, useForno: boolean) => BaseOracleDeployer
+} = {
+  [CloudProvider.AWS]: getAWSOracleDeployer,
+  [CloudProvider.AZURE]: getAKSOracleDeployer,
+}
+
+
+export function getOracleDeployerForContext(celoEnv: string, context: string, useForno: boolean = false) {
+  const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
+  return deployerGetterByCloudProvider[cloudProvider]!(celoEnv, context, useForno)
+}
+
+function getAKSOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
+  return getAKSHSMOracleDeployer(celoEnv, context, useForno)
+}
+
+function getAKSHSMOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
+  const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
+    contextOracleKeyVaultIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressAzureKeyVaults: '',
+    }
+  )
+  const identities = getAzureHsmOracleIdentities(addressAzureKeyVaults)
+  const deploymentConfig: AKSOracleDeploymentConfig = {
+    context,
+    identities,
+    useForno,
+  }
+  return new AKSOracleDeployer(deploymentConfig, celoEnv)
+}
+
+function getAWSOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
+  return getAWSHSMOracleDeployer(celoEnv, context, useForno)
+}
+
+function getAWSHSMOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
+  const deploymentConfig: AWSOracleDeploymentConfig = {
+    context,
+    identities: [
+      {
+        address: '0xf7Af8e3f613E5CB210F6f96B46DA41Fb91338E95'
+      },
+      {
+        address: '0x3Ec7D9e8e13c85b9ED38039d8f9807534F73f713'
+      }
+    ],
+    useForno,
+  }
+  return new AWSOracleDeployer(deploymentConfig, celoEnv)
+}
 
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
@@ -290,7 +353,8 @@ function getOracleIdentities(context: string): OracleIdentity[] {
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
  * returns an array of OracleIdentity in the same order
  */
-function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdentity[] {
+// @ts-ignore
+function getAzureHsmOracleIdentities1(addressAzureKeyVaults: string): OracleIdentity[] {
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {

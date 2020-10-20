@@ -1,11 +1,11 @@
-import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
+// import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 // import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 // import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
-import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
+// import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { /*getAKSClusterConfig, */getContextDynamicEnvVarValues } from '../context-utils'
+// import { /*getAKSClusterConfig, */getContextDynamicEnvVarValues } from '../context-utils'
 // import { AKSClusterConfig } from '../k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -24,7 +24,7 @@ export interface BaseOracleDeploymentConfig {
 }
 
 export abstract class BaseOracleDeployer {
-  private _deploymentConfig: BaseOracleDeploymentConfig
+  protected _deploymentConfig: BaseOracleDeploymentConfig
   private _celoEnv: string
 
   constructor(deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) {
@@ -71,11 +71,12 @@ export abstract class BaseOracleDeployer {
 
   async helmParameters() {
     // const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(this.celoEnv, replicas)
-
+    // @ts-ignore
     const httpRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoUrl(this.celoEnv)
       : getFullNodeHttpRpcInternalUrl(this.celoEnv)
     // TODO: let forno support websockets
+    // @ts-ignore
     const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(this.celoEnv)
     return [
       `--set environment.name=${this.celoEnv}`,
@@ -85,13 +86,13 @@ export abstract class BaseOracleDeployer {
       `--set oracle.azureHsm.initTryCount=5`,
       `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
       `--set oracle.replicas=${this.replicas}`,
-      `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
-      `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
+      `--set oracle.rpcProviderUrls.http=http://35.227.154.48:8545`, //${httpRpcProviderUrl}`,
+      `--set oracle.rpcProviderUrls.ws=ws://35.227.154.48:8546`, // ${wsRpcProviderUrl}`,
       `--set oracle.metrics.enabled=true`,
       `--set oracle.metrics.prometheusPort=9090`,
       `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
     ].concat(await this.oracleIdentityHelmParameters())
-    //.concat(await oracleIdentityHelmParameters(context, oracleConfig))
+    // .concat(await oracleIdentityHelmParameters(context, oracleConfig))
   }
 
   /**
@@ -99,7 +100,7 @@ export abstract class BaseOracleDeployer {
    * Supports both private key and Azure HSM signing.
    */
   async oracleIdentityHelmParameters() {
-    let params: string[] = []
+    const params: string[] = []
     for (let i = 0; i < this.replicas; i++) {
       const oracleIdentity = this.deploymentConfig.identities[i]
       const prefix = `--set oracle.identities[${i}]`
@@ -164,27 +165,27 @@ export interface OracleConfig {
   identities: OracleIdentity[]
 }
 
-interface OracleKeyVaultIdentityConfig {
-  addressAzureKeyVaults: string
-}
-
-interface OracleMnemonicIdentityConfig {
-  addressesFromMnemonicCount: string
-}
-
-/**
- * Env vars corresponding to each value for the OracleKeyVaultIdentityConfig for a particular context
- */
-const contextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
-  addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
-}
-
-/**
- * Env vars corresponding to each value for the OracleMnemonicIdentityConfig for a particular context
- */
-const contextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMnemonicIdentityConfig]: DynamicEnvVar } = {
-  addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
-}
+// interface OracleKeyVaultIdentityConfig {
+//   addressAzureKeyVaults: string
+// }
+//
+// interface OracleMnemonicIdentityConfig {
+//   addressesFromMnemonicCount: string
+// }
+//
+// // /**
+//  * Env vars corresponding to each value for the OracleKeyVaultIdentityConfig for a particular context
+//  */
+// const contextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
+//   addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
+// }
+//
+// /**
+//  * Env vars corresponding to each value for the OracleMnemonicIdentityConfig for a particular context
+//  */
+// const contextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMnemonicIdentityConfig]: DynamicEnvVar } = {
+//   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
+// }
 
 // function releaseName(celoEnv: string) {
 //   return `${celoEnv}-oracle`
@@ -364,101 +365,101 @@ const contextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMne
 //     `az keyvault delete-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
 //   )
 // }
-
-/**
- * Gives a config for all oracles for a particular context
- */
-export function getOracleConfig(context: string): OracleConfig {
-  return {
-    identities: getOracleIdentities(context),
-  }
-}
-
-/**
- * Returns an array of oracle identities. If the Azure Key Vault env var is specified,
- * the identities are created from that. Otherwise, the identities are created
- * with private keys generated by the mnemonic.
- */
-function getOracleIdentities(context: string): OracleIdentity[] {
-  const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
-    contextOracleKeyVaultIdentityConfigDynamicEnvVars,
-    context,
-    {
-      addressAzureKeyVaults: '',
-    }
-  )
-  // Give priority to key vault
-  if (addressAzureKeyVaults) {
-    return getAzureHsmOracleIdentities(addressAzureKeyVaults)
-  }
-
-  // If key vaults are not set, try from mnemonic
-  const { addressesFromMnemonicCount } = getContextDynamicEnvVarValues(
-    contextOracleMnemonicIdentityConfigDynamicEnvVars,
-    context,
-    {
-      addressesFromMnemonicCount: '',
-    }
-  )
-  if (addressesFromMnemonicCount) {
-    const addressesFromMnemonicCountNum = parseInt(addressesFromMnemonicCount, 10)
-    return getMnemonicBasedOracleIdentities(addressesFromMnemonicCountNum)
-  }
-
-  throw Error('No oracle identity env vars specified')
-}
-
-/**
- * Given a string addressAzureKeyVaults of the form:
- * <address>:<keyVaultName>,<address>:<keyVaultName>
- * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
- * returns an array of OracleIdentity in the same order
- */
-function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdentity[] {
-  const identityStrings = addressAzureKeyVaults.split(',')
-  const identities = []
-  for (const identityStr of identityStrings) {
-    const [address, keyVaultName, resourceGroup] = identityStr.split(':')
-    // resourceGroup can be undefined
-    if (!address || !keyVaultName) {
-      throw Error(
-        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
-      )
-    }
-    identities.push({
-      address,
-      azureHsmIdentity: {
-        identityName: getOracleAzureIdentityName(keyVaultName, address),
-        keyVaultName,
-        resourceGroup
-      }
-    })
-  }
-  return identities
-}
-
-/**
- * Returns oracle identities with private keys and addresses generated from the mnemonic
- */
-function getMnemonicBasedOracleIdentities(count: number): OracleIdentity[] {
-  return getPrivateKeysFor(
-    AccountType.PRICE_ORACLE,
-    fetchEnv(envVar.MNEMONIC),
-    count
-  ).map((pkey) => ({
-    address: privateKeyToAddress(pkey),
-    privateKey: ensureLeading0x(pkey),
-  }))
-}
-
-/**
- * @return the intended name of an azure identity given a key vault name and address
- */
-function getOracleAzureIdentityName(keyVaultName: string, address: string) {
-  // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
-  const maxIdentityNameLength = 128
-  return `${keyVaultName}-${address}`.substring(0, maxIdentityNameLength)
-}
+//
+// /**
+//  * Gives a config for all oracles for a particular context
+//  */
+// export function getOracleConfig(context: string): OracleConfig {
+//   return {
+//     identities: getOracleIdentities(context),
+//   }
+// }
+//
+// /**
+//  * Returns an array of oracle identities. If the Azure Key Vault env var is specified,
+//  * the identities are created from that. Otherwise, the identities are created
+//  * with private keys generated by the mnemonic.
+//  */
+// function getOracleIdentities(context: string): OracleIdentity[] {
+//   const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
+//     contextOracleKeyVaultIdentityConfigDynamicEnvVars,
+//     context,
+//     {
+//       addressAzureKeyVaults: '',
+//     }
+//   )
+//   // Give priority to key vault
+//   if (addressAzureKeyVaults) {
+//     return getAzureHsmOracleIdentities(addressAzureKeyVaults)
+//   }
+//
+//   // If key vaults are not set, try from mnemonic
+//   const { addressesFromMnemonicCount } = getContextDynamicEnvVarValues(
+//     contextOracleMnemonicIdentityConfigDynamicEnvVars,
+//     context,
+//     {
+//       addressesFromMnemonicCount: '',
+//     }
+//   )
+//   if (addressesFromMnemonicCount) {
+//     const addressesFromMnemonicCountNum = parseInt(addressesFromMnemonicCount, 10)
+//     return getMnemonicBasedOracleIdentities(addressesFromMnemonicCountNum)
+//   }
+//
+//   throw Error('No oracle identity env vars specified')
+// }
+//
+// /**
+//  * Given a string addressAzureKeyVaults of the form:
+//  * <address>:<keyVaultName>,<address>:<keyVaultName>
+//  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
+//  * returns an array of OracleIdentity in the same order
+//  */
+// function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdentity[] {
+//   const identityStrings = addressAzureKeyVaults.split(',')
+//   const identities = []
+//   for (const identityStr of identityStrings) {
+//     const [address, keyVaultName, resourceGroup] = identityStr.split(':')
+//     // resourceGroup can be undefined
+//     if (!address || !keyVaultName) {
+//       throw Error(
+//         `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
+//       )
+//     }
+//     identities.push({
+//       address,
+//       azureHsmIdentity: {
+//         identityName: getOracleAzureIdentityName(keyVaultName, address),
+//         keyVaultName,
+//         resourceGroup
+//       }
+//     })
+//   }
+//   return identities
+// }
+//
+// /**
+//  * Returns oracle identities with private keys and addresses generated from the mnemonic
+//  */
+// function getMnemonicBasedOracleIdentities(count: number): OracleIdentity[] {
+//   return getPrivateKeysFor(
+//     AccountType.PRICE_ORACLE,
+//     fetchEnv(envVar.MNEMONIC),
+//     count
+//   ).map((pkey) => ({
+//     address: privateKeyToAddress(pkey),
+//     privateKey: ensureLeading0x(pkey),
+//   }))
+// }
+//
+// /**
+//  * @return the intended name of an azure identity given a key vault name and address
+//  */
+// function getOracleAzureIdentityName(keyVaultName: string, address: string) {
+//   // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
+//   const maxIdentityNameLength = 128
+//   return `${keyVaultName}-${address}`.substring(0, maxIdentityNameLength)
+// }
 //
 // // Oracle RBAC------
 // // We need the oracle pods to be able to change their label to accommodate

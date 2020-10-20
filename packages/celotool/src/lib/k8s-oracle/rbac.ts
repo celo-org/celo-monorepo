@@ -1,4 +1,5 @@
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
+import { execCmdWithExitOnFailure } from '../cmd-utils'
 
 // Oracle RBAC------
 // We need the oracle pods to be able to change their label to accommodate
@@ -7,21 +8,21 @@ import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChar
 
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
-export async function installOracleRBACHelmChart(celoEnv: string, context: string) {
+export async function installOracleRBACHelmChart(celoEnv: string, replicas: number) {
   return installGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, context)
+    rbacHelmParameters(celoEnv, replicas)
   )
 }
 
-export async function upgradeOracleRBACHelmChart(celoEnv: string, context: string) {
+export async function upgradeOracleRBACHelmChart(celoEnv: string, replicas: number) {
   return upgradeGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, context)
+    rbacHelmParameters(celoEnv, replicas)
   )
 }
 
@@ -29,9 +30,7 @@ export function removeOracleRBACHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(rbacReleaseName(celoEnv))
 }
 
-function rbacHelmParameters(celoEnv: string,  context: string) {
-  const oracleConfig = getOracleConfig(context)
-  const replicas = oracleConfig.identities.length
+function rbacHelmParameters(celoEnv: string, replicas: number) {
   return [`--set environment.name=${celoEnv}`,  `--set oracle.replicas=${replicas}`,]
 }
 
