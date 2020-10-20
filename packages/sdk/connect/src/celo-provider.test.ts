@@ -24,9 +24,6 @@ class MockWallet implements ReadOnlyWallet {
     return this.addresses
   }
   hasAccount(address?: string | undefined): boolean {
-    console.log('addresses: ', this.addresses)
-    console.log('address: ', address)
-    console.log('result: ', address != null && this.addresses.includes(address))
     return address != null && this.addresses.includes(address)
   }
   signTransaction(_txParams: CeloTx): Promise<EncodedTransaction> {

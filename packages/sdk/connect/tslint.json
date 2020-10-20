@@ -2,7 +2,6 @@
   "extends": ["@celo/typescript/tslint.json"],
   "rules": {
     "no-global-arrow-functions": false,
-    "no-console": false,
     "member-ordering": false,
     "max-classes-per-file": false
   }
