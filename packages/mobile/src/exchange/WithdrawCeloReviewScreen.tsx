@@ -31,7 +31,7 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
 
 function WithdrawCeloReviewScreen({ route }: Props) {
-  const { amount, recipientAddress } = route.params
+  const { amount, recipientAddress, feeEstimate } = route.params
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   // loading is never set to false, when the withdrawal is complete or after a short while,
   // withdrawCelo saga will navigate to |ExchangeHomeScreen|.
@@ -56,7 +56,11 @@ function WithdrawCeloReviewScreen({ route }: Props) {
           amount={<ShortenedAddress style={styles.withdrawAddress} address={recipientAddress} />}
         />
         <HorizontalLine />
-        <WithdrawCeloSummary amount={amount} recipientAddress={recipientAddress} />
+        <WithdrawCeloSummary
+          amount={amount}
+          recipientAddress={recipientAddress}
+          feeEstimate={feeEstimate}
+        />
       </View>
       <Button
         onPress={onConfirmWithdraw}
