@@ -2,6 +2,7 @@ import { Address } from '@celo/utils/lib/address'
 import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import {
+  getInitializeAbiOfImplementation,
   PROXY_ABI,
   PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE,
   PROXY_SET_IMPLEMENTATION_SIGNATURE,
@@ -123,6 +124,20 @@ export class BlockExplorer {
     const { args, params } = parseDecodedParams(
       abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
+
+    // Transform delegate call data into a readable params map
+    if (
+      matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE &&
+      args.length === 2
+    ) {
+      const initializeAbi = getInitializeAbiOfImplementation(contract)
+      const encodedInitializeParameters = args[1].slice(10)
+
+      const { params: initializeParams } = parseDecodedParams(
+        abi.decodeParameters(initializeAbi.inputs!, encodedInitializeParameters)
+      )
+      params[`initialize@${abi.encodeFunctionSignature(initializeAbi)}`] = initializeParams
+    }
 
     return {
       contract,

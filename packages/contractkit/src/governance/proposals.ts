@@ -130,27 +130,22 @@ export class ProposalBuilder {
     const address =
       this.registryAdditions[tx.contract] ?? (await this.kit.registry.addressFor(tx.contract))
 
-    // Update canonical registry addresses
     if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
+      // Update canonical registry addresses
       this.registryAdditions[tx.args[0]] = tx.args[1]
+    } else if (
+      tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
+      Array.isArray(tx.args[1])
+    ) {
+      // Transform array of initialize arguments (if provided) into delegate call data
+      tx.args[1] = this.kit.web3.eth.abi.encodeFunctionCall(
+        getInitializeAbiOfImplementation(tx.contract),
+        tx.args[1]
+      )
     }
 
     const contract = await this.kit._web3Contracts.getContract(tx.contract, address)
     const methodName = tx.function
-
-    // Transform array of initialize arguments (if provided) into delegate call data
-    if (
-      methodName === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
-      tx.args.length === 2 &&
-      Array.isArray(tx.args[1])
-    ) {
-      const initializeAbi = getInitializeAbiOfImplementation(tx.contract)
-      if (!initializeAbi) {
-        throw new Error(`Initialize method not found on implementation of ${tx.contract}`)
-      }
-      tx.args[1] = this.kit.web3.eth.abi.encodeFunctionCall(initializeAbi, tx.args[1])
-    }
-
     const method = (contract.methods as Contract['methods'])[methodName]
     if (!method) {
       throw new Error(`Method ${methodName} not found on ${tx.contract}`)

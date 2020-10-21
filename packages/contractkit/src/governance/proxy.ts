@@ -66,5 +66,9 @@ export const PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE =
 export const getInitializeAbiOfImplementation = (proxyContractName: string) => {
   const implementationABI = require(`../generated/${proxyContractName.replace('Proxy', '')}`)
     .ABI as AbiItem[]
-  return implementationABI.find((item) => item.name === 'initialize')
+  const initializeAbi = implementationABI.find((item) => item.name === 'initialize')
+  if (!initializeAbi) {
+    throw new Error(`Initialize method not found on implementation of ${proxyContractName}`)
+  }
+  return initializeAbi
 }
