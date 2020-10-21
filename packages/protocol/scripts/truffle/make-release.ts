@@ -231,10 +231,7 @@ module.exports = async (callback: (error?: any) => number) => {
             proposal.push({
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: contractName }),
-                proxy.address,
-              ],
+              args: [contractName, proxy.address],
               value: '0',
               description: `Registry: ${contractName} -> ${proxy.address}`,
             })

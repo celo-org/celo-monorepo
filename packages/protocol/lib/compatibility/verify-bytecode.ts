@@ -48,13 +48,11 @@ const isRegistryRepointTransaction = (tx: ProposalTx, registryId: string) =>
   tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, registryId))
+  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, contract))
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, registryId))
+  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, contract))
   return relevantTx.args[1]
 }
 
