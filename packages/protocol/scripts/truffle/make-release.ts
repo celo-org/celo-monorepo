@@ -248,7 +248,7 @@ module.exports = async (callback: (error?: any) => number) => {
               const args = initializationData[contractName]
               console.log(`Initializing ${contractName} with: ${args}`)
               proposal.push({
-                contract: `${contractName}Proxy`,
+                contract: contractName,
                 function: 'initialize',
                 args,
                 value: '0',
