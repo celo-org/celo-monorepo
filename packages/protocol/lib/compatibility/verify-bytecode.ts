@@ -3,7 +3,7 @@ import {
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyLibraryPrefix,
+  verifyLibraryPrefix
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
@@ -34,7 +34,7 @@ interface VerificationContext {
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
 const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
+  tx.contract === `${contract}Proxy` && (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
   context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
