@@ -24,7 +24,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 
 export async function removeHelmRelease(celoEnv: string) {
   console.info(`Deleting helm chart ${celoEnv}-tracer-tool`)
-  await execCmdWithExitOnFailure(`helm del --purge ${celoEnv}-tracer-tool`)
+  await execCmdWithExitOnFailure(`helm delete --namespace ${celoEnv} ${celoEnv}-tracer-tool`)
 }
 
 async function helmParameters(celoEnv: string) {

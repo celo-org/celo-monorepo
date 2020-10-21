@@ -19,7 +19,7 @@ export const handler = async (argv: DestroyArgv) => {
   // Delete replica before deleting the master
   await deleteCloudSQLInstance(instanceName + '-replica')
   await deleteCloudSQLInstance(instanceName)
-  await removeHelmRelease(helmReleaseName)
+  await removeHelmRelease(helmReleaseName, argv.celoEnv)
   await cleanDefaultIngress(argv.celoEnv, `${argv.celoEnv}-blockscout-web-ingress`)
 }
 

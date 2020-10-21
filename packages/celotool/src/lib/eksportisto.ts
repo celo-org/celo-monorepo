@@ -26,7 +26,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 export async function removeHelmRelease(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
   console.info(`Deleting helm chart ${celoEnv}-eksportisto-${suffix}`)
-  await execCmdWithExitOnFailure(`helm del --purge ${celoEnv}-eksportisto-${suffix}`)
+  await execCmdWithExitOnFailure(`helm delete --namespace ${celoEnv} ${celoEnv}-eksportisto-${suffix}`)
 }
 
 function fetchSensitiveAccounts() {

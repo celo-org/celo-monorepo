@@ -24,7 +24,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(releaseName(celoEnv))
+  return removeGenericHelmChart(releaseName(celoEnv), celoEnv)
 }
 
 function helmParameters(celoEnv: string) {

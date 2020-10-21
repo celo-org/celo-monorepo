@@ -35,8 +35,8 @@ export async function installHelmChart(
   )
 }
 
-export async function removeHelmRelease(helmReleaseName: string) {
-  await removeGenericHelmChart(helmReleaseName)
+export async function removeHelmRelease(helmReleaseName: string, celoEnv: string) {
+  await removeGenericHelmChart(helmReleaseName, celoEnv)
 }
 
 export async function upgradeHelmChart(

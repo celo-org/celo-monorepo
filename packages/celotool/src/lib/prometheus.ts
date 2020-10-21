@@ -51,7 +51,7 @@ async function installPrometheus(clusterConfig?: BaseClusterConfig) {
 }
 
 export async function removeHelmRelease() {
-  await removeGenericHelmChart(releaseName)
+  await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
 export async function upgradePrometheus() {
@@ -202,6 +202,6 @@ export async function removeGrafanaHelmRelease() {
   )
   if (grafanaExists) {
     console.info('Removing grafana')
-    await removeGenericHelmChart(releaseName)
+    await removeGenericHelmChart(releaseName, kubeNamespace)
   }
 }
