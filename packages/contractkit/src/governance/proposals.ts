@@ -70,7 +70,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 }
 
 type ProposalTxParams = Pick<ProposalTransaction, 'to' | 'value'>
-type RegistryAdditions = { [contractNameHash: string]: Address }
+type RegistryAdditions = { [contractName: string]: Address }
 /**
  * Builder class to construct proposals from JSON or transaction objects.
  */
@@ -153,12 +153,8 @@ export class ProposalBuilder {
       address = await this.kit.registry.addressFor(tx.contract)
     } catch (error) {
       // Check if prior proposal TXs include setting the registry for this contract
-      const contractNameHash = this.kit.web3.utils.soliditySha3({
-        type: 'string',
-        value: tx.contract,
-      })
-      if (this.registryAdditions[contractNameHash]) {
-        address = this.registryAdditions[contractNameHash]
+      if (this.registryAdditions[tx.contract]) {
+        address = this.registryAdditions[tx.contract]
       } else {
         throw new Error(
           `Could not find address for contract ${tx.contract} in Registry or Proposal`
