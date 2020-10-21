@@ -1,11 +1,12 @@
 import { concurrentMap } from '@celo/base/lib/async'
 import { isHexString } from '@celo/utils/lib/address'
+import { BigNumber } from 'bignumber.js'
 import { isValidAddress, keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
 import { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
-import { Address, CeloContract } from '../base'
+import { Address, CeloContract, RegisteredContracts } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
@@ -13,7 +14,7 @@ import { ContractKit } from '../kit'
 import { getAbiTypes } from '../utils/web3-utils'
 import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
 import { hotfixToParams, Proposal, ProposalTransaction } from '../wrappers/Governance'
-import { setImplementationOnProxy } from './proxy'
+import { getInitializeAbiOfImplementation, SET_AND_INITIALIZE_IMPLEMENTATION_ABI } from './proxy'
 
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
@@ -102,21 +103,6 @@ export class ProposalBuilder {
   })
 
   /**
-   * Adds a transaction to set the implementation on a proxy to the given address.
-   * @param contract Celo contract name of the proxy which should have its implementation set.
-   * @param newImplementationAddress Address of the new contract implementation.
-   */
-  addProxyRepointingTx = (contract: CeloContract, newImplementationAddress: string) => {
-    this.builders.push(async () => {
-      const proxy = await this.kit._web3Contracts.getContract(contract)
-      return this.fromWeb3tx(setImplementationOnProxy(newImplementationAddress), {
-        to: proxy.options.address,
-        value: '0',
-      })
-    })
-  }
-
-  /**
    * Adds a Web3 transaction to the list for proposal construction.
    * @param tx A Web3 transaction object to add to the proposal.
    * @param params Parameters for how the transaction should be executed.
@@ -140,8 +126,31 @@ export class ProposalBuilder {
   }
 
   fromJsonTx = async (tx: ProposalTransactionJSON) => {
-    const contract = await this.kit._web3Contracts.getContract(tx.contract)
+    // Account for canonical registry addresses from current proposal
+    const address =
+      this.registryAdditions[tx.contract] ?? (await this.kit.registry.addressFor(tx.contract))
+
+    // Update canonical registry addresses
+    if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
+      this.registryAdditions[tx.args[0]] = tx.args[1]
+    }
+
+    const contract = await this.kit._web3Contracts.getContract(tx.contract, address)
     const methodName = tx.function
+
+    // Transform array of initialize arguments (if provided) into delegate call data
+    if (
+      methodName === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
+      tx.args.length === 2 &&
+      Array.isArray(tx.args[1])
+    ) {
+      const initializeAbi = getInitializeAbiOfImplementation(tx.contract)
+      if (!initializeAbi) {
+        throw new Error(`Initialize method not found on implementation of ${tx.contract}`)
+      }
+      tx.args[1] = this.kit.web3.eth.abi.encodeFunctionCall(initializeAbi, tx.args[1])
+    }
+
     const method = (contract.methods as Contract['methods'])[methodName]
     if (!method) {
       throw new Error(`Method ${methodName} not found on ${tx.contract}`)
@@ -149,14 +158,6 @@ export class ProposalBuilder {
     const txo = method(...tx.args)
     if (!txo) {
       throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
-    }
-
-    const address = this.registryAdditions[tx.contract]
-      ? this.registryAdditions[tx.contract]
-      : await this.kit.registry.addressFor(tx.contract)
-
-    if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
-      this.registryAdditions[tx.args[0]] = tx.args[1]
     }
 
     return this.fromWeb3tx(txo, { to: address, value: tx.value })
@@ -185,7 +186,7 @@ export class InteractiveProposalBuilder {
       const contractAnswer = await inquirer.prompt({
         name: contractPromptName,
         type: 'list',
-        choices: [DONE_CHOICE, ...Object.keys(CeloContract)],
+        choices: [DONE_CHOICE, ...RegisteredContracts],
       })
 
       const choice = contractAnswer[contractPromptName]
@@ -222,8 +223,13 @@ export class InteractiveProposalBuilder {
           validate: async (input: string) => {
             switch (functionInput.type) {
               case 'uint256':
-                const parsed = parseInt(input, 10)
-                return !isNaN(parsed)
+                try {
+                  // tslint:disable-next-line: no-unused-expression
+                  new BigNumber(input)
+                  return true
+                } catch (e) {
+                  return false
+                }
               case 'boolean':
                 return input === 'true' || input === 'false'
               case 'address':
