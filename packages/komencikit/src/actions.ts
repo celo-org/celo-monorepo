@@ -39,6 +39,7 @@ export interface StartSessionPayload {
   iosDeviceToken?: string
   androidSignedAttestation?: string
   externalAccount: string
+  signature: string
 }
 
 export const StartSessionResp = t.type({
@@ -113,6 +114,7 @@ export const submitMetaTransaction = action<
 export interface RequestSubsidisedAttestationsPayload {
   identifier: string
   attestationsRequested: number
+  walletAddress: string
   transactions: {
     approve: RawTransaction
     request: RawTransaction

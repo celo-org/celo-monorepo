@@ -6,6 +6,7 @@ import {
   RawTransaction,
   toRawTransaction,
 } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import { TransactionReceipt } from 'web3-core'
 import {
   deployWallet,
@@ -67,6 +68,10 @@ export class KomenciKit {
       captchaResponseToken: captchaToken,
       externalAccount: this.options.account,
       deviceType: this.options.platform,
+      signature: await this.contractKit.web3.eth.sign(
+        hashMessage(`komenci:${this.options.account}`),
+        this.options.account
+      ),
     }
 
     if (this.options.platform === 'ios') {
@@ -115,6 +120,7 @@ export class KomenciKit {
     const resp = await this.client.exec(deployWallet())
     if (resp.ok) {
       if (resp.result.status === 'deployed') {
+        await this.setWallet(resp.result.walletAddress)
         return Ok(resp.result.walletAddress)
       } else {
         const txHash = resp.result.txHash
@@ -204,22 +210,25 @@ export class KomenciKit {
       return Err(new NoWalletError())
     }
 
+    const nonce = await this.wallet.nonce()
     const attestations = await this.contractKit.contracts.getAttestations()
-    const requestTx = await attestations.request(identifier, attestationsRequested)
-    const requestTxSig = await this.wallet.signMetaTransaction(requestTx.txo)
-    const requestMetaTx = this.wallet.executeMetaTransaction(requestTx.txo, requestTxSig)
 
     const approveTx = await attestations.approveAttestationFee(attestationsRequested)
-    const approveTxSig = await this.wallet.signMetaTransaction(approveTx.txo)
+    const approveTxSig = await this.wallet.signMetaTransaction(approveTx.txo, nonce)
     const approveMetaTx = this.wallet.executeMetaTransaction(approveTx.txo, approveTxSig)
+
+    const requestTx = await attestations.request(identifier, attestationsRequested)
+    const requestTxSig = await this.wallet.signMetaTransaction(requestTx.txo, nonce + 1)
+    const requestMetaTx = this.wallet.executeMetaTransaction(requestTx.txo, requestTxSig)
 
     const resp = await this.client.exec(
       requestSubsidisedAttestations({
         identifier,
         attestationsRequested,
+        walletAddress: this.wallet.address,
         transactions: {
-          request: toRawTransaction(requestMetaTx),
-          approve: toRawTransaction(approveMetaTx),
+          request: toRawTransaction(requestMetaTx.txo),
+          approve: toRawTransaction(approveMetaTx.txo),
         },
       })
     )
@@ -257,6 +266,8 @@ export class KomenciKit {
 
   public async setWallet(walletAddress: string) {
     this.wallet = await this.contractKit.contracts.getMetaTransactionWallet(walletAddress)
+    const signer = await this.wallet.signer()
+    console.log('Wallet signer: ', signer)
   }
 
   private async waitForReceipt(txHash: string): Promise<Result<TransactionReceipt, TxError>> {
