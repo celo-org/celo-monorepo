@@ -1,9 +1,7 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base'
 import { Signature } from '@celo/base/lib/signatureUtils'
-import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import BigNumber from 'bignumber.js'
-import { HttpProvider } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { Address } from '../base'
 import { MetaTransactionWallet } from '../generated/MetaTransactionWallet'
@@ -59,11 +57,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   public executeTransactions(
     txs: Array<TransactionInput<any>>
   ): CeloTransactionObject<{ 0: string; 1: string[] }> {
-    const rawTxs: RawTransaction[] = txs.map(toRawTransaction)
-    const destinations = rawTxs.map((rtx) => rtx.destination)
-    const values = rawTxs.map((rtx) => rtx.value)
-    const callData = ensureLeading0x(rawTxs.map((rtx) => trimLeading0x(rtx.data)).join(''))
-    const callDataLengths = rawTxs.map((rtx) => trimLeading0x(rtx.data).length / 2)
+    const { destinations, values, callData, callDataLengths } = toTransactionBatch(txs)
 
     return toTransactionObject(
       this.kit,
@@ -112,31 +106,8 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
       nonce,
       await this.chainId()
     )
-    // TODO: This should be cached by the CeloProvider and executed through the wallets.
-    //       But I think the GethNativeBridgeWallet currently doesn't support this, it's
-    //       in the works.
     const signer = await this.signer()
-    const signature = await new Promise<string>((resolve, reject) => {
-      ;(this.kit.web3.currentProvider as Pick<HttpProvider, 'send'>).send(
-        {
-          jsonrpc: '2.0',
-          method: 'eth_signTypedData',
-          params: [signer, typedData],
-        },
-        (error, resp) => {
-          if (error) {
-            reject(error)
-          } else if (resp) {
-            resolve(resp.result as string)
-          } else {
-            reject(new Error('empty-response'))
-          }
-        }
-      )
-    })
-
-    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-    return parseSignatureWithoutPrefix(messageHash, signature, signer)
+    return this.kit.signTypedData(signer, typedData)
   }
 
   /**
@@ -208,7 +179,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   )
 
   /**
-   * Get an cache the chain ID -- assume it's static for a kit instance
+   * Get and cache the chain ID -- assume it's static for a kit instance
    * @returns chainId
    */
   _chainId?: number
@@ -256,6 +227,33 @@ export const toRawTransaction = (tx: TransactionInput<any>): RawTransaction => {
       data: tx.encodeABI(),
       value: '0',
     }
+  }
+}
+
+/**
+ * Turns an array of transaction inputs into the argument that
+ * need to be passed to the executeTransactions call.
+ * Main transformation is that all the `data` parts of each
+ * transaction in the batch are concatenated and an array
+ * of lengths is constructed.
+ * This is a gas optimisation on the contract.
+ * @param txs Array<TransactionInput<any>> array of txs
+ * @returns Params for the executeTransactions method call
+ */
+export const toTransactionBatch = (
+  txs: Array<TransactionInput<any>>
+): {
+  destinations: string[]
+  values: string[]
+  callData: string
+  callDataLengths: number[]
+} => {
+  const rawTxs: RawTransaction[] = txs.map(toRawTransaction)
+  return {
+    destinations: rawTxs.map((rtx) => rtx.destination),
+    values: rawTxs.map((rtx) => rtx.value),
+    callData: ensureLeading0x(rawTxs.map((rtx) => trimLeading0x(rtx.data)).join('')),
+    callDataLengths: rawTxs.map((rtx) => trimLeading0x(rtx.data).length / 2),
   }
 }
 
