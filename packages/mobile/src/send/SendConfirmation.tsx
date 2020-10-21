@@ -467,7 +467,7 @@ export class SendConfirmation extends React.Component<Props, State> {
           feeType: FeeType.SEND,
           account,
           recipientAddress,
-          amount,
+          amount: amount.valueOf(),
           includeDekFee: !isDekRegistered,
         }
       : { feeType: FeeType.INVITE, account, amount }
