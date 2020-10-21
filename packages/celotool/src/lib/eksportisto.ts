@@ -7,7 +7,7 @@ export async function installHelmChart(celoEnv: string) {
   console.info(`Installing helm release ${celoEnv}-eksportisto-${suffix}`)
   const params = await helmParameters(celoEnv)
   await execCmdWithExitOnFailure(
-    `helm install ../helm-charts/eksportisto/ --name ${celoEnv}-eksportisto-${suffix} ${params.join(
+    `helm install ${celoEnv}-eksportisto-${suffix} ../helm-charts/eksportisto/ ${params.join(
       ' '
     )}
   `

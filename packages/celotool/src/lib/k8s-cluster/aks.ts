@@ -45,7 +45,7 @@ export class AKSClusterManager extends BaseClusterManager {
     if (!aadPodIdentityExists) {
       console.info('Installing aad-pod-identity')
       await execCmdWithExitOnFailure(
-        `helm install --name aad-pod-identity ../helm-charts/aad-pod-identity`
+        `helm install aad-pod-identity ../helm-charts/aad-pod-identity`
       )
     }
   }

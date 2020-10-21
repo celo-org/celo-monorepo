@@ -130,7 +130,7 @@ export async function createDefaultIngressIfNotExists(celoEnv: string, ingressNa
     console.info(`Creating ingress ${celoEnv}-blockscout-web-ingress`)
     const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.json`
     const ingressResource = `
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:

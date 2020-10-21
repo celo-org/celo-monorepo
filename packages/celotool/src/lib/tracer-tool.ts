@@ -8,7 +8,7 @@ export async function installHelmChart(celoEnv: string) {
   const params = await helmParameters(celoEnv)
 
   await execCmdWithExitOnFailure(
-    `helm install ../helm-charts/tracer-tool/ --name ${celoEnv}-tracer-tool ${params}`
+    `helm install ${celoEnv}-tracer-tool ../helm-charts/tracer-tool/ ${params}`
   )
 }
 

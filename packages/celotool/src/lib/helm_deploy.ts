@@ -195,7 +195,7 @@ export async function installCertManagerAndNginx() {
     `nginx-ingress-release exists, skipping install`
   )
   if (!nginxIngressReleaseExists) {
-    await execCmdWithExitOnFailure(`helm install --name nginx-ingress-release stable/nginx-ingress`)
+    await execCmdWithExitOnFailure(`helm install nginx-ingress-release stable/nginx-ingress`)
   }
 }
 
@@ -210,7 +210,7 @@ export async function installCertManager() {
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
   console.info('Installing cert-manager-cluster-issuers')
   await execCmdWithExitOnFailure(
-    `helm install --name cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
+    `helm install cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
   )
 }
 
@@ -225,7 +225,7 @@ export async function installAndEnableMetricsDeps(
   )
   if (!kubeStateMetricsReleaseExists) {
     await execCmdWithExitOnFailure(
-      `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
+      `helm install kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
   if (installPrometheus) {
@@ -725,7 +725,7 @@ export async function installGenericHelmChart(
 
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
-    `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`
+    `helm install ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
   )
 }
 
@@ -870,10 +870,11 @@ function useStaticIPsForGethNodes() {
 
 export async function checkHelmVersion() {
   const requiredHelmVersion = 'v3.3'
-  const helmOK = await outputIncludes('helm version --short', requiredHelmVersion, `Error checking local helm version. Helm version required ${requiredHelmVersion}`)
+  const helmOK = await outputIncludes('helm version -c --short', requiredHelmVersion, `Checking local Helm version. Required ${requiredHelmVersion}`)
   if (helmOK) {
     return true
   } else {
+    console.error(`Error checking local helm version. Helm version required ${requiredHelmVersion}`)
     process.exit(1)
   }
 }
