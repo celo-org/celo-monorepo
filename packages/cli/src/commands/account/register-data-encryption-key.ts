@@ -6,13 +6,13 @@ import { Flags } from '../../utils/command'
 
 export default class RegisterDataEncryptionKey extends BaseCommand {
   static description =
-    'Register a data encryption key for an account where users will be able to retieve the metadata file and verify your claims'
+    'Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments'
 
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({
       required: true,
-      description: 'Addess of the account to set metadata for',
+      description: 'Addess of the account to set the data encryption key for',
     }),
     publicKey: flags.string({
       required: true,

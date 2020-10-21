@@ -2,7 +2,7 @@ import { Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base/sr
 import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { AES128Decrypt, AES128Encrypt, Encrypt, IV_LENGTH } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import { trimPublicKeyPrefix } from '@celo/utils/src/ecdh'
+import { ensureUncompressed, trimUncompressedPrefix } from '@celo/utils/src/ecdh'
 import { createHmac, randomBytes } from 'crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
@@ -66,7 +66,10 @@ const distributeSymmetricKey = async (
   const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
   const computedDataPath = getCiphertextLabel(`${dataPath}.key`, sharedSecret, fromPubKey, toPubKey)
-  const encryptedData = Encrypt(Buffer.from(trimPublicKeyPrefix(toPubKey), 'hex'), key)
+  const encryptedData = Encrypt(
+    Buffer.from(trimUncompressedPrefix(ensureUncompressed(toPubKey)), 'hex'),
+    key
+  )
 
   const signature = await signBuffer(wrapper, computedDataPath, encryptedData)
   return wrapper.writeDataTo(
