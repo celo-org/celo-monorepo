@@ -80,7 +80,7 @@ export const builder = (yargs: Argv) => {
     })
     .option('context', {
       type: 'string',
-      description: 'ODIS context',
+      description: 'ODIS context (mainnet, alfajores, alfajoresstaging)',
       default: 'mainnet',
     })
 }
