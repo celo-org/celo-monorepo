@@ -284,7 +284,10 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       sendTransaction,
       approveTx.txo,
       account,
-      newTransactionContext(TAG, `Approve exchange of ${makerToken}`)
+      newTransactionContext(TAG, `Approve exchange of ${makerToken}`),
+      undefined, // staticGas
+      undefined, // cancelAction
+      makerToken
     )
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 
@@ -397,7 +400,14 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       }
     )
 
-    yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
+    yield call(
+      sendAndMonitorTransaction,
+      tx,
+      account,
+      context,
+      CURRENCY_ENUM.GOLD,
+      CURRENCY_ENUM.GOLD
+    )
 
     const dollarAmount = yield call(celoToDollarAmount, amount)
     yield put(sendPaymentOrInviteSuccess(dollarAmount))
