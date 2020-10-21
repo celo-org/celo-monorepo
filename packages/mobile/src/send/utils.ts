@@ -8,6 +8,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { FeeType } from 'src/fees/actions'
+import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
@@ -190,23 +191,6 @@ export function* handleSendPaymentData(
 
   yield put(storeLatestInRecents(recipient))
 
-  if (data.isCELO == 'true') {
-    console.log('isCELO 1: ', data.isCELO)
-    if (data.amount) {
-      const exchangeRate = yield select(getLocalCurrencyExchangeRate)
-      const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
-      console.log('isCELO 2: ', data.isCELO)
-      if (!amount) {
-        Logger.warn(TAG, '@handleSendPaymentData null amount')
-        return
-      }
-      navigate(Screens.WithdrawCeloReviewScreen, {
-        amount,
-        recipientAddress: data.address.toLowerCase(),
-      })
-    }
-  }
-
   if (data.currencyCode) {
     yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
     const action: FetchCurrentRateSuccessAction | FetchCurrentRateFailureAction = yield take([
@@ -220,24 +204,51 @@ export function* handleSendPaymentData(
     }
   }
 
-  // if (data.amount) {
-  //   // TODO: integrate with SendConfirmation component
-  //   const exchangeRate = yield select(getLocalCurrencyExchangeRate)
-  //   const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
-  //   if (!amount) {
-  //     Logger.warn(TAG, '@handleSendPaymentData null amount')
-  //     return
-  //   }
-  //   const transactionData: TransactionDataInput = {
-  //     recipient,
-  //     amount,
-  //     reason: data.comment,
-  //     type: TokenTransactionType.PayPrefill,
-  //   }
-  //   navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
-  // } else {
-  //   navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
-  // }
+  if (data.amount) {
+    // TODO: integrate with SendConfirmation component
+    const exchangeRate = yield select(getLocalCurrencyExchangeRate)
+    const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
+    if (!amount) {
+      Logger.warn(TAG, '@handleSendPaymentData null amount')
+      return
+    }
+
+    if (data.isCELO == 'true') {
+      console.log('isCELO 1: ', data.isCELO)
+
+      const { result } = useSendFee({
+        feeType: FeeType.SEND,
+        account: RANDOM_ADDRESS,
+        currency: CURRENCY_ENUM.GOLD,
+        recipientAddress: RANDOM_ADDRESS,
+        amount: goldBalance || '0',
+        includeDekFee: false,
+      })
+      const feeEstimate = result && divideByWei(result)
+
+      navigate(Screens.WithdrawCeloReviewScreen, {
+        amount,
+        recipientAddress: data.address.toLowerCase(),
+        feeEstimate: feeEstimate || new BigNumber(0),
+      })
+    } else {
+      const transactionData: TransactionDataInput = {
+        recipient,
+        amount,
+        reason: data.comment,
+        type: TokenTransactionType.PayPrefill,
+      }
+      navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
+    }
+  } else {
+    if (data.isCELO == 'true') {
+      navigate(Screens.WithdrawCeloScreen, {
+        accountAddress: data.address.toLowerCase(),
+      })
+    } else {
+      navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    }
+  }
 }
 
 export function* handlePaymentDeeplink(deeplink: string) {

@@ -7,6 +7,7 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
@@ -35,8 +36,15 @@ type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
 const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 
-function WithdrawCeloScreen({ navigation }: Props) {
-  const [accountAddress, setAccountAddress] = useState('')
+function WithdrawCeloScreen(
+  { navigation }: Props,
+  {
+    route,
+  }: {
+    route: RouteProp<StackParamList, Screens.WithdrawCeloScreen>
+  }
+) {
+  const [accountAddress, setAccountAddress] = useState(route.params.accountAddress)
   const [celoInput, setCeloToTransfer] = useState('')
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
