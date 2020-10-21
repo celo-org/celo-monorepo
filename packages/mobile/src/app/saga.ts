@@ -15,6 +15,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
   appLock,
+  minAppVersionDetermined,
   OpenDeepLink,
   openDeepLink,
   OpenUrlAction,
@@ -25,7 +26,7 @@ import {
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { isAppVersionDeprecated } from 'src/firebase/firebase'
+import { appVersionDeprecationChannel } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
@@ -48,16 +49,6 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  const isDeprecated: boolean = yield call(isAppVersionDeprecated)
-
-  if (isDeprecated) {
-    Logger.warn(TAG, 'App version is deprecated')
-    navigate(Screens.UpgradeScreen)
-    return
-  } else {
-    Logger.debug(TAG, 'App version is valid')
-  }
-
   const language = yield select(currentLanguageSelector)
   if (language) {
     yield put(setLanguage(language))
@@ -76,6 +67,28 @@ export function* appInit() {
     // This is fragile, change me :D
     yield call(handleDeepLink, openDeepLink(deepLink))
     return
+  }
+}
+
+export function* appVersionSaga() {
+  const appVersionChannel = yield call(appVersionDeprecationChannel)
+  if (!appVersionChannel) {
+    return
+  }
+  try {
+    while (true) {
+      const minRequiredVersion = yield take(appVersionChannel)
+      Logger.info(TAG, `Required min version: ${minRequiredVersion}`)
+      // Note: The NavigatorWrapper will read this value from the store and
+      // show the UpdateScreen if necessary.
+      yield put(minAppVersionDetermined(minRequiredVersion))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@appVersionSaga`, error)
+  } finally {
+    if (yield cancelled()) {
+      appVersionChannel.close()
+    }
   }
 }
 
