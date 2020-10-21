@@ -238,11 +238,10 @@ module.exports = async (callback: (error?: any) => number) => {
             const initializeAbi = (contract as any).abi.find(
               (abi: any) => abi.type === 'function' && abi.name === 'initialize'
             )
-            console.log(`Adding initialization of ${contractName} to proposal`)
             if (initializeAbi) {
               const args = initializationData[contractName]
               const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
-              console.log(`Initializing ${contractName} with: ${args}`)
+              console.log(`Add 'Initializing ${contractName} with: ${args}' to proposal`)
               proposal.push({
                 contract: `${contractName}Proxy`,
                 function: '_setAndInitializeImplementation',
