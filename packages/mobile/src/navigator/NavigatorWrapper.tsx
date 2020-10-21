@@ -57,6 +57,10 @@ export const NavigatorWrapper = () => {
       return false
     }
     const version = DeviceInfo.getVersion()
+    Logger.info(
+      'NavigatorWrapper',
+      `Current version: ${version}. Required min version: ${minRequiredVersion}`
+    )
     return isVersionBelowMinimum(version, minRequiredVersion)
   }, [minRequiredVersion])
 

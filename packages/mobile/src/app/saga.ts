@@ -1,5 +1,4 @@
 import { AppState, Linking } from 'react-native'
-import DeviceInfo from 'react-native-device-info'
 import { eventChannel } from 'redux-saga'
 import {
   call,
@@ -79,8 +78,7 @@ export function* appVersionSaga() {
   try {
     while (true) {
       const minRequiredVersion = yield take(appVersionChannel)
-      const version = DeviceInfo.getVersion()
-      Logger.info(TAG, `Current version: ${version}. Required min version: ${minRequiredVersion}`)
+      Logger.info(TAG, `Required min version: ${minRequiredVersion}`)
       yield put(minAppVersionDetermined(minRequiredVersion))
     }
   } catch (error) {
