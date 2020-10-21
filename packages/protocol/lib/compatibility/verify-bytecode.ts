@@ -34,7 +34,8 @@ interface VerificationContext {
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
 const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` && (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
+  tx.contract === `${contract}Proxy` &&
+  (tx.function === '_setImplementation' || tx.function === 'initialize')
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
   context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
@@ -127,7 +128,10 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   } else {
     // tslint:disable-next-line: no-console
     console.log(
-      `${isLibrary(contract, context) ? 'Library' : 'Contract'} deployed at ${implementationAddress} matches ${contract}`)
+      `${
+        isLibrary(contract, context) ? 'Library' : 'Contract'
+      } deployed at ${implementationAddress} matches ${contract}`
+    )
   }
 
   // push unvisited libraries to DFS queue
@@ -148,7 +152,7 @@ export const verifyBytecodes = async (
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
   web3: Web3,
-  isBeforeRelease1: boolean = false,
+  isBeforeRelease1: boolean = false
 ) => {
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)

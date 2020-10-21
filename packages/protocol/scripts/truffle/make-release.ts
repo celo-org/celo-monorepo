@@ -142,6 +142,11 @@ const deployProxy = async (
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
 
+  console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
+  if (!dryRun) {
+    await proxy._setImplementation(contract.address)
+  }
+
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
   if (!dryRun) {
@@ -233,15 +238,8 @@ module.exports = async (callback: (error?: any) => number) => {
               )
               proposal.push({
                 contract: `${contractName}Proxy`,
-                function: '_setAndInitializeImplementation',
-                args: [contract.address, callData],
-                value: '0',
-              })
-            } else {
-              proposal.push({
-                contract: `${contractName}Proxy`,
-                function: '_setImplementation',
-                args: [contract.address],
+                function: 'initialize',
+                args: [callData],
                 value: '0',
               })
             }
