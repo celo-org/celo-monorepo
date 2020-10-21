@@ -41,6 +41,10 @@ function getSecurityCodeText(language: string | undefined) {
     case 'es-LA': {
       return 'Código de seguridad de Celo'
     }
+    case 'pt':
+    case 'pt-BR': {
+      return 'Esse é o seu código de segurança Celo'
+    }
     default: {
       return 'Celo security code'
     }
