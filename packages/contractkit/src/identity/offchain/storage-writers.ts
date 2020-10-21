@@ -1,4 +1,4 @@
-import { execSync } from 'child_process'
+import { spawnSync } from 'child_process'
 import { promises } from 'fs'
 import { join, normalize, parse } from 'path'
 import { resolve } from 'url'
@@ -27,11 +27,11 @@ export class LocalStorageWriter extends StorageWriter {
 export class GitStorageWriter extends LocalStorageWriter {
   async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    execSync(`git add ${dataPath}`, {
+    spawnSync('git', ['add', dataPath], {
       cwd: this.root,
     })
-    execSync(`git commit --message "Upload ${dataPath}"`, { cwd: this.root })
-    execSync(`git push origin master`, { cwd: this.root })
+    spawnSync('git', ['commit', '--message', `"Upload ${dataPath}"`], { cwd: this.root })
+    spawnSync('git', ['push', 'origin', 'master'], { cwd: this.root })
     return
   }
 }
@@ -46,9 +46,13 @@ export class GoogleStorageWriter extends LocalStorageWriter {
 
   async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    execSync(`gsutil cp ${normalize(this.root + '/' + dataPath)} gs://${this.bucket}${dataPath}`, {
-      cwd: this.root,
-    })
+    spawnSync(
+      'gsutil',
+      ['cp', normalize(this.root + '/' + dataPath), `gs://${this.bucket}${dataPath}`],
+      {
+        cwd: this.root,
+      }
+    )
   }
 }
 

@@ -209,11 +209,6 @@ export class ContractKit {
     this.web3.currentProvider.addAccount(privateKey)
   }
 
-  removeAccount(address: Address) {
-    assertIsCeloProvider(this.web3.currentProvider)
-    this.web3.currentProvider.removeAccount(address)
-  }
-
   /**
    * Set default account for generated transactions (eg. tx.from )
    */

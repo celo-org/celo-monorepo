@@ -54,6 +54,8 @@ testWithGanache('Offchain Data', (web3) => {
   let reader2Wrapper: OffchainDataWrapper
 
   beforeEach(async () => {
+    // kit = newKitFromWeb3(web3)
+
     accounts = await kit.contracts.getAccounts()
     await accounts.createAccount().sendAndWaitForReceipt({ from: writerAddress })
 
@@ -87,7 +89,7 @@ testWithGanache('Offchain Data', (web3) => {
 
   afterEach(() => {
     fetchMock.reset()
-    kit.removeAccount(writerAddress)
+    kit.getWallet().removeAccount(writerAddress)
   })
 
   describe('with the account being the signer', () => {
@@ -153,7 +155,7 @@ testWithGanache('Offchain Data', (web3) => {
     const authorization = await authorizedSignerAccessor.readAsResult(writerAddress, signerAddress)
     expect(authorization.ok).toEqual(false)
 
-    kit.removeAccount(signerAddress)
+    kit.getWallet().removeAccount(signerAddress)
   })
 
   describe('with a different key being authorized to sign off-chain', () => {
@@ -175,7 +177,7 @@ testWithGanache('Offchain Data', (web3) => {
     })
 
     afterEach(() => {
-      kit.removeAccount(signerAddress)
+      kit.getWallet().removeAccount(signerAddress)
     })
 
     it('can read the authorization', async () => {
@@ -220,7 +222,7 @@ testWithGanache('Offchain Data', (web3) => {
       })
 
       afterEach(() => {
-        kit.removeAccount(publicKeyToAddress(readerEncryptionKeyPublic))
+        kit.getWallet().removeAccount(publicKeyToAddress(readerEncryptionKeyPublic))
       })
 
       it('encrypted data can be read and written', async () => {
