@@ -214,6 +214,7 @@ export type StackParamList = {
   [Screens.WithdrawCeloReviewScreen]: {
     amount: BigNumber
     recipientAddress: string
+    feeEstimate: BigNumber
   }
   [Screens.WithdrawCeloScreen]: undefined
 }
