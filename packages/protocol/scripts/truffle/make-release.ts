@@ -145,6 +145,8 @@ const deployProxy = async (
   const initializeAbi = (contract as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
+  // Only set implementation if there is no initialize on the implementation contract,
+  // as otherwise anyone could initialize via the proxy and become the owner
   if (!initializeAbi) {
     console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
     if (!dryRun) {
