@@ -96,11 +96,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   if (isLoading) {
     return (
       <View style={styles.loader}>
-        <VerificationSkipDialog
-          isVisible={showSkipDialog}
-          onPressCancel={onPressSkipCancel}
-          onPressConfirm={onPressSkipConfirm}
-        />
         <ActivityIndicator size="large" color={colors.greenBrand} />
       </View>
     )

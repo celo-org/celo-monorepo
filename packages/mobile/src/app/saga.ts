@@ -79,6 +79,8 @@ export function* appVersionSaga() {
     while (true) {
       const minRequiredVersion = yield take(appVersionChannel)
       Logger.info(TAG, `Required min version: ${minRequiredVersion}`)
+      // Note: The NavigatorWrapper will read this value from the store and
+      // show the UpdateScreen if necessary.
       yield put(minAppVersionDetermined(minRequiredVersion))
     }
   } catch (error) {
