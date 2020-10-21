@@ -8,7 +8,7 @@ import {
 } from '@celo/utils/lib/address'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
-import { newKitFromWeb3 } from '../kit'
+import { ContractKit, newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from '../wrappers/Accounts'
 import { createStorageClaim } from './claims/claim'
 import { IdentityMetadataWrapper } from './metadata'
@@ -22,7 +22,7 @@ const testname = 'test'
 const testPayload = { name: testname }
 
 testWithGanache('Offchain Data', (web3) => {
-  const kit = newKitFromWeb3(web3)
+  let kit: ContractKit
 
   const writerPrivate = ACCOUNT_PRIVATE_KEYS[0]
   const writerPublic = privateKeyToPublicKey(writerPrivate)
@@ -54,7 +54,7 @@ testWithGanache('Offchain Data', (web3) => {
   let reader2Wrapper: OffchainDataWrapper
 
   beforeEach(async () => {
-    // kit = newKitFromWeb3(web3)
+    kit = newKitFromWeb3(web3)
 
     accounts = await kit.contracts.getAccounts()
     await accounts.createAccount().sendAndWaitForReceipt({ from: writerAddress })
