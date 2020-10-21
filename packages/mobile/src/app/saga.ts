@@ -1,4 +1,5 @@
 import { AppState, Linking } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import { eventChannel } from 'redux-saga'
 import {
   call,
@@ -26,10 +27,10 @@ import {
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { isAppVersionDeprecated } from 'src/firebase/firebase'
+import { appVersionDeprecationChannel } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { navigate, replace } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handlePaymentDeeplink } from 'src/send/utils'
 import { navigateToURI } from 'src/utils/linking'
@@ -49,17 +50,6 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  const [isDeprecated, minVersion]: [boolean, string] = yield call(isAppVersionDeprecated)
-
-  if (isDeprecated) {
-    Logger.warn(TAG, 'App version is deprecated')
-    yield put(minAppVersionDetermined(minVersion))
-    replace(Screens.UpgradeScreen)
-    return
-  } else {
-    Logger.debug(TAG, 'App version is valid')
-  }
-
   const language = yield select(currentLanguageSelector)
   if (language) {
     yield put(setLanguage(language))
@@ -78,6 +68,27 @@ export function* appInit() {
     // This is fragile, change me :D
     yield call(handleDeepLink, openDeepLink(deepLink))
     return
+  }
+}
+
+export function* appVersionSaga() {
+  const appVersionChannel = yield call(appVersionDeprecationChannel)
+  if (!appVersionChannel) {
+    return
+  }
+  try {
+    while (true) {
+      const minRequiredVersion = yield take(appVersionChannel)
+      const version = DeviceInfo.getVersion()
+      Logger.info(TAG, `Current version: ${version}. Required min version: ${minRequiredVersion}`)
+      yield put(minAppVersionDetermined(minRequiredVersion))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@appVersionSaga`, error)
+  } finally {
+    if (yield cancelled()) {
+      appVersionChannel.close()
+    }
   }
 }
 
