@@ -34,8 +34,7 @@ interface VerificationContext {
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
 const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` &&
-  (tx.function === '_setImplementation' || tx.function === 'initialize')
+  tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
   context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
