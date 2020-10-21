@@ -142,9 +142,14 @@ const deployProxy = async (
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
 
-  console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
-  if (!dryRun) {
-    await proxy._setImplementation(contract.address)
+  const initializeAbi = (contract as any).abi.find(
+    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+  )
+  if (!initializeAbi) {
+    console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
+    if (!dryRun) {
+      await proxy._setImplementation(contract.address)
+    }
   }
 
   // This makes essentially every contract dependent on Governance.
@@ -152,16 +157,7 @@ const deployProxy = async (
   if (!dryRun) {
     await proxy._transferOwnership(addresses.get('Governance'))
   }
-  const proxiedContract = await artifacts.require(contractName).at(proxy.address)
-  const transferOwnershipAbi = (contract as any).abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
-  )
-  if (transferOwnershipAbi) {
-    console.log(`Transferring ownership of ${contractName} to Governance`)
-    if (!dryRun) {
-      await proxiedContract.transferOwnership(addresses.get('Governance'))
-    }
-  }
+
   return proxy
 }
 
@@ -243,11 +239,12 @@ module.exports = async (callback: (error?: any) => number) => {
             console.log(`Adding initialization of ${contractName} to proposal`)
             if (initializeAbi) {
               const args = initializationData[contractName]
+              const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
               console.log(`Initializing ${contractName} with: ${args}`)
               proposal.push({
-                contract: contractName,
-                function: 'initialize',
-                args,
+                contract: `${contractName}Proxy`,
+                function: '_setAndInitializeImplementation',
+                args: [contract.address, callData],
                 value: '0',
               })
             }
