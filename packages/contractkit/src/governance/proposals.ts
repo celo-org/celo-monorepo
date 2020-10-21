@@ -70,7 +70,9 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 }
 
 type ProposalTxParams = Pick<ProposalTransaction, 'to' | 'value'>
-type RegistryAdditions = { [contractName: string]: Address }
+interface RegistryAdditions {
+  [contractName: string]: Address
+}
 /**
  * Builder class to construct proposals from JSON or transaction objects.
  */
