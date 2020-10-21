@@ -29,7 +29,7 @@
 
 \+ **new BlockExplorer**(`kit`: [ContractKit](_kit_.contractkit.md), `contractDetails`: [ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]): *[BlockExplorer](_explorer_block_explorer_.blockexplorer.md)*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L40)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L41)*
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ Name | Type |
 
 • **contractDetails**: *[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L42)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L43)*
 
 ## Methods
 
@@ -54,7 +54,7 @@ Name | Type |
 
 ▸ **fetchBlock**(`blockNumber`: number): *Promise‹Block›*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L62)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L63)*
 
 **Parameters:**
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **fetchBlockByHash**(`blockHash`: string): *Promise‹Block›*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L58)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L59)*
 
 **Parameters:**
 
@@ -86,7 +86,7 @@ ___
 
 ▸ **fetchBlockRange**(`from`: number, `to`: number): *Promise‹Block[]›*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L66)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L67)*
 
 **Parameters:**
 
@@ -103,7 +103,7 @@ ___
 
 ▸ **parseBlock**(`block`: Block): *[ParsedBlock](../interfaces/_explorer_block_explorer_.parsedblock.md)*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L74)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L75)*
 
 **Parameters:**
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **tryParseTx**(`tx`: Transaction): *null | [ParsedTx](../interfaces/_explorer_block_explorer_.parsedtx.md)*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L91)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L92)*
 
 **Parameters:**
 
@@ -135,7 +135,7 @@ ___
 
 ▸ **tryParseTxInput**(`address`: string, `input`: string): *null | [CallDetails](../interfaces/_explorer_block_explorer_.calldetails.md)*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L103)*
+*Defined in [packages/contractkit/src/explorer/block-explorer.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L104)*
 
 **Parameters:**
 
