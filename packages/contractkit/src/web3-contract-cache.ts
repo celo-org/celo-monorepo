@@ -116,6 +116,9 @@ export class Web3ContractCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
+  getMetaTransactionWalletDeployer(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
+  }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
