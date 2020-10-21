@@ -107,6 +107,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -167,7 +168,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -184,6 +185,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -246,7 +248,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -263,6 +265,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -325,7 +328,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -342,6 +345,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -404,7 +408,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -421,6 +425,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -483,7 +488,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -500,6 +505,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -543,7 +549,7 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
-          Locked Celo Gold
+          Locked CELO
         </div>
         <div
           className="css-text-901oao"
@@ -562,7 +568,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -579,6 +585,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -641,7 +648,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -658,6 +665,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -720,7 +728,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -737,6 +745,7 @@ exports[`ValidatorsList renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
+        onClick={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -799,7 +808,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(90)"
+            transform="rotate(270)"
             viewBox="0 0 8 12"
             width={10}
           >
@@ -927,8 +936,11 @@ exports[`ValidatorsList renders 1`] = `
               onClick={[Function]}
               style={
                 Object {
+                  "MozTransitionProperty": "transform",
                   "WebkitBoxFlex": 0,
                   "WebkitFlexGrow": 0,
+                  "WebkitTransitionDuration": "0.2s",
+                  "WebkitTransitionProperty": "-webkit-transform,transform",
                   "color": "rgba(255,255,255,1.00)",
                   "flexGrow": 0,
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -941,6 +953,8 @@ exports[`ValidatorsList renders 1`] = `
                   "paddingRight": "10px",
                   "paddingTop": "12px",
                   "textAlign": "center",
+                  "transitionDuration": "0.2s",
+                  "transitionProperty": "-webkit-transform,transform",
                   "width": "20px",
                 }
               }
@@ -1739,8 +1753,11 @@ exports[`ValidatorsList renders 1`] = `
               onClick={[Function]}
               style={
                 Object {
+                  "MozTransitionProperty": "transform",
                   "WebkitBoxFlex": 0,
                   "WebkitFlexGrow": 0,
+                  "WebkitTransitionDuration": "0.2s",
+                  "WebkitTransitionProperty": "-webkit-transform,transform",
                   "color": "rgba(255,255,255,1.00)",
                   "flexGrow": 0,
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -1753,6 +1770,8 @@ exports[`ValidatorsList renders 1`] = `
                   "paddingRight": "10px",
                   "paddingTop": "12px",
                   "textAlign": "center",
+                  "transitionDuration": "0.2s",
+                  "transitionProperty": "-webkit-transform,transform",
                   "width": "20px",
                 }
               }
@@ -2551,8 +2570,11 @@ exports[`ValidatorsList renders 1`] = `
               onClick={[Function]}
               style={
                 Object {
+                  "MozTransitionProperty": "transform",
                   "WebkitBoxFlex": 0,
                   "WebkitFlexGrow": 0,
+                  "WebkitTransitionDuration": "0.2s",
+                  "WebkitTransitionProperty": "-webkit-transform,transform",
                   "color": "rgba(255,255,255,1.00)",
                   "flexGrow": 0,
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -2565,6 +2587,8 @@ exports[`ValidatorsList renders 1`] = `
                   "paddingRight": "10px",
                   "paddingTop": "12px",
                   "textAlign": "center",
+                  "transitionDuration": "0.2s",
+                  "transitionProperty": "-webkit-transform,transform",
                   "width": "20px",
                 }
               }
@@ -3363,8 +3387,11 @@ exports[`ValidatorsList renders 1`] = `
               onClick={[Function]}
               style={
                 Object {
+                  "MozTransitionProperty": "transform",
                   "WebkitBoxFlex": 0,
                   "WebkitFlexGrow": 0,
+                  "WebkitTransitionDuration": "0.2s",
+                  "WebkitTransitionProperty": "-webkit-transform,transform",
                   "color": "rgba(255,255,255,1.00)",
                   "flexGrow": 0,
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -3377,6 +3404,8 @@ exports[`ValidatorsList renders 1`] = `
                   "paddingRight": "10px",
                   "paddingTop": "12px",
                   "textAlign": "center",
+                  "transitionDuration": "0.2s",
+                  "transitionProperty": "-webkit-transform,transform",
                   "width": "20px",
                 }
               }
@@ -4175,8 +4204,11 @@ exports[`ValidatorsList renders 1`] = `
               onClick={[Function]}
               style={
                 Object {
+                  "MozTransitionProperty": "transform",
                   "WebkitBoxFlex": 0,
                   "WebkitFlexGrow": 0,
+                  "WebkitTransitionDuration": "0.2s",
+                  "WebkitTransitionProperty": "-webkit-transform,transform",
                   "color": "rgba(255,255,255,1.00)",
                   "flexGrow": 0,
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -4189,6 +4221,8 @@ exports[`ValidatorsList renders 1`] = `
                   "paddingRight": "10px",
                   "paddingTop": "12px",
                   "textAlign": "center",
+                  "transitionDuration": "0.2s",
+                  "transitionProperty": "-webkit-transform,transform",
                   "width": "20px",
                 }
               }
@@ -4987,8 +5021,11 @@ exports[`ValidatorsList renders 1`] = `
               onClick={[Function]}
               style={
                 Object {
+                  "MozTransitionProperty": "transform",
                   "WebkitBoxFlex": 0,
                   "WebkitFlexGrow": 0,
+                  "WebkitTransitionDuration": "0.2s",
+                  "WebkitTransitionProperty": "-webkit-transform,transform",
                   "color": "rgba(255,255,255,1.00)",
                   "flexGrow": 0,
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
@@ -5001,6 +5038,8 @@ exports[`ValidatorsList renders 1`] = `
                   "paddingRight": "10px",
                   "paddingTop": "12px",
                   "textAlign": "center",
+                  "transitionDuration": "0.2s",
+                  "transitionProperty": "-webkit-transform,transform",
                   "width": "20px",
                 }
               }

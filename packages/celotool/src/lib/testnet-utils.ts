@@ -26,7 +26,7 @@ export async function uploadTestnetInfoToGoogleStorage(
   if (uploadGenesis) {
     await uploadGenesisBlockToGoogleStorage(networkName)
   }
-  await uploadStaticNodesToGoogleStorage(networkName)
+  await uploadTestnetStaticNodesToGoogleStorage(networkName)
   await uploadBootnodeToGoogleStorage(networkName)
   await uploadEnvFileToGoogleStorage(networkName)
 }
@@ -49,8 +49,9 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
   return JSON.stringify(await resp.json())
 }
 
-// This will throw an error if it fails to upload
-export async function uploadStaticNodesToGoogleStorage(networkName: string) {
+// This will throw an error if it fails to upload.
+// Intended to be used for deploying testnets, not forno full nodes.
+export async function uploadTestnetStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
   const nodesData: string[] | null = await retryCmd(() =>
@@ -59,12 +60,16 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  const nodesJson = JSON.stringify(nodesData)
-  console.debug('Static nodes are ' + nodesJson + '\n')
+  return uploadStaticNodesToGoogleStorage(networkName, nodesData)
+}
+
+export async function uploadStaticNodesToGoogleStorage(fileName: string, enodes: string[]) {
+  const json = JSON.stringify(enodes)
+  console.debug(`${fileName} static nodes are ${json}\n`)
   await uploadDataToGoogleStorage(
-    nodesJson,
+    json,
     staticNodesBucketName,
-    networkName,
+    fileName,
     true,
     'application/json'
   )

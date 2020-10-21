@@ -285,6 +285,8 @@ OPTIONS
 
   --hotfix=hotfix                                Hash of hotfix proposal
 
+  --jsonTransactions=jsonTransactions            Output proposal JSON to provided file
+
   --nonwhitelisters                              If set, displays validators that have not whitelisted the hotfix.
 
   --notwhitelisted                               List validators who have not whitelisted the specified hotfix

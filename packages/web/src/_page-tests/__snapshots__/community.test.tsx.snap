@@ -575,12 +575,7 @@ exports[`Community renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -643,12 +638,7 @@ exports[`Community renders 1`] = `
       </div>
     </div>
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -1543,12 +1533,7 @@ We believe that many of these features have great potential for positive impact,
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -1713,12 +1698,7 @@ We believe that many of these features have great potential for positive impact,
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <h2
           aria-level="2"
@@ -2366,12 +2346,7 @@ We believe that many of these features have great potential for positive impact,
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <h2
             aria-level="2"
@@ -3080,7 +3055,7 @@ We believe that many of these features have great potential for positive impact,
           }
         }
       >
-        The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible monetary system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.
+        The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible financial system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -5530,12 +5505,7 @@ We believe that many of these features have great potential for positive impact,
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -6313,12 +6283,7 @@ We believe that many of these features have great potential for positive impact,
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <h2
           aria-level="2"
@@ -6344,12 +6309,7 @@ We believe that many of these features have great potential for positive impact,
     </div>
   </div>
   <div
-    className="react-reveal"
-    style={
-      Object {
-        "opacity": undefined,
-      }
-    }
+    className="css-q7lffx"
   >
     <div
       className="css-view-1dbjc4n"

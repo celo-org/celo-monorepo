@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { Slide } from 'react-awesome-reveal'
 import { StyleSheet, View } from 'react-native'
-import Slide from 'react-reveal/Slide'
 import analytics from 'src/analytics/analytics'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -75,7 +75,7 @@ const coins = [colors.purple, colors.red, colors.lightBlue, colors.gold, colors.
 function CoinLine() {
   return (
     <View style={rainBowStyles.centerItems}>
-      <Slide left={true} cascade={true}>
+      <Slide direction="right" cascade={true}>
         <View style={rainBowStyles.coinLineGroup}>
           {coins.map((color, index) => {
             const overlap = (index * sizeOfSlidingOval) / 2

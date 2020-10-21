@@ -17,7 +17,7 @@ const argv = yargs
   )
   .option('exclude', {
     alias: 'e',
-    description: 'Contract name exclusion pattern',
+    description: 'Contract name exclusion regex',
     type: 'string',
   })
   .option('old_contracts', {
@@ -88,7 +88,7 @@ try {
       )
       const mismatches = versionChecker.excluding(exclude).mismatches()
       if (mismatches.isEmpty()) {
-        out('Actual version numbers match expected\n')
+        out('Success! Actual version numbers match expected\n')
         process.exit(0)
       } else {
         console.error(`Version mismatch detected:\n${JSON.stringify(mismatches, null, 4)}`)
