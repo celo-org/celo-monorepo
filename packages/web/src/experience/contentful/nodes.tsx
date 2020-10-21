@@ -10,6 +10,7 @@ import Showcase from 'src/experience/common/Showcase'
 import { contentfulToProps } from 'src/experience/grants/contentfulToProps'
 import DirectorySection from 'src/experience/grants/DirectorySection'
 import IdeaReadiness from 'src/experience/grants/IdeaReadiness'
+import JourneySteps from 'src/experience/grants/JourneySteps'
 import { H1, H2, H3, H4 } from 'src/fonts/Fonts'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import Button from 'src/shared/Button.3'
@@ -87,6 +88,8 @@ function embedded(node) {
       )
     case 'grantIdeaReadiness':
       return <IdeaReadiness title={fields.title} caption={fields.caption} stages={fields.stages} />
+    case 'steps':
+      return <JourneySteps steps={fields.steps} term={fields.stepTerm} />
     default:
       console.info(node.data?.target?.sys?.contentType?.sys?.id)
       return null

@@ -22,7 +22,7 @@ export default function IdeaReadiness({ title, caption, stages }: Props) {
         {stages.map((stage) => {
           return (
             <View key={stage.sys.id} style={styles.stage}>
-              <Image style={styles.image} source={{ uri: stage.fields.file.url }} />
+              <Image style={styles.image} source={{ uri: `${stage.fields.file.url}?w=52` }} />
               <Text style={fonts.h6}>{stage.fields.title}</Text>
             </View>
           )
