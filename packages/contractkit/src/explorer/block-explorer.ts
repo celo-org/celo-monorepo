@@ -1,7 +1,11 @@
 import { Address } from '@celo/utils/lib/address'
 import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { PROXY_ABI, PROXY_SET_IMPLEMENTATION_SIGNATURE } from '../governance/proxy'
+import {
+  PROXY_ABI,
+  PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE,
+  PROXY_SET_IMPLEMENTATION_SIGNATURE,
+} from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
@@ -111,7 +115,8 @@ export class BlockExplorer {
     }
 
     const contract =
-      matchedAbi.signature === PROXY_SET_IMPLEMENTATION_SIGNATURE
+      matchedAbi.signature === PROXY_SET_IMPLEMENTATION_SIGNATURE ||
+      matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE
         ? contractMapping.details.name + 'Proxy'
         : contractMapping.details.name
 
