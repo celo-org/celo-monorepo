@@ -148,19 +148,9 @@ export class ProposalBuilder {
       throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
     }
 
-    let address: Address
-    try {
-      address = await this.kit.registry.addressFor(tx.contract)
-    } catch (error) {
-      // Check if prior proposal TXs include setting the registry for this contract
-      if (this.registryAdditions[tx.contract]) {
-        address = this.registryAdditions[tx.contract]
-      } else {
-        throw new Error(
-          `Could not find address for contract ${tx.contract} in Registry or Proposal`
-        )
-      }
-    }
+    const address = this.registryAdditions[tx.contract]
+      ? this.registryAdditions[tx.contract]
+      : await this.kit.registry.addressFor(tx.contract)
 
     if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
       this.registryAdditions[tx.args[0]] = tx.args[1]
