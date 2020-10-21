@@ -200,11 +200,7 @@ const readSymmetricKey = async (
     senderPubKey,
     readerPubKey
   )
-  const encryptedPayload = await wrapper.readDataFromAsResult(
-    senderAddress,
-    (buf) => buildEIP712TypedData(wrapper, computedDataPath, buf),
-    computedDataPath
-  )
+  const encryptedPayload = await wrapper.readDataFromAsResult(senderAddress, computedDataPath)
 
   if (!encryptedPayload.ok) {
     return Err(new OffchainError(encryptedPayload.error))
@@ -229,11 +225,7 @@ export const readEncrypted = async (
 ): Promise<Result<Buffer, SchemaErrors>> => {
   const encryptedPayloadPath = `${dataPath}.enc`
   const [payload, key] = await Promise.all([
-    wrapper.readDataFromAsResult(
-      senderAddress,
-      (buf) => buildEIP712TypedData(wrapper, encryptedPayloadPath, buf),
-      encryptedPayloadPath
-    ),
+    wrapper.readDataFromAsResult(senderAddress, encryptedPayloadPath),
     readSymmetricKey(wrapper, dataPath, senderAddress),
   ])
 

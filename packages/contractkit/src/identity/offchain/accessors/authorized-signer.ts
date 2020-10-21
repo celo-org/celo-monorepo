@@ -21,14 +21,8 @@ export class AuthorizedSignerAccessor {
     const dataPath = this.basePath + '/' + toChecksumAddress(signer)
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
-      (buf) =>
-        buildEIP712TypedData(
-          this.wrapper,
-          dataPath,
-          JSON.parse(buf.toString()),
-          AuthorizedSignerSchema
-        ),
-      dataPath
+      dataPath,
+      AuthorizedSignerSchema
     )
     if (!rawData.ok) {
       return Err(new OffchainError(rawData.error))

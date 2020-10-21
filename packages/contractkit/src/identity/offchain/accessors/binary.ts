@@ -1,7 +1,7 @@
 import { Address, trimLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok } from '@celo/base/lib/result'
 import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { buildEIP712TypedData, readEncrypted, signBuffer, writeEncrypted } from '../utils'
+import { readEncrypted, signBuffer, writeEncrypted } from '../utils'
 import { OffchainError } from './errors'
 import { PrivateAccessor, PublicAccessor } from './interfaces'
 
@@ -24,11 +24,7 @@ export class PublicBinaryAccessor implements PublicAccessor<Buffer> {
   }
 
   async readAsResult(account: Address) {
-    const rawData = await this.wrapper.readDataFromAsResult(
-      account,
-      (buf) => buildEIP712TypedData(this.wrapper, this.dataPath, buf),
-      this.dataPath
-    )
+    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
     if (!rawData.ok) {
       return Err(new OffchainError(rawData.error))
     }

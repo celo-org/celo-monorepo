@@ -1,6 +1,5 @@
 import { Address, ensureLeading0x, eqAddress } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
-import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { recoverEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
@@ -10,6 +9,7 @@ import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
 import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
 import { StorageWriter } from './offchain/storage-writers'
+import { buildEIP712TypedData } from './offchain/utils'
 
 const debug = debugFactory('offchaindata')
 
@@ -61,8 +61,8 @@ export default class OffchainDataWrapper {
 
   async readDataFromAsResult(
     account: Address,
-    buildTypedData: (x: Buffer) => Promise<EIP712TypedData>,
-    dataPath: string
+    dataPath: string,
+    type?: any
   ): Promise<Result<Buffer, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
@@ -79,7 +79,7 @@ export default class OffchainDataWrapper {
     }
 
     const item = (
-      await Promise.all(storageRoots.map((s) => s.readAndVerifySignature(dataPath, buildTypedData)))
+      await Promise.all(storageRoots.map((s) => s.readAndVerifySignature(dataPath, type)))
     ).find((s) => s.ok)
 
     if (item === undefined) {
@@ -120,7 +120,7 @@ class StorageRoot {
 
   async readAndVerifySignature(
     dataPath: string,
-    buildTypedData: (x: Buffer) => Promise<EIP712TypedData>
+    type?: any
   ): Promise<Result<Buffer, OffchainErrors>> {
     let dataResponse, signatureResponse
 
@@ -147,7 +147,8 @@ class StorageRoot {
     const body = Buffer.from(dataBody)
     const signature = ensureLeading0x(Buffer.from(signatureBody).toString('hex'))
 
-    const typedData = await buildTypedData(body)
+    const toParse = type ? JSON.parse(body.toString()) : body
+    const typedData = await buildEIP712TypedData(this.wrapper, dataPath, toParse, type)
     const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
 
     if (eqAddress(guessedSigner, this.account)) {
