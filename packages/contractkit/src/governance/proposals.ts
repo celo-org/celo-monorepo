@@ -5,7 +5,7 @@ import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
 import { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
-import { CeloContract } from '../base'
+import { Address, CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
@@ -70,14 +70,15 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 }
 
 type ProposalTxParams = Pick<ProposalTransaction, 'to' | 'value'>
-
+type RegistryAdditions = { [contractNameHash: string]: Address }
 /**
  * Builder class to construct proposals from JSON or transaction objects.
  */
 export class ProposalBuilder {
   constructor(
     private readonly kit: ContractKit,
-    private readonly builders: Array<() => Promise<ProposalTransaction>> = []
+    private readonly builders: Array<() => Promise<ProposalTransaction>> = [],
+    private readonly registryAdditions: RegistryAdditions = {}
   ) {}
 
   /**
@@ -146,7 +147,29 @@ export class ProposalBuilder {
     if (!txo) {
       throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
     }
-    const address = await this.kit.registry.addressFor(tx.contract)
+
+    let address: Address
+    try {
+      address = await this.kit.registry.addressFor(tx.contract)
+    } catch (error) {
+      // Check if prior proposal TXs include setting the registry for this contract
+      const contractNameHash = this.kit.web3.utils.soliditySha3({
+        type: 'string',
+        value: tx.contract,
+      })
+      if (this.registryAdditions[contractNameHash]) {
+        address = this.registryAdditions[contractNameHash]
+      } else {
+        throw new Error(
+          `Could not find address for contract ${tx.contract} in Registry or Proposal`
+        )
+      }
+    }
+
+    if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
+      this.registryAdditions[tx.args[0]] = tx.args[1]
+    }
+
     return this.fromWeb3tx(txo, { to: address, value: tx.value })
   }
 

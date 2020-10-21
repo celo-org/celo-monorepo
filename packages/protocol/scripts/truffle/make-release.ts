@@ -226,23 +226,6 @@ module.exports = async (callback: (error?: any) => number) => {
             // Changes need another proxy/registry repointing
             const proxy = await deployProxy(contractName, contract, addresses, argv.dry_run)
 
-            const initializeAbi = (contract as any).abi.find(
-              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-            )
-            console.log(`Adding initialization of ${contractName} to proposal`)
-            if (initializeAbi) {
-              const args = initializationData[contractName]
-              const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
-              console.log(
-                `Initializing ${contractName} with: ${args} (encoded as callData: ${callData})`
-              )
-              proposal.push({
-                contract: `${contractName}Proxy`,
-                function: 'initialize',
-                args: [callData],
-                value: '0',
-              })
-            }
             // 4. Update the contract's address, if needed.
             addresses.set(contractName, proxy.address)
             proposal.push({
@@ -255,6 +238,22 @@ module.exports = async (callback: (error?: any) => number) => {
               value: '0',
               description: `Registry: ${contractName} -> ${proxy.address}`,
             })
+
+            // 5. If the implementation has an initialize function, add it to the proposal
+            const initializeAbi = (contract as any).abi.find(
+              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+            )
+            console.log(`Adding initialization of ${contractName} to proposal`)
+            if (initializeAbi) {
+              const args = initializationData[contractName]
+              console.log(`Initializing ${contractName} with: ${args}`)
+              proposal.push({
+                contract: `${contractName}Proxy`,
+                function: 'initialize',
+                args,
+                value: '0',
+              })
+            }
           } else {
             // Proxy can be repointed to new implementation
             proposal.push({
