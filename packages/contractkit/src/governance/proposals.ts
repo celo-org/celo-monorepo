@@ -5,7 +5,7 @@ import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
 import { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
-import { CeloContract } from '../base'
+import { Address, CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
@@ -59,6 +59,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
     }
+
     return {
       contract: parsedTx.callDetails.contract as CeloContract,
       function: parsedTx.callDetails.function,
@@ -70,14 +71,17 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 }
 
 type ProposalTxParams = Pick<ProposalTransaction, 'to' | 'value'>
-
+interface RegistryAdditions {
+  [contractName: string]: Address
+}
 /**
  * Builder class to construct proposals from JSON or transaction objects.
  */
 export class ProposalBuilder {
   constructor(
     private readonly kit: ContractKit,
-    private readonly builders: Array<() => Promise<ProposalTransaction>> = []
+    private readonly builders: Array<() => Promise<ProposalTransaction>> = [],
+    private readonly registryAdditions: RegistryAdditions = {}
   ) {}
 
   /**
@@ -146,7 +150,15 @@ export class ProposalBuilder {
     if (!txo) {
       throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
     }
-    const address = await this.kit.registry.addressFor(tx.contract)
+
+    const address = this.registryAdditions[tx.contract]
+      ? this.registryAdditions[tx.contract]
+      : await this.kit.registry.addressFor(tx.contract)
+
+    if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
+      this.registryAdditions[tx.args[0]] = tx.args[1]
+    }
+
     return this.fromWeb3tx(txo, { to: address, value: tx.value })
   }
 
