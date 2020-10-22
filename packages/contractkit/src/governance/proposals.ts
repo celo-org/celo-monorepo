@@ -133,8 +133,11 @@ export class ProposalBuilder {
 
   fromJsonTx = async (tx: ProposalTransactionJSON) => {
     // Account for canonical registry addresses from current proposal
-    const address =
-      this.registryAdditions[tx.contract] ?? (await this.kit.registry.addressFor(tx.contract))
+    let address = this.registryAdditions[tx.contract]
+
+    if (!address) {
+      address = await this.kit.registry.addressFor(tx.contract)
+    }
 
     if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
       // Update canonical registry addresses

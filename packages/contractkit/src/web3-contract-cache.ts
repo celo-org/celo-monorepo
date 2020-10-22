@@ -152,7 +152,9 @@ export class Web3ContractCache {
       debug('Initiating contract %s', contract)
       const createFn = ProxyContracts.includes(contract)
         ? newProxy
-        : (ContractFactories[contract] as CFType[C])
+        : ContractFactories[contract]
+        ? (ContractFactories[contract] as CFType[C])
+        : newProxy
       // @ts-ignore: Too complex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
