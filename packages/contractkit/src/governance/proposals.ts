@@ -133,6 +133,7 @@ export class ProposalBuilder {
     if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
       // Update canonical registry addresses
       this.registryAdditions[tx.args[0]] = tx.args[1]
+      this.registryAdditions[tx.args[0] + 'Proxy'] = tx.args[1]
     } else if (
       tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
       Array.isArray(tx.args[1])
