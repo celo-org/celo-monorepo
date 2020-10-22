@@ -89,7 +89,13 @@ export class ProposalBuilder {
    * Build calls all of the added build steps and returns the final proposal.
    * @returns A constructed Proposal object (i.e. a list of ProposalTransaction)
    */
-  build = async () => concurrentMap(4, this.builders, (builder) => builder())
+  build = async () => {
+    const ret = []
+    for (const builder of this.builders) {
+      ret.push(await builder())
+    }
+    return ret
+  }
 
   /**
    * Converts a Web3 transaction into a proposal transaction object.
