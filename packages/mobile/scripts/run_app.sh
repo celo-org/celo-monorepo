@@ -59,13 +59,23 @@ startPackager() {
         echo "Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly"
         exit 2
       fi
+      echo "Packager server already running"
     else
+      terminal="${RCT_TERMINAL-${REACT_TERMINAL-$TERM_PROGRAM}}"
+      echo "Starting packager in new terminal..."
+
       if [ "$MACHINE" = "Mac" ]; then
-        echo "Starting packager in new terminal"
-        USER_TERMINAL="${RCT_TERMINAL-${REACT_TERMINAL-$TERM_PROGRAM}}"
-        open -a "$USER_TERMINAL" ./scripts/launch_packager.sh || echo "Can't start packager automatically"
+        open -a "$terminal" ./scripts/launch_packager.command || open ./scripts/launch_packager.command || open_failed=1
+      elif [ "$MACHINE" = "Linux" ]; then
+        "$terminal" -e "sh ./scripts/launch_packager.command" || open_failed=1
       else 
-        yarn react-native start 
+        echo "Unsupported machine for running in new terminal"
+        open_failed=1
+      fi
+
+      if [ "${open_failed-}" = 1 ]; then
+        echo "Could not open terminal '${terminal}'. Falling back to running the packager inline."
+        yarn react-native start &
       fi
     fi
   fi
@@ -86,8 +96,8 @@ if [ "$PLATFORM" = "android" ]; then
   esac
 
   # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
-  yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
   startPackager
+  yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
 
 elif [ "$PLATFORM" = "ios" ]; then
 
