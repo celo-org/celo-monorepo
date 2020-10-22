@@ -41,7 +41,7 @@ done
 [ -z "$REPORT" ] && echo "Need to set the compatibility report input via the -r flag" && exit 1;
 
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
-
+git fetch --all --tags
 git checkout $BRANCH
 rm -rf build/contracts
 yarn build

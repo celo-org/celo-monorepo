@@ -121,12 +121,7 @@ const deployImplementation = async (
   return contract
 }
 
-const deployProxy = async (
-  contractName: string,
-  contract: Truffle.ContractInstance,
-  addresses: ContractAddresses,
-  dryRun: boolean
-) => {
+const deployProxy = async (contractName: string, addresses: ContractAddresses, dryRun: boolean) => {
   // Explicitly forbid upgrading to a new Governance proxy contract.
   // Upgrading to a new Governance proxy contract would require ownership of all
   // contracts to be moved to the new governance contract, possibly including contracts
@@ -141,18 +136,6 @@ const deployProxy = async (
   const Proxy = await artifacts.require(`${contractName}Proxy`)
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
-
-  const initializeAbi = (contract as any).abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-  )
-  // Only set implementation if there is no initialize on the implementation contract,
-  // as otherwise anyone could initialize via the proxy and become the owner
-  if (!initializeAbi) {
-    console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
-    if (!dryRun) {
-      await proxy._setImplementation(contract.address)
-    }
-  }
 
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
@@ -220,9 +203,16 @@ module.exports = async (callback: (error?: any) => number) => {
         // 3. Deploy new versions of the contract and proxy, if needed.
         if (shouldDeployImplementation || isLibrary) {
           const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const setImplementationTx: ProposalTx = {
+            contract: `${contractName}Proxy`,
+            function: '_setImplementation',
+            args: [contract.address],
+            value: '0',
+          }
+
           if (shouldDeployProxy || isLibrary) {
             // Changes need another proxy/registry repointing
-            const proxy = await deployProxy(contractName, contract, addresses, argv.dry_run)
+            const proxy = await deployProxy(contractName, addresses, argv.dry_run)
 
             // 4. Update the contract's address, if needed.
             addresses.set(contractName, proxy.address)
@@ -248,15 +238,11 @@ module.exports = async (callback: (error?: any) => number) => {
                 args: [contract.address, callData],
                 value: '0',
               })
+            } else {
+              proposal.push(setImplementationTx)
             }
           } else {
-            // Proxy can be repointed to new implementation
-            proposal.push({
-              contract: `${contractName}Proxy`,
-              function: '_setImplementation',
-              args: [contract.address],
-              value: '0',
-            })
+            proposal.push(setImplementationTx)
           }
         }
         // 5. Mark the contract as released
