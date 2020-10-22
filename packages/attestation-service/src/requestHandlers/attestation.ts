@@ -6,7 +6,7 @@ import { AttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
-import { findAttestationByKey, kit, makeSequelizeLogger, SequelizeLogger } from '../db'
+import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger, useKit } from '../db'
 import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
@@ -90,7 +90,7 @@ class AttestationRequestHandler {
 
     // Check the on-chain status of the attestation. If it's marked Complete, don't do it.
     // If it's missing, the full node could be behind by a block or two. Try a few times before erroring.
-    const attestations = await kit.contracts.getAttestations()
+    const attestations = await useKit((kit) => kit.contracts.getAttestations())
     for (let i = 0; i < 4; i++) {
       try {
         const state = await attestations.getAttestationState(this.key.identifier, account, issuer)
@@ -120,7 +120,7 @@ class AttestationRequestHandler {
     )
 
     try {
-      return await kit.web3.eth.sign(message, getAttestationSignerAddress())
+      return await useKit((kit) => kit.web3.eth.sign(message, getAttestationSignerAddress()))
     } catch (error) {
       if (isDevMode()) {
         return randomBytes(65).toString('hex')
@@ -134,7 +134,7 @@ class AttestationRequestHandler {
     if (!isDevMode()) {
       const { account } = this.attestationRequest
       const address = getAccountAddress()
-      const attestations = await kit.contracts.getAttestations()
+      const attestations = await useKit((kit) => kit.contracts.getAttestations())
       const isValid = await attestations.validateAttestationCode(
         this.key.identifier,
         account,

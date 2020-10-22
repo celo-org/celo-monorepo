@@ -48,7 +48,17 @@ export function isDBOnline() {
   }
 }
 
-export let kit: ContractKit
+let kit: ContractKit
+
+// Wrapper that on error tries once to reinitialize connection to node.
+export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
+  try {
+    return f(kit)
+  } catch (error) {
+    await initializeKit(true)
+    return f(kit)
+  }
+}
 
 export async function isNodeSyncing() {
   const syncProgress = await kit.web3.eth.isSyncing()
@@ -115,8 +125,8 @@ export async function verifyConfigurationAndGetURL() {
   }
 }
 
-export async function initializeKit() {
-  if (kit === undefined) {
+export async function initializeKit(force: boolean = false) {
+  if (kit === undefined || force) {
     kit = newKit(fetchEnv('CELO_PROVIDER'))
     // Copied from @celo/cli/src/utils/helpers
     try {
