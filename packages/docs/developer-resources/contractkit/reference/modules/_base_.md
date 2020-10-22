@@ -48,7 +48,7 @@ ___
 
 • **NULL_ADDRESS**: *string* = '0x0000000000000000000000000000000000000000' as Address
 
-*Defined in [packages/contractkit/src/base.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L39)*
+*Defined in [packages/contractkit/src/base.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L43)*
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 • **RegisteredContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
-*Defined in [packages/contractkit/src/base.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L37)*
+*Defined in [packages/contractkit/src/base.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L41)*
