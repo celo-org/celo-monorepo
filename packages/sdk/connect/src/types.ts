@@ -1,4 +1,5 @@
 import { PromiEvent, Transaction, TransactionConfig, TransactionReceipt } from 'web3-core'
+import { Contract } from 'web3-eth-contract'
 
 export type Address = string
 
@@ -16,6 +17,7 @@ export interface CeloTxObject<T> {
   send(tx?: CeloTx): PromiEvent<CeloTxReceipt>
   estimateGas(tx?: CeloTx): Promise<number>
   encodeABI(): string
+  _parent: Contract
 }
 
 export { BlockNumber, EventLog, Log, PromiEvent } from 'web3-core'

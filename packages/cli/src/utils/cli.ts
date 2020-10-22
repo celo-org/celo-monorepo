@@ -41,7 +41,7 @@ export async function displaySendTx<A>(
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>, color = chalk.red.bold) {
+export function printValueMap(valueMap: Record<string, any>, color = chalk.yellowBright.bold) {
   console.log(
     Object.keys(valueMap)
       .map((key) => color(`${key}: `) + valueMap[key])
@@ -66,7 +66,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
     return chalk`${v}`
   }
   return Object.keys(valueMap)
-    .map((key) => prefix + chalk`{red.bold ${key}:} ${printValue(valueMap[key])}`)
+    .map((key) => prefix + chalk.yellowBright.bold(`${key}: `) + printValue(valueMap[key]))
     .join('\n')
 }
 

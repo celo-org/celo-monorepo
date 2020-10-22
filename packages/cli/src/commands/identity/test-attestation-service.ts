@@ -94,7 +94,7 @@ export default class TestAttestationService extends BaseCommand {
       cli.action.stop()
 
       const testRes = JSON.parse(await response.text())
-      if (testRes.success !== 'true') {
+      if (!testRes.success) {
         console.error('Request was not successful')
         cli.styledJSON(testRes)
         return

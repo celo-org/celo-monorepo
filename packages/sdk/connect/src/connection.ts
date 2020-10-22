@@ -1,4 +1,6 @@
-import { toChecksumAddress } from '@celo/utils/lib/address'
+import { ensureLeading0x, toChecksumAddress } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix, Signature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 import Web3 from 'web3'
 import { AbiCoder } from './abi-types'
@@ -226,6 +228,33 @@ export class Connection {
         gas,
       })
     )
+  }
+
+  async signTypedData(signer: string, typedData: EIP712TypedData): Promise<Signature> {
+    // Uses the Provider and not the RpcCaller, because this method should be intercepted
+    // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
+    // would just forward it to the node
+    const signature = await new Promise<string>((resolve, reject) => {
+      ;(this.web3.currentProvider as Provider).send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_signTypedData',
+          params: [signer, typedData],
+        },
+        (error, resp) => {
+          if (error) {
+            reject(error)
+          } else if (resp) {
+            resolve(resp.result as string)
+          } else {
+            reject(new Error('empty-response'))
+          }
+        }
+      )
+    })
+
+    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
   async sendSignedTransaction(signedTransactionData: string): Promise<TransactionResult> {

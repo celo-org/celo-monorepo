@@ -16,4 +16,4 @@
 
 Ƭ **ValidWrappers**: *keyof CFType*
 
-*Defined in [packages/contractkit/src/contract-cache.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L51)*
+*Defined in [packages/contractkit/src/contract-cache.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L53)*
