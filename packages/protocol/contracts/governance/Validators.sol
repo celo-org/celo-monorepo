@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -6,8 +6,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
-
-import "../identity/interfaces/IRandom.sol";
 
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
@@ -351,8 +349,14 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account);
@@ -502,8 +506,9 @@ contract Validators is
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      getStableToken().mint(group, groupPayment);
-      getStableToken().mint(account, validatorPayment);
+      IStableToken stableToken = getStableToken();
+      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
+      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
@@ -916,8 +921,8 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in a 1
-    // wei rounding error.
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
+    // wei rounding errors. Using 10 as an additional margin of safety.
     return balance.add(10) >= getAccountLockedGoldRequirement(account);
   }
 

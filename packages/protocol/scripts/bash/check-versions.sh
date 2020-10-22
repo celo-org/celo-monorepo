@@ -5,38 +5,59 @@ set -euo pipefail
 # a released branch.
 #
 # Flags:
-# -o: Old branch containing smart contracts, which has likely been released.
-# -n: New branch containing smart contracts, on which version numbers may be updated.
+# -a: Old branch containing smart contracts, which has likely been released.
+# -b: New branch containing smart contracts, on which version numbers may be updated.
+# -r: Path that the contract compatibility report should be written to.
+# -l: Path to a file to which logs should be appended
 
-BRANCH_1=""
-BRANCH_2=""
+OLD_BRANCH=""
+NEW_BRANCH=""
+REPORT=""
+LOG_FILE="/dev/null"
 
-while getopts 'o:n:' flag; do
+while getopts 'a:b:r:l:' flag; do
   case "${flag}" in
-    o) BRANCH_1="${OPTARG}" ;;
-    n) BRANCH_2="${OPTARG}" ;;
+    a) OLD_BRANCH="${OPTARG}" ;;
+    b) NEW_BRANCH="${OPTARG}" ;;
+    r) REPORT="${OPTARG}" ;;
+    l) LOG_FILE="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
 
-[ -z "$BRANCH_1" ] && echo "Need to set the first branch via the -n flag" && exit 1;
-[ -z "$BRANCH_2" ] && echo "Need to set the second branch via the -o flag" && exit 1;
+[ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
+[ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
-BUILD_DIR_1=$(echo build/$(echo $BRANCH_1 | sed -e 's/\//_/g'))
-git checkout $BRANCH_1
+ORIGINAL_GIT_REF=$(git symbolic-ref --short HEAD)
+echo " - Checkout source code of old branch at $OLD_BRANCH"
+BUILD_DIR_1=$(echo build/$(echo $OLD_BRANCH | sed -e 's/\//_/g'))
+git checkout $OLD_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
+
+echo " - Build contract artifacts ..."
 # TODO: Move to yarn build:sol after the next contract release.
-yarn build
+yarn build > $LOG_FILE
 rm -rf $BUILD_DIR_1 && mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
 
-
-BUILD_DIR_2=$(echo build/$(echo $BRANCH_2 | sed -e 's/\//_/g'))
-git checkout $BRANCH_2
+echo " - Checkout source code of new branch at $NEW_BRANCH"
+BUILD_DIR_2=$(echo build/$(echo $NEW_BRANCH | sed -e 's/\//_/g'))
+git checkout $NEW_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
-yarn build:sol
+echo " - Build contract artifacts ..."
+yarn build:sol > $LOG_FILE
 rm -rf $BUILD_DIR_2 && mkdir -p $BUILD_DIR_2
 mv build/contracts $BUILD_DIR_2
 
-CONTRACT_EXCLUSION_REGEX=".*Test.*|.*LinkedList.*|.*MultiSig.*|.*Mock.*|I[A-Z].*|ReleaseGold"
-yarn ts-node scripts/check-backward.ts sem_check -o $BUILD_DIR_1/contracts -n $BUILD_DIR_2/contracts -e $CONTRACT_EXCLUSION_REGEX
+REPORT_FLAG=""
+if [ ! -z "$REPORT" ]; then
+  REPORT_FLAG="--output_file "$REPORT
+fi
+
+echo " - Return to original git ref"
+git checkout $ORIGINAL_GIT_REF > $LOG_FILE
+
+# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
+# MultiSig contracts, and the ReleaseGold contract.
+CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|^LinkedList$|^SortedLinkedList$|^SortedLinkedListWithMedian$|MultiSig.*|ReleaseGold|FixidityLib|MetaTransactionWallet|SlasherUtil|UsingPrecompiles"
+yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR_1/contracts --new_contracts $BUILD_DIR_2/contracts --exclude $CONTRACT_EXCLUSION_REGEX $REPORT_FLAG

@@ -3,6 +3,11 @@
 exports[`Experience/KeyImagery renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "isolation": "isolate",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
@@ -102,14 +107,9 @@ exports[`Experience/KeyImagery renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -118,7 +118,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                     "WebkitBoxDirection": "normal",
                     "WebkitBoxOrient": "horizontal",
                     "WebkitFlexDirection": "row",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "alignContent": "center",
@@ -129,7 +129,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -172,14 +172,9 @@ exports[`Experience/KeyImagery renders 1`] = `
               <div
                 className="css-view-1dbjc4n"
                 data-focusable={true}
+                onClick={[Function]}
+                onContextMenu={[Function]}
                 onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -188,7 +183,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                     "WebkitBoxDirection": "normal",
                     "WebkitBoxOrient": "horizontal",
                     "WebkitFlexDirection": "row",
-                    "WebkitTransitionDuration": "0.15s",
+                    "WebkitTransitionDuration": "0s",
                     "WebkitTransitionProperty": "opacity",
                     "WebkitUserSelect": "none",
                     "alignContent": "center",
@@ -199,7 +194,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                     "msTouchAction": "manipulation",
                     "msUserSelect": "none",
                     "touchAction": "manipulation",
-                    "transitionDuration": "0.15s",
+                    "transitionDuration": "0s",
                     "transitionProperty": "opacity",
                     "userSelect": "none",
                   }
@@ -209,6 +204,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(46,51,56,1.00)",
@@ -290,8 +286,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -401,8 +395,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -480,8 +472,83 @@ exports[`Experience/KeyImagery renders 1`] = `
                   onMouseEnter={[Function]}
                   onMouseLeave={[Function]}
                   onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
+                    href="/experience/grants"
+                    onClick={[Function]}
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(129,134,139,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    GrantKit
+                  </a>
+                </div>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
                 >
                   <a
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -548,6 +615,7 @@ exports[`Experience/KeyImagery renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -592,8 +660,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -690,8 +756,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -788,8 +852,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -886,8 +948,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -984,8 +1044,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1082,8 +1140,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1163,8 +1219,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1244,8 +1298,6 @@ exports[`Experience/KeyImagery renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1387,6 +1439,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 aria-level="1"
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="heading"
                 style={
                   Object {
@@ -1400,12 +1453,13 @@ exports[`Experience/KeyImagery renders 1`] = `
                   }
                 }
               >
-                keyImagery.title
+                Key Imagery
               </h1>
               <h4
                 aria-level="4"
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="heading"
                 style={
                   Object {
@@ -1418,12 +1472,15 @@ exports[`Experience/KeyImagery renders 1`] = `
                   }
                 }
               >
-                keyImagery.headline
+                Used to tell a story, key images are visual tools that bring the text to life. These images help the user comprehend the material multidimensionally.
+
+Images have descriptions that act as guidelines for both accessibility and communication clarity. Most images can have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.
               </h4>
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1438,11 +1495,12 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              licenseTitle
+              Usage & License Note
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1457,6 +1515,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
+              You may copy and redistribute illustrations and abstract graphics as long as you are abiding by the 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1464,8 +1523,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1475,7 +1532,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="/code-of-conduct"
                   onClick={[Function]}
                   role="link"
@@ -1490,9 +1546,10 @@ exports[`Experience/KeyImagery renders 1`] = `
                     }
                   }
                 >
-                  Code of Conduct
+                  Community Code of Conduct
                 </a>
               </div>
+               and 
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -1500,8 +1557,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -1511,7 +1566,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="/brand-policy"
                   onClick={[Function]}
                   role="link"
@@ -1529,6 +1583,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                   Brand Policy
                 </a>
               </div>
+              . You may not remix or transform them.
             </div>
           </div>
         </div>
@@ -1548,6 +1603,7 @@ exports[`Experience/KeyImagery renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1563,11 +1619,12 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.illoTitle
+              Illustrations
             </h2>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1580,7 +1637,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.illoText
+              Illustrations show concrete ways that humans interact with an idea. They utilize current mental models to simplify a concept.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1613,12 +1670,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -1685,7 +1737,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                               style={
                                 Object {
                                   "backgroundColor": "rgba(0,0,0,0.00)",
-                                  "backgroundImage": "url(\\"preview.png\\")",
                                   "backgroundPosition": "center",
                                   "backgroundRepeat": "no-repeat",
                                   "backgroundSize": "contain",
@@ -1699,12 +1750,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                                   "zIndex": -1,
                                 }
                               }
-                            />
-                            <img
-                              alt="Preview of Graphic"
-                              className="css-accessibilityImage-9pa8cd"
-                              draggable={false}
-                              src="preview.png"
                             />
                           </div>
                         </div>
@@ -1730,6 +1775,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                       <div
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -1748,6 +1794,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                       <div
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -1768,8 +1815,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                     >
                       <a
                         className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1817,7 +1862,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                           }
                         }
                       >
-                        downloadAssetBtn
+                        Download
                         <div
                           className="css-view-1dbjc4n"
                           style={
@@ -1878,6 +1923,7 @@ exports[`Experience/KeyImagery renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1893,11 +1939,12 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.abstractTitle
+              Abstract Graphics
             </h2>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1910,7 +1957,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              keyImagery.abstractText
+              Abstract Graphics are visual tools that use coins to animate an idea. They can be dynamic or static.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1940,12 +1987,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               >
                 <div
-                  className="react-reveal"
-                  style={
-                    Object {
-                      "opacity": undefined,
-                    }
-                  }
+                  className="css-q7lffx"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -2012,7 +2054,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                               style={
                                 Object {
                                   "backgroundColor": "rgba(0,0,0,0.00)",
-                                  "backgroundImage": "url(\\"preview.png\\")",
                                   "backgroundPosition": "center",
                                   "backgroundRepeat": "no-repeat",
                                   "backgroundSize": "contain",
@@ -2026,12 +2067,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                                   "zIndex": -1,
                                 }
                               }
-                            />
-                            <img
-                              alt="Preview of Graphic"
-                              className="css-accessibilityImage-9pa8cd"
-                              draggable={false}
-                              src="preview.png"
                             />
                           </div>
                         </div>
@@ -2057,6 +2092,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                       <div
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -2075,6 +2111,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                       <div
                         className="css-text-901oao"
                         dir="auto"
+                        onClick={[Function]}
                         style={
                           Object {
                             "color": "rgba(46,51,56,1.00)",
@@ -2095,8 +2132,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                       onMouseEnter={[Function]}
                       onMouseLeave={[Function]}
                       onMouseUp={[Function]}
-                      onResponderGrant={[Function]}
-                      onResponderRelease={[Function]}
                     >
                       <a
                         className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2144,7 +2179,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                           }
                         }
                       >
-                        downloadAssetBtn
+                        Download
                         <div
                           className="css-view-1dbjc4n"
                           style={
@@ -2217,6 +2252,7 @@ exports[`Experience/KeyImagery renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2287,6 +2323,7 @@ exports[`Experience/KeyImagery renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -2300,11 +2337,12 @@ exports[`Experience/KeyImagery renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -2318,6 +2356,7 @@ exports[`Experience/KeyImagery renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -2325,8 +2364,6 @@ exports[`Experience/KeyImagery renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "display": "inline",
@@ -2336,7 +2373,6 @@ exports[`Experience/KeyImagery renders 1`] = `
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                 data-focusable={true}
-                dir="auto"
                 href="/terms"
                 onClick={[Function]}
                 role="link"
@@ -2404,6 +2440,7 @@ exports[`Experience/KeyImagery renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2434,8 +2471,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2452,13 +2487,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2487,8 +2526,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2505,13 +2542,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2540,8 +2581,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2558,13 +2597,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2593,8 +2636,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2611,13 +2652,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2646,8 +2691,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2664,13 +2707,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2699,8 +2746,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2717,13 +2762,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2752,8 +2801,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2770,13 +2817,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2802,6 +2853,7 @@ exports[`Experience/KeyImagery renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2814,7 +2866,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2832,8 +2884,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2850,13 +2900,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2885,8 +2939,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2903,13 +2955,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2938,8 +2994,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -2956,13 +3010,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -2991,8 +3049,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3009,13 +3065,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3041,6 +3101,7 @@ exports[`Experience/KeyImagery renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3053,7 +3114,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3071,8 +3132,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3089,13 +3148,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3124,8 +3187,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3142,13 +3203,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3177,8 +3242,61 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/press"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  Press
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3195,13 +3313,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3230,8 +3352,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3248,13 +3368,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3283,8 +3407,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3301,13 +3423,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3336,8 +3462,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3354,13 +3478,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3389,8 +3517,61 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/experience/grants"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  GrantKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3407,13 +3588,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3439,6 +3624,7 @@ exports[`Experience/KeyImagery renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -3451,7 +3637,7 @@ exports[`Experience/KeyImagery renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -3469,8 +3655,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3487,13 +3671,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3511,34 +3699,22 @@ exports[`Experience/KeyImagery renders 1`] = `
                       }
                     }
                   >
-                    <a
-                      href="https://medium.com/celoOrg"
-                      rel="noopener"
-                      style={
-                        Object {
-                          "height": "13px",
-                          "lineHeight": "13px",
-                        }
-                      }
-                      target="_blank"
+                    <svg
+                      fill="none"
+                      height={13}
+                      style={Object {}}
+                      viewBox="0 0 24 24"
+                      width={13}
                     >
-                      <svg
-                        fill="none"
-                        height={13}
+                      <title>
+                        Medium
+                      </title>
+                      <path
+                        d="M0 0V24H24V0H0ZM19.9385 5.68615L18.6511 6.92062C18.5403 7.00554 18.4849 7.14462 18.5083 7.28246V16.3495C18.4849 16.4874 18.5403 16.6265 18.6511 16.7114L19.9089 17.9446V18.2154H13.5852V17.9446L14.8874 16.6806C15.0154 16.5526 15.0154 16.5157 15.0154 16.32V8.99077L11.3957 18.1858H10.9058L6.69046 8.99077V15.1532C6.656 15.4117 6.74215 15.6726 6.92431 15.8609L8.61785 17.9151V18.1858H3.81538V17.9151L5.50892 15.8609C5.68985 15.6726 5.77108 15.4105 5.72677 15.1532V8.02708C5.74769 7.82892 5.67138 7.63323 5.52369 7.50031L4.01846 5.68615V5.41538H8.69292L12.3065 13.3391L15.4818 5.41538H19.9385V5.68615Z"
+                        fill="#2E3338"
                         style={Object {}}
-                        viewBox="0 0 24 24"
-                        width={13}
-                      >
-                        <title>
-                          Medium
-                        </title>
-                        <path
-                          d="M0 0V24H24V0H0ZM19.9385 5.68615L18.6511 6.92062C18.5403 7.00554 18.4849 7.14462 18.5083 7.28246V16.3495C18.4849 16.4874 18.5403 16.6265 18.6511 16.7114L19.9089 17.9446V18.2154H13.5852V17.9446L14.8874 16.6806C15.0154 16.5526 15.0154 16.5157 15.0154 16.32V8.99077L11.3957 18.1858H10.9058L6.69046 8.99077V15.1532C6.656 15.4117 6.74215 15.6726 6.92431 15.8609L8.61785 17.9151V18.1858H3.81538V17.9151L5.50892 15.8609C5.68985 15.6726 5.77108 15.4105 5.72677 15.1532V8.02708C5.74769 7.82892 5.67138 7.63323 5.52369 7.50031L4.01846 5.68615V5.41538H8.69292L12.3065 13.3391L15.4818 5.41538H19.9385V5.68615Z"
-                          fill="#2E3338"
-                          style={Object {}}
-                        />
-                      </svg>
-                    </a>
+                      />
+                    </svg>
                   </div>
                   Blog
                 </a>
@@ -3560,8 +3736,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3578,13 +3752,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3641,8 +3819,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3659,13 +3835,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3720,8 +3900,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3738,13 +3916,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3799,8 +3981,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3817,13 +3997,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3880,8 +4064,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3898,13 +4080,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -3959,8 +4145,6 @@ exports[`Experience/KeyImagery renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -3977,13 +4161,17 @@ exports[`Experience/KeyImagery renders 1`] = `
                   role="link"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
                       "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
                       "color": "rgba(46,51,56,1.00)",
                       "cursor": "pointer",
-                      "display": "inline",
+                      "display": "inline-flex",
                       "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                       "fontSize": "16px",
                       "lineHeight": "20px",
+                      "msFlexAlign": "center",
                       "opacity": 1,
                       "textDecoration": "none",
                       "textDecorationStyle": "solid",
@@ -4039,6 +4227,7 @@ exports[`Experience/KeyImagery renders 1`] = `
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -4084,6 +4273,7 @@ exports[`Experience/KeyImagery renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -4095,7 +4285,7 @@ exports[`Experience/KeyImagery renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>

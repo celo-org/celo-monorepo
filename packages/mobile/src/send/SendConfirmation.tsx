@@ -1,10 +1,10 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -16,14 +16,14 @@ import { connect } from 'react-redux'
 import { FeeEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import FeeDrawer from 'src/components/FeeDrawer'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import ShortenedAddress from 'src/components/ShortenedAddress'
-import TotalLineItem from 'src/components/TotalLineItem.v2'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
   CalculateFeeChildren,
@@ -40,7 +40,7 @@ import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -370,7 +370,7 @@ export class SendConfirmation extends React.Component<Props, State> {
         <View style={styles.encryptionWarningLabelContainer}>
           <Text style={styles.encryptionWarningLabel}>{t('encryption.warningLabel')}</Text>
           <Touchable onPress={this.onShowEncryptionModal} borderless={true} hitSlop={iconHitslop}>
-            <InfoIcon size={12} tintColor={colors.gray3} />
+            <InfoIcon size={12} />
           </Touchable>
         </View>
       ) : null
@@ -467,7 +467,7 @@ export class SendConfirmation extends React.Component<Props, State> {
           feeType: FeeType.SEND,
           account,
           recipientAddress,
-          amount,
+          amount: amount.valueOf(),
           includeDekFee: !isDekRegistered,
         }
       : { feeType: FeeType.INVITE, account, amount }

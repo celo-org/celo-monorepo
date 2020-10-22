@@ -11,7 +11,11 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
-import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
+import {
+  e164NumberToSaltSelector,
+  E164NumberToSaltType,
+  isBalanceSufficientForSigRetrievalSelector,
+} from 'src/identity/reducer'
 import { isUserBalanceSufficient } from 'src/identity/utils'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -33,7 +37,10 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
     const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
     return details
   } catch (error) {
-    if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
+    if (error.message === ErrorMessages.ODIS_INSUFFICIENT_BALANCE) {
+      Logger.error(`${TAG}@fetchPhoneHashPrivate`, 'ODIS insufficient balance', error)
+      throw error
+    } else if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
       Logger.error(
         `${TAG}@fetchPhoneHashPrivate`,
         'Salt quota exceeded, navigating to quota purchase screen'
@@ -71,6 +78,10 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
+  const isBalanceSufficientForQuota = yield select(isBalanceSufficientForSigRetrievalSelector)
+  if (!isBalanceSufficientForQuota) {
+    throw new Error(ErrorMessages.ODIS_INSUFFICIENT_BALANCE)
+  }
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
     getUserSelfPhoneHashDetails
   )

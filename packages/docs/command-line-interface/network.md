@@ -1,19 +1,20 @@
 ---
-description: Prints Celo contract addesses.
+description: View details about the network, like contracts and parameters
 ---
 
 ## Commands
 
 ### Contracts
 
-Prints Celo contract addesses.
+Lists Celo core contracts and their addesses.
 
 ```
 USAGE
   $ celocli network:contracts
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 ```
 
 _See code: [packages/cli/src/commands/network/contracts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/contracts.ts)_
@@ -27,7 +28,8 @@ USAGE
   $ celocli network:parameters
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 ```
 
 _See code: [packages/cli/src/commands/network/parameters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/parameters.ts)_

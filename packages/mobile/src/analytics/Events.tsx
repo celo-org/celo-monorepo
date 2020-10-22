@@ -88,8 +88,11 @@ export enum OnboardingEvents {
 
   invite_redeem_start = 'invite_redeem_start',
   invite_redeem_complete = 'invite_redeem_complete',
+  invite_redeem_cancel = 'invite_redeem_cancel',
   invite_redeem_timeout = 'invite_redeem_timeout',
   invite_redeem_error = 'invite_redeem_error',
+  invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
+  invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
   invite_redeem_skip_start = 'invite_redeem_skip_start',
   invite_redeem_skip_complete = 'invite_redeem_skip_complete',
@@ -99,7 +102,10 @@ export enum OnboardingEvents {
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
 
-  account_dek_set = 'account_dek_set',
+  account_dek_register_start = 'account_dek_register_start',
+  account_dek_register_account_unlocked = 'account_dek_register_account_unlocked',
+  account_dek_register_account_checked = 'account_dek_register_account_checked',
+  account_dek_register_complete = 'account_dek_register_complete',
 }
 
 export enum VerificationEvents {
@@ -144,6 +150,8 @@ export enum VerificationEvents {
   verification_revoke_start = 'verification_revoke_start',
   verification_revoke_finish = 'verification_revoke_finish',
   verification_revoke_error = 'verification_revoke_error',
+
+  verification_resend_messages = 'verification_resend_messages',
 }
 
 export enum IdentityEvents {
@@ -282,6 +290,10 @@ export enum CeloExchangeEvents {
   celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
+export enum FiatExchangeEvents {
+  external_exchange_link = 'external_exchange_link',
+}
+
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
   geth_init_start = 'geth_init_start',
@@ -333,6 +345,7 @@ export type AnalyticsEventType =
   | IdentityEvents
   | InviteEvents
   | EscrowEvents
+  | FiatExchangeEvents
   | SendEvents
   | RequestEvents
   | FeeEvents

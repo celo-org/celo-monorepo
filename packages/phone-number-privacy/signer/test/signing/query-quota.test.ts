@@ -3,10 +3,10 @@ import {
   ContractRetrieval,
   createMockAttestation,
   createMockContractKit,
-  createMockStableToken,
+  createMockToken,
   createMockWeb3,
-} from '../../../common/test/utils'
-import { mockAccount, mockPhoneNumber } from '../../../common/test/values'
+} from '../../../common/src/test/utils'
+import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit, isVerified } from '../../src/web3/contracts'
@@ -24,9 +24,8 @@ describe(getRemainingQueryCount, () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(3, 3),
-        [ContractRetrieval.getStableToken]: createMockStableToken(
-          new BigNumber(200000000000000000)
-        ),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
       },
       createMockWeb3(5)
     )
@@ -42,9 +41,8 @@ describe(getRemainingQueryCount, () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
-        [ContractRetrieval.getStableToken]: createMockStableToken(
-          new BigNumber(200000000000000000)
-        ),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
       },
       createMockWeb3(0)
     )
@@ -60,9 +58,8 @@ describe(getRemainingQueryCount, () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(3, 3),
-        [ContractRetrieval.getStableToken]: createMockStableToken(
-          new BigNumber(200000000000000000)
-        ),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
       },
       createMockWeb3(100)
     )
@@ -78,9 +75,8 @@ describe(getRemainingQueryCount, () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
-        [ContractRetrieval.getStableToken]: createMockStableToken(
-          new BigNumber(200000000000000000)
-        ),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
       },
       createMockWeb3(100)
     )
@@ -96,7 +92,8 @@ describe(getRemainingQueryCount, () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
-        [ContractRetrieval.getStableToken]: createMockStableToken(new BigNumber(0)),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(0)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
       },
       createMockWeb3(100)
     )
@@ -108,13 +105,46 @@ describe(getRemainingQueryCount, () => {
       totalQuota: 0,
     })
   })
+  it('Calculates remaining query count for unverified account with only cUSD balance', async () => {
+    const contractKitVerifiedNoTx = createMockContractKit(
+      {
+        [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
+      },
+      createMockWeb3(0)
+    )
+    mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
+    mockIsVerified.mockReturnValue(false)
+    mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+      performedQueryCount: 1,
+      totalQuota: 2,
+    })
+  })
+  it('Calculates remaining query count for unverified account with only CELO balance', async () => {
+    const contractKitVerifiedNoTx = createMockContractKit(
+      {
+        [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(0)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+      },
+      createMockWeb3(0)
+    )
+    mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
+    mockIsVerified.mockReturnValue(false)
+    mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
+      performedQueryCount: 1,
+      totalQuota: 2,
+    })
+  })
   it('No phone number hash when request own phone number', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
-        [ContractRetrieval.getStableToken]: createMockStableToken(
-          new BigNumber(200000000000000000)
-        ),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
       },
       createMockWeb3(0)
     )

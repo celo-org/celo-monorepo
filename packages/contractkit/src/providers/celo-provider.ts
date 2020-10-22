@@ -6,7 +6,7 @@ import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
 import { LocalWallet } from '../wallets/local-wallet'
-import { Wallet } from '../wallets/wallet'
+import { ReadOnlyWallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
@@ -25,7 +25,7 @@ export class CeloProvider {
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
-  wallet: Wallet
+  wallet: ReadOnlyWallet
 
   // Transaction nonce is calculated as the max of an account's nonce on-chain, and any pending transactions in a node's
   // transaction pool. As a result, once a nonce is used, the transaction must be sent to the node before the nonce can
@@ -33,7 +33,7 @@ export class CeloProvider {
   // relation to other sign and send operations.
   nonceLock: Lock
 
-  constructor(readonly existingProvider: provider, wallet: Wallet = new LocalWallet()) {
+  constructor(readonly existingProvider: provider, wallet: ReadOnlyWallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.nonceLock = new Lock()

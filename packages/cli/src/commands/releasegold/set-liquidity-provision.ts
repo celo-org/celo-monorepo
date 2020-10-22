@@ -1,15 +1,15 @@
 import { flags } from '@oclif/command'
 import prompts from 'prompts'
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetLiquidityProvision extends ReleaseGoldCommand {
+export default class SetLiquidityProvision extends ReleaseGoldBaseCommand {
   static description =
     'Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.'
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     yesreally: flags.boolean({ description: 'Override prompt to set liquidity (be careful!)' }),
   }
 

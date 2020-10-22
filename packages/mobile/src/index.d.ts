@@ -6,7 +6,6 @@ declare module '*.json' {
 declare module '*.png'
 declare module '*.jpg'
 
-declare module 'react-native-geth'
 declare module 'react-native-tcp'
 declare module 'react-native-send-intent'
 declare module 'sleep-promise'

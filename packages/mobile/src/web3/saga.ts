@@ -1,4 +1,5 @@
-import { RpcWallet, RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { RpcWalletErrors } from '@celo/contractkit/lib/wallets/rpc-wallet'
+import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import * as bip39 from 'react-native-bip39'
@@ -62,7 +63,7 @@ export function* checkWeb3SyncProgress() {
       let syncProgress: boolean | Web3SyncProgress
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      const web3 = yield call(getWeb3)
+      const web3 = yield call(getWeb3, false)
       syncProgress = yield call(web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
@@ -80,7 +81,9 @@ export function* checkWeb3SyncProgress() {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
           if (status !== SyncStatus.WAITING) {
             status = SyncStatus.WAITING
-            ValoraAnalytics.track(NetworkEvents.network_sync_waiting)
+            ValoraAnalytics.track(NetworkEvents.network_sync_waiting, {
+              latestBlock: latestBlock?.number,
+            })
           }
         }
       } else if (typeof syncProgress === 'object') {
@@ -210,7 +213,7 @@ export function* getOrCreateAccount() {
 export function* assignAccountFromPrivateKey(privateKey: string, mnemonic: string) {
   try {
     const account = privateKeyToAddress(privateKey)
-    const wallet: RpcWallet = yield call(getWallet)
+    const wallet: UnlockableWallet = yield call(getWallet)
     const password: string = yield call(getPasswordSaga, account, false, true)
 
     try {
@@ -256,7 +259,7 @@ export function* getAccount() {
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  const wallet: RpcWallet = yield call(getWallet)
+  const wallet: UnlockableWallet = yield call(getWallet)
   if (wallet.isAccountUnlocked(account)) {
     return true
   }

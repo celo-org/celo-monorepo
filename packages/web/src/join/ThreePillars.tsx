@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import HollowOval from 'src/shared/HollowOval'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -111,7 +111,7 @@ class Animation extends React.PureComponent<ScreenProps> {
               { mixBlendMode: 'multiply', top: coinsSize / 3, left: (-coinsSize * ratio) / 6 },
             ]}
           >
-            <Fade bottom={true} distance={`${coinsSize / 3}px`} delay={baseDelay}>
+            <Fade distance={`${coinsSize / 3}px`} delay={baseDelay}>
               <HollowOval color={colors.deepBlue} size={coinsSize} />
             </Fade>
           </View>
@@ -126,7 +126,7 @@ class Animation extends React.PureComponent<ScreenProps> {
               { mixBlendMode: 'multiply', top: 0 },
             ]}
           >
-            <Fade bottom={true} distance={`${coinsSize / 4}px`} delay={baseDelay * 2}>
+            <Fade distance={`${coinsSize / 4}px`} delay={baseDelay * 2}>
               <OvalCoin color={colors.deepBlue} size={coinsSize} />
             </Fade>
           </View>
@@ -139,7 +139,7 @@ class Animation extends React.PureComponent<ScreenProps> {
               { mixBlendMode: 'multiply', top: -coinsSize / 2, left: (coinsSize * ratio) / 3 },
             ]}
           >
-            <Fade bottom={true} distance={`${coinsSize / 5}px`} delay={baseDelay * 3}>
+            <Fade distance={`${coinsSize / 5}px`} delay={baseDelay * 3}>
               <OvalCoin color={colors.deepBlue} size={coinsSize} />
             </Fade>
           </View>

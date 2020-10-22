@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
@@ -73,14 +73,6 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
     overflow: 'hidden',
-  },
-  infoBox: {
-    paddingVertical: 9,
-    paddingHorizontal: 5,
-    backgroundColor: colors.dark,
-    opacity: 1,
-    marginTop: 15,
-    borderRadius: 3,
   },
   infoText: {
     position: 'absolute',

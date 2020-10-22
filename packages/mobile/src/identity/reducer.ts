@@ -1,11 +1,28 @@
+import {
+  isBalanceSufficientForSigRetrieval,
+  PhoneNumberHashDetails,
+} from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { ActionableAttestation } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationsStatus } from '@celo/utils/src/attestations'
+import BigNumber from 'bignumber.js'
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
+import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
+import { ATTESTATION_REVEAL_TIMEOUT_SECONDS, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
-import { AttestationCode } from 'src/identity/verification'
+import {
+  AttestationCode,
+  ESTIMATED_COST_PER_ATTESTATION,
+  NUM_ATTESTATIONS_REQUIRED,
+} from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { Actions as SendActions, StoreLatestInRecentsAction } from 'src/send/actions'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+import { timeDeltaInSeconds } from 'src/utils/time'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
@@ -24,6 +41,10 @@ export interface E164NumberToSaltType {
 
 export interface AddressToDataEncryptionKeyType {
   [address: string]: string | null // null means no DEK registered
+}
+
+export interface AddressToDisplayNameType {
+  [address: string]: string | undefined
 }
 
 export interface ImportContactProgress {
@@ -49,11 +70,22 @@ export interface SecureSendDetails {
   validationSuccessful: boolean | undefined
 }
 
+export interface UpdatableVerificationState {
+  phoneHashDetails: PhoneNumberHashDetails
+  actionableAttestations: ActionableAttestation[]
+  status: AttestationsStatus
+}
+
+export type VerificationState = State['verificationState'] & {
+  isBalanceSufficient: boolean
+}
+
 export interface State {
   attestationCodes: AttestationCode[]
   // we store acceptedAttestationCodes to tell user if code
   // was already used even after Actions.RESET_VERIFICATION
   acceptedAttestationCodes: AttestationCode[]
+  // numCompleteAttestations is controlled locally
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
@@ -62,12 +94,21 @@ export interface State {
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
+  // Doesn't contain all known addresses, use only as a fallback.
+  // TODO: Remove if unused after CIP-8 implementation.
+  addressToDisplayName: AddressToDisplayNameType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
   // Contacts found during the matchmaking process
   matchedContacts: ContactMatches
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+  // verificationState is fetched from the network
+  verificationState: {
+    isLoading: boolean
+    lastFetch: number | null
+  } & UpdatableVerificationState
+  lastRevealAttempt: number | null
 }
 
 const initialState: State = {
@@ -80,6 +121,7 @@ const initialState: State = {
   e164NumberToAddress: {},
   e164NumberToSalt: {},
   addressToDataEncryptionKey: {},
+  addressToDisplayName: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -88,11 +130,28 @@ const initialState: State = {
   },
   matchedContacts: {},
   secureSendPhoneNumberMapping: {},
+  verificationState: {
+    isLoading: false,
+    phoneHashDetails: {
+      e164Number: '',
+      phoneHash: '',
+      pepper: '',
+    },
+    actionableAttestations: [],
+    status: {
+      isVerified: false,
+      numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+      total: 0,
+      completed: 0,
+    },
+    lastFetch: null,
+  },
+  lastRevealAttempt: null,
 }
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction | StoreLatestInRecentsAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -106,6 +165,7 @@ export const reducer = (
           current: 0,
           total: 0,
         },
+        verificationState: initialState.verificationState,
         isFetchingAddresses: false,
       }
     }
@@ -156,6 +216,17 @@ export const reducer = (
       return {
         ...state,
         e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
+      }
+    case SendActions.STORE_LATEST_IN_RECENTS:
+      if (!action.recipient.address) {
+        return state
+      }
+      return {
+        ...state,
+        addressToDisplayName: {
+          ...state.addressToDisplayName,
+          [action.recipient.address]: action.recipient.displayName,
+        },
       }
     case Actions.IMPORT_CONTACTS:
       return {
@@ -265,16 +336,38 @@ export const reducer = (
         matchedContacts: state.matchedContacts,
         secureSendPhoneNumberMapping: state.secureSendPhoneNumberMapping,
       }
+    case Actions.FETCH_VERIFICATION_STATE:
+      return {
+        ...state,
+        verificationState: {
+          ...initialState.verificationState,
+          isLoading: true,
+        },
+      }
+    case Actions.UPDATE_VERIFICATION_STATE:
+      return {
+        ...state,
+        verificationState: {
+          lastFetch: Date.now(),
+          isLoading: false,
+          ...action.state,
+        },
+      }
+    case Actions.SET_LAST_REVEAL_ATTEMPT:
+      return {
+        ...state,
+        lastRevealAttempt: action.time,
+      }
     default:
       return state
   }
 }
 
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
-  const { attestationCodes } = state
+  const { attestationCodes, acceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
   for (let i = 0; i < numCompleteAttestations; i++) {
-    attestationCodes[i] = attestationCodes[i] || {
+    attestationCodes[i] = acceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
       issuer: ATTESTATION_ISSUER_PLACEHOLDER,
     }
@@ -296,3 +389,55 @@ export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const addressToDisplayNameSelector = (state: RootState) =>
+  state.identity.addressToDisplayName
+
+export const isBalanceSufficientForSigRetrievalSelector = (state: RootState) => {
+  const dollarBalance = stableTokenBalanceSelector(state) || 0
+  const celoBalance = celoTokenBalanceSelector(state) || 0
+  return isBalanceSufficientForSigRetrieval(dollarBalance, celoBalance)
+}
+
+function isBalanceSufficientForAttestations(state: RootState, attestationsRemaining: number) {
+  const userBalance = stableTokenBalanceSelector(state) || 0
+  return new BigNumber(userBalance).isGreaterThan(
+    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
+  )
+}
+
+const identityVerificationStateSelector = (state: RootState) => state.identity.verificationState
+
+const isBalanceSufficientSelector = (state: RootState) => {
+  const verificationState = state.identity.verificationState
+  const { phoneHashDetails, status, actionableAttestations } = verificationState
+  const attestationsRemaining = status.numAttestationsRemaining - actionableAttestations.length
+  const isBalanceSufficient = !phoneHashDetails.phoneHash
+    ? isBalanceSufficientForSigRetrievalSelector(state)
+    : isBalanceSufficientForAttestations(state, attestationsRemaining)
+
+  return isBalanceSufficient
+}
+
+export const verificationStateSelector = createSelector(
+  identityVerificationStateSelector,
+  isBalanceSufficientSelector,
+  (verificationState, isBalanceSufficient): VerificationState => ({
+    ...verificationState,
+    isBalanceSufficient,
+  })
+)
+
+export const isVerificationStateExpiredSelector = (state: RootState) => {
+  return (
+    !state.identity.verificationState.lastFetch ||
+    timeDeltaInSeconds(Date.now(), state.identity.verificationState.lastFetch) >
+      VERIFICATION_STATE_EXPIRY_SECONDS
+  )
+}
+
+export const isRevealAllowed = ({ identity: { lastRevealAttempt } }: RootState) => {
+  return (
+    !lastRevealAttempt ||
+    timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
+  )
+}

@@ -6,7 +6,7 @@
   - [Setup](#setup)
     - [iOS](#ios)
       - [Enroll in the Apple Developer Program](#enroll-in-the-apple-developer-program)
-      - [Install XCode](#install-xcode)
+      - [Install Xcode](#install-xcode)
       - [Install Cocopods, Bundler, and download project dependencies](#install-cocopods-bundler-and-download-project-dependencies)
     - [Android](#android)
       - [Install Java](#install-java)
@@ -68,15 +68,15 @@ In order to successfully set up your iOS development environment you will need t
 
 _If you are a cLabs employee, please ask to be added to the cLabs iOS development team._
 
-#### Install XCode
+#### Install Xcode
 
-XCode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
+Xcode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
 
 Install [Xcode 11.4](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
 
 We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects.
 
-Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of XCode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
+Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of Xcode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
 
 #### Install Cocopods, Bundler, and download project dependencies
 
@@ -142,6 +142,7 @@ Next install [Android Studio][android studio] and add the [Android NDK][android 
 Execute the following (and make sure the lines are in your `~/.bash_profile`).
 
 _Note that these paths may differ on your machine. You can find the path to the SDK and NDK via the [Android Studio menu](https://stackoverflow.com/questions/40520324/how-to-find-the-path-to-ndk)._
+
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
@@ -150,10 +151,10 @@ export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
-Then install the Android 28 platform:
+Then install the Android 29 platform:
 
 ```bash
-sdkmanager 'platforms;android-28'
+sdkmanager 'platforms;android-29'
 ```
 
 ##### Linux
@@ -178,11 +179,11 @@ You can find the complete instructions about how to install the tools in Linux e
 
 ##### Configure an emulator using the Android SDK Manager
 
-Install the Android 28 system image and create an Android Virtual Device:
+Install the Android 29 system image and create an Android Virtual Device:
 
 ```bash
-sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+sdkmanager "system-images;android-29;default;x86_64"
+avdmanager create avd --force --name Pixel_API_29_AOSP_x86_64 --device pixel -k "system-images;android-29;default;x86_64"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:
@@ -194,7 +195,7 @@ export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
 Run the emulator with:
 
 ```bash
-emulator -avd Nexus_5X_API_28_x86
+emulator -avd Pixel_API_29_AOSP_x86_64
 ```
 
 ##### Install Genymotion Emulator Manager
@@ -238,9 +239,9 @@ The below steps should help you successfully run the mobile wallet on either a U
 
 ### iOS
 
-3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by XCode.
+3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by Xcode.
 
-4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the XCode menu bar.
+4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the Xcode menu bar.
 
 5. From the `mobile` directory run `yarn run dev:ios`.
 
@@ -312,9 +313,9 @@ See [`src/identity/verification.test.ts`] for an example.
 ### End-to-End testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
-must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
+must have the proper emulator set up. Follow the instructions in [e2e/README.md][e2e readme].
 
-Once setup is done, you can run the tests with `yarn test:e2e:android`
+Once setup is done, you can run the tests with `yarn test:e2e:android` or `yarn test:e2e:ios`.
 
 ## Building APKs / Bundles
 
@@ -393,6 +394,26 @@ There are two major differences in Forno mode:
 ### Why do we use http(s) provider?
 
 Websockets (`ws`) would have been a better choice but we cannot use unencrypted `ws` provider since it would be bad to send plain-text data from a privacy perspective. Geth does not support `wss` by [default](https://github.com/ethereum/go-ethereum/issues/16423). And Kubernetes does not support it either. This forced us to use https provider.
+
+### Attaching to the geth instance
+
+#### Android
+
+1. Start geth's HTTP RPC server by setting the config variable `GETH_START_HTTP_RPC_SERVER` to true. This is meant for development purposes only and can be a serious vulnerability if used in production.
+2. Forward traffic from your computer's port 8545 to the android device's: `adb forward tcp:8545 tcp:8545`
+3. Using a geth binary on your computer, run `geth attach http://localhost:8545`
+
+#### iOS
+
+We need the IP address of the iOS device. If it is being run in a simulator, the IP address is `127.0.0.1`. If not running in a simulator:
+
+1. Ensure the iOS device is on the same network as your computer.
+2. Find the device's local IP address by going to the Settings app, Wi-Fi, and tapping the 'i' next to the network.
+
+To attach:
+
+1. Start geth's HTTP RPC server by setting the config variable `GETH_START_HTTP_RPC_SERVER` to true. This is meant for development purposes only and can be a serious vulnerability if used in production.
+2. Using a geth binary on your computer, run `geth attach http://<DEVICE_IP_ADDRESS>:8545`
 
 ### Troubleshooting
 

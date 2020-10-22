@@ -6,7 +6,7 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers.v2'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 
@@ -41,13 +41,12 @@ const styles = StyleSheet.create({
   },
   header: {
     ...fontStyles.h1,
-    textAlign: 'center',
+    textAlign: 'left',
     paddingBottom: 15,
   },
   bodyText: {
-    ...fontStyles.paragraph,
-    fontSize: 15,
-    color: colors.gray5,
+    ...fontStyles.small,
+    color: colors.gray4,
   },
 })
 

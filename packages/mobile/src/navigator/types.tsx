@@ -51,10 +51,6 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
-  [Screens.BackupSocial]: undefined
-  [Screens.BackupSocialIntro]: {
-    incomingFromBackupFlow: boolean
-  }
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -87,6 +83,7 @@ export type StackParamList = {
       makerTokenBalance: string
     }
   }
+  [Screens.ExternalExchanges]: undefined
   [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeAmount]: {
     isAddFunds: boolean
@@ -107,7 +104,7 @@ export type StackParamList = {
         showZeroBalanceModal?: boolean
       }
     | undefined
-  [Screens.ImportWalletSocial]: undefined
+
   [Screens.ImportContacts]:
     | undefined
     | {
@@ -115,10 +112,6 @@ export type StackParamList = {
         importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.Invite]: undefined
-  [Screens.InviteReview]: {
-    recipient: Recipient
-  }
   [Screens.NameAndNumber]:
     | {
         selectedCountryCodeAlpha2: string
@@ -210,7 +203,7 @@ export type StackParamList = {
     | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
     | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
-  [Screens.VerificationLoadingScreen]: undefined
+  [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
@@ -221,6 +214,7 @@ export type StackParamList = {
   [Screens.WithdrawCeloReviewScreen]: {
     amount: BigNumber
     recipientAddress: string
+    feeEstimate: BigNumber
   }
   [Screens.WithdrawCeloScreen]: undefined
 }

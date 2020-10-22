@@ -48,6 +48,8 @@ const styles = StyleSheet.create({
   },
   link: {
     textDecorationLine: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
   },
   linkContainer: {
     marginVertical: 8,

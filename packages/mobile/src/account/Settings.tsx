@@ -1,17 +1,24 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import {
   SettingsExpandedItem,
   SettingsItemSwitch,
   SettingsItemTextValue,
 } from '@celo/react-components/components/SettingsItem'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { clearStoredAccount, devModeTriggerClicked, toggleBackupState } from 'src/account/actions'
@@ -26,7 +33,7 @@ import {
   setRequirePinOnAppOpen,
   setSessionId,
 } from 'src/app/actions'
-import { sessionIdSelector } from 'src/app/selectors'
+import { sessionIdSelector, verificationPossibleSelector } from 'src/app/selectors'
 import Dialog from 'src/components/Dialog'
 import SessionId from 'src/components/SessionId'
 import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
@@ -63,6 +70,7 @@ interface StateProps {
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
+  verificationPossible: boolean
   pincodeType: PincodeType
   backupCompleted: boolean
   requirePinOnAppOpen: boolean
@@ -84,6 +92,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164PhoneNumber: state.account.e164PhoneNumber,
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
+    verificationPossible: verificationPossibleSelector(state),
     pincodeType: pincodeTypeSelector(state),
     requirePinOnAppOpen: state.app.requirePinOnAppOpen,
     fornoEnabled: state.web3.fornoMode,
@@ -157,12 +166,12 @@ export class Account extends React.Component<Props, State> {
     this.props.setNumberVerified(!this.props.numberVerified)
   }
 
-  revokeNumberVerification = async () => {
+  revokeNumberVerification = () => {
     if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
-      Logger.showMessage('Cannot revoke verificaton: number invalid')
+      Logger.showError('Cannot revoke verificaton: number invalid')
       return
     }
-    Logger.showMessage(`Revoking verification`)
+    Logger.showMessage('Revoking verification')
     this.props.revokeVerification()
   }
 
@@ -174,6 +183,10 @@ export class Account extends React.Component<Props, State> {
     this.props.navigation.navigate(Screens.Debug)
   }
 
+  onDevSettingsTriggerPress = () => {
+    this.props.devModeTriggerClicked()
+  }
+
   getDevSettingsComp() {
     const { devModeActive } = this.props
 
@@ -182,13 +195,6 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={styles.devSettings}>
-          {/*
-          // TODO: It's commented because it broke a while back but this is something we'd like to re-enable
-          <View style={style.devSettingsItem}>
-            <TouchableOpacity onPress={this.revokeNumberVerification}>
-              <Text>Revoke Number Verification</Text>
-            </TouchableOpacity>
-          </View> */}
           <View style={styles.devSettingsItem}>
             <Text style={fontStyles.label}>Session ID</Text>
             <SessionId sessionId={this.props.sessionId || ''} />
@@ -196,6 +202,11 @@ export class Account extends React.Component<Props, State> {
           <View style={styles.devSettingsItem}>
             <TouchableOpacity onPress={this.toggleNumberVerified}>
               <Text>Toggle verification done</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.devSettingsItem}>
+            <TouchableOpacity onPress={this.revokeNumberVerification}>
+              <Text>Revoke Number Verification</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.devSettingsItem}>
@@ -217,6 +228,11 @@ export class Account extends React.Component<Props, State> {
           <View style={styles.devSettingsItem}>
             <TouchableOpacity onPress={Sentry.nativeCrash}>
               <Text>Trigger a crash</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.devSettingsItem}>
+            <TouchableOpacity onPress={this.confirmAccountRemoval}>
+              <Text>Valora Quick Reset</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -294,20 +310,22 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, i18n, numberVerified } = this.props
+    const { t, i18n, numberVerified, verificationPossible } = this.props
     const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
     const promptConfirmRemovalModal = this.props.route.params?.promptConfirmRemovalModal ?? false
     const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
     return (
       <SafeAreaView style={styles.container}>
         <DrawerTopBar />
-        <ScrollView>
-          <Text style={styles.title} testID={'SettingsTitle'}>
-            {t('global:settings')}
-          </Text>
+        <ScrollView testID="SettingsScrollView">
+          <TouchableWithoutFeedback onPress={this.onDevSettingsTriggerPress}>
+            <Text style={styles.title} testID={'SettingsTitle'}>
+              {t('global:settings')}
+            </Text>
+          </TouchableWithoutFeedback>
           <View style={styles.containerList}>
             <SettingsItemTextValue title={t('editProfile')} onPress={this.goToProfile} />
-            {!numberVerified && (
+            {!numberVerified && verificationPossible && (
               <SettingsItemTextValue title={t('confirmNumber')} onPress={this.goToConfirmNumber} />
             )}
             <SettingsItemTextValue
@@ -320,7 +338,7 @@ export class Account extends React.Component<Props, State> {
               value={this.props.preferredCurrencyCode}
               onPress={this.goToLocalCurrencySetting}
             />
-            <SectionHeadNew text={t('securityAndData')} style={styles.sectionTitle} />
+            <SectionHead text={t('securityAndData')} style={styles.sectionTitle} />
             <SettingsItemSwitch
               title={t('requirePinOnAppOpen')}
               value={this.props.requirePinOnAppOpen}
@@ -338,14 +356,15 @@ export class Account extends React.Component<Props, State> {
               onValueChange={this.props.setAnalyticsEnabled}
               details={t('shareAnalytics_detail')}
             />
-            <SectionHeadNew text={t('legal')} style={styles.sectionTitle} />
+            <SectionHead text={t('legal')} style={styles.sectionTitle} />
             <SettingsItemTextValue title={t('licenses')} onPress={this.goToLicenses} />
             <SettingsItemTextValue title={t('termsOfServiceLink')} onPress={this.onTermsPress} />
-            <SectionHeadNew text={''} style={styles.sectionTitle} />
+            <SectionHead text={''} style={styles.sectionTitle} />
             <SettingsExpandedItem
               title={t('removeAccountTitle')}
               details={t('removeAccountDetails')}
               onPress={this.onRemoveAccountPress}
+              testID="ResetAccount"
             />
           </View>
           {this.getDevSettingsComp()}
@@ -376,6 +395,7 @@ export class Account extends React.Component<Props, State> {
             actionPress={this.onPressContinueWithAccountRemoval}
             secondaryActionText={t('global:cancel')}
             secondaryActionPress={this.hideRemoveAccountModal}
+            testID="RemoveAccountModal"
           >
             {t('accountKeyModal.body1')}
             {'\n\n'}
@@ -388,6 +408,7 @@ export class Account extends React.Component<Props, State> {
             actionPress={this.confirmAccountRemoval}
             secondaryActionText={t('global:cancel')}
             secondaryActionPress={this.hideConfirmRemovalModal}
+            testID="ConfirmAccountRemovalModal"
           >
             {t('promptConfirmRemovalModal.body')}
           </Dialog>

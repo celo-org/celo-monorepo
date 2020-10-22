@@ -1,6 +1,7 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
+import { ExternalExchangeProvider } from 'src/fiatExchanges/ExternalExchanges'
 import { GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
@@ -23,7 +24,7 @@ export const AVAILABLE_LANGUAGES = [
 ]
 
 // DEV only related settings
-export const isE2EEnv = Config.IS_E2E || false
+export const isE2EEnv = stringToBoolean(Config.IS_E2E || 'false')
 export const DEV_RESTORE_NAV_STATE_ON_RELOAD = stringToBoolean(
   Config.DEV_RESTORE_NAV_STATE_ON_RELOAD || 'false'
 )
@@ -48,10 +49,19 @@ export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 // The number of seconds before the sender can reclaim the payment.
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
-// We need to fallback to `integration` for testing under jest where react-native-config is undefined.
-export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
+export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
+// ODIS minimum dollar balance for pepper quota retrieval
+// TODO change this to new ODIS minimum dollar balance once deployed
+export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.1
+// When user goes to VerificationEducationScreen - we fetch current verification state.
+// Then user decides on what to do and go to VerificationInputScreen.
+// If user were "deciding" for more than VERIFICATION_STATE_EXPIRY_SECONDS, then
+// we would refetch verification state before going to VerificationInputScreen
+export const VERIFICATION_STATE_EXPIRY_SECONDS = 30
+
+export const ATTESTATION_REVEAL_TIMEOUT_SECONDS = 60 // 1 minute
 
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
@@ -68,6 +78,14 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
+export const GETH_USE_FULL_NODE_DISCOVERY = stringToBoolean(
+  Config.GETH_USE_FULL_NODE_DISCOVERY || 'true'
+)
+export const GETH_USE_STATIC_NODES = stringToBoolean(Config.GETH_USE_STATIC_NODES || 'true')
+// NOTE: Development purposes only
+export const GETH_START_HTTP_RPC_SERVER = stringToBoolean(
+  Config.GETH_START_HTTP_RPC_SERVER || 'false'
+)
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
@@ -79,6 +97,33 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
   'MOONPAY_PUBLIC_KEY'
 )
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
+
+export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
+  {
+    name: 'Bittrex (CELO)',
+    link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
+  },
+  {
+    name: 'OKCoin (CELO, CUSD)',
+    link: 'https://www.okcoin.com/en/spot/trade/cusd-usd/',
+  },
+  {
+    name: 'OKEx (CELO)',
+    link: 'https://www.okex.com/spot/trade/CELO-USDT',
+  },
+  {
+    name: 'CoinList Pro (CELO)',
+    link: 'https://coinlist.co/asset/celo',
+  },
+  {
+    name: 'Coinbase Pro (CELO as CGLD)',
+    link: 'https://pro.coinbase.com/trade/CGLD-USD',
+  },
+  {
+    name: 'Coinbase (CELO as CGLD)',
+    link: 'https://www.coinbase.com',
+  },
+]
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN

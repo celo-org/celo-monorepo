@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import ArticleProps from 'fullstack/ArticleProps'
 import * as React from 'react'
 import ArticlesSection from 'src/community/connect/ArticlesSection'

@@ -118,11 +118,15 @@ export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
 
 // Actually runs through the parsing instead of using a regex
 export function isE164NumberStrict(phoneNumber: string) {
-  const parsedPhoneNumber = phoneUtil.parse(phoneNumber)
-  if (!phoneUtil.isValidNumber(parsedPhoneNumber)) {
+  try {
+    const parsedPhoneNumber = phoneUtil.parse(phoneNumber)
+    if (!phoneUtil.isValidNumber(parsedPhoneNumber)) {
+      return false
+    }
+    return phoneUtil.format(parsedPhoneNumber, PhoneNumberFormat.E164) === phoneNumber
+  } catch {
     return false
   }
-  return phoneUtil.format(parsedPhoneNumber, PhoneNumberFormat.E164) === phoneNumber
 }
 
 export function parsePhoneNumber(

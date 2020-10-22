@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -9,11 +9,13 @@ import "../common/Freezable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Contract for calculating epoch rewards.
  */
 contract EpochRewards is
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   UsingPrecompiles,
@@ -81,6 +83,14 @@ contract EpochRewards is
   );
 
   event TargetVotingYieldUpdated(uint256 fraction);
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -158,7 +168,10 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCommunityRewardFraction(uint256 value) public onlyOwner returns (bool) {
-    require(value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap());
+    require(
+      value != communityRewardFraction.unwrap() && value < FixidityLib.fixed1().unwrap(),
+      "Value must be different from existing community reward fraction and less than 1"
+    );
     communityRewardFraction = FixidityLib.wrap(value);
     emit CommunityRewardFractionSet(value);
     return true;
@@ -179,8 +192,11 @@ contract EpochRewards is
    * @return True upon success.
    */
   function setCarbonOffsettingFund(address partner, uint256 value) public onlyOwner returns (bool) {
-    require(partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap());
-    require(value < FixidityLib.fixed1().unwrap());
+    require(
+      partner != carbonOffsettingPartner || value != carbonOffsettingFraction.unwrap(),
+      "Partner and value must be different from existing carbon offsetting fund"
+    );
+    require(value < FixidityLib.fixed1().unwrap(), "Value must be less than 1");
     carbonOffsettingPartner = partner;
     carbonOffsettingFraction = FixidityLib.wrap(value);
     emit CarbonOffsettingFundSet(partner, value);
@@ -317,8 +333,7 @@ contract EpochRewards is
       uint256 targetRewards = linearRewards.mul(timeSinceInitialization).div(SECONDS_LINEAR);
       return targetRewards.add(GENESIS_GOLD_SUPPLY);
     } else {
-      // TODO(asa): Implement block reward calculation for years 15-30.
-      require(false, "Implement block reward calculation for years 15-30");
+      require(false, "Block reward calculation for years 15-30 unimplemented");
       return 0;
     }
   }
@@ -499,7 +514,6 @@ contract EpochRewards is
   function calculateTargetEpochRewards()
     external
     view
-    onlyWhenNotFrozen
     returns (uint256, uint256, uint256, uint256)
   {
     uint256 targetVoterReward = getTargetVoterRewards();

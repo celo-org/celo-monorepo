@@ -1,7 +1,7 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
@@ -72,7 +72,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   )
 
   renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
-    <SectionHeadNew text={info.section.key as string} />
+    <SectionHead text={info.section.key as string} />
   )
 
   keyExtractor = (item: Recipient, index: number) => {
@@ -91,7 +91,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     }
   }
 
-  renderItemSeparator = () => <View style={style.separator} />
+  renderItemSeparator = () => <View style={styles.separator} />
 
   renderEmptyView = () => {
     const parsedNumber = parsePhoneNumber(
@@ -108,19 +108,19 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   renderNoContentEmptyView = () => (
-    <View style={style.emptyView}>
+    <View style={styles.emptyView}>
       {this.props.searchQuery !== '' ? (
         <>
-          <View style={style.emptyViewBody}>
+          <View style={styles.emptyViewBody}>
             <Text style={fontStyles.emptyState}>
               {this.props.t('noResultsFor')}
               <Text style={fontStyles.emptyState}>{` "${this.props.searchQuery}"`}</Text>
             </Text>
-            <Text style={style.emptyStateBody}>{this.props.t('searchForSomeone')}</Text>
+            <Text style={styles.emptyStateBody}>{this.props.t('searchForSomeone')}</Text>
           </View>
         </>
       ) : (
-        <View style={style.emptyViewBody}>
+        <View style={styles.emptyViewBody}>
           <Text style={fontStyles.emptyState}>{this.props.t('noContacts')}</Text>
         </View>
       )}
@@ -145,8 +145,9 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const searchedAddress = searchQuery.toLowerCase()
     const existingContact = getRecipientFromAddress(
-      searchQuery,
+      searchedAddress,
       addressToE164Number,
       recipientCache
     )
@@ -161,8 +162,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       const recipient: RecipientWithAddress = {
         kind: RecipientKind.Address,
         displayName: t('walletAddress'),
-        displayId: searchQuery.substring(2, 17) + '...',
-        address: searchQuery,
+        displayId: searchedAddress.substring(2, 17) + '...',
+        address: searchedAddress,
       }
 
       return (
@@ -178,7 +179,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const { sections, listHeaderComponent } = this.props
 
     return (
-      <View style={style.body} testID={this.props.testID}>
+      <View style={styles.body} testID={this.props.testID}>
         <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <SectionList
@@ -209,7 +210,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   body: {
     flex: 1,
   },

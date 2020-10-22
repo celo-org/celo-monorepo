@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/src/async'
 import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
@@ -27,11 +28,12 @@ import {
 } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { store } from 'src/redux/store'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { BLOCK_AGE_LIMIT } from 'src/web3/utils'
+import { BLOCK_AGE_LIMIT, blockIsFresh } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -40,8 +42,10 @@ const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000 // ms
 const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
+const GETH_SYNC_TIMEOUT = 30000 // ms
+const GETH_POLLING_INTERVAL = 500 // ms
 
-enum GethInitOutcomes {
+export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
   NETWORK_ERROR_FETCHING_STATIC_NODES = 'NETWORK_ERROR_FETCHING_STATIC_NODES',
   IRRECOVERABLE_FAILURE = 'IRRECOVERABLE_FAILURE',
@@ -98,6 +102,74 @@ export function* waitForGethConnectivity() {
   }
 }
 
+function* pollGethStatusUntilSynced() {
+  let head: BlockHeader = yield select(chainHeadSelector)
+
+  // Head may be null on startup
+  if (!head) {
+    head = (yield take(Actions.SET_CHAIN_HEAD)).head
+  }
+
+  while (true) {
+    if (blockIsFresh(head)) {
+      return true
+    }
+
+    head = (yield take(Actions.SET_CHAIN_HEAD)).head
+  }
+}
+
+export function* waitForGethSync() {
+  const fornoEnabled = yield select(fornoSelector)
+  if (fornoEnabled) {
+    return
+  }
+
+  const { result } = yield race({
+    result: call(pollGethStatusUntilSynced),
+    timeout: delay(GETH_SYNC_TIMEOUT),
+  })
+
+  if (!result) {
+    throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
+  }
+}
+
+function pollGethSyncStatusAsync() {
+  return new Promise(async (resolve, reject) => {
+    const dateLimit = Date.now() + GETH_SYNC_TIMEOUT
+
+    while (Date.now() <= dateLimit) {
+      const head = chainHeadSelector(store.getState())
+      if (!head) {
+        await sleep(GETH_POLLING_INTERVAL)
+        continue
+      }
+
+      if (blockIsFresh(head)) {
+        resolve()
+      }
+
+      await sleep(GETH_POLLING_INTERVAL)
+    }
+
+    reject()
+  })
+}
+
+export async function waitForGethSyncAsync() {
+  const fornoEnabled = fornoSelector(store.getState())
+  if (fornoEnabled) {
+    return
+  }
+
+  try {
+    await pollGethSyncStatusAsync()
+  } catch (error) {
+    throw Error(`Geth failed to sync within ${GETH_SYNC_TIMEOUT / 1000} seconds`)
+  }
+}
+
 export function* waitForNextBlock() {
   const startTime = Date.now()
   const web3 = yield call(getWeb3)
@@ -111,13 +183,12 @@ export function* waitForNextBlock() {
   }
 }
 
-function* waitForGethInstance() {
+function* waitForGethInit() {
   try {
     const fornoMode = yield select(fornoSelector)
-    // get geth without syncing if fornoMode
-    const gethInstance = yield call(initGeth, !fornoMode)
-    if (!gethInstance) {
-      throw new Error('Geth instance is null')
+    const gethInitialized = yield call(initGeth, !fornoMode)
+    if (!gethInitialized) {
+      throw new Error('Geth not initialized correctly')
     }
     return GethInitOutcomes.SUCCESS
   } catch (error) {
@@ -134,12 +205,14 @@ function* waitForGethInstance() {
   }
 }
 
+export const _waitForGethInit = waitForGethInit
+
 export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
   const { result } = yield race({
-    result: call(waitForGethInstance),
+    result: call(waitForGethInit),
     timeout: delay(INIT_GETH_TIMEOUT),
   })
 

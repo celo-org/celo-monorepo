@@ -1,18 +1,17 @@
 // SCREEN that scans QRs and calls |onAddressScanned| param when one is found.
 
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import { ADDRESS_LENGTH } from 'src/exchange/reducer'
 import i18n from 'src/i18n'
-import { nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -62,7 +61,8 @@ WithdrawCeloQrScannerScreen.navigationOptions = () => {
     headerTitle: i18n.t('exchangeFlow9:withdrawScanQrTitle'),
     headerTitleStyle: {
       ...fontStyles.navigationHeader,
-      ...componentStyles.screenHeader,
+      textAlign: 'center',
+      fontWeight: undefined,
       color: colors.light,
     },
   }

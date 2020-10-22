@@ -3,10 +3,13 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import AlertBanner from 'src/alert/AlertBanner'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { getAppLocked } from 'src/app/selectors'
+import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
+import { isVersionBelowMinimum } from 'src/firebase/firebase'
 import { navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import PincodeLock from 'src/pincode/PincodeLock'
@@ -20,7 +23,7 @@ import Logger from 'src/utils/Logger'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // @ts-ignore https://reactnavigation.org/docs/screen-tracking/
-const getActiveRouteName = (state: NavigationState) => {
+export const getActiveRouteName = (state: NavigationState) => {
   const route = state.routes[state.index]
 
   if (route.state) {
@@ -46,7 +49,20 @@ export const NavigatorWrapper = () => {
   const [isReady, setIsReady] = React.useState(RESTORE_STATE ? false : true)
   const [initialState, setInitialState] = React.useState()
   const appLocked = useTypedSelector(getAppLocked)
+  const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
   const routeNameRef = React.useRef()
+
+  const updateRequired = React.useMemo(() => {
+    if (!minRequiredVersion) {
+      return false
+    }
+    const version = DeviceInfo.getVersion()
+    Logger.info(
+      'NavigatorWrapper',
+      `Current version: ${version}. Required min version: ${minRequiredVersion}`
+    )
+    return isVersionBelowMinimum(version, minRequiredVersion)
+  }, [minRequiredVersion])
 
   React.useEffect(() => {
     if (navigationRef && navigationRef.current) {
@@ -121,13 +137,11 @@ export const NavigatorWrapper = () => {
     >
       <View style={styles.container}>
         <Navigator />
-        {appLocked && (
-          <View style={styles.locked}>
-            <PincodeLock />
-          </View>
+        {(appLocked || updateRequired) && (
+          <View style={styles.locked}>{updateRequired ? <UpgradeScreen /> : <PincodeLock />}</View>
         )}
         <View style={styles.floating}>
-          {!appLocked && <BackupPrompt />}
+          {!appLocked && !updateRequired && <BackupPrompt />}
           <AlertBanner />
         </View>
       </View>

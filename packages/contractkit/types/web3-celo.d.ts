@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js'
 import 'web3-core'
+// tslint:disable-next-line:no-duplicate-imports
 import { Tx } from 'web3-core'
+import { Contract } from 'web3-eth-contract'
 
 declare module 'web3-core' {
   export interface TransactionConfig extends TransactionConfig {
@@ -45,6 +47,7 @@ declare module 'web3-eth' {
     send(tx?: Tx): PromiEvent<T>
     estimateGas(tx?: Tx): Promise<number>
     encodeABI(): string
+    _parent: Contract
   }
 
   export type BlockType = string | number | BN | BigNumber | 'latest' | 'pending' | 'earliest'

@@ -1,4 +1,5 @@
 import {
+  InteractiveProposalBuilder,
   ProposalBuilder,
   proposalToJSON,
   ProposalTransactionJSON,
@@ -16,7 +17,16 @@ export default class Propose extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    jsonTransactions: flags.string({ required: true, description: 'Path to json transactions' }),
+    jsonTransactions: flags.string({
+      exclusive: ['interactive'],
+      description: 'Path to json transactions',
+    }),
+    interactive: flags.boolean({
+      default: false,
+      exclusive: ['jsonTransactions'],
+      description:
+        'Form proposal using an interactive prompt for Celo registry contracts and functions',
+    }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
     descriptionURL: flags.string({
@@ -36,15 +46,26 @@ export default class Propose extends BaseCommand {
     this.kit.defaultAccount = account
 
     await newCheckBuilder(this, account)
-      .hasEnoughGold(account, deposit)
+      .hasEnoughCelo(account, deposit)
       .exceedsProposalMinDeposit(deposit)
       .runChecks()
 
     const builder = new ProposalBuilder(this.kit)
 
-    // BUILD FROM JSON
-    const jsonString = readFileSync(res.flags.jsonTransactions).toString()
-    const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
+    // TODO: optimize builder redundancies
+    let jsonTransactions: ProposalTransactionJSON[]
+    if (res.flags.interactive) {
+      // BUILD FROM INTERACTIVE PROMPT
+      const promptBuilder = new InteractiveProposalBuilder(builder)
+      jsonTransactions = await promptBuilder.promptTransactions()
+    } else if (res.flags.jsonTransactions) {
+      // BUILD FROM JSON
+      const jsonString = readFileSync(res.flags.jsonTransactions).toString()
+      jsonTransactions = JSON.parse(jsonString)
+    } else {
+      throw new Error('No jsonTransactions provided and interactive mode not specified')
+    }
+
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
 
     // BUILD FROM CONTRACTKIT FUNCTIONS

@@ -14,6 +14,8 @@ import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
+import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
+import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
@@ -38,6 +40,8 @@ const WrapperFactories = {
   [CeloContract.LockedGold]: LockedGoldWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
+  [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
+  [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
   [CeloContract.MultiSig]: MultiSigWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
@@ -64,6 +68,8 @@ interface WrapperCacheMap {
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
   [CeloContract.LockedGold]?: LockedGoldWrapper
+  [CeloContract.MetaTransactionWallet]?: MetaTransactionWalletWrapper
+  [CeloContract.MetaTransactionWalletDeployer]?: MetaTransactionWalletDeployerWrapper
   [CeloContract.MultiSig]?: MultiSigWrapper
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
@@ -128,6 +134,12 @@ export class WrapperCache {
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
+  }
+  getMetaTransactionWallet(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWallet, address)
+  }
+  getMetaTransactionWalletDeployer(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
