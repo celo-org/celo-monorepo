@@ -216,9 +216,7 @@ export type StackParamList = {
     recipientAddress: string
     feeEstimate: BigNumber
   }
-  [Screens.WithdrawCeloScreen]: {
-    accountAddress: string
-  }
+  [Screens.WithdrawCeloScreen]: undefined
 }
 
 // tslint:disable-next-line: interface-over-type-literal
