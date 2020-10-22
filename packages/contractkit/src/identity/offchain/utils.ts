@@ -7,7 +7,7 @@ import { createHmac, randomBytes } from 'crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { join, normalize } from 'path'
+import { join } from 'path'
 import OffchainDataWrapper, { OffchainErrors, OffchainErrorTypes } from '../offchain-data-wrapper'
 import {
   InvalidDataError,
@@ -32,11 +32,9 @@ function getCiphertextLabel(
   const receiverPublicKeyBuffer = Buffer.from(trimLeading0x(receiverPublicKey), 'hex')
 
   const label = createHmac('blake2s256', sharedSecret)
-    .update(
-      Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(normalize(path))])
-    )
+    .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
     .digest('base64')
-  return normalize(join('ciphertexts', label))
+  return join('ciphertexts', label)
 }
 
 // Assumes that the wallet has the dataEncryptionKey of wrapper.self available

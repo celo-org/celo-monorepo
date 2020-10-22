@@ -1,6 +1,6 @@
 import { spawnSync } from 'child_process'
 import { promises } from 'fs'
-import { join, normalize, parse } from 'path'
+import { join, parse } from 'path'
 import { resolve } from 'url'
 
 const { writeFile, mkdir } = promises
@@ -19,8 +19,8 @@ export class LocalStorageWriter extends StorageWriter {
 
   protected async writeToFs(data: string | Buffer, dataPath: string): Promise<void> {
     const directory = parse(dataPath).dir
-    await mkdir(normalize(join(this.root, directory)), { recursive: true })
-    await writeFile(normalize(join(this.root, dataPath)), data)
+    await mkdir(join(this.root, directory), { recursive: true })
+    await writeFile(join(this.root, dataPath), data)
   }
 }
 
@@ -46,13 +46,9 @@ export class GoogleStorageWriter extends LocalStorageWriter {
 
   async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    spawnSync(
-      'gsutil',
-      ['cp', normalize(this.root + '/' + dataPath), `gs://${this.bucket}${dataPath}`],
-      {
-        cwd: this.root,
-      }
-    )
+    spawnSync('gsutil', ['cp', join(this.root, dataPath), `gs://${this.bucket}${dataPath}`], {
+      cwd: this.root,
+    })
   }
 }
 
