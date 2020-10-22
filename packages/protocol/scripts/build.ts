@@ -44,6 +44,7 @@ export const CoreContracts = [
   'MultiSig',
   'Registry',
   'Freezer',
+  'MetaTransactionWallet',
   'TransferWhitelist',
 
   // governance

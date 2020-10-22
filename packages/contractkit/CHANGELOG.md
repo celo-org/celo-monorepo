@@ -5,12 +5,12 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.4.15--dev]**
+### **[0.4.16--dev]**
 Features
 - Select static node based on region resolved from timezone - [#5266](https://github.com/celo-org/celo-monorepo/pull/5266)
 
 Bug Fixes
-- [one-line summary] - ( [link PR] )
+- Handle errors when fetching contract addresses from registry - [#5301](https://github.com/celo-org/celo-monorepo/pull/5301)
 
 Other Changes
 - [one-line summary] - ( [link PR] )
