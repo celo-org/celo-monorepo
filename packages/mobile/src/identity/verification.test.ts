@@ -706,7 +706,7 @@ describe(reportRevealStatusSaga, () => {
       })),
     }
     const mockIssuer = mockActionableAttestations[0].issuer
-    const body = { custom: 'payload' }
+    const body = { issuer: mockIssuer, custom: 'payload' }
     await expectSaga(reportRevealStatusSaga, {
       attestationServiceUrl: 'url',
       e164Number: mockE164Number,
@@ -725,9 +725,6 @@ describe(reportRevealStatusSaga, () => {
     expect(MockedAnalytics.track.mock.calls[0][0]).toBe(
       VerificationEvents.verification_reveal_attestation_status
     )
-    expect(MockedAnalytics.track.mock.calls[0][1]).toStrictEqual({
-      issuer: mockIssuer,
-      status: body,
-    })
+    expect(MockedAnalytics.track.mock.calls[0][1]).toStrictEqual(body)
   })
 })

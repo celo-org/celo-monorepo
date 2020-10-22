@@ -8,7 +8,6 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
@@ -22,7 +21,6 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
-import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
 import {
@@ -909,10 +907,7 @@ export function* reportRevealStatusSaga({
         `${TAG}@reportAttestationRevealStatus`,
         `Successful for service url ${attestationServiceUrl}`
       )
-      ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_status, {
-        issuer,
-        status: body,
-      })
+      ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_status, body)
     } else {
       Logger.debug(
         `${TAG}@reportAttestationRevealStatus`,
@@ -970,18 +965,8 @@ function* waitForAttestationCode(issuer: string) {
 function* getPhoneHashData(e164Number: string) {
   let phoneHash: string
   let phoneHashDetails: PhoneNumberHashDetails
-  if (features.USE_PHONE_NUMBER_PRIVACY) {
-    phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    phoneHash = phoneHashDetails.phoneHash
-  } else {
-    phoneHash = getPhoneHash(e164Number)
-    phoneHashDetails = {
-      e164Number,
-      phoneHash,
-      // @ts-ignore
-      salt: undefined,
-    }
-  }
+  phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+  phoneHash = phoneHashDetails.phoneHash
   return { phoneHash, phoneHashDetails }
 }
 

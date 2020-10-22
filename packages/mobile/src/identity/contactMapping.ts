@@ -220,12 +220,8 @@ export function* fetchAddressesAndValidateSaga({
 
 function* getAddresses(e164Number: string) {
   let phoneHash: string
-  if (features.USE_PHONE_NUMBER_PRIVACY) {
-    const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    phoneHash = phoneHashDetails.phoneHash
-  } else {
-    phoneHash = getPhoneHash(e164Number)
-  }
+  const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+  phoneHash = phoneHashDetails.phoneHash
 
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
   return getAddressesFromLookupResult(lookupResult, phoneHash) || []
