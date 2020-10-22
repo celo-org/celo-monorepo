@@ -8,6 +8,7 @@ import {
 import { base64ToHex } from '@celo/utils/lib/attestations'
 import prompts from 'prompts'
 import {
+  getIdentifierAndPepper,
   printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
@@ -22,6 +23,8 @@ export const describe = 'command for requesting attestations for a phone number'
 interface VerifyArgv extends AccountArgv {
   phone: string
   num: number
+  salt: string
+  context: string
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -35,6 +38,16 @@ export const builder = (argv: yargs.Argv) => {
       type: 'number',
       description: 'Number of attestations to request',
       default: 3,
+    })
+    .option('salt', {
+      type: 'string',
+      description: 'The salt to use instead of getting a pepper from ODIS',
+      default: '',
+    })
+    .option('context', {
+      type: 'string',
+      description: 'ODIS context',
+      default: 'mainnet',
     })
 }
 
@@ -58,7 +71,16 @@ async function verifyCmd(argv: VerifyArgv) {
 
   const attestations = await kit.contracts.getAttestations()
   const accounts = await kit.contracts.getAccounts()
-  await printCurrentCompletedAttestations(attestations, argv.phone, account)
+
+  const { identifier, pepper } = await getIdentifierAndPepper(
+    kit,
+    argv.context,
+    account,
+    argv.phone,
+    argv.salt
+  )
+
+  await printCurrentCompletedAttestations(attestations, identifier, argv.phone, account)
   let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
 
   // Request more attestations
@@ -83,25 +105,27 @@ async function verifyCmd(argv: VerifyArgv) {
     await result.waitReceipt()
   }
 
-  attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
+  attestationsToComplete = await attestations.getActionableAttestations(identifier, account)
   // Find attestations we can verify
   console.info(`Requesting ${attestationsToComplete.length} attestations from issuers`)
   const possibleErrors = await requestAttestationsFromIssuers(
     attestationsToComplete,
     attestations,
     argv.phone,
-    account
+    account,
+    pepper
   )
   printAndIgnoreRequestErrors(possibleErrors)
-  await promptForCodeAndVerify(attestations, argv.phone, account)
+  await promptForCodeAndVerify(attestations, identifier, argv.phone, account)
 }
 
 export async function printCurrentCompletedAttestations(
   attestations: AttestationsWrapper,
+  identifier: string,
   phoneNumber: string,
   account: string
 ) {
-  const attestationStat = await attestations.getAttestationStat(phoneNumber, account)
+  const attestationStat = await attestations.getAttestationStat(identifier, account)
 
   console.info(
     `Phone Number: ${phoneNumber} has completed ${attestationStat.completed} attestations out of a total of ${attestationStat.total}`
@@ -111,6 +135,7 @@ export async function printCurrentCompletedAttestations(
 async function verifyCode(
   attestations: AttestationsWrapper,
   base64Code: string,
+  identifier: string,
   phoneNumber: string,
   account: string,
   attestationsToComplete: ActionableAttestation[]
@@ -129,7 +154,7 @@ async function verifyCode(
   }
 
   const isValidRequest = await attestations.validateAttestationCode(
-    phoneNumber,
+    identifier,
     account,
     matchingIssuer,
     code
@@ -147,14 +172,12 @@ async function verifyCode(
 
 async function promptForCodeAndVerify(
   attestations: AttestationsWrapper,
+  identifier: string,
   phoneNumber: string,
   account: string
 ) {
   while (true) {
-    const attestationsToComplete = await attestations.getActionableAttestations(
-      phoneNumber,
-      account
-    )
+    const attestationsToComplete = await attestations.getActionableAttestations(identifier, account)
 
     if (attestationsToComplete.length === 0) {
       console.info('No attestations left')
@@ -171,7 +194,14 @@ async function promptForCodeAndVerify(
       break
     }
 
-    await verifyCode(attestations, userResponse.code, phoneNumber, account, attestationsToComplete)
-    await printCurrentCompletedAttestations(attestations, phoneNumber, account)
+    await verifyCode(
+      attestations,
+      userResponse.code,
+      identifier,
+      phoneNumber,
+      account,
+      attestationsToComplete
+    )
+    await printCurrentCompletedAttestations(attestations, identifier, phoneNumber, account)
   }
 }

@@ -1,6 +1,6 @@
 import { concurrentMap } from '@celo/base/lib/async'
 import { AbiItem, Address } from '@celo/connect'
-import { AllContracts, ContractKit } from '@celo/contractkit'
+import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
 
 export interface ContractDetails {
   name: string
@@ -8,18 +8,22 @@ export interface ContractDetails {
   jsonInterface: AbiItem[]
 }
 
+export const getContractDetailsFromContract = async (
+  kit: ContractKit,
+  celoContract: CeloContract,
+  address?: string
+) => {
+  const contract = await kit._web3Contracts.getContract(celoContract, address)
+  return {
+    name: celoContract,
+    address: address ?? contract.options.address,
+    jsonInterface: contract.options.jsonInterface,
+  }
+}
+
 export async function obtainKitContractDetails(kit: ContractKit): Promise<ContractDetails[]> {
-  return concurrentMap(
-    5,
-    AllContracts.filter((name: any) => name !== 'MultiSig'),
-    async (celoContract) => {
-      const contract = await kit._web3Contracts.getContract(celoContract)
-      return {
-        name: celoContract,
-        address: contract.options.address,
-        jsonInterface: contract.options.jsonInterface,
-      }
-    }
+  return concurrentMap(5, RegisteredContracts, (celoContract) =>
+    getContractDetailsFromContract(kit, celoContract)
   )
 }
 

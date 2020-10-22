@@ -1,6 +1,6 @@
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
 import debugFactory from 'debug'
-import { AllContracts, CeloContract } from './base'
+import { CeloContract, RegisteredContracts } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
 
@@ -50,7 +50,7 @@ export class AddressRegistry {
 
   async allAddresses(): Promise<Record<CeloContract, Address | null>> {
     const res: Partial<Record<CeloContract, Address | null>> = {}
-    for (const contract of AllContracts) {
+    for (const contract of RegisteredContracts) {
       try {
         res[contract] = await this.addressFor(contract)
       } catch (error) {

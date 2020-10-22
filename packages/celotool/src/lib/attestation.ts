@@ -1,13 +1,43 @@
 import { Address, CeloTransactionParams } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
   AttestationsWrapper
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { OdisUtils } from '@celo/identity'
+import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { sample } from 'lodash'
 import moment from 'moment'
 import { Twilio } from 'twilio'
+
+// Use the supplied salt, or if none supplied, go to ODIS and retrieve a pepper
+export async function getIdentifierAndPepper(kit : ContractKit, context : string, account : string, phoneNumber : string, salt : string | null) {
+  if (salt) {
+    return {
+      pepper: salt,
+      identifier: PhoneNumberUtils.getPhoneHash(phoneNumber, salt!),
+    }
+  } else {
+    const authSigner: AuthSigner = {
+      authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+      contractKit: kit,
+    }
+
+    const ret = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+      phoneNumber,
+      account,
+      authSigner,
+      OdisUtils.Query.getServiceContext(context)
+    )
+
+    return {
+      pepper: ret.pepper,
+      identifier: ret.phoneHash,
+    }
+  }
+}
 
 export async function requestMoreAttestations(
   attestations: AttestationsWrapper,
@@ -39,7 +69,8 @@ export async function requestAttestationsFromIssuers(
   attestationsToReveal: ActionableAttestation[],
   attestations: AttestationsWrapper,
   phoneNumber: string,
-  account: string
+  account: string,
+  pepper: string,
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
@@ -47,7 +78,8 @@ export async function requestAttestationsFromIssuers(
         phoneNumber,
         account,
         attestation.issuer,
-        attestation.attestationServiceURL
+        attestation.attestationServiceURL,
+        pepper
       )
       if (!response.ok) {
         return {
@@ -93,7 +125,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
 export async function findValidCode(
   attestations: AttestationsWrapper,
   messages: string[],
-  phoneNumber: string,
+  identifier: string,
   attestationsToComplete: ActionableAttestation[],
   account: string
 ) {
@@ -105,7 +137,7 @@ export async function findValidCode(
       }
 
       const issuer = await attestations.findMatchingIssuer(
-        phoneNumber,
+        identifier,
         account,
         code,
         attestationsToComplete.map((_) => _.issuer)
@@ -115,7 +147,7 @@ export async function findValidCode(
         continue
       }
 
-      const isValid = await attestations.validateAttestationCode(phoneNumber, account, issuer, code)
+      const isValid = await attestations.validateAttestationCode(identifier, account, issuer, code)
 
       if (!isValid) {
         continue

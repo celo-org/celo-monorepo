@@ -29,6 +29,6 @@ export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
 export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
 
-export const AllContracts = Object.keys(CeloContract).map(
-  (k) => (CeloContract as any)[k as any]
-) as CeloContract[]
+export const AllContracts = Object.keys(CeloContract) as CeloContract[]
+const AuxiliaryContracts = [CeloContract.MultiSig, CeloContract.MetaTransactionWalletDeployer]
+export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))

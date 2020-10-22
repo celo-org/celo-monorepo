@@ -477,6 +477,83 @@ exports[`Experience/Typography renders 1`] = `
                     className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                     data-focusable={true}
                     dir="auto"
+                    href="/experience/grants"
+                    onClick={[Function]}
+                    role="link"
+                    style={
+                      Object {
+                        "WebkitAlignItems": "center",
+                        "WebkitBoxAlign": "center",
+                        "WebkitBoxFlex": 0,
+                        "WebkitBoxPack": "center",
+                        "WebkitFlexGrow": 0,
+                        "WebkitJustifyContent": "center",
+                        "alignItems": "center",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "borderBottomColor": "rgba(0,0,0,0.00)",
+                        "borderLeftColor": "rgba(0,0,0,0.00)",
+                        "borderRightColor": "rgba(0,0,0,0.00)",
+                        "borderTopColor": "rgba(0,0,0,0.00)",
+                        "color": "rgba(129,134,139,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "flexGrow": 0,
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "justifyContent": "center",
+                        "lineHeight": "16px",
+                        "msFlexAlign": "center",
+                        "msFlexPack": "center",
+                        "msFlexPositive": 0,
+                        "opacity": 1,
+                        "outlineColor": "transparent",
+                        "textAlign": "center",
+                        "textRendering": "geometricPrecision",
+                        "width": "fit-content",
+                      }
+                    }
+                  >
+                    GrantKit
+                  </a>
+                </div>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "vertical",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "column",
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "justifyContent": "center",
+                    "marginBottom": "0px",
+                    "marginLeft": "15px",
+                    "marginRight": "15px",
+                    "msFlexAlign": "center",
+                    "msFlexDirection": "column",
+                    "msFlexPack": "center",
+                    "position": "relative",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseEnter={[Function]}
+                  onMouseLeave={[Function]}
+                  onMouseUp={[Function]}
+                >
+                  <a
+                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                    data-focusable={true}
+                    dir="auto"
                     href="/experience/merchant"
                     onClick={[Function]}
                     role="link"
@@ -1377,7 +1454,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.title
+                Typography
               </h1>
               <h4
                 aria-level="4"
@@ -1396,7 +1473,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.headline
+                The Celo fonts were intentionally chosen to speak to Celo’s Approachable and Academic brand principles. To honor both energies and compliment a broader range of expression, a serif and a sans serif font were chosen.
               </h4>
             </div>
             <div
@@ -1423,7 +1500,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.facesTitle
+                Typefaces
               </div>
               <div
                 className="css-text-901oao"
@@ -1441,6 +1518,9 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
+                Celo uses open-source fonts in order for community members to download, build, and design Celo branded material.
+
+Refer to the 
                 <div
                   className="css-view-1dbjc4n"
                   onClick={[Function]}
@@ -1474,6 +1554,7 @@ exports[`Experience/Typography renders 1`] = `
                     philosophy
                   </a>
                 </div>
+                 and guidelines below when building a project on Celo
               </div>
               <h2
                 aria-level="2"
@@ -1496,7 +1577,8 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.mainFontTitle
+                This is Garamond,
+the Celo brand typeface.
               </h2>
               <div
                 className="css-text-901oao"
@@ -1513,7 +1595,9 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.mainFontText
+                EB Garamond represents our Academic brand principle described as timeless and professional. It is an appropriate formal visual tone for education and declaration.
+
+Use EB Garamond for the majority of titles and paragraphs
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -1571,7 +1655,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadAssetBtn
+                  Download
                   <div
                     className="css-view-1dbjc4n"
                     style={
@@ -1639,7 +1723,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.subFontTitle
+                  This is Jost*, our supporting font.
                 </h3>
                 <div
                   className="css-text-901oao"
@@ -1656,7 +1740,9 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.subFontText
+                  Jost*’s geometric form functions as an approachable compliment to EB Garamond. It is used more sparingly and speaks to the typography found in the logo and the round shapes in the illustrations.
+
+Use Jost* for call to actions, diagrams, instructions, and infographics.
                 </div>
                 <div
                   className="css-view-1dbjc4n"
@@ -1714,7 +1800,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                     target="_blank"
                   >
-                    downloadAssetBtn
+                    Download
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -1793,7 +1879,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.typescaleTitle
+                Type Scale
               </h2>
             </div>
             <div
@@ -1812,7 +1898,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              typography.typescaleText
+              For typographic hierarchy, we recommend the following type scale.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2994,7 +3080,7 @@ exports[`Experience/Typography renders 1`] = `
                   }
                 }
               >
-                typography.examplesTitle
+                Usage Examples
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -3033,7 +3119,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h1Example
+                  Main Title
                 </h1>
                 <h2
                   aria-level="2"
@@ -3053,7 +3139,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h2Example
+                  Article Title
                 </h2>
                 <h3
                   aria-level="3"
@@ -3073,7 +3159,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h3Example
+                  Section Title
                 </h3>
                 <h4
                   aria-level="4"
@@ -3093,7 +3179,8 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h4Example
+                  Subtitle / larger text that is one size larger than the body 
+ lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
                 </h4>
                 <div
                   className="css-text-901oao"
@@ -3111,7 +3198,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h5Example
+                  Sub-section Title
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3128,7 +3215,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.bodyExample
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3146,7 +3233,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.h5Example
+                  Sub-section Title
                 </div>
                 <div
                   className="css-text-901oao"
@@ -3162,7 +3249,7 @@ exports[`Experience/Typography renders 1`] = `
                     }
                   }
                 >
-                  typography.smallExample
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.
                 </div>
               </div>
             </div>
@@ -3281,7 +3368,7 @@ exports[`Experience/Typography renders 1`] = `
               }
             }
           >
-            disclaimer
+            Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
           </div>
           <div
             className="css-text-901oao"
@@ -3300,6 +3387,7 @@ exports[`Experience/Typography renders 1`] = `
               }
             }
           >
+            Read more in Celo 
             <div
               className="css-view-1dbjc4n"
               onClick={[Function]}
@@ -3809,7 +3897,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              footer.technology
+              Technology
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4057,7 +4145,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              footer.resources
+              Resources
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -4470,6 +4558,61 @@ exports[`Experience/Typography renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
+                  href="/experience/grants"
+                  onClick={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitTextDecorationStyle": "solid",
+                      "alignItems": "center",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "msFlexAlign": "center",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  GrantKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
                   href="/community#fund"
                   onClick={[Function]}
                   rel=" noopener noreferrer"
@@ -4525,7 +4668,7 @@ exports[`Experience/Typography renders 1`] = `
                 }
               }
             >
-              footer.social
+              Social
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -5173,7 +5316,7 @@ exports[`Experience/Typography renders 1`] = `
             }
           }
         >
-          footer.copyright
+          The Celo Foundation, © Celo 2020
         </div>
       </div>
     </div>
