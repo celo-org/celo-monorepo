@@ -8,7 +8,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION, DAILY_PAYMENT_LIMIT_CUSD } from 'src/config'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { FeeType } from 'src/fees/actions'
-import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
@@ -212,24 +211,13 @@ export function* handleSendPaymentData(
       Logger.warn(TAG, '@handleSendPaymentData null amount')
       return
     }
-
     if (data.isCELO == 'true') {
       console.log('isCELO 1: ', data.isCELO)
-
-      const { result } = useSendFee({
-        feeType: FeeType.SEND,
-        account: RANDOM_ADDRESS,
-        currency: CURRENCY_ENUM.GOLD,
-        recipientAddress: RANDOM_ADDRESS,
-        amount: goldBalance || '0',
-        includeDekFee: false,
-      })
-      const feeEstimate = result && divideByWei(result)
 
       navigate(Screens.WithdrawCeloReviewScreen, {
         amount,
         recipientAddress: data.address.toLowerCase(),
-        feeEstimate: feeEstimate || new BigNumber(0),
+        feeEstimate: new BigNumber(0),
       })
     } else {
       const transactionData: TransactionDataInput = {
@@ -242,9 +230,8 @@ export function* handleSendPaymentData(
     }
   } else {
     if (data.isCELO == 'true') {
-      navigate(Screens.WithdrawCeloScreen, {
-        accountAddress: data.address.toLowerCase(),
-      })
+      Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
+      return
     } else {
       navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
     }
