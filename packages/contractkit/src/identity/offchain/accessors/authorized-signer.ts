@@ -22,6 +22,7 @@ export class AuthorizedSignerAccessor {
     const rawData = await this.wrapper.readDataFromAsResult(
       account,
       dataPath,
+      false,
       AuthorizedSignerSchema
     )
     if (!rawData.ok) {

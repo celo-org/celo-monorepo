@@ -3,6 +3,7 @@ import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/r
 import { recoverEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
+import * as t from 'io-ts'
 import { resolve } from 'url'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
@@ -59,10 +60,11 @@ export default class OffchainDataWrapper {
     this.signer = signer || self
   }
 
-  async readDataFromAsResult(
+  async readDataFromAsResult<DataType>(
     account: Address,
     dataPath: string,
-    type?: any
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
   ): Promise<Result<Buffer, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
@@ -72,15 +74,15 @@ export default class OffchainDataWrapper {
     const storageRoots = metadata
       .filterClaims(ClaimTypes.STORAGE)
       .map((_) => new StorageRoot(this, account, _.address))
-    debug({ account, storageRoots })
 
     if (storageRoots.length === 0) {
       return Err(new NoStorageRootProvidedData())
     }
 
-    const item = (
-      await Promise.all(storageRoots.map((s) => s.readAndVerifySignature(dataPath, type)))
-    ).find((s) => s.ok)
+    const results = await Promise.all(
+      storageRoots.map(async (s) => s.readAndVerifySignature(dataPath, checkOffchainSigners, type))
+    )
+    const item = results.find((s) => s.ok)
 
     if (item === undefined) {
       return Err(new NoStorageRootProvidedData())
@@ -118,9 +120,10 @@ class StorageRoot {
     readonly root: string
   ) {}
 
-  async readAndVerifySignature(
+  async readAndVerifySignature<DataType>(
     dataPath: string,
-    type?: any
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
   ): Promise<Result<Buffer, OffchainErrors>> {
     let dataResponse, signatureResponse
 
@@ -166,13 +169,15 @@ class StorageRoot {
         return Ok(body)
       }
 
-      const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
-      const authorizedSigner = await authorizedSignerAccessor.readAsResult(
-        this.account,
-        guessedSigner
-      )
-      if (authorizedSigner.ok) {
-        return Ok(body)
+      if (checkOffchainSigners) {
+        const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
+        const authorizedSigner = await authorizedSignerAccessor.readAsResult(
+          this.account,
+          guessedSigner
+        )
+        if (authorizedSigner.ok) {
+          return Ok(body)
+        }
       }
     }
 

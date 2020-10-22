@@ -24,7 +24,7 @@ export class PublicBinaryAccessor implements PublicAccessor<Buffer> {
   }
 
   async readAsResult(account: Address) {
-    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath)
+    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath, true)
     if (!rawData.ok) {
       return Err(new OffchainError(rawData.error))
     }

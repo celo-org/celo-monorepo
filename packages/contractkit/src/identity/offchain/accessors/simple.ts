@@ -44,7 +44,7 @@ export class PublicSimpleAccessor<DataType> implements PublicAccessor<DataType> 
   }
 
   async readAsResult(account: Address): Promise<Result<DataType, SchemaErrors>> {
-    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath, this.type)
+    const rawData = await this.wrapper.readDataFromAsResult(account, this.dataPath, true, this.type)
 
     if (!rawData.ok) {
       return Err(new OffchainError(rawData.error))
