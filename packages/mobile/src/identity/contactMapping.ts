@@ -5,7 +5,6 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { isValidAddress } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { call, delay, put, race, select, take } from 'redux-saga/effects'
@@ -15,7 +14,6 @@ import { showErrorOrFallback } from 'src/alert/actions'
 import { IdentityEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { features } from 'src/flags'
 import {
   Actions,
   endFetchingAddresses,
