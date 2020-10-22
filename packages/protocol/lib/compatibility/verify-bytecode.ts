@@ -38,8 +38,7 @@ const isProxyRepointTransaction = (tx: ProposalTx) =>
   (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
 
 const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` &&
-  (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
+  tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
   context.proposal.some((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract))
