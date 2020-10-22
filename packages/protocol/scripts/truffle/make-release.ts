@@ -203,6 +203,13 @@ module.exports = async (callback: (error?: any) => number) => {
         // 3. Deploy new versions of the contract and proxy, if needed.
         if (shouldDeployImplementation || isLibrary) {
           const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const setImplementationTx: ProposalTx = {
+            contract: `${contractName}Proxy`,
+            function: '_setImplementation',
+            args: [contract.address],
+            value: '0',
+          }
+
           if (shouldDeployProxy || isLibrary) {
             // Changes need another proxy/registry repointing
             const proxy = await deployProxy(contractName, addresses, argv.dry_run)
@@ -232,13 +239,10 @@ module.exports = async (callback: (error?: any) => number) => {
                 value: '0',
               })
             } else {
-              proposal.push({
-                contract: `${contractName}Proxy`,
-                function: '_setImplementation',
-                args: [contract.address],
-                value: '0',
-              })
+              proposal.push(setImplementationTx)
             }
+          } else {
+            proposal.push(setImplementationTx)
           }
         }
         // 5. Mark the contract as released
