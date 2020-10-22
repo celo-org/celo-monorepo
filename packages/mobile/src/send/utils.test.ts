@@ -128,6 +128,7 @@ describe('send/utils', () => {
       const parsed: UriData = {
         ...data,
         e164PhoneNumber: undefined,
+        isCELO: undefined,
       }
       await expectSaga(handlePaymentDeeplink, deeplink)
         .provide([[matchers.call.fn(handleSendPaymentData), parsed]])
