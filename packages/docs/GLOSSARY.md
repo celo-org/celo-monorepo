@@ -52,6 +52,10 @@ An open platform that makes financial tools accessible to anyone with a mobile p
 
 The ticker symbol for the [Celo native asset](#celo-native-asset), often written in capital letters to avoid confusion with references to the Celo protocol.
 
+## Celo Foundation
+
+A mission-driven foundation responsible for education, community engagement, and ecosystem support of the Celo platform.
+
 ## Celo Gold
 
 The deprecated name for the Celo native asset, which now is referred to simply as "Celo" or preferably "CELO".
