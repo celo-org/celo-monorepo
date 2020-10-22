@@ -19,9 +19,9 @@ Each proposal starts on the **Proposal Queue** where it may receive upvotes to m
 
 ### Proposal
 
-Any user may submit a Proposal to the `Governance` smart contract, along with a small deposit of CELO. This deposit is required to avoid spam proposals, and is refunded to the proposer if the proposal reaches the Approval stage. A Proposal consists of a list of transactions, and a description URL where voters can get more information about the proposal. Transaction data in the proposal includes the destination address, data, and value. If the proposal passes, the included transactions will be executed by the `Governance` contract.
+Any user may submit a Proposal to the `Governance` smart contract, along with a small deposit of CELO. This deposit is required to avoid spam proposals, and is refunded to the proposer if the proposal reaches the Approval stage. A Proposal consists of a list of transactions, and a description URL where voters can get more information about the proposal. It is encouraged that this description URL points to a CGP document in the [celo-org/celo-proposals](https://github.com/celo-org/celo-proposals) repository. Transaction data in the proposal includes the destination address, data, and value. If the proposal passes, the included transactions will be executed by the `Governance` contract.
 
-Submitted proposals are added to the queue of proposals. While a proposal is on this queue, voters may use their [Locked Celo](./proof-of-stake/locked-gold.md) to **upvote** the proposal. Once per day the top three proposals, by weight of the Locked Gold upvoting them, are dequeued and moved into the Approval phase. Note that if there are fewer than three proposals on the queue, all may be dequeued enough if they have no upvotes. If a proposal has been on the queue for for more than 4 weeks, it expires and the deposit is forfeited.
+Submitted proposals are added to the queue of proposals. While a proposal is on this queue, voters may use their [Locked Celo](./proof-of-stake/locked-gold.md) to **upvote** the proposal. Once per day the top three proposals, by weight of the Locked Gold upvoting them, are dequeued and moved into the Approval phase. Note that if there are fewer than three proposals on the queue, all may be dequeued even if they have no upvotes. If a proposal has been on the queue for for more than 4 weeks, it expires and the deposit is forfeited.
 
 ### Approval
 
@@ -48,7 +48,7 @@ for improvements, new features, and bug fixes, the Celo codebase uses the
 ​
 ### Upgrade risks
 ​
-The core contracts define critical behavior of the Celo network such as CELO and Celo Dollar asset management or validator elections and rewards. Malicious or inadvertent contract bugs could compromise user balances or cause potentially harm, irreversible without a blockchain hard fork.
+The core contracts define critical behavior of the Celo network such as CELO and Celo Dollar asset management or validator elections and rewards. Malicious or inadvertent contract bugs could compromise user balances or potentially cause harm, irreversible without a blockchain hard fork.
 
 Great care must be taken to ensure that any Governance proposal that modifies smart contract code will not break the existing system. To this end, the contracts have a well defined [release process](../../community/release-process/smart-contracts.md), which includes soliciting security audits from reputable third-party auditors.
 
