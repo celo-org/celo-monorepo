@@ -1,6 +1,7 @@
 import { Address } from '@celo/utils/lib/address'
 import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
+import { CeloContract } from '../base'
 import {
   getInitializeAbiOfImplementation,
   PROXY_ABI,
@@ -9,7 +10,12 @@ import {
 } from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
-import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
+import {
+  ContractDetails,
+  getContractDetailsFromContract,
+  mapFromPairs,
+  obtainKitContractDetails,
+} from './base'
 
 export interface CallDetails {
   contract: string
@@ -37,23 +43,27 @@ export async function newBlockExplorer(kit: ContractKit) {
   return new BlockExplorer(kit, await obtainKitContractDetails(kit))
 }
 
+const getContractMappingFromDetails = (cd: ContractDetails) => ({
+  details: cd,
+  fnMapping: mapFromPairs(
+    (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
+      .filter((ad) => ad.type === 'function')
+      .map((ad) => [ad.signature, ad])
+  ),
+})
+
 export class BlockExplorer {
   private addressMapping: Map<Address, ContractMapping>
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
-      contractDetails.map((cd) => [
-        cd.address,
-        {
-          details: cd,
-          fnMapping: mapFromPairs(
-            (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
-              .filter((ad) => ad.type === 'function')
-              .map((ad) => [ad.signature, ad])
-          ),
-        },
-      ])
+      contractDetails.map((cd) => [cd.address, getContractMappingFromDetails(cd)])
     )
+  }
+
+  async updateContractDetailsMapping(name: string, address: string) {
+    const cd = await getContractDetailsFromContract(this.kit, name as CeloContract, address)
+    this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {

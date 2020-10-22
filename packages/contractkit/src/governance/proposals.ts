@@ -1,12 +1,11 @@
-import { concurrentMap } from '@celo/base/lib/async'
-import { isHexString } from '@celo/utils/lib/address'
+import { Address, isHexString } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { isValidAddress, keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
 import { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
-import { Address, CeloContract, RegisteredContracts } from '../base'
+import { CeloContract, RegisteredContracts } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
@@ -45,6 +44,9 @@ export interface ProposalTransactionJSON {
   value: string
 }
 
+const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Registry' && tx.function === 'setAddressFor'
+
 /**
  * Convert a compiled proposal to a human-readable JSON form using network information.
  * @param kit Contract kit instance used to resolve addresses to contract names.
@@ -55,26 +57,36 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
   const contractDetails = await obtainKitContractDetails(kit)
   const blockExplorer = new BlockExplorer(kit, contractDetails)
 
-  return concurrentMap<ProposalTransaction, ProposalTransactionJSON>(4, proposal, async (tx) => {
+  const proposalJson: ProposalTransactionJSON[] = []
+  for (const tx of proposal) {
     const parsedTx = blockExplorer.tryParseTx(tx as Transaction)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
     }
 
-    return {
+    const jsonTx: ProposalTransactionJSON = {
       contract: parsedTx.callDetails.contract as CeloContract,
       function: parsedTx.callDetails.function,
       args: parsedTx.callDetails.argList,
       params: parsedTx.callDetails.paramMap,
       value: parsedTx.tx.value,
     }
-  })
+
+    if (isRegistryRepoint(jsonTx)) {
+      const [name, address] = jsonTx.args
+      await blockExplorer.updateContractDetailsMapping(name, address)
+    }
+
+    proposalJson.push(jsonTx)
+  }
+  return proposalJson
 }
 
 type ProposalTxParams = Pick<ProposalTransaction, 'to' | 'value'>
 interface RegistryAdditions {
   [contractName: string]: Address
 }
+
 /**
  * Builder class to construct proposals from JSON or transaction objects.
  */
@@ -139,7 +151,7 @@ export class ProposalBuilder {
       address = await this.kit.registry.addressFor(tx.contract)
     }
 
-    if (tx.contract === 'Registry' && tx.function === 'setAddressFor') {
+    if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
       this.registryAdditions[tx.args[0]] = tx.args[1]
       this.registryAdditions[tx.args[0] + 'Proxy'] = tx.args[1]
