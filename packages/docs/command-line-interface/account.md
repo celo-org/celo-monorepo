@@ -696,6 +696,41 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/register-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-metadata.ts)_
 
+### Revoke
+
+Revoke an account address
+
+```
+USAGE
+  $ celocli account:revoke
+
+OPTIONS
+  --from=from                                    (required)
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
+  --identifiers=identifiers                      (required)
+
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                    Set it to use a ledger wallet
+
+EXAMPLE
+  revoke --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --identifiers
+  '["0x411a7e866a6315409ed021d9299bf6814275409ed021d9299bf6814279a6a1","0x411a7e866a6315409ed021d9299bf6814275409ed021d9
+  299bf6814279a6a2"]'
+```
+
+_See code: [packages/cli/src/commands/account/revoke.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/revoke.ts)_
+
 ### Set-name
 
 Sets the name of a registered account on-chain. An account's name is an optional human readable identifier

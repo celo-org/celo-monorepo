@@ -39,6 +39,7 @@
 * [getNonCompliantIssuers](_wrappers_attestations_.attestationswrapper.md#getnoncompliantissuers)
 * [getPastEvents](_wrappers_attestations_.attestationswrapper.md#getpastevents)
 * [getVerifiedStatus](_wrappers_attestations_.attestationswrapper.md#getverifiedstatus)
+* [hasAccountForIdentifier](_wrappers_attestations_.attestationswrapper.md#hasaccountforidentifier)
 * [isAttestationExpired](_wrappers_attestations_.attestationswrapper.md#isattestationexpired)
 * [lookupIdentifiers](_wrappers_attestations_.attestationswrapper.md#lookupidentifiers)
 * [request](_wrappers_attestations_.attestationswrapper.md#request)
@@ -476,6 +477,23 @@ Name | Type | Description |
 `attestationThreshold?` | undefined &#124; number | Optional threshold for fraction attestations completed. Will  default to hardcoded value if absent.  |
 
 **Returns:** *Promise‹AttestationsStatus›*
+
+___
+
+###  hasAccountForIdentifier
+
+▸ **hasAccountForIdentifier**(`identifer`: string, `account`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
+
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:661](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L661)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`identifer` | string |
+`account` | [Address](../modules/_base_.md#address) |
+
+**Returns:** *Promise‹boolean›*
 
 ___
 
