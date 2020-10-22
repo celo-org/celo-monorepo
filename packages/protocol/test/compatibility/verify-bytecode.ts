@@ -361,10 +361,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                testContract.address,
-              ],
+              args: ['TestContract', testContract.address],
               value: '0',
             },
           ]
@@ -385,10 +382,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                testContract.address,
-              ],
+              args: ['TestContract', testContract.address],
               value: '0',
             },
           ]
@@ -403,10 +397,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                accounts[0],
-              ],
+              args: ['TestContract', accounts[0]],
               value: '0',
             },
           ]

@@ -3,7 +3,7 @@ import {
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyLibraryPrefix,
+  verifyLibraryPrefix
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
@@ -34,7 +34,7 @@ interface VerificationContext {
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
 const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
+  tx.contract === `${contract}Proxy` && (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
   context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
@@ -48,13 +48,11 @@ const isRegistryRepointTransaction = (tx: ProposalTx, registryId: string) =>
   tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, registryId))
+  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, contract))
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, registryId))
+  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, contract))
   return relevantTx.args[1]
 }
 
@@ -81,7 +79,7 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     proxyAddress = context.libraryAddresses.addresses[contract]
     // Before the first contracts upgrade libraries are not proxied.
     if (context.isBeforeRelease1) {
-      return proxyAddress
+      return `0x${proxyAddress}`
     }
   } else {
     // contract is registered but we need to check if the proxy is affected by the proposal
@@ -124,6 +122,13 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+  } else {
+    // tslint:disable-next-line: no-console
+    console.log(
+      `${
+        isLibrary(contract, context) ? 'Library' : 'Contract'
+      } deployed at ${implementationAddress} matches ${contract}`
+    )
   }
 
   // push unvisited libraries to DFS queue
