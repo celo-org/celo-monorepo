@@ -15,7 +15,7 @@ The change procedure happens in the following phases:
 
 ### Overview of Phases
 
-Each proposal starts on the **Proposal Queue** where it may receive upvotes for promotion to the Approval phase. Proposals are promoted once per day, and must be promoted within 4 weeks. **Approval** lasts 1 days, during which the proposal must be approved by the Approver. Approved proposals are promoted to the Referendum stage. **Referendum** lasts five days, during which owners of Locked Celo vote yes or no on the proposal. Proposals that satisfy the necessary quorum are promoted to the execution phase. **Execution** lasts up to three days, during which anybody may trigger the execution of the proposal. 
+Each proposal starts on the **Proposal Queue** where it may receive upvotes to move forward in the queue relative to other queued proposals.  Three proposals from the top of the queue are dequeued and promoted to the approval stage per day.  Any proposal that remains in the queue for 4 weeks will expire. **Approval** lasts 1 days, during which the proposal must be approved by the Approver. Approved proposals are promoted to the Referendum stage. **Referendum** lasts five days, during which owners of Locked Celo vote yes or no on the proposal. Proposals that satisfy the necessary quorum are promoted to the execution phase. **Execution** lasts up to three days, during which anybody may trigger the execution of the proposal. 
 
 ### Proposal
 
