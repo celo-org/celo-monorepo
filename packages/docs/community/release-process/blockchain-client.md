@@ -4,7 +4,7 @@
 
 Releases of celo-blockchain are numbered according to semantic versioning, as described at [semver.org](https://semver.org).
 
-  * New releases of celo-blockchain can be expected as follows:
+New releases of celo-blockchain can be expected as follows:
   * Major releases: approximately yearly
   * Minor releases: approximately 4 times a year
   * Patch releases: as needed
@@ -22,8 +22,10 @@ gpg --auto-key-locate wkd --locate-keys $EMAIL
 ```
 
 Currently hosted core developer keys include:
+
 * victor@clabs.co
 * mariano@clabs.co
+* joshua@clabs.co
 
 ## Documentation
 

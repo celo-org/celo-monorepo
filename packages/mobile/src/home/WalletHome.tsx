@@ -145,6 +145,7 @@ export class WalletHome extends React.Component<Props, State> {
       t('testnetAlert.1', { testnet: _.startCase(DEFAULT_TESTNET) }),
       ALERT_BANNER_DURATION,
       null,
+      null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
   }
