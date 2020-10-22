@@ -21,19 +21,19 @@ The change procedure happens in the following phases:
 
 Any user may submit a “Proposal” to the `Governance` smart contract, along with a small deposit of CELO. This deposit is required to avoid spam proposals, and is refunded to the proposer if the community decides the proposal is worthy of voting on. A “Proposal” consists of a timestamp and the information needed to the “call” the operation code that will run if the proposal is accepted. This information includes an address, data, and value. Submitted proposals are added to the queue of proposals and expire from this list after one week.
 
-Once added to the queue, a proposal needs to get voted on by CELO holders to pass to the next “Approval” phase. Every CELO holder with a Locked Gold account may vote for at most one proposal and in order to be eligible to do so, the account must put up a commitment, which involves sending CELO to a smart contract and specifying a notice period to wait once the withdrawal is requested. This Locked Gold commitment can be the same as the funds used for validator elections and earning epoch rewards. The list of proposals is sorted by the weight of the votes they have received.
+Once added to the queue, a proposal needs to get voted on by CELO holders to pass to the next “Approval” phase. Every CELO holder with a Locked CELO account may vote for at most one proposal and in order to be eligible to do so, the account must put up a commitment, which involves sending CELO to a smart contract and specifying a notice period to wait once the withdrawal is requested. This Locked CELO commitment can be the same as the funds used for validator elections and earning epoch rewards. The list of proposals is sorted by the weight of the votes they have received.
 
 ### Approval
 
-Every day the top three proposals at the head of the queue are popped off and move to the approval phase. At this time, the original proposers are eligible to reclaim their Locked Gold commitment. In this phase graduated proposals need to be approved by the approver within the current approval phase of a day. The approver is initially a multi-signature address and will move to a DAO in the future. If a proposal is not approved within this phase, it is considered expired and does not move on to the “Referendum” phase.
+Every day the top three proposals at the head of the queue are popped off and move to the approval phase. At this time, the original proposers are eligible to reclaim their Locked CELO commitment. In this phase graduated proposals need to be approved by the approver within the current approval phase of a day. The approver is initially a multi-signature address and will move to a DAO in the future. If a proposal is not approved within this phase, it is considered expired and does not move on to the “Referendum” phase.
 
 ### Referendum
 
-Once the Approval phase is over, approved proposals graduate to the referendum phase. Any user may vote yes, no, or abstain on these proposals. Their vote's weight is determined by the weight of their Locked Gold commitment. After the Referendum phase is over, which lasts two days, each proposal is marked as passed or failed as a function of the votes and the corresponding passing function parameters.
+Once the Approval phase is over, approved proposals graduate to the referendum phase. Any user may vote yes, no, or abstain on these proposals. Their vote's weight is determined by the weight of their Locked CELO commitment. After the Referendum phase is over, which lasts two days, each proposal is marked as passed or failed as a function of the votes and the corresponding passing function parameters.
 
 In order for a proposal to pass, it must meet a minimum threshold for **participation**, and **agreement**:
 
-* Participation is the minimum portion of Locked Gold which must cast a vote for a proposal to pass. It exists to prevent proposals passing with very low participation. The participation requirement is calculated as a governable portion of the participation baseline, which is an exponential moving average of final participation in past governance proposals.
+* Participation is the minimum portion of Locked CELO which must cast a vote for a proposal to pass. It exists to prevent proposals passing with very low participation. The participation requirement is calculated as a governable portion of the participation baseline, which is an exponential moving average of final participation in past governance proposals.
 * Agreement is the portion of votes cast that must be "yes" votes for a proposal to pass. Each contract and function can define a required level of agreement, and the required agreement for a proposal is the maximum requirement among its constituent transactions.
 
 ### Execution

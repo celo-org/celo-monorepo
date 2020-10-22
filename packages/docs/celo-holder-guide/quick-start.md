@@ -32,7 +32,7 @@ In this guide, you will:
 - Access the `ReleaseGold` account associated with your address using your existing Ledger
 - Authorize a voting key, which you will hold on a new, second Ledger
 - Lock some of the Gold in your `ReleaseGold` account
-- Use that Locked Gold to vote for Validator Groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
+- Use that Locked CELO to vote for Validator Groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
 
 ## Preparing Ledgers
 
@@ -184,7 +184,7 @@ Now switch ledgers.
 Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
 {% endhint %}
 
-Next, register the `ReleaseGold` contract as a “Locked Gold” account:
+Next, register the `ReleaseGold` contract as a “Locked CELO” account:
 
 ```bash
 # Using the Beneficiary Ledger
@@ -193,13 +193,13 @@ celocli releasegold:create-account --contract $CELO_RG_ADDRESS --useLedger
 
 You'll need to press right on the Ledger several times to review details of the transactions, then when the device says "Accept and send" press both buttons together.
 
-Check that the `ReleaseGold` contract address is associated with a registered Locked Gold Account:
+Check that the `ReleaseGold` contract address is associated with a registered Locked CELO Account:
 
 ```bash
 celocli account:show $CELO_RG_ADDRESS
 ```
 
-Now, using the proof-of-possession you generated above, as the Locked Gold Account account, you will authorize the vote signing key to vote on the Locked Gold Account's behalf:
+Now, using the proof-of-possession you generated above, as the Locked CELO Account account, you will authorize the vote signing key to vote on the Locked CELO Account's behalf:
 
 ```bash
 # Using the Beneficiary Ledger
@@ -271,7 +271,7 @@ celocli account:balance $CELO_RG_ADDRESS
 
 All CELO amounts should be expressed in wei: that means 1 CELO = 1000000000000000000. Don’t include the `< >` braces in the line below.
 
-To vote, you will use your vote signer key, which is voting *on behalf of* your Locked Gold account.
+To vote, you will use your vote signer key, which is voting *on behalf of* your Locked CELO account.
 
 {% hint style="info" %}
 Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
@@ -282,7 +282,7 @@ Connect your **Vote Signer Ledger** now, unlock it, and open the Celo applicatio
 celocli election:vote --from $CELO_VOTE_SIGNER_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --useLedger --value <CELO-GOLD-AMOUNT>
 ```
 
-Verify that your votes were cast successfully. Since your Vote Signer account votes on behalf of the Celo Locked Gold account, you want to check the election status for that account:
+Verify that your votes were cast successfully. Since your Vote Signer account votes on behalf of the Celo Locked CELO account, you want to check the election status for that account:
 
 ```bash
 celocli election:show $CELO_RG_ADDRESS --voter
@@ -374,7 +374,7 @@ At some point, the terms of your `ReleaseGold` contract will allow you to withdr
 There are actually several steps to this process:
 
 1. First, revoke all outstanding votes as above (including for governance proposals)
-2. Unlock the non-voting Locked Gold, starting a 72 hour unlocking period
+2. Unlock the non-voting Locked CELO, starting a 72 hour unlocking period
 3. After the three day unlocking period is complete, withdraw the CELO back to the `ReleaseGold` contract
 4. Assuming vesting and distribution requirements are met, withdraw the CELO to the beneficiary address
 
@@ -394,7 +394,7 @@ celocli account:balance $CELO_RG_ADDRESS
 Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
 {% endhint %}
 
-Assuming you have non-voting Locked Gold, you can initiate the process to unlock:
+Assuming you have non-voting Locked CELO, you can initiate the process to unlock:
 
 ```bash
 # Using the Beneficiary Ledger
@@ -415,4 +415,4 @@ Finally, request that the `ReleaseGold` contract transfer an amount to your bene
 celocli releasegold:withdraw --contract $CELO_RG_ADDRESS --useLedger --value <CELO-GOLD-AMOUNT>
 ```
 
-To vote with any CELO in your beneficiary account, you'll want to register it as a Locked Gold Acccount, authorize a new vote signing key for it, then lock CELO.
+To vote with any CELO in your beneficiary account, you'll want to register it as a Locked CELO Acccount, authorize a new vote signing key for it, then lock CELO.

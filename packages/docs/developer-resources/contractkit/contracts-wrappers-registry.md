@@ -46,7 +46,7 @@ For the moment, we have contract wrappers for:
 - GasPriceMinimum
 - GoldToken
 - Gobernance
-- LockedGold
+- LockedCELO
 - Reserve
 - SortedOracles
 - Validators
@@ -91,7 +91,7 @@ The complete list is:
 - GasPriceMinimum
 - GoldToken
 - Governance
-- LockedGold
+- LockedCELO
 - Random
 - Registry
 - Reserve

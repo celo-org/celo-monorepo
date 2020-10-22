@@ -93,7 +93,7 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/releasegold/create-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/create-account.ts)_
 
-### Locked-gold
+### Locked-CELO
 
 Perform actions [lock, unlock, withdraw] on CELO that has been locked via the provided ReleaseGold contract.
 
@@ -166,7 +166,7 @@ _See code: [packages/cli/src/commands/releasegold/refund-and-finalize.ts](https:
 
 ### Revoke
 
-Revoke the given contract instance. Once revoked, any Locked Gold can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.
+Revoke the given contract instance. Once revoked, any Locked CELO can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.
 
 ```
 USAGE

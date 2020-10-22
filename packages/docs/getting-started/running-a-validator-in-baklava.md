@@ -581,7 +581,7 @@ celocli election:show $CELO_VALIDATOR_GROUP_RG_ADDRESS --voter
 celocli election:show $CELO_VALIDATOR_RG_ADDRESS --voter
 ```
 
-If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked Gold voting for your Validator Group. You can see these rewards accumulate with the commands in the previous set, as well as:
+If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked CELO voting for your Validator Group. You can see these rewards accumulate with the commands in the previous set, as well as:
 
 ```bash
 # On your local machine

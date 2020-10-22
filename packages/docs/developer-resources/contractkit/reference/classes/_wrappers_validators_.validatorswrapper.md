@@ -182,9 +182,9 @@ ___
 
 *Defined in [packages/contractkit/src/wrappers/Validators.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L130)*
 
-Returns the Locked Gold requirements for specific account.
+Returns the Locked CELO requirements for specific account.
 
-**`returns`** The Locked Gold requirements for a specific account.
+**`returns`** The Locked CELO requirements for a specific account.
 
 #### Type declaration:
 
@@ -720,11 +720,11 @@ ___
 
 *Defined in [packages/contractkit/src/wrappers/Validators.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L118)*
 
-Returns the Locked Gold requirements for validator groups.
+Returns the Locked CELO requirements for validator groups.
 
 **Returns:** *Promise‹[LockedGoldRequirements](../interfaces/_wrappers_validators_.lockedgoldrequirements.md)›*
 
-The Locked Gold requirements for validator groups.
+The Locked CELO requirements for validator groups.
 
 ___
 
@@ -859,11 +859,11 @@ ___
 
 *Defined in [packages/contractkit/src/wrappers/Validators.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L106)*
 
-Returns the Locked Gold requirements for validators.
+Returns the Locked CELO requirements for validators.
 
 **Returns:** *Promise‹[LockedGoldRequirements](../interfaces/_wrappers_validators_.lockedgoldrequirements.md)›*
 
-The Locked Gold requirements for validators.
+The Locked CELO requirements for validators.
 
 ___
 

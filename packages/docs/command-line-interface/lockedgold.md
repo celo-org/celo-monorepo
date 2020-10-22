@@ -39,7 +39,7 @@ _See code: [packages/cli/src/commands/lockedgold/lock.ts](https://github.com/cel
 
 ### Show
 
-Show Locked Gold information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked Gold balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
+Show Locked CELO information for a given account. This includes the total amount of locked gold, the amount being used for voting in Validator Elections, the Locked CELO balance this account is required to maintain due to a registered Validator or Validator Group, and any pending withdrawals that have been initiated via "lockedgold:unlock".
 
 ```
 USAGE

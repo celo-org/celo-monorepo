@@ -19,14 +19,14 @@ For more details on a specific key type, please see the more detailed sections b
 | Role                                | Description                                                                                      | Ledger compatible |
 | ----------------------------------- |--------------------------------------------------------------------------------------------------|-----|
 | Celo Account                        | An account used to send transactions in the Celo protocol                                        | Yes |
-| Locked Gold Account                 | Used to lock and unlock CELO and authorize signers                                               | Yes |
-| Authorized vote signer              | Can vote on behalf of a Locked Gold Account                                                      | Yes |
-| Authorized validator (group) signer | Can register and manage a validator group on behalf of a Locked Gold Account                     | Yes |
-| Authorized validator signer         | Can register, manage a validator, and sign consensus messages on behalf of a Locked Gold Account | No  |
+| Locked CELO Account                 | Used to lock and unlock CELO and authorize signers                                               | Yes |
+| Authorized vote signer              | Can vote on behalf of a Locked CELO Account                                                      | Yes |
+| Authorized validator (group) signer | Can register and manage a validator group on behalf of a Locked CELO Account                     | Yes |
+| Authorized validator signer         | Can register, manage a validator, and sign consensus messages on behalf of a Locked CELO Account | No  |
 | Authorized validator BLS signer     | Used to sign blocks as a validator                                                               | No  |
-| Authorized attestation signer       | Can sign attestation messages on behalf of a Locked Gold account                                 | No  |
+| Authorized attestation signer       | Can sign attestation messages on behalf of a Locked CELO account                                 | No  |
 
 
 {% hint style="warning" %}
-A Locked Gold Account may have at most one authorized signer of each type at any time. Once a signer is authorized, the only way to deauthorize that signer is to authorize a new signer that has never previously been used as an authorized signer or Locked Gold Account. It follows then that a newly deauthorized signer cannot be reauthorized.
+A Locked CELO Account may have at most one authorized signer of each type at any time. Once a signer is authorized, the only way to deauthorize that signer is to authorize a new signer that has never previously been used as an authorized signer or Locked CELO Account. It follows then that a newly deauthorized signer cannot be reauthorized.
 {% endhint %}

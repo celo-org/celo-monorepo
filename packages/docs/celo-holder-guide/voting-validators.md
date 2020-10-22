@@ -8,7 +8,7 @@ The Celo community makes these decisions through elections for [Validator Groups
 
 [Validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md) are held every epoch (approximately once per day). The protocol elects a maximum of 100 Validators. At each epoch, every elected Validator must be re-elected to continue. Validators are selected [in proportion](../celo-codebase/protocol/proof-of-stake/validator-elections.md#Running-the-Election) to votes received for each Validator Group.
 
-If you hold CELO, or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting, you can vote for Validator Groups. A single account can split their LockedGold balance to have outstanding votes for up to 10 groups.
+If you hold CELO, or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting, you can vote for Validator Groups. A single account can split their LockedCELO balance to have outstanding votes for up to 10 groups.
 
 CELO that you lock and use to vote for a group that elects one or more Validators receives [epoch rewards](../celo-codebase/protocol/proof-of-stake/epoch-rewards.md) every epoch (approximately every day) once the community passes a governance proposal enabling rewards. The initial level of rewards is anticipated to be around 6% per annum equivalent (but is subject to change).
 
@@ -34,9 +34,9 @@ A white check mark next to the name of a Validator Group shows that there is one
 
 The Votes Available column shows:
 
-- On the left: Votes made for the group, as a percentage of the total Locked Gold
+- On the left: Votes made for the group, as a percentage of the total Locked CELO
 
-- On the right: The voting cap of that group, as a percentage of the total Locked Gold
+- On the right: The voting cap of that group, as a percentage of the total Locked CELO
 
 - In the middle: votes made for the group as a proportion of the voting cap
 
@@ -64,13 +64,13 @@ You might consider these factors when choosing a Validator Group for whom to vot
 
 - **Participated in The Great Celo Stake Off**: [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136) was a Validator challenge that ran on the [Baklava Testnet](../getting-started/baklava-testnet.md) between November 2019 and March 2020. Its aims were to help organizations interested in operating Celo Validators build operational experience. Validators that participated have had an opportunity to build tooling, understand the Celo protocol, and in many cases undergo a security audit. The [final Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) is public, although addresses that Validators used for the Stake Off are different to those on the Mainnet network.
 
-- **Will get elected**: Locked Gold only receives voter rewards during an epoch if it is used to vote for a Validator Group that elects at least one Validator during that epoch. Put another way, your vote does not contribute to securing the network or earning you rewards if your group does not receive enough other votes to elect a Validator.
+- **Will get elected**: Locked CELO only receives voter rewards during an epoch if it is used to vote for a Validator Group that elects at least one Validator during that epoch. Put another way, your vote does not contribute to securing the network or earning you rewards if your group does not receive enough other votes to elect a Validator.
 
 - **Secure**: The operational security of Validators is essential for everyone's use of the Celo network. All Validators that participated in the Stake Off were eligible for a [security audit](https://medium.com/celoorg/the-celo-Validator-community-security-audits-and-lessons-learned-e67b78cd4123). You can see scores under the "Master Validator Challenge" column in the [Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true). Scores of 80% or greater were awarded the "Master Validator" badge, indiciating a serious proven commitment to operational security.
 
 - **Reliable**: Celo's consensus protocol relies on two-thirds of elected Validators being available in order to produce blocks and process transactions. Voter rewards are directly tied to the [uptime score](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-uptime-score) of all elected Validators in the group for which the vote was made. Any period of consecutive downtime greater than a minute reduces a Validator's uptime score.
 
-- **No recent slashing:** When Validators and groups register, their Locked Gold becomes "staked", in that it is subject to penalties for conduct that could seriously adversely affect the health of the network. Voters' Locked Gold is never slashed, but voter rewards are affected by a group's [slashing penalty](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-slashing-penalty), which is halved when a group or one of its Validators is slashed. Look for groups with a last slashing time long in the past, ideally `0` (never), and a slashing penalty value of `1.0`.
+- **No recent slashing:** When Validators and groups register, their Locked CELO becomes "staked", in that it is subject to penalties for conduct that could seriously adversely affect the health of the network. Voters' Locked CELO is never slashed, but voter rewards are affected by a group's [slashing penalty](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-slashing-penalty), which is halved when a group or one of its Validators is slashed. Look for groups with a last slashing time long in the past, ideally `0` (never), and a slashing penalty value of `1.0`.
 
 - **Runs an Attestation Service**: The [Attestation Service](../celo-codebase/protocol/identity/README.md) is an important service that Validators can run that allows users to verify that they have access to a phone number and map it to an address. Supporting Validators that run this service makes it easier for new users to begin using Celo.
 

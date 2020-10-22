@@ -98,7 +98,7 @@ A fixed number of blocks, configured in the network's genesis block, during whic
 
 ## Epoch Rewards
 
-Funds disbursed by the protocol at the end of every epoch as incentives for validators, validator groups, holders of [Locked Gold](#locked-gold) that voted for validator groups that elected one or more validators, the Reserve, the Community Fund, and the Carbon Offsetting Fund.
+Funds disbursed by the protocol at the end of every epoch as incentives for validators, validator groups, holders of [Locked CELO](#locked-gold) that voted for validator groups that elected one or more validators, the Reserve, the Community Fund, and the Carbon Offsetting Fund.
 
 ## ERC-20
 
@@ -172,11 +172,11 @@ Istanbul, or IBFT, is the original name of the implementation of the Byzantine F
 
 A device or computer running the Celo Blockchain software that keeps typically only the most recent blockchain state, such that it can send transactions and identify what other data to request as necessary. Every Celo Wallet installation includes a Celo Blockchain light client.
 
-## [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
+## [Locked CELO](celo-codebase/protocol/proof-of-stake/locked-gold.md)
 
-[CELO](#celo-native-asset) balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
+[CELO](#celo-native-asset) balances held in escrow at the Locked CELO contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
 
-Locked Gold is in the process of being renamed along with other references to [Celo Gold](#celo-gold) (cGLD), which is now referred as [CELO](#celo-native-asset).
+Locked CELO is in the process of being renamed along with other references to [Celo Gold](#celo-gold) (cGLD), which is now referred as [CELO](#celo-native-asset).
 
 ## Mainnet
 
@@ -192,7 +192,7 @@ An interaction that takes place solely through a transaction being executed on t
 
 ## Proof-of-Stake
 
-The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of [CELO](#celo-native-asset) into [Locked Gold](#locked-gold) then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
+The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of [CELO](#celo-native-asset) into [Locked CELO](#locked-gold) then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
 
 ## RC1
 
@@ -240,7 +240,7 @@ A stablecoin is a type of cryptocurrency whose price tracks an external currency
 
 ## Stake
 
-[Locked Gold](#locked-gold) that a validator or validator group puts at risk at the point of registration. A portion of a stake can be slashed for particular actions not conducive to the health of the network.
+[Locked CELO](#locked-gold) that a validator or validator group puts at risk at the point of registration. A portion of a stake can be slashed for particular actions not conducive to the health of the network.
 
 ## Testnet
 
@@ -252,7 +252,7 @@ Requests to make a change to the state of the blockchain. They can: transfer val
 
 ## Unlocking Period
 
-The elapsed time between an account requesting an amount of [Locked Gold](#locked-gold) be unlocked and the first point it can be withdrawn.
+The elapsed time between an account requesting an amount of [Locked CELO](#locked-gold) be unlocked and the first point it can be withdrawn.
 
 ## Uptime Score
 
@@ -264,7 +264,7 @@ Both: the entity in the proof-of-stake mechanism that can be associated with a v
 
 ## Validator Group
 
-The entity in the proof-of-stake mechanism that can associate validators, receive votes from holders of [Locked Gold](#locked-gold) and cause those validators to be elected.
+The entity in the proof-of-stake mechanism that can associate validators, receive votes from holders of [Locked CELO](#locked-gold) and cause those validators to be elected.
 
 ## Validator Set
 
