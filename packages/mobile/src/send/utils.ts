@@ -176,7 +176,6 @@ export function* handleSendPaymentData(
   cachedRecipient?: RecipientWithContact,
   isOutgoingPaymentRequest?: true
 ) {
-  console.log('in handleSendPaymentData')
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
     address: data.address.toLowerCase(),
@@ -212,8 +211,6 @@ export function* handleSendPaymentData(
       return
     }
     if (data.isCELO == 'true') {
-      console.log('isCELO 1: ', data.isCELO)
-
       navigate(Screens.WithdrawCeloReviewScreen, {
         amount,
         recipientAddress: data.address.toLowerCase(),
