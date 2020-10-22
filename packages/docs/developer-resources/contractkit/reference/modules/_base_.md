@@ -16,6 +16,7 @@
 * [AllContracts](_base_.md#const-allcontracts)
 * [NULL_ADDRESS](_base_.md#const-null_address)
 * [ProxyContracts](_base_.md#const-proxycontracts)
+* [RegisteredContracts](_base_.md#const-registeredcontracts)
 
 ## Type aliases
 
@@ -37,9 +38,7 @@ ___
 
 ### `Const` AllContracts
 
-• **AllContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = Object.keys(CeloContract).map(
-  (k) => (CeloContract as any)[k as any]
-) as CeloContract[]
+• **AllContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = Object.keys(CeloContract) as CeloContract[]
 
 *Defined in [packages/contractkit/src/base.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L35)*
 
@@ -58,3 +57,11 @@ ___
 • **ProxyContracts**: *string[]* = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
 *Defined in [packages/contractkit/src/base.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L31)*
+
+___
+
+### `Const` RegisteredContracts
+
+• **RegisteredContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
+
+*Defined in [packages/contractkit/src/base.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L37)*

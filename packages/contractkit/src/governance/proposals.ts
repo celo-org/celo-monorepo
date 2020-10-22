@@ -59,6 +59,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
     }
+
     return {
       contract: parsedTx.callDetails.contract as CeloContract,
       function: parsedTx.callDetails.function,
