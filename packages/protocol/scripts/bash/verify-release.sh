@@ -35,6 +35,7 @@ done
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal via the -p flag" && exit 1;
 
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+git fetch --all --tags >> $LOG_FILE 
 echo " - Checkout source code at $BRANCH"
 git checkout $BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
