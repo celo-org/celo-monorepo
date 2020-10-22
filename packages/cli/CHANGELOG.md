@@ -10,7 +10,7 @@ Features
 - [one-line summary] - ( [link PR] )
 
 Bug Fixes
-- [one-line summary] -  ( [link PR] )
+- Fix error when listing contract addresses and include some missing new contracts - [#5301](https://github.com/celo-org/celo-monorepo/pull/5301)
 
 Other Changes
 - [one-line summary] - ( [link PR] )

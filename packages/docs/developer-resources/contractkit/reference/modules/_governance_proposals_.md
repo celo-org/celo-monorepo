@@ -71,7 +71,7 @@ ___
 
 ▸ **proposalToJSON**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `proposal`: [Proposal](_wrappers_governance_.md#proposal)): *Promise‹[ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)[]›*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L53)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L56)*
 
 Convert a compiled proposal to a human-readable JSON form using network information.
 
