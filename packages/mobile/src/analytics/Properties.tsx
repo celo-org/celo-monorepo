@@ -627,7 +627,9 @@ interface NetworkEventsProperties {
     latestBlock: number
     latestTimestamp: number
   }
-  [NetworkEvents.network_sync_waiting]: undefined
+  [NetworkEvents.network_sync_waiting]: {
+    latestBlock?: number
+  }
   [NetworkEvents.network_sync_start]: {
     startingBlock: number
     currentBlock: number

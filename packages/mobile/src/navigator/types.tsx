@@ -51,10 +51,6 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
-  [Screens.BackupSocial]: undefined
-  [Screens.BackupSocialIntro]: {
-    incomingFromBackupFlow: boolean
-  }
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -108,7 +104,7 @@ export type StackParamList = {
         showZeroBalanceModal?: boolean
       }
     | undefined
-  [Screens.ImportWalletSocial]: undefined
+
   [Screens.ImportContacts]:
     | undefined
     | {
@@ -116,10 +112,6 @@ export type StackParamList = {
         importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.Invite]: undefined
-  [Screens.InviteReview]: {
-    recipient: Recipient
-  }
   [Screens.NameAndNumber]:
     | {
         selectedCountryCodeAlpha2: string
@@ -222,6 +214,7 @@ export type StackParamList = {
   [Screens.WithdrawCeloReviewScreen]: {
     amount: BigNumber
     recipientAddress: string
+    feeEstimate: BigNumber
   }
   [Screens.WithdrawCeloScreen]: undefined
 }
