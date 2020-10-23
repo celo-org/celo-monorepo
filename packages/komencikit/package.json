@@ -22,6 +22,9 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "@celo/contractkit": "0.4.16-dev",
+    "@celo/base": "0.0.4-dev",
+    "@celo/utils": "0.1.22-dev",
     "cross-fetch": "^3.0.6",
     "fp-ts": "^2.8.4",
     "io-ts": "^2.2.11"
@@ -30,8 +33,8 @@
     "node": ">=8.13.0"
   },
   "devDependencies": {
-    "web3": "1.2.4",
     "domexception": "^2.0.1",
-    "jest-fetch-mock": "^3.0.3"
+    "jest-fetch-mock": "^3.0.3",
+    "web3": "1.2.4"
   }
 }

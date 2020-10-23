@@ -87,7 +87,9 @@
   "@celo/komencikit": {
     "location": "packages/komencikit",
     "dependencies": [
-      "@celo/contractkit"
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
     ]
   },
   "@celo/metadata-crawler": {
