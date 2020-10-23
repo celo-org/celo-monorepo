@@ -10,10 +10,10 @@ export enum ErrorMessages {
   INVALID_SIGNATURE = 'Invalid signature provided',
   NO_PROVIDER_SETUP = 'No provider was setup for this phone number',
   UNKNOWN_ERROR = 'Something went wrong',
-  ATTESTATION_SIGNER_CANNOT_SIGN = 'Attestation signer could not sign',
+  ATTESTATION_SIGNER_CANNOT_SIGN = 'Node offline or attestation signer account not unlocked',
   DATABASE_IS_OFFLINE = 'Database is offline',
-  NODE_IS_SYNCING = 'Full node is not synced',
-  NODE_IS_STUCK = 'Full node is not up to date',
+  NODE_IS_SYNCING = 'Node is not synced',
+  NODE_IS_STUCK = 'Node is not up to date',
 }
 
 export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {
