@@ -1,7 +1,7 @@
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import 'cross-fetch'
 // tslint:disable-next-line:no-duplicate-imports
-import fetch from 'cross-fetch'
+// import fetch from 'cross-fetch'
 import { isRight } from 'fp-ts/Either'
 
 import { Action } from './actions'

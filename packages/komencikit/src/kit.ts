@@ -1,4 +1,4 @@
-import { Address, normalizeAddress, sleep } from '@celo/base'
+import { Address, normalizeAddressWith0x, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import {
@@ -55,7 +55,7 @@ export class KomenciKit {
     externalAccount: string,
     options: KomenciOptionsInput
   ) {
-    this.externalAccount = normalizeAddress(externalAccount)
+    this.externalAccount = normalizeAddressWith0x(externalAccount)
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -159,7 +159,7 @@ export class KomenciKit {
           })
 
           const deployWalletLog = events.find(
-            (event) => normalizeAddress(event.returnValues.owner) === this.externalAccount
+            (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
           )
 
           if (deployWalletLog === undefined) {

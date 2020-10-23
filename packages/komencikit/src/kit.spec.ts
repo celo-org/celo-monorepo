@@ -1,3 +1,4 @@
+import { normalizeAddressWith0x } from '@celo/base'
 import { Err, Ok } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
 import Web3 from 'web3'
@@ -8,6 +9,8 @@ import { KomenciKit, KomenciOptionsInput } from './kit'
 jest.mock('@celo/contractkit')
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
+// @ts-ignore
+contractKit.web3 = { eth: { sign: jest.fn() } }
 
 describe('KomenciKit', () => {
   beforeEach(() => {
@@ -15,14 +18,13 @@ describe('KomenciKit', () => {
   })
 
   const account = Web3.utils.randomHex(20)
+  const implAddress = Web3.utils.randomHex(20)
   const defaults: KomenciOptionsInput = {
     url: 'http://komenci.com/',
-    platform: 'ios',
-    account,
   }
 
   const kitWithOptions = (options?: Partial<KomenciOptionsInput>) => {
-    return new KomenciKit(contractKit, {
+    return new KomenciKit(contractKit, account, {
       ...defaults,
       ...options,
     })
@@ -39,21 +41,24 @@ describe('KomenciKit', () => {
   })
 
   describe('startSession', () => {
+    beforeEach(() => {
+      jest.spyOn(contractKit.web3.eth, 'sign').mockResolvedValue(`${account}:signature`)
+    })
+
     it('constructs the payload and calls exec', async () => {
       const kit = kitWithOptions()
       const execSpy = jest
         .spyOn((kit as any).client, 'exec')
         .mockResolvedValue(Err(new Unauthorised()))
-      await kit.startSession('captcha-token', 'device-token')
+      await kit.startSession('captcha-token')
       expect(execSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
           action: ActionTypes.StartSession,
           payload: {
             captchaResponseToken: 'captcha-token',
-            externalAccount: account,
-            deviceType: 'ios',
-            iosDeviceToken: 'device-token',
+            externalAccount: normalizeAddressWith0x(account),
+            signature: `${account}:signature`,
           },
         })
       )
@@ -66,7 +71,7 @@ describe('KomenciKit', () => {
           .spyOn((kit as any).client, 'exec')
           .mockResolvedValue(Err(new Unauthorised()))
 
-        await expect(kit.startSession('captcha-token', 'device-token')).resolves.toEqual(
+        await expect(kit.startSession('captcha-token')).resolves.toEqual(
           Err(new AuthenticationFailed())
         )
         expect(execSpy).toHaveBeenCalled()
@@ -78,7 +83,7 @@ describe('KomenciKit', () => {
         const kit = kitWithOptions()
         jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Err(new ServiceUnavailable()))
 
-        await expect(kit.startSession('captcha-token', 'device-token')).resolves.toEqual(
+        await expect(kit.startSession('captcha-token')).resolves.toEqual(
           Err(new ServiceUnavailable())
         )
       })
@@ -90,7 +95,7 @@ describe('KomenciKit', () => {
         jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Ok({ token: 'komenci-token' }))
         const setTokenSpy = jest.spyOn((kit as any).client, 'setToken')
 
-        await expect(kit.startSession('captcha-token', 'device-token')).resolves.toEqual(Ok(true))
+        await expect(kit.startSession('captcha-token')).resolves.toEqual(Ok('komenci-token'))
         expect(setTokenSpy).toHaveBeenCalledWith('komenci-token')
       })
     })
@@ -133,11 +138,16 @@ describe('KomenciKit', () => {
         const kit = kitWithOptions()
         jest
           .spyOn((kit as any).client, 'exec')
-          .mockResolvedValue(Ok({ identifier: 'pn-identifier' }))
+          .mockResolvedValue(Ok({ identifier: 'pn-identifier', pepper: 'pn-pepper' }))
 
         await expect(
           kit.getDistributedBlindedPepper('phone-number', 'client-version')
-        ).resolves.toEqual(Ok('pn-identifier'))
+        ).resolves.toEqual(
+          Ok({
+            identifier: 'pn-identifier',
+            pepper: 'pn-pepper',
+          })
+        )
       })
     })
   })
@@ -149,13 +159,15 @@ describe('KomenciKit', () => {
         .spyOn((kit as any).client, 'exec')
         .mockResolvedValue(Ok({ status: 'deployed', walletAddress: '0x0' }))
 
-      await kit.deployWallet()
+      await kit.deployWallet(implAddress)
 
       expect(execSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
           action: ActionTypes.DeployWallet,
-          payload: {},
+          payload: {
+            implementationAddress: implAddress,
+          },
         })
       )
     })
