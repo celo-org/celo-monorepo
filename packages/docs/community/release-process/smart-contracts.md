@@ -148,31 +148,31 @@ All changes since the last release should be covered by unit tests. Unit test co
 After a successful release execution on a testnet, the resulting network state should be spot-checked to ensure that no regressions have been caused by the release. Flows to test include:
 
 - Do a cUSD and CELO transfer
-```bash
-celocli transfer:dollars --from <addr> --value <number> --to <addr>
-celocli transfer:celo --from <addr> --value <number> --to <addr>
-```
+    ```bash
+    celocli transfer:dollars --from <addr> --value <number> --to <addr>
+    celocli transfer:celo --from <addr> --value <number> --to <addr>
+    ```
 - Register a Celo account
-```bash
-celocli account:register --from <addr> --name <test-name>
-```
+    ```bash
+    celocli account:register --from <addr> --name <test-name>
+    ```
 - Do a CP-DOTO exchange
-```bash
-celocli exchange:celo --value <number> --from <addr>
-celocli exchange:dollars --value <number> --from <addr>
-```
+    ```bash
+    celocli exchange:celo --value <number> --from <addr>
+    celocli exchange:dollars --value <number> --from <addr>
+    ```
 - Complete a round of attestation
 - Redeem from Escrow
 - Register a Vaildator
-```bash
-celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
-```
+    ```bash
+    celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
+    ```
 - Vote for a Validator
 - Get a valildator slashed for downtime and ejected from the validator set
 - Propose a governance proposal and get it executed
-```bash
-celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
-```
+    ```bash
+    celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
+    ```
 
 
 ### Performance
