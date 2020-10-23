@@ -186,7 +186,7 @@ class AttestationRequestHandler {
 
       // Append with the retriever appsig.
       if (this.attestationRequest.smsRetrieverAppSig) {
-        if (!this.attestationRequest.smsRetrieverAppSig.match('^[w+]{5,12}$')) {
+        if (!this.attestationRequest.smsRetrieverAppSig.match('^[\\w+]{5,12}$')) {
           throw new ErrorWithResponse('Invalid smsRetrieverAppSig', 422)
         }
         textMessage = `<#> ${messageBase} ${this.attestationRequest.smsRetrieverAppSig}`
