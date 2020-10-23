@@ -1,68 +1,80 @@
-# Default values for komenci.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# This file is intended to show the expected value structure with placeholder values.
+# Many values are optional, and the defaults are left up to the client.
+# These values are commented out in this file, but show the correct structure
+# if they were to be specified.
 
-replicaCount: 1
+environment:
+  name: test
 
-image:
-  repository: nginx
-  pullPolicy: IfNotPresent
+kubectl:
+  image:
+    repository: bitnami/kubectl
+    tag: 1.17.4
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+relayer:
+  image:
+    repository: celotestnet.azurecr.io/komenci/relayer
+    tag: latest
+  replicas: 2
+  rpcProviderUrls:
+    ws: wss://alfajoresstaging-forno.celo-testnet.org
+    http: https://alfajoresstaging-forno.celo-testnet.org
+  identities:
+  - address: 0x0000000000000000000000000000000000000000
+    privateKey: 0x000
+    azure:
+      id: defaultId
+      clientId: defaultClientId
+      keyVaultName: defaultKeyVaultName
+  - address: 0x0000000000000000000000000000000000000001
+    privateKey: 0x001
+    azure:
+      id: defaultId1
+      clientId: defaultClientId1
+      keyVaultName: defaultKeyVaultName1
+  azureHsm:
+    initTryCount: 5
+    initMaxRetryBackoffMs: 30000
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      askMaxPercentageDeviation: 0.05
+      bidMaxPercentageDeviation: 0.05
+      maxPercentageBidAskSpread: 0.025
+      # minReportPriceChangeThreshold
+    trades:
+      periodMs: 300000
+      # dataFetchFrequency
+      # minimumTrades
+      # scalingRate
+  baseCurrency: GoldToken
+  quoteCurrency: USD
+  token: StableToken
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  allowNotCGLD: false
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  exchanges: BITTREX,OKCOIN,COINBASE
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%
+      # targetMaxHeartbeatPeriodMs
+    timer:
+      removeExpiredFrequencyMs: 60000
+      # removeExpiredOffsetOverride
+      # removeFrequencyOverride
+      # reportOffsetOverride
+  # privateKeyPath
+  # unusedOracleAddresses
+  # overrideIndex
+  # overrideOracleCount
+  # maxBlockTimestampAgeMs
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name:
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths: []
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+onboarding:
+  image: 
+    repository: celotestnet.azurecr.io/komenci/onboarding
+    tag: latest
+  replicas: 2

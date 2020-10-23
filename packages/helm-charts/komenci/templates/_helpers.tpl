@@ -1,63 +1,45 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
-Expand the name of the chart.
+The name of the deployment
 */}}
-{{- define "komenci.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- define "name" -}}
+{{- .Values.environment.name -}}-relayer
 {{- end -}}
 
 {{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+Common labels that are recommended to be used by Helm and Kubernetes
 */}}
-{{- define "komenci.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "komenci.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{/*
-Common labels
-*/}}
-{{- define "komenci.labels" -}}
-helm.sh/chart: {{ include "komenci.chart" . }}
-{{ include "komenci.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
+{{- define "labels" -}}
+app.kubernetes.io/name: {{ template "name" . }}
+helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-{{/*
-Selector labels
-*/}}
-{{- define "komenci.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "komenci.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*
-Create the name of the service account to use
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
 */}}
-{{- define "komenci.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "komenci.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+{{- define "metric-annotations" -}}
+prometheus.io/scrape: "true"
+prometheus.io/port: "{{ .Values.relayer.metrics.prometheusPort }}"
 {{- end -}}
+
+{{/*
+Label specific to the komenci relayer component
+*/}}
+{{- define "komenci-relayer-component-label" -}}
+app.kubernetes.io/component: komenci-relayer
+{{- end -}}
+
+{{/*
+The name of the azure identity binding for all relayers
+*/}}
+{{- define "azure-identity-binding-name" -}}
+{{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity-binding
+{{- end -}}
+
+{{/*
+The name of the azure identity for all oracles
+*/}}
+{{- define "azure-identity-name" -}}
+{{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity
 {{- end -}}

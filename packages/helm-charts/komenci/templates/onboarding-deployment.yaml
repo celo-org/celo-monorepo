@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "komenci.fullname" . }}
+  name: {{ include "komenci-onboarding.fullname" . }}
   labels:
-    {{- include "komenci.labels" . | nindent 4 }}
+    {{- include "komenci-onboarding.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.onboarding.replicaCount }}
   selector:
     matchLabels:
-      {{- include "komenci.selectorLabels" . | nindent 6 }}
+      {{- include "komenci-onboarding.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "komenci.selectorLabels" . | nindent 8 }}
+        {{- include "komenci-onboarding.selectorLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+    {{- with .Values.onboarding.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "komenci.serviceAccountName" . }}
+      serviceAccountName: {{ include "komenci-onboarding.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.onboarding.image.repository }}::{{ .Values.onboarding.image.tag }}
+          imagePullPolicy: {{ .Values.onboarding.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
@@ -40,16 +40,16 @@ spec:
               path: /
               port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .Values.onboarding.resources | nindent 12 }}
+      {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+    {{- with .Values.onboarding.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with .Values.onboarding.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
