@@ -23,9 +23,10 @@ export class KomenciClient {
   private token: string | undefined
   private readonly url: string
 
-  constructor(url: string) {
+  constructor(url: string, token?: string) {
     // Ensure trailing slash
     this.url = url.replace(/\/$/, '') + '/'
+    this.token = token
   }
 
   setToken(token: string) {

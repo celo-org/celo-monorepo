@@ -83,12 +83,6 @@ export class TxEventNotFound extends RootError<TxErrorTypes.EventNotFound> {
   }
 }
 
-export class NoWalletError extends RootError<'NoWalletError'> {
-  constructor() {
-    super('NoWalletError')
-  }
-}
-
 export type TxError = TxTimeoutError | TxRevertError | TxEventNotFound
 
 export enum KomenciErrorTypes {
@@ -98,5 +92,11 @@ export enum KomenciErrorTypes {
 export class AuthenticationFailed extends RootError<KomenciErrorTypes.AuthenticationFailed> {
   constructor() {
     super(KomenciErrorTypes.AuthenticationFailed)
+  }
+}
+
+export class LoginSignatureError extends RootError<'LoginSignatureError'> {
+  constructor(public readonly error) {
+    super('LoginSignatureError')
   }
 }

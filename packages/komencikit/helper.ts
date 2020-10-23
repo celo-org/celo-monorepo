@@ -1,3 +1,8 @@
+import { base64ToHex } from '@celo/base'
+import {
+  printAndIgnoreRequestErrors,
+  requestAttestationsFromIssuers,
+} from '@celo/celotool/lib/lib/attestation'
 import { ContractKit } from '@celo/contractkit'
 import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
 import Web3 from 'web3'
@@ -20,6 +25,12 @@ const komenciKit = new KomenciKit(contractKit, {
   url: 'http://localhost:3000',
 })
 
+const readline = require('readline')
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+})
+
 const run = async () => {
   const attestations = await contractKit.contracts.getAttestations()
   console.log('Attestations: ', attestations.address)
@@ -34,19 +45,22 @@ const run = async () => {
   if (!deployWallet.ok) {
     return
   }
+  const walletAddress = deployWallet.result
   // cached:
-  const identifier = '0x59c637d9c774d242dc36bdb0445e29fa79c69b74ef70b6d1a5c407c1db6b4110'
-  // const getIdentifier = await komenciKit.getDistributedBlindedPepper('+40723301264', '1.1.0')
-  // console.log('GetIdentifier: ', getIdentifier)
-  // if (!getIdentifier.ok) {
-  //   return
-  // }
-  // const identifier = getIdentifier.result
-  const statsBefore = await attestations.getAttestationStat(identifier, account)
+  const phoneNumber = '+40723301264'
+  // const identifier = '0x59c637d9c774d242dc36bdb0445e29fa79c69b74ef70b6d1a5c407c1db6b4110'
+  const getIdentifier = await komenciKit.getDistributedBlindedPepper(phoneNumber, 'unknown')
+  console.log('GetIdentifier: ', getIdentifier)
+  if (!getIdentifier.ok) {
+    return
+  }
+  const identifier = getIdentifier.result.identifier
+  const pepper = getIdentifier.result.pepper
+  const statsBefore = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('Before ===== ')
   console.log(statsBefore)
-  const requestAttestations = await komenciKit.requestAttestations(identifier, 1)
-  const statsAfter = await attestations.getAttestationStat(identifier, deployWallet.result)
+  const requestAttestations = await komenciKit.requestAttestations(identifier, walletAddress, 3)
+  const statsAfter = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('After ===== ')
   console.log(statsAfter)
   console.log('RequestAttestations: ', requestAttestations)
@@ -60,7 +74,7 @@ const run = async () => {
   })
   console.log(events)
 
-  const selectIssuers = await komenciKit.selectIssuers(identifier)
+  const selectIssuers = await komenciKit.selectIssuers(identifier, walletAddress)
   if (!selectIssuers.ok) {
     return
   }
@@ -70,6 +84,73 @@ const run = async () => {
     toBlock: selectIssuers.result.blockNumber,
   })
   console.log(issuersEvents)
+  console.log('====================')
+  const attestationsToComplete = await attestations.getActionableAttestations(
+    identifier,
+    walletAddress
+  )
+  console.log(attestationsToComplete)
+  console.log('====================')
+  const possibleErrors = await requestAttestationsFromIssuers(
+    attestationsToComplete,
+    attestations,
+    phoneNumber,
+    walletAddress,
+    pepper
+  )
+  printAndIgnoreRequestErrors(possibleErrors)
+  while (true) {
+    const attestationsToComplete = await attestations.getActionableAttestations(
+      identifier,
+      walletAddress
+    )
+    if (attestationsToComplete.length == 0) {
+      break
+    }
+    console.log(attestationsToComplete)
+    console.log('====================')
+
+    await new Promise((resolve) => {
+      rl.question('Enter code: ', async (base64Code: string) => {
+        if (base64Code == 'exit') process.exit(0)
+        const code = base64ToHex(base64Code)
+        const matchingIssuer = await attestations.findMatchingIssuer(
+          identifier,
+          walletAddress,
+          code,
+          attestationsToComplete.map((a) => a.issuer)
+        )
+
+        if (matchingIssuer === null) {
+          console.warn('No matching issuer found for code')
+          resolve()
+          return
+        }
+
+        const isValidRequest = await attestations.validateAttestationCode(
+          identifier,
+          walletAddress,
+          matchingIssuer,
+          code
+        )
+        if (!isValidRequest) {
+          console.warn('Code was not valid')
+          resolve()
+          return
+        }
+
+        const completeResult = await komenciKit.completeAttestation(
+          identifier,
+          walletAddress,
+          matchingIssuer,
+          code
+        )
+
+        console.log(completeResult)
+        resolve()
+      })
+    })
+  }
 }
 
 run()

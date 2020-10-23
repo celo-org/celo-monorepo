@@ -35,9 +35,6 @@ export enum ActionTypes {
 
 export interface StartSessionPayload {
   captchaResponseToken: string
-  deviceType: 'ios' | 'android'
-  iosDeviceToken?: string
-  androidSignedAttestation?: string
   externalAccount: string
   signature: string
 }
@@ -61,6 +58,7 @@ interface GetDistributedBlindedPepperPayload {
 
 export const GetDistributedBlindedPepperResp = t.type({
   identifier: t.string,
+  pepper: t.string,
 })
 
 export type GetDistributedBlindedPepperResp = t.TypeOf<typeof GetDistributedBlindedPepperResp>
@@ -91,13 +89,15 @@ export type DeployWalletInProgress = t.TypeOf<typeof DeployWalletInProgress>
 export const DeployWalletResp = t.union([DeployWalletDeployed, DeployWalletInProgress])
 export type DeployWalletResp = t.TypeOf<typeof DeployWalletResp>
 
-const _deployWallet = action<ActionTypes.DeployWallet, {}, DeployWalletResp>(
+export interface DeployWalletPayload {
+  implementationAddress: string
+}
+
+export const deployWallet = action<ActionTypes.DeployWallet, DeployWalletPayload, DeployWalletResp>(
   'POST',
   ActionTypes.DeployWallet,
   DeployWalletResp
 )
-
-export const deployWallet = () => _deployWallet({})
 
 export const SubmitMetaTransactionResp = t.type({
   txHash: t.string,
