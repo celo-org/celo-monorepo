@@ -1,18 +1,20 @@
 import {
+  authenticateUser,
   ErrorMessage,
   hasValidAccountParam,
   hasValidContractPhoneNumbersParam,
   hasValidPhoneNumberHash,
   hasValidUserPhoneNumberParam,
+  logger,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
-import { authenticateUser, isVerified } from '../common/identity'
-import logger from '../common/logger'
+import { isVerified } from '../common/identity'
 import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
+import { getContractKit } from '../web3/contracts'
 
 interface GetContactMatchesRequest {
   account: string
@@ -35,7 +37,7 @@ export async function handleGetContactMatches(
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request))) {
+    if (!(await authenticateUser(request, getContractKit()))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
@@ -56,8 +58,8 @@ export async function handleGetContactMatches(
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
     await setDidMatchmaking(account)
     response.json({ success: true, matchedContacts, version: VERSION })
-  } catch (e) {
-    logger.error('Failed to getContactMatches', e)
+  } catch (err) {
+    logger.error({ err }, 'Failed to getContactMatches')
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }

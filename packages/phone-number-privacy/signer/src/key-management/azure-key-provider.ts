@@ -1,6 +1,5 @@
 import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../common/logger'
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
 
@@ -18,8 +17,8 @@ export class AzureKeyProvider extends KeyProviderBase {
       const keyVaultClient = new AzureKeyVaultClient(vaultName)
       const privateKey = await keyVaultClient.getSecret(secretName)
       this.setPrivateKey(privateKey)
-    } catch (error) {
-      logger.error('Error retrieving key', error)
+    } catch (err) {
+      logger.error({ err }, 'Error retrieving key')
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }

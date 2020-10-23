@@ -1,4 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
+import { TestUtils } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
@@ -9,9 +10,12 @@ import {
   registerWalletAddress,
   replenishQuota,
 } from '../../../common/src/test/utils'
+
 import config from '../../src/config'
 
 require('dotenv').config()
+
+const { replenishQuota, getBlindedPhoneNumber } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
