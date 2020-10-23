@@ -69,7 +69,6 @@ export class KomenciKit {
    * It results in a token that is saved in the client automatically and
    * will be used on subsequent requests.
    *
-   * @param externalAccount - the Valora EOA
    * @param captchaToken - an unspent captcha token
    * @return Result<token, error>
    */
@@ -183,7 +182,7 @@ export class KomenciKit {
    * which are executed in batch in Komenci.
    *
    * @param identifier - phone number identifier
-   * @param account - MTW account requesting attestations
+   * @param walletAddress - MetaTransactionWallet address requesting attestations
    * @param attestationsRequested - the number of attestations
    * @return TransactionReceipt of the batch transaction
    */
@@ -200,10 +199,10 @@ export class KomenciKit {
   })
   public async requestAttestations(
     identifier: string,
-    account: string,
+    walletAddress: string,
     attestationsRequested: number
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
-    const wallet = await this.getWallet(account)
+    const wallet = await this.getWallet(walletAddress)
     const nonce = await wallet.nonce()
     const attestations = await this.contractKit.contracts.getAttestations()
 
@@ -219,7 +218,7 @@ export class KomenciKit {
       requestSubsidisedAttestations({
         identifier,
         attestationsRequested,
-        walletAddress: account,
+        walletAddress,
         transactions: {
           request: toRawTransaction(requestMetaTx.txo),
           approve: toRawTransaction(approveMetaTx.txo),
@@ -241,37 +240,37 @@ export class KomenciKit {
    * TODO: I'm not sure if we need this. Valora can call submitMetaTransaction
    *
    * @param identifier - the phone number identifier
-   * @param account - MTW account requesting attestations
+   * @param walletAddress - MetaTransactionWallet address requesting attestations
    */
   public async selectIssuers(
     identifier: string,
-    account: string
+    walletAddress: string
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
     const attestations = await this.contractKit.contracts.getAttestations()
-    await attestations.waitForSelectingIssuers(identifier, account)
-    return this.submitMetaTransaction(account, attestations.selectIssuers(identifier))
+    await attestations.waitForSelectingIssuers(identifier, walletAddress)
+    return this.submitMetaTransaction(walletAddress, attestations.selectIssuers(identifier))
   }
 
   /**
    * completeAttestation: just wraps the `submitMetaTransaction` action in order
-   * to execute Attestations.complete(identifier, account, issuer, code)
+   * to execute Attestations.complete(identifier, walletAddress, issuer, code)
    * TODO: I'm not sure if we need this. Valora can call submitMetaTransaction
    *
    * @param identifier - the phone number identifier
-   * @param account - MTW account requesting attestations
+   * @param walletAddress - MetaTransactionWallet address requesting attestations
    * @param issuer - the issuer ID
    * @param code - the code
    */
   public async completeAttestation(
     identifier: string,
-    account: string,
+    walletAddress: string,
     issuer: Address,
     code: string
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
     const attestations = await this.contractKit.contracts.getAttestations()
     return this.submitMetaTransaction(
-      account,
-      await attestations.complete(identifier, account, issuer, code)
+      walletAddress,
+      await attestations.complete(identifier, walletAddress, issuer, code)
     )
   }
 
@@ -358,7 +357,7 @@ export class KomenciKit {
    * TODO: In order to increase security and prevent replay attacks we should introduce a nonce
    * Flow would be:
    * 1. KomenciKit asks for a nonce from Komenci
-   * 2. Komenci saves the nonce in state, associated with the external account requsting it
+   * 2. Komenci saves the nonce in state, associated with the external account requesting it
    * 3. KomenciKit signs a message containing the nonce and uses it to call startSession
    *
    * @param externalAccount

@@ -6,7 +6,7 @@ import {
 import { ContractKit } from '@celo/contractkit'
 import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
 import Web3 from 'web3'
-import { KomenciKit } from './src'
+import { KomenciKit } from '../src'
 
 const WALLET_IMPLEMENTATION_ADDRESS = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
 
