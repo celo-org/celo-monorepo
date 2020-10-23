@@ -123,3 +123,7 @@ export function copyToClipboad(text: string) {
 export function weiToDecimal(number: number) {
   return number / 10 ** 18
 }
+
+export function isExternalLink(link: string) {
+  return link.startsWith('http')
+}

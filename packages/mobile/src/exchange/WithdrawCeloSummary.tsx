@@ -1,14 +1,14 @@
 // VIEW Small component that has the details of a withdrawal transaction
 
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { View, ViewStyle } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import FeeDrawer from 'src/components/FeeDrawer'
-import LineItemRow from 'src/components/LineItemRow.v2'
-import TotalLineItem from 'src/components/TotalLineItem.v2'
+import LineItemRow from 'src/components/LineItemRow'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 
@@ -16,16 +16,16 @@ interface WithdrawCeloProps {
   style?: ViewStyle
   amount: BigNumber
   recipientAddress: string
+  feeEstimate: BigNumber
 }
 
 export default function WithdrawCeloSummary({
   style,
   amount,
   recipientAddress,
+  feeEstimate,
 }: WithdrawCeloProps) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
-  // TODO: Estimate real fee.
-  const fee = new BigNumber(0)
 
   return (
     <View style={style}>
@@ -46,8 +46,8 @@ export default function WithdrawCeloSummary({
         currency={CURRENCY_ENUM.GOLD}
         isExchange={false}
         isEstimate={true}
-        securityFee={fee}
-        totalFee={fee}
+        securityFee={feeEstimate}
+        totalFee={feeEstimate}
       />
       <TotalLineItem
         amount={{

@@ -1,10 +1,10 @@
 // SCREEN where users can review the data about the witdrawal of CELO they are about to make
 // and confirm.
 
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useState } from 'react'
@@ -14,24 +14,24 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import CancelButton from 'src/components/CancelButton.v2'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import CancelButton from 'src/components/CancelButton'
+import LineItemRow from 'src/components/LineItemRow'
 import ShortenedAddress from 'src/components/ShortenedAddress'
 import { withdrawCelo } from 'src/exchange/actions'
 import WithdrawCeloSummary from 'src/exchange/WithdrawCeloSummary'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
-import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
+import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
 
 function WithdrawCeloReviewScreen({ route }: Props) {
-  const { amount, recipientAddress } = route.params
+  const { amount, recipientAddress, feeEstimate } = route.params
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   // loading is never set to false, when the withdrawal is complete or after a short while,
   // withdrawCelo saga will navigate to |ExchangeHomeScreen|.
@@ -56,7 +56,11 @@ function WithdrawCeloReviewScreen({ route }: Props) {
           amount={<ShortenedAddress style={styles.withdrawAddress} address={recipientAddress} />}
         />
         <HorizontalLine />
-        <WithdrawCeloSummary amount={amount} recipientAddress={recipientAddress} />
+        <WithdrawCeloSummary
+          amount={amount}
+          recipientAddress={recipientAddress}
+          feeEstimate={feeEstimate}
+        />
       </View>
       <Button
         onPress={onConfirmWithdraw}

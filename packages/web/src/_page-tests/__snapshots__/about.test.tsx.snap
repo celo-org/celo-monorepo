@@ -160,8 +160,8 @@ exports[`About renders 1`] = `
           }
         }
       >
-        <h1
-          aria-level="1"
+        <h2
+          aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
           onClick={[Function]}
@@ -180,7 +180,7 @@ exports[`About renders 1`] = `
           }
         >
           Prosperity for All
-        </h1>
+        </h2>
         <div
           className="css-view-1dbjc4n"
           style={

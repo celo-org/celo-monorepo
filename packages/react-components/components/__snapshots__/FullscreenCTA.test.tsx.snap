@@ -4,6 +4,7 @@ exports[`FullscreenCTA renders correctly 1`] = `
 <RNCSafeAreaView
   style={
     Object {
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
       "justifyContent": "space-between",
@@ -56,8 +57,10 @@ exports[`FullscreenCTA renders correctly 1`] = `
         Object {
           "backgroundColor": "rgba(238, 238, 238, 0.75)",
           "borderRadius": 25,
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 12,
+          "lineHeight": 22,
           "padding": 15,
         }
       }

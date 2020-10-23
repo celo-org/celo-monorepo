@@ -45,39 +45,6 @@ describe('VerificationEducationScreen', () => {
     expect(queryByTestId('VerificationEducationAlready')).toBeFalsy()
   })
 
-  it('shows the `continue` and `already received` buttons when there are actionable attestations', () => {
-    const store = createMockStore({
-      stableToken: {
-        balance: '50',
-      },
-      identity: {
-        verificationState: {
-          phoneHashDetails: {
-            e164Number: '',
-            phoneHash: '',
-            pepper: '',
-          },
-          status: {
-            numAttestationsRemaining: 2,
-          },
-          actionableAttestations: [{}, {}],
-        },
-      },
-    })
-    const { toJSON, queryByTestId, queryByText } = render(
-      <Provider store={store}>
-        <VerificationEducationScreen
-          {...getMockStackScreenProps(Screens.VerificationEducationScreen)}
-        />
-      </Provider>
-    )
-    expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('verificationEducation.bodyInsufficientBalance')).toBeFalsy()
-    expect(queryByTestId('VerificationEducationSkip')).toBeFalsy()
-    expect(queryByTestId('VerificationEducationContinue')).toBeTruthy()
-    expect(queryByTestId('VerificationEducationAlready')).toBeTruthy()
-  })
-
   it('shows the `skip` button when user is not already verified and has NOT enough balance', () => {
     const store = createMockStore({
       stableToken: {
@@ -96,5 +63,45 @@ describe('VerificationEducationScreen', () => {
     expect(queryByTestId('VerificationEducationSkip')).toBeTruthy()
     expect(queryByTestId('VerificationEducationContinue')).toBeFalsy()
     expect(queryByTestId('VerificationEducationAlready')).toBeFalsy()
+  })
+
+  it('allows to skip if verification is loading', () => {
+    const defaultVerificationState = {
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: 3,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+    }
+    const store = createMockStore({
+      stableToken: {
+        balance: '0',
+      },
+      identity: {
+        verificationState: {
+          ...defaultVerificationState,
+          isLoading: true,
+        },
+      },
+    })
+    const { getByTestId, toJSON } = render(
+      <Provider store={store}>
+        <VerificationEducationScreen
+          {...getMockStackScreenProps(Screens.VerificationEducationScreen, {
+            showSkipDialog: true,
+          })}
+        />
+      </Provider>
+    )
+    expect(toJSON()).toMatchSnapshot()
+    expect(getByTestId('VerificationSkipDialog').props.isVisible).toBe(true)
   })
 })
