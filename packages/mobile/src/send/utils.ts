@@ -216,7 +216,7 @@ export function* handleSendPaymentData(
         recipientAddress: data.address.toLowerCase(),
         feeEstimate: new BigNumber(0),
       })
-    } else if (data.asset === 'cUSD' || undefined) {
+    } else if (data.asset === 'cUSD' || !data.asset) {
       const transactionData: TransactionDataInput = {
         recipient,
         amount,
@@ -229,7 +229,7 @@ export function* handleSendPaymentData(
     if (data.asset === 'CELO') {
       Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
       return
-    } else if (data.asset === 'cUSD' || undefined) {
+    } else if (data.asset === 'cUSD' || !data.asset) {
       navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
     }
   }
