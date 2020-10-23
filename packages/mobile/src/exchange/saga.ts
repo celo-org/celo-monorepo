@@ -306,7 +306,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, 'No transaction ID. Did not exchange.')
       return
     }
-    yield call(sendAndMonitorTransaction, tx, account, context)
+    yield call(
+      sendAndMonitorTransaction,
+      tx,
+      account,
+      context,
+      undefined, // currency, undefined because it's an exchange and we need both.
+      makerToken
+    )
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
       txId: context.id,
       currency: makerToken,
