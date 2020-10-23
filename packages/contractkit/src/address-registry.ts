@@ -1,6 +1,6 @@
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
+import { Address, CeloContract, NULL_ADDRESS, RegisteredContracts } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
 
@@ -45,11 +45,16 @@ export class AddressRegistry {
    * Get the address for all possible `CeloContract`
    */
 
-  async allAddresses(): Promise<Record<CeloContract, Address>> {
-    const res: Partial<Record<CeloContract, Address>> = {}
-    for (const contract of AllContracts) {
-      res[contract] = await this.addressFor(contract)
+  async allAddresses(): Promise<Record<CeloContract, Address | null>> {
+    const res: Partial<Record<CeloContract, Address | null>> = {}
+    for (const contract of RegisteredContracts) {
+      try {
+        res[contract] = await this.addressFor(contract)
+      } catch (error) {
+        res[contract] = null
+        debug(`Failed to find address for ${contract}: ${error.message}`)
+      }
     }
-    return res as Record<CeloContract, Address>
+    return res as Record<CeloContract, Address | null>
   }
 }

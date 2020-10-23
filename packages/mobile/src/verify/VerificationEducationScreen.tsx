@@ -56,10 +56,8 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   useFocusEffect(
     // useCallback is needed here: https://bit.ly/2G0WKTJ
     useCallback(() => {
-      if (!partOfOnboarding) {
-        dispatch(fetchVerificationState())
-      }
-    }, [partOfOnboarding])
+      dispatch(fetchVerificationState())
+    }, [])
   )
 
   const onPressStart = (withoutRevealing: boolean) => {
@@ -98,6 +96,11 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   if (isLoading) {
     return (
       <View style={styles.loader}>
+        <VerificationSkipDialog
+          isVisible={showSkipDialog}
+          onPressCancel={onPressSkipCancel}
+          onPressConfirm={onPressSkipConfirm}
+        />
         <ActivityIndicator size="large" color={colors.greenBrand} />
       </View>
     )

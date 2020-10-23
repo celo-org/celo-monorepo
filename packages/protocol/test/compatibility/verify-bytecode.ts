@@ -8,6 +8,7 @@ import { Artifact } from '@celo/protocol/lib/compatibility/internal'
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
 import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
+import { NULL_ADDRESS } from '@celo/utils/lib/address'
 import { assert } from 'chai'
 import { RegistryInstance } from 'types'
 
@@ -361,10 +362,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                testContract.address,
-              ],
+              args: ['TestContract', testContract.address],
               value: '0',
             },
           ]
@@ -385,10 +383,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                testContract.address,
-              ],
+              args: ['TestContract', testContract.address],
               value: '0',
             },
           ]
@@ -403,10 +398,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                accounts[0],
-              ],
+              args: ['TestContract', accounts[0]],
               value: '0',
             },
           ]
@@ -430,6 +422,28 @@ contract('', (accounts) => {
             )
           )
         })
+      })
+
+      it('throws when a proposal does not only proxy or registry repointing', async () => {
+        const proposal = [
+          {
+            contract: 'GoldToken',
+            function: 'transfer',
+            args: [NULL_ADDRESS, '100000000'],
+            value: '0',
+          },
+        ]
+
+        await assertThrowsAsync(
+          verifyBytecodes(
+            ['TestContract'],
+            upgradedContractBuildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+        )
       })
     })
   })

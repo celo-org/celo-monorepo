@@ -120,6 +120,7 @@ describe('SendAmount', () => {
       fireEvent.press(reviewButton)
       expect(store.getActions()).toEqual([
         {
+          action: null,
           alertType: 'error',
           buttonMessage: null,
           dismissAfter: 5000,
@@ -148,6 +149,7 @@ describe('SendAmount', () => {
       fireEvent.press(sendButton)
       expect(store.getActions()).toEqual([
         {
+          action: null,
           alertType: 'error',
           buttonMessage: null,
           dismissAfter: 5000,
