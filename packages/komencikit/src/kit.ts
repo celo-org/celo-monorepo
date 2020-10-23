@@ -21,12 +21,12 @@ import {
   AuthenticationFailed,
   FetchError,
   FetchErrorTypes,
+  LoginSignatureError,
   TxError,
   TxErrorTypes,
   TxEventNotFound,
   TxRevertError,
   TxTimeoutError,
-  LoginSignatureError,
 } from './errors'
 import { retry } from './retry'
 

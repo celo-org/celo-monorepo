@@ -1,5 +1,5 @@
-import * as t from 'io-ts'
 import { RawTransaction } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+import * as t from 'io-ts'
 
 export enum ActionTypes {
   StartSession = 'StartSession',
