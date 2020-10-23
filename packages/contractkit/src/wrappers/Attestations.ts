@@ -489,6 +489,28 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
+   * Updates sender's approval status in regards to allowing an attestation identifier
+   * mapping to be transfered from one address to another.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  async approveTransfer(
+    identifier: string,
+    index: number,
+    from: Address,
+    to: Address,
+    status: boolean
+  ) {
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.approveTransfer(identifier, index, from, to, status)
+    )
+  }
+
+  /**
    * Selects the issuers for previously requested attestations for a phone number
    * @param identifier Attestation identifier (e.g. phone hash)
    */
