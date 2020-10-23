@@ -3,7 +3,7 @@ import {
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyLibraryPrefix
+  verifyLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
@@ -33,26 +33,33 @@ interface VerificationContext {
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
-const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` && (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
+const isProxyRepointTransaction = (tx: ProposalTx) =>
+  tx.contract.endsWith('Proxy') &&
+  (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
+
+const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
+  tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
-  context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
+  context.proposal.some((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract))
 
 const getProposedImplementationAddress = (contract: string, context: VerificationContext) =>
-  context.proposal.find((tx: ProposalTx) => isProxyRepointTransaction(tx, contract)).args[0]
+  context.proposal.find((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract)).args[0]
 
 // Checks if the given transaction is a repointing of the Registry entry for the
 // given registryId.
-const isRegistryRepointTransaction = (tx: ProposalTx, registryId: string) =>
-  tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
+const isRegistryRepointTransaction = (tx: ProposalTx) =>
+  tx.contract === `Registry` && tx.function === 'setAddressFor'
+
+const isRegistryRepointForIdTransaction = (tx: ProposalTx, registryId: string) =>
+  isRegistryRepointTransaction(tx) && tx.args[0] === registryId
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, contract))
+  return context.proposal.some((tx) => isRegistryRepointForIdTransaction(tx, contract))
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, contract))
+  const relevantTx = context.proposal.find((tx) => isRegistryRepointForIdTransaction(tx, contract))
   return relevantTx.args[1]
 }
 
@@ -151,6 +158,13 @@ export const verifyBytecodes = async (
   web3: Web3,
   isBeforeRelease1: boolean = false
 ) => {
+  const invalidTransactions = proposal.filter(
+    (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
+  )
+  if (invalidTransactions.length > 0) {
+    throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
+  }
+
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
 
