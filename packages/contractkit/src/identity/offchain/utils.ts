@@ -33,7 +33,7 @@ function getCiphertextLabel(
 
   const label = createHmac('blake2s256', sharedSecret)
     .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
-    .digest('base64')
+    .digest('hex')
   return join('ciphertexts', label)
 }
 
