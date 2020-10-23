@@ -20,6 +20,10 @@ export function zip3<A, B, C>(as: A[], bs: B[], cs: C[]) {
   return res
 }
 
+export function mapFromPairs<A, B>(pairs: Array<[A, B]>): Map<A, B> {
+  return new Map<A, B>(pairs)
+}
+
 // https://stackoverflow.com/questions/43118692/typescript-filter-out-nulls-from-an-array
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined

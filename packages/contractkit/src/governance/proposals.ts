@@ -6,8 +6,7 @@ import { Transaction, TransactionObject } from 'web3-eth'
 import { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
 import { CeloContract, RegisteredContracts } from '../base'
-import { obtainKitContractDetails } from '../explorer/base'
-import { BlockExplorer } from '../explorer/block-explorer'
+import { newBlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
 import { ContractKit } from '../kit'
 import { getAbiTypes } from '../utils/web3-utils'
@@ -54,8 +53,7 @@ const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
  * @returns The JSON encoding of the proposal.
  */
 export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
-  const contractDetails = await obtainKitContractDetails(kit)
-  const blockExplorer = new BlockExplorer(kit, contractDetails)
+  const blockExplorer = await newBlockExplorer(kit)
 
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {

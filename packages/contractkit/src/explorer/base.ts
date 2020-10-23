@@ -1,16 +1,24 @@
 import { Address } from '@celo/base/lib/address'
 import { concurrentMap } from '@celo/base/lib/async'
+import { mapFromPairs } from '@celo/base/lib/collections'
 import { ABIDefinition } from 'web3-eth-abi'
+import { AbiType } from 'web3-utils'
 import { CeloContract, RegisteredContracts } from '../base'
+import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
 
-export interface ContractDetails {
+interface ContractDetails {
   name: string
   address: Address
   jsonInterface: ABIDefinition[]
 }
 
-export const getContractDetailsFromContract = async (
+interface ContractMapping {
+  details: ContractDetails
+  abiMapping: Map<string, ABIDefinition>
+}
+
+const getContractDetailsFromContract = async (
   kit: ContractKit,
   celoContract: CeloContract,
   address?: string
@@ -23,16 +31,43 @@ export const getContractDetailsFromContract = async (
   }
 }
 
-export async function obtainKitContractDetails(kit: ContractKit): Promise<ContractDetails[]> {
-  return concurrentMap(5, RegisteredContracts, (celoContract) =>
+const getContractMappingFromDetails = (
+  cd: ContractDetails,
+  abiFilterType: AbiType
+): ContractMapping => ({
+  details: cd,
+  abiMapping: mapFromPairs(
+    cd.jsonInterface
+      .concat(PROXY_ABI)
+      .filter((ad) => ad.type === abiFilterType)
+      .map((ad) => [ad.signature, ad])
+  ),
+})
+
+const obtainKitContractDetails = (kit: ContractKit): Promise<ContractDetails[]> =>
+  concurrentMap(5, RegisteredContracts, (celoContract) =>
     getContractDetailsFromContract(kit, celoContract)
   )
-}
 
-export function mapFromPairs<A, B>(pairs: Array<[A, B]>): Map<A, B> {
-  const map = new Map<A, B>()
-  pairs.forEach(([k, v]) => {
-    map.set(k, v)
-  })
-  return map
+const getAddressMappingFromDetails = (contractDetails: ContractDetails[], abiType: AbiType) =>
+  mapFromPairs(
+    contractDetails.map((cd) => [cd.address, getContractMappingFromDetails(cd, abiType)])
+  )
+
+export class BaseExplorer {
+  constructor(
+    protected readonly kit: ContractKit,
+    private readonly abiType: AbiType,
+    protected addressMapping: Map<Address, ContractMapping> = new Map()
+  ) {}
+
+  init = async () => {
+    const contractDetails = await obtainKitContractDetails(this.kit)
+    this.addressMapping = getAddressMappingFromDetails(contractDetails, this.abiType)
+  }
+
+  updateContractDetailsMapping = async (name: string, address: string) => {
+    const cd = await getContractDetailsFromContract(this.kit, name as CeloContract, address)
+    this.addressMapping.set(cd.address, getContractMappingFromDetails(cd, this.abiType))
+  }
 }

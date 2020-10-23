@@ -1,49 +1,17 @@
-import { Address } from '@celo/base/lib/address'
 import { EventLog, Log, TransactionReceipt } from 'web3-core'
-import abi, { ABIDefinition } from 'web3-eth-abi'
+import abi from 'web3-eth-abi'
 import { ContractKit } from '../kit'
-import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
-
-interface ContractMapping {
-  details: ContractDetails
-  logMapping: Map<string, ABIDefinition>
-}
+import { BaseExplorer } from './base'
 
 export async function newLogExplorer(kit: ContractKit) {
-  return new LogExplorer(kit, await obtainKitContractDetails(kit))
+  const logExplorer = new LogExplorer(kit)
+  await logExplorer.init()
+  return logExplorer
 }
 
-export class LogExplorer {
-  private readonly addressMapping: Map<Address, ContractMapping>
-
-  constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
-    this.addressMapping = mapFromPairs(
-      contractDetails.map((cd) => [
-        cd.address,
-        {
-          details: cd,
-          logMapping: mapFromPairs(
-            (cd.jsonInterface as ABIDefinition[])
-              .filter((ad) => ad.type === 'event')
-              .map((ad) => [ad.signature, ad])
-          ),
-        },
-      ])
-    )
-
-    for (const cd of contractDetails) {
-      const fnMapping: Map<string, ABIDefinition> = new Map()
-      for (const abiDef of cd.jsonInterface as ABIDefinition[]) {
-        if (abiDef.type === 'event') {
-          fnMapping.set(abiDef.signature, abiDef)
-        }
-      }
-
-      this.addressMapping.set(cd.address, {
-        details: cd,
-        logMapping: fnMapping,
-      })
-    }
+export class LogExplorer extends BaseExplorer {
+  constructor(kit: ContractKit) {
+    super(kit, 'event')
   }
 
   async fetchTxReceipt(txhash: string): Promise<TransactionReceipt> {
@@ -71,7 +39,7 @@ export class LogExplorer {
       return null
     }
     const logSignature = log.topics[0]
-    const matchedAbi = contractMapping.logMapping.get(logSignature)
+    const matchedAbi = contractMapping.abiMapping.get(logSignature)
     if (matchedAbi == null) {
       return null
     }
