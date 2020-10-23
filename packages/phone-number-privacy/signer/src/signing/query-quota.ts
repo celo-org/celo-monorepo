@@ -80,9 +80,11 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
+  const walletAddress = await getWalletAddress(account)
+
   if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber))) {
     logger.debug('Account is verified')
-    const transactionCount = await getTransactionCountFromAccount(account)
+    const transactionCount = await getTransactionCount(account, walletAddress)
     return (
       config.quota.unverifiedQueryMax +
       config.quota.additionalVerifiedQueryMax +
@@ -112,7 +114,7 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   ) {
     logger.debug('Account is not verified but meets min balance')
     // TODO consider granting these unverified users slightly less queryPerTx
-    const transactionCount = await getTransactionCountFromAccount(account)
+    const transactionCount = await getTransactionCount(account, walletAddress)
     return config.quota.unverifiedQueryMax + config.quota.queryPerTransaction * transactionCount
   }
 
@@ -120,27 +122,48 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   return 0
 }
 
-export async function getTransactionCountFromAccount(account: string): Promise<number> {
-  return retryAsyncWithBackOff(
-    () => getContractKit().web3.eth.getTransactionCount(account),
-    RETRY_COUNT,
-    [],
-    RETRY_DELAY_IN_MS
-  )
+export async function getTransactionCount(...addresses: string[]): Promise<number> {
+  return Promise.all(
+    addresses.map((address) =>
+      retryAsyncWithBackOff(
+        () => getContractKit().web3.eth.getTransactionCount(address),
+        RETRY_COUNT,
+        [],
+        RETRY_DELAY_IN_MS
+      )
+    )
+  ).then((values) => values.reduce((a, b) => a + b))
 }
 
-export async function getDollarBalance(account: string): Promise<BigNumber> {
-  return retryAsyncWithBackOff(
-    async () => (await getContractKit().contracts.getStableToken()).balanceOf(account),
-    RETRY_COUNT,
-    [],
-    RETRY_DELAY_IN_MS
-  )
+export async function getDollarBalance(...addresses: string[]): Promise<BigNumber> {
+  return Promise.all(
+    addresses.map((address) =>
+      retryAsyncWithBackOff(
+        async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
+        RETRY_COUNT,
+        [],
+        RETRY_DELAY_IN_MS
+      )
+    )
+  ).then((values) => values.reduce((a, b) => a.plus(b)))
 }
 
-export async function getCeloBalance(account: string): Promise<BigNumber> {
+export async function getCeloBalance(...addresses: string[]): Promise<BigNumber> {
+  return Promise.all(
+    addresses.map((address) =>
+      retryAsyncWithBackOff(
+        async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
+        RETRY_COUNT,
+        [],
+        RETRY_DELAY_IN_MS
+      )
+    )
+  ).then((values) => values.reduce((a, b) => a.plus(b)))
+}
+
+export async function getWalletAddress(account: string): Promise<string> {
   return retryAsyncWithBackOff(
-    async () => (await getContractKit().contracts.getGoldToken()).balanceOf(account),
+    async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
     RETRY_COUNT,
     [],
     RETRY_DELAY_IN_MS
