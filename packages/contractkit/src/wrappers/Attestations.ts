@@ -479,6 +479,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return this.selectIssuers(identifier)
   }
 
+  /**
+   * Reveal phone number to issuer
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   * @param smsRetrieverAppSig?: Android app's hash
+   */
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
@@ -503,6 +512,14 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     })
   }
 
+  /**
+   * Returns reveal status from validator's attestation service
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   */
   getRevealStatus(
     phoneNumber: string,
     account: Address,
