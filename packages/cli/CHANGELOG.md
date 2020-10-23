@@ -7,13 +7,14 @@ This package will follow the release process outlined [here](https://docs.celo.o
 ## Development (not published yet)
 ### **[0.0.59--dev]**
 Features
-- [one-line summary] - ( [link PR] )
+- Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - ( [#5111](https://github.com/celo-org/celo-monorepo/pull/5111) )
 
 Bug Fixes
+- Fix attestation service test delivering false negatives - [#5336](https://github.com/celo-org/celo-monorepo/pull/5336)
 - Fix error when listing contract addresses and include some missing new contracts - [#5301](https://github.com/celo-org/celo-monorepo/pull/5301)
 
 Other Changes
-- [one-line summary] - ( [link PR] )
+- Convert default log output color from red to yellow - [#5517](https://github.com/celo-org/celo-monorepo/pull/5517)
 
 
 ## Published
