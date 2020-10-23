@@ -1,7 +1,6 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
@@ -122,13 +121,7 @@ const deployImplementation = async (
   return contract
 }
 
-const deployProxy = async (
-  contractName: string,
-  contract: Truffle.ContractInstance,
-  addresses: ContractAddresses,
-  initializationData: { [contract: string]: any[] },
-  dryRun: boolean
-) => {
+const deployProxy = async (contractName: string, addresses: ContractAddresses, dryRun: boolean) => {
   // Explicitly forbid upgrading to a new Governance proxy contract.
   // Upgrading to a new Governance proxy contract would require ownership of all
   // contracts to be moved to the new governance contract, possibly including contracts
@@ -143,43 +136,13 @@ const deployProxy = async (
   const Proxy = await artifacts.require(`${contractName}Proxy`)
   // Hack to trick truffle, which checks that the provided address has code
   const proxy = await (dryRun ? Proxy.at(REGISTRY_ADDRESS) : Proxy.new())
-  const initializeAbi = (contract as any).abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'initialize'
-  )
-  console.log(`Setting ${contractName}Proxy implementation to ${contract.address}`)
-  if (initializeAbi) {
-    const args = initializationData[contractName]
-    console.log(`Initializing ${contractName} with: ${args}`)
-    if (!dryRun) {
-      await setAndInitializeImplementation(
-        web3,
-        proxy,
-        contract.address,
-        initializeAbi,
-        {},
-        ...args
-      )
-    }
-  } else {
-    if (!dryRun) {
-      await proxy._setImplementation(contract.address)
-    }
-  }
+
   // This makes essentially every contract dependent on Governance.
   console.log(`Transferring ownership of ${contractName}Proxy to Governance`)
   if (!dryRun) {
     await proxy._transferOwnership(addresses.get('Governance'))
   }
-  const proxiedContract = await artifacts.require(contractName).at(proxy.address)
-  const transferOwnershipAbi = (contract as any).abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
-  )
-  if (transferOwnershipAbi) {
-    console.log(`Transferring ownership of ${contractName} to Governance`)
-    if (!dryRun) {
-      await proxiedContract.transferOwnership(addresses.get('Governance'))
-    }
-  }
+
   return proxy
 }
 
@@ -240,33 +203,46 @@ module.exports = async (callback: (error?: any) => number) => {
         // 3. Deploy new versions of the contract and proxy, if needed.
         if (shouldDeployImplementation || isLibrary) {
           const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          const setImplementationTx: ProposalTx = {
+            contract: `${contractName}Proxy`,
+            function: '_setImplementation',
+            args: [contract.address],
+            value: '0',
+          }
+
           if (shouldDeployProxy || isLibrary) {
-            const proxy = await deployProxy(
-              contractName,
-              contract,
-              addresses,
-              initializationData,
-              argv.dry_run
-            )
+            // Changes need another proxy/registry repointing
+            const proxy = await deployProxy(contractName, addresses, argv.dry_run)
+
             // 4. Update the contract's address, if needed.
             addresses.set(contractName, proxy.address)
             proposal.push({
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: contractName }),
-                proxy.address,
-              ],
+              args: [contractName, proxy.address],
               value: '0',
               description: `Registry: ${contractName} -> ${proxy.address}`,
             })
+
+            // 5. If the implementation has an initialize function, add it to the proposal
+            const initializeAbi = (contract as any).abi.find(
+              (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+            )
+            if (initializeAbi) {
+              const args = initializationData[contractName]
+              const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+              console.log(`Add 'Initializing ${contractName} with: ${args}' to proposal`)
+              proposal.push({
+                contract: `${contractName}Proxy`,
+                function: '_setAndInitializeImplementation',
+                args: [contract.address, callData],
+                value: '0',
+              })
+            } else {
+              proposal.push(setImplementationTx)
+            }
           } else {
-            proposal.push({
-              contract: `${contractName}Proxy`,
-              function: '_setImplementation',
-              args: [contract.address],
-              value: '0',
-            })
+            proposal.push(setImplementationTx)
           }
         }
         // 5. Mark the contract as released
