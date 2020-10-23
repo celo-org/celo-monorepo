@@ -31,6 +31,7 @@ done
 ORIGINAL_GIT_REF=$(git symbolic-ref --short HEAD)
 echo " - Checkout source code of old branch at $OLD_BRANCH"
 BUILD_DIR_1=$(echo build/$(echo $OLD_BRANCH | sed -e 's/\//_/g'))
+git fetch --all --tags >> $LOG_FILE
 git checkout $OLD_BRANCH 2>$LOG_FILE > $LOG_FILE
 rm -rf build/contracts
 
