@@ -1,5 +1,6 @@
 import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
@@ -10,7 +11,6 @@ import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
 import { printValueMapRecursive } from './cli'
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 
 export interface CommandCheck {
   name: string
