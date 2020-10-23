@@ -49,14 +49,20 @@ spec:
         - |
           RID=${POD_NAME##*-}
           TOKEN_ENV_VAR_NAME="TOKEN_$RID"
+          ROLE_ARNS={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.aws.roleArn }},{{- end }}
+          ROLE_ARN=`echo -n $ROLE_ARNS | cut -d ',' -f $((RID + 1))`
+          # TODO!!!! Add a condition here to label or annotate
           kubectl \
           --namespace "$POD_NAMESPACE" \
           --server="https://kubernetes.default.svc" \
           --token="${!TOKEN_ENV_VAR_NAME}" \
           --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
-          label pod "$POD_NAME" \
-          --overwrite \
-          "aadpodidbinding=$POD_NAME-identity-binding"
+          --overwrite=true \
+          annotate pod "$POD_NAME" \
+          "iam.amazonaws.com/role=$ROLE_ARN"
+
+          # label pod "$POD_NAME" \
+          # "aadpodidbinding=$POD_NAME-identity-binding"
         env:
         - name: POD_NAMESPACE
           valueFrom:

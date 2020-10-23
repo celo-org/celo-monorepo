@@ -26,6 +26,8 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
       ...(await super.additionalHelmParameters()),
       `--set aws=true`,
       `--set storage.storageClass=gp2`,
+      // A single element because we will be using tcp and udp on a single service
+      `--set geth.service_protocols='{tcp-and-udp}'`
     ]
   }
 

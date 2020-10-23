@@ -140,13 +140,14 @@ export async function switchToContextCluster(celoEnv: string, context: string, c
     await doCheckOrPromptIfStagingOrProduction()
   }
   const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
-  return clusterManager.switchToClusterContext()
+  await clusterManager.switchToClusterContext()
+  return clusterManager
 }
 
 export function getClusterManagerForContext(celoEnv: string, context: string) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
-  const deploymentConfig = clusterConfigGetterByCloudProvider[cloudProvider](context)
-  return getClusterManager(cloudProvider, celoEnv, deploymentConfig)
+  const clusterConfig = clusterConfigGetterByCloudProvider[cloudProvider](context)
+  return getClusterManager(cloudProvider, celoEnv, clusterConfig)
 }
 
 

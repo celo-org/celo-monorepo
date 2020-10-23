@@ -21,10 +21,15 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleInitialArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
+  const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
   if (false) {
     await installHelmChart(argv.celoEnv, argv.context, argv.useForno)
   }
-  const deployer = await getOracleDeployerForContext(argv.celoEnv, argv.context, argv.useForno)
+  const deployer = getOracleDeployerForContext(
+    argv.celoEnv,
+    argv.context,
+    argv.useForno,
+    clusterManager
+  )
   await deployer.installChart()
 }

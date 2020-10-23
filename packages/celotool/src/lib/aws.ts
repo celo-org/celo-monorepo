@@ -1,6 +1,99 @@
 import { execCmd } from './cmd-utils'
 import { AWSClusterConfig } from './k8s-cluster/aws'
 
+export async function getKeyArnFromAlias(alias: string, region: string) {
+  const fullAliasName = `alias/${alias}`
+  const [output] = await execCmd(
+    `aws kms list-aliases --region ${region} --query 'Aliases[?AliasName == \`${fullAliasName}\`]' --output json`
+  )
+  const [parsed] = JSON.parse(output)
+  if (!parsed) {
+    throw Error(`Could not find key with alias ${alias} and region ${region}`)
+  }
+  /**
+   * Expected output:
+   * [
+   *   {
+   *     "AliasName": "alias/test-ecc-key",
+   *     "AliasArn": "arn:aws:kms:eu-central-1:243983831780:alias/test-ecc-key",
+   *     "TargetKeyId": "1d6db902-9a45-4dd5-bd1e-7250b2306f18"
+   *   }
+   * ]
+   */
+  return parsed.AliasArn.replace(fullAliasName, `key/${parsed.TargetKeyId}`)
+}
+
+export async function getEKSNodeInstanceGroupRoleArn(clusterName: string) {
+  // Looking for
+  /*
+            "Path": "/",
+            "RoleName": "eksctl-adorable-monster-159725124-NodeInstanceRole-4VBXGB53SK1A",
+  */
+  const [existingRolesRaw] = await execCmd(
+    `aws iam list-roles --query 'Roles' --output json`
+  )
+  const existingRoles = JSON.parse(existingRolesRaw)
+  const potentialRoles = existingRoles.filter((role: any) => {
+    // The role name doesn't necessarily include the cluster name, but it will include
+    // NodeInstanceRole.
+    const re = new RegExp(`.+-NodeInstanceRole-.+`)
+    return re.test(role.RoleName)
+  })
+  let roleArn: string | undefined
+  for (const role of potentialRoles) {
+    const [clusterNameTagRaw] = await execCmd(
+      `aws iam list-role-tags --role-name ${role.RoleName} --query 'Tags[?Key == \`alpha.eksctl.io/cluster-name\`]'`
+    )
+    const [clusterNameTag] = JSON.parse(clusterNameTagRaw)
+    if (clusterNameTag && clusterNameTag.Value === clusterName) {
+      roleArn = role.Arn
+      break
+    }
+  }
+  if (!roleArn) {
+    throw Error(`Could not find NodeInstanceRole for cluster ${clusterName}`)
+  }
+  return roleArn
+}
+
+export async function attachPolicyIdempotent(roleName: string, policyArn: string) {
+  return execCmd(
+    `aws iam attach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`
+  )
+}
+
+export async function createRoleIdempotent(roleName: string, policyDocumentJson: string) {
+  const [existingRaw] = await execCmd(
+    `aws iam list-roles --query 'Roles[?RoleName == \`${roleName}\`]' --output json`
+  )
+  const [existing] = JSON.parse(existingRaw)
+  if (existing) {
+    console.info(`Role ${roleName} exists`)
+    return existing.Arn
+  }
+  console.info(`Creating role ${roleName}`)
+  const [outputRaw] = await execCmd(
+    `aws iam create-role --role-name ${roleName} --assume-role-policy-document '${policyDocumentJson}' --query 'Role.Arn' --output text`
+  )
+  return outputRaw.trim()
+}
+
+export async function createPolicyIdempotent(policyName: string, policyDocumentJson: string) {
+  const [existingRaw] = await execCmd(
+    `aws iam list-policies --query 'Policies[?PolicyName == \`${policyName}\`]' --output json`
+  )
+  const [existing] = JSON.parse(existingRaw)
+  if (existing) {
+    console.info(`Policy ${policyName} exists`)
+    return existing.Arn
+  }
+  console.info(`Creating policy ${policyName}`)
+  const [output] = await execCmd(
+    `aws iam create-policy --policy-name ${policyName} --policy-document '${policyDocumentJson}' --query 'Policy.Arn' --output text`
+  )
+  return output.trim()
+}
+
 /**
  * A cluster will have a security group that applies to all nodes (ie VMs) in the cluster.
  * This returns a description of that security group.

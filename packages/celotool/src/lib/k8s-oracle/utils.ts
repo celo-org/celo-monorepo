@@ -3,7 +3,7 @@ import { DynamicEnvVar } from "../env-utils"
 import { CloudProvider } from "../k8s-cluster/base"
 import { AKSOracleDeployer, AKSOracleDeploymentConfig, OracleAzureHsmIdentity } from "./aks"
 import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleConfig, OracleIdentity } from "./base"
-import { AWSOracleDeployer, AWSOracleDeploymentConfig } from "./aws"
+import { AWSOracleDeployer, AWSOracleDeploymentConfig, AWSOracleHSMIdentity } from "./aws"
 
 const oracleDeployerByCloudProvider: {
   [key in CloudProvider]?: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => BaseOracleDeployer
@@ -80,6 +80,32 @@ export function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): Orac
       identityName: getOracleAzureIdentityName(keyVaultName, address),
       keyVaultName,
       resourceGroup
+    })
+  }
+  return identities
+}
+
+/**
+ * Given a string addressAzureKeyVaults of the form:
+ * <address>:<keyVaultName>,<address>:<keyVaultName>
+ * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
+ * returns an array of OracleIdentity in the same order
+ */
+export function getAwsHsmOracleIdentities(addressKeyAliases: string): AWSOracleHSMIdentity[] {
+  const identityStrings = addressKeyAliases.split(',')
+  const identities = []
+  for (const identityStr of identityStrings) {
+    const [address, keyAlias, region] = identityStr.split(':')
+    // resourceGroup can be undefined
+    if (!address || !region) {
+      throw Error(
+        `Address or key alias is invalid. Address: ${address} Key Alias: ${keyAlias}`
+      )
+    }
+    identities.push({
+      address,
+      keyAlias,
+      region
     })
   }
   return identities

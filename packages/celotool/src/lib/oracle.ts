@@ -7,42 +7,43 @@ import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getAKSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues } from './context-utils'
 import { AKSClusterConfig } from './k8s-cluster/aks'
-import { CloudProvider } from './k8s-cluster/base'
+import { CloudProvider, BaseClusterManager } from './k8s-cluster/base'
 import { AKSOracleDeployer, AKSOracleDeploymentConfig } from './k8s-oracle/aks'
 import { BaseOracleDeployer } from './k8s-oracle/base'
-import { getAzureHsmOracleIdentities } from './k8s-oracle/utils'
-import { AWSOracleDeploymentConfig, AWSOracleDeployer } from './k8s-oracle/aws'
+import { getAzureHsmOracleIdentities, getAwsHsmOracleIdentities } from './k8s-oracle/utils'
+import { AWSOracleDeployer, AWSOracleDeploymentConfig } from './k8s-oracle/aws'
+import { AWSClusterConfig } from './k8s-cluster/aws'
 
 /**
  * Maps each cloud provider to the correct function to get the appropriate full
  * node deployment config
  */
 const deployerGetterByCloudProvider: {
-  [key in CloudProvider]?: (celoEnv: string, context: string, useForno: boolean) => BaseOracleDeployer
+  [key in CloudProvider]?: (celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) => BaseOracleDeployer
 } = {
   [CloudProvider.AWS]: getAWSOracleDeployer,
   [CloudProvider.AZURE]: getAKSOracleDeployer,
 }
 
 
-export function getOracleDeployerForContext(celoEnv: string, context: string, useForno: boolean = false) {
+export function getOracleDeployerForContext(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
-  return deployerGetterByCloudProvider[cloudProvider]!(celoEnv, context, useForno)
+  return deployerGetterByCloudProvider[cloudProvider]!(celoEnv, context, useForno, clusterManager)
 }
 
-function getAKSOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
-  return getAKSHSMOracleDeployer(celoEnv, context, useForno)
+function getAKSOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  return getAKSHSMOracleDeployer(celoEnv, context, useForno, clusterManager)
 }
 
-function getAKSHSMOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
-  const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
-    contextOracleKeyVaultIdentityConfigDynamicEnvVars,
+function getAKSHSMOracleDeployer(celoEnv: string, context: string, useForno: boolean, _: BaseClusterManager) {
+  const { addressKeyVaults } = getContextDynamicEnvVarValues(
+    contextAKSOracleKeyVaultIdentityConfigDynamicEnvVars,
     context,
     {
-      addressAzureKeyVaults: '',
+      addressKeyVaults: '',
     }
   )
-  const identities = getAzureHsmOracleIdentities(addressAzureKeyVaults)
+  const identities = getAzureHsmOracleIdentities(addressKeyVaults)
   const deploymentConfig: AKSOracleDeploymentConfig = {
     context,
     identities,
@@ -51,22 +52,25 @@ function getAKSHSMOracleDeployer(celoEnv: string, context: string, useForno: boo
   return new AKSOracleDeployer(deploymentConfig, celoEnv)
 }
 
-function getAWSOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
-  return getAWSHSMOracleDeployer(celoEnv, context, useForno)
+function getAWSOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  return getAWSHSMOracleDeployer(celoEnv, context, useForno, clusterManager)
 }
 
-function getAWSHSMOracleDeployer(celoEnv: string, context: string, useForno: boolean) {
+function getAWSHSMOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  const { addressKeyAliases } = getContextDynamicEnvVarValues(
+    contextAWSOracleKeyVaultIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressKeyAliases: '',
+    }
+  )
+
+  const identities = getAwsHsmOracleIdentities(addressKeyAliases)
   const deploymentConfig: AWSOracleDeploymentConfig = {
     context,
-    identities: [
-      {
-        address: '0xf7Af8e3f613E5CB210F6f96B46DA41Fb91338E95'
-      },
-      {
-        address: '0x3Ec7D9e8e13c85b9ED38039d8f9807534F73f713'
-      }
-    ],
+    identities,
     useForno,
+    clusterConfig: clusterManager.clusterConfig as AWSClusterConfig
   }
   return new AWSOracleDeployer(deploymentConfig, celoEnv)
 }
@@ -103,8 +107,12 @@ interface OracleConfig {
   identities: OracleIdentity[]
 }
 
-interface OracleKeyVaultIdentityConfig {
-  addressAzureKeyVaults: string
+interface OracleAKSHSMIdentityConfig {
+  addressKeyVaults: string
+}
+
+interface OracleAWSHSMIdentityConfig {
+  addressKeyAliases: string
 }
 
 interface OracleMnemonicIdentityConfig {
@@ -114,8 +122,15 @@ interface OracleMnemonicIdentityConfig {
 /**
  * Env vars corresponding to each value for the OracleKeyVaultIdentityConfig for a particular context
  */
-const contextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
-  addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
+const contextAKSOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleAKSHSMIdentityConfig]: DynamicEnvVar } = {
+  addressKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
+}
+
+/**
+ * Env vars corresponding to each value for the OracleKeyVaultIdentityConfig for a particular context
+ */
+const contextAWSOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleAWSHSMIdentityConfig]: DynamicEnvVar } = {
+  addressKeyAliases: DynamicEnvVar.ORACLE_ADDRESS_AWS_KEY_ALIASES,
 }
 
 /**
@@ -320,6 +335,7 @@ function getOracleConfig(context: string): OracleConfig {
  */
 function getOracleIdentities(context: string): OracleIdentity[] {
   const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
+    // @ts-ignore
     contextOracleKeyVaultIdentityConfigDynamicEnvVars,
     context,
     {
