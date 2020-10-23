@@ -1,9 +1,18 @@
-import { RawTransaction } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import * as t from 'io-ts'
+import { RawTransaction } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+
+export enum ActionTypes {
+  StartSession = 'StartSession',
+  DeployWallet = 'DeployWallet',
+  DistributedBlindedPepper = 'DistributedBlindedPepper',
+  SubmitMetaTransaction = 'SubmitMetaTransaction',
+  RequestSubsidisedAttestation = 'RequestSubsidisedAttestation',
+}
 
 export interface Action<TAction, TPayload, TResp> {
   method: string
   action: TAction
+  path: string
   payload: TPayload
   codec: t.Type<TResp>
 }
@@ -13,25 +22,19 @@ type ActionFactory<TAction, TPayload, TResp> = (
 ) => Action<TAction, TPayload, TResp>
 
 export const action = <TAction, TPayload, TResp>(
+  action: TAction,
   method: string,
-  _action: TAction,
+  path: string,
   codec: t.Type<TResp>
-): ActionFactory<TAction, TPayload, t.TypeOf<typeof codec>> => (payload) => ({
+): ActionFactory<TAction, TPayload, TResp> => (payload) => ({
   method,
-  action: _action,
+  path: path,
+  action: action,
   codec,
   payload: {
     ...payload,
   },
 })
-
-export enum ActionTypes {
-  StartSession = 'startSession',
-  DeployWallet = 'deployWallet',
-  DistributedBlindedPepper = 'distributedBlindedPepper',
-  SubmitMetaTransaction = 'submitMetaTransaction',
-  RequestSubsidisedAttestation = 'requestSubsidisedAttestation',
-}
 
 export interface StartSessionPayload {
   captchaResponseToken: string
@@ -46,8 +49,9 @@ export const StartSessionResp = t.type({
 export type StartSessionResp = t.TypeOf<typeof StartSessionResp>
 
 export const startSession = action<ActionTypes.StartSession, StartSessionPayload, StartSessionResp>(
-  'POST',
   ActionTypes.StartSession,
+  'POST',
+  'v1/startSession',
   StartSessionResp
 )
 
@@ -67,7 +71,12 @@ export const getDistributedBlindedPepper = action<
   ActionTypes.DistributedBlindedPepper,
   GetDistributedBlindedPepperPayload,
   GetDistributedBlindedPepperResp
->('POST', ActionTypes.DistributedBlindedPepper, GetDistributedBlindedPepperResp)
+>(
+  ActionTypes.DistributedBlindedPepper,
+  'POST',
+  'v1/distributedBlindedPepper',
+  GetDistributedBlindedPepperResp
+)
 
 // export interface DeployWalletPayload {}
 
@@ -94,8 +103,9 @@ export interface DeployWalletPayload {
 }
 
 export const deployWallet = action<ActionTypes.DeployWallet, DeployWalletPayload, DeployWalletResp>(
-  'POST',
   ActionTypes.DeployWallet,
+  'POST',
+  'v1/deployWallet',
   DeployWalletResp
 )
 
@@ -105,11 +115,12 @@ export const SubmitMetaTransactionResp = t.type({
 
 export type SubmitMetaTransactionResp = t.TypeOf<typeof SubmitMetaTransactionResp>
 
-export const submitMetaTransaction = action<
+export const submitMetaTransaction = action<ActionTypes, RawTransaction, SubmitMetaTransactionResp>(
   ActionTypes.SubmitMetaTransaction,
-  RawTransaction,
+  'POST',
+  'v1/submitMetaTransaction',
   SubmitMetaTransactionResp
->('POST', ActionTypes.SubmitMetaTransaction, SubmitMetaTransactionResp)
+)
 
 export interface RequestSubsidisedAttestationsPayload {
   identifier: string
@@ -125,4 +136,9 @@ export const requestSubsidisedAttestations = action<
   ActionTypes.RequestSubsidisedAttestation,
   RequestSubsidisedAttestationsPayload,
   SubmitMetaTransactionResp
->('POST', ActionTypes.RequestSubsidisedAttestation, SubmitMetaTransactionResp)
+>(
+  ActionTypes.RequestSubsidisedAttestation,
+  'POST',
+  'v1/requestSubsidisedAttestations',
+  SubmitMetaTransactionResp
+)

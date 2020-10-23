@@ -7,6 +7,7 @@ import {
   FetchError,
   FetchErrorTypes,
   NetworkError,
+  NotFoundError,
   RequestError,
   ResponseDecodeError,
   ServiceUnavailable,
@@ -52,7 +53,7 @@ export class KomenciClient {
       }
 
       const body = action.payload !== null ? JSON.stringify(action.payload) : undefined
-      const resp = await fetch(this.url + action.action, {
+      const resp = await fetch(this.url + action.path, {
         method: action.method,
         body,
         headers,
@@ -66,6 +67,8 @@ export class KomenciClient {
         } else {
           return Err(new ResponseDecodeError(payload))
         }
+      } else if (resp.status === 404) {
+        return Err(new NotFoundError(this.url + action.path))
       } else if (resp.status === 403) {
         return Err(new Unauthorised())
       } else if (resp.status === 400) {

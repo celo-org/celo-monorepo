@@ -7,6 +7,7 @@ export enum FetchErrorTypes {
   UnexpectedStatus = 'UnexpectedStatus',
   NetworkError = 'NetworkError',
   DecodeError = 'DecodeError',
+  NotFoundError = 'NotFoundError',
 }
 
 export class Unauthorised extends RootError<FetchErrorTypes.Unauthorised> {
@@ -51,6 +52,12 @@ export class ResponseDecodeError extends RootError<FetchErrorTypes.DecodeError> 
   }
 }
 
+export class NotFoundError extends RootError<FetchErrorTypes.NotFoundError> {
+  constructor(public readonly path: string) {
+    super(FetchErrorTypes.NotFoundError)
+  }
+}
+
 export type FetchError =
   | Unauthorised
   | RequestError
@@ -58,6 +65,7 @@ export type FetchError =
   | UnexpectedStatus
   | NetworkError
   | ResponseDecodeError
+  | NotFoundError
 
 export enum TxErrorTypes {
   Timeout = 'Timeout',

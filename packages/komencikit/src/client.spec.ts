@@ -15,7 +15,12 @@ describe('KomenciClient', () => {
       field: t.string,
     })
     type TestResp = t.TypeOf<typeof TestResp>
-    const testAction = action<'testAction', {}, TestResp>('POST', 'testAction', TestResp)
+    const testAction = action<'testAction', {}, TestResp>(
+      'testAction',
+      'POST',
+      'testAction',
+      TestResp
+    )
 
     let client: KomenciClient
 
@@ -43,7 +48,7 @@ describe('KomenciClient', () => {
     describe('when the response is 403', () => {
       it('returns an Unauthorised error', async () => {
         const act = testAction({})
-        fetchMock.mockIf(URL + act.action, () => {
+        fetchMock.mockIf(URL + act.path, () => {
           return Promise.resolve({
             status: 403,
             body: 'Unauthorised',
@@ -61,7 +66,7 @@ describe('KomenciClient', () => {
     describe('when the response is 400', () => {
       it('returns a RequestError', async () => {
         const act = testAction({})
-        fetchMock.mockIf(URL + act.action, () => {
+        fetchMock.mockIf(URL + act.path, () => {
           return Promise.resolve({
             status: 400,
             body: JSON.stringify({
@@ -88,7 +93,7 @@ describe('KomenciClient', () => {
     describe('when the response is 500', () => {
       it('returns a ServiceUnavailable', async () => {
         const act = testAction({})
-        fetchMock.mockIf(URL + act.action, () => {
+        fetchMock.mockIf(URL + act.path, () => {
           return Promise.resolve({
             status: 500,
             body: JSON.stringify({
@@ -110,7 +115,7 @@ describe('KomenciClient', () => {
       describe('but the payload is in the wrong format', () => {
         it('returns a DecodeError', async () => {
           const act = testAction({})
-          fetchMock.mockIf(URL + act.action, () => {
+          fetchMock.mockIf(URL + act.path, () => {
             return Promise.resolve({
               status: 200,
               body: JSON.stringify({
@@ -130,7 +135,7 @@ describe('KomenciClient', () => {
       describe('and the payload is in the right format', () => {
         it('returns the data', async () => {
           const act = testAction({})
-          fetchMock.mockIf(URL + act.action, () => {
+          fetchMock.mockIf(URL + act.path, () => {
             return Promise.resolve({
               status: 200,
               body: JSON.stringify({
