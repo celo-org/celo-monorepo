@@ -14,7 +14,7 @@
     "test:watch": "export TZ=UTC && jest --watch"
   },
   "dependencies": {
-    "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
+    "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#11e078e",
     "@celo/utils": "0.1.22-dev",
     "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.14",

@@ -68,7 +68,6 @@ export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
-const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -649,16 +648,6 @@ function* revealAttestations(
       phoneHashDetails,
       attestation
     )
-    // TODO (i1skn): remove this clause when
-    // https://github.com/celo-org/celo-labs/issues/578 is resolved.
-    // This sends messages with 5000ms delay on Android if reveals is successful
-    if (success && Platform.OS === 'android') {
-      Logger.debug(
-        TAG + '@revealAttestations',
-        `Delaying the next one for: ${ANDROID_DELAY_REVEAL_ATTESTATION}ms`
-      )
-      yield delay(ANDROID_DELAY_REVEAL_ATTESTATION)
-    }
     reveals.push(success)
   }
   yield put(setLastRevealAttempt(Date.now()))

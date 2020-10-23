@@ -2919,9 +2919,9 @@
   dependencies:
     bignumber.js "^9.0.0"
 
-"@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
+"@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#11e078e":
   version "1.0.3"
-  resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
+  resolved "git+https://github.com/celo-org/react-native-sms-retriever#11e078e7631348d27bf7a0e8d0e172701ae30ea8"
 
 "@celo/typechain-target-web3-v1-celo@0.0.2":
   version "0.0.2"
