@@ -210,7 +210,7 @@ export function* handleSendPaymentData(
       Logger.warn(TAG, '@handleSendPaymentData null amount')
       return
     }
-    if (data.isCELO == 'true') {
+    if (data.isCELO === 'true') {
       navigate(Screens.WithdrawCeloReviewScreen, {
         amount,
         recipientAddress: data.address.toLowerCase(),
@@ -226,7 +226,7 @@ export function* handleSendPaymentData(
       navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
     }
   } else {
-    if (data.isCELO == 'true') {
+    if (data.isCELO === 'true') {
       Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
       return
     } else {
