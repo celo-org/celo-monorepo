@@ -8,11 +8,14 @@ import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError } from '../request'
 import { obfuscateNumber } from '../sms/base'
 
-const maxSecurityCodeAttempts = 5
+const MAX_SECURITY_CODE_ATTEMPTS = 5
 
 function obfuscateGetAttestationRequest(getRequest: GetAttestationRequest) {
   const obfuscatedRequest = { ...getRequest }
   obfuscatedRequest.phoneNumber = obfuscateNumber(getRequest.phoneNumber)
+  if (obfuscatedRequest.securityCode) {
+    obfuscatedRequest.securityCode = 'XXX'
+  }
   return obfuscatedRequest
 }
 
@@ -36,7 +39,9 @@ class GetAttestationRequestHandler {
     this.key = getAttestationKey(getRequest)
   }
 
-  async withAttestationAndSecurityCodeChecked(f: (attestation: AttestationModel) => any) {
+  async withAttestationAndSecurityCodeChecked(
+    callback: (attestation: AttestationModel, attestationCode: string | null) => any
+  ) {
     const transaction = await sequelize!.transaction({
       logging: this.sequelizeLogger,
       type: Transaction.TYPES.IMMEDIATE,
@@ -51,19 +56,20 @@ class GetAttestationRequestHandler {
         throw new ErrorWithResponse('Attestation not found', 404)
       }
 
-      // Check security code is supplied and attempts allow
+      if (attestation.securityCodeAttempt >= MAX_SECURITY_CODE_ATTEMPTS) {
+        throw new ErrorWithResponse('Security code attempts exceeded', 403)
+      }
+
+      // No security code supplied in request. Just show other metadata.
       if (!this.getRequest.securityCode) {
-        f(attestation)
+        callback(attestation, null)
         await transaction.commit()
         return
       }
 
-      if (attestation.securityCodeAttempt >= maxSecurityCodeAttempts) {
-        throw new ErrorWithResponse('Security code attempts exceeded', 403)
-      }
-
-      if (this.getRequest.securityCode === attestation.securityCode) {
-        f(attestation)
+      // Security code is supplied. Check it's correct.
+      if (attestation.securityCode === this.getRequest.securityCode) {
+        callback(attestation, attestation.attestationCode)
         await transaction.commit()
         return
       }
@@ -88,8 +94,8 @@ export async function handleGetAttestationRequest(
   try {
     const handler = new GetAttestationRequestHandler(getRequest, res.locals.logger)
 
-    await handler.withAttestationAndSecurityCodeChecked((attestation) => {
-      respondWithAttestation(res, attestation, true, undefined, true)
+    await handler.withAttestationAndSecurityCodeChecked((attestation, attestationCode) => {
+      respondWithAttestation(res, attestation, true, undefined, attestationCode)
     })
   } catch (error) {
     if (!error.responseCode) {
