@@ -1,4 +1,4 @@
-import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleIdentity } from "./base"
+import { BaseOracleDeploymentConfig, OracleIdentity } from "./base"
 import {
   createPolicyIdempotent,
   getEKSNodeInstanceGroupRoleArn,
@@ -7,7 +7,7 @@ import {
   attachPolicyIdempotent
 } from '../aws'
 import { AWSClusterConfig } from "../k8s-cluster/aws"
-import { installOracleRBACHelmChart, rbacServiceAccountSecretNames, removeOracleRBACHelmRelease, upgradeOracleRBACHelmChart } from './rbac'
+import { RBACOracleDeployer } from './rbac'
 
 /**
  * Contains information needed when using Azure HSM signing
@@ -25,48 +25,19 @@ export interface AWSOracleDeploymentConfig extends BaseOracleDeploymentConfig {
   clusterConfig: AWSClusterConfig
 }
 
-export class AWSOracleDeployer extends BaseOracleDeployer {
+export class AWSOracleDeployer extends RBACOracleDeployer {
 
   // Explicitly specify this so we enforce AWSOracleDeploymentConfig
   constructor(deploymentConfig: AWSOracleDeploymentConfig, celoEnv: string) {
     super(deploymentConfig, celoEnv)
   }
 
-  async installChart() {
-    // First install the oracle-rbac helm chart.
-    // This must be deployed before so we can use a resulting auth token so that
-    // oracle pods can reach the K8s API server to change their aad labels
-    await installOracleRBACHelmChart(this.celoEnv, this.replicas)
-    await super.installChart()
-  }
-
-  async upgradeChart() {
-    await upgradeOracleRBACHelmChart(this.celoEnv, this.replicas)
-    await super.upgradeChart()
-  }
-
   async removeChart() {
-    await removeOracleRBACHelmRelease(this.celoEnv)
     await super.removeChart()
     // for (const identity of this.deploymentConfig.identities) {
     //   await deleteOracleAzureIdentity(this.deploymentConfig.context, identity)
     // }
   }
-
-  async helmParameters() {
-    const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(this.celoEnv, this.replicas)
-    return [
-      ...await super.helmParameters(),
-      `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`
-    ]
-  }
-
-  // async helmParameters() {
-  //   return [
-  //     ...await super.helmParameters(),
-  //     // `--set `
-  //   ]
-  // }
 
   async oracleIdentityHelmParameters() {
     let params = await super.oracleIdentityHelmParameters()

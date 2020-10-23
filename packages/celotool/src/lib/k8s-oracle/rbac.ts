@@ -1,5 +1,6 @@
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
+import { BaseOracleDeployer } from './base'
 
 // Oracle RBAC------
 // We need the oracle pods to be able to change their label to accommodate
@@ -8,41 +9,54 @@ import { execCmdWithExitOnFailure } from '../cmd-utils'
 
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
-export async function installOracleRBACHelmChart(celoEnv: string, replicas: number) {
-  return installGenericHelmChart(
-    celoEnv,
-    rbacReleaseName(celoEnv),
-    rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, replicas)
-  )
-}
+export class RBACOracleDeployer extends BaseOracleDeployer {
+  async installChart() {
+    await installGenericHelmChart(
+      this.celoEnv,
+      this.rbacReleaseName(),
+      rbacHelmChartPath,
+      this.rbacHelmParameters()
+    )
+    return super.installChart()
+  }
 
-export async function upgradeOracleRBACHelmChart(celoEnv: string, replicas: number) {
-  return upgradeGenericHelmChart(
-    celoEnv,
-    rbacReleaseName(celoEnv),
-    rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, replicas)
-  )
-}
+  async upgradeChart() {
+    await upgradeGenericHelmChart(
+      this.celoEnv,
+      this.rbacReleaseName(),
+      rbacHelmChartPath,
+      this.rbacHelmParameters()
+    )
+    return super.upgradeChart()
+  }
 
-export function removeOracleRBACHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(rbacReleaseName(celoEnv))
-}
+  async removeChart() {
+    await removeGenericHelmChart(this.rbacReleaseName())
+    return super.removeChart()
+  }
 
-function rbacHelmParameters(celoEnv: string, replicas: number) {
-  return [`--set environment.name=${celoEnv}`,  `--set oracle.replicas=${replicas}`,]
-}
+  async helmParameters() {
+    const kubeServiceAccountSecretNames = await this.rbacServiceAccountSecretNames()
+    return [
+      ...await super.helmParameters(),
+      `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`
+    ]
+  }
 
-function rbacReleaseName(celoEnv: string) {
-  return `${celoEnv}-oracle-rbac`
-}
+  rbacHelmParameters() {
+    return [`--set environment.name=${this.celoEnv}`,  `--set oracle.replicas=${this.replicas}`,]
+  }
 
-export async function rbacServiceAccountSecretNames(celoEnv: string, replicas: number) {
-  const names = [...Array(replicas).keys()].map(i => `${rbacReleaseName(celoEnv)}-${i}`)
-  const [tokenName] = await execCmdWithExitOnFailure(
-    `kubectl get serviceaccount --namespace=${celoEnv} ${names.join(' ')} -o=jsonpath="{.items[*].secrets[0]['name']}"`
-  )
-  const tokenNames = tokenName.trim().split(' ')
-  return tokenNames
+  async rbacServiceAccountSecretNames() {
+    const names = [...Array(this.replicas).keys()].map(i => `${this.rbacReleaseName()}-${i}`)
+    const [tokenName] = await execCmdWithExitOnFailure(
+      `kubectl get serviceaccount --namespace=${this.celoEnv} ${names.join(' ')} -o=jsonpath="{.items[*].secrets[0]['name']}"`
+    )
+    const tokenNames = tokenName.trim().split(' ')
+    return tokenNames
+  }
+
+  rbacReleaseName() {
+    return `${this.celoEnv}-oracle-rbac`
+  }
 }

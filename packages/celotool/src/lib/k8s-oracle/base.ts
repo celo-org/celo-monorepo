@@ -128,6 +128,10 @@ export abstract class BaseOracleDeployer {
   get replicas(): number {
     return this.deploymentConfig.identities.length
   }
+
+  get context(): string {
+    return this.deploymentConfig.context
+  }
 }
 
 
