@@ -5,7 +5,7 @@ import yargs from 'yargs'
 
 export const command = 'komenci'
 
-export const describe = 'upgrade the oracle(s) on an AKS cluster'
+export const describe = 'upgrade komenci on an AKS cluster'
 
 type OracleUpgradeArgv = UpgradeArgv &
   ContextArgv & {

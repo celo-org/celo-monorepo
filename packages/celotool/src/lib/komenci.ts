@@ -1,7 +1,7 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
+import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl, getRelayerHttpRpcInternalUrl } from 'src/lib/endpoints'
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
@@ -23,18 +23,18 @@ interface KomenciAzureHsmIdentity {
 }
 
 /**
- * Represents the identity of a single komenci
+ * Represents the identity of a single komenci relayer
  */
 interface KomenciIdentity {
   address: string
-  // Used if generating komenci clients from a mnemonic
+  // Used if generating komenci relayers from a mnemonic
   privateKey?: string,
   // Used if using Azure HSM signing
   azureHsmIdentity?: KomenciAzureHsmIdentity
 }
 
 /**
- * Configuration of multiple komencis
+ * Configuration of multiple relayers
  */
 interface KomenciConfig {
   identities: KomenciIdentity[]
@@ -116,6 +116,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const replicas = komenciConfig.identities.length
   const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, replicas)
 
+  const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
     : getFullNodeHttpRpcInternalUrl(celoEnv)
@@ -128,17 +129,19 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
     `--set komenci.azureHsm.initTryCount=5`,
     `--set komenci.azureHsm.initMaxRetryBackoffMs=30000`,
-    `--set komenci.replicas=${replicas}`,
-    `--set komenci.rpcProviderUrls.http=${httpRpcProviderUrl}`,
-    `--set komenci.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
-    `--set komenci.metrics.enabled=true`,
-    `--set komenci.metrics.prometheusPort=9090`,
-    `--set-string komenci.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
+    `--set onboarding.replicas=${replicas}`,
+    `--set onboarding.relayerUrls=${clusterIP}`,
+    `--set relayer.replicas=${replicas}`,
+    `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
+    `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
+    `--set relayer.metrics.enabled=true`,
+    `--set relayer.metrics.prometheusPort=9090`,
+    `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }
 
 /**
- * Returns an array of helm command line parameters for the komenci identities.
+ * Returns an array of helm command line parameters for the komenci relayer identities.
  * Supports both private key and Azure HSM signing.
  */
 async function komenciIdentityHelmParameters(
@@ -149,7 +152,7 @@ async function komenciIdentityHelmParameters(
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
     const komenciIdentity = komenciConfig.identities[i]
-    const prefix = `--set komenci.identities[${i}]`
+    const prefix = `--set relayer.identities[${i}]`
     params.push(`${prefix}.address=${komenciIdentity.address}`)
     // An komenci identity can specify either a private key or some information
     // about an Azure Key Vault that houses an HSM with the address provided.
@@ -164,7 +167,7 @@ async function komenciIdentityHelmParameters(
     } else if (komenciIdentity.privateKey) {
       params.push(`${prefix}.privateKey=${komenciIdentity.privateKey}`)
     } else {
-      throw Error(`Incomplete komenci identity: ${komenciIdentity}`)
+      throw Error(`Incomplete relayer identity: ${komenciIdentity}`)
     }
   }
   return params
@@ -337,7 +340,7 @@ function getKomenciAzureIdentityName(keyVaultName: string, address: string) {
 }
 
 // Komenci RBAC------
-// We need the komenci pods to be able to change their label to accommodate
+// We need the relayer pods to be able to change their label to accommodate
 // limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
 // To do this, we use an auth token that we get using the resources in the `komenci-rbac` chart
 
@@ -366,7 +369,7 @@ function removeKomenciRBACHelmRelease(celoEnv: string) {
 function rbacHelmParameters(celoEnv: string,  context: string) {
   const komenciConfig = getKomenciConfig(context)
   const replicas = komenciConfig.identities.length
-  return [`--set environment.name=${celoEnv}`,  `--set komenci.replicas=${replicas}`,]
+  return [`--set environment.name=${celoEnv}`,  `--set relayer.replicas=${replicas}`,]
 }
 
 function rbacReleaseName(celoEnv: string) {
