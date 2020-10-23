@@ -8,20 +8,20 @@ import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
 import Web3 from 'web3'
 import { KomenciKit } from './src'
 
-export const wallet = new LocalWallet()
+const WALLET_IMPLEMENTATION_ADDRESS = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
+
+const wallet = new LocalWallet()
 const pkey = Web3.utils.randomHex(32)
 // const pkey = '0xdc771e7878396744e17afcb0dea4cfc96ce6f116107c7bcc0687b812048a2bf7'
 wallet.addAccount(pkey)
 console.log('Private key: ', pkey)
 
 const provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
-export const web3 = new Web3(provider)
-export const contractKit = new ContractKit(web3, wallet)
+const web3 = new Web3(provider)
+const contractKit = new ContractKit(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
-const komenciKit = new KomenciKit(contractKit, {
-  account,
-  platform: 'ios',
+const komenciKit = new KomenciKit(contractKit, account, {
   url: 'http://localhost:3000',
 })
 
@@ -35,12 +35,13 @@ const run = async () => {
   const attestations = await contractKit.contracts.getAttestations()
   console.log('Attestations: ', attestations.address)
   console.log('Starting')
-  const startSession = await komenciKit.startSession('token', 'token')
+  const startSession = await komenciKit.startSession('captcha-token')
+
   console.log('StartSession: ', startSession)
   if (!startSession.ok) {
     return
   }
-  const deployWallet = await komenciKit.deployWallet()
+  const deployWallet = await komenciKit.deployWallet(WALLET_IMPLEMENTATION_ADDRESS)
   console.log('DeployWallet: ', deployWallet)
   if (!deployWallet.ok) {
     return

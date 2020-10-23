@@ -96,7 +96,7 @@ export class AuthenticationFailed extends RootError<KomenciErrorTypes.Authentica
 }
 
 export class LoginSignatureError extends RootError<'LoginSignatureError'> {
-  constructor(public readonly error) {
+  constructor(public readonly error: Error) {
     super('LoginSignatureError')
   }
 }

@@ -1,9 +1,8 @@
-import { Address, sleep } from '@celo/base'
+import { Address, normalizeAddress, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import {
   MetaTransactionWalletWrapper,
-  RawTransaction,
   toRawTransaction,
 } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { hashMessage } from '@celo/utils/lib/signatureUtils'
@@ -28,7 +27,6 @@ import {
   TxRevertError,
   TxTimeoutError,
   LoginSignatureError,
-  KomenciErrorTypes,
 } from './errors'
 import { retry } from './retry'
 
@@ -50,8 +48,14 @@ export type KomenciOptionsInput = Omit<KomenciOptions, keyof typeof DEFAULT_OPTI
 export class KomenciKit {
   private client: KomenciClient
   private options: KomenciOptions
+  private externalAccount: string
 
-  constructor(private contractKit: ContractKit, options: KomenciOptionsInput) {
+  constructor(
+    private contractKit: ContractKit,
+    externalAccount: string,
+    options: KomenciOptionsInput
+  ) {
+    this.externalAccount = normalizeAddress(externalAccount)
     this.options = {
       ...DEFAULT_OPTIONS,
       ...options,
@@ -70,16 +74,15 @@ export class KomenciKit {
    * @return Result<token, error>
    */
   startSession = async (
-    externalAccount: string,
     captchaToken: string
   ): Promise<Result<string, FetchError | AuthenticationFailed | LoginSignatureError>> => {
-    const signatureResp = await this.getLoginSignature(externalAccount)
+    const signatureResp = await this.getLoginSignature()
     if (!signatureResp.ok) {
       return signatureResp
     }
 
     const payload: StartSessionPayload = {
-      externalAccount,
+      externalAccount: this.externalAccount,
       captchaResponseToken: captchaToken,
       signature: signatureResp.result,
     }
@@ -132,7 +135,7 @@ export class KomenciKit {
   })
   public async deployWallet(
     implementationAddress: string
-  ): Promise<Result<string, FetchError | TxError | KomenciErrorTypes>> {
+  ): Promise<Result<string, FetchError | TxError>> {
     const resp = await this.client.exec(deployWallet({ implementationAddress }))
     if (resp.ok) {
       if (resp.result.status === 'deployed') {
@@ -156,7 +159,7 @@ export class KomenciKit {
           })
 
           const deployWalletLog = events.find(
-            (event) => event.returnValues.owner.toLocaleLowerCase() === this.options.account
+            (event) => normalizeAddress(event.returnValues.owner) === this.externalAccount
           )
 
           if (deployWalletLog === undefined) {
@@ -245,6 +248,7 @@ export class KomenciKit {
     account: string
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
     const attestations = await this.contractKit.contracts.getAttestations()
+    await attestations.waitForSelectingIssuers(identifier, account)
     return this.submitMetaTransaction(account, attestations.selectIssuers(identifier))
   }
 
@@ -361,13 +365,11 @@ export class KomenciKit {
    * @returns the signature of the login message
    * @private
    */
-  private async getLoginSignature(
-    externalAccount: string
-  ): Promise<Result<string, LoginSignatureError>> {
+  private async getLoginSignature(): Promise<Result<string, LoginSignatureError>> {
     try {
       const signature = await this.contractKit.web3.eth.sign(
-        hashMessage(`komenci:login:${externalAccount}`),
-        externalAccount
+        hashMessage(`komenci:login:${this.externalAccount}`),
+        this.externalAccount
       )
       return Ok(signature)
     } catch (e) {
