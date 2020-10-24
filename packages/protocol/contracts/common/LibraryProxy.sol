@@ -9,8 +9,9 @@ import "./Registry.sol";
  * for calls to a linked library pointed to by a Registry.
  * @dev This contract should be inherited from (e.g. for a library called Math,
  * create `contract MathProxy is LibraryProxy`). The inheriting contract should
- * implement a fallback function that calls `_delegateToLibrary`, passing in a
- * Registry hashed identifier referencing the implementation library.
+ * implement a fallback function that calls `_delegateToRegisteredLibrary`,
+ * passing in a Registry hashed identifier referencing the implementation
+ * library.
  */
 contract LibraryProxy {
   // Used to store the address of the registry contract.
@@ -39,7 +40,7 @@ contract LibraryProxy {
     }
   }
 
-  function _delegateToLibrary(bytes32 libraryIdentifier) internal {
+  function _delegateToRegisteredLibrary(bytes32 libraryIdentifier) internal {
     Registry registry = Registry(_getRegistry());
 
     address implementationAddress = registry.getAddressForOrDie(libraryIdentifier);

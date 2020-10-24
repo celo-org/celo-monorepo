@@ -1,10 +1,10 @@
 pragma solidity ^0.5.13;
 
-import "../LibraryProxyShim.sol";
+import "../UsingProxiedLibraries.sol";
 import "./TestLibrary1.sol";
 import "./TestLibraryStruct.sol";
 
-contract ProxiedLibraryTest {
+contract ProxiedLibraryTest is UsingProxiedLibraries {
   // For the test, we need to pull the library's struct definition out to a
   // separate library because the logic library's name changes. In the expected
   // production use case, a library's name would stay the same across upgrades
@@ -18,6 +18,10 @@ contract ProxiedLibraryTest {
     setLibraryRegistry(registryAddress);
   }
 
+  function setLibraryRegistryExternal(address registryAddress) external {
+    setLibraryRegistry(registryAddress);
+  }
+
   function set(uint256 _x) public {
     x.x = _x;
   }
@@ -28,14 +32,6 @@ contract ProxiedLibraryTest {
 
   function librarySet(uint256 _x) public {
     x.set(_x);
-  }
-
-  function setLibraryRegistry(address registryAddress) public {
-    LibraryProxyShim._setRegistry(registryAddress);
-  }
-
-  function getLibraryRegistryAddress() public view returns (address) {
-    return LibraryProxyShim._getRegistry();
   }
 
   function increase(uint256 n) public view returns (uint256) {

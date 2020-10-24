@@ -50,21 +50,21 @@ contract('LibraryProxy', (accounts: string[]) => {
 
   describe('#_setRegistry', () => {
     it('should set the registry', async () => {
-      await proxiedLibraryTest.setLibraryRegistry(registry.address)
-      const res = await proxiedLibraryTest.getLibraryRegistryAddress()
+      await proxiedLibraryTest.setLibraryRegistryExternal(registry.address)
+      const res = await proxiedLibraryTest.getLibraryRegistry()
       assert.equal(res, registry.address)
     })
 
     it('should allow the registry to be updated', async () => {
-      await proxiedLibraryTest.setLibraryRegistry(libraryProxy.address)
-      await proxiedLibraryTest.setLibraryRegistry(registry.address)
-      const res = await proxiedLibraryTest.getLibraryRegistryAddress()
+      await proxiedLibraryTest.setLibraryRegistryExternal(libraryProxy.address)
+      await proxiedLibraryTest.setLibraryRegistryExternal(registry.address)
+      const res = await proxiedLibraryTest.getLibraryRegistry()
       assert.equal(res, registry.address)
     })
 
     it(`should not affect the contract's own storage`, async () => {
       await proxiedLibraryTest.set(42)
-      await proxiedLibraryTest.setLibraryRegistry(registry.address)
+      await proxiedLibraryTest.setLibraryRegistryExternal(registry.address)
 
       const res = await proxiedLibraryTest.get()
       assert.equal(res.toNumber(), 42)
@@ -73,7 +73,7 @@ contract('LibraryProxy', (accounts: string[]) => {
 
   describe('when the Registry is set', () => {
     beforeEach(async () => {
-      await proxiedLibraryTest.setLibraryRegistry(registry.address)
+      await proxiedLibraryTest.setLibraryRegistryExternal(registry.address)
     })
 
     it('can call a library function', async () => {
