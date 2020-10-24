@@ -1,5 +1,5 @@
 import { execCmd } from './cmd-utils'
-import { AWSClusterConfig } from './k8s-cluster/aws'
+import { AwsClusterConfig } from './k8s-cluster/aws'
 
 export async function getKeyArnFromAlias(alias: string, region: string) {
   const fullAliasName = `alias/${alias}`
@@ -21,6 +21,58 @@ export async function getKeyArnFromAlias(alias: string, region: string) {
    * ]
    */
   return parsed.AliasArn.replace(fullAliasName, `key/${parsed.TargetKeyId}`)
+}
+
+export async function deleteRole(roleName: string) {
+  return execCmd(
+    `aws iam delete-role --role-name ${roleName}`
+  )
+}
+
+export async function detachPolicyIdempotent(roleName: string, policyArn: string) {
+  return execCmd(
+    `aws iam detach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`
+  )
+}
+
+/**
+ * Deletes all policy versions and the policy itself
+ */
+export async function deletePolicy(policyArn: string) {
+  // First, delete all non-default policy versions
+  const policyVersions = await getPolicyVersions(policyArn)
+  await Promise.all(
+    policyVersions
+      .filter((version: any) => !version.IsDefaultVersion)
+      .map((version: any) => deletePolicyVersion(policyArn, version.VersionId))
+  )
+  return execCmd(
+    `aws iam delete-policy --policy-arn ${policyArn}`
+  )
+}
+
+async function deletePolicyVersion(policyArn: string, versionId: string) {
+  return execCmd(
+    `aws iam delete-policy-version --policy-arn ${policyArn} --version-id ${versionId}`
+  )
+}
+
+async function getPolicyVersions(policyArn: string) {
+  const [output] = await execCmd(
+    `aws iam list-policy-versions --policy-arn ${policyArn} --query 'Versions' --output json`
+  )
+  return JSON.parse(output)
+}
+
+export async function getPolicyArn(policyName: string) {
+  const [output] = await execCmd(
+    `aws iam list-policies --query 'Policies[?PolicyName == \`${policyName}\`]' --output json`
+  )
+  const [policy] = JSON.parse(output)
+  if (!policy) {
+    return undefined
+  }
+  return policy.Arn
 }
 
 export async function getEKSNodeInstanceGroupRoleArn(clusterName: string) {
@@ -98,7 +150,7 @@ export async function createPolicyIdempotent(policyName: string, policyDocumentJ
  * A cluster will have a security group that applies to all nodes (ie VMs) in the cluster.
  * This returns a description of that security group.
  */
-export async function getClusterSharedNodeSecurityGroup(clusterConfig: AWSClusterConfig) {
+export async function getClusterSharedNodeSecurityGroup(clusterConfig: AwsClusterConfig) {
   const [output] = await execCmd(
     `aws ec2 describe-security-groups --filters "Name=tag:aws:cloudformation:logical-id,Values=ClusterSharedNodeSecurityGroup" "Name=tag:eksctl.cluster.k8s.io/v1alpha1/cluster-name,Values=${clusterConfig.clusterName}" --query "SecurityGroups[0]" --output json`
   )

@@ -9,7 +9,7 @@ import { BaseOracleDeployer } from './base'
 
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
-export class RBACOracleDeployer extends BaseOracleDeployer {
+export class RbacOracleDeployer extends BaseOracleDeployer {
   async installChart() {
     await installGenericHelmChart(
       this.celoEnv,
@@ -44,7 +44,7 @@ export class RBACOracleDeployer extends BaseOracleDeployer {
   }
 
   rbacHelmParameters() {
-    return [`--set environment.name=${this.celoEnv}`,  `--set oracle.replicas=${this.replicas}`,]
+    return [`--set environment.name=${this.celoEnv}`, `--set oracle.replicas=${this.replicas}`]
   }
 
   async rbacServiceAccountSecretNames() {

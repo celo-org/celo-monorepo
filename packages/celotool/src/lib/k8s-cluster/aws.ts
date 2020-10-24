@@ -4,7 +4,7 @@ import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 /**
  * Basic info for an EKS cluster
  */
-export interface AWSClusterConfig extends BaseClusterConfig {
+export interface AwsClusterConfig extends BaseClusterConfig {
   clusterRegion: string,
   resourceGroupTag: string
 }
@@ -20,8 +20,8 @@ export class AWSClusterManager extends BaseClusterManager {
     )
   }
 
-  get clusterConfig(): AWSClusterConfig {
-    return this._clusterConfig as AWSClusterConfig
+  get clusterConfig(): AwsClusterConfig {
+    return this._clusterConfig as AwsClusterConfig
   }
 
   get kubernetesContextName(): string {

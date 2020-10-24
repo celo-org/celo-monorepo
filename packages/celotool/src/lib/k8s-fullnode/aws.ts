@@ -1,10 +1,10 @@
 import { authorizeSecurityGroupIngress, getClusterSharedNodeSecurityGroup, revokeSecurityGroupIngress } from '../aws'
-import { AWSClusterConfig } from '../k8s-cluster/aws'
+import { AwsClusterConfig } from '../k8s-cluster/aws'
 import { BaseFullNodeDeploymentConfig } from './base'
 import { BaseNodePortFullNodeDeployer } from './base-nodeport'
 
 export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
-  clusterConfig: AWSClusterConfig
+  clusterConfig: AwsClusterConfig
 }
 
 enum Protocols {

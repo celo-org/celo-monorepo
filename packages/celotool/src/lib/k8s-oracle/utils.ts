@@ -3,12 +3,12 @@ import { DynamicEnvVar } from "../env-utils"
 import { CloudProvider } from "../k8s-cluster/base"
 import { AKSOracleDeployer, AKSOracleDeploymentConfig, OracleAzureHsmIdentity } from "./aks"
 import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleConfig, OracleIdentity } from "./base"
-import { AWSOracleDeployer, AWSOracleDeploymentConfig, AWSOracleHSMIdentity } from "./aws"
+import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig, AwsHsmOracleIdentity } from "./aws"
 
 const oracleDeployerByCloudProvider: {
   [key in CloudProvider]?: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => BaseOracleDeployer
 } = {
-  [CloudProvider.AWS]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new AWSOracleDeployer(deploymentConfig as AWSOracleDeploymentConfig, celoEnv),
+  [CloudProvider.AWS]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new AwsHsmOracleDeployer(deploymentConfig as AwsHsmOracleDeploymentConfig, celoEnv),
   [CloudProvider.AZURE]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new AKSOracleDeployer(deploymentConfig as AKSOracleDeploymentConfig, celoEnv),
   // [CloudProvider.GCP]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new GCPFullNodeDeployer(deploymentConfig as GCPFullNodeDeploymentConfig, celoEnv),
 }
@@ -91,7 +91,7 @@ export function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): Orac
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
  * returns an array of OracleIdentity in the same order
  */
-export function getAwsHsmOracleIdentities(addressKeyAliases: string): AWSOracleHSMIdentity[] {
+export function getAwsHsmOracleIdentities(addressKeyAliases: string): AwsHsmOracleIdentity[] {
   const identityStrings = addressKeyAliases.split(',')
   const identities = []
   for (const identityStr of identityStrings) {

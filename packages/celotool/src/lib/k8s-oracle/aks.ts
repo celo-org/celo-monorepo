@@ -1,9 +1,8 @@
 import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
-import { getAKSClusterConfig } from '../context-utils'
 import { AKSClusterConfig } from '../k8s-cluster/aks'
 import { BaseOracleDeploymentConfig, OracleIdentity } from './base'
-import { RBACOracleDeployer } from './rbac'
+import { RbacOracleDeployer } from './rbac'
 
 /**
  * Contains information needed when using Azure HSM signing
@@ -44,7 +43,7 @@ export interface AKSOracleDeploymentConfig extends BaseOracleDeploymentConfig {
 //   addressesFromMnemonicCount: string
 // }
 
-export class AKSOracleDeployer extends RBACOracleDeployer {
+export class AKSOracleDeployer extends RbacOracleDeployer {
   // Explicitly specify this so we enforce AKSOracleDeploymentConfig
   constructor(deploymentConfig: AKSOracleDeploymentConfig, celoEnv: string) {
     super(deploymentConfig, celoEnv)
