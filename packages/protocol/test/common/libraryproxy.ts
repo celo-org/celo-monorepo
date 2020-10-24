@@ -1,11 +1,11 @@
 // import { assertRevert } from '@celo/protocol/lib/test-utils'
 import {
-  TestLibraryProxyInstance,
-  TestLibrary1Instance,
-  TestLibrary2Instance,
   ProxiedLibraryTestInstance,
   ProxyInstance,
   RegistryInstance,
+  TestLibrary1Instance,
+  TestLibrary2Instance,
+  TestLibraryProxyInstance,
 } from 'types'
 
 const TestLibraryProxy: Truffle.Contract<TestLibraryProxyInstance> = artifacts.require(
