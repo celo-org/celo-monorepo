@@ -2,7 +2,7 @@
 // import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 // import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 // import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { DynamicEnvVar } from 'src/lib/env-utils'
+import { DynamicEnvVar, fetchEnv, envVar } from 'src/lib/env-utils'
 // import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 // import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getCloudProviderFromContext, getContextDynamicEnvVarValues } from './context-utils'
@@ -14,6 +14,9 @@ import { getAzureHsmOracleIdentities, getAwsHsmOracleIdentities } from './k8s-or
 import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig } from './k8s-oracle/aws-hsm'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { AKSClusterConfig } from './k8s-cluster/aks'
+import { AccountType, getPrivateKeysFor, privateKeyToAddress } from './generate_utils'
+import { PrivateKeyOracleIdentity, PrivateKeyOracleDeploymentConfig, PrivateKeyOracleDeployer } from './k8s-oracle/pkey'
+import { ensureLeading0x } from '@celo/utils/src/address'
 
 /**
  * Maps each cloud provider to the correct function to get the appropriate full
@@ -27,6 +30,21 @@ const deployerGetterByCloudProvider: {
 }
 
 export function getOracleDeployerForContext(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  // If the mnemonic-based oracle address env var has a value, we should be using
+  // the private key oracle deployer.
+  const { addressesFromMnemonicCount } = getContextDynamicEnvVarValues(
+    contextOracleMnemonicIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressesFromMnemonicCount: '',
+    }
+  )
+  if (addressesFromMnemonicCount) {
+    const addressesFromMnemonicCountNum = parseInt(addressesFromMnemonicCount, 10)
+    // This is a cloud-provider agnostic deployer because it doesn't rely
+    // on cloud-specific HSMs
+    return getPrivateKeyOracleDeployer(celoEnv, context, useForno, addressesFromMnemonicCountNum)
+  }
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
   return deployerGetterByCloudProvider[cloudProvider]!(celoEnv, context, useForno, clusterManager)
 }
@@ -395,19 +413,25 @@ const contextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMne
 //   return identities
 // }
 //
-// /**
-//  * Returns oracle identities with private keys and addresses generated from the mnemonic
-//  */
-// function getMnemonicBasedOracleIdentities(count: number): OracleIdentity[] {
-//   return getPrivateKeysFor(
-//     AccountType.PRICE_ORACLE,
-//     fetchEnv(envVar.MNEMONIC),
-//     count
-//   ).map((pkey) => ({
-//     address: privateKeyToAddress(pkey),
-//     privateKey: ensureLeading0x(pkey),
-//   }))
-// }
+/**
+ * Returns oracle identities with private keys and addresses generated from the mnemonic
+ */
+function getPrivateKeyOracleDeployer(celoEnv: string, context: string, useForno: boolean, count: number): PrivateKeyOracleDeployer {
+  const identities: PrivateKeyOracleIdentity[] = getPrivateKeysFor(
+    AccountType.PRICE_ORACLE,
+    fetchEnv(envVar.MNEMONIC),
+    count
+  ).map((pkey) => ({
+    address: privateKeyToAddress(pkey),
+    privateKey: ensureLeading0x(pkey)
+  }))
+  const deploymentConfig: PrivateKeyOracleDeploymentConfig = {
+    context,
+    identities,
+    useForno
+  }
+  return new PrivateKeyOracleDeployer(deploymentConfig, celoEnv)
+}
 //
 // /**
 //  * @return the intended name of an azure identity given a key vault name and address
