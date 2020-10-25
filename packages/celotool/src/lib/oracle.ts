@@ -8,10 +8,10 @@ import { DynamicEnvVar } from 'src/lib/env-utils'
 import { getCloudProviderFromContext, getContextDynamicEnvVarValues } from './context-utils'
 // import { AKSClusterConfig } from './k8s-cluster/aks'
 import { CloudProvider, BaseClusterManager } from './k8s-cluster/base'
-import { AKSOracleDeployer, AKSOracleDeploymentConfig } from './k8s-oracle/aks'
+import { AksHsmOracleDeployer, AksHsmOracleDeploymentConfig } from './k8s-oracle/aks-hsm'
 import { BaseOracleDeployer } from './k8s-oracle/base'
 import { getAzureHsmOracleIdentities, getAwsHsmOracleIdentities } from './k8s-oracle/utils'
-import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig } from './k8s-oracle/aws'
+import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig } from './k8s-oracle/aws-hsm'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { AKSClusterConfig } from './k8s-cluster/aks'
 
@@ -23,7 +23,7 @@ const deployerGetterByCloudProvider: {
   [key in CloudProvider]?: (celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) => BaseOracleDeployer
 } = {
   [CloudProvider.AWS]: getAwsHsmOracleDeployer,
-  [CloudProvider.AZURE]: getAKSOracleDeployer,
+  [CloudProvider.AZURE]: getAksHsmOracleDeployer,
 }
 
 export function getOracleDeployerForContext(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
@@ -31,7 +31,7 @@ export function getOracleDeployerForContext(celoEnv: string, context: string, us
   return deployerGetterByCloudProvider[cloudProvider]!(celoEnv, context, useForno, clusterManager)
 }
 
-function getAKSOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
   return getAKSHSMOracleDeployer(celoEnv, context, useForno, clusterManager)
 }
 
@@ -44,13 +44,13 @@ function getAKSHSMOracleDeployer(celoEnv: string, context: string, useForno: boo
     }
   )
   const identities = getAzureHsmOracleIdentities(addressKeyVaults)
-  const deploymentConfig: AKSOracleDeploymentConfig = {
+  const deploymentConfig: AksHsmOracleDeploymentConfig = {
     context,
     clusterConfig: clusterManager.clusterConfig as AKSClusterConfig,
     identities,
     useForno,
   }
-  return new AKSOracleDeployer(deploymentConfig, celoEnv)
+  return new AksHsmOracleDeployer(deploymentConfig, celoEnv)
 }
 
 function getAwsHsmOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
@@ -82,7 +82,7 @@ function getAWSHSMOracleDeployer(celoEnv: string, context: string, useForno: boo
 // /**
 //  * Contains information needed when using Azure HSM signing
 //  */
-// interface OracleAzureHsmIdentity {
+// interface AksHsmOracleIdentity {
 //   identityName: string
 //   keyVaultName: string
 //   // If a resource group is not specified, it is assumed to be the same
@@ -98,7 +98,7 @@ function getAWSHSMOracleDeployer(celoEnv: string, context: string, useForno: boo
 //   // Used if generating oracle clients from a mnemonic
 //   privateKey?: string,
 //   // Used if using Azure HSM signing
-//   azureHsmIdentity?: OracleAzureHsmIdentity
+//   azureHsmIdentity?: AksHsmOracleIdentity
 // }
 
 // /**

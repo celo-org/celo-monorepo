@@ -7,7 +7,7 @@ import { RbacOracleDeployer } from './rbac'
 /**
  * Contains information needed when using Azure HSM signing
  */
-export interface OracleAzureHsmIdentity extends OracleIdentity {
+export interface AksHsmOracleIdentity extends OracleIdentity {
   identityName: string
   keyVaultName: string
   // If a resource group is not specified, it is assumed to be the same
@@ -19,9 +19,9 @@ export interface OracleAzureHsmIdentity extends OracleIdentity {
 //   addressAzureKeyVaults: string
 // }
 
-export interface AKSOracleDeploymentConfig extends BaseOracleDeploymentConfig {
+export interface AksHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig {
   clusterConfig: AKSClusterConfig,
-  identities: OracleAzureHsmIdentity[]
+  identities: AksHsmOracleIdentity[]
 }
 
 // /**
@@ -32,7 +32,7 @@ export interface AKSOracleDeploymentConfig extends BaseOracleDeploymentConfig {
 //   // Used if generating oracle clients from a mnemonic
 //   privateKey?: string,
 //   // Used if using Azure HSM signing
-//   azureHsmIdentity?: OracleAzureHsmIdentity
+//   azureHsmIdentity?: AksHsmOracleIdentity
 // }
 
 // interface OracleKeyVaultIdentityConfig {
@@ -43,9 +43,9 @@ export interface AKSOracleDeploymentConfig extends BaseOracleDeploymentConfig {
 //   addressesFromMnemonicCount: string
 // }
 
-export class AKSOracleDeployer extends RbacOracleDeployer {
-  // Explicitly specify this so we enforce AKSOracleDeploymentConfig
-  constructor(deploymentConfig: AKSOracleDeploymentConfig, celoEnv: string) {
+export class AksHsmOracleDeployer extends RbacOracleDeployer {
+  // Explicitly specify this so we enforce AksHsmOracleDeploymentConfig
+  constructor(deploymentConfig: AksHsmOracleDeploymentConfig, celoEnv: string) {
     super(deploymentConfig, celoEnv)
   }
 
@@ -76,7 +76,7 @@ export class AKSOracleDeployer extends RbacOracleDeployer {
    * called when an oracle identity is using an Azure Key Vault for HSM signing
    */
   async createOracleAzureIdentityIfNotExists(
-    oracleHsmIdentity: OracleAzureHsmIdentity
+    oracleHsmIdentity: AksHsmOracleIdentity
   ) {
     const identity = await createIdentityIfNotExists(this.clusterConfig, oracleHsmIdentity.identityName!)
     // We want to grant the identity for the cluster permission to manage the oracle identity.
@@ -96,7 +96,7 @@ export class AKSOracleDeployer extends RbacOracleDeployer {
   }
 
   async setOracleKeyVaultPolicyIfNotSet(
-    oracleHsmIdentity: OracleAzureHsmIdentity,
+    oracleHsmIdentity: AksHsmOracleIdentity,
     azureIdentity: any
   ) {
     const keyPermissions = ['get', 'list', 'sign']
@@ -121,14 +121,14 @@ export class AKSOracleDeployer extends RbacOracleDeployer {
    * deleteOracleAzureIdentity deletes the key vault policy and the oracle's managed identity
    */
   async deleteOracleAzureIdentity(
-    oracleHsmIdentity: OracleAzureHsmIdentity
+    oracleHsmIdentity: AksHsmOracleIdentity
   ) {
     await this.deleteOracleKeyVaultPolicy(oracleHsmIdentity)
     return deleteIdentity(this.clusterConfig, oracleHsmIdentity.identityName)
   }
 
   async deleteOracleKeyVaultPolicy(
-    oracleHsmIdentity: OracleAzureHsmIdentity
+    oracleHsmIdentity: AksHsmOracleIdentity
   ) {
     const azureIdentity = await getIdentity(this.clusterConfig, oracleHsmIdentity.identityName)
     return execCmdWithExitOnFailure(
@@ -136,8 +136,8 @@ export class AKSOracleDeployer extends RbacOracleDeployer {
     )
   }
 
-  get deploymentConfig(): AKSOracleDeploymentConfig {
-    return this._deploymentConfig as AKSOracleDeploymentConfig
+  get deploymentConfig(): AksHsmOracleDeploymentConfig {
+    return this._deploymentConfig as AksHsmOracleDeploymentConfig
   }
 
   get clusterConfig(): AKSClusterConfig {

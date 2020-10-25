@@ -1,15 +1,15 @@
 import { getContextDynamicEnvVarValues } from "../context-utils"
 import { DynamicEnvVar } from "../env-utils"
 import { CloudProvider } from "../k8s-cluster/base"
-import { AKSOracleDeployer, AKSOracleDeploymentConfig, OracleAzureHsmIdentity } from "./aks"
+import { AksHsmOracleDeployer, AksHsmOracleDeploymentConfig, AksHsmOracleIdentity } from "./aks-hsm"
 import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleConfig, OracleIdentity } from "./base"
-import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig, AwsHsmOracleIdentity } from "./aws"
+import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig, AwsHsmOracleIdentity } from "./aws-hsm"
 
 const oracleDeployerByCloudProvider: {
   [key in CloudProvider]?: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => BaseOracleDeployer
 } = {
   [CloudProvider.AWS]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new AwsHsmOracleDeployer(deploymentConfig as AwsHsmOracleDeploymentConfig, celoEnv),
-  [CloudProvider.AZURE]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new AKSOracleDeployer(deploymentConfig as AKSOracleDeploymentConfig, celoEnv),
+  [CloudProvider.AZURE]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new AksHsmOracleDeployer(deploymentConfig as AksHsmOracleDeploymentConfig, celoEnv),
   // [CloudProvider.GCP]: (deploymentConfig: BaseOracleDeploymentConfig, celoEnv: string) => new GCPFullNodeDeployer(deploymentConfig as GCPFullNodeDeploymentConfig, celoEnv),
 }
 
@@ -64,7 +64,7 @@ function getOracleIdentities(context: string): OracleIdentity[] {
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
  * returns an array of OracleIdentity in the same order
  */
-export function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleAzureHsmIdentity[] {
+export function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): AksHsmOracleIdentity[] {
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {

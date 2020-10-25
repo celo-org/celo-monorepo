@@ -29,7 +29,6 @@ export interface AwsHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig
 }
 
 export class AwsHsmOracleDeployer extends RbacOracleDeployer {
-
   // Explicitly specify this so we enforce AwsHsmOracleDeploymentConfig
   constructor(deploymentConfig: AwsHsmOracleDeploymentConfig, celoEnv: string) {
     super(deploymentConfig, celoEnv)
@@ -74,15 +73,10 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
       ]
     }
     const roleName = this.awsHsmRoleName(identity)
-    console.log('roleName', roleName)
     const roleArn = await createRoleIdempotent(roleName, JSON.stringify(rolePolicy))
-    console.log('roleArn', roleArn)
     const policyName = this.awsHsmPolicyName(identity)
-    console.log('policyName', policyName)
     const keyArn = await getKeyArnFromAlias(identity.keyAlias, identity.region)
-    console.log('keyArn', keyArn)
     const policyArn = await this.createAwsHsmSignPolicyIdempotent(policyName, keyArn)
-    console.log('policyArn', policyArn)
     await attachPolicyIdempotent(roleName, policyArn)
     return roleArn
   }
@@ -134,11 +128,11 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
   }
 
   awsHsmRoleName(identity: AwsHsmOracleIdentity) {
-    return `${identity.keyAlias}-${identity.address}-sign-role`.substring(0, 64)
+    return `${identity.keyAlias}-${identity.address}`.substring(0, 64)
   }
 
   awsHsmPolicyName(identity: AwsHsmOracleIdentity) {
-    return `${identity.keyAlias}-${identity.address}-sign-policy`
+    return `${identity.keyAlias}-${identity.address}`
   }
 
   get deploymentConfig(): AwsHsmOracleDeploymentConfig {

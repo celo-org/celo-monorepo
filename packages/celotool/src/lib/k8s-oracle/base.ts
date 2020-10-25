@@ -143,7 +143,7 @@ export abstract class BaseOracleDeployer {
 // /**
 //  * Contains information needed when using Azure HSM signing
 //  */
-// interface OracleAzureHsmIdentity {
+// interface AksHsmOracleIdentity {
 //   identityName: string
 //   keyVaultName: string
 //   // If a resource group is not specified, it is assumed to be the same
@@ -159,7 +159,7 @@ export abstract class BaseOracleDeployer {
 //   // Used if generating oracle clients from a mnemonic
 //   privateKey?: string,
 //   // Used if using Azure HSM signing
-//   azureHsmIdentity?: OracleAzureHsmIdentity
+//   azureHsmIdentity?: AksHsmOracleIdentity
 // }
 
 /**
