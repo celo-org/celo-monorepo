@@ -81,19 +81,14 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     return getProposedImplementationAddress(contract, context)
   }
 
-  let proxyAddress: string
   if (isLibrary(contract, context)) {
-    proxyAddress = context.libraryAddresses.addresses[contract]
-    // Before the first contracts upgrade libraries are not proxied.
-    if (context.isBeforeRelease1) {
-      return `0x${proxyAddress}`
-    }
-  } else {
-    // contract is registered but we need to check if the proxy is affected by the proposal
-    proxyAddress = isProxyChanged(contract, context)
-      ? getProposedProxyAddress(contract, context)
-      : await context.registry.getAddressForString(contract)
+    return `0x${context.libraryAddresses.addresses[contract]}`
   }
+
+  // contract is registered but we need to check if the proxy is affected by the proposal
+  const proxyAddress = isProxyChanged(contract, context)
+    ? getProposedProxyAddress(contract, context)
+    : await context.registry.getAddressForString(contract)
 
   // at() returns a promise despite Typescript labelling the await as extraneous
   const proxy: ProxyInstance = await context.Proxy.at(
