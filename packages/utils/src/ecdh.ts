@@ -33,7 +33,7 @@ export function ensureUncompressed(publicKey: string) {
 
 export function trimUncompressedPrefix(publicKey: string) {
   const noLeading0x = trimLeading0x(publicKey)
-  if (noLeading0x.length === 130) {
+  if (noLeading0x.length === 130 && noLeading0x.startsWith('04')) {
     return noLeading0x.slice(2)
   }
   return noLeading0x

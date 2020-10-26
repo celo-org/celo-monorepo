@@ -2,7 +2,7 @@ import { Err, Ok, parseJsonAsResult, Result, trimLeading0x } from '@celo/base/sr
 import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { AES128Decrypt, AES128Encrypt, Encrypt, IV_LENGTH } from '@celo/utils/lib/ecies'
 import { EIP712Object, EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
-import { ensureUncompressed, trimUncompressedPrefix } from '@celo/utils/src/ecdh'
+import { ensureCompressed, ensureUncompressed, trimUncompressedPrefix } from '@celo/utils/src/ecdh'
 import { createHmac, randomBytes } from 'crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
@@ -28,8 +28,8 @@ function getCiphertextLabel(
   senderPublicKey: string,
   receiverPublicKey: string
 ) {
-  const senderPublicKeyBuffer = Buffer.from(trimLeading0x(senderPublicKey), 'hex')
-  const receiverPublicKeyBuffer = Buffer.from(trimLeading0x(receiverPublicKey), 'hex')
+  const senderPublicKeyBuffer = Buffer.from(ensureCompressed(senderPublicKey), 'hex')
+  const receiverPublicKeyBuffer = Buffer.from(ensureCompressed(receiverPublicKey), 'hex')
 
   const label = createHmac('blake2s256', sharedSecret)
     .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
