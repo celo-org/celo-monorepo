@@ -67,11 +67,7 @@ export async function replenishQuota(account: string, contractKit: any) {
   await selfTransferTx.sendAndWaitForReceipt()
 }
 
-export async function registerWalletAddress(
-  account: string,
-  walletAddress: string,
-  contractKit: ContractKit
-) {
+export async function registerWalletAddress(walletAddress: string, contractKit: ContractKit) {
   await (await contractKit.contracts.getAccounts())
     .setWalletAddress(walletAddress)
     .sendAndWaitForReceipt()

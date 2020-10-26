@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   hasValidAccountParam,
   isBodyReasonablySized,
+  isVerified,
   logger,
   phoneNumberHashIsValidIfExists,
   RETRY_COUNT,
@@ -15,7 +16,7 @@ import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
-import { getContractKit, isVerified } from '../web3/contracts'
+import { getContractKit } from '../web3/contracts'
 
 export interface GetQuotaRequest {
   account: string
@@ -82,7 +83,7 @@ export async function getRemainingQueryCount(
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   const walletAddress = await getWalletAddress(account)
 
-  if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber))) {
+  if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber, getContractKit()))) {
     logger.debug('Account is verified')
     const transactionCount = await getTransactionCount(account, walletAddress)
     return (

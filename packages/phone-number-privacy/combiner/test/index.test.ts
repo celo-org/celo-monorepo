@@ -1,7 +1,7 @@
+import { authenticateUser, isVerified } from '@celo/phone-number-privacy-common'
 import { Response } from 'node-fetch'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
-import { authenticateUser, isVerified } from '../src/common/identity'
 import { VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
 import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'

@@ -5,12 +5,12 @@ import {
   hasValidContractPhoneNumbersParam,
   hasValidPhoneNumberHash,
   hasValidUserPhoneNumberParam,
+  isVerified,
   logger,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
-import { isVerified } from '../common/identity'
 import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
@@ -44,7 +44,7 @@ export async function handleGetContactMatches(
 
     const { account, userPhoneNumber, contactPhoneNumbers, hashedPhoneNumber } = request.body
 
-    if (!(await isVerified(account, hashedPhoneNumber))) {
+    if (!(await isVerified(account, hashedPhoneNumber, getContractKit()))) {
       respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
       return
     }

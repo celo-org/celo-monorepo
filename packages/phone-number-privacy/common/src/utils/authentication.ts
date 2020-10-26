@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { AuthenticationMethod } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
@@ -68,6 +69,36 @@ export async function getDataEncryptionKey(
     async () => {
       const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
       return accountWrapper.getDataEncryptionKey(address)
+    },
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
+}
+
+export async function isVerified(
+  account: string,
+  hashedPhoneNumber: string,
+  contractKit: ContractKit
+): Promise<boolean> {
+  return retryAsyncWithBackOff(
+    async () => {
+      const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
+      const {
+        isVerified: _isVerified,
+        completed,
+        numAttestationsRemaining,
+        total,
+      } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
+
+      logger.debug({
+        account,
+        isVerified: _isVerified,
+        completedAttestations: completed,
+        remainingAttestations: numAttestationsRemaining,
+        totalAttestationsRequested: total,
+      })
+      return _isVerified
     },
     RETRY_COUNT,
     [],

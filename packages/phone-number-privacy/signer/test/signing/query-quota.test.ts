@@ -1,3 +1,4 @@
+import { isVerified } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import {
   ContractRetrieval,
@@ -9,7 +10,7 @@ import {
 import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
-import { getContractKit, isVerified } from '../../src/web3/contracts'
+import { getContractKit } from '../../src/web3/contracts'
 
 jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock
