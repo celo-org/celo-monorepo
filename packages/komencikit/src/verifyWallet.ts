@@ -3,53 +3,51 @@ import { Err, Ok, Result } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
 import { GET_IMPLEMENTATION_ABI } from '@celo/contractkit/lib/governance/proxy'
 import Proxy from '@celo/protocol/build/contracts/Proxy.json'
-import { EventLog } from 'web3-core'
-import { InvalidWallet, WalletIntegrityIssue } from './errors'
-
-// XXX: Because of how we have things set up
-// There's no easy way to cherry-pick the type
-// of an event from the generated types :(
-interface DeployWalletLog extends EventLog {
-  returnValues: {
-    owner: string
-    wallet: string
-    implementation: string
-    0: string
-    1: string
-    2: string
-  }
-}
+import {
+  InvalidBytecode,
+  InvalidImplementation,
+  InvalidSigner,
+  WalletVerificationError,
+} from './errors'
 
 export const verifyWallet = async (
   contractKit: ContractKit,
-  deployLog: DeployWalletLog,
-  implementation: Address,
-  signer: Address
-): Promise<Result<true, InvalidWallet>> => {
-  const code = await contractKit.web3.eth.getCode(deployLog.returnValues.wallet)
+  walletAddress: Address,
+  allowedImplementations: Address[],
+  expectedSigner: Address
+): Promise<Result<true, WalletVerificationError>> => {
+  const code = await contractKit.web3.eth.getCode(walletAddress)
   // XXX: I'm unsure whether this is safe or if we should store the
   // bytecode as a constant in `mobile` and pass it into KomenciKit
   // I'm unsure if we should protect from the `Proxy` contract output
   // in protocol from changing, or there are already constraints put in
   // place for that not to happen.
   if (stripBzz(code) !== stripBzz(Proxy.deployedBytecode)) {
-    return Err(new InvalidWallet(WalletIntegrityIssue.WrongProxyBytecode))
+    return Err(new InvalidBytecode(walletAddress))
   }
 
   const actualImplementationRaw = await contractKit.web3.eth.call({
-    to: deployLog.returnValues.wallet,
+    to: walletAddress,
     data: GET_IMPLEMENTATION_ABI.signature,
   })
   const actualImplementation = normalizeAddress(actualImplementationRaw.slice(26, 66))
+  const normalizedAllowedImplementations = allowedImplementations.map(normalizeAddress)
 
-  if (normalizeAddress(implementation) !== actualImplementation) {
-    return Err(new InvalidWallet(WalletIntegrityIssue.WrongImplementation))
+  if (normalizedAllowedImplementations.indexOf(actualImplementation) > -1) {
+    return Err(
+      new InvalidImplementation(
+        walletAddress,
+        actualImplementation,
+        normalizedAllowedImplementations
+      )
+    )
   }
 
-  const wallet = await contractKit.contracts.getMetaTransactionWallet(deployLog.returnValues.wallet)
-  const actualSigner = await wallet.signer()
-  if (normalizeAddress(signer) !== normalizeAddress(actualSigner)) {
-    return Err(new InvalidWallet(WalletIntegrityIssue.WrongSigner))
+  const wallet = await contractKit.contracts.getMetaTransactionWallet(walletAddress)
+  const actualSigner = normalizeAddress(await wallet.signer())
+  const normalizedExpectedSigner = normalizeAddress(expectedSigner)
+  if (actualSigner !== normalizedExpectedSigner) {
+    return Err(new InvalidSigner(walletAddress, actualSigner, normalizedExpectedSigner))
   }
 
   return Ok(true)

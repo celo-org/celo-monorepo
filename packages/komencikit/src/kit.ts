@@ -22,6 +22,7 @@ import {
   FetchError,
   FetchErrorTypes,
   InvalidWallet,
+  KomenciKitErrorTypes,
   LoginSignatureError,
   TxError,
   TxErrorTypes,
@@ -131,6 +132,7 @@ export class KomenciKit {
       FetchErrorTypes.Unauthorised,
       FetchErrorTypes.ServiceUnavailable,
       TxErrorTypes.Revert,
+      KomenciKitErrorTypes.InvalidWallet,
     ],
     onRetry: (_args, error, attempt) => {
       console.debug(`${TAG}/deployWallet attempt#${attempt} error: `, error)
@@ -140,53 +142,64 @@ export class KomenciKit {
     implementationAddress: string
   ): Promise<Result<string, FetchError | TxError | InvalidWallet>> {
     const resp = await this.client.exec(deployWallet({ implementationAddress }))
-    if (resp.ok) {
-      if (resp.result.status === 'deployed') {
-        return Ok(resp.result.walletAddress)
-      } else {
-        const txHash = resp.result.txHash
-        const receiptResult = await this.waitForReceipt(txHash)
-        if (receiptResult.ok) {
-          const receipt = receiptResult.result
-          if (!receipt.status) {
-            // TODO: Possible to extract reason?
-            return Err(new TxRevertError(txHash, ''))
-          }
+    if (resp.ok === false) {
+      return resp
+    }
 
-          const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(
-            resp.result.deployerAddress
-          )
-          const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
-            fromBlock: receipt.blockNumber,
-            toBlock: receipt.blockNumber,
-          })
+    if (resp.result.status === 'deployed') {
+      const walletStatus = await verifyWallet(
+        this.contractKit,
+        resp.result.walletAddress,
+        [implementationAddress],
+        this.externalAccount
+      )
 
-          const deployWalletLog = events.find(
-            (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
-          )
+      if (!walletStatus.ok) {
+        return Err(new InvalidWallet(walletStatus.error))
+      }
 
-          if (deployWalletLog === undefined) {
-            return Err(new TxEventNotFound(txHash, deployer.events.WalletDeployed.name))
-          }
-
-          const walletStatus = await verifyWallet(
-            this.contractKit,
-            deployWalletLog,
-            implementationAddress,
-            this.externalAccount
-          )
-
-          if (!walletStatus.ok) {
-            return walletStatus
-          }
-
-          return Ok(deployWalletLog.returnValues.wallet)
-        }
-
+      return Ok(resp.result.walletAddress)
+    } else {
+      const txHash = resp.result.txHash
+      const receiptResult = await this.waitForReceipt(txHash)
+      if (!receiptResult.ok) {
         return receiptResult
       }
-    } else {
-      return resp
+
+      const receipt = receiptResult.result
+      if (!receipt.status) {
+        // TODO: Possible to extract reason?
+        return Err(new TxRevertError(txHash, ''))
+      }
+
+      const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(
+        resp.result.deployerAddress
+      )
+      const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
+        fromBlock: receipt.blockNumber,
+        toBlock: receipt.blockNumber,
+      })
+
+      const deployWalletLog = events.find(
+        (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
+      )
+
+      if (deployWalletLog === undefined) {
+        return Err(new TxEventNotFound(txHash, deployer.eventTypes.WalletDeployed))
+      }
+
+      const walletStatus = await verifyWallet(
+        this.contractKit,
+        deployWalletLog.returnValues.wallet,
+        [implementationAddress],
+        this.externalAccount
+      )
+
+      if (!walletStatus.ok) {
+        return Err(new InvalidWallet(walletStatus.error))
+      }
+
+      return Ok(deployWalletLog.returnValues.wallet)
     }
   }
 

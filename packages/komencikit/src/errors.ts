@@ -114,14 +114,45 @@ export class LoginSignatureError extends RootError<KomenciKitErrorTypes.LoginSig
   }
 }
 
-export enum WalletIntegrityIssue {
-  WrongProxyBytecode = 'WrongBytecodeInvalid',
-  WrongSigner = 'WrongSigner',
-  WrongImplementation = 'WrongImplementation',
-}
-
 export class InvalidWallet extends RootError<KomenciKitErrorTypes.InvalidWallet> {
-  constructor(public readonly issue: WalletIntegrityIssue) {
+  constructor(public readonly error: WalletVerificationError) {
     super(KomenciKitErrorTypes.InvalidWallet)
   }
 }
+
+export enum WalletVerificationErrorTypes {
+  InvalidBytecode = 'InvalidBytecode',
+  InvalidSigner = 'InvalidSigner',
+  InvalidImplementation = 'InvalidImplementation',
+}
+
+export class InvalidBytecode extends RootError<WalletVerificationErrorTypes.InvalidBytecode> {
+  constructor(public readonly walletAddress: string) {
+    super(WalletVerificationErrorTypes.InvalidBytecode)
+    this.message = 'Invalid wallet bytecode, should be a Proxy'
+  }
+}
+
+export class InvalidSigner extends RootError<WalletVerificationErrorTypes.InvalidBytecode> {
+  constructor(
+    public readonly walletAddress: string,
+    public readonly actual: string,
+    public readonly expected: string
+  ) {
+    super(WalletVerificationErrorTypes.InvalidBytecode)
+    this.message = `Invalid signer got ${actual}, expected: ${expected}`
+  }
+}
+
+export class InvalidImplementation extends RootError<WalletVerificationErrorTypes.InvalidBytecode> {
+  constructor(
+    public readonly walletAddress: string,
+    public readonly actual: string,
+    public readonly expected: string[]
+  ) {
+    super(WalletVerificationErrorTypes.InvalidBytecode)
+    this.message = `Invalid implementation got ${actual}, expected one of: ${expected}`
+  }
+}
+
+export type WalletVerificationError = InvalidBytecode | InvalidImplementation | InvalidSigner
