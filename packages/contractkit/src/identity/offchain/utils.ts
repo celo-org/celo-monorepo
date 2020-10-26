@@ -8,7 +8,7 @@ import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { join } from 'path'
-import OffchainDataWrapper, { OffchainErrors, OffchainErrorTypes } from '../offchain-data-wrapper'
+import OffchainDataWrapper, { OffchainErrorTypes } from '../offchain-data-wrapper'
 import {
   InvalidDataError,
   InvalidKey,
@@ -54,12 +54,19 @@ const distributeSymmetricKey = async (
   dataPath: string,
   key: Buffer,
   toAddress: Address
-): Promise<void | OffchainErrors> => {
+): Promise<void | SchemaErrors> => {
   const accounts = await wrapper.kit.contracts.getAccounts()
   const [fromPubKey, toPubKey] = await Promise.all([
     accounts.getDataEncryptionKey(wrapper.self),
     accounts.getDataEncryptionKey(toAddress),
   ])
+  if (fromPubKey === null) {
+    return new UnavailableKey(wrapper.self)
+  }
+  if (toPubKey === null) {
+    return new UnavailableKey(toAddress)
+  }
+
   const wallet = wrapper.kit.getWallet()
   const sharedSecret = await wallet.computeSharedSecret(publicKeyToAddress(fromPubKey), toPubKey)
 
@@ -70,11 +77,14 @@ const distributeSymmetricKey = async (
   )
 
   const signature = await signBuffer(wrapper, computedDataPath, encryptedData)
-  return wrapper.writeDataTo(
+  const writeError = await wrapper.writeDataTo(
     encryptedData,
     Buffer.from(trimLeading0x(signature), 'hex'),
     computedDataPath
   )
+  if (writeError) {
+    return new OffchainError(writeError)
+  }
 }
 
 /**
@@ -154,9 +164,7 @@ export const writeEncrypted = async (
       )
     )
   ).find(Boolean)
-  if (firstWriteError) {
-    return new OffchainError(firstWriteError)
-  }
+  return firstWriteError
 }
 
 /**
