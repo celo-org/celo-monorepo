@@ -1,4 +1,3 @@
-import { ContractKit } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
@@ -67,7 +66,7 @@ export async function replenishQuota(account: string, contractKit: any) {
   await selfTransferTx.sendAndWaitForReceipt()
 }
 
-export async function registerWalletAddress(walletAddress: string, contractKit: ContractKit) {
+export async function registerWalletAddress(walletAddress: string, contractKit: any) {
   await (await contractKit.contracts.getAccounts())
     .setWalletAddress(walletAddress)
     .sendAndWaitForReceipt()
