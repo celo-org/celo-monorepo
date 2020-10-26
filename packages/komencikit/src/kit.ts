@@ -36,10 +36,12 @@ interface KomenciOptions {
   url: string
   token?: string
   txRetryTimeoutMs: number
+  txPollingIntervalMs: number
 }
 
-const DEFAULT_OPTIONS: Pick<KomenciOptions, 'txRetryTimeoutMs'> = {
+const DEFAULT_OPTIONS: Pick<KomenciOptions, 'txRetryTimeoutMs' | 'txPollingIntervalMs'> = {
   txRetryTimeoutMs: 20000,
+  txPollingIntervalMs: 100,
 }
 
 export type KomenciOptionsInput = Omit<KomenciOptions, keyof typeof DEFAULT_OPTIONS> &
@@ -202,16 +204,16 @@ export class KomenciKit {
     walletAddress: string,
     attestationsRequested: number
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
-    const wallet = await this.getWallet(walletAddress)
-    const nonce = await wallet.nonce()
     const attestations = await this.contractKit.contracts.getAttestations()
+    const wallet = await this.getWallet(walletAddress)
+    let nonce = await wallet.nonce()
 
     const approveTx = await attestations.approveAttestationFee(attestationsRequested)
-    const approveTxSig = await wallet.signMetaTransaction(approveTx.txo, nonce)
+    const approveTxSig = await wallet.signMetaTransaction(approveTx.txo, nonce++)
     const approveMetaTx = wallet.executeMetaTransaction(approveTx.txo, approveTxSig)
 
     const requestTx = await attestations.request(identifier, attestationsRequested)
-    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo, nonce + 1)
+    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo, nonce++)
     const requestMetaTx = wallet.executeMetaTransaction(requestTx.txo, requestTxSig)
 
     const resp = await this.client.exec(
@@ -324,8 +326,8 @@ export class KomenciKit {
     while (receipt == null && waited < this.options.txRetryTimeoutMs) {
       receipt = await this.contractKit.web3.eth.getTransactionReceipt(txHash)
       if (receipt == null) {
-        await sleep(100)
-        waited += 100
+        await sleep(this.options.txPollingIntervalMs)
+        waited += this.options.txPollingIntervalMs
       }
     }
 

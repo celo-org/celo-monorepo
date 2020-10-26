@@ -9,8 +9,13 @@ export enum ActionTypes {
   RequestSubsidisedAttestation = 'RequestSubsidisedAttestation',
 }
 
+export enum RequestMethod {
+  POST = 'POST',
+  GET = 'GET',
+}
+
 export interface Action<TAction, TPayload, TResp> {
-  method: string
+  method: RequestMethod
   action: TAction
   path: string
   payload: TPayload
@@ -22,14 +27,14 @@ type ActionFactory<TAction, TPayload, TResp> = (
 ) => Action<TAction, TPayload, TResp>
 
 export const action = <TAction, TPayload, TResp>(
-  action: TAction,
-  method: string,
+  actionType: TAction,
+  method: RequestMethod,
   path: string,
   codec: t.Type<TResp>
 ): ActionFactory<TAction, TPayload, TResp> => (payload) => ({
   method,
-  path: path,
-  action: action,
+  path,
+  action: actionType,
   codec,
   payload: {
     ...payload,
@@ -50,7 +55,7 @@ export type StartSessionResp = t.TypeOf<typeof StartSessionResp>
 
 export const startSession = action<ActionTypes.StartSession, StartSessionPayload, StartSessionResp>(
   ActionTypes.StartSession,
-  'POST',
+  RequestMethod.POST,
   'v1/startSession',
   StartSessionResp
 )
@@ -73,7 +78,7 @@ export const getDistributedBlindedPepper = action<
   GetDistributedBlindedPepperResp
 >(
   ActionTypes.DistributedBlindedPepper,
-  'POST',
+  RequestMethod.POST,
   'v1/distributedBlindedPepper',
   GetDistributedBlindedPepperResp
 )
@@ -104,7 +109,7 @@ export interface DeployWalletPayload {
 
 export const deployWallet = action<ActionTypes.DeployWallet, DeployWalletPayload, DeployWalletResp>(
   ActionTypes.DeployWallet,
-  'POST',
+  RequestMethod.POST,
   'v1/deployWallet',
   DeployWalletResp
 )
@@ -117,7 +122,7 @@ export type SubmitMetaTransactionResp = t.TypeOf<typeof SubmitMetaTransactionRes
 
 export const submitMetaTransaction = action<ActionTypes, RawTransaction, SubmitMetaTransactionResp>(
   ActionTypes.SubmitMetaTransaction,
-  'POST',
+  RequestMethod.POST,
   'v1/submitMetaTransaction',
   SubmitMetaTransactionResp
 )
@@ -138,7 +143,7 @@ export const requestSubsidisedAttestations = action<
   SubmitMetaTransactionResp
 >(
   ActionTypes.RequestSubsidisedAttestation,
-  'POST',
+  RequestMethod.POST,
   'v1/requestSubsidisedAttestations',
   SubmitMetaTransactionResp
 )

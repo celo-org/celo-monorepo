@@ -13,7 +13,8 @@ The main actions that KomenciKit exposes are:
 
 ## User Guide
 
-To start working with Komencikit you need a to pass in a ContractKit instance, the external account 
+KomenciKit requires an instance of `contractKit`, an EOA that's managed by the `contractKit` instance and
+options which must at least include the URL of the Komenci API to point to.
 
 ```ts
 import { newKit } from '@celo/contractkit'

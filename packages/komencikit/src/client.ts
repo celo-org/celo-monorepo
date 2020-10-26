@@ -48,6 +48,7 @@ export class KomenciClient {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       }
+
       if (this.token) {
         headers.Authorization = `Bearer ${this.token}`
       }
