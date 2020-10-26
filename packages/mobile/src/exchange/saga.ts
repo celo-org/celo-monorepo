@@ -408,17 +408,14 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       amount: amount.toString(),
     })
   } catch (error) {
-    yield put(withdrawCeloFailed())
     Logger.error(TAG, 'Error withdrawing CELO', error)
-    if (context?.id) {
-      yield put(removeStandbyTransaction(context.id))
-    }
 
-    if (error.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN))
-    } else {
-      yield put(showError(ErrorMessages.TRANSACTION_FAILED))
-    }
+    const errorToShow =
+      error.message === ErrorMessages.INCORRECT_PIN
+        ? ErrorMessages.INCORRECT_PIN
+        : ErrorMessages.TRANSACTION_FAILED
+    yield put(withdrawCeloFailed(context?.id, errorToShow))
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_error, {
       error,
     })

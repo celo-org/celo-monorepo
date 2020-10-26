@@ -11,12 +11,12 @@ export enum Actions {
   HIDE = 'ALERT/HIDE',
 }
 
-enum AlertTypes {
+export enum AlertTypes {
   MESSAGE = 'message',
   ERROR = 'error',
 }
 
-interface ShowAlertAction {
+export interface ShowAlertAction {
   type: Actions.SHOW
   alertType: AlertTypes
   displayMethod: ErrorDisplayType

@@ -11,7 +11,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelButton from 'src/components/CancelButton'
@@ -26,7 +26,7 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
-import { RootState } from 'src/redux/reducers'
+import useTypedSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
@@ -34,7 +34,7 @@ type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
 function WithdrawCeloReviewScreen({ route }: Props) {
   const { amount, recipientAddress } = route.params
   const { t } = useTranslation(Namespaces.exchangeFlow9)
-  const isLoading = useSelector((state: RootState) => state.exchange.isLoading)
+  const isLoading = useTypedSelector((state) => state.exchange.isLoading)
   const dispatch = useDispatch()
 
   const onConfirmWithdraw = () => {

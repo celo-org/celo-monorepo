@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ExchangeRate, ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 
@@ -57,6 +58,8 @@ export interface WithdrawCeloAction {
 
 export interface WithdrawCeloFailureAction {
   type: Actions.WITHDRAW_CELO_FAILED
+  idx: string | undefined
+  error: ErrorMessages
 }
 
 export interface WithdrawCeloSuccessAction {
@@ -112,8 +115,13 @@ export const withdrawCelo = (amount: BigNumber, recipientAddress: string): Withd
   recipientAddress,
 })
 
-export const withdrawCeloFailed = (): WithdrawCeloFailureAction => ({
+export const withdrawCeloFailed = (
+  idx: string | undefined,
+  error: ErrorMessages
+): WithdrawCeloFailureAction => ({
   type: Actions.WITHDRAW_CELO_FAILED,
+  idx,
+  error,
 })
 
 export const withdrawCeloSuccess = (): WithdrawCeloSuccessAction => ({
