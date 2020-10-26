@@ -1,6 +1,6 @@
 import * as t from 'io-ts'
 import 'jest-fetch-mock'
-import { action } from './actions'
+import { action, RequestMethod } from './actions'
 import { KomenciClient } from './client'
 import { FetchErrorTypes } from './errors'
 
@@ -17,7 +17,7 @@ describe('KomenciClient', () => {
     type TestResp = t.TypeOf<typeof TestResp>
     const testAction = action<'testAction', {}, TestResp>(
       'testAction',
-      'POST',
+      RequestMethod.POST,
       'testAction',
       TestResp
     )
