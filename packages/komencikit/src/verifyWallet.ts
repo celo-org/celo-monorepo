@@ -33,7 +33,7 @@ export const verifyWallet = async (
   const actualImplementation = normalizeAddress(actualImplementationRaw.slice(26, 66))
   const normalizedAllowedImplementations = allowedImplementations.map(normalizeAddress)
 
-  if (normalizedAllowedImplementations.indexOf(actualImplementation) > -1) {
+  if (normalizedAllowedImplementations.indexOf(actualImplementation) === -1) {
     return Err(
       new InvalidImplementation(
         walletAddress,

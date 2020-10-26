@@ -146,61 +146,27 @@ export class KomenciKit {
       return resp
     }
 
-    if (resp.result.status === 'deployed') {
-      const walletStatus = await verifyWallet(
-        this.contractKit,
-        resp.result.walletAddress,
-        [implementationAddress],
-        this.externalAccount
-      )
+    const walletAddress =
+      resp.result.status === 'deployed'
+        ? Ok(resp.result.walletAddress)
+        : await this.getAddressFromDeploy(resp.result.txHash)
 
-      if (!walletStatus.ok) {
-        return Err(new InvalidWallet(walletStatus.error))
-      }
-
-      return Ok(resp.result.walletAddress)
-    } else {
-      const txHash = resp.result.txHash
-      const receiptResult = await this.waitForReceipt(txHash)
-      if (!receiptResult.ok) {
-        return receiptResult
-      }
-
-      const receipt = receiptResult.result
-      if (!receipt.status) {
-        // TODO: Possible to extract reason?
-        return Err(new TxRevertError(txHash, ''))
-      }
-
-      const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(
-        resp.result.deployerAddress
-      )
-      const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
-        fromBlock: receipt.blockNumber,
-        toBlock: receipt.blockNumber,
-      })
-
-      const deployWalletLog = events.find(
-        (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
-      )
-
-      if (deployWalletLog === undefined) {
-        return Err(new TxEventNotFound(txHash, deployer.eventTypes.WalletDeployed))
-      }
-
-      const walletStatus = await verifyWallet(
-        this.contractKit,
-        deployWalletLog.returnValues.wallet,
-        [implementationAddress],
-        this.externalAccount
-      )
-
-      if (!walletStatus.ok) {
-        return Err(new InvalidWallet(walletStatus.error))
-      }
-
-      return Ok(deployWalletLog.returnValues.wallet)
+    if (!walletAddress.ok) {
+      return walletAddress
     }
+
+    const walletStatus = await verifyWallet(
+      this.contractKit,
+      walletAddress.result,
+      [implementationAddress],
+      this.externalAccount
+    )
+
+    if (!walletStatus.ok) {
+      return Err(new InvalidWallet(walletStatus.error))
+    }
+
+    return Ok(walletAddress.result)
   }
 
   /**
@@ -254,12 +220,12 @@ export class KomenciKit {
       })
     )
 
-    if (resp.ok) {
-      const txHash = resp.result.txHash
-      return this.waitForReceipt(txHash)
+    if (!resp.ok) {
+      return resp
     }
 
-    return resp
+    const txHash = resp.result.txHash
+    return this.waitForReceipt(txHash)
   }
 
   /**
@@ -332,12 +298,12 @@ export class KomenciKit {
     const rawMetaTx = toRawTransaction(wallet.executeMetaTransaction(tx.txo, signature).txo)
 
     const resp = await this.client.exec(submitMetaTransaction(rawMetaTx))
-    if (resp.ok) {
-      const txHash = resp.result.txHash
-      return this.waitForReceipt(txHash)
+    if (!resp.ok) {
+      return resp
     }
 
-    return resp
+    const txHash = resp.result.txHash
+    return this.waitForReceipt(txHash)
   }
 
   /**
@@ -402,5 +368,40 @@ export class KomenciKit {
     } catch (e) {
       return Err(new LoginSignatureError(e))
     }
+  }
+
+  /**
+   * Wait for the deploy tx and extract the wallet from events
+   * @param txHash the transaction hash of the wallet deploy tx
+   * @private
+   */
+  private async getAddressFromDeploy(txHash: string): Promise<Result<string, TxError>> {
+    const receiptResult = await this.waitForReceipt(txHash)
+    if (!receiptResult.ok) {
+      return receiptResult
+    }
+
+    const receipt = receiptResult.result
+    if (!receipt.status) {
+      // TODO: Possible to extract reason?
+      return Err(new TxRevertError(txHash, ''))
+    }
+
+    const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
+
+    const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
+      fromBlock: receipt.blockNumber,
+      toBlock: receipt.blockNumber,
+    })
+
+    const deployWalletLog = events.find(
+      (event) => normalizeAddressWith0x(event.returnValues.owner) === this.externalAccount
+    )
+
+    if (deployWalletLog === undefined) {
+      return Err(new TxEventNotFound(txHash, deployer.eventTypes.WalletDeployed))
+    }
+
+    return Ok(deployWalletLog.returnValues.wallet)
   }
 }
