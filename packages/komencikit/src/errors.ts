@@ -115,7 +115,7 @@ export class LoginSignatureError extends RootError<KomenciKitErrorTypes.LoginSig
 }
 
 export class InvalidWallet extends RootError<KomenciKitErrorTypes.InvalidWallet> {
-  constructor(public readonly error: WalletVerificationError) {
+  constructor(public readonly error: WalletValidationError) {
     super(KomenciKitErrorTypes.InvalidWallet)
   }
 }
@@ -155,4 +155,4 @@ export class InvalidImplementation extends RootError<WalletVerificationErrorType
   }
 }
 
-export type WalletVerificationError = InvalidBytecode | InvalidImplementation | InvalidSigner
+export type WalletValidationError = InvalidBytecode | InvalidImplementation | InvalidSigner

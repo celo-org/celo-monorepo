@@ -7,7 +7,7 @@ import {
   InvalidBytecode,
   InvalidImplementation,
   InvalidSigner,
-  WalletVerificationError,
+  WalletValidationError,
 } from './errors'
 
 export const verifyWallet = async (
@@ -15,7 +15,7 @@ export const verifyWallet = async (
   walletAddress: Address,
   allowedImplementations: Address[],
   expectedSigner: Address
-): Promise<Result<true, WalletVerificationError>> => {
+): Promise<Result<true, WalletValidationError>> => {
   const code = await contractKit.web3.eth.getCode(walletAddress)
   // XXX: I'm unsure whether this is safe or if we should store the
   // bytecode as a constant in `mobile` and pass it into KomenciKit
