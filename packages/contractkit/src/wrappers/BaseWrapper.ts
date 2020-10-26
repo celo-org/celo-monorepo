@@ -35,6 +35,18 @@ export abstract class BaseWrapper<T extends Contract> {
     (acc, key) => ({ ...acc, key }),
     {} as any
   )
+
+  methodIds = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)

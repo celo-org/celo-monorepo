@@ -30,7 +30,13 @@ export const verifyWallet = async (
     to: walletAddress,
     data: GET_IMPLEMENTATION_ABI.signature,
   })
-  const actualImplementation = normalizeAddress(actualImplementationRaw.slice(26, 66))
+  const actualImplementation = normalizeAddress(
+    // XXX: This is a typing issue in web3js :(
+    (contractKit.web3.eth.abi.decodeParameter(
+      'address',
+      actualImplementationRaw
+    ) as unknown) as string
+  )
   const normalizedAllowedImplementations = allowedImplementations.map(normalizeAddress)
 
   if (normalizedAllowedImplementations.indexOf(actualImplementation) === -1) {
