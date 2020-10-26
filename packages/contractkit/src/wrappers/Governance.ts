@@ -19,6 +19,7 @@ import {
   identity,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   solidityBytesToString,
   stringIdentity,
   toTransactionObject,
@@ -246,6 +247,31 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       queueExpiry: res[3],
       stageDurations: res[4],
       participationParameters: res[5],
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the governance contract
+   * @return GovernanceConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const stageDurations = {
+      [ProposalStage.Approval]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Approval]
+      ),
+      [ProposalStage.Referendum]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Referendum]
+      ),
+      [ProposalStage.Execution]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Execution]
+      ),
+    }
+    return {
+      ...config,
+      dequeueFrequency: secondsToDurationString(config.dequeueFrequency),
+      queueExpiry: secondsToDurationString(config.queueExpiry),
+      stageDurations,
     }
   }
 
