@@ -27,9 +27,12 @@ export const verifyWallet = async (
   signer: Address
 ): Promise<Result<true, InvalidWallet>> => {
   const code = await contractKit.web3.eth.getCode(deployLog.returnValues.wallet)
+  // XXX: I'm unsure whether this is safe or if we should store the
+  // bytecode as a constant in `mobile` and pass it into KomenciKit
+  // I'm unsure if we should protect from the `Proxy` contract output
+  // in protocol from changing, or there are already constraints put in
+  // place for that not to happen.
   if (stripBzz(code) !== stripBzz(Proxy.deployedBytecode)) {
-    console.log(code)
-    console.log(Proxy.deployedBytecode)
     return Err(new InvalidWallet(WalletIntegrityIssue.WrongProxyBytecode))
   }
 
@@ -40,16 +43,12 @@ export const verifyWallet = async (
   const actualImplementation = normalizeAddress(actualImplementationRaw.slice(26, 66))
 
   if (normalizeAddress(implementation) !== actualImplementation) {
-    console.log(implementation)
-    console.log(actualImplementation)
     return Err(new InvalidWallet(WalletIntegrityIssue.WrongImplementation))
   }
 
   const wallet = await contractKit.contracts.getMetaTransactionWallet(deployLog.returnValues.wallet)
   const actualSigner = await wallet.signer()
   if (normalizeAddress(signer) !== normalizeAddress(actualSigner)) {
-    console.log(signer)
-    console.log(actualSigner)
     return Err(new InvalidWallet(WalletIntegrityIssue.WrongSigner))
   }
 
@@ -57,5 +56,7 @@ export const verifyWallet = async (
 }
 
 function stripBzz(bytecode: string): string {
+  // The actual deployed bytecode always differs because of the BZZ prefix
+  // https://www.shawntabrizi.com/ethereum/verify-ethereum-contracts-using-web3-js-and-solc/
   return bytecode.split('a265627a7a72315820')[0]
 }
