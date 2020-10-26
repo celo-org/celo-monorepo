@@ -17,7 +17,7 @@ async function start() {
   })
 }
 
-start().catch((e) => {
-  logger.error({ e }, 'Fatal error occured. Exiting')
+start().catch((err) => {
+  logger.error({ err }, 'Fatal error occured. Exiting')
   process.exit(1)
 })
