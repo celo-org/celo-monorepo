@@ -30,7 +30,11 @@ export abstract class BaseWrapper<T extends Contract> {
     return this.contract.getPastEvents(event, options)
   }
 
-  events = this.contract.events
+  events: T['events'] = this.contract.events
+  eventTypes = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)

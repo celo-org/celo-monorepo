@@ -103,8 +103,25 @@ export class AuthenticationFailed extends RootError<KomenciErrorTypes.Authentica
   }
 }
 
-export class LoginSignatureError extends RootError<'LoginSignatureError'> {
+export enum KomenciKitErrorTypes {
+  LoginSignatureError = 'LoginSignatureError',
+  InvalidWallet = 'InvalidWallet',
+}
+
+export class LoginSignatureError extends RootError<KomenciKitErrorTypes.LoginSignatureError> {
   constructor(public readonly error: Error) {
-    super('LoginSignatureError')
+    super(KomenciKitErrorTypes.LoginSignatureError)
+  }
+}
+
+export enum WalletIntegrityIssue {
+  WrongProxyBytecode = 'WrongBytecodeInvalid',
+  WrongSigner = 'WrongSigner',
+  WrongImplementation = 'WrongImplementation',
+}
+
+export class InvalidWallet extends RootError<KomenciKitErrorTypes.InvalidWallet> {
+  constructor(public readonly issue: WalletIntegrityIssue) {
+    super(KomenciKitErrorTypes.InvalidWallet)
   }
 }

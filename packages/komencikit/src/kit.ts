@@ -21,6 +21,7 @@ import {
   AuthenticationFailed,
   FetchError,
   FetchErrorTypes,
+  InvalidWallet,
   LoginSignatureError,
   TxError,
   TxErrorTypes,
@@ -29,6 +30,7 @@ import {
   TxTimeoutError,
 } from './errors'
 import { retry } from './retry'
+import { verifyWallet } from './verifyWallet'
 
 const TAG = 'KomenciKit'
 
@@ -136,7 +138,7 @@ export class KomenciKit {
   })
   public async deployWallet(
     implementationAddress: string
-  ): Promise<Result<string, FetchError | TxError>> {
+  ): Promise<Result<string, FetchError | TxError | InvalidWallet>> {
     const resp = await this.client.exec(deployWallet({ implementationAddress }))
     if (resp.ok) {
       if (resp.result.status === 'deployed') {
@@ -154,7 +156,7 @@ export class KomenciKit {
           const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(
             resp.result.deployerAddress
           )
-          const events = await deployer.getPastEvents('WalletDeployed', {
+          const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
             fromBlock: receipt.blockNumber,
             toBlock: receipt.blockNumber,
           })
@@ -164,7 +166,18 @@ export class KomenciKit {
           )
 
           if (deployWalletLog === undefined) {
-            return Err(new TxEventNotFound(txHash, 'WalletDeployed'))
+            return Err(new TxEventNotFound(txHash, deployer.events.WalletDeployed.name))
+          }
+
+          const walletStatus = await verifyWallet(
+            this.contractKit,
+            deployWalletLog,
+            implementationAddress,
+            this.externalAccount
+          )
+
+          if (!walletStatus.ok) {
+            return walletStatus
           }
 
           return Ok(deployWalletLog.returnValues.wallet)
