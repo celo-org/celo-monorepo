@@ -12,6 +12,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const SELL_AMOUNT = 50 // in dollars/gold (not wei)
+const account = '0x22c8a9178841ba95a944afd1a1faae517d3f5daa'
 
 describe(doFetchTobinTax, () => {
   beforeAll(() => {
@@ -52,7 +53,7 @@ describe(exchangeGoldAndStableTokens, () => {
     }
     await expectSaga(exchangeGoldAndStableTokens, exchangeGoldAndStableTokensAction)
       .provide([
-        [call(getConnectedUnlockedAccount), true],
+        [call(getConnectedUnlockedAccount), account],
         [
           select(exchangeRatePairSelector),
           {
@@ -73,6 +74,14 @@ describe(exchangeGoldAndStableTokens, () => {
             outValue: (SELL_AMOUNT / 2).toString(),
           },
         },
+      })
+      .call.like({
+        fn: sendTransaction,
+        args: [{}, account, {}, undefined, undefined, CURRENCY_ENUM.GOLD],
+      })
+      .call.like({
+        fn: sendAndMonitorTransaction,
+        args: [undefined, account, {}, undefined, CURRENCY_ENUM.GOLD],
       })
       .run()
   })
