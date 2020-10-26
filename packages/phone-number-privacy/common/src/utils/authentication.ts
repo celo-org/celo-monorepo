@@ -24,7 +24,7 @@ export async function authenticateUser(
   // https://tools.ietf.org/html/rfc7235#section-4.2
   const messageSignature = request.get('Authorization')
   const message = JSON.stringify(request.body)
-  const signer = JSON.stringify(request.body.account)
+  const signer = request.body.account
   const authMethod = request.body.authenticationMethod
 
   if (!messageSignature || !signer) {

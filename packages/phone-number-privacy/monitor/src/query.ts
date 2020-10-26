@@ -18,10 +18,13 @@ export const queryOdisForSalt = () => {
     contractKit,
   }
 
+  const clientVersion = 'monitor:1.0.0'
+
   return OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
     phoneNumber,
     accountAddress,
     authSigner,
-    OdisUtils.Query.getServiceContext(functions.config().blockchain.name)
+    OdisUtils.Query.getServiceContext(functions.config().blockchain.name),
+    clientVersion
   )
 }
