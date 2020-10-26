@@ -18,8 +18,6 @@ import { RbacOracleDeployer } from './rbac'
  */
 export interface AwsHsmOracleIdentity extends OracleIdentity {
   keyAlias: string
-  // If a resource group is not specified, it is assumed to be the same
-  // as the kubernetes cluster resource group specified in the AKSClusterConfig
   region: string
 }
 
@@ -28,6 +26,9 @@ export interface AwsHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig
   clusterConfig: AwsClusterConfig
 }
 
+/**
+ * AwsHsmOracleDeployer manages deployments for HSM-based oracles on AWS
+ */
 export class AwsHsmOracleDeployer extends RbacOracleDeployer {
   // Explicitly specify this so we enforce AwsHsmOracleDeploymentConfig
   constructor(deploymentConfig: AwsHsmOracleDeploymentConfig, celoEnv: string) {
@@ -54,6 +55,11 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
     return params
   }
 
+  /**
+   * Creates an AWS role for a specific oracle identity with the
+   * appropriate permissions to use its HSM.
+   * Idempotent.
+   */
   async createAwsHsmRoleIdempotent(identity: AwsHsmOracleIdentity) {
     // The role that each node (ie VM) uses
     const nodeInstanceGroupRoleArn = await getEKSNodeInstanceGroupRoleArn(this.deploymentConfig.clusterConfig.clusterName)
@@ -81,6 +87,10 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
     return roleArn
   }
 
+  /**
+   * Creates an AWS policy to allow usage of an HSM.
+   * Idempotent.
+   */
   async createAwsHsmSignPolicyIdempotent(policyName: string, keyArn: string) {
     const policy = {
       Version: '2012-10-17',
@@ -106,8 +116,12 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
     return createPolicyIdempotent(policyName, JSON.stringify(policy))
   }
 
-  // Note this assumes that the role created by this class is the only
-  // attachment of the policy
+  /**
+   * Deletes both the AWS role and policy for a particular identity.
+   * Note this assumes that the policy has only been attached to the corresponding
+   * role and no others. This may not be the case if someone manually attaches
+   * the policy to a different role in the AWS console.
+   */
   async deleteAwsHsmRoleAndPolicyIdempotent(identity: AwsHsmOracleIdentity) {
     const policyArn = await getPolicyArn(this.awsHsmPolicyName(identity))
     const roleName = this.awsHsmRoleName(identity)

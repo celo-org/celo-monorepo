@@ -1,4 +1,4 @@
-import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from '../azure'
+import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
 import { AKSClusterConfig } from '../k8s-cluster/aks'
 import { BaseOracleDeploymentConfig, OracleIdentity } from './base'
@@ -11,38 +11,18 @@ export interface AksHsmOracleIdentity extends OracleIdentity {
   identityName: string
   keyVaultName: string
   // If a resource group is not specified, it is assumed to be the same
-  // as the kubernetes cluster resource group specified in the AKSClusterConfig
+  // as the kubernetes cluster resource group specified in the clusterConfig
   resourceGroup?: string
 }
-//
-// interface OracleKeyVaultIdentityConfig {
-//   addressAzureKeyVaults: string
-// }
 
 export interface AksHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig {
   clusterConfig: AKSClusterConfig,
   identities: AksHsmOracleIdentity[]
 }
 
-// /**
-//  * Represents the identity of a single oracle
-//  */
-// interface OracleIdentity {
-//   address: string
-//   // Used if generating oracle clients from a mnemonic
-//   privateKey?: string,
-//   // Used if using Azure HSM signing
-//   azureHsmIdentity?: AksHsmOracleIdentity
-// }
-
-// interface OracleKeyVaultIdentityConfig {
-//   addressAzureKeyVaults: string
-// }
-
-// interface OracleMnemonicIdentityConfig {
-//   addressesFromMnemonicCount: string
-// }
-
+/**
+ * AksHsmOracleDeployer manages deployments for HSM-based oracles on AKS
+ */
 export class AksHsmOracleDeployer extends RbacOracleDeployer {
   // Explicitly specify this so we enforce AksHsmOracleDeploymentConfig
   constructor(deploymentConfig: AksHsmOracleDeploymentConfig, celoEnv: string) {
@@ -61,7 +41,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
     for (let i = 0; i < this.replicas; i++) {
       const oracleIdentity = this.deploymentConfig.identities[i]
       const prefix = `--set oracle.identities[${i}]`
-      const azureIdentity = await this.createOracleAzureIdentityIfNotExists(oracleIdentity)
+      const azureIdentity = await this.createOracleAzureIdentityIdempotent(oracleIdentity)
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
@@ -72,13 +52,14 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   }
 
   /**
-   * This creates an Azure identity for a specific oracle identity. Should only be
-   * called when an oracle identity is using an Azure Key Vault for HSM signing
+   * Creates an Azure identity for a specific oracle identity with the
+   * appropriate permissions to use its HSM.
+   * Idempotent.
    */
-  async createOracleAzureIdentityIfNotExists(
+  async createOracleAzureIdentityIdempotent(
     oracleHsmIdentity: AksHsmOracleIdentity
   ) {
-    const identity = await createIdentityIfNotExists(this.clusterConfig, oracleHsmIdentity.identityName!)
+    const identity = await createIdentityIdempotent(this.clusterConfig, oracleHsmIdentity.identityName!)
     // We want to grant the identity for the cluster permission to manage the oracle identity.
     // Get the correct object ID depending on the cluster configuration, either
     // the service principal or the managed service identity.
@@ -89,13 +70,18 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
       assigneeObjectId = await getAKSManagedServiceIdentityObjectId(this.clusterConfig)
       assigneePrincipalType = 'MSI'
     }
-    await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
+    await assignRoleIdempotent(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
     // Allow the oracle identity to access the correct key vault
-    await this.setOracleKeyVaultPolicyIfNotSet(oracleHsmIdentity, identity)
+    await this.setOracleKeyVaultPolicyIdempotent(oracleHsmIdentity, identity)
     return identity
   }
 
-  async setOracleKeyVaultPolicyIfNotSet(
+  /**
+   * Ensures an Azure identity has the appropriate permissions to use its HSM
+   * via a key vault policy.
+   * Idempotent.
+   */
+  async setOracleKeyVaultPolicyIdempotent(
     oracleHsmIdentity: AksHsmOracleIdentity,
     azureIdentity: any
   ) {
@@ -118,7 +104,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   }
 
   /**
-   * deleteOracleAzureIdentity deletes the key vault policy and the oracle's managed identity
+   * Deletes the key vault policy and the oracle's managed identity
    */
   async deleteOracleAzureIdentity(
     oracleHsmIdentity: AksHsmOracleIdentity
@@ -127,6 +113,10 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
     return deleteIdentity(this.clusterConfig, oracleHsmIdentity.identityName)
   }
 
+  /**
+   * Deletes the key vault policy that allows an Azure managed identity to use
+   * its HSM.
+   */
   async deleteOracleKeyVaultPolicy(
     oracleHsmIdentity: AksHsmOracleIdentity
   ) {

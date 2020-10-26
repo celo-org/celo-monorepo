@@ -9,7 +9,14 @@ import { BaseOracleDeployer } from './base'
 
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
-export class RbacOracleDeployer extends BaseOracleDeployer {
+/**
+ * RbacOracleDeployer cloud-agnostically manages deployments for oracles
+ * whose pods must change their metadata in order to accomodate limitations
+ * in pod identity solutions (like Azure's aad-pod-identity and AWS's kube2iam).
+ * This will create a k8s service account for each oracle pod that can modify
+ * pod metadata, and will ensure each SA's credentials make their way to the helm chart.
+ */
+export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   async installChart() {
     await installGenericHelmChart(
       this.celoEnv,

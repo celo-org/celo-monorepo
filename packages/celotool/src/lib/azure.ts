@@ -22,9 +22,9 @@ export async function getIdentity(
   return matchingIdentities[0]
 }
 
-// createIdentityIfNotExists creates an identity if it doesn't already exist.
+// createIdentityIdempotent creates an identity if it doesn't already exist.
 // Returns an object including basic info on the identity.
-export async function createIdentityIfNotExists(
+export async function createIdentityIdempotent(
   clusterConfig: AKSClusterConfig,
   identityName: string
 ) {
@@ -61,7 +61,7 @@ async function roleIsAssigned(assignee: string, scope: string, role: string) {
   return parseInt(matchingAssignedRoles.trim(), 10) > 0
 }
 
-export async function assignRoleIfNotAssigned(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
+export async function assignRoleIdempotent(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
   if (await roleIsAssigned(assigneeObjectId, scope, role)) {
     console.info(`Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`)
     return
