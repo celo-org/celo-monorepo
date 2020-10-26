@@ -1,0 +1,5 @@
+environment:
+  name: default
+
+komenci:
+  replicas: 2

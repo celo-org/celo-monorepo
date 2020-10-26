@@ -1,28 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "komenci-onboarding-fullname" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "komenci-onboarding-component-label" . | indent 4 }}
+spec:
+  clusterIP: None
+  selector:
+{{ include "komenci-onboarding-component-label" . | indent 4 }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "komenci-onboarding.fullname" . }}
+  name: {{ include "komenci-onboarding-fullname" . }}
   labels:
-    {{- include "komenci-onboarding.labels" . | nindent 4 }}
+{{- include "komenci-onboarding-component-label" . | nindent 4 }}
 spec:
   replicas: {{ .Values.onboarding.replicaCount }}
   selector:
-    matchLabels:
-      {{- include "komenci-onboarding.selectorLabels" . | nindent 6 }}
+    matchLabels: 
+    {{- include "komenci-onboarding-component-label" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "komenci-onboarding.selectorLabels" . | nindent 8 }}
+{{- include "komenci-onboarding-component-label" . | nindent 8 }}
     spec:
     {{- with .Values.onboarding.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "komenci-onboarding.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ include "komenci-onboarding-fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ .Values.onboarding.image.repository }}::{{ .Values.onboarding.image.tag }}

@@ -5,6 +5,10 @@ The name of the deployment
 {{- .Values.environment.name -}}-relayer
 {{- end -}}
 
+{{- define "komenci-onboarding-fullname" -}}
+{{- .Values.environment.name -}}-onboarding
+{{- end -}}
+
 {{/*
 Common labels that are recommended to be used by Helm and Kubernetes
 */}}
@@ -28,6 +32,13 @@ Label specific to the komenci relayer component
 */}}
 {{- define "komenci-relayer-component-label" -}}
 app.kubernetes.io/component: komenci-relayer
+{{- end -}}
+
+{{/*
+Label specific to the komenci onboarding component
+*/}}
+{{- define "komenci-onboarding-component-label" -}}
+app.kubernetes.io/component: komenci-onboarding
 {{- end -}}
 
 {{/*
