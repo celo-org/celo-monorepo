@@ -26,9 +26,6 @@ interface VerificationContext {
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
-
-  // TODO: remove this after first smart contracts release
-  isBeforeRelease1: boolean
 }
 
 // Checks if the given transaction is a repointing of the Proxy for the given
@@ -150,8 +147,7 @@ export const verifyBytecodes = async (
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
-  web3: Web3,
-  isBeforeRelease1: boolean = false
+  web3: Web3
 ) => {
   const invalidTransactions = proposal.filter(
     (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
@@ -170,7 +166,6 @@ export const verifyBytecodes = async (
     proposal,
     Proxy,
     web3,
-    isBeforeRelease1,
   }
 
   while (queue.length > 0) {
