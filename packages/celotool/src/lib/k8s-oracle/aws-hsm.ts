@@ -1,16 +1,16 @@
-import { BaseOracleDeploymentConfig, OracleIdentity } from "./base"
 import {
-  createPolicyIdempotent,
-  getEKSNodeInstanceGroupRoleArn,
-  getKeyArnFromAlias,
-  createRoleIdempotent,
   attachPolicyIdempotent,
-  getPolicyArn,
+  createPolicyIdempotent,
+  createRoleIdempotent,
   deletePolicy,
   deleteRole,
-  detachPolicyIdempotent
+  detachPolicyIdempotent,
+  getEKSNodeInstanceGroupRoleArn,
+  getKeyArnFromAlias,
+  getPolicyArn
 } from '../aws'
 import { AwsClusterConfig } from "../k8s-cluster/aws"
+import { BaseOracleDeploymentConfig, OracleIdentity } from "./base"
 import { RbacOracleDeployer } from './rbac'
 
 /**

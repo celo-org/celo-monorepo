@@ -1,4 +1,4 @@
-import { OracleIdentity, BaseOracleDeployer, BaseOracleDeploymentConfig } from "./base";
+import { BaseOracleDeployer, BaseOracleDeploymentConfig, OracleIdentity } from "./base";
 
 export interface PrivateKeyOracleIdentity extends OracleIdentity {
   privateKey: string
@@ -18,7 +18,7 @@ export class PrivateKeyOracleDeployer extends BaseOracleDeployer {
   }
 
   async oracleIdentityHelmParameters() {
-    let params: string[] = await super.oracleIdentityHelmParameters()
+    const params: string[] = await super.oracleIdentityHelmParameters()
     for (let i = 0; i < this.replicas; i++) {
       const oracleIdentity = this.deploymentConfig.identities[i]
       const prefix = `--set oracle.identities[${i}]`

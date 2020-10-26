@@ -1,6 +1,6 @@
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
-import { DestroyArgv } from '../../deploy/destroy'
 import { getOracleDeployerForContext } from 'src/lib/oracle'
+import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'oracle'
 
