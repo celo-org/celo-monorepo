@@ -70,7 +70,7 @@ export class KomenciClient {
       } else if (resp.status === 404) {
         return Err(new NotFoundError(this.url + action.path))
       } else if (resp.status === 403) {
-        return Err(new Unauthorised())
+        return Err(new Unauthorized())
       } else if (resp.status === 400) {
         const payload = await resp.json()
         return Err(new RequestError(payload))

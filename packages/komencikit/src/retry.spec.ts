@@ -120,7 +120,7 @@ describe('retry Decorator', () => {
   })
 
   describe('options:onRetry', () => {
-    it('is called after each unsuccsseful try', async () => {
+    it('is called after each unsuccessful try', async () => {
       const impl = alwaysReturn(Err(new TestError()))
       const onRetry = jest.fn()
       const instance = buildTestInstanceWithOptions(

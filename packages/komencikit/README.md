@@ -26,4 +26,4 @@ const komenciKit = new KomenciKit(contractkit, "0xaaaa...aaaa", {
 })
 ```
 
-See `examples/attestation-flow.ts` for an example of a full attestation flow executed via KomenciKit
+See [examples/attestation-flow.ts](./examples/attestation-flow.ts) for an example of a full attestation flow executed via KomenciKit
