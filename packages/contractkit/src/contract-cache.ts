@@ -164,7 +164,7 @@ export class WrapperCache {
    * Get Contract wrapper
    */
   public async getContract<C extends ValidWrappers>(contract: C, address?: string) {
-    if (this.wrapperCache[contract] == null) {
+    if (this.wrapperCache[contract] == null || address !== undefined) {
       const instance = await this.kit._web3Contracts.getContract(contract, address)
       const Klass: CFType[C] = WrapperFactories[contract]
       this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
