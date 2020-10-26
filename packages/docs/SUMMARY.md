@@ -303,6 +303,10 @@
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
       - [PendingWithdrawal](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)
       - [VotingDetails](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.votingdetails.md)
+      - [wrappers/MetaTransactionWallet](developer-resources/contractkit/reference/modules/_wrappers_metatransactionwallet_.md)
+      - [MetaTransactionWalletWrapper](developer-resources/contractkit/reference/classes/_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md)
+      - [RawTransaction](developer-resources/contractkit/reference/interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)
+      - [TransactionObjectWithValue](developer-resources/contractkit/reference/interfaces/_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)
       - [wrappers/MetaTransactionWalletDeployer](developer-resources/contractkit/reference/modules/_wrappers_metatransactionwalletdeployer_.md)
       - [MetaTransactionWalletDeployerWrapper](developer-resources/contractkit/reference/classes/_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)
       - [wrappers/MultiSig](developer-resources/contractkit/reference/modules/_wrappers_multisig_.md)
@@ -393,6 +397,7 @@
       - [GoldTokenWrapper](developer-resources/contractkit/reference/classes/_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
       - [GovernanceWrapper](developer-resources/contractkit/reference/classes/_wrappers_governance_.governancewrapper.md)
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
+      - [MetaTransactionWalletWrapper](developer-resources/contractkit/reference/classes/_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md)
       - [MetaTransactionWalletDeployerWrapper](developer-resources/contractkit/reference/classes/_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)
       - [MultiSigWrapper](developer-resources/contractkit/reference/classes/_wrappers_multisig_.multisigwrapper.md)
       - [ReleaseGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_releasegold_.releasegoldwrapper.md)
@@ -478,6 +483,8 @@
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
       - [PendingWithdrawal](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)
       - [VotingDetails](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.votingdetails.md)
+      - [RawTransaction](developer-resources/contractkit/reference/interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)
+      - [TransactionObjectWithValue](developer-resources/contractkit/reference/interfaces/_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)
       - [TransactionData](developer-resources/contractkit/reference/interfaces/_wrappers_multisig_.transactiondata.md)
       - [BalanceState](developer-resources/contractkit/reference/interfaces/_wrappers_releasegold_.balancestate.md)
       - [ReleaseGoldInfo](developer-resources/contractkit/reference/interfaces/_wrappers_releasegold_.releasegoldinfo.md)
@@ -570,6 +577,7 @@
 - [Release Process](community/release-process/README.md)
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
+  - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
 
 ## Important Information
 

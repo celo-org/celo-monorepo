@@ -63,7 +63,8 @@ export function* sendAndMonitorTransaction<T>(
   tx: CeloTransactionObject<T>,
   account: string,
   context: TransactionContext,
-  currency?: CURRENCY_ENUM
+  currency?: CURRENCY_ENUM,
+  feeCurrency?: CURRENCY_ENUM
 ) {
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${context.id}`)
@@ -74,6 +75,7 @@ export function* sendAndMonitorTransaction<T>(
         tx.txo,
         account,
         context,
+        feeCurrency,
         nonce
       )
       const hash = yield transactionHash

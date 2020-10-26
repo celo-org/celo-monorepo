@@ -20,7 +20,7 @@ RELEASE_1=""
 FORNO=""
 LOG_FILE="/dev/null"
 
-while getopts 'b:n:rf' flag; do
+while getopts 'b:n:rfl:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
@@ -36,6 +36,7 @@ done
 
 echo "- Checkout source code at $BRANCH"
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
+git fetch --all --tags >> $LOG_FILE
 git checkout $BRANCH 2>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts

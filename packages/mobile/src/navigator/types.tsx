@@ -14,6 +14,7 @@ import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
@@ -174,6 +175,7 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
     isFromScan?: boolean
+    currencyInfo?: CurrencyInfo
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]:
@@ -214,6 +216,7 @@ export type StackParamList = {
   [Screens.WithdrawCeloReviewScreen]: {
     amount: BigNumber
     recipientAddress: string
+    feeEstimate: BigNumber
   }
   [Screens.WithdrawCeloScreen]: undefined
 }
