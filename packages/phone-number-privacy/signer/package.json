@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -18,9 +18,9 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.15-dev",
-    "@celo/phone-number-privacy-common": "1.0.9-dev",
-    "@celo/utils": "0.1.18",
+    "@celo/contractkit": "0.4.16",
+    "@celo/phone-number-privacy-common": "1.0.11",
+    "@celo/utils": "0.1.21",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/elliptic": "^6.4.12",
     "aws-sdk": "^2.696.0",

@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-common",
-  "version": "1.0.9-dev",
+  "version": "1.0.11",
   "description": "Common library for the combiner and signer libraries",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -16,8 +16,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/contractkit": "0.4.16-dev",
-    "@celo/utils": "0.1.22-dev",
+    "@celo/contractkit": "0.4.16",
+    "@celo/utils": "0.1.21",
     "bignumber.js": "^9.0.0",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
