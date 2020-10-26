@@ -69,7 +69,7 @@ const run = async () => {
     return
   }
 
-  const events = await attestations.getPastEvents('AttestationsRequested', {
+  const events = await attestations.getPastEvents(attestations.eventTypes.AttestationsRequested, {
     fromBlock: requestAttestations.result.blockNumber,
     toBlock: requestAttestations.result.blockNumber,
   })
@@ -80,13 +80,16 @@ const run = async () => {
     return
   }
   console.log(selectIssuers)
-  const issuersEvents = await attestations.getPastEvents('AttestationIssuerSelected', {
-    fromBlock: selectIssuers.result.blockNumber,
-    toBlock: selectIssuers.result.blockNumber,
-  })
+  const issuersEvents = await attestations.getPastEvents(
+    attestations.eventTypes.AttestationIssuerSelected,
+    {
+      fromBlock: selectIssuers.result.blockNumber,
+      toBlock: selectIssuers.result.blockNumber,
+    }
+  )
   console.log(issuersEvents)
   console.log('====================')
-  const attestationsToComplete = await attestations.getActionableAttestations(
+  let attestationsToComplete = await attestations.getActionableAttestations(
     identifier,
     walletAddress
   )
@@ -101,19 +104,20 @@ const run = async () => {
   )
   printAndIgnoreRequestErrors(possibleErrors)
   while (true) {
-    const attestationsToComplete = await attestations.getActionableAttestations(
-      identifier,
-      walletAddress
-    )
-    if (attestationsToComplete.length == 0) {
+    attestationsToComplete = await attestations.getActionableAttestations(identifier, walletAddress)
+
+    if (attestationsToComplete.length === 0) {
       break
     }
+
     console.log(attestationsToComplete)
     console.log('====================')
 
     await new Promise((resolve) => {
       rl.question('Enter code: ', async (base64Code: string) => {
-        if (base64Code == 'exit') process.exit(0)
+        if (base64Code === 'exit') {
+          process.exit(0)
+        }
         const code = base64ToHex(base64Code)
         const matchingIssuer = await attestations.findMatchingIssuer(
           identifier,
