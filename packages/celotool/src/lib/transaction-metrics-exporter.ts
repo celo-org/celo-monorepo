@@ -29,7 +29,7 @@ export async function removeHelmRelease(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
   console.info(`Deleting helm chart ${celoEnv}-transaction-metrics-exporter-${suffix}`)
   await execCmdWithExitOnFailure(
-    `helm delete --namespace ${celoEnv} ${celoEnv}-transaction-metrics-exporter-${suffix}`
+    `helm uninstall --namespace ${celoEnv} ${celoEnv}-transaction-metrics-exporter-${suffix}`
   )
 }
 

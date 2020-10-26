@@ -751,7 +751,7 @@ export function isCelotoolVerbose() {
 export async function removeGenericHelmChart(releaseName: string, namespace: string) {
   console.info(`Deleting helm chart ${releaseName} from namespace ${namespace}`)
   try {
-    await execCmd(`helm delete --namespace ${namespace} ${releaseName}`)
+    await execCmd(`helm uninstall --namespace ${namespace} ${releaseName}`)
   } catch (error) {
     console.error(error)
   }
