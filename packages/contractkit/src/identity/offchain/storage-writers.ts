@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process'
 import { promises } from 'fs'
 import { join, parse } from 'path'
-import { resolve } from 'url'
+import { resolvePath } from './utils'
 
 const { writeFile, mkdir } = promises
 
@@ -58,7 +58,7 @@ export class MockStorageWriter extends LocalStorageWriter {
   }
   async write(data: Buffer, dataPath: string): Promise<void> {
     await this.writeToFs(data, dataPath)
-    this.fetchMock.mock(resolve(this.mockedStorageRoot, dataPath), data, {
+    this.fetchMock.mock(resolvePath(this.mockedStorageRoot, dataPath), data, {
       sendAsJson: false,
       overwriteRoutes: true,
     })

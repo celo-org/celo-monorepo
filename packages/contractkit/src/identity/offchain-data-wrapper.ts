@@ -4,13 +4,12 @@ import { recoverEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import * as t from 'io-ts'
-import { resolve } from 'url'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
 import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
 import { StorageWriter } from './offchain/storage-writers'
-import { buildEIP712TypedData } from './offchain/utils'
+import { buildEIP712TypedData, resolvePath } from './offchain/utils'
 
 const debug = debugFactory('offchaindata')
 
@@ -105,7 +104,7 @@ export default class OffchainDataWrapper {
     try {
       await Promise.all([
         this.storageWriter.write(data, dataPath),
-        await this.storageWriter.write(signature, `${dataPath}.signature`),
+        this.storageWriter.write(signature, `${dataPath}.signature`),
       ])
     } catch (e) {
       return new FetchError(e)
@@ -129,8 +128,8 @@ class StorageRoot {
 
     try {
       ;[dataResponse, signatureResponse] = await Promise.all([
-        fetch(resolve(this.root, dataPath)),
-        fetch(resolve(this.root, `${dataPath}.signature`)),
+        fetch(resolvePath(this.root, dataPath)),
+        fetch(resolvePath(this.root, `${dataPath}.signature`)),
       ])
     } catch (error) {
       return Err(new FetchError(error))
@@ -153,7 +152,6 @@ class StorageRoot {
     const toParse = type ? JSON.parse(body.toString()) : body
     const typedData = await buildEIP712TypedData(this.wrapper, dataPath, toParse, type)
     const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
-
     if (eqAddress(guessedSigner, this.account)) {
       return Ok(body)
     }

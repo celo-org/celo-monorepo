@@ -7,7 +7,7 @@ import { createHmac, randomBytes } from 'crypto'
 import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
-import { join } from 'path'
+import { join, sep } from 'path'
 import OffchainDataWrapper, { OffchainErrorTypes } from '../offchain-data-wrapper'
 import {
   InvalidDataError,
@@ -34,7 +34,7 @@ function getCiphertextLabel(
   const label = createHmac('blake2s256', sharedSecret)
     .update(Buffer.concat([senderPublicKeyBuffer, receiverPublicKeyBuffer, Buffer.from(path)]))
     .digest('hex')
-  return join('ciphertexts', label)
+  return join(sep, 'ciphertexts', label)
 }
 
 // Assumes that the wallet has the dataEncryptionKey of wrapper.self available
@@ -355,4 +355,30 @@ const buildEIP712Schema = <DataType>(type: t.Type<DataType>): EIP712Schema => {
       },
     ]
   }, [])
+}
+
+function ensureTrailingSeparator(str: string) {
+  if (str[str.length - 1] !== '/') {
+    return `${str}/`
+  }
+  return str
+}
+function trimLeadingSeparator(str: string) {
+  if (str[0] === '/') {
+    return str.slice(1)
+  }
+  return str
+}
+
+/**
+ * We want users to be able to specify a root + path as their base
+ * storage url, https://example.com/store-under/path, for example. Constructing
+ * a URL doesn't respect these paths if the appended path is absolute, so we ensure
+ * it's not and ensure the base is
+ *
+ * @param base root or base of the domain
+ * @param path the path to append
+ */
+export function resolvePath(base: string, path: string) {
+  return new URL(trimLeadingSeparator(path), ensureTrailingSeparator(base)).href
 }
