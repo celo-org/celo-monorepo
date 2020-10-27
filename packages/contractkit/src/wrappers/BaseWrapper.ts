@@ -29,8 +29,8 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   /** Contract getPastEvents */
-  public getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
-    return this.contract.getPastEvents(event, options)
+  public getPastEvents(event: Events<T>, options: PastEventOptions): Promise<EventLog[]> {
+    return this.contract.getPastEvents(event as string, options)
   }
 
   events: Events<T> = this.contract.events
