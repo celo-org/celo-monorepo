@@ -15,6 +15,9 @@ export interface Filter {
   [key: string]: number | string | string[] | number[]
 }
 
+type Events<T extends Contract> = keyof T['events']
+type Methods<T extends Contract> = keyof T['methods']
+
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
@@ -30,14 +33,15 @@ export abstract class BaseWrapper<T extends Contract> {
     return this.contract.getPastEvents(event, options)
   }
 
-  events: T['events'] = this.contract.events
-  eventTypes = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
-    (acc, key) => ({ ...acc, key }),
+  events: Events<T> = this.contract.events
+
+  eventTypes = Object.keys(this.events).reduce<Record<Events<T>, string>>(
+    (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
 
-  methodIds = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
-    (acc, method: keyof T['methods']) => {
+  methodIds = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+    (acc, method: Methods<T>) => {
       const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
 
       acc[method] =
