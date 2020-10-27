@@ -25,6 +25,7 @@ Bug Fixes
 
 Other Changes
 - Support the use of scientific notation for the deposit of a governance proposal - [#5326](https://github.com/celo-org/celo-monorepo/pull/5326)
+- Require `--force` with `account:claim-attestation-service-url` for non-TLS urls [#5599](https://github.com/celo-org/celo-monorepo/pull/5599)
 
 ### **[0.0.59]** -- 2020-10-23
 Features
