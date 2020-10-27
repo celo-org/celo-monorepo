@@ -357,6 +357,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return { referendum, execution, expiration }
   }
 
+  async humanReadableTimeUntilStages(propoaslID: BigNumber.Value) {
+    const time = await this.timeUntilStages(propoaslID)
+    return {
+      referendum: secondsToDurationString(time.referendum),
+      execution: secondsToDurationString(time.execution),
+      expiration: secondsToDurationString(time.expiration),
+    }
+  }
+
   /**
    * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID

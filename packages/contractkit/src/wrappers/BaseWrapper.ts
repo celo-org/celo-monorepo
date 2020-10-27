@@ -100,6 +100,10 @@ export function secondsToDurationString(
     .times(TimeDurations.second)
     .toNumber()
 
+  if (durationMilliseconds <= 0) {
+    return 'past'
+  }
+
   const durations = outputUnits.reduce((res: Map<TimeUnit, number>, key) => {
     const unitDuration = TimeDurations[key]
     const value = Math.floor(durationMilliseconds / unitDuration)
