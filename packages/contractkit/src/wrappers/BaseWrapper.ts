@@ -102,9 +102,9 @@ export function secondsToDurationString(
 
   const durations = outputUnits.reduce((res: Map<TimeUnit, number>, key) => {
     const unitDuration = TimeDurations[key]
-    res.set(key, Math.floor(durationMilliseconds / unitDuration))
-    durationMilliseconds -= res.get(key)! * unitDuration
-    return res
+    const value = Math.floor(durationMilliseconds / unitDuration)
+    durationMilliseconds -= value * unitDuration
+    return res.set(key, value)
   }, new Map())
 
   let s = ''
