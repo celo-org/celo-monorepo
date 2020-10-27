@@ -56,6 +56,11 @@ export class App extends React.Component<Props> {
 
     Linking.addEventListener('url', this.handleOpenURL)
 
+    const url: string | null = await Linking.getInitialURL()
+    if (url) {
+      this.handleOpenURL({ url })
+    }
+
     this.logAppLoadTime()
   }
 

@@ -1,5 +1,6 @@
 package org.celo.mobile;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,6 +55,14 @@ public class MainActivity extends ReactActivity {
     super.onPause();
     getWindow()
       .setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+  }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+    Boolean firebaseEnabled = Boolean.parseBoolean(BuildConfig.FIREBASE_ENABLED);
+    if (firebaseEnabled) {
+      super.onNewIntent(intent);
+    }
   }
 
   @Override

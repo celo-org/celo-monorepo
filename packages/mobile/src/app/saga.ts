@@ -54,18 +54,9 @@ export function* appInit() {
     yield put(setLanguage(language))
   }
 
-  const deepLink: string | null = yield call(Linking.getInitialURL)
   const inSync = yield call(clockInSync)
   if (!inSync) {
     navigate(Screens.SetClock)
-    return
-  }
-
-  if (deepLink) {
-    // TODO: this should dispatch (put) but since this appInit
-    // is called before the listener is set, we do it this way.
-    // This is fragile, change me :D
-    yield call(handleDeepLink, openDeepLink(deepLink))
     return
   }
 }
