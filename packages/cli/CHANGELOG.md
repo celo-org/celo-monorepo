@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.0.60--dev]**
+### **[0.0.61--dev]**
 Features
 - [one-line summary] - ( [link PR] )
 
@@ -17,9 +17,15 @@ Other Changes
 
 
 ## Published
+
+### **[0.0.60]** -- 2020-10-27
+Bug Fixes
+- Uses the most up-to-date version of @celo/contractkit (0.4.17) & fixes backward compatibility issues from the last release
+- Actually call toString in oracle report CLI - [#5594](https://github.com/celo-org/celo-monorepo/pull/5594)
+
 ### **[0.0.59]** -- 2020-10-23
 Features
-- Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - ( [#5111](https://github.com/celo-org/celo-monorepo/pull/5111) )
+- Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - [#5111](https://github.com/celo-org/celo-monorepo/pull/5111)
 
 Bug Fixes
 - Fix attestation service test delivering false negatives - [#5336](https://github.com/celo-org/celo-monorepo/pull/5336)
