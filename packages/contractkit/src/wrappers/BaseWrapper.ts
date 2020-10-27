@@ -17,6 +17,9 @@ export interface Filter {
 
 type Events<T extends Contract> = keyof T['events']
 type Methods<T extends Contract> = keyof T['methods']
+type EventsEnum<T extends Contract> = {
+  [event in Events<T>]: event
+}
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
@@ -35,7 +38,7 @@ export abstract class BaseWrapper<T extends Contract> {
 
   events: T['events'] = this.contract.events
 
-  eventTypes = Object.keys(this.events).reduce<Record<Events<T>, Events<T>>>(
+  eventTypes = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
