@@ -156,6 +156,10 @@ After a successful release execution on a testnet, the resulting network state s
     ```bash
     celocli account:register --from <addr> --name <test-name>
     ```
+- Report an Oracle rate
+    ```bash
+    celocli oracle:report --from <addr> --value <num>
+    ```
 - Do a CP-DOTO exchange
     ```bash
     celocli exchange:celo --value <number> --from <addr>
