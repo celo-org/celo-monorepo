@@ -1,7 +1,7 @@
 import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils/lib/io'
 import express from 'express'
 import * as t from 'io-ts'
-import { getAgeOfLatestBlock, isNodeSyncing, kit } from '../db'
+import { getAgeOfLatestBlock, isNodeSyncing, useKit } from '../db'
 import { fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
 import { configuredSmsProviders } from '../sms'
@@ -19,7 +19,9 @@ function produceSignature(message: string | undefined) {
     return undefined
   }
 
-  return kit.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
+  return useKit((kit) =>
+    kit.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
+  )
 }
 
 export async function handleStatusRequest(
