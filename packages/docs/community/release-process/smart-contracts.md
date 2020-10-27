@@ -25,6 +25,9 @@ Celo Core Contracts deployed to a live network without the `getVersion()` functi
 
 Mixin contracts and libraries are considered part of the contracts that consume them. When a mixin or library has changed, all contracts that consume them should be considered to have changed as well, and thus the contracts should have their version numbers incremented and should be re-deployed as part of the next smart contract release.
 
+### Initialize Data
+
+Whenever Celo Core Contracts need to be re-initialized, their initialization arguments should be checked into version control under `packages/protocol/releaseData/initializationData/release${N}.json`.
 
 ### Release management in Git/Github
 
@@ -32,10 +35,10 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 
 #### When a new release branch is cut:
 1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
-2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`. 
+2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`.
 3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
 4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.pre-audit` so that all future changes to master are versioned against the new release.
-5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`. 
+5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`.
 
 #### During the release proposal stage:
 1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
@@ -50,8 +53,8 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 
 There are several scripts provided (under `packages/protocol` in [celo-org/celo-monorepo](https://github.com/celo-org/celo-monorepo) and via [celocli](../../command-line-interface/introduction.md)) for use in the release process and with contract upgrade governance proposals to give participating stakeholders increased confidence.
 
-{% hint style="warning" %}​ 
-For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup. 
+{% hint style="warning" %}​
+For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup.
 {% endhint %}
 
 Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
@@ -92,7 +95,7 @@ STORAGE updates are adopted by deploying a new proxy/implementation pair. These 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 RELEASE="celo-core-contracts-v${N}.rc${X}"
-yarn make-release -b $RELEASE -n $NETWORK -r "report.json" -i "initialize_data.json" -p "proposal.json"
+yarn make-release -b $RELEASE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
 ```
 
 The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
