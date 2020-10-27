@@ -168,6 +168,10 @@ After a successful release execution on a testnet, the resulting network state s
     celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
     ```
 - Vote for a Validator
+- Run a mock election
+    ```bash
+    celocli election:run
+    ```
 - Get a valildator slashed for downtime and ejected from the validator set
 - Propose a governance proposal and get it executed
     ```bash
