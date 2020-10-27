@@ -193,8 +193,6 @@ The `us.gcr.io/celo-org/celo-node:mainnet` image contains the [genesis block](ht
 
 Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator. To do this, we need to run the following command to run the node.
 
-To run the node:
-
 ```bash
 # On your local machine
 mkdir celo-accounts-node
