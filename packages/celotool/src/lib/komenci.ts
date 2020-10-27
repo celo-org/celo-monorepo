@@ -9,7 +9,7 @@ import { getAKSClusterConfig, getContextDynamicEnvVarValues } from './context-ut
 import { AKSClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/komenci'
-const rbacHelmChartPath = '../helm-charts/oracle-rbac'
+const rbacHelmChartPath = '../helm-charts/komenci-rbac'
 
 /**
  * Contains information needed when using Azure HSM signing
@@ -368,6 +368,7 @@ function removeKomenciRBACHelmRelease(celoEnv: string) {
 
 function rbacHelmParameters(celoEnv: string,  context: string) {
   const komenciConfig = getKomenciConfig(context)
+  console.info(komenciConfig)
   const replicas = komenciConfig.identities.length
   return [`--set environment.name=${celoEnv}`,  `--set relayer.replicas=${replicas}`,]
 }
