@@ -24,6 +24,7 @@ import {
   stringIdentity,
   toTransactionObject,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToInt,
   valueToString,
@@ -290,6 +291,18 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       descriptionURL: res[4],
     })
   )
+
+  /**
+   * Returns the human readable metadata associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
+  async getHumanReadableProposalMetadata(proposalID: BigNumber.Value) {
+    const meta = await this.getProposalMetadata(proposalID)
+    return {
+      ...meta,
+      timestamp: unixSecondsTimestampToDateString(meta.timestamp),
+    }
+  }
 
   /**
    * Returns the transaction at the given index associated with a given proposal.
