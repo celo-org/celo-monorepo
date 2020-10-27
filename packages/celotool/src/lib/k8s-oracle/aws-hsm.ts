@@ -42,6 +42,13 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
     }
   }
 
+  async helmParameters() {
+    return [
+      ...await super.helmParameters(),
+      `--set kube.cloudProvider=aws`
+    ]
+  }
+
   async oracleIdentityHelmParameters() {
     let params = await super.oracleIdentityHelmParameters()
     for (let i = 0; i < this.replicas; i++) {
@@ -123,8 +130,10 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
    * the policy to a different role in the AWS console.
    */
   async deleteAwsHsmRoleAndPolicyIdempotent(identity: AwsHsmOracleIdentity) {
-    const policyArn = await getPolicyArn(this.awsHsmPolicyName(identity))
     const roleName = this.awsHsmRoleName(identity)
+    const policyName = this.awsHsmPolicyName(identity)
+    console.log(`Deleting AWS role ${roleName} and policy ${policyName}`)
+    const policyArn = await getPolicyArn(policyName)
     if (policyArn) {
       // Don't throw if it's not attached
       try {

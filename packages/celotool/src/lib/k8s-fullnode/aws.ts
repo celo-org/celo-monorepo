@@ -3,7 +3,7 @@ import { AwsClusterConfig } from '../k8s-cluster/aws'
 import { BaseFullNodeDeploymentConfig } from './base'
 import { BaseNodePortFullNodeDeployer } from './base-nodeport'
 
-export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
+export interface AwsFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
   clusterConfig: AwsClusterConfig
 }
 
@@ -17,7 +17,7 @@ enum Protocols {
  * with ingress TCP & UDP traffic on the same port. Instead, we use NodePort
  * services.
  */
-export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
+export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
   /**
    * Gets AWS-specific helm parameters.
    */
@@ -98,7 +98,7 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
     }
   }
 
-  get deploymentConfig(): AWSFullNodeDeploymentConfig {
-    return this._deploymentConfig as AWSFullNodeDeploymentConfig
+  get deploymentConfig(): AwsFullNodeDeploymentConfig {
+    return this._deploymentConfig as AwsFullNodeDeploymentConfig
   }
 }

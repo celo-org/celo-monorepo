@@ -1,6 +1,6 @@
 import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
-import { AKSClusterConfig } from '../k8s-cluster/aks'
+import { AksClusterConfig } from '../k8s-cluster/aks'
 import { BaseOracleDeploymentConfig, OracleIdentity } from './base'
 import { RbacOracleDeployer } from './rbac'
 
@@ -8,7 +8,6 @@ import { RbacOracleDeployer } from './rbac'
  * Contains information needed when using Azure HSM signing
  */
 export interface AksHsmOracleIdentity extends OracleIdentity {
-  identityName: string
   keyVaultName: string
   // If a resource group is not specified, it is assumed to be the same
   // as the kubernetes cluster resource group specified in the clusterConfig
@@ -16,7 +15,7 @@ export interface AksHsmOracleIdentity extends OracleIdentity {
 }
 
 export interface AksHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig {
-  clusterConfig: AKSClusterConfig,
+  clusterConfig: AksClusterConfig,
   identities: AksHsmOracleIdentity[]
 }
 
@@ -32,8 +31,15 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   async removeChart() {
     await super.removeChart()
     for (const identity of this.deploymentConfig.identities) {
-      await this.deleteOracleAzureIdentity(identity)
+      await this.deleteAzureHsmIdentity(identity)
     }
+  }
+
+  async helmParameters() {
+    return [
+      ...await super.helmParameters(),
+      `--set kube.cloudProvider=azure`
+    ]
   }
 
   async oracleIdentityHelmParameters() {
@@ -59,7 +65,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   async createOracleAzureIdentityIdempotent(
     oracleHsmIdentity: AksHsmOracleIdentity
   ) {
-    const identity = await createIdentityIdempotent(this.clusterConfig, oracleHsmIdentity.identityName!)
+    const identity = await createIdentityIdempotent(this.clusterConfig, this.azureHsmIdentityName(oracleHsmIdentity))
     // We want to grant the identity for the cluster permission to manage the oracle identity.
     // Get the correct object ID depending on the cluster configuration, either
     // the service principal or the managed service identity.
@@ -106,11 +112,13 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   /**
    * Deletes the key vault policy and the oracle's managed identity
    */
-  async deleteOracleAzureIdentity(
+  async deleteAzureHsmIdentity(
     oracleHsmIdentity: AksHsmOracleIdentity
   ) {
+    const identityName = this.azureHsmIdentityName(oracleHsmIdentity)
+    console.log(`Deleting Azure identity ${identityName}`)
     await this.deleteOracleKeyVaultPolicy(oracleHsmIdentity)
-    return deleteIdentity(this.clusterConfig, oracleHsmIdentity.identityName)
+    return deleteIdentity(this.clusterConfig, identityName)
   }
 
   /**
@@ -120,17 +128,25 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   async deleteOracleKeyVaultPolicy(
     oracleHsmIdentity: AksHsmOracleIdentity
   ) {
-    const azureIdentity = await getIdentity(this.clusterConfig, oracleHsmIdentity.identityName)
+    const azureIdentity = await getIdentity(this.clusterConfig, this.azureHsmIdentityName(oracleHsmIdentity))
     return execCmdWithExitOnFailure(
       `az keyvault delete-policy --name ${oracleHsmIdentity.keyVaultName} --object-id ${azureIdentity.principalId} -g ${this.clusterConfig.resourceGroup}`
     )
+  }
+
+  /**
+   * @return the intended name of an azure identity
+   */
+  azureHsmIdentityName(identity: AksHsmOracleIdentity) {
+    // Max length from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
+    return `${identity.keyVaultName}-${identity.address}`.substring(0, 128)
   }
 
   get deploymentConfig(): AksHsmOracleDeploymentConfig {
     return this._deploymentConfig as AksHsmOracleDeploymentConfig
   }
 
-  get clusterConfig(): AKSClusterConfig {
+  get clusterConfig(): AksClusterConfig {
     return this.deploymentConfig.clusterConfig
   }
 }

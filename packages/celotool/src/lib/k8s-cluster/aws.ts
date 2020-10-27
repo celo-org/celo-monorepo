@@ -9,7 +9,7 @@ export interface AwsClusterConfig extends BaseClusterConfig {
   resourceGroupTag: string
 }
 
-export class AWSClusterManager extends BaseClusterManager {
+export class AwsClusterManager extends BaseClusterManager {
   async switchToSubscription() {
     // TODO: not supported at the moment
   }

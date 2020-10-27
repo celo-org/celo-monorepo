@@ -16,7 +16,7 @@ kubectl:
     tag: 1.17.4
 
 kube:
-  foo: bar
+  cloudProvider: azure
 
 oracle:
   replicas: 2

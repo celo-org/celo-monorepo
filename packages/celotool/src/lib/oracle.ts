@@ -2,7 +2,7 @@ import { ensureLeading0x } from '@celo/utils/src/address'
 import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
 import { getCloudProviderFromContext, getContextDynamicEnvVarValues } from './context-utils'
 import { AccountType, getPrivateKeysFor, privateKeyToAddress } from './generate_utils'
-import { AKSClusterConfig } from './k8s-cluster/aks'
+import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 import { BaseClusterManager, CloudProvider } from './k8s-cluster/base'
 import { AksHsmOracleDeployer, AksHsmOracleDeploymentConfig, AksHsmOracleIdentity } from './k8s-oracle/aks-hsm'
@@ -65,7 +65,7 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
   const identities = getAksHsmOracleIdentities(addressKeyVaults)
   const deploymentConfig: AksHsmOracleDeploymentConfig = {
     context,
-    clusterConfig: clusterManager.clusterConfig as AKSClusterConfig,
+    clusterConfig: clusterManager.clusterConfig as AksClusterConfig,
     identities,
     useForno,
   }
@@ -91,21 +91,11 @@ export function getAksHsmOracleIdentities(addressAzureKeyVaults: string): AksHsm
     }
     identities.push({
       address,
-      identityName: getOracleAzureIdentityName(keyVaultName, address),
       keyVaultName,
       resourceGroup
     })
   }
   return identities
-}
-
-/**
- * @return the intended name of an azure identity given a key vault name and address
- */
-function getOracleAzureIdentityName(keyVaultName: string, address: string) {
-  // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
-  const maxIdentityNameLength = 128
-  return `${keyVaultName}-${address}`.substring(0, maxIdentityNameLength)
 }
 
 /**
