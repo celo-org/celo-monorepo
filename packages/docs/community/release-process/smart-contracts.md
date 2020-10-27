@@ -64,7 +64,7 @@ NETWORK=${"baklava"|"alfajores"|"mainnet"}
 RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
 # A -r boolean flag should be provided if this is the first release (before linked libraries were proxied)
-yarn verify-deployed -n $NETWORK -b $RELEASE -r -f
+yarn verify-deployed -n $NETWORK -b $RELEASE -f
 ```
 
 ### Check Backward Compatibility
