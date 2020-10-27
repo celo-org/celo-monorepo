@@ -1,4 +1,4 @@
-import { AppState, Linking } from 'react-native'
+import { AppState } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import {
   call,
@@ -17,7 +17,6 @@ import {
   appLock,
   minAppVersionDetermined,
   OpenDeepLink,
-  openDeepLink,
   OpenUrlAction,
   SetAppState,
   setAppState,
