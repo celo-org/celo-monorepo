@@ -46,14 +46,6 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   }
 
   /**
-   * Adds the account via the private key. Needs to be implemented by subclass, otherwise throws error
-   * @param privateKey The private key for the account to be added
-   */
-  addAccount(_privateKey: string) {
-    throw new Error('addAccount is not supported for this wallet')
-  }
-
-  /**
    * Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
    * @param address The address of the account to be removed
    */

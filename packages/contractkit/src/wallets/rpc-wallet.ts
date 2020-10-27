@@ -36,7 +36,6 @@ export class RpcWallet extends RemoteWallet<RpcSigner> implements UnlockableWall
     return addressToSigner
   }
 
-  // @ts-ignore
   async addAccount(privateKey: string, passphrase: string): Promise<string> {
     const address = normalizeAddressWith0x(privateKeyToAddress(ensureLeading0x(privateKey)))
     if (this.hasAccount(address)) {
