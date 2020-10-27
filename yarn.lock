@@ -2832,6 +2832,25 @@
     express "^4.17.1"
     web3 "1.2.4"
 
+"@celo/phone-number-privacy-common@1.0.12":
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.12.tgz#43cc1c02bb69b9e31ca389d0ed9783ceedf2fc0d"
+  integrity sha512-3uimofE7TBTY7Yw0e15KuSaS2xHzleL2HMwxYWX9pnuRPL/oaZ+RIkZAOuTLXMU245R7jXwoUoxiLuzfXtcugg==
+  dependencies:
+    "@celo/contractkit" "0.4.16"
+    "@celo/utils" "0.1.21"
+    "@types/btoa" "^1.2.3"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "6.5.3"
+    express "^4.17.1"
+    web3 "1.2.4"
+
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#b88e502fcd5bab2b6b9a22f59829c3eb40e27780"
@@ -11289,7 +11308,7 @@ btoa-lite@^1.0.0:
   resolved "https://registry.yarnpkg.com/btoa-lite/-/btoa-lite-1.0.0.tgz#337766da15801210fdd956c22e9c6891ab9d0337"
   integrity sha1-M3dm2hWAEhD92VbCLpxokaudAzc=
 
-btoa@^1.2.1:
+btoa@1.2.1, btoa@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/btoa/-/btoa-1.2.1.tgz#01a9909f8b2c93f6bf680ba26131eb30f7fa3d73"
   integrity sha512-SB4/MIGlsiVkMcHmT+pSmIPoNDoHg+7cMzmt3Uxt628MTz2487DKSqK/fuhFBrkuqrYv5UCEnACpF4dTFNKc/g==
