@@ -1,4 +1,4 @@
-import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@celo/base'
+import { Address, normalizeAddressWith0x, serializeSignature, Signature, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import {
@@ -229,9 +229,8 @@ export class KomenciKit {
   }
 
   /**
-   * selectIssuers: just wraps the `submitMetaTransaction` action in order
+   * selectIssuers: wraps the `submitMetaTransaction` action in order
    * to execute Attestations.selectIssuers(identifier)
-   * TODO: I'm not sure if we need this. Valora can call submitMetaTransaction
    *
    * @param identifier - the phone number identifier
    * @param walletAddress - MetaTransactionWallet address requesting attestations
@@ -246,9 +245,8 @@ export class KomenciKit {
   }
 
   /**
-   * completeAttestation: just wraps the `submitMetaTransaction` action in order
+   * completeAttestation: wraps the `submitMetaTransaction` action in order
    * to execute Attestations.complete(identifier, walletAddress, issuer, code)
-   * TODO: I'm not sure if we need this. Valora can call submitMetaTransaction
    *
    * @param identifier - the phone number identifier
    * @param walletAddress - MetaTransactionWallet address requesting attestations
@@ -265,6 +263,28 @@ export class KomenciKit {
     return this.submitMetaTransaction(
       walletAddress,
       await attestations.complete(identifier, walletAddress, issuer, code)
+    )
+  }
+
+  /**
+   * setAccount: wraps the `submitMetaTransaction` action in order
+   * to execute Account.setAccount(...)
+   *
+   * @param name A string to set as the name of the account
+   * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
+   * @param walletAddress The wallet address to set for the account
+   * @param proofOfPossession Signature from the wallet address key over the sender's address
+   */
+  public async setAccount(
+    name: string,
+    dataEncryptionKey: string,
+    walletAddress: Address,
+    proofOfPossession: Signature | null = null
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+    const accounts = await this.contractKit.contracts.getAccounts()
+    return this.submitMetaTransaction(
+      walletAddress,
+      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession).txo
     )
   }
 

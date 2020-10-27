@@ -7,9 +7,10 @@ The main actions that KomenciKit exposes are:
 - startSession: Initiate a Komenci session with a solved captcha
 - deployWallet: deploy a MTW for Valora's EOA
 - requestAttestations: request attestations fee-lessly 
-- submitMetaTransaction: submit arbitrary meta transactions via Komenci
-- selectIssuers: wrapper for selectIssuers as meta-tx
-- completeAttestation: wrapper for complete attestations as meta-tx
+- selectIssuers: wrapper for Attestation.selectIssuers as meta-tx
+- completeAttestation: wrapper for Attestations.complete as a meta-tax
+- setAccount: wrapper for Accounts.setAccount as a meta-tx
+- submitMetaTransaction: submit arbitrary allowed meta transactions via Komenci
 
 ## User Guide
 
