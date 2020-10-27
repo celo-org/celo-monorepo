@@ -23,6 +23,9 @@ Bug Fixes
 - Uses the most up-to-date version of @celo/contractkit (0.4.17) & fixes backward compatibility issues from the last release
 - Actually call toString in oracle report CLI - [#5594](https://github.com/celo-org/celo-monorepo/pull/5594)
 
+Other Changes
+- Support the use of scientific notation for the deposit of a governance proposal - [#5326](https://github.com/celo-org/celo-monorepo/pull/5326)
+
 ### **[0.0.59]** -- 2020-10-23
 Features
 - Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - [#5111](https://github.com/celo-org/celo-monorepo/pull/5111)
