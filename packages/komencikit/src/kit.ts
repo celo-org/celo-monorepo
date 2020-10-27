@@ -1,11 +1,10 @@
-import { Address, normalizeAddressWith0x, sleep } from '@celo/base'
+import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import {
   MetaTransactionWalletWrapper,
   toRawTransaction,
 } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
-import { hashMessage } from '@celo/utils/lib/signatureUtils'
 import { TransactionReceipt } from 'web3-core'
 import {
   deployWallet,
@@ -30,6 +29,7 @@ import {
   TxRevertError,
   TxTimeoutError,
 } from './errors'
+import { buildLoginTypedData } from './login'
 import { retry } from './retry'
 import { verifyWallet } from './verifyWallet'
 
@@ -80,7 +80,7 @@ export class KomenciKit {
   startSession = async (
     captchaToken: string
   ): Promise<Result<string, FetchError | AuthenticationFailed | LoginSignatureError>> => {
-    const signatureResp = await this.getLoginSignature()
+    const signatureResp = await this.getLoginSignature(captchaToken)
     if (!signatureResp.ok) {
       return signatureResp
     }
@@ -347,24 +347,21 @@ export class KomenciKit {
   /**
    * Used to create a signature for a login message that allows the server to verify that the
    * externalAccount passed in is actually owned by the caller.
+   * It uses the captchaToken as a nonce
    *
-   * TODO: In order to increase security and prevent replay attacks we should introduce a nonce
-   * Flow would be:
-   * 1. KomenciKit asks for a nonce from Komenci
-   * 2. Komenci saves the nonce in state, associated with the external account requesting it
-   * 3. KomenciKit signs a message containing the nonce and uses it to call startSession
-   *
-   * @param externalAccount
+   * @param captchaToken
    * @returns the signature of the login message
    * @private
    */
-  private async getLoginSignature(): Promise<Result<string, LoginSignatureError>> {
+  private async getLoginSignature(
+    captchaToken: string
+  ): Promise<Result<string, LoginSignatureError>> {
     try {
-      const signature = await this.contractKit.web3.eth.sign(
-        hashMessage(`komenci:login:${this.externalAccount}`),
-        this.externalAccount
-      )
-      return Ok(signature)
+      const loginStruct = buildLoginTypedData(this.externalAccount, captchaToken)
+
+      const signature = await this.contractKit.signTypedData(this.externalAccount, loginStruct)
+
+      return Ok(serializeSignature(signature))
     } catch (e) {
       return Err(new LoginSignatureError(e))
     }

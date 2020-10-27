@@ -3,10 +3,14 @@ import { Err, Ok } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
 import Web3 from 'web3'
 import { ActionTypes } from './actions'
-import { AuthenticationFailed, ServiceUnavailable, Unauthorised } from './errors'
+import { AuthenticationFailed, KomenciErrorTypes, ServiceUnavailable, Unauthorised } from './errors'
 import { KomenciKit, KomenciOptionsInput } from './kit'
 
 jest.mock('@celo/contractkit')
+jest.mock('./verifyWallet', () => ({
+  verifyWallet: () => Promise.resolve(Ok(true)),
+}))
+
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
 // @ts-ignore
@@ -42,7 +46,7 @@ describe('KomenciKit', () => {
 
   describe('startSession', () => {
     beforeEach(() => {
-      jest.spyOn(contractKit.web3.eth, 'sign').mockResolvedValue(`${account}:signature`)
+      jest.spyOn(contractKit, 'signTypedData').mockResolvedValue({ v: 0, r: '0x0', s: '0x0' })
     })
 
     it('constructs the payload and calls exec', async () => {
@@ -50,7 +54,7 @@ describe('KomenciKit', () => {
       const execSpy = jest
         .spyOn((kit as any).client, 'exec')
         .mockResolvedValue(Err(new Unauthorised()))
-      await kit.startSession('captcha-token')
+      const resp = await kit.startSession('captcha-token')
       expect(execSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
@@ -58,10 +62,15 @@ describe('KomenciKit', () => {
           payload: {
             captchaResponseToken: 'captcha-token',
             externalAccount: normalizeAddressWith0x(account),
-            signature: `${account}:signature`,
+            signature: `0x000`,
           },
         })
       )
+
+      expect(resp.ok).toBe(false)
+      if (resp.ok === false) {
+        expect(resp.error.errorType).toBe(KomenciErrorTypes.AuthenticationFailed)
+      }
     })
 
     describe('when the authentication fails', () => {
