@@ -661,6 +661,40 @@ EXAMPLES
 
 _See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
 
+### Register-data-encryption-key
+
+Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments
+
+```
+USAGE
+  $ celocli account:register-data-encryption-key
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set the data encryption key for
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --publicKey=publicKey                              (required) The public key you want to register
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  register-data-encryption-key --publicKey 0x...  --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+```
+
+_See code: [packages/cli/src/commands/account/register-data-encryption-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-data-encryption-key.ts)_
+
 ### Register-metadata
 
 Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
