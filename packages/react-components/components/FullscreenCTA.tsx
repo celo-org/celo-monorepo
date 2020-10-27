@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
@@ -38,6 +39,7 @@ class FullscreenCTA extends React.PureComponent<Props> {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: Colors.light,
     height: variables.height,
     width: variables.width,
     flex: 1,

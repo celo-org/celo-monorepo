@@ -26,35 +26,37 @@ interface VerificationContext {
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
-
-  // TODO: remove this after first smart contracts release
-  isBeforeRelease1: boolean
 }
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
-const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
+const isProxyRepointTransaction = (tx: ProposalTx) =>
+  tx.contract.endsWith('Proxy') &&
+  (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
+
+const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
+  tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
-  context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
+  context.proposal.some((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract))
 
 const getProposedImplementationAddress = (contract: string, context: VerificationContext) =>
-  context.proposal.find((tx: ProposalTx) => isProxyRepointTransaction(tx, contract)).args[0]
+  context.proposal.find((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract)).args[0]
 
 // Checks if the given transaction is a repointing of the Registry entry for the
 // given registryId.
-const isRegistryRepointTransaction = (tx: ProposalTx, registryId: string) =>
-  tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
+const isRegistryRepointTransaction = (tx: ProposalTx) =>
+  tx.contract === `Registry` && tx.function === 'setAddressFor'
+
+const isRegistryRepointForIdTransaction = (tx: ProposalTx, registryId: string) =>
+  isRegistryRepointTransaction(tx) && tx.args[0] === registryId
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, registryId))
+  return context.proposal.some((tx) => isRegistryRepointForIdTransaction(tx, contract))
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, registryId))
+  const relevantTx = context.proposal.find((tx) => isRegistryRepointForIdTransaction(tx, contract))
   return relevantTx.args[1]
 }
 
@@ -76,19 +78,14 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     return getProposedImplementationAddress(contract, context)
   }
 
-  let proxyAddress: string
   if (isLibrary(contract, context)) {
-    proxyAddress = context.libraryAddresses.addresses[contract]
-    // Before the first contracts upgrade libraries are not proxied.
-    if (context.isBeforeRelease1) {
-      return proxyAddress
-    }
-  } else {
-    // contract is registered but we need to check if the proxy is affected by the proposal
-    proxyAddress = isProxyChanged(contract, context)
-      ? getProposedProxyAddress(contract, context)
-      : await context.registry.getAddressForString(contract)
+    return `0x${context.libraryAddresses.addresses[contract]}`
   }
+
+  // contract is registered but we need to check if the proxy is affected by the proposal
+  const proxyAddress = isProxyChanged(contract, context)
+    ? getProposedProxyAddress(contract, context)
+    : await context.registry.getAddressForString(contract)
 
   // at() returns a promise despite Typescript labelling the await as extraneous
   const proxy: ProxyInstance = await context.Proxy.at(
@@ -124,6 +121,13 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+  } else {
+    // tslint:disable-next-line: no-console
+    console.log(
+      `${
+        isLibrary(contract, context) ? 'Library' : 'Contract'
+      } deployed at ${implementationAddress} matches ${contract}`
+    )
   }
 
   // push unvisited libraries to DFS queue
@@ -143,9 +147,15 @@ export const verifyBytecodes = async (
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
-  web3: Web3,
-  isBeforeRelease1: boolean = false
+  web3: Web3
 ) => {
+  const invalidTransactions = proposal.filter(
+    (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
+  )
+  if (invalidTransactions.length > 0) {
+    throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
+  }
+
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
 
@@ -156,7 +166,6 @@ export const verifyBytecodes = async (
     proposal,
     Proxy,
     web3,
-    isBeforeRelease1,
   }
 
   while (queue.length > 0) {

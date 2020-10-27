@@ -25,6 +25,8 @@ export enum Actions {
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
   SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
+  MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
 }
 
 export interface SetAppState {
@@ -87,6 +89,16 @@ export interface SetSessionId {
   sessionId: string
 }
 
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+}
+
+interface MinAppVersionDeterminedAction {
+  type: Actions.MIN_APP_VERSION_DETERMINED
+  minVersion: string | null
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -101,6 +113,8 @@ export type ActionTypes =
   | Lock
   | Unlock
   | SetSessionId
+  | OpenUrlAction
+  | MinAppVersionDeterminedAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -168,4 +182,16 @@ export const appUnlock = (): Unlock => ({
 export const setSessionId = (sessionId: string) => ({
   type: Actions.SET_SESSION_ID,
   sessionId,
+})
+
+export const openUrl = (url: string): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
+})
+
+export const minAppVersionDetermined = (
+  minVersion: string | null
+): MinAppVersionDeterminedAction => ({
+  type: Actions.MIN_APP_VERSION_DETERMINED,
+  minVersion,
 })

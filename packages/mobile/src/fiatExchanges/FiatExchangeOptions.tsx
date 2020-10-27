@@ -17,7 +17,7 @@ import Dialog from 'src/components/Dialog'
 import { MOONPAY_RATE_API } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import i18n from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import QuestionIcon from 'src/icons/QuestionIcon'
 import { moonpayLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -144,7 +144,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   }
 
   const { isAddFunds } = route.params
-  const { t } = useTranslation('fiatExchangeFlow')
+  const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>

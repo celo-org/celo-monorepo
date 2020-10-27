@@ -8,6 +8,7 @@ import { Artifact } from '@celo/protocol/lib/compatibility/internal'
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
 import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
+import { NULL_ADDRESS } from '@celo/utils/lib/address'
 import { assert } from 'chai'
 import { RegistryInstance } from 'types'
 
@@ -108,10 +109,10 @@ contract('', (accounts) => {
     beforeEach(async () => {
       registry = await Registry.new()
 
-      library1 = await deployProxiedContract(LinkedLibrary1, accounts[0])
-      library3 = await deployProxiedContract(LinkedLibrary3, accounts[0])
+      library1 = await LinkedLibrary1.new({ from: accounts[0] })
+      library3 = await LinkedLibrary3.new({ from: accounts[0] })
       LinkedLibrary2.link('LinkedLibrary3', library3.address)
-      library2 = await deployProxiedContract(LinkedLibrary2, accounts[0])
+      library2 = await LinkedLibrary2.new({ from: accounts[0] })
 
       TestContract.link('LinkedLibrary1', library1.address)
       TestContract.link('LinkedLibrary2', library2.address)
@@ -152,14 +153,18 @@ contract('', (accounts) => {
         )
         beforeEach(async () => {
           library3 = await LinkedLibrary3Upgraded.new({ from: accounts[0] })
+          LinkedLibrary2.link('LinkedLibrary3', library3.address)
+          library2 = await LinkedLibrary2.new({ from: accounts[0] })
+          TestContract.link('LinkedLibrary2', library2.address)
+          testContract = await TestContract.new({ from: accounts[0] })
         })
 
         it(`doesn't throw on matching contracts`, async () => {
           const proposal = [
             {
-              contract: 'LinkedLibrary3Proxy',
+              contract: 'TestContractProxy',
               function: '_setImplementation',
-              args: [library3.address],
+              args: [testContract.address],
               value: '0',
             },
           ]
@@ -178,9 +183,9 @@ contract('', (accounts) => {
         it(`throws on different contracts`, async () => {
           const proposal = [
             {
-              contract: 'LinkedLibrary3Proxy',
+              contract: 'TestContractProxy',
               function: '_setImplementation',
-              args: [library3.address],
+              args: [testContract.address],
               value: '0',
             },
           ]
@@ -193,7 +198,7 @@ contract('', (accounts) => {
         it(`throws when the proposed address is wrong`, async () => {
           const proposal = [
             {
-              contract: 'LinkedLibrary3Proxy',
+              contract: 'TestContractProxy',
               function: '_setImplementation',
               args: [accounts[1]],
               value: '0',
@@ -202,69 +207,6 @@ contract('', (accounts) => {
 
           await assertThrowsAsync(
             verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
-          )
-        })
-      })
-
-      describe(`when a proposal changes a library's proxy`, () => {
-        const LinkedLibrary3Upgraded = makeTruffleContract(
-          upgradedLibBuildArtifacts.getArtifactByName('LinkedLibrary3')
-        )
-        let newLibrary2Implementation
-        beforeEach(async () => {
-          library3 = await deployProxiedContract(LinkedLibrary3Upgraded, accounts[0])
-          LinkedLibrary2.link('LinkedLibrary3', library3.address)
-          newLibrary2Implementation = await LinkedLibrary2.new({ from: accounts[0] })
-        })
-
-        it(`doesn't throw on matching contracts`, async () => {
-          const proposal = [
-            {
-              contract: 'LinkedLibrary2Proxy',
-              function: '_setImplementation',
-              args: [newLibrary2Implementation.address],
-              value: '0',
-            },
-          ]
-
-          await verifyBytecodes(
-            ['TestContract'],
-            upgradedLibBuildArtifacts,
-            registry,
-            proposal,
-            Proxy,
-            web3
-          )
-          assert(true)
-        })
-
-        it(`throws on different contracts`, async () => {
-          const proposal = [
-            {
-              contract: 'LinkedLibrary2Proxy',
-              function: '_setImplementation',
-              args: [newLibrary2Implementation.address],
-              value: '0',
-            },
-          ]
-
-          await assertThrowsAsync(
-            verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
-          )
-        })
-
-        it(`throws when dependent contract wasn't repointed`, async () => {
-          const proposal = []
-
-          await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              upgradedLibBuildArtifacts,
-              registry,
-              proposal,
-              Proxy,
-              web3
-            )
           )
         })
       })
@@ -361,10 +303,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                testContract.address,
-              ],
+              args: ['TestContract', testContract.address],
               value: '0',
             },
           ]
@@ -385,10 +324,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                testContract.address,
-              ],
+              args: ['TestContract', testContract.address],
               value: '0',
             },
           ]
@@ -403,10 +339,7 @@ contract('', (accounts) => {
             {
               contract: 'Registry',
               function: 'setAddressFor',
-              args: [
-                web3.utils.soliditySha3({ type: 'string', value: 'TestContract' }),
-                accounts[0],
-              ],
+              args: ['TestContract', accounts[0]],
               value: '0',
             },
           ]
@@ -430,6 +363,28 @@ contract('', (accounts) => {
             )
           )
         })
+      })
+
+      it('throws when a proposal does not only proxy or registry repointing', async () => {
+        const proposal = [
+          {
+            contract: 'GoldToken',
+            function: 'transfer',
+            args: [NULL_ADDRESS, '100000000'],
+            value: '0',
+          },
+        ]
+
+        await assertThrowsAsync(
+          verifyBytecodes(
+            ['TestContract'],
+            upgradedContractBuildArtifacts,
+            registry,
+            proposal,
+            Proxy,
+            web3
+          )
+        )
       })
     })
   })

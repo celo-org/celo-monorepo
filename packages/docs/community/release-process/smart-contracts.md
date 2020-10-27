@@ -32,10 +32,10 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 
 #### When a new release branch is cut:
 1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
-2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`. 
+2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`.
 3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
 4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.pre-audit` so that all future changes to master are versioned against the new release.
-5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`. 
+5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`.
 
 #### During the release proposal stage:
 1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
@@ -50,8 +50,8 @@ Github branches/tags and Github releases are used to coordinate past and ongoing
 
 There are several scripts provided (under `packages/protocol` in [celo-org/celo-monorepo](https://github.com/celo-org/celo-monorepo) and via [celocli](../../command-line-interface/introduction.md)) for use in the release process and with contract upgrade governance proposals to give participating stakeholders increased confidence.
 
-{% hint style="warning" %}​ 
-For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup. 
+{% hint style="warning" %}​
+For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup.
 {% endhint %}
 
 Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
@@ -125,6 +125,16 @@ NETWORK=${"baklava"|"alfajores"|"mainnet"}
 yarn verify-release -p "upgrade_proposal.json" -b $RELEASE -n $NETWORK -f
 ```
 
+### Verify Executed Release
+
+After a release executes via Governance, you can verify that the resulting network state reflects the tagged release candidate
+
+```bash
+RELEASE="celo-core-contracts-v${N}.rc${X}"
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+yarn verify-deployed -n $NETWORK -b $RELEASE -f
+```
+
 ## Testing
 
 All releases should be evaluated according to the following tests.
@@ -132,6 +142,46 @@ All releases should be evaluated according to the following tests.
 ### Unit tests
 
 All changes since the last release should be covered by unit tests. Unit test coverage should be enforced by automated checks run on every commit.
+
+### Manual Checklist
+
+After a successful release execution on a testnet, the resulting network state should be spot-checked to ensure that no regressions have been caused by the release. Flows to test include:
+
+- Do a cUSD and CELO transfer
+    ```bash
+    celocli transfer:dollars --from <addr> --value <number> --to <addr>
+    celocli transfer:celo --from <addr> --value <number> --to <addr>
+    ```
+- Register a Celo account
+    ```bash
+    celocli account:register --from <addr> --name <test-name>
+    ```
+- Report an Oracle rate
+    ```bash
+    celocli oracle:report --from <addr> --value <num>
+    ```
+- Do a CP-DOTO exchange
+    ```bash
+    celocli exchange:celo --value <number> --from <addr>
+    celocli exchange:dollars --value <number> --from <addr>
+    ```
+- Complete a round of attestation
+- Redeem from Escrow
+- Register a Vaildator
+    ```bash
+    celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
+    ```
+- Vote for a Validator
+- Run a mock election
+    ```bash
+    celocli election:run
+    ```
+- Get a valildator slashed for downtime and ejected from the validator set
+- Propose a governance proposal and get it executed
+    ```bash
+    celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
+    ```
+
 
 ### Performance
 
