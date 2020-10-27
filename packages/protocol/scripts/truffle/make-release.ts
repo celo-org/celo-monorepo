@@ -156,6 +156,7 @@ module.exports = async (callback: (error?: any) => number) => {
 
         // 3. Deploy new versions of the contract, if needed.
         const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
+        const isLibrary = linkedLibraries[contractName]
         if (shouldDeployImplementation) {
           const contract = await deployImplementation(contractName, Contract, argv.dry_run)
           const setImplementationTx: ProposalTx = {
@@ -200,6 +201,9 @@ module.exports = async (callback: (error?: any) => number) => {
               proposal.push(setImplementationTx)
             }
           }
+        } else if (isLibrary) {
+          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          addresses.set(contractName, contract.address)
         }
         // 7. Mark the contract as released
         released.add(contractName)
