@@ -36,7 +36,6 @@ spec:
 {{ if .Values.oracle.metrics.enabled }}
 {{ include "metric-annotations" . | indent 8 }}
 {{ end }}
-        iam.amazonaws.com/role: arn:aws:iam::243983831780:role/trevor-oracledev-sign-test-ecc-keys
     spec:
 {{ if .Values.kube.serviceAccountSecretNames }}
       initContainers:
@@ -59,7 +58,6 @@ spec:
           CMD="annotate pod $POD_NAME 'iam.amazonaws.com/role=$ROLE_ARN'"
           {{ end }}
 
-          # TODO!!!! Add a condition here to label or annotate
           kubectl \
           --namespace "$POD_NAMESPACE" \
           --server="https://kubernetes.default.svc" \
@@ -67,12 +65,6 @@ spec:
           --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
           --overwrite=true \
           $CMD
-
-          # annotate pod "$POD_NAME" \
-          # "iam.amazonaws.com/role=$ROLE_ARN"
-
-          # label pod "$POD_NAME" \
-          # "aadpodidbinding=$POD_NAME-identity-binding"
         env:
         - name: POD_NAMESPACE
           valueFrom:

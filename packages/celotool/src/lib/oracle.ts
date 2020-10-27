@@ -62,10 +62,11 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
       addressKeyVaults: '',
     }
   )
-  const identities = getAksHsmOracleIdentities(addressKeyVaults)
+  const aksClusterConfig = clusterManager.clusterConfig as AksClusterConfig
+  const identities = getAksHsmOracleIdentities(addressKeyVaults, aksClusterConfig.resourceGroup)
   const deploymentConfig: AksHsmOracleDeploymentConfig = {
     context,
-    clusterConfig: clusterManager.clusterConfig as AksClusterConfig,
+    clusterConfig: aksClusterConfig,
     identities,
     useForno,
   }
@@ -78,7 +79,7 @@ function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boo
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1:resourceGroup1
  * returns an array of AksHsmOracleIdentity in the same order
  */
-export function getAksHsmOracleIdentities(addressAzureKeyVaults: string): AksHsmOracleIdentity[] {
+export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, defaultResourceGroup: string): AksHsmOracleIdentity[] {
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
@@ -92,7 +93,7 @@ export function getAksHsmOracleIdentities(addressAzureKeyVaults: string): AksHsm
     identities.push({
       address,
       keyVaultName,
-      resourceGroup
+      resourceGroup: resourceGroup || defaultResourceGroup
     })
   }
   return identities

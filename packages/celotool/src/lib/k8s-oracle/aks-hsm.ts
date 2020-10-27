@@ -9,9 +9,7 @@ import { RbacOracleDeployer } from './rbac'
  */
 export interface AksHsmOracleIdentity extends OracleIdentity {
   keyVaultName: string
-  // If a resource group is not specified, it is assumed to be the same
-  // as the kubernetes cluster resource group specified in the clusterConfig
-  resourceGroup?: string
+  resourceGroup: string
 }
 
 export interface AksHsmOracleDeploymentConfig extends BaseOracleDeploymentConfig {
@@ -92,9 +90,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
     azureIdentity: any
   ) {
     const keyPermissions = ['get', 'list', 'sign']
-    const keyVaultResourceGroup = oracleHsmIdentity.resourceGroup ?
-      oracleHsmIdentity.resourceGroup :
-      this.clusterConfig.resourceGroup
+    const keyVaultResourceGroup = oracleHsmIdentity.resourceGroup
     const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
       `az keyvault show --name ${oracleHsmIdentity.keyVaultName} -g ${keyVaultResourceGroup} --query "properties.accessPolicies[?objectId == '${azureIdentity.principalId}' && sort(permissions.keys) == [${keyPermissions.map(perm => `'${perm}'`).join(', ')}]]"`
     )

@@ -1,4 +1,4 @@
-import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
+import { getFornoUrl, getFornoWebSocketUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 
@@ -52,14 +52,14 @@ export abstract class BaseOracleDeployer {
     const httpRpcProviderUrl = this.deploymentConfig.useForno
       ? getFornoUrl(this.celoEnv)
       : getFullNodeHttpRpcInternalUrl(this.celoEnv)
-    // TODO: let forno support websockets
-    // @ts-ignore
-    const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(this.celoEnv)
+    const wsRpcProviderUrl = this.deploymentConfig.useForno
+      ? getFornoWebSocketUrl(this.celoEnv)
+      : getFullNodeWebSocketRpcInternalUrl(this.celoEnv)
     return [
       `--set environment.name=${this.celoEnv}`,
       `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-      // `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
+      // TODO change this & the corresponding oracle env var
       `--set oracle.azureHsm.initTryCount=5`,
       `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
       `--set oracle.replicas=${this.replicas}`,

@@ -1,17 +1,10 @@
-import { execCmd } from './cmd-utils'
+import { execCmd, execCmdAndParseJson } from './cmd-utils'
 import { AwsClusterConfig } from './k8s-cluster/aws'
 
 export async function getKeyArnFromAlias(alias: string, region: string) {
   const fullAliasName = `alias/${alias}`
-  const [output] = await execCmd(
-    `aws kms list-aliases --region ${region} --query 'Aliases[?AliasName == \`${fullAliasName}\`]' --output json`
-  )
-  const [parsed] = JSON.parse(output)
-  if (!parsed) {
-    throw Error(`Could not find key with alias ${alias} and region ${region}`)
-  }
   /**
-   * Expected output:
+   * Expected output example:
    * [
    *   {
    *     "AliasName": "alias/test-ecc-key",
@@ -20,16 +13,22 @@ export async function getKeyArnFromAlias(alias: string, region: string) {
    *   }
    * ]
    */
+  const [parsed] = await execCmdAndParseJson(
+    `aws kms list-aliases --region ${region} --query 'Aliases[?AliasName == \`${fullAliasName}\`]' --output json`
+  )
+  if (!parsed) {
+    throw Error(`Could not find key with alias ${alias} and region ${region}`)
+  }
   return parsed.AliasArn.replace(fullAliasName, `key/${parsed.TargetKeyId}`)
 }
 
-export async function deleteRole(roleName: string) {
+export function deleteRole(roleName: string) {
   return execCmd(
     `aws iam delete-role --role-name ${roleName}`
   )
 }
 
-export async function detachPolicyIdempotent(roleName: string, policyArn: string) {
+export function detachPolicyIdempotent(roleName: string, policyArn: string) {
   return execCmd(
     `aws iam detach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`
   )
@@ -43,7 +42,7 @@ export async function deletePolicy(policyArn: string) {
   const policyVersions = await getPolicyVersions(policyArn)
   await Promise.all(
     policyVersions
-      .filter((version: any) => !version.IsDefaultVersion)
+      .filter((version: any) => !version.IsDefaultVersion) // cannot delete the default version
       .map((version: any) => deletePolicyVersion(policyArn, version.VersionId))
   )
   return execCmd(
@@ -51,52 +50,48 @@ export async function deletePolicy(policyArn: string) {
   )
 }
 
-async function deletePolicyVersion(policyArn: string, versionId: string) {
+function deletePolicyVersion(policyArn: string, versionId: string) {
   return execCmd(
     `aws iam delete-policy-version --policy-arn ${policyArn} --version-id ${versionId}`
   )
 }
 
 async function getPolicyVersions(policyArn: string) {
-  const [output] = await execCmd(
+  return execCmdAndParseJson(
     `aws iam list-policy-versions --policy-arn ${policyArn} --query 'Versions' --output json`
   )
-  return JSON.parse(output)
 }
 
 export async function getPolicyArn(policyName: string) {
-  const [output] = await execCmd(
+  const [policy] = await execCmdAndParseJson(
     `aws iam list-policies --query 'Policies[?PolicyName == \`${policyName}\`]' --output json`
   )
-  const [policy] = JSON.parse(output)
   if (!policy) {
     return undefined
   }
   return policy.Arn
 }
 
+/**
+ * Given a cluster name, finds the NodeInstanceRole that's used by the nodes.
+ * There's no easy way to query this directly, so this command searches through
+ * roles and finds the correct one.
+ */
 export async function getEKSNodeInstanceGroupRoleArn(clusterName: string) {
-  // Looking for
-  /*
-            "Path": "/",
-            "RoleName": "eksctl-adorable-monster-159725124-NodeInstanceRole-4VBXGB53SK1A",
-  */
-  const [existingRolesRaw] = await execCmd(
+  const existingRoles = await execCmdAndParseJson(
     `aws iam list-roles --query 'Roles' --output json`
   )
-  const existingRoles = JSON.parse(existingRolesRaw)
   const potentialRoles = existingRoles.filter((role: any) => {
     // The role name doesn't necessarily include the cluster name, but it will include
-    // NodeInstanceRole.
+    // 'NodeInstanceRole'.
     const re = new RegExp(`.+-NodeInstanceRole-.+`)
     return re.test(role.RoleName)
   })
   let roleArn: string | undefined
   for (const role of potentialRoles) {
-    const [clusterNameTagRaw] = await execCmd(
+    const [clusterNameTag] = await execCmdAndParseJson(
       `aws iam list-role-tags --role-name ${role.RoleName} --query 'Tags[?Key == \`alpha.eksctl.io/cluster-name\`]'`
     )
-    const [clusterNameTag] = JSON.parse(clusterNameTagRaw)
     if (clusterNameTag && clusterNameTag.Value === clusterName) {
       roleArn = role.Arn
       break
@@ -108,17 +103,16 @@ export async function getEKSNodeInstanceGroupRoleArn(clusterName: string) {
   return roleArn
 }
 
-export async function attachPolicyIdempotent(roleName: string, policyArn: string) {
+export function attachPolicyIdempotent(roleName: string, policyArn: string) {
   return execCmd(
     `aws iam attach-role-policy --role-name ${roleName} --policy-arn ${policyArn}`
   )
 }
 
 export async function createRoleIdempotent(roleName: string, policyDocumentJson: string) {
-  const [existingRaw] = await execCmd(
+  const [existing] = await execCmdAndParseJson(
     `aws iam list-roles --query 'Roles[?RoleName == \`${roleName}\`]' --output json`
   )
-  const [existing] = JSON.parse(existingRaw)
   if (existing) {
     console.info(`Role ${roleName} exists`)
     return existing.Arn
@@ -131,10 +125,9 @@ export async function createRoleIdempotent(roleName: string, policyDocumentJson:
 }
 
 export async function createPolicyIdempotent(policyName: string, policyDocumentJson: string) {
-  const [existingRaw] = await execCmd(
+  const [existing] = await execCmdAndParseJson(
     `aws iam list-policies --query 'Policies[?PolicyName == \`${policyName}\`]' --output json`
   )
-  const [existing] = JSON.parse(existingRaw)
   if (existing) {
     console.info(`Policy ${policyName} exists`)
     return existing.Arn
@@ -150,18 +143,17 @@ export async function createPolicyIdempotent(policyName: string, policyDocumentJ
  * A cluster will have a security group that applies to all nodes (ie VMs) in the cluster.
  * This returns a description of that security group.
  */
-export async function getClusterSharedNodeSecurityGroup(clusterConfig: AwsClusterConfig) {
-  const [output] = await execCmd(
+export function getClusterSharedNodeSecurityGroup(clusterConfig: AwsClusterConfig) {
+  return execCmdAndParseJson(
     `aws ec2 describe-security-groups --filters "Name=tag:aws:cloudformation:logical-id,Values=ClusterSharedNodeSecurityGroup" "Name=tag:eksctl.cluster.k8s.io/v1alpha1/cluster-name,Values=${clusterConfig.clusterName}" --query "SecurityGroups[0]" --output json`
   )
-  return JSON.parse(output)
 }
 
 /**
  * For a given security group, authorizes ingress traffic on a provided port
  * for a given protocol and CIDR range.
  */
-export async function authorizeSecurityGroupIngress(groupID: string, port: number, protocol: string, cidrRange: string) {
+export function authorizeSecurityGroupIngress(groupID: string, port: number, protocol: string, cidrRange: string) {
   return execCmd(
     `aws ec2 authorize-security-group-ingress --group-id ${groupID} --ip-permissions IpProtocol=${protocol},FromPort=${port},ToPort=${port},IpRanges='[{CidrIp=${cidrRange}}]'`
   )
@@ -171,7 +163,7 @@ export async function authorizeSecurityGroupIngress(groupID: string, port: numbe
  * For a given security group, revokes authorized ingress traffic on a provided port
  * for a given protocol and CIDR range.
  */
-export async function revokeSecurityGroupIngress(groupID: string, port: number, protocol: string, cidrRange: string) {
+export function revokeSecurityGroupIngress(groupID: string, port: number, protocol: string, cidrRange: string) {
   return execCmd(
     `aws ec2 revoke-security-group-ingress --group-id ${groupID} --ip-permissions IpProtocol=${protocol},FromPort=${port},ToPort=${port},IpRanges='[{CidrIp=${cidrRange}}]'`
   )
