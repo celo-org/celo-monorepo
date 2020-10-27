@@ -108,6 +108,9 @@ export const AttestationRequestType = t.type({
   // io-ts way of defining optional key-value pair
   salt: t.union([t.undefined, SaltType]),
   smsRetrieverAppSig: t.union([t.undefined, t.string]),
+  // if specified, the message sent will be short random number prefixed by this string
+  securityCodePrefix: t.union([t.undefined, t.string]),
+  language: t.union([t.undefined, t.string]),
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
@@ -118,6 +121,8 @@ export const GetAttestationRequestType = t.type({
   issuer: AddressType,
   // io-ts way of defining optional key-value pair
   salt: t.union([t.undefined, SaltType]),
+  // if the value supplied matches the stored security code, the response will include the complete message
+  securityCode: t.union([t.undefined, t.string]),
 })
 
 export type GetAttestationRequest = t.TypeOf<typeof GetAttestationRequestType>
@@ -149,6 +154,9 @@ export const AttestationResponseType = t.type({
   // Only used by test endpoint to return randomly generated salt.
   // Never return a user-supplied salt.
   salt: t.union([t.undefined, t.string]),
+
+  // only returned if the request supplied the correct security code
+  attestationCode: t.union([t.undefined, t.string]),
 })
 
 export type AttestationResponse = t.TypeOf<typeof AttestationResponseType>
