@@ -61,10 +61,9 @@ Using these tools, a contract release candidate can be built, deployed, and prop
 Use the following script to compile contracts at a release tag and verify that the deployed network bytecode matches the compiled bytecode.
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
+PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
-# A -r boolean flag should be provided if this is the first release (before linked libraries were proxied)
-yarn verify-deployed -n $NETWORK -b $RELEASE -f
+yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
 ```
 
 ### Check Backward Compatibility
@@ -91,8 +90,8 @@ STORAGE updates are adopted by deploying a new proxy/implementation pair. These 
 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-RELEASE="celo-core-contracts-v${N}.rc${X}"
-yarn make-release -b $RELEASE -n $NETWORK -r "report.json" -i "initialize_data.json" -p "proposal.json"
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "initialize_data.json" -p "proposal.json"
 ```
 
 The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
@@ -111,7 +110,7 @@ celocli governance:propose <...> --jsonTransactions "proposal.json"
 Fetch the upgrade proposal and output the JSON encoded proposal contents.
 
 ```bash
-celocli governance:show <...> --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
+celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
 ```
 
 ### Verify Proposed Release
@@ -119,10 +118,10 @@ celocli governance:show <...> --proposalID <proposalId> --jsonTransactions "upgr
 Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly.
 
 ```bash
-RELEASE="celo-core-contracts-v${N}.rc${X}"
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
-yarn verify-release -p "upgrade_proposal.json" -b $RELEASE -n $NETWORK -f
+yarn verify-release -p "upgrade_proposal.json" -b $RELEASE_CANDIDATE -n $NETWORK -f
 ```
 
 ### Verify Executed Release
