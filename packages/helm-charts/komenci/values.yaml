@@ -20,18 +20,18 @@ relayer:
     ws: wss://alfajoresstaging-forno.celo-testnet.org
     http: https://alfajoresstaging-forno.celo-testnet.org
   identities:
-  - address: 0x0000000000000000000000000000000000000000
+  - address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
     privateKey: 0x000
     azure:
       id: defaultId
       clientId: defaultClientId
-      keyVaultName: defaultKeyVaultName
-  - address: 0x0000000000000000000000000000000000000001
+      keyVaultName: staging-komenci-eus
+  - address: 0xc6f0f9bfb1aed83620ece3eac0add98a65a8574e
     privateKey: 0x001
     azure:
       id: defaultId1
       clientId: defaultClientId1
-      keyVaultName: defaultKeyVaultName1
+      keyVaultName: staging-komenci-eus
   azureHsm:
     initTryCount: 5
     initMaxRetryBackoffMs: 30000
