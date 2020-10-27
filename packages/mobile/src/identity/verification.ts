@@ -324,6 +324,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           )
         }
       }
+      ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
       yield race({
@@ -343,7 +344,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       }
     }
 
-    ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
     yield put(setVerificationStatus(VerificationStatus.Done))
     yield put(setNumberVerified(true))
     return true
