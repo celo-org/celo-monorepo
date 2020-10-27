@@ -18,6 +18,7 @@ Contract for handling an instance of a ReleaseGold contract.
 
 * [_relockGold](_wrappers_releasegold_.releasegoldwrapper.md#_relockgold)
 * [createAccount](_wrappers_releasegold_.releasegoldwrapper.md#createaccount)
+* [eventTypes](_wrappers_releasegold_.releasegoldwrapper.md#eventtypes)
 * [events](_wrappers_releasegold_.releasegoldwrapper.md#events)
 * [getBeneficiary](_wrappers_releasegold_.releasegoldwrapper.md#getbeneficiary)
 * [getCanValidate](_wrappers_releasegold_.releasegoldwrapper.md#getcanvalidate)
@@ -35,6 +36,7 @@ Contract for handling an instance of a ReleaseGold contract.
 * [getTotalWithdrawn](_wrappers_releasegold_.releasegoldwrapper.md#gettotalwithdrawn)
 * [isRevoked](_wrappers_releasegold_.releasegoldwrapper.md#isrevoked)
 * [lockGold](_wrappers_releasegold_.releasegoldwrapper.md#lockgold)
+* [methodIds](_wrappers_releasegold_.releasegoldwrapper.md#methodids)
 * [setAccount](_wrappers_releasegold_.releasegoldwrapper.md#setaccount)
 * [setAccountDataEncryptionKey](_wrappers_releasegold_.releasegoldwrapper.md#setaccountdataencryptionkey)
 * [setAccountMetadataURL](_wrappers_releasegold_.releasegoldwrapper.md#setaccountmetadataurl)
@@ -142,9 +144,24 @@ Name | Type |
 
 ___
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *ReleaseGold["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -446,6 +463,28 @@ Locks gold to be used for voting.
 Name | Type |
 ------ | ------ |
 `value` | BigNumber.Value |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 

@@ -18,6 +18,7 @@ Contract for voting for validators and managing validator groups.
 
 * [affiliate](_wrappers_validators_.validatorswrapper.md#affiliate)
 * [deaffiliate](_wrappers_validators_.validatorswrapper.md#deaffiliate)
+* [eventTypes](_wrappers_validators_.validatorswrapper.md#eventtypes)
 * [events](_wrappers_validators_.validatorswrapper.md#events)
 * [forceDeaffiliateIfValidator](_wrappers_validators_.validatorswrapper.md#forcedeaffiliateifvalidator)
 * [getAccountLockedGoldRequirement](_wrappers_validators_.validatorswrapper.md#getaccountlockedgoldrequirement)
@@ -31,6 +32,7 @@ Contract for voting for validators and managing validator groups.
 * [getValidatorMembershipHistoryExtraData](_wrappers_validators_.validatorswrapper.md#getvalidatormembershiphistoryextradata)
 * [isValidator](_wrappers_validators_.validatorswrapper.md#isvalidator)
 * [isValidatorGroup](_wrappers_validators_.validatorswrapper.md#isvalidatorgroup)
+* [methodIds](_wrappers_validators_.validatorswrapper.md#methodids)
 * [registerValidator](_wrappers_validators_.validatorswrapper.md#registervalidator)
 * [removeMember](_wrappers_validators_.validatorswrapper.md#removemember)
 * [resetSlashingMultiplier](_wrappers_validators_.validatorswrapper.md#resetslashingmultiplier)
@@ -137,9 +139,24 @@ Name | Type |
 
 ___
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *Validators["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -439,6 +456,28 @@ Returns whether a particular account has a registered validator group.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 

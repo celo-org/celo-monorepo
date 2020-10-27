@@ -16,9 +16,11 @@ Contract handling slashing for Validator downtime using intervals.
 
 ### Properties
 
+* [eventTypes](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#eventtypes)
 * [events](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#events)
 * [getBitmapForInterval](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#getbitmapforinterval)
 * [isBitmapSetForInterval](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#isbitmapsetforinterval)
+* [methodIds](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#methodids)
 * [setBitmapForInterval](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#setbitmapforinterval)
 * [slashableDowntime](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#slashabledowntime)
 * [slashingIncentives](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#slashingincentives)
@@ -60,9 +62,24 @@ Name | Type |
 
 ## Properties
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *DowntimeSlasher["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -133,6 +150,28 @@ the specific interval.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 

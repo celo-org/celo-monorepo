@@ -17,11 +17,13 @@ Contract for voting for validators and managing validator groups.
 ### Properties
 
 * [electabilityThreshold](_wrappers_election_.electionwrapper.md#electabilitythreshold)
+* [eventTypes](_wrappers_election_.electionwrapper.md#eventtypes)
 * [events](_wrappers_election_.electionwrapper.md#events)
 * [getCurrentValidatorSigners](_wrappers_election_.electionwrapper.md#getcurrentvalidatorsigners)
 * [getGroupsVotedForByAccount](_wrappers_election_.electionwrapper.md#getgroupsvotedforbyaccount)
 * [getTotalVotes](_wrappers_election_.electionwrapper.md#gettotalvotes)
 * [getTotalVotesForGroupByAccount](_wrappers_election_.electionwrapper.md#gettotalvotesforgroupbyaccount)
+* [methodIds](_wrappers_election_.electionwrapper.md#methodids)
 * [numberValidatorsInCurrentSet](_wrappers_election_.electionwrapper.md#numbervalidatorsincurrentset)
 * [numberValidatorsInSet](_wrappers_election_.electionwrapper.md#numbervalidatorsinset)
 * [validatorSignerAddressFromCurrentSet](_wrappers_election_.electionwrapper.md#validatorsigneraddressfromcurrentset)
@@ -105,9 +107,24 @@ Name | Type |
 
 ___
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *Election["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -208,6 +225,28 @@ Returns the total votes for `group` made by `account`.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 

@@ -16,12 +16,14 @@ Contract for handling multisig actions
 
 ### Properties
 
+* [eventTypes](_wrappers_multisig_.multisigwrapper.md#eventtypes)
 * [events](_wrappers_multisig_.multisigwrapper.md#events)
 * [getInternalRequired](_wrappers_multisig_.multisigwrapper.md#getinternalrequired)
 * [getOwners](_wrappers_multisig_.multisigwrapper.md#getowners)
 * [getRequired](_wrappers_multisig_.multisigwrapper.md#getrequired)
 * [getTransactionCount](_wrappers_multisig_.multisigwrapper.md#gettransactioncount)
 * [isowner](_wrappers_multisig_.multisigwrapper.md#isowner)
+* [methodIds](_wrappers_multisig_.multisigwrapper.md#methodids)
 * [replaceOwner](_wrappers_multisig_.multisigwrapper.md#replaceowner)
 
 ### Accessors
@@ -56,9 +58,24 @@ Name | Type |
 
 ## Properties
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *MultiSig["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -157,6 +174,28 @@ ___
 Name | Type |
 ------ | ------ |
 `owner` | [Address](../modules/_base_.md#address) |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 

@@ -20,6 +20,7 @@ Contract managing voting for governance proposals.
 * [concurrentProposals](_wrappers_governance_.governancewrapper.md#concurrentproposals)
 * [dequeueFrequency](_wrappers_governance_.governancewrapper.md#dequeuefrequency)
 * [dequeueProposalsIfReady](_wrappers_governance_.governancewrapper.md#dequeueproposalsifready)
+* [eventTypes](_wrappers_governance_.governancewrapper.md#eventtypes)
 * [events](_wrappers_governance_.governancewrapper.md#events)
 * [executeHotfix](_wrappers_governance_.governancewrapper.md#executehotfix)
 * [getApprover](_wrappers_governance_.governancewrapper.md#getapprover)
@@ -41,6 +42,7 @@ Contract managing voting for governance proposals.
 * [isQueuedProposalExpired](_wrappers_governance_.governancewrapper.md#isqueuedproposalexpired)
 * [isVoting](_wrappers_governance_.governancewrapper.md#isvoting)
 * [lastDequeue](_wrappers_governance_.governancewrapper.md#lastdequeue)
+* [methodIds](_wrappers_governance_.governancewrapper.md#methodids)
 * [minDeposit](_wrappers_governance_.governancewrapper.md#mindeposit)
 * [minQuorumSize](_wrappers_governance_.governancewrapper.md#minquorumsize)
 * [prepareHotfix](_wrappers_governance_.governancewrapper.md#preparehotfix)
@@ -192,9 +194,24 @@ Name | Type |
 
 ___
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *Governance["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -707,6 +724,28 @@ Query proposal dequeue frequency.
 Name | Type |
 ------ | ------ |
 `...args` | InputArgs |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 

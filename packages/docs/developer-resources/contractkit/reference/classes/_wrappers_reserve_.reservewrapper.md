@@ -16,6 +16,7 @@ Contract for handling reserve for stable currencies
 
 ### Properties
 
+* [eventTypes](_wrappers_reserve_.reservewrapper.md#eventtypes)
 * [events](_wrappers_reserve_.reservewrapper.md#events)
 * [frozenReserveGoldDays](_wrappers_reserve_.reservewrapper.md#frozenreservegolddays)
 * [frozenReserveGoldStartBalance](_wrappers_reserve_.reservewrapper.md#frozenreservegoldstartbalance)
@@ -25,6 +26,7 @@ Contract for handling reserve for stable currencies
 * [getReserveGoldBalance](_wrappers_reserve_.reservewrapper.md#getreservegoldbalance)
 * [isOtherReserveAddress](_wrappers_reserve_.reservewrapper.md#isotherreserveaddress)
 * [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
+* [methodIds](_wrappers_reserve_.reservewrapper.md#methodids)
 * [tobinTaxStalenessThreshold](_wrappers_reserve_.reservewrapper.md#tobintaxstalenessthreshold)
 * [transferGold](_wrappers_reserve_.reservewrapper.md#transfergold)
 
@@ -59,9 +61,24 @@ Name | Type |
 
 ## Properties
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<keyof T['events'], string>>(
+    (acc, key) => ({ ...acc, key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L34)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *Reserve["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
@@ -226,6 +243,28 @@ ___
 Name | Type |
 ------ | ------ |
 `account` | string |
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<keyof T['methods'], string>>(
+    (acc, method: keyof T['methods']) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+#### Type declaration:
 
 ___
 
