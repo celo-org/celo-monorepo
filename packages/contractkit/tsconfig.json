@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*", "types/**/*", "src/utils/timezones.json"],
   "references": [{ "path": "../utils" }]

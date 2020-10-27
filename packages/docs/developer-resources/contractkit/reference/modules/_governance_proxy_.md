@@ -10,8 +10,7 @@
 
 ### Functions
 
-* [getImplementationOfProxy](_governance_proxy_.md#const-getimplementationofproxy)
-* [setImplementationOnProxy](_governance_proxy_.md#const-setimplementationonproxy)
+* [getInitializeAbiOfImplementation](_governance_proxy_.md#const-getinitializeabiofimplementation)
 
 ### Object literals
 
@@ -49,9 +48,9 @@ ___
 
 ## Functions
 
-### `Const` getImplementationOfProxy
+### `Const` getInitializeAbiOfImplementation
 
-▸ **getImplementationOfProxy**(`web3`: Web3, `proxyContractAddress`: string): *Promise‹string›*
+▸ **getInitializeAbiOfImplementation**(`proxyContractName`: string): *AbiItem*
 
 *Defined in [packages/contractkit/src/governance/proxy.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L66)*
 
@@ -59,26 +58,9 @@ ___
 
 Name | Type |
 ------ | ------ |
-`web3` | Web3 |
-`proxyContractAddress` | string |
+`proxyContractName` | string |
 
-**Returns:** *Promise‹string›*
-
-___
-
-### `Const` setImplementationOnProxy
-
-▸ **setImplementationOnProxy**(`address`: string): *any*
-
-*Defined in [packages/contractkit/src/governance/proxy.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L74)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`address` | string |
-
-**Returns:** *any*
+**Returns:** *AbiItem*
 
 ## Object literals
 
