@@ -33,7 +33,7 @@ export abstract class BaseWrapper<T extends Contract> {
     return this.contract.getPastEvents(event as string, options)
   }
 
-  events: Events<T> = this.contract.events
+  events: T['events'] = this.contract.events
 
   eventTypes = Object.keys(this.events).reduce<Record<Events<T>, string>>(
     (acc, key) => ({ ...acc, [key]: key }),
