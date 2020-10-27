@@ -48,15 +48,32 @@ export function isDBOnline() {
   }
 }
 
-export let kit: ContractKit
+let kit: ContractKit | undefined
+
+// Wrapper that on error tries once to reinitialize connection to node.
+export async function useKit<T>(f: (kit: ContractKit) => T): Promise<T> {
+  if (!kit) {
+    await initializeKit(true)
+    // tslint:disable-next-line: no-return-await
+    return await f(kit!)
+  } else {
+    try {
+      return await f(kit!)
+    } catch (error) {
+      await initializeKit(true)
+      // tslint:disable-next-line: no-return-await
+      return await f(kit!)
+    }
+  }
+}
 
 export async function isNodeSyncing() {
-  const syncProgress = await kit.web3.eth.isSyncing()
+  const syncProgress = await useKit((k) => k.web3.eth.isSyncing())
   return typeof syncProgress === 'boolean' && syncProgress
 }
 
 export async function getAgeOfLatestBlock() {
-  const latestBlock = await kit.web3.eth.getBlock('latest')
+  const latestBlock = await useKit((k) => k.web3.eth.getBlock('latest'))
   const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
   return {
     ageOfLatestBlock,
@@ -67,7 +84,7 @@ export async function getAgeOfLatestBlock() {
 export async function isAttestationSignerUnlocked() {
   // The only way to see if a key is unlocked is to try to sign something
   try {
-    await kit.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress())
+    await useKit((k) => k.web3.eth.sign('DO_NOT_USE', getAttestationSignerAddress()))
     return true
   } catch {
     return false
@@ -82,7 +99,7 @@ export async function verifyConfigurationAndGetURL() {
   const signer = getAttestationSignerAddress()
   const validator = getAccountAddress()
 
-  const accounts = await kit.contracts.getAccounts()
+  const accounts = await useKit((k) => k.contracts.getAccounts())
   if (!(await accounts.isAccount(validator))) {
     throw Error(`${validator} is not registered as an account!`)
   }
@@ -104,7 +121,7 @@ export async function verifyConfigurationAndGetURL() {
 
   const metadataURL = await accounts.getMetadataURL(validator)
   try {
-    const metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL)
+    const metadata = await useKit((k) => IdentityMetadataWrapper.fetchFromURL(k, metadataURL))
     const claim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
     if (!claim) {
       throw Error('Missing ATTESTATION_SERVICE_URL claim')
@@ -115,19 +132,19 @@ export async function verifyConfigurationAndGetURL() {
   }
 }
 
-export async function initializeKit() {
-  if (kit === undefined) {
+export async function initializeKit(force: boolean = false) {
+  if (kit === undefined || force) {
     kit = newKit(fetchEnv('CELO_PROVIDER'))
     // Copied from @celo/cli/src/utils/helpers
     try {
-      const { ageOfLatestBlock } = await getAgeOfLatestBlock()
-      rootLogger.info({ ageOfLatestBlock }, 'Initializing ContractKit')
+      await kit.web3.eth.getBlock('latest')
+      rootLogger.info(`Connected to Celo node at ${fetchEnv('CELO_PROVIDER')}`)
     } catch (error) {
-      rootLogger.error(
+      kit = undefined
+      throw new Error(
         'Initializing ContractKit failed. Is the Celo node running and accessible via ' +
           `the "CELO_PROVIDER" env var? Currently set as ${fetchEnv('CELO_PROVIDER')}`
       )
-      throw error
     }
   }
 }
