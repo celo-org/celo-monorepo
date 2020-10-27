@@ -27,7 +27,7 @@ export class Input {
     try {
       return coder.decodeParameters(abi, this.data)
     } catch (e) {
-      console.log(`Error decoding input: ${e.message}`)
+      console.debug(`Error decoding input: ${e.message}`)
       return
     }
   }

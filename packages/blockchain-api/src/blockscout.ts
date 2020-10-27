@@ -16,12 +16,12 @@ import { EscrowContractCall } from './events/EscrowContractCall'
 import { ExchangeContractCall } from './events/ExchangeContractCall'
 import { Input } from './helpers/Input'
 import { InputDecoder } from './helpers/InputDecoder'
+import { TokenTransactionArgs } from './schema'
 import { Transaction } from './transaction/Transaction'
 import { TransactionAggregator } from './transaction/TransactionAggregator'
 import { TransactionClassifier } from './transaction/TransactionClassifier'
 import { TransactionNavigator } from './transaction/TransactionNavigator'
 import { TransferCollection } from './transaction/TransferCollection'
-import { TokenTransactionArgs } from './schema'
 import { ContractAddresses, getContractAddresses } from './utils'
 
 export interface BlockscoutTransferTx {
