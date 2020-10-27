@@ -2814,24 +2814,6 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.11":
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.11.tgz#4a415b1beaa84f18f0aab8f704072dd6b8871e07"
-  integrity sha512-DZj+iVtwD3CtNttMNTZ/0AaSPDFr9alL65LDwsQipmVRyIpDnMjy4FR9s0eQ7UMG9UXcp9fce7Yed17y8erQpw==
-  dependencies:
-    "@celo/contractkit" "0.4.16"
-    "@celo/utils" "0.1.21"
-    "@types/btoa" "^1.2.3"
-    bignumber.js "^9.0.0"
-    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
-    bunyan "1.8.12"
-    bunyan-debug-stream "2.0.0"
-    bunyan-gke-stackdriver "0.1.2"
-    dotenv "^8.2.0"
-    elliptic "6.5.3"
-    express "^4.17.1"
-    web3 "1.2.4"
-
 "@celo/phone-number-privacy-common@1.0.12":
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.12.tgz#43cc1c02bb69b9e31ca389d0ed9783ceedf2fc0d"
