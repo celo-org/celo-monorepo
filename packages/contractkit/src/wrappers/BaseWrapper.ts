@@ -35,7 +35,7 @@ export abstract class BaseWrapper<T extends Contract> {
 
   events: T['events'] = this.contract.events
 
-  eventTypes = Object.keys(this.events).reduce<Record<Events<T>, string>>(
+  eventTypes = Object.keys(this.events).reduce<Record<Events<T>, Events<T>>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
