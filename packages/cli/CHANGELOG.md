@@ -5,18 +5,30 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.0.59--dev]**
+### **[0.0.60--dev]**
 Features
 - [one-line summary] - ( [link PR] )
 
 Bug Fixes
-- Fix error when listing contract addresses and include some missing new contracts - [#5301](https://github.com/celo-org/celo-monorepo/pull/5301)
+- [one-line summary] - ( [link PR] )
 
 Other Changes
-- [one-line summary] - ( [link PR] )
+- [one-line summary - ( [link PR] )
 
 
 ## Published
+### **[0.0.59]** -- 2020-10-23
+Features
+- Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - ( [#5111](https://github.com/celo-org/celo-monorepo/pull/5111) )
+
+Bug Fixes
+- Fix attestation service test delivering false negatives - [#5336](https://github.com/celo-org/celo-monorepo/pull/5336)
+- Fix error when listing contract addresses and include some missing new contracts - [#5301](https://github.com/celo-org/celo-monorepo/pull/5301)
+
+Other Changes
+- Convert default log output color from red to yellow - [#5517](https://github.com/celo-org/celo-monorepo/pull/5517)
+
+
 ### **[0.0.58]** -- 2020-10-08
 Features
 - CLI compatability with [Attestation Service 1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5) - [#5011](https://github.com/celo-org/celo-monorepo/pull/5011)
