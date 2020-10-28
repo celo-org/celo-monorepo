@@ -120,6 +120,11 @@ export class ContractKit {
     this.contracts = new WrapperCache(this)
   }
 
+  getWallet() {
+    assertIsCeloProvider(this.web3.currentProvider)
+    return this.web3.currentProvider.wallet
+  }
+
   async getTotalBalance(address: string): Promise<AccountBalance> {
     const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
