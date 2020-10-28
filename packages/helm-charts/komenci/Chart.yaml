@@ -3,8 +3,4 @@ appVersion: "0.1.0"
 description: A Helm chart for the Komenci app
 name: Komenci
 version: 0.1.0
-# dependencies:
-# - name: postgres
-#   version: "11.9.0-debian-10-r48"
-#   repository: "https://marketplace.azurecr.io/helm/v1/repo"
  

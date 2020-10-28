@@ -78,3 +78,19 @@ onboarding:
     repository: celotestnet.azurecr.io/komenci/onboarding
     tag: latest
   replicas: 2
+  relayer:
+    host: komenci-relayer
+    port: 5050
+  db:
+    host: komenci-komenci-postgresql-headless
+    port: 5432
+    username: 'postgres'
+    database: 'postgres'
+    synchronize: true
+  onchain:
+    fundAddress: 0xa7d74cb4fca9458757cfc8b90d9b38a126f68b47
+    mtwImplementationAddress: 0x88a2b9B8387A1823D821E406b4e951337fa1D46D
+    mtwDeployerAddress: 0x47b05993C360dEA811ACe7eC725897aCB74AaBA5
+    network: alfajores
+    nodeProviderType: http
+    nodeUrl: https://alfajores-forno.celo-testnet.org

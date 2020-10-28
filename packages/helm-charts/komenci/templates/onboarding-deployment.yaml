@@ -33,10 +33,10 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ include "komenci-onboarding-fullname" . }}
+        - name: komenci-onboarding
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: {{ .Values.onboarding.image.repository }}::{{ .Values.onboarding.image.tag }}
+          image: {{ .Values.onboarding.image.repository }}:{{ .Values.onboarding.image.tag }}
           imagePullPolicy: {{ .Values.onboarding.image.pullPolicy }}
           ports:
             - name: http
@@ -52,6 +52,14 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.onboarding.resources | nindent 12 }}
+          env:
+          - name: REPLICA_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db.host "value_name" "host" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db.port "value_name" "port" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db.username "value_name" "username") | indent 8 }}
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
