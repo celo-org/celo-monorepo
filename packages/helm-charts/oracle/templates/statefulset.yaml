@@ -39,7 +39,7 @@ spec:
     spec:
 {{ if .Values.kube.serviceAccountSecretNames }}
       initContainers:
-      - name: set-label
+      - name: set-metadata
         image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
         command:
         - /bin/bash

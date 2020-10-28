@@ -132,7 +132,7 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
   async deleteAwsHsmRoleAndPolicyIdempotent(identity: AwsHsmOracleIdentity) {
     const roleName = this.awsHsmRoleName(identity)
     const policyName = this.awsHsmPolicyName(identity)
-    console.log(`Deleting AWS role ${roleName} and policy ${policyName}`)
+    console.info(`Deleting AWS role ${roleName} and policy ${policyName}`)
     const policyArn = await getPolicyArn(policyName)
     if (policyArn) {
       // Don't throw if it's not attached

@@ -112,7 +112,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
     oracleHsmIdentity: AksHsmOracleIdentity
   ) {
     const identityName = this.azureHsmIdentityName(oracleHsmIdentity)
-    console.log(`Deleting Azure identity ${identityName}`)
+    console.info(`Deleting Azure identity ${identityName}`)
     await this.deleteOracleKeyVaultPolicy(oracleHsmIdentity)
     return deleteIdentity(this.clusterConfig, identityName)
   }
