@@ -44,6 +44,7 @@
   "accountAddressLabel": "Nro de cuenta o dirección",
   "celoAmountLabel": "Cantidad (CELO)",
   "maxSymbol": "Max",
+  "countryRestrictedExchange": "CELO exchange is currently restricted in your country.",
   "withdrawCeloReview": "Resúmen",
   "withdrawCeloTo": "Retirar en",
   "withdrawCeloAmount": "Cantidad (CELO)",
