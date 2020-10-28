@@ -1,8 +1,12 @@
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
+import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
+import AccountNumber from 'src/components/AccountNumber'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -36,6 +40,20 @@ function Simplex({ route }: Props) {
   )
   return (
     <View style={styles.container}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderBottomWidth: 1,
+          borderBottomColor: colors.gray2,
+          paddingHorizontal: 10,
+          paddingBottom: 20,
+          backgroundColor: colors.gray1,
+        }}
+      >
+        <Text style={fontStyles.regular}>{`Tap to copy your Valora cUSD address`}</Text>
+        <AccountNumber address={account || ''} />
+      </View>
       <WebView style={styles.exchangeWebView} source={{ uri: SIMPLEX_URI }} />
     </View>
   )
