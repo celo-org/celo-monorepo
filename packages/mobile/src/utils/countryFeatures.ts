@@ -18,7 +18,7 @@ function getCountryFeatures(countryCodeAlpha2: string | null): SpecificCountryFe
   return features
 }
 
-const getCountryFeaturesSelector = createSelector(
+export const getCountryFeaturesSelector = createSelector(
   defaultCountryCodeSelector,
   (countryCallingCode) => {
     const countryCodeAlpha2 = countryCallingCode
