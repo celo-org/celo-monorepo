@@ -180,7 +180,9 @@ function getProvidersFor(attestation: AttestationModel, logger: Logger) {
 export async function startSendSms(
   key: AttestationKey,
   phoneNumber: E164Number,
-  message: string,
+  messageToSend: string,
+  securityCode: string | null = null,
+  attestationCode: string | null = null,
   logger: Logger,
   sequelizeLogger: SequelizeLogger,
   onlyUseProvider: string | null = null
@@ -213,11 +215,14 @@ export async function startSendSms(
         phoneNumber,
         countryCode,
         status: AttestationStatus.NotSent,
-        message,
+        message: messageToSend,
+        attestationCode,
         providers: providersToCsv(providers),
         attempt: 0,
         errors: undefined,
         ongoingDeliveryId: null,
+        securityCode,
+        securityCodeAttempt: 0,
       },
       transaction
     )
