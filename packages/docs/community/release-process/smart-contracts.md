@@ -64,10 +64,9 @@ Using these tools, a contract release candidate can be built, deployed, and prop
 Use the following script to compile contracts at a release tag and verify that the deployed network bytecode matches the compiled bytecode.
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
+PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
-# A -r boolean flag should be provided if this is the first release (before linked libraries were proxied)
-yarn verify-deployed -n $NETWORK -b $RELEASE -r -f
+yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
 ```
 
 ### Check Backward Compatibility
@@ -94,8 +93,8 @@ STORAGE updates are adopted by deploying a new proxy/implementation pair. These 
 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
-RELEASE="celo-core-contracts-v${N}.rc${X}"
-yarn make-release -b $RELEASE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
 ```
 
 The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
@@ -114,7 +113,7 @@ celocli governance:propose <...> --jsonTransactions "proposal.json"
 Fetch the upgrade proposal and output the JSON encoded proposal contents.
 
 ```bash
-celocli governance:show <...> --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
+celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
 ```
 
 ### Verify Proposed Release
@@ -122,10 +121,20 @@ celocli governance:show <...> --proposalID <proposalId> --jsonTransactions "upgr
 Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly.
 
 ```bash
-RELEASE="celo-core-contracts-v${N}.rc${X}"
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
-yarn verify-release -p "upgrade_proposal.json" -b $RELEASE -n $NETWORK -f
+yarn verify-release -p "upgrade_proposal.json" -b $RELEASE_CANDIDATE -n $NETWORK -f
+```
+
+### Verify Executed Release
+
+After a release executes via Governance, you can verify that the resulting network state reflects the tagged release candidate
+
+```bash
+RELEASE="celo-core-contracts-v${N}.rc${X}"
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+yarn verify-deployed -n $NETWORK -b $RELEASE -f
 ```
 
 ## Testing
@@ -135,6 +144,46 @@ All releases should be evaluated according to the following tests.
 ### Unit tests
 
 All changes since the last release should be covered by unit tests. Unit test coverage should be enforced by automated checks run on every commit.
+
+### Manual Checklist
+
+After a successful release execution on a testnet, the resulting network state should be spot-checked to ensure that no regressions have been caused by the release. Flows to test include:
+
+- Do a cUSD and CELO transfer
+    ```bash
+    celocli transfer:dollars --from <addr> --value <number> --to <addr>
+    celocli transfer:celo --from <addr> --value <number> --to <addr>
+    ```
+- Register a Celo account
+    ```bash
+    celocli account:register --from <addr> --name <test-name>
+    ```
+- Report an Oracle rate
+    ```bash
+    celocli oracle:report --from <addr> --value <num>
+    ```
+- Do a CP-DOTO exchange
+    ```bash
+    celocli exchange:celo --value <number> --from <addr>
+    celocli exchange:dollars --value <number> --from <addr>
+    ```
+- Complete a round of attestation
+- Redeem from Escrow
+- Register a Vaildator
+    ```bash
+    celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
+    ```
+- Vote for a Validator
+- Run a mock election
+    ```bash
+    celocli election:run
+    ```
+- Get a valildator slashed for downtime and ejected from the validator set
+- Propose a governance proposal and get it executed
+    ```bash
+    celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
+    ```
+
 
 ### Performance
 
