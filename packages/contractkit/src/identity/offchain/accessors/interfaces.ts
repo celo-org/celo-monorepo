@@ -1,4 +1,4 @@
-import { Result } from '@celo/base/src'
+import { Result } from '@celo/base'
 import { SchemaErrors } from './errors'
 
 export interface PublicAccessor<DataType> {

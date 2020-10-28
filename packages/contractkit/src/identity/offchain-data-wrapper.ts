@@ -1,6 +1,6 @@
 import { Address, ensureLeading0x, eqAddress } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
-import { recoverEIP712TypedDataSigner } from '@celo/utils/src/signatureUtils'
+import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import * as t from 'io-ts'

@@ -1,8 +1,7 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { Decrypt } from '@celo/utils/lib/ecies'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { computeSharedSecret as computeECDHSecret } from '@celo/utils/src/ecdh'
-// @ts-ignore-next-line
+import { computeSharedSecret as computeECDHSecret } from '@celo/utils/lib/ecdh'
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import { decodeSig, getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'

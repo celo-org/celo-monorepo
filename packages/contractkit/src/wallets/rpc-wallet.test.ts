@@ -6,7 +6,7 @@ import {
   privateKeyToAddress,
   privateKeyToPublicKey,
   trimLeading0x,
-} from '@celo/utils/src/address'
+} from '@celo/utils/lib/address'
 import net from 'net'
 import Web3 from 'web3'
 import { Tx } from 'web3-core'
