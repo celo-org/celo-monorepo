@@ -1,7 +1,8 @@
 import { trimLeading0x } from '@celo/base/lib/address'
-import { createECDH, ECDH } from 'crypto'
+import { createECDH } from 'crypto'
+import { ec as EC } from 'elliptic'
 
-const { convertKey } = ECDH
+const secp256k1 = new EC('secp256k1')
 
 export function computeSharedSecret(privateKey: string, publicKey: string): Buffer {
   const ecdh = createECDH('secp256k1')
@@ -10,25 +11,15 @@ export function computeSharedSecret(privateKey: string, publicKey: string): Buff
 }
 
 export function ensureCompressed(publicKey: string): string {
-  // convertKey doesn't accept decompressed public keys without
-  // the 04 prefix
-  return convertKey(
-    ensureUncompressedPrefix(publicKey),
-    'secp256k1',
-    'hex',
-    'hex',
-    'compressed'
-  ) as string
+  return secp256k1.keyFromPublic(ensureUncompressedPrefix(publicKey), 'hex').getPublic(true, 'hex')
 }
 
 export function ensureUncompressed(publicKey: string) {
-  return convertKey(
-    ensureUncompressedPrefix(publicKey),
-    'secp256k1',
-    'hex',
-    'hex',
-    'uncompressed'
-  ) as string
+  const noLeading0x = trimLeading0x(publicKey)
+  const uncompressed = secp256k1
+    .keyFromPublic(ensureUncompressedPrefix(noLeading0x), 'hex')
+    .getPublic(false, 'hex')
+  return uncompressed
 }
 
 export function trimUncompressedPrefix(publicKey: string) {
