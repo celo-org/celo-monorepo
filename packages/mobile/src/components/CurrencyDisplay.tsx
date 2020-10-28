@@ -120,6 +120,17 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
   }
 }
 
+function getFullCurrencyName(currency: CURRENCY_ENUM | null) {
+  switch (currency) {
+    case CURRENCY_ENUM.DOLLAR:
+      return i18n.t('global:celoDollars')
+    case CURRENCY_ENUM.GOLD:
+      return i18n.t('global:celoGold')
+    default:
+      return null
+  }
+}
+
 export default function CurrencyDisplay({
   type,
   size,
@@ -169,6 +180,7 @@ export default function CurrencyDisplay({
   const formattedValue =
     value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
   const code = displayAmount?.currencyCode
+  const fullCurrencyName = getFullCurrencyName(displayCurrency)
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
@@ -218,9 +230,7 @@ export default function CurrencyDisplay({
       {!hideSymbol && currencySymbol}
       {formattedValue}
       {!hideCode && !!code && ` ${code}`}
-      {!hideFullCurrencyName &&
-        code === CURRENCIES[CURRENCY_ENUM.DOLLAR].code &&
-        ` ${i18n.t('global:celoDollars')}`}
+      {!hideFullCurrencyName && !!fullCurrencyName && ` ${fullCurrencyName}`}
     </Text>
   )
 }

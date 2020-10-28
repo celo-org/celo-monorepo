@@ -20,6 +20,7 @@ import {
   useLinkBuilder,
 } from '@react-navigation/native'
 import { TransitionPresets } from '@react-navigation/stack'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -40,6 +41,7 @@ import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
 import { AccountKey } from 'src/icons/navigator/AccountKey'
@@ -132,6 +134,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     value: dollarBalance ?? '0',
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
+  const celoBalance = useSelector(celoTokenBalanceSelector)
+  const celoAmount = {
+    value: new BigNumber(celoBalance ?? '0'),
+    currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
+  }
+  const hasCeloBalance = celoAmount.value.isGreaterThan(0)
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
 
@@ -153,13 +161,30 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           showLocalAmount={true}
         />
         <CurrencyDisplay
-          style={styles.dollarsLabel}
+          style={styles.amountLabelSmall}
           amount={dollarAmount}
           showLocalAmount={false}
           hideFullCurrencyName={false}
           hideSymbol={true}
         />
         <View style={styles.borderBottom} />
+        {hasCeloBalance && (
+          <>
+            <CurrencyDisplay
+              style={fontStyles.regular500}
+              amount={celoAmount}
+              showLocalAmount={true}
+            />
+            <CurrencyDisplay
+              style={styles.amountLabelSmall}
+              amount={celoAmount}
+              showLocalAmount={false}
+              hideFullCurrencyName={false}
+              hideSymbol={true}
+            />
+            <View style={styles.borderBottom} />
+          </>
+        )}
       </View>
       <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
@@ -257,7 +282,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray2,
     alignSelf: 'stretch',
   },
-  dollarsLabel: {
+  amountLabelSmall: {
     ...fontStyles.small,
     color: colors.gray4,
     marginTop: 2,
