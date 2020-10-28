@@ -7,7 +7,15 @@ import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -153,12 +161,16 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
-        <View>
+        <View style={{ flex: 1 }}>
           {providers[isAddFunds ? 'addFunds' : 'cashOut'].map((value, idx) => {
             return (
-              <ListItem key={idx} onPress={goToProvider(value.screen)}>
+              <TouchableOpacity
+                key={idx}
+                onPress={goToProvider(value.screen)}
+                style={styles.provider}
+              >
                 {value.image}
-              </ListItem>
+              </TouchableOpacity>
             )
           })}
         </View>
@@ -180,7 +192,9 @@ const styles = StyleSheet.create({
     paddingVertical: variables.contentPadding,
   },
   content: {
-    alignItems: 'flex-start',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   pleaseSelectProvider: {
     ...fontStyles.regular,
@@ -192,8 +206,17 @@ const styles = StyleSheet.create({
     width: 104,
   },
   simplexLogo: {
-    alignSelf: 'flex-start',
-    height: 60,
+    height: 59,
+    width: 111,
+  },
+  provider: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: variables.contentPadding,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray2,
+    marginLeft: variables.contentPadding,
   },
 })
 
