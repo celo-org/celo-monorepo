@@ -25,7 +25,7 @@ const TAG = 'transactions/send'
 // causing failures when a tx times out (rare but can happen on slow devices)
 const TX_NUM_TRIES = 1 // Try txs up to this many times
 const TX_RETRY_DELAY = 2000 // 2s
-const TX_TIMEOUT = 45000 // 45s
+const TX_TIMEOUT = 90000 // 90s
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
