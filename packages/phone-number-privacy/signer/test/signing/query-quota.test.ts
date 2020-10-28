@@ -1,13 +1,14 @@
-import { isVerified } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import {
   ContractRetrieval,
+  createMockAccounts,
   createMockAttestation,
   createMockContractKit,
   createMockToken,
   createMockWeb3,
 } from '../../../common/src/test/utils'
 import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
+import { isVerified } from '../../../common/src/utils/authentication'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit } from '../../src/web3/contracts'
@@ -16,7 +17,7 @@ jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock
 jest.mock('../../src/database/wrappers/account')
 const mockPerformedQueryCount = getPerformedQueryCount as jest.Mock
-jest.mock('../../src/common/identity')
+jest.mock('../../../common/src/utils/authentication')
 const mockIsVerified = isVerified as jest.Mock
 // tslint:disable-next-line: no-object-literal-type-assertion
 
@@ -27,6 +28,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(3, 3),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(5)
     )
@@ -44,12 +46,13 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(0)
     )
+    mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
-    mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
       totalQuota: 2,
@@ -61,6 +64,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(3, 3),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(100)
     )
@@ -78,6 +82,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(100)
     )
@@ -95,6 +100,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(100)
     )
@@ -112,6 +118,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(0)
     )
@@ -129,6 +136,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(0)
     )
@@ -146,6 +154,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
         [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(0)
     )

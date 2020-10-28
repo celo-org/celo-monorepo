@@ -98,10 +98,10 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
 
   await Promise.all([
     new Promise((resolve) => {
-      resolve(getDollarBalance(account))
+      resolve(getDollarBalance(account, walletAddress))
     }),
     new Promise((resolve) => {
-      resolve(getCeloBalance(account))
+      resolve(getCeloBalance(account, walletAddress))
     }),
   ]).then((values) => {
     cUSDAccountBalance = values[0] as BigNumber
@@ -125,48 +125,59 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
 
 export async function getTransactionCount(...addresses: string[]): Promise<number> {
   return Promise.all(
-    addresses.map((address) =>
-      retryAsyncWithBackOff(
-        () => getContractKit().web3.eth.getTransactionCount(address),
-        RETRY_COUNT,
-        [],
-        RETRY_DELAY_IN_MS
+    addresses
+      .filter((address) => address !== '0x0')
+      .map((address) =>
+        retryAsyncWithBackOff(
+          () => getContractKit().web3.eth.getTransactionCount(address),
+          RETRY_COUNT,
+          [],
+          RETRY_DELAY_IN_MS
+        )
       )
-    )
   ).then((values) => values.reduce((a, b) => a + b))
 }
 
 export async function getDollarBalance(...addresses: string[]): Promise<BigNumber> {
   return Promise.all(
-    addresses.map((address) =>
-      retryAsyncWithBackOff(
-        async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
-        RETRY_COUNT,
-        [],
-        RETRY_DELAY_IN_MS
+    addresses
+      .filter((address) => address !== '0x0')
+      .map((address) =>
+        retryAsyncWithBackOff(
+          async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
+          RETRY_COUNT,
+          [],
+          RETRY_DELAY_IN_MS
+        )
       )
-    )
   ).then((values) => values.reduce((a, b) => a.plus(b)))
 }
 
 export async function getCeloBalance(...addresses: string[]): Promise<BigNumber> {
   return Promise.all(
-    addresses.map((address) =>
-      retryAsyncWithBackOff(
-        async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
-        RETRY_COUNT,
-        [],
-        RETRY_DELAY_IN_MS
+    addresses
+      .filter((address) => address !== '0x0')
+      .map((address) =>
+        retryAsyncWithBackOff(
+          async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
+          RETRY_COUNT,
+          [],
+          RETRY_DELAY_IN_MS
+        )
       )
-    )
   ).then((values) => values.reduce((a, b) => a.plus(b)))
 }
 
 export async function getWalletAddress(account: string): Promise<string> {
-  return retryAsyncWithBackOff(
-    async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
-    RETRY_COUNT,
-    [],
-    RETRY_DELAY_IN_MS
-  )
+  try {
+    return retryAsyncWithBackOff(
+      async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
+      RETRY_COUNT,
+      [],
+      RETRY_DELAY_IN_MS
+    )
+  } catch (err) {
+    logger.error({ err, account }, 'failed to get wallet address for account')
+    return '0x0'
+  }
 }

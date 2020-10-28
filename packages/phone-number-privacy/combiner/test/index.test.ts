@@ -1,5 +1,5 @@
-import { authenticateUser, isVerified } from '@celo/phone-number-privacy-common'
 import { Response } from 'node-fetch'
+import { authenticateUser, isVerified } from '../../common/src/utils/authentication'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
@@ -10,7 +10,7 @@ import { getBlindedMessageSig, getContactMatches } from '../src/index'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
-jest.mock('../src/common/identity')
+jest.mock('../../common/src/utils/authentication')
 const mockAuthenticateUser = authenticateUser as jest.Mock
 mockAuthenticateUser.mockReturnValue(true)
 const mockIsVerified = isVerified as jest.Mock
@@ -78,6 +78,14 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
           expect(body.success).toEqual(true)
           expect(body.combinedSignature).toEqual(BLS_SIGNATURE)
           expect(body.version).toEqual(VERSION)
+        },
+        status(status: any) {
+          expect(status).toEqual(200)
+          return {
+            json() {
+              return {}
+            },
+          }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
@@ -216,6 +224,14 @@ describe(`POST /getContactMatches endpoint`, () => {
           expect(body.success).toEqual(true)
           expect(body.matchedContacts).toEqual(expected)
         },
+        status(status: any) {
+          expect(status).toEqual(200)
+          return {
+            json() {
+              return {}
+            },
+          }
+        },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
       await getContactMatches(req, res)
@@ -227,6 +243,14 @@ describe(`POST /getContactMatches endpoint`, () => {
         json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.matchedContacts).toEqual([])
+        },
+        status(status: any) {
+          expect(status).toEqual(200)
+          return {
+            json() {
+              return {}
+            },
+          }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req

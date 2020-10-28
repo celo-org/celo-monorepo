@@ -5,13 +5,19 @@ import Web3 from 'web3'
 
 export function createMockAttestation(completed: number, total: number) {
   return {
-    getAttestationStat: jest.fn(() => ({ completed, total })),
+    getVerifiedStatus: jest.fn(() => ({ completed, total })),
   }
 }
 
 export function createMockToken(balance: BigNumber) {
   return {
     balanceOf: jest.fn(() => balance),
+  }
+}
+
+export function createMockAccounts(walletAddress: string) {
+  return {
+    getWalletAddress: jest.fn(() => walletAddress),
   }
 }
 
@@ -37,6 +43,7 @@ export enum ContractRetrieval {
   getAttestations = 'getAttestations',
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
+  getAccounts = 'getAccounts',
 }
 
 export function createMockWeb3(txCount: number) {
