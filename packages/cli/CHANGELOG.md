@@ -5,9 +5,31 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.0.59--dev]**
+### **[0.0.61--dev]**
 Features
-- Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - ( [#5111](https://github.com/celo-org/celo-monorepo/pull/5111) )
+- [one-line summary] - ( [link PR] )
+
+Bug Fixes
+- [one-line summary] - ( [link PR] )
+
+Other Changes
+- [one-line summary - ( [link PR] )
+
+
+## Published
+
+### **[0.0.60]** -- 2020-10-27
+Bug Fixes
+- Uses the most up-to-date version of @celo/contractkit (0.4.17) & fixes backward compatibility issues from the last release
+- Actually call toString in oracle report CLI - [#5594](https://github.com/celo-org/celo-monorepo/pull/5594)
+
+Other Changes
+- Support the use of scientific notation for the deposit of a governance proposal - [#5326](https://github.com/celo-org/celo-monorepo/pull/5326)
+- Require `--force` with `account:claim-attestation-service-url` for non-TLS urls [#5599](https://github.com/celo-org/celo-monorepo/pull/5599)
+
+### **[0.0.59]** -- 2020-10-23
+Features
+- Add `jsonTransactions` flag to `governance:show` for use in the (contract release process)[https://docs.celo.org/community/release-process/smart-contracts]  - [#5111](https://github.com/celo-org/celo-monorepo/pull/5111)
 
 Bug Fixes
 - Fix attestation service test delivering false negatives - [#5336](https://github.com/celo-org/celo-monorepo/pull/5336)
@@ -17,7 +39,6 @@ Other Changes
 - Convert default log output color from red to yellow - [#5517](https://github.com/celo-org/celo-monorepo/pull/5517)
 
 
-## Published
 ### **[0.0.58]** -- 2020-10-08
 Features
 - CLI compatability with [Attestation Service 1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5) - [#5011](https://github.com/celo-org/celo-monorepo/pull/5011)
