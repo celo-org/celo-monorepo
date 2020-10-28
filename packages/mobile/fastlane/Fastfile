@@ -2,13 +2,6 @@ fastlane_version '2.94.0'
 
 default_platform(:android)
 
-$mapping_path = 'android/app/build/outputs/mapping/'
-$mapping_file = '/mapping.txt'
-
-def get_mapping_path(env)
-  return $mapping_path + env + $mapping_file
-end
-
 def get_app_bundle_id(env)
   Dotenv.parse("../.env.#{env}")['APP_BUNDLE_ID']
 end
@@ -19,7 +12,7 @@ def fastlane_supply(env, track)
     track: track,
     track_promote_to: track,
     package_name: get_app_bundle_id(env),
-    mapping: get_mapping_path(env),
+    mapping: lane_context[SharedValues::GRADLE_MAPPING_TXT_OUTPUT_PATH],
     skip_upload_apk: true,
     skip_upload_metadata: true,
     skip_upload_changelogs: true,
@@ -43,30 +36,16 @@ platform :android do
     environment = options[:environment].capitalize
     if options[:buildApk]
       ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
-      gradle(task: 'assemble', build_type: environment, project_dir: 'android/')
+      gradle(task: 'assemble', build_type: 'Release', flavor: environment, project_dir: 'android/')
     else
       ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
-      gradle(task: 'bundle', build_type: environment, project_dir: 'android/')
+      gradle(task: 'bundle', build_type: 'Release', flavor: environment, project_dir: 'android/')
     end
-  end
-
-  desc 'Ship Integration to Playstore Internal'
-  lane :integration do
-    env = 'integration'
-    build(environment: env)
-    fastlane_supply(env, 'internal')
   end
 
   desc 'Ship Alfajores to Playstore Internal'
   lane :alfajores do
     env = 'alfajores'
-    build(environment: env)
-    fastlane_supply(env, 'internal')
-  end
-
-  desc 'Ship Pilot to Playstore Internal'
-  lane :pilotapp do
-    env = 'pilot'
     build(environment: env)
     fastlane_supply(env, 'internal')
   end
@@ -108,24 +87,6 @@ platform :ios do
   desc 'Ship Alfajores to TestFlight'
   lane :alfajores do
     env = 'alfajores'
-    build(environment: env)
-    upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-    )
-  end
-
-  desc 'Ship Pilot to TestFlight'
-  lane :pilotapp do
-    env = 'pilot'
-    build(environment: env)
-    upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-    )
-  end
-
-  desc 'Ship Integration to TestFlight'
-  lane :integration do
-    env = 'integration'
     build(environment: env)
     upload_to_testflight(
       skip_waiting_for_build_processing: true,

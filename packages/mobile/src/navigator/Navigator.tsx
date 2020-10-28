@@ -6,7 +6,6 @@ import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import GoldEducation from 'src/account/GoldEducation'
-import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
@@ -20,8 +19,6 @@ import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
-import BackupSocial from 'src/backup/BackupSocial'
-import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import BackButton from 'src/components/BackButton'
 import CancelButton from 'src/components/CancelButton'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
@@ -49,7 +46,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
@@ -236,11 +232,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={ImportWallet.navigationOptions}
     />
     <Navigator.Screen
-      name={Screens.ImportWalletSocial}
-      component={ImportWalletSocial}
-      options={nuxNavigationOptions}
-    />
-    <Navigator.Screen
       name={Screens.ImportContacts}
       component={ImportContactsScreen}
       options={ImportContactsScreen.navigationOptions}
@@ -399,8 +390,6 @@ const backupScreens = (Navigator: typeof Stack) => (
       component={BackupQuiz}
       options={navOptionsForQuiz}
     />
-    <Navigator.Screen name={Screens.BackupSocialIntro} component={BackupSocialIntro} />
-    <Navigator.Screen name={Screens.BackupSocial} component={BackupSocial} />
     <Navigator.Screen name={Screens.BackupComplete} component={BackupComplete} options={noHeader} />
   </>
 )
@@ -417,11 +406,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.SelectLocalCurrency}
       component={SelectLocalCurrency}
       options={headerWithBackButton}
-    />
-    <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.InviteReview}
-      component={InviteReview}
     />
     <Navigator.Screen
       options={Licenses.navigationOptions}
