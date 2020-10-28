@@ -78,7 +78,7 @@ Base ContractWrapper
 
 \+ **new BaseWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: T): *[BaseWrapper](_wrappers_basewrapper_.basewrapper.md)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L22)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L25)*
 
 **Parameters:**
 
@@ -93,12 +93,12 @@ Name | Type |
 
 ###  eventTypes
 
-• **eventTypes**: *object* = Object.keys(this.events).reduce<Record<Events<T>, Events<T>>>(
+• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L38)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 #### Type declaration:
 
@@ -108,7 +108,7 @@ ___
 
 • **events**: *T["events"]* = this.contract.events
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L36)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -126,7 +126,7 @@ ___
     {} as any
   )
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L43)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L46)*
 
 #### Type declaration:
 
@@ -136,7 +136,7 @@ ___
 
 • **get address**(): *string*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L26)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
 
 Contract address
 
@@ -148,7 +148,7 @@ Contract address
 
 ▸ **getPastEvents**(`event`: Events‹T›, `options`: PastEventOptions): *Promise‹EventLog[]›*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L32)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
 
 Contract getPastEvents
 
