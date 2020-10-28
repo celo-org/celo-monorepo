@@ -746,9 +746,12 @@ export async function installGenericHelmChart(
   celoEnv: string,
   releaseName: string,
   chartDir: string,
-  parameters: string[]
+  parameters: string[],
+  buildDependencies: boolean = true
 ) {
-  await buildHelmChartDependencies(chartDir)
+  if (buildDependencies) {
+    await buildHelmChartDependencies(chartDir)
+  }
 
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(

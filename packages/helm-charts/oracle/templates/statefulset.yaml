@@ -55,7 +55,7 @@ spec:
           # AWS
           ROLE_ARNS={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.aws.roleArn }},{{- end }}
           ROLE_ARN=`echo -n $ROLE_ARNS | cut -d ',' -f $((RID + 1))`
-          CMD="annotate pod $POD_NAME 'iam.amazonaws.com/role=$ROLE_ARN'"
+          CMD="annotate pod $POD_NAME iam.amazonaws.com/role=$ROLE_ARN"
           {{ end }}
 
           kubectl \
