@@ -358,7 +358,7 @@ export class KomenciKit {
    */
   _wallet?: MetaTransactionWalletWrapper
   private async getWallet(address: string): Promise<MetaTransactionWalletWrapper> {
-    if (this._wallet === undefined || this._wallet.address !== address) {
+    if (this._wallet?.address !== address) {
       this._wallet = await this.contractKit.contracts.getMetaTransactionWallet(address)
     }
     return this._wallet
