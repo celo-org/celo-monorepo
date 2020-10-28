@@ -323,8 +323,8 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
             attestations
           )
         }
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
       }
-      ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
       yield race({
