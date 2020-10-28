@@ -23,6 +23,12 @@ variable health_check_destination_port {
   description = "The destination port the health check will test"
 }
 
+variable timeout_sec {
+  type        = number
+  description = "The timeout for the backend service in seconds"
+  default     = 30
+}
+
 variable type {
   type        = string
   description = "Type of backends, only used for names"
