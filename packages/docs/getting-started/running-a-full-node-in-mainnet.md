@@ -27,7 +27,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for the `mainnet` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 export NETWORK_ID=42220
 ```
 

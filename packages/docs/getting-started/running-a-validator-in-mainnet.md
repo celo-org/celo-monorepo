@@ -175,7 +175,7 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 First we are going to set up the main environment variables related to the mainnet network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
+export CELO_IMAGE=us.gcr.io/celo-org/gcreth:mainnet
 export NETWORK_ID=42220
 ```
 
@@ -187,7 +187,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-org/celo-node:mainnet` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-org/geth:mainnet` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
 
 ### Start your Accounts node
 
