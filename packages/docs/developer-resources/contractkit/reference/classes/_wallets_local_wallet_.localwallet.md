@@ -16,9 +16,11 @@
 ### Methods
 
 * [addAccount](_wallets_local_wallet_.localwallet.md#addaccount)
+* [computeSharedSecret](_wallets_local_wallet_.localwallet.md#computesharedsecret)
 * [decrypt](_wallets_local_wallet_.localwallet.md#decrypt)
 * [getAccounts](_wallets_local_wallet_.localwallet.md#getaccounts)
 * [hasAccount](_wallets_local_wallet_.localwallet.md#hasaccount)
+* [removeAccount](_wallets_local_wallet_.localwallet.md#removeaccount)
 * [signPersonalMessage](_wallets_local_wallet_.localwallet.md#signpersonalmessage)
 * [signTransaction](_wallets_local_wallet_.localwallet.md#signtransaction)
 * [signTypedData](_wallets_local_wallet_.localwallet.md#signtypeddata)
@@ -43,13 +45,34 @@ Name | Type | Description |
 
 ___
 
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`address`: [Address](../modules/_base_.md#address), `publicKey`: string): *Promise‹Buffer›*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[computeSharedSecret](_wallets_wallet_.walletbase.md#computesharedsecret)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L157)*
+
+Computes the shared secret (an ECDH key exchange object) between two accounts
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+`publicKey` | string |
+
+**Returns:** *Promise‹Buffer›*
+
+___
+
 ###  decrypt
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L130)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L149)*
 
 **Parameters:**
 
@@ -68,7 +91,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[getAccounts](_wallets_wallet_.walletbase.md#getaccounts)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L42)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L44)*
 
 Gets a list of accounts that have been registered
 
@@ -82,7 +105,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[hasAccount](_wallets_wallet_.walletbase.md#hasaccount)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L50)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L60)*
 
 Returns true if account has been registered
 
@@ -96,13 +119,33 @@ Name | Type | Description |
 
 ___
 
+###  removeAccount
+
+▸ **removeAccount**(`address`: [Address](../modules/_base_.md#address)): *void*
+
+*Overrides [WalletBase](_wallets_wallet_.walletbase.md).[removeAccount](_wallets_wallet_.walletbase.md#removeaccount)*
+
+*Defined in [packages/contractkit/src/wallets/local-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/local-wallet.ts#L25)*
+
+Remove the account
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`address` | [Address](../modules/_base_.md#address) | Adddress of the account to remove  |
+
+**Returns:** *void*
+
+___
+
 ###  signPersonalMessage
 
 ▸ **signPersonalMessage**(`address`: [Address](../modules/_base_.md#address), `data`: string): *Promise‹string›*
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signPersonalMessage](_wallets_wallet_.walletbase.md#signpersonalmessage)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L94)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L113)*
 
 Sign a personal Ethereum signed message.
 
@@ -125,7 +168,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signTransaction](_wallets_wallet_.walletbase.md#signtransaction)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L73)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L92)*
 
 Gets the signer based on the 'from' field in the tx body
 
@@ -145,7 +188,7 @@ ___
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signTypedData](_wallets_wallet_.walletbase.md#signtypeddata)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L111)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L130)*
 
 Sign an EIP712 Typed Data message.
 
