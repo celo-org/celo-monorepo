@@ -19,7 +19,7 @@ import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import QuestionIcon from 'src/icons/QuestionIcon'
-import { moonpayLogo } from 'src/images/Images'
+import { moonpayLogo, simplexLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { emptyHeader, HeaderTitleWithSubtitle } from 'src/navigator/Headers'
@@ -140,6 +140,10 @@ function FiatExchangeOptions({ route, navigation }: Props) {
         image: <Image source={moonpayLogo} style={styles.moonpayLogo} resizeMode={'contain'} />,
         screen: Screens.MoonPay,
       },
+      {
+        image: <Image source={simplexLogo} style={styles.simplexLogo} resizeMode={'contain'} />,
+        screen: Screens.Simplex,
+      },
     ],
   }
 
@@ -147,7 +151,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation('fiatExchangeFlow')
   return (
     <ScrollView style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
         <View>
           {providers[isAddFunds ? 'addFunds' : 'cashOut'].map((value, idx) => {
@@ -175,6 +179,9 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: variables.contentPadding,
   },
+  content: {
+    alignItems: 'flex-start',
+  },
   pleaseSelectProvider: {
     ...fontStyles.regular,
     paddingHorizontal: variables.contentPadding,
@@ -183,6 +190,10 @@ const styles = StyleSheet.create({
   moonpayLogo: {
     height: 30,
     width: 104,
+  },
+  simplexLogo: {
+    alignSelf: 'flex-start',
+    height: 60,
   },
 })
 
