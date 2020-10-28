@@ -45,7 +45,7 @@ export async function requestMoreAttestations(
   txParams: CeloTransactionParams = {}
 ) {
   const unselectedRequest = await attestations.getUnselectedRequest(phoneNumber, account)
-  if (unselectedRequest.blockNumber === 0) {
+  if (unselectedRequest.blockNumber === 0 || (await attestations.isAttestationExpired(unselectedRequest.blockNumber))) {
     await attestations
       .approveAttestationFee(attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))

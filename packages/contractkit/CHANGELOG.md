@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.4.17--dev]**
+### **[0.4.18--dev]**
 Features
 - [one-line summary] - ( [link PR] )
 
@@ -16,6 +16,10 @@ Other Changes
 - [one-line summary - ( [link PR] )
 
 ## Published
+
+### **[0.4.17]** -- 2020-10-27
+Bug Fixes
+- Uses the most up-to-date version of @celo/utils (0.1.21) & fixes backward compatibility issues from the last release
 
 ### **[0.4.16]** -- 2020-10-23
 Features
@@ -33,7 +37,7 @@ Other Changes
 - Filter out MetaTransactionWallet from registered contracts [#5523](https://github.com/celo-org/celo-monorepo/pull/5523)
 - Enable non-singletons in web3/wrapper contract caches [#5518](https://github.com/celo-org/celo-monorepo/pull/5518), [#5507](https://github.com/celo-org/celo-monorepo/pull/5507)
 - `AwsHsmSigner` and `AwsHsmWallet` moved from default exports to named exports - [#5337](https://github.com/celo-org/celo-monorepo/pull/5337)
-- Added `PROXY_SET_IMPLEMENTATION_SIGNATURE` - ( [#5111](https://github.com/celo-org/celo-monorepo/pull/5111) )
+- Added `PROXY_SET_IMPLEMENTATION_SIGNATURE` - [#5111](https://github.com/celo-org/celo-monorepo/pull/5111)
 - Add blockchain parameters to network config - [#5319](https://github.com/celo-org/celo-monorepo/pull/5319)
 - Make initialization of the proxy part of the governance proposal - [#5481](https://github.com/celo-org/celo-monorepo/pull/5481)
 
