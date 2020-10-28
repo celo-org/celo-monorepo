@@ -131,6 +131,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --force                                            Ignore URL validity checks
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
@@ -147,12 +149,12 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --url=https://www.celo.org                         (required) The url you want to claim
+  --url=https://www.celo.org                         (required) The URL you want to claim. Should begin http://
 
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
-  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
+  claim-attestation-service-url ~/metadata.json --url https://test.com/myurl --from
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
