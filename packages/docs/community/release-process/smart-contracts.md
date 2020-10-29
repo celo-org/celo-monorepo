@@ -25,69 +25,117 @@ Celo Core Contracts deployed to a live network without the `getVersion()` functi
 
 Mixin contracts and libraries are considered part of the contracts that consume them. When a mixin or library has changed, all contracts that consume them should be considered to have changed as well, and thus the contracts should have their version numbers incremented and should be re-deployed as part of the next smart contract release.
 
+### Initialize Data
+
+Whenever Celo Core Contracts need to be re-initialized, their initialization arguments should be checked into version control under `packages/protocol/releaseData/initializationData/release${N}.json`.
 
 ### Release management in Git/Github
 
-Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut).
+Github branches/tags and Github releases are used to coordinate past and ongoing releases. Ongoing smart contract development is done on the `master` branch (even after release branches are cut). Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo.
 
-Every smart contract release has a designated release branch, e.g. `release/celo-core-contracts/${N}` in the celo-monorepo. When a new release branch is cut, the commit is tagged with `celo-core-contracts-v${N}.pre-audit`. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
+#### When a new release branch is cut:
+1. A new release branch is created `release/celo-core-contracts/${N}` with the contracts to be audited.
+2. The latest commit on the release branch is tagged with `celo-core-contracts-v${N}.pre-audit`.
+3. On Github, a pre-release Github release should be created pointing at the latest tag on the release branch.
+4. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.pre-audit` so that all future changes to master are versioned against the new release.
+5. Ongoing audit responses/fixes should continue to go into `release/celo-core-contracts/${N}`.
 
-When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
+#### During the release proposal stage:
+1. Whenever release candidates are available they should be tagged `celo-core-contracts-v${N}.rc1`, `...rc2`, etc.
+2. When a release is getting proposed on a Baklava/Alfajores/Mainnet, the commit that was used (which should be the latest release candidate) should be tagged with `celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`.
 
-After a completed release process, the release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
+#### After a completed release process:
+1. The release branch should be merged into `master` with a merge commit (instead of the usual squash merge strategy).
+2. On master branch, `.circleci/config.yml` should be edited so that the variable `RELEASE_TAG` points to the tag `celo-core-contracts-v${N}.mainnet`
 
 
-## Build and Release Process
+## Release Process
 
-Using the following scripts, new contracts can be built and deployed alongside a corresponding on-chain governance proposal. Run the following scripts from the branch with the new release contracts:
+There are several scripts provided (under `packages/protocol` in [celo-org/celo-monorepo](https://github.com/celo-org/celo-monorepo) and via [celocli](../../command-line-interface/introduction.md)) for use in the release process and with contract upgrade governance proposals to give participating stakeholders increased confidence.
 
+{% hint style="warning" %}​
+For these to run, you may need to follow the [setup instructions](https://github.com/celo-org/celo-monorepo/blob/master/SETUP.md). These steps include installing Node and setting `nvm` to use the correct version of Node. Successful `yarn install` and `yarn build` in the protocol package signal a completed setup.
+{% endhint %}
+
+Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
+
+### Verify Release on Network
+
+Use the following script to compile contracts at a release tag and verify that the deployed network bytecode matches the compiled bytecode.
 ```bash
-## Script 1 ##
-# TODO: command to pull source code from release N-1, compile and get the artifacts
-# verify the current contract bytecode on the network matches the contracts currently on the RC1 branch
-yarn truffle exec --network $NETWORK ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
-
-## Script 2 ##
-# TODO: command to pull source code from current release branch
-# generate report on backwards compatibility between RC1 and current branch with new release contracts
-yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/rc1 -n build/contracts --output_file report.json
-
-## Script 3 ##
-# deploy new contracts and generate governance proposal for upgrade
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data example-initialize-data.json'
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
+# A -f boolean flag can be provided to use a forno full node to connect to the provided network
+yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
 ```
 
-These scripts do the following:
+### Check Backward Compatibility
 
-#### Script 1:
+Use the following script to compile candidate and current release contracts to check storage layout and ABI backwards compatibility, subject to the following exceptions:
+  1. If the STORAGE version has changed, does not perform backwards compatibility checks
+  2. If the MAJOR version has changed, checks storage layout compatibility but not ABI compatibility
 
-1. Compiles the contracts at <code>rc1</code> branch and confirms that the compiled bytecode matches what is currently deployed on the specified network.
-
-#### Script 2:
-
-1. Compiles the contracts in the current branch and checks backwards compatibility with what is currently deployed on the specified network, with the following exceptions:
-   1. If the STORAGE version has changed, does not perform backwards compatibility checks
-   2. If the MAJOR version has changed, checks that the storage layout is backwards compatible, but does not check that the contract ABI is backwards compatible.
-2. For contracts that have changed, confirms that the version number in the current branch is strictly greater than the deployed version number.
-3. For contracts that have not changed, confirms that the version number in the current branch is exactly the same as the deployed version number
-
-#### Script 3:
-
-1. For contracts that have changed, deploys those contracts to the specified network.
-2. Creates and submits a single governance proposal to upgrade to the newly deployed contracts.
-   1. STORAGE updates are adopted by deploying a new proxy and implementation and updating the Registry contract.
-   2. All other updates are adopted by updating the proxy contract’s implementation pointer.
-
-## Verify Release Process
-
-Using the following script, any stakeholders can verify that the release contracts deployed as a part of the upgrade proposal match the contracts from the release branch exactly. Run this script from the relevant release tag (`celo-core-contracts-v${N}.(baklava | alfajores | mainnet)`) or release branch `release/celo-core-contracts/N`:
+For changed contracts, checks that new version number is strictly greater than previous release. For unchanged contracts, checks that version number exactly matches previous release. Outputs a JSON backwards compatibility report.
 
 ```bash
-# verify bytecode of upgrade deployment
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+yarn check-versions -a $PREVIOUS_RELEASE -b $RELEASE_CANDIDATE -r "report.json"
 ```
 
-This script compiles the contracts at the current branch and confirms that the compiled bytecode matches the bytecode of contracts deployed as a part of the ugrade propsal.
+This should be used in tandem with `verify-deployed -b $PREVIOUS_RELEASE -n $NETWORK` to ensure the compatibility checks compare the release candidate to what is actually active on the network.
+
+### Deploy New Contracts
+
+Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network. (Use `-d` to dry-run the deploy).
+STORAGE updates are adopted by deploying a new proxy/implementation pair. These new contracts may need to be initialized, for which values can be provided. Outputs a JSON contract upgrade governance proposal.
+
+```bash
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
+```
+
+The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
+
+### Submit Upgrade Proposal
+
+Submit the autogenerated upgrade proposal to the Governance contract for review by voters, outputting a unique identifier.
+
+```bash
+# resultant proposal ID should be communicated publicly
+celocli governance:propose <...> --jsonTransactions "proposal.json"
+```
+
+### Fetch Upgrade Proposal
+
+Fetch the upgrade proposal and output the JSON encoded proposal contents.
+
+```bash
+celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
+```
+
+### Verify Proposed Release
+
+Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly.
+
+```bash
+RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+# A -f boolean flag can be provided to use a forno full node to connect to the provided network
+yarn verify-release -p "upgrade_proposal.json" -b $RELEASE_CANDIDATE -n $NETWORK -f
+```
+
+### Verify Executed Release
+
+After a release executes via Governance, you can verify that the resulting network state reflects the tagged release candidate
+
+```bash
+RELEASE="celo-core-contracts-v${N}.rc${X}"
+NETWORK=${"baklava"|"alfajores"|"mainnet"}
+yarn verify-deployed -n $NETWORK -b $RELEASE -f
+```
 
 ## Testing
 
@@ -96,6 +144,46 @@ All releases should be evaluated according to the following tests.
 ### Unit tests
 
 All changes since the last release should be covered by unit tests. Unit test coverage should be enforced by automated checks run on every commit.
+
+### Manual Checklist
+
+After a successful release execution on a testnet, the resulting network state should be spot-checked to ensure that no regressions have been caused by the release. Flows to test include:
+
+- Do a cUSD and CELO transfer
+    ```bash
+    celocli transfer:dollars --from <addr> --value <number> --to <addr>
+    celocli transfer:celo --from <addr> --value <number> --to <addr>
+    ```
+- Register a Celo account
+    ```bash
+    celocli account:register --from <addr> --name <test-name>
+    ```
+- Report an Oracle rate
+    ```bash
+    celocli oracle:report --from <addr> --value <num>
+    ```
+- Do a CP-DOTO exchange
+    ```bash
+    celocli exchange:celo --value <number> --from <addr>
+    celocli exchange:dollars --value <number> --from <addr>
+    ```
+- Complete a round of attestation
+- Redeem from Escrow
+- Register a Vaildator
+    ```bash
+    celocli validator:register --blsKey <hexString> --blsSignature <hexString> --ecdsaKey <hexString> --from <addr>
+    ```
+- Vote for a Validator
+- Run a mock election
+    ```bash
+    celocli election:run
+    ```
+- Get a valildator slashed for downtime and ejected from the validator set
+- Propose a governance proposal and get it executed
+    ```bash
+    celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
+    ```
+
 
 ### Performance
 
@@ -129,10 +217,8 @@ Deploying a new contract release should occur with the following process. On-cha
     <td>
       <ol>
         <li>Create a Github issue tracking all these checklist items as an audit log</li>
-        <li>Create a <code>release/celo-core-contracts/${N}</code> release branch at the desired commit.</li>
-        <li>Tag the commit <code>celo-core-contracts-v${N}.pre-audit</code></li>
-        <li>Create Github release with above tag</li>
-        <li>Submit this branch to a reputable third party auditor for review.</li>
+        <li>Implement the <a href="#When-a-new-release-branch-is-cut">git management steps</a> for when a new release branch is cut.</li>
+        <li>Submit release branch to a reputable third party auditor for review.</li>
         <li>Begin drafting release notes.</li>
       </ol>
     </td>
@@ -151,7 +237,7 @@ Deploying a new contract release should occur with the following process. On-cha
         </li>
         <li>Commit audit fixes to the release branch</li>
         <li>Submit audit fixes to auditors for review.</li>
-        <li>Tag the first release candidate commit</li>
+        <li>Tag the first release candidate commit according to the <a href="#During-the-release-proposal-stage">git release management instructions</a>.</li>
         <li>Let the community know about the upcoming release proposal by posting details to the Governance category on https://forum.celo.org and cross post in the <a href="https://discord.com/channels/600834479145353243/704805825373274134">Discord <code>#governance</code> channel</a>. See the 'Communication guidelines' section below for information on what your post should contain.</li>
       </ol>
     </td>

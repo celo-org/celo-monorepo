@@ -19,6 +19,8 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
+import { FeeType } from 'src/fees/actions'
+import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
@@ -27,8 +29,11 @@ import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
 import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { divideByWei } from 'src/utils/formatting'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
+
+const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
@@ -51,6 +56,16 @@ function WithdrawCeloScreen({ navigation }: Props) {
     CURRENCY_ENUM.GOLD
   )
 
+  const { result } = useSendFee({
+    feeType: FeeType.SEND,
+    account: RANDOM_ADDRESS,
+    currency: CURRENCY_ENUM.GOLD,
+    recipientAddress: RANDOM_ADDRESS,
+    amount: goldBalance || '0',
+    includeDekFee: false,
+  })
+  const feeEstimate = result && divideByWei(result)
+
   const onConfirm = async () => {
     if (isTransferLimitReached) {
       showLimitReachedBanner()
@@ -63,6 +78,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     navigation.navigate(Screens.WithdrawCeloReviewScreen, {
       amount: celoToTransfer,
       recipientAddress: accountAddress,
+      feeEstimate: feeEstimate || new BigNumber(0),
     })
   }
 
@@ -86,6 +102,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
           inputStyle={styles.input}
           onCeloChanged={setCeloToTransfer}
           celo={celoInput}
+          feeEstimate={feeEstimate}
         />
       </KeyboardAwareScrollView>
       <Button

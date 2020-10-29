@@ -82,6 +82,10 @@ export const pagePaths = {
     link: '/developers',
     isDark: true,
   },
+  FLOWERS: {
+    name: 'For Value Flowers',
+    link: '/flowers',
+  },
   FAQ: {
     name: 'FAQ',
     link: '/faq',
@@ -90,6 +94,11 @@ export const pagePaths = {
   FAUCET: {
     name: 'Faucet',
     link: '/developers/faucet',
+    isDark: false,
+  },
+  GRANT_KIT: {
+    name: 'GrantKit',
+    link: '/experience/grants',
     isDark: false,
   },
   JOBS: {
@@ -179,6 +188,7 @@ export enum CeloLinks {
   reserve = 'https://www.celoreserve.org',
   instagram = 'https://www.instagram.com/celoorg/',
   twitter = 'https://twitter.com/CeloOrg',
+  kuneco = 'https://app.livestorm.co/clabs/kuneco',
   medium = 'https://medium.com/celoOrg',
   mediumUser = 'https://medium.com/@celoorg',
   mediumPublication = 'https://medium.com/celoOrg',

@@ -318,8 +318,10 @@ PODS:
     - React
   - react-native-camera/RN (3.23.1):
     - React
-  - react-native-config (0.11.7):
-    - React
+  - react-native-config (1.3.3):
+    - react-native-config/App (= 1.3.3)
+  - react-native-config/App (1.3.3):
+    - React-Core
   - react-native-contacts (5.0.0):
     - React
   - react-native-fast-crypto (1.8.3):
@@ -470,7 +472,7 @@ PODS:
     - React
   - RNPermissions (2.1.5):
     - React
-  - RNReanimated (1.9.0):
+  - RNReanimated (1.13.1):
     - React
   - RNScreens (2.7.0):
     - React
@@ -791,7 +793,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-blind-threshold-bls: 86068a0a8890b04b5492a4a8787b53dbde1aea8d
   react-native-camera: 1b52abea404d04e040edb3e74b7c5523c01a3089
-  react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
+  react-native-config: e8c71f602c92ddd2f5c24b0b7a90d239ecab8d9f
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
   react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
   react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
@@ -835,7 +837,7 @@ SPEC CHECKSUMS:
   RNKeychain: bf2d7e9a0ae7a073c07770dd2aa6d11c67581733
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
-  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
   RNSentry: 2bae4ffee2e66376ef42cb845a494c3bde17bc56
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765

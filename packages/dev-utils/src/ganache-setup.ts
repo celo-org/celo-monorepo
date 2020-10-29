@@ -41,7 +41,10 @@ export async function startGanache(
     : () => {
         /*nothing*/
       }
-  const chainCopy: string = path.resolve(path.join(filePath, 'tmp/copychain'))
+
+  const chainCopyBase = process.env.GANACHE_CHAIN_DATA_PATH || path.resolve(filePath)
+  const chainCopy: string = path.resolve(path.join(chainCopyBase, 'tmp/copychain'))
+  console.log(chainCopy)
   console.log(filePath, datafile)
   const filenameWithPath: string = path.resolve(path.join(filePath, datafile))
 

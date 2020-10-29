@@ -93,9 +93,6 @@ commands:
       - run:
           name: Fail if generated dependency graph doesn't match committed
           command: ./scripts/ci_check_dependency_graph_changed.sh
-      - run:
-          name: Fail if there are vulnerabilities in packages
-          command: ./scripts/ci_check_vulnerabilities.sh
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -371,8 +368,6 @@ jobs:
           command: |
             set -euo pipefail
             cd packages/mobile
-            # Create dummy Google services plist
-            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.dev.plist
             yarn run test:e2e:ios
       - store_artifacts:
           path: packages/mobile/e2e/artifacts
@@ -387,6 +382,13 @@ jobs:
       # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
+
+  vulnerability-checks:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run: ./scripts/ci_check_vulnerabilities.sh
 
   general-test:
     <<: *defaults
@@ -473,11 +475,11 @@ jobs:
           command: |
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against first commit to contain version numbers"
             git fetch --all
-            RELEASE_BRANCH=$(git branch -a --list *release/contracts/* | tail -1 | sed -e 's/remotes\/origin\///g')
-            yarn --cwd packages/protocol check-versions -a $RELEASE_BRANCH -b $CIRCLE_BRANCH
-
-            LIBRARIES_CHANGED=$(git diff $RELEASE_BRANCH --name-only packages/protocol/contracts/common/linkedlists)
+            RELEASE_TAG=celo-core-contracts-v1.rc1
+            yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
+            LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
             if [[ $LIBRARIES_CHANGED ]]; then
               echo "Changing the linked list libraries is not currently supported."
               exit 0
@@ -497,11 +499,14 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Verify bytecodes between RC1 and current branch
+          name: Verify bytecodes between most recent release and current branch
           command: |
+            # TODO: remove once devchain can reproduce deployments after release 1
+            exit 0
+
             cd packages/protocol
 
-            # deploy RC1 contracts to ganache devchain
+            # deploy most recent release contracts to ganache devchain
             # We fetch via HTTPS instead of SSH to avoid the interactive "do you
             # trust the RSA key fingerprint" prompt.
             git remote add origin-https https://github.com/celo-org/celo-monorepo.git
@@ -977,7 +982,7 @@ jobs:
             sudo apt-get install -y software-properties-common
             sudo apt-get install python3-pip
             pip3 install certora-cli==0.1.1
-            wget https://github.com/ethereum/solidity/releases/download/v0.5.12/solc-static-linux
+            wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
             chmod +x solc-static-linux
             sudo mv solc-static-linux /usr/bin/solc
       - run:
@@ -1010,6 +1015,9 @@ workflows:
           requires:
             - install_dependencies
       - lint-checks:
+          requires:
+            - install_dependencies
+      - vulnerability-checks:
           requires:
             - install_dependencies
       - general-test:

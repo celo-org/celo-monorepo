@@ -164,7 +164,7 @@ ___
 
 ### `Static` fromEmpty
 
-▸ **fromEmpty**(`address`: string): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
+▸ **fromEmpty**(`address`: [Address](../modules/_base_.md#address)): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
 
 *Defined in [packages/contractkit/src/identity/metadata.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L30)*
 
@@ -172,7 +172,7 @@ ___
 
 Name | Type |
 ------ | ------ |
-`address` | string |
+`address` | [Address](../modules/_base_.md#address) |
 
 **Returns:** *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
 
@@ -233,7 +233,7 @@ ___
 
 ### `Static` verifySignerForAddress
 
-▸ **verifySignerForAddress**(`kit`: [ContractKit](_kit_.contractkit.md), `hash`: any, `signature`: any, `address`: string): *Promise‹boolean›*
+▸ **verifySignerForAddress**(`kit`: [ContractKit](_kit_.contractkit.md), `hash`: any, `signature`: any, `address`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
 
 *Defined in [packages/contractkit/src/identity/metadata.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L56)*
 
@@ -244,6 +244,6 @@ Name | Type |
 `kit` | [ContractKit](_kit_.contractkit.md) |
 `hash` | any |
 `signature` | any |
-`address` | string |
+`address` | [Address](../modules/_base_.md#address) |
 
 **Returns:** *Promise‹boolean›*

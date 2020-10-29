@@ -9,6 +9,32 @@ In this documentation you’ll find information on:
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
+## Quick Navigation
+
+#### Celo Holders
+
+Are you a Celo Native asset holder looking for information about how to access your account and earn rewards for participating in the network? [Start here](celo-holder-guide/quick-start.md)
+
+#### Validator & Node Operators
+
+Are you looking for more information about how to run a validating node or a full node?
+
+- Check out the [Validator overview page](operations-manual/overview.md)
+- Consider running a node on the [Baklava testnet](getting-started/baklava-testnet) before getting started on mainnet.
+- Learn more about running nodes on [mainnet](getting-started/mainnet)
+
+#### Developers
+
+Are you interested in building a dapp or service on the Celo network?
+
+- Check out the [developer tools page](developer-resources/overview.md)
+
+#### Integration Guide
+
+This section includes some guides about common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
+
+- Check out the [integration guide](developer-resources/integrations/integrations.md)
+
 ### About Celo
 
 Celo’s purpose is to empower anyone with a smartphone anywhere in the world to have access to financial services, send money to phone numbers, and pay merchants.
@@ -117,7 +143,7 @@ Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
 - [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
-- [Celo Subreddit](https://www.reddit.com/r/CeloHQ/)
+- [Celo Subreddit](https://www.reddit.com/r/celo/)
 - [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)
 

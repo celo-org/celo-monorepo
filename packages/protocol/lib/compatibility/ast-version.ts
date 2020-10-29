@@ -25,7 +25,7 @@ export class ASTContractVersions {
  * Gets the version of a contract by calling Contract.getVersionNumber() on
  * the contract deployed bytecode.
  *
- * If the contract version cannot be retrieved, returns version 1.0.0.0 by default.
+ * If the contract version cannot be retrieved, returns version 1.1.0.0 by default.
  */
 export async function getContractVersion(artifact: Artifact): Promise<ContractVersion> {
   const vm = new VM()

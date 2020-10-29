@@ -61,7 +61,7 @@ export default class MyDocument extends Document<Props> {
             rel="stylesheet"
           />
 
-          <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+          <link key="favicon" rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         </Head>
         <body>
           <Main />
