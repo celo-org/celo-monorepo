@@ -238,7 +238,7 @@ The Celo validator community will contribute full node peers to help kickstart y
 export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
 ```
 
-To use the nodes, set them to the value of the `--bootnodes` or `bootnodesv4` options when running your node-starting `docker run...` commands (in this example, we will use `bootnodesv4` to keep the original command intact). To bootstrap your proxy node, you can run the command below (the same command at line 239 appended with `--bootnodesv4 $COMMUNITY_ENODES`):
+To use the nodes, set them to the value of the `bootnodes` or `bootnodesv4` options when running your node-starting `docker run...` commands (in this example, we will use `bootnodesv4` to keep the original command intact). To bootstrap your proxy node, you can run the command below (the same command at line 239 appended with `--bootnodesv4 $COMMUNITY_ENODES`):
 ```bash
 export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
