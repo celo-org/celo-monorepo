@@ -178,11 +178,8 @@ if [[ ${geth_metrics} == "true" ]]; then
   METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
 fi
 
-if [[ "${network_name}" == "alfajores" || "${network_name}" == "baklava" ]]; then
-  BOOTNODE_FLAG="--${network_name}"
-else
-  BOOTNODE_FLAG="--bootnodes=enode://$BOOTNODE_ENODE"
-fi
+# Using bootnode so their enode url will be published to the discv5 DHT (and light clients can discover them)
+BOOTNODE_FLAG="--bootnodes=enode://$BOOTNODE_ENODE"
 
 DATA_DIR=/root/.celo
 
