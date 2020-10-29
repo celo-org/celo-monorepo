@@ -99,39 +99,6 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validator/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/deregister.ts)_
 
-### Downtime-slash
-
-Downtime slash a validator
-
-```
-USAGE
-  $ celocli validator:downtime-slash
-
-OPTIONS
-  -k, --privateKey=privateKey                             Use a private key to sign local transactions with
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Slasher
-
-  --ledgerAddresses=ledgerAddresses                       [default: 1] If --useLedger is set, this will get the first N
-                                                          addresses for local signing
-
-  --ledgerConfirmAddress                                  Set it to ask confirmation for the address of the transaction
-                                                          from the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses           [default: [0]] If --useLedger is set, this will get the array
-                                                          of index addresses for local signing. Example
-                                                          --ledgerCustomAddresses "[4,99]"
-
-  --useLedger                                             Set it to use a ledger wallet
-
-  --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
-
-EXAMPLE
-  downtime-slash --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator
-  0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD
-```
-
-_See code: [packages/cli/src/commands/validator/downtime-slash.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/downtime-slash.ts)_
-
 ### Force-deaffiliate
 
 Force deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member. Used by stake-off admins in order to remove validators from the next epoch's validator set if they are down and consistently unresponsive, in order to preserve the health of the network. This feature will be removed once slashing for downtime is implemented.
