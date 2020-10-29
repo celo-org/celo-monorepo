@@ -134,10 +134,7 @@ export function embedPhoneNumberMetadata(
   phoneNumberDetails?: PhoneNumberHashDetails
 ) {
   return phoneNumberDetails
-    ? comment +
-        METADATA_CONTENT_SEPARATOR +
-        phoneNumberDetails.e164Number +
-        phoneNumberDetails.pepper
+    ? comment + METADATA_CONTENT_SEPARATOR + phoneNumberDetails.e164Number + phoneNumberDetails.salt
     : comment
 }
 

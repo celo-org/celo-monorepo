@@ -388,7 +388,7 @@ export const v5Schema = {
       phoneHashDetails: {
         e164Number: '',
         phoneHash: '',
-        pepper: '',
+        salt: '',
       },
       actionableAttestations: [],
       status: {
@@ -407,6 +407,18 @@ export const v5Schema = {
   },
 }
 
+export const v6Schema = {
+  ...v5Schema,
+  web3: {
+    ...v5Schema.web3,
+    scwAccount: null,
+  },
+  identity: {
+    ...v5Schema.identity,
+    walletToAccountAddress: {},
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v5Schema as Partial<RootState>
+  return v6Schema as Partial<RootState>
 }

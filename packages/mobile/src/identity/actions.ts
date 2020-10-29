@@ -5,6 +5,7 @@ import {
   E164NumberToAddressType,
   E164NumberToSaltType,
   UpdatableVerificationState,
+  WalletToAccountAddressType,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -22,6 +23,7 @@ export enum Actions {
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
   COMPLETE_ATTESTATION_CODE = 'IDENTITY/COMPLETE_ATTESTATION_CODE',
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
+  UPDATE_WALLET_TO_ACCOUNT_ADDRESS = 'UPDATE_WALLET_TO_ACCOUNT_ADDRESS',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
   END_FETCHING_ADDRESSES = 'IDENTITY/END_FETCHING_ADDRESSES',
@@ -95,6 +97,11 @@ export interface UpdateE164PhoneNumberAddressesAction {
   type: Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES
   e164NumberToAddress: E164NumberToAddressType
   addressToE164Number: AddressToE164NumberType
+}
+
+export interface UpdateWalletToAccountAddressAction {
+  type: Actions.UPDATE_WALLET_TO_ACCOUNT_ADDRESS
+  walletToAccountAddress: WalletToAccountAddressType
 }
 
 export interface UpdateE164PhoneNumberSaltAction {
@@ -208,6 +215,7 @@ export type ActionTypes =
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
+  | UpdateWalletToAccountAddressAction
   | UpdateE164PhoneNumberSaltAction
   | ImportContactsAction
   | UpdateImportContactProgress
@@ -299,6 +307,13 @@ export const updateE164PhoneNumberAddresses = (
   type: Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES,
   e164NumberToAddress,
   addressToE164Number,
+})
+
+export const updateWalletToAccountAddress = (
+  walletToAccountAddress: WalletToAccountAddressType
+): UpdateWalletToAccountAddressAction => ({
+  type: Actions.UPDATE_WALLET_TO_ACCOUNT_ADDRESS,
+  walletToAccountAddress,
 })
 
 export const updateE164PhoneNumberSalts = (

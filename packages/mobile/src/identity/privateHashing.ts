@@ -73,7 +73,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   if (cachedSalt) {
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
     const phoneHash = getPhoneHash(e164Number, cachedSalt)
-    const cachedDetails: PhoneNumberHashDetails = { e164Number, phoneHash, pepper: cachedSalt }
+    const cachedDetails: PhoneNumberHashDetails = { e164Number, phoneHash, salt: cachedSalt }
     return cachedDetails
   }
 
@@ -92,7 +92,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
     account,
     selfPhoneHash
   )
-  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.pepper }))
+  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
   return details
 }
 
@@ -155,7 +155,7 @@ export function* getUserSelfPhoneHashDetails() {
 
   const details: PhoneNumberHashDetails = {
     e164Number,
-    pepper: salt,
+    salt,
     phoneHash: PhoneNumberUtils.getPhoneHash(e164Number, salt),
   }
 

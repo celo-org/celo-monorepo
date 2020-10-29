@@ -16,7 +16,12 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
-import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
+import {
+  FetchDataEncryptionKeyAction,
+  updateAddressDekMap,
+  updateWalletToAccountAddress,
+} from 'src/identity/actions'
+import { walletToAccountAddressSelector, WalletToAccountAddressType } from 'src/identity/reducer'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
@@ -24,7 +29,11 @@ import Logger from 'src/utils/Logger'
 import { registerDataEncryptionKey, setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { dataEncryptionKeySelector, isDekRegisteredSelector } from 'src/web3/selectors'
+import {
+  dataEncryptionKeySelector,
+  isDekRegisteredSelector,
+  scwAccountSelector,
+} from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'web3/dataEncryptionKey'
@@ -34,7 +43,7 @@ export function* fetchDataEncryptionKeyWrapper({ address }: FetchDataEncryptionK
   yield call(doFetchDataEncryptionKey, address)
 }
 
-export function* doFetchDataEncryptionKey(address: string) {
+export function* doFetchDataEncryptionKey(walletAddress: string) {
   // TODO consider caching here
   // We could use the values in the DekMap instead of looking up each time
   // But Deks can change, how should we invalidate the cache?
@@ -44,8 +53,12 @@ export function* doFetchDataEncryptionKey(address: string) {
     contractKit.contracts,
     contractKit.contracts.getAccounts,
   ])
-  const dek: string = yield call(accountsWrapper.getDataEncryptionKey, address)
-  yield put(updateAddressDekMap(address, dek || null))
+  const walletToAccountAddress: WalletToAccountAddressType = yield select(
+    walletToAccountAddressSelector
+  )
+  const accountAddress = walletToAccountAddress[walletAddress] || walletAddress
+  const dek: string = yield call(accountsWrapper.getDataEncryptionKey, accountAddress)
+  yield put(updateAddressDekMap(accountAddress, dek || null))
   return !dek ? null : hexToBuffer(dek)
 }
 
@@ -61,7 +74,7 @@ export function* createAccountDek(mnemonic: string) {
 
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
-export function* registerAccountDek(account: string) {
+export function* registerAccountDek(walletAccount: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
@@ -90,7 +103,12 @@ export function* registerAccountDek(account: string) {
       contractKit.contracts.getAccounts,
     ])
 
-    const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
+    const upToDate: boolean = yield call(
+      isAccountUpToDate,
+      accountsWrapper,
+      walletAccount,
+      publicDataKey
+    )
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
 
     if (upToDate) {
@@ -103,11 +121,16 @@ export function* registerAccountDek(account: string) {
     }
 
     // Generate and send a transaction to set the DEK on-chain.
-    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, account)
+    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAccount)
     const context = newTransactionContext(TAG, 'Set wallet address & DEK')
-    yield call(sendTransaction, setAccountTx.txo, account, context)
+    yield call(sendTransaction, setAccountTx.txo, walletAccount, context)
 
     yield put(registerDataEncryptionKey())
+    // TODO: Move this update to the end of the onboarding flow
+    const accountAddress: string | null = yield select(scwAccountSelector)
+    if (accountAddress) {
+      yield put(updateWalletToAccountAddress({ walletAccount: accountAddress }))
+    }
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
       newRegistration: true,
     })
