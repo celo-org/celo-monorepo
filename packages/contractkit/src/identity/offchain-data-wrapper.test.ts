@@ -22,121 +22,95 @@ import { MockStorageWriter } from './offchain/storage-writers'
 const testname = 'test'
 const testPayload = { name: testname }
 
+interface RegisteredAccount {
+  wrapper: OffchainDataWrapper
+  privateKey: string
+  publicKey: string
+  address: string
+  storageRoot: string
+  localStorageRoot: string
+  kit: ContractKit
+}
+
 testWithGanache('Offchain Data', (web3) => {
-  let kit: ContractKit
+  const kit = newKitFromWeb3(web3)
 
   const writerPrivate = ACCOUNT_PRIVATE_KEYS[0]
-  const writerPublic = privateKeyToPublicKey(writerPrivate)
-  const writerAddress = publicKeyToAddress(writerPublic)
-
   const readerPrivate = ACCOUNT_PRIVATE_KEYS[1]
-  const readerPublic = privateKeyToPublicKey(readerPrivate)
-  const readerAddress = publicKeyToAddress(readerPublic)
-
   const reader2Private = ACCOUNT_PRIVATE_KEYS[2]
-  const reader2Public = privateKeyToPublicKey(reader2Private)
-  const reader2Address = publicKeyToAddress(reader2Public)
-
   const signerPrivate = ACCOUNT_PRIVATE_KEYS[3]
-  const signerPublic = privateKeyToPublicKey(signerPrivate)
-  const signerAddress = publicKeyToAddress(signerPublic)
 
   const writerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
-  const writerEncryptionKeyPublic = privateKeyToPublicKey(writerEncryptionKeyPrivate)
   const readerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
-  const readerEncryptionKeyPublic = privateKeyToPublicKey(readerEncryptionKeyPrivate)
+  const reader2EncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
 
-  const METADATA_URL = 'http://example.com'
-  const WRITER_METADATA_URL = 'http://example.com/writer'
-  const WRITER_STORAGE_ROOT = 'http://example.com/root'
-  const WRITER_LOCAL_STORAGE_ROOT = `/tmp/offchain/${writerAddress}`
   let accounts: AccountsWrapper
-  let wrapper: OffchainDataWrapper
-  let readerWrapper: OffchainDataWrapper
-  let reader2Wrapper: OffchainDataWrapper
+  let writer: RegisteredAccount
+  let reader: RegisteredAccount
+  let reader2: RegisteredAccount
+  let signer: RegisteredAccount
 
   async function setupAccount(
     privateKey: string,
-    dek: string
-  ): Promise<{
-    wrapper: OffchainDataWrapper
-    privateKey: string
-    publicKey: string
-    account: string
-  }> {
-    const cKit = newKitFromWeb3(web3)
+    dek?: string,
+    compressedDEK = false
+  ): Promise<RegisteredAccount> {
     const publicKey = privateKeyToPublicKey(privateKey)
-    const from = publicKeyToAddress(publicKey)
-    const metadataURL = `${METADATA_URL}/${from}/metadata`
-    const storageRoot = `${METADATA_URL}/${from}/root`
-    const localStorageRoot = `/tmp/offchain/${from}`
+    const address = publicKeyToAddress(publicKey)
+    const metadataURL = `http://example.com/${address}/metadata`
+    const storageRoot = `http://example.com/${address}/root`
+    const localStorageRoot = `/tmp/offchain/${address}`
 
-    accounts = await cKit.contracts.getAccounts()
-    await accounts.createAccount().sendAndWaitForReceipt({ from })
+    accounts = await kit.contracts.getAccounts()
+    await accounts.createAccount().sendAndWaitForReceipt({ from: address })
 
-    await accounts.setAccountDataEncryptionKey(dek).sendAndWaitForReceipt({ from })
+    if (dek) {
+      await accounts
+        .setAccountDataEncryptionKey(
+          compressedDEK
+            ? ensureLeading0x(ensureCompressed(privateKeyToPublicKey(dek)))
+            : privateKeyToPublicKey(dek)
+        )
+        .sendAndWaitForReceipt({ from: address })
+      kit.addAccount(dek)
+    }
 
-    const metadata = IdentityMetadataWrapper.fromEmpty(from)
-    await metadata.addClaim(createStorageClaim(storageRoot), NativeSigner(web3.eth.sign, from))
+    const metadata = IdentityMetadataWrapper.fromEmpty(address)
+    await metadata.addClaim(createStorageClaim(storageRoot), NativeSigner(web3.eth.sign, address))
 
     fetchMock.mock(metadataURL, metadata.toString())
-    await accounts.setMetadataURL(metadataURL).sendAndWaitForReceipt({ from })
+    await accounts.setMetadataURL(metadataURL).sendAndWaitForReceipt({ from: address })
 
-    cKit.addAccount(privateKey)
-    cKit.addAccount(privateKey)
+    kit.addAccount(privateKey)
 
-    const wrapper = new OffchainDataWrapper(from, kit)
+    const wrapper = new OffchainDataWrapper(address, kit)
     wrapper.storageWriter = new MockStorageWriter(localStorageRoot, storageRoot, fetchMock)
 
-    return { wrapper, privateKey, publicKey, account: from }
+    return { wrapper, privateKey, publicKey, address, storageRoot, localStorageRoot, kit }
   }
 
   beforeEach(async () => {
-    kit = newKitFromWeb3(web3)
-
-    accounts = await kit.contracts.getAccounts()
-    await accounts.createAccount().sendAndWaitForReceipt({ from: writerAddress })
-
-    await accounts
-      .setAccountDataEncryptionKey(writerEncryptionKeyPublic)
-      .sendAndWaitForReceipt({ from: writerAddress })
-
-    const metadata = IdentityMetadataWrapper.fromEmpty(writerAddress)
-    await metadata.addClaim(
-      createStorageClaim(WRITER_STORAGE_ROOT),
-      NativeSigner(web3.eth.sign, writerAddress)
-    )
-
-    fetchMock.mock(WRITER_METADATA_URL, metadata.toString())
-    await accounts
-      .setMetadataURL(WRITER_METADATA_URL)
-      .sendAndWaitForReceipt({ from: writerAddress })
-
-    kit.addAccount(writerPrivate)
-
-    wrapper = new OffchainDataWrapper(writerAddress, kit)
-    wrapper.storageWriter = new MockStorageWriter(
-      WRITER_LOCAL_STORAGE_ROOT,
-      WRITER_STORAGE_ROOT,
-      fetchMock
-    )
-
-    readerWrapper = new OffchainDataWrapper(readerAddress, kit)
-    reader2Wrapper = new OffchainDataWrapper(reader2Address, kit)
+    writer = await setupAccount(writerPrivate, writerEncryptionKeyPrivate)
+    reader = await setupAccount(readerPrivate, readerEncryptionKeyPrivate)
+    reader2 = await setupAccount(reader2Private, reader2EncryptionKeyPrivate)
+    signer = await setupAccount(signerPrivate)
   })
 
   afterEach(() => {
     fetchMock.reset()
-    kit.getWallet().removeAccount(writerAddress)
+    writer.kit.getWallet().removeAccount(writer.address)
+    reader.kit.getWallet().removeAccount(reader.address)
+    reader2.kit.getWallet().removeAccount(reader2.address)
+    signer.kit.getWallet().removeAccount(signer.address)
   })
 
   describe('with the account being the signer', () => {
     it('can write a name', async () => {
-      const nameAccessor = new PublicNameAccessor(wrapper)
+      const nameAccessor = new PublicNameAccessor(writer.wrapper)
       await nameAccessor.write(testPayload)
 
-      const readerNameAccessor = new PublicNameAccessor(readerWrapper)
-      const resp = await readerNameAccessor.readAsResult(writerAddress)
+      const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
+      const resp = await readerNameAccessor.readAsResult(writer.address)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       } else {
@@ -170,69 +144,51 @@ testWithGanache('Offchain Data', (web3) => {
   it('cannot write with a signer that is not authorized', async () => {
     // Mock the 404
     fetchMock.mock(
-      WRITER_STORAGE_ROOT + `/account/authorizedSigners/${toChecksumAddress(signerAddress)}`,
+      writer.storageRoot + `/account/authorizedSigners/${toChecksumAddress(signer.address)}`,
       404
     )
 
-    // this is so it doesn't fail on writing
-    kit.addAccount(signerPrivate)
-
-    wrapper = new OffchainDataWrapper(signerAddress, kit)
+    const wrapper = new OffchainDataWrapper(signer.address, kit)
     wrapper.storageWriter = new MockStorageWriter(
-      WRITER_LOCAL_STORAGE_ROOT,
-      WRITER_STORAGE_ROOT,
+      writer.localStorageRoot,
+      writer.storageRoot,
       fetchMock
     )
-
     const nameAccessor = new PublicNameAccessor(wrapper)
     await nameAccessor.write(testPayload)
 
-    const receivedName = await nameAccessor.readAsResult(writerAddress)
+    const receivedName = await nameAccessor.readAsResult(writer.address)
     expect(receivedName.ok).toEqual(false)
-    const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-    const authorization = await authorizedSignerAccessor.readAsResult(writerAddress, signerAddress)
+    const authorizedSignerAccessor = new AuthorizedSignerAccessor(writer.wrapper)
+    const authorization = await authorizedSignerAccessor.readAsResult(
+      writer.address,
+      signer.address
+    )
     expect(authorization.ok).toEqual(false)
-
-    kit.getWallet().removeAccount(signerAddress)
   })
 
   describe('with a different key being authorized to sign off-chain', () => {
-    let signerWrapper: OffchainDataWrapper
-
     beforeEach(async () => {
-      const pop = await accounts.generateProofOfKeyPossession(writerAddress, signerAddress)
-      const authorizedSignerAccessor = new AuthorizedSignerAccessor(wrapper)
-      await authorizedSignerAccessor.write(signerAddress, serializeSignature(pop), '.*')
-
-      signerWrapper = new OffchainDataWrapper(writerAddress, kit, signerAddress)
-      signerWrapper.storageWriter = new MockStorageWriter(
-        WRITER_LOCAL_STORAGE_ROOT,
-        WRITER_STORAGE_ROOT,
-        fetchMock
-      )
-
-      kit.addAccount(signerPrivate)
-    })
-
-    afterEach(() => {
-      kit.getWallet().removeAccount(signerAddress)
+      const pop = await accounts.generateProofOfKeyPossession(writer.address, signer.address)
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(writer.wrapper)
+      await authorizedSignerAccessor.write(signer.address, serializeSignature(pop), '.*')
     })
 
     it('can read the authorization', async () => {
-      const authorizedSignerAccessor = new AuthorizedSignerAccessor(readerWrapper)
+      const authorizedSignerAccessor = new AuthorizedSignerAccessor(reader.wrapper)
       const authorization = await authorizedSignerAccessor.readAsResult(
-        writerAddress,
-        signerAddress
+        writer.address,
+        signer.address
       )
       expect(authorization).toBeDefined()
     })
 
     it('can write a name', async () => {
-      const nameAccessor = new PublicNameAccessor(signerWrapper)
+      const nameAccessor = new PublicNameAccessor(signer.wrapper)
       await nameAccessor.write(testPayload)
 
-      const readerNameAccessor = new PublicNameAccessor(readerWrapper)
-      const resp = await readerNameAccessor.readAsResult(writerAddress)
+      const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
+      const resp = await readerNameAccessor.readAsResult(writer.address)
       if (resp.ok) {
         expect(resp.result.name).toEqual(testname)
       }
@@ -240,104 +196,81 @@ testWithGanache('Offchain Data', (web3) => {
   })
 
   describe('with a reader that has a dataEncryptionKey registered', () => {
-    beforeEach(async () => {
-      await accounts.createAccount().sendAndWaitForReceipt({ from: readerAddress })
-      await accounts
-        .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
-        .sendAndWaitForReceipt({ from: readerAddress })
+    it('encrypted data can be read and written', async () => {
+      const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+      const receivedName = await readerNameAccessor.readAsResult(writer.address)
 
-      await accounts.createAccount().sendAndWaitForReceipt({ from: reader2Address })
-      await accounts
-        .setAccountDataEncryptionKey(readerEncryptionKeyPublic)
-        .sendAndWaitForReceipt({ from: reader2Address })
-
-      kit.addAccount(writerEncryptionKeyPrivate)
+      if (receivedName.ok) {
+        expect(receivedName.result.name).toEqual(testname)
+      } else {
+        console.error(receivedName.error)
+        throw new Error('should not get here')
+      }
     })
 
-    describe('when the key is added to the wallet', () => {
-      beforeEach(() => {
-        kit.addAccount(readerEncryptionKeyPrivate)
-      })
+    it('trying to read encrypted data without an encrypted accessor fails', async () => {
+      const nameAccessor = new PrivateNameAccessor(writer.wrapper)
+      await nameAccessor.write(testPayload, [reader.address])
 
-      afterEach(() => {
-        kit.getWallet().removeAccount(publicKeyToAddress(readerEncryptionKeyPublic))
-      })
+      const readerNameAccessor = new PublicNameAccessor(reader.wrapper)
+      const receivedName = await readerNameAccessor.readAsResult(writer.address)
 
-      it('encrypted data can be read and written', async () => {
-        const nameAccessor = new PrivateNameAccessor(wrapper)
-        await nameAccessor.write(testPayload, [readerAddress])
+      if (receivedName.ok) {
+        throw new Error('Should not be able to read data without encrypted name accessor')
+      }
+      expect(receivedName.error.errorType).toBe(SchemaErrorTypes.OffchainError)
+      // @ts-ignore
+      expect(receivedName.error.error.errorType).toBe(OffchainErrorTypes.NoStorageRootProvidedData)
+    })
 
-        const readerNameAccessor = new PrivateNameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
+    it('can re-encrypt data to more recipients', async () => {
+      const nameAccessor = new PrivateNameAccessor(writer.wrapper)
+      console.log(1, await nameAccessor.write(testPayload, [reader.address]))
+      console.log(2, await nameAccessor.write(testPayload, [reader2.address]))
 
-        if (receivedName.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-        } else {
-          console.error(receivedName.error)
-          throw new Error('should not get here')
-        }
-      })
+      const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+      const receivedName = await readerNameAccessor.readAsResult(writer.address)
+      const reader2NameAccessor = new PrivateNameAccessor(reader2.wrapper)
+      const receivedName2 = await reader2NameAccessor.readAsResult(writer.address)
 
-      it('trying to read encrypted data without an encrypted accessor fails', async () => {
-        const nameAccessor = new PrivateNameAccessor(wrapper)
-        await nameAccessor.write(testPayload, [readerAddress])
+      if (receivedName.ok && receivedName2.ok) {
+        expect(receivedName.result.name).toEqual(testname)
+        expect(receivedName2.result.name).toEqual(testname)
+      } else {
+        throw new Error('should not get here')
+      }
+    })
 
-        const readerNameAccessor = new PublicNameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
+    it('can encrypt data with user defined symmetric key', async () => {
+      const symmetricKey = randomBytes(16)
 
-        if (receivedName.ok) {
-          throw new Error('Should not be able to read data without encrypted name accessor')
-        }
-        expect(receivedName.error.errorType).toBe(SchemaErrorTypes.OffchainError)
-        // @ts-ignore
-        expect(receivedName.error.error.errorType).toBe(
-          OffchainErrorTypes.NoStorageRootProvidedData
-        )
-      })
+      const nameAccessor = new PrivateNameAccessor(writer.wrapper)
+      await nameAccessor.write(testPayload, [reader.address], symmetricKey)
 
-      it('can re-encrypt data to more recipients', async () => {
-        const nameAccessor = new PrivateNameAccessor(wrapper)
-        await nameAccessor.write(testPayload, [readerAddress])
-        await nameAccessor.write(testPayload, [reader2Address])
+      const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+      const receivedName = await readerNameAccessor.readAsResult(writer.address)
 
-        const readerNameAccessor = new PrivateNameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
-        const reader2NameAccessor = new PrivateNameAccessor(reader2Wrapper)
-        const receivedName2 = await reader2NameAccessor.readAsResult(writerAddress)
-
-        if (receivedName.ok && receivedName2.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-          expect(receivedName2.result.name).toEqual(testname)
-        } else {
-          throw new Error('should not get here')
-        }
-      })
-
-      it('can encrypt data with user defined symmetric key', async () => {
-        const symmetricKey = randomBytes(16)
-
-        const nameAccessor = new PrivateNameAccessor(wrapper)
-        await nameAccessor.write(testPayload, [readerAddress], symmetricKey)
-
-        const readerNameAccessor = new PrivateNameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
-
-        if (receivedName.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-        } else {
-          console.error(receivedName.error)
-          throw new Error('should not get here')
-        }
-      })
+      if (receivedName.ok) {
+        expect(receivedName.result.name).toEqual(testname)
+      } else {
+        console.error(receivedName.error)
+        throw new Error('should not get here')
+      }
     })
 
     describe('when the key is not added to the wallet', () => {
-      it('the reader cannot decrypt the data', async () => {
-        const nameAccessor = new PrivateNameAccessor(wrapper)
-        await nameAccessor.write(testPayload, [readerAddress])
+      beforeEach(() => {
+        reader.kit
+          .getWallet()
+          .removeAccount(publicKeyToAddress(privateKeyToPublicKey(readerEncryptionKeyPrivate)))
+      })
 
-        const readerNameAccessor = new PrivateNameAccessor(readerWrapper)
-        const receivedName = await readerNameAccessor.readAsResult(writerAddress)
+      it('the reader cannot decrypt the data', async () => {
+        const nameAccessor = new PrivateNameAccessor(writer.wrapper)
+        await nameAccessor.write(testPayload, [reader.address])
+
+        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+        const receivedName = await readerNameAccessor.readAsResult(writer.address)
 
         if (receivedName.ok) {
           throw new Error('Should not get here')
@@ -346,91 +279,69 @@ testWithGanache('Offchain Data', (web3) => {
         expect(receivedName.error.errorType).toEqual(SchemaErrorTypes.UnavailableKey)
       })
     })
+  })
 
-    describe('when data encryption keys are compressed', () => {
-      it('works when the writer has a compressed key', async () => {
-        const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[4]
-        const writerDEK = randomBytes(32).toString('hex')
-        const writer = await setupAccount(
-          writerPrivateKey,
-          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(writerDEK)))
-        )
-        writer.wrapper.kit.addAccount(writerDEK)
+  describe('when data encryption keys are compressed', () => {
+    it('works when the writer has a compressed key', async () => {
+      const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[4]
+      const writerDEK = randomBytes(32).toString('hex')
+      const compressedWriter = await setupAccount(writerPrivateKey, writerDEK, true)
+      compressedWriter.wrapper.kit.addAccount(writerDEK)
 
-        const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[5]
-        const readerDEK = randomBytes(32).toString('hex')
-        const reader = await setupAccount(readerPrivateKey, privateKeyToPublicKey(readerDEK))
-        reader.wrapper.kit.addAccount(readerDEK)
+      const writerNameAccessor = new PrivateNameAccessor(compressedWriter.wrapper)
+      const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
 
-        const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
-        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+      await writerNameAccessor.write(testPayload, [reader.address])
+      const receivedName = await readerNameAccessor.readAsResult(compressedWriter.address)
+      if (receivedName.ok) {
+        expect(receivedName.result.name).toEqual(testname)
+      } else {
+        console.error(receivedName.error)
+        throw new Error('should not get here')
+      }
+    })
 
-        await writerNameAccessor.write(testPayload, [reader.account])
-        const receivedName = await readerNameAccessor.readAsResult(writer.account)
-        if (receivedName.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-        } else {
-          console.error(receivedName.error)
-          throw new Error('should not get here')
-        }
-      })
+    it('works when the reader has a compressed key', async () => {
+      const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[7]
+      const readerDEK = randomBytes(32).toString('hex')
+      const compressedReader = await setupAccount(readerPrivateKey, readerDEK, true)
+      compressedReader.wrapper.kit.addAccount(readerDEK)
 
-      it('works when the reader has a compressed key', async () => {
-        const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[6]
-        const writerDEK = randomBytes(32).toString('hex')
-        const writer = await setupAccount(writerPrivateKey, privateKeyToPublicKey(writerDEK))
-        writer.wrapper.kit.addAccount(writerDEK)
+      const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
+      const readerNameAccessor = new PrivateNameAccessor(compressedReader.wrapper)
 
-        const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[7]
-        const readerDEK = randomBytes(32).toString('hex')
-        const reader = await setupAccount(
-          readerPrivateKey,
-          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(readerDEK)))
-        )
-        reader.wrapper.kit.addAccount(readerDEK)
+      await writerNameAccessor.write(testPayload, [compressedReader.address])
+      const receivedName = await readerNameAccessor.readAsResult(writer.address)
+      if (receivedName.ok) {
+        expect(receivedName.result.name).toEqual(testname)
+      } else {
+        console.error(receivedName.error)
+        throw new Error('should not get here')
+      }
+    })
 
-        const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
-        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+    it('works when both the reader and the writer have compressed keys', async () => {
+      const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[8]
+      const writerDEK = randomBytes(32).toString('hex')
+      const compressedWriter = await setupAccount(writerPrivateKey, writerDEK, true)
+      compressedWriter.wrapper.kit.addAccount(writerDEK)
 
-        await writerNameAccessor.write(testPayload, [reader.account])
-        const receivedName = await readerNameAccessor.readAsResult(writer.account)
-        if (receivedName.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-        } else {
-          console.error(receivedName.error)
-          throw new Error('should not get here')
-        }
-      })
+      const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[9]
+      const readerDEK = randomBytes(32).toString('hex')
+      const compressedReader = await setupAccount(readerPrivateKey, readerDEK, true)
+      compressedReader.wrapper.kit.addAccount(readerDEK)
 
-      it('works when both the reader and the writer have compressed keys', async () => {
-        const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[8]
-        const writerDEK = randomBytes(32).toString('hex')
-        const writer = await setupAccount(
-          writerPrivateKey,
-          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(writerDEK)))
-        )
-        writer.wrapper.kit.addAccount(writerDEK)
+      const writerNameAccessor = new PrivateNameAccessor(compressedWriter.wrapper)
+      const readerNameAccessor = new PrivateNameAccessor(compressedReader.wrapper)
 
-        const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[9]
-        const readerDEK = randomBytes(32).toString('hex')
-        const reader = await setupAccount(
-          readerPrivateKey,
-          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(readerDEK)))
-        )
-        reader.wrapper.kit.addAccount(readerDEK)
-
-        const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
-        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
-
-        await writerNameAccessor.write(testPayload, [reader.account])
-        const receivedName = await readerNameAccessor.readAsResult(writer.account)
-        if (receivedName.ok) {
-          expect(receivedName.result.name).toEqual(testname)
-        } else {
-          console.error(receivedName.error)
-          throw new Error('should not get here')
-        }
-      })
+      await writerNameAccessor.write(testPayload, [compressedReader.address])
+      const receivedName = await readerNameAccessor.readAsResult(compressedWriter.address)
+      if (receivedName.ok) {
+        expect(receivedName.result.name).toEqual(testname)
+      } else {
+        console.error(receivedName.error)
+        throw new Error('should not get here')
+      }
     })
   })
 })
