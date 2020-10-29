@@ -17,10 +17,10 @@ describe('Deep link without account', () => {
   describe('HandleDeepLinkSend', HandleDeepLinkSend)
 })
 
-describe('Deep Link with account', () => {
-  beforeEach(dismissBanners)
+//describe('Deep Link with account', () => {
+//  beforeEach(dismissBanners)
 
-  describe('Onboarding', RestoreAccountOnboarding)
-  describe('HandleDeepLinkSend', HandleDeepLinkSend)
-  describe('Reset Account', ResetAccount)
-})
+//  describe('Onboarding', RestoreAccountOnboarding)
+//  describe('HandleDeepLinkSend', HandleDeepLinkSend)
+//  describe('Reset Account', ResetAccount)
+//})

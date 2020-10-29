@@ -176,7 +176,6 @@
     "eslint": "^6.8.0",
     "jest-fetch-mock": "^2.1.2",
     "metro-react-native-babel-preset": "^0.58.0",
-    "mocha": "8.2.0",
     "patch-package": "^5.1.1",
     "postinstall-prepare": "^1.0.1",
     "react-dom": "16.11.0",
