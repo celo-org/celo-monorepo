@@ -30,7 +30,10 @@ export default class DowntimeSlashCommand extends BaseCommand {
   }
 
   static examples = [
-    'downtime-slash --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --validator 0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD',
+    'downtime-slash \
+    --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 \
+    --validator 0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD \
+    --startBlocks "[100, 150]" --endBlocks "[149, 199]"',
   ]
 
   async run() {
@@ -58,12 +61,15 @@ export default class DowntimeSlashCommand extends BaseCommand {
         `provided intervals span slashableDowntime blocks (${slashableDowntime})`,
         () => slashableDowntime < intervals[intervals.length - 1].end - intervals[0].start + 1
       )
-      .addCheck(`bitmaps are set for intervals (${intervals})`, async () =>
-        intervals.some(
-          async (interval) =>
-            !(await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end))
-        )
-      )
+      .addCheck(`bitmaps are set for intervals (${intervals})`, async () => {
+        for (const interval of intervals) {
+          const set = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
+          if (!set) {
+            return false
+          }
+        }
+        return true
+      })
       .addCheck(`validator was down for intervals`, () =>
         downtimeSlasher.wasValidatorDown(validator, startBlocks, endBlocks)
       )
