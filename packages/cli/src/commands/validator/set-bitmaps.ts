@@ -26,7 +26,7 @@ export default class SetBitmapsCommand extends BaseCommand {
   }
 
   static examples = [
-    'downtime-slash \
+    'set-bitmaps \
     --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 \
     --startBlocks "[100, 150]" --endBlocks "[149, 199]"',
   ]
@@ -40,16 +40,22 @@ export default class SetBitmapsCommand extends BaseCommand {
 
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
 
+    let someSet = false
+    let setInterval = {}
+    for (const interval of intervals) {
+      someSet = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
+      if (someSet) {
+        setInterval = interval
+        break
+      }
+    }
+
     await newCheckBuilder(this)
-      .addCheck(`bitmaps are not already set for intervals (${intervals})`, async () => {
-        for (const interval of intervals) {
-          const set = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
-          if (set) {
-            return true
-          }
-        }
-        return false
-      })
+      .addCheck(
+        `bitmaps are not already set for intervals`,
+        () => someSet,
+        `interval ${setInterval} already set`
+      )
       .runChecks()
 
     for (const interval of intervals) {

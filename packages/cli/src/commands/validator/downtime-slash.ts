@@ -61,15 +61,19 @@ export default class DowntimeSlashCommand extends BaseCommand {
         `provided intervals span slashableDowntime blocks (${slashableDowntime})`,
         () => slashableDowntime < intervals[intervals.length - 1].end - intervals[0].start + 1
       )
-      .addCheck(`bitmaps are set for intervals (${intervals})`, async () => {
-        for (const interval of intervals) {
-          const set = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
-          if (!set) {
-            return false
+      .addCheck(
+        `bitmaps are set for intervals`,
+        async () => {
+          for (const interval of intervals) {
+            const set = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
+            if (!set) {
+              return false
+            }
           }
-        }
-        return true
-      })
+          return true
+        },
+        'some bitmaps are not set, please use validator:set-bitmaps'
+      )
       .addCheck(`validator was down for intervals`, () =>
         downtimeSlasher.wasValidatorDown(validator, startBlocks, endBlocks)
       )
