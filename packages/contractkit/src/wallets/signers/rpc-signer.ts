@@ -167,4 +167,9 @@ export class RpcSigner implements Signer {
 
     return Buffer.from(trimLeading0x(resp), 'hex')
   }
+
+  computeSharedSecret(_publicKey: string) {
+    throw new Error('Not implemented')
+    return Promise.resolve(Buffer.from([]))
+  }
 }

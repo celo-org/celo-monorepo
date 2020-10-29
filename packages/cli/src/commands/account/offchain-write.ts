@@ -1,4 +1,4 @@
-import { NameAccessor } from '@celo/contractkit/lib/identity/offchain/schemas'
+import { PublicNameAccessor } from '@celo/contractkit/lib/identity/offchain/accessors/name'
 import { flags } from '@oclif/command'
 import { OffchainDataCommand } from '../../utils/off-chain-data'
 
@@ -20,7 +20,7 @@ export default class OffchainWrite extends OffchainDataCommand {
   async run() {
     const res = this.parse(OffchainWrite)
     this.kit.defaultAccount = res.flags.from
-    const nameSchema = new NameAccessor(this.offchainDataWrapper)
+    const nameSchema = new PublicNameAccessor(this.offchainDataWrapper)
     await nameSchema.write({ name: res.flags.name })
   }
 }
