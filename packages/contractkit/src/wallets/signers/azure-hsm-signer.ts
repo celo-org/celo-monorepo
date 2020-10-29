@@ -77,4 +77,9 @@ export class AzureHSMSigner implements Signer {
     // To make the compiler happy
     return Promise.resolve(_ciphertext)
   }
+
+  computeSharedSecret(_publicKey: string) {
+    throw new Error('Not implemented')
+    return Promise.resolve(Buffer.from([]))
+  }
 }
