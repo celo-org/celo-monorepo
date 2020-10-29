@@ -1,10 +1,10 @@
 import Carousel from 'nuka-carousel'
 import * as React from 'react'
 import { View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import PagingDots from 'src/carousel/PagingDots'
 import Fellow from 'src/community/connect/Fellow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN } from 'src/shared/Button.3'
 import { colors, standardStyles } from 'src/styles'
 
@@ -76,7 +76,7 @@ class FellowViewer extends React.PureComponent<ScreenProps> {
             : standardStyles.sectionMarginTop
         }
       >
-        <Fade distance={'20px'} bottom={true}>
+        <Fade distance={'20px'}>
           <Carousel
             heightMode={'current'}
             autoplay={false}

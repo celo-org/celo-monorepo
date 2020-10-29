@@ -43,8 +43,13 @@ export async function getKit(
   })
 
   const data = kit.items[0].fields
-  const pageID = data.pages_.find((p) => p.fields.slug === (!pageSlug ? 'index' : pageSlug))?.sys
-    ?.id
+
+  const homePageSlug = kitSlug === 'merchant' ? 'index' : kitSlug
+
+  const actualPageSlug = !pageSlug ? homePageSlug : pageSlug
+
+  const pageID = data.pages_.find((p) => p.fields.slug === actualPageSlug)?.sys?.id
+
   return {
     kitName: data.name,
     metaDescription: data.metaDescription,
@@ -54,7 +59,7 @@ export async function getKit(
       return {
         title: page.fields.title,
         href: `/experience/${kitSlug}${
-          page.fields.slug === 'index' ? '' : '/' + page.fields.slug
+          page.fields.slug === kitSlug || page.fields.slug === 'index' ? '' : '/' + page.fields.slug
         }${addLocale(locale)}`,
         sections: [],
       }
@@ -68,18 +73,16 @@ interface ContentFulPage {
   sections: Array<Entry<{ name: string; contentField: Document; slug: string }>>
 }
 
-export async function getPage(pageSlug: string, id, { preview, locale }) {
+export async function getPage(id: string, { preview, locale }) {
   const pages = await intialize(preview).getEntries<ContentFulPage>({
     content_type: 'page',
-    'fields.slug': !pageSlug ? 'index' : pageSlug,
     'sys.id': id,
     include: 3,
     locale,
   })
-
   const data = pages.items[0].fields
 
-  const sections = data.sections.map((section) => section.fields)
+  const sections = (data.sections || []).map((section) => section.fields)
   return { ...data, sections }
 }
 

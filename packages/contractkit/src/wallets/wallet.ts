@@ -1,5 +1,5 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
@@ -12,11 +12,13 @@ import { Signer } from './signers/signer'
 
 export interface ReadOnlyWallet {
   getAccounts: () => Address[]
+  removeAccount: (address: Address) => void
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
+  computeSharedSecret: (address: Address, publicKey: string) => Promise<Buffer>
 }
 
 type addInMemoryAccount = (privateKey: string) => void
@@ -44,6 +46,14 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   }
 
   /**
+   * Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+   * @param address The address of the account to be removed
+   */
+  removeAccount(_address: string) {
+    throw new Error('removeAccount is not supported for this wallet')
+  }
+
+  /**
    * Returns true if account has been registered
    * @param address Account to check
    */
@@ -64,6 +74,15 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   protected addSigner(address: Address, signer: TSigner) {
     const normalizedAddress = normalizeAddressWith0x(address)
     this.accountSigners.set(normalizedAddress, signer)
+  }
+
+  /**
+   * Removes the account-signer
+   * @param address Account address
+   */
+  protected removeSigner(address: Address) {
+    const normalizedAddress = normalizeAddressWith0x(address)
+    this.accountSigners.delete(normalizedAddress)
   }
 
   /**
@@ -113,11 +132,8 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
       throw Error('wallet@signTypedData: TypedData Missing')
     }
 
-    const dataBuff = generateTypedDataHash(typedData)
-    const trimmedData = dataBuff.toString('hex')
-
     const signer = this.getSigner(address)
-    const sig = await signer.signPersonalMessage(trimmedData)
+    const sig = await signer.signTypedData(typedData)
 
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }
@@ -133,5 +149,13 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   async decrypt(address: string, ciphertext: Buffer) {
     const signer = this.getSigner(address)
     return signer.decrypt(ciphertext)
+  }
+
+  /**
+   * Computes the shared secret (an ECDH key exchange object) between two accounts
+   */
+  computeSharedSecret(address: Address, publicKey: string): Promise<Buffer> {
+    const signer = this.getSigner(address)
+    return signer.computeSharedSecret(publicKey)
   }
 }

@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
@@ -15,6 +16,14 @@ const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloScreen)
 const store = createMockStore({
   goldToken: { balance: SAMPLE_BALANCE },
 })
+
+const mockResult = new BigNumber(10)
+jest.mock('src/fees/CalculateFee', () => ({
+  useSendFee: () => ({
+    result: mockResult,
+    loading: false,
+  }),
+}))
 
 describe('WithdrawCeloScreen', () => {
   it('renders correctly', () => {
@@ -55,7 +64,7 @@ describe('WithdrawCeloScreen', () => {
 
     expect(getByTestId('CeloAmount').props.value).toBe('')
     fireEvent.press(getByTestId('MaxAmount'))
-    expect(getByTestId('CeloAmount').props.value).toBe(SAMPLE_BALANCE)
+    expect(parseFloat(getByTestId('CeloAmount').props.value).toFixed(5)).toBe(SAMPLE_BALANCE)
     expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
   })
 

@@ -64,6 +64,7 @@ export interface AttesationServiceRevealRequest {
   // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
+  language?: string
 }
 
 export interface UnselectedRequest {

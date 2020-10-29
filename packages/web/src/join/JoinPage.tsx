@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import analytics from 'src/analytics/analytics'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
@@ -13,13 +12,14 @@ import ImagePanes from 'src/join/ImagePanes'
 import previewImage from 'src/join/preview.png'
 import Rise from 'src/join/Rise'
 import ThreePillars from 'src/join/ThreePillars'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
 
 const DESCRIPTION =
-  'Join us in building monetary system that creates the conditions for prosperity for all. We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.'
+  'Join us in building financial system that creates the conditions for prosperity for all. We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.'
 
 interface OwnProps {
   positions: LeverJob[]
@@ -56,9 +56,12 @@ class JoinPage extends React.PureComponent<Props> {
           <View style={styles.cover}>
             <View style={styles.heading}>
               <View style={[standardStyles.centered, styles.cloud, styles.inside]}>
-                <Fade ssrReveal={true} bottom={true} delay={10} distance={'20px'}>
+                <Fade delay={10} distance={'20px'}>
                   <View style={standardStyles.centered}>
-                    <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+                    <H1
+                      ariaLevel="2"
+                      style={[textStyles.center, standardStyles.elementalMarginBottom]}
+                    >
                       {t('workWithValue')}
                     </H1>
                     <H4 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
@@ -68,7 +71,7 @@ class JoinPage extends React.PureComponent<Props> {
                 </Fade>
               </View>
               <View style={[styles.cloud]}>
-                <Fade ssrReveal={true} bottom={true} delay={20} distance={'20px'}>
+                <Fade delay={20} distance={'20px'}>
                   <Button
                     kind={BTN.PRIMARY}
                     text={t('exploreRoles')}

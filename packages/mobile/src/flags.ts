@@ -15,3 +15,11 @@ export const features = {
 export const pausedFeatures = {
   INVITE: true,
 }
+
+// Country specific features, unlisted countries are set to `false` by default
+// Using 2 letters alpha code. See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+export const countryFeatures = {
+  RESTRICTED_CP_DOTO: {
+    PH: true,
+  },
+}
