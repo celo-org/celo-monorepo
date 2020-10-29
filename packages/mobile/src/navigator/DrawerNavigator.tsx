@@ -20,10 +20,12 @@ import {
   useLinkBuilder,
 } from '@react-navigation/native'
 import { TransitionPresets } from '@react-navigation/stack'
-import * as React from 'react'
+import BigNumber from 'bignumber.js'
+import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
+import { useDispatch } from 'react-redux'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import {
@@ -39,7 +41,10 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
+import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
 import { AccountKey } from 'src/icons/navigator/AccountKey'
@@ -132,8 +137,20 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     value: dollarBalance ?? '0',
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
+  const celoBalance = useSelector(celoTokenBalanceSelector)
+  const celoAmount = {
+    value: new BigNumber(celoBalance ?? '0'),
+    currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
+  }
+  const hasCeloBalance = celoAmount.value.isGreaterThan(GOLD_TRANSACTION_MIN_AMOUNT)
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
+
+  const dispatch = useDispatch()
+  useEffect(() => {
+    // Needed for the local CELO balance display
+    dispatch(fetchExchangeRate())
+  }, [])
 
   return (
     <DrawerContentScrollView {...props}>
@@ -151,15 +168,36 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           style={fontStyles.regular500}
           amount={dollarAmount}
           showLocalAmount={true}
+          testID="LocalDollarBalance"
         />
         <CurrencyDisplay
-          style={styles.dollarsLabel}
+          style={styles.amountLabelSmall}
           amount={dollarAmount}
           showLocalAmount={false}
           hideFullCurrencyName={false}
           hideSymbol={true}
+          testID="DollarBalance"
         />
         <View style={styles.borderBottom} />
+        {hasCeloBalance && (
+          <>
+            <CurrencyDisplay
+              style={fontStyles.regular500}
+              amount={celoAmount}
+              showLocalAmount={true}
+              testID="LocalCeloBalance"
+            />
+            <CurrencyDisplay
+              style={styles.amountLabelSmall}
+              amount={celoAmount}
+              showLocalAmount={false}
+              hideFullCurrencyName={false}
+              hideSymbol={true}
+              testID="CeloBalance"
+            />
+            <View style={styles.borderBottom} />
+          </>
+        )}
       </View>
       <CustomDrawerItemList {...props} protectedRoutes={[Screens.BackupIntroduction]} />
       <View style={styles.drawerBottom}>
@@ -257,7 +295,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray2,
     alignSelf: 'stretch',
   },
-  dollarsLabel: {
+  amountLabelSmall: {
     ...fontStyles.small,
     color: colors.gray4,
     marginTop: 2,
