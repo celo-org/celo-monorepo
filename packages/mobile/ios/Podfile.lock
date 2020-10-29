@@ -472,7 +472,7 @@ PODS:
     - React
   - RNPermissions (2.1.5):
     - React
-  - RNReanimated (1.9.0):
+  - RNReanimated (1.13.1):
     - React
   - RNScreens (2.7.0):
     - React
@@ -837,7 +837,7 @@ SPEC CHECKSUMS:
   RNKeychain: bf2d7e9a0ae7a073c07770dd2aa6d11c67581733
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
-  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
   RNSentry: 2bae4ffee2e66376ef42cb845a494c3bde17bc56
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765
