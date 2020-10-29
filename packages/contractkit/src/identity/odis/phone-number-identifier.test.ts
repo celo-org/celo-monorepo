@@ -1,9 +1,20 @@
+import { getPhoneHash, hexToBuffer } from '@celo/base'
+import { ec as EC } from 'elliptic'
+import { sha3 } from 'web3-utils'
+import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
   isBalanceSufficientForSigRetrieval,
+  performGetPhoneNumberIdentifier,
 } from './phone-number-identifier'
-import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
+import {
+  AuthenticationMethod,
+  CustomSigner,
+  EncryptionKeySigner,
+  ErrorMessages,
+  ServiceContext,
+} from './query'
 
 jest.mock('./bls-blinding-client', () => {
   class WasmBlsBlindingClient {
@@ -15,8 +26,12 @@ jest.mock('./bls-blinding-client', () => {
   }
 })
 
+const ec = new EC('secp256k1')
+
 const mockE164Number = '+14155550000'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
+const expectedPhoneHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
+const expectedPepper = 'nHIvMC9B4j2+H'
 
 const serviceContext: ServiceContext = {
   odisUrl: 'https://mockodis.com',
@@ -24,10 +39,11 @@ const serviceContext: ServiceContext = {
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
 const endpoint = serviceContext.odisUrl + '/getBlindedMessageSig'
+const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
 
 const authSigner: EncryptionKeySigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
-  rawKey: '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04',
+  rawKey,
 }
 
 describe(isBalanceSufficientForSigRetrieval, () => {
@@ -43,18 +59,74 @@ describe(getPhoneNumberIdentifier, () => {
     fetchMock.reset()
   })
 
-  it('Retrieves a pepper correctly', async () => {
-    fetchMock.mock(endpoint, {
-      success: true,
-      combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+  describe('Retrieves a pepper correctly', () => {
+    it('Using EncryptionKeySigner', async () => {
+      fetchMock.mock(endpoint, {
+        success: true,
+        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+      })
+
+      await expect(
+        getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
+      ).resolves.toMatchObject({
+        e164Number: mockE164Number,
+        pepper: expectedPepper,
+        phoneHash: expectedPhoneHash,
+      })
     })
 
-    await expect(
-      getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
-    ).resolves.toMatchObject({
-      e164Number: mockE164Number,
-      pepper: 'nHIvMC9B4j2+H',
-      phoneHash: '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301',
+    it('Using CustomSigner', async () => {
+      fetchMock.mock(endpoint, {
+        success: true,
+        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+      })
+
+      const customSignerMethod = jest.fn((bodyString) => {
+        const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+        return Promise.resolve(JSON.stringify(key.sign(bodyString).toDER()))
+      })
+      const customSigner: CustomSigner = {
+        authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER,
+        customSigner: customSignerMethod,
+      }
+
+      await expect(
+        getPhoneNumberIdentifier(mockE164Number, mockAccount, customSigner, serviceContext)
+      ).resolves.toMatchObject({
+        e164Number: mockE164Number,
+        pepper: expectedPepper,
+        phoneHash: expectedPhoneHash,
+      })
+
+      expect(customSignerMethod.mock.calls.length).toBe(1)
+    })
+
+    it('Preblinding the phone number', async () => {
+      fetchMock.mock(endpoint, {
+        success: true,
+        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+      })
+
+      const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
+
+      const base64PhoneNumber = Buffer.from(mockE164Number).toString('base64')
+      const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
+
+      const base64BlindSig = await performGetPhoneNumberIdentifier(
+        mockAccount,
+        authSigner,
+        serviceContext,
+        base64BlindedMessage
+      )
+
+      const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
+      const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
+
+      const pepper = getPepperFromThresholdSignature(sigBuf)
+      const phoneHash = getPhoneHash(sha3, mockE164Number, pepper)
+
+      expect(phoneHash).toEqual(expectedPhoneHash)
+      expect(pepper).toEqual(expectedPepper)
     })
   })
 

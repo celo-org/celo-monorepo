@@ -56,6 +56,36 @@ export async function getPhoneNumberIdentifier(
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
   const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
 
+  const base64BlindSig = await performGetPhoneNumberIdentifier(
+    account,
+    signer,
+    context,
+    base64BlindedMessage,
+    selfPhoneHash,
+    clientVersion
+  )
+
+  debug('Retrieving unblinded signature')
+  const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
+  const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
+
+  debug('Converting sig to pepper')
+  const pepper = getPepperFromThresholdSignature(sigBuf)
+  const phoneHash = getPhoneHash(sha3, e164Number, pepper)
+  return { e164Number, phoneHash, pepper }
+}
+
+/**
+ * Retrieve the on-chain identifier for the provided phone number
+ */
+export async function performGetPhoneNumberIdentifier(
+  account: string,
+  signer: AuthSigner,
+  context: ServiceContext,
+  base64BlindedMessage: string,
+  selfPhoneHash?: string,
+  clientVersion?: string
+): Promise<string> {
   const body: SignMessageRequest = {
     account,
     timestamp: Date.now(),
@@ -71,15 +101,7 @@ export async function getPhoneNumberIdentifier(
     context,
     SIGN_MESSAGE_ENDPOINT
   )
-  const base64BlindSig = response.combinedSignature
-  debug('Retrieving unblinded signature')
-  const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
-  const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
-
-  debug('Converting sig to pepper')
-  const pepper = getPepperFromThresholdSignature(sigBuf)
-  const phoneHash = getPhoneHash(sha3, e164Number, pepper)
-  return { e164Number, phoneHash, pepper }
+  return response.combinedSignature
 }
 
 // This is the algorithm that creates a pepper from the unblinded message signatures
