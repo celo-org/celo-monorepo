@@ -74,7 +74,7 @@ export function* createAccountDek(mnemonic: string) {
 
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
-export function* registerAccountDek(walletAccount: string) {
+export function* registerAccountDek(walletAddress: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
@@ -106,7 +106,7 @@ export function* registerAccountDek(walletAccount: string) {
     const upToDate: boolean = yield call(
       isAccountUpToDate,
       accountsWrapper,
-      walletAccount,
+      walletAddress,
       publicDataKey
     )
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
@@ -121,15 +121,15 @@ export function* registerAccountDek(walletAccount: string) {
     }
 
     // Generate and send a transaction to set the DEK on-chain.
-    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAccount)
+    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
     const context = newTransactionContext(TAG, 'Set wallet address & DEK')
-    yield call(sendTransaction, setAccountTx.txo, walletAccount, context)
+    yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
 
     yield put(registerDataEncryptionKey())
     // TODO: Move this update to the end of the onboarding flow
-    const accountAddress: string | null = yield select(scwAccountSelector)
-    if (accountAddress) {
-      yield put(updateWalletToAccountAddress({ walletAccount: accountAddress }))
+    const scwAddress: string | null = yield select(scwAccountSelector)
+    if (scwAddress) {
+      yield put(updateWalletToAccountAddress({ walletAddress: scwAddress }))
     }
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
       newRegistration: true,

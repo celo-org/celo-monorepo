@@ -26,7 +26,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, unlockAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { currentAccountSelector, scwAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privateHashing'
 export const LOOKUP_GAS_FEE_ESTIMATE = 0.03
@@ -65,7 +65,9 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
  * otherwise query from the service
  */
 function* doFetchPhoneHashPrivate(e164Number: string) {
-  const account: string = yield call(getConnectedAccount)
+  const scwAddress: string | null = yield select(scwAccountSelector)
+  const walletAddress: string = yield call(getConnectedAccount)
+  const accountAddress: string = scwAddress || walletAddress
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
   const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
   const cachedSalt = saltCache[e164Number]
@@ -89,7 +91,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   const details: PhoneNumberHashDetails = yield call(
     getPhoneHashPrivate,
     e164Number,
-    account,
+    accountAddress,
     selfPhoneHash
   )
   yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
@@ -99,15 +101,16 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
 // Unlike the getPhoneHash in utils, this leverages the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
-function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash?: string) {
+function* getPhoneHashPrivate(e164Number: string, accountAddress: string, selfPhoneHash?: string) {
   if (!isE164Number(e164Number)) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, account)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, accountAddress)
   // Unlock the account if the authentication is signed by the wallet
   if (authSigner.authenticationMethod === OdisUtils.Query.AuthenticationMethod.WALLET_KEY) {
-    const success: boolean = yield call(unlockAccount, account)
+    const walletAddress: string = yield call(getConnectedAccount)
+    const success: boolean = yield call(unlockAccount, walletAddress)
     if (!success) {
       throw new Error(ErrorMessages.INCORRECT_PIN)
     }
@@ -123,7 +126,7 @@ function* getPhoneHashPrivate(e164Number: string, account: string, selfPhoneHash
     return yield call(
       OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier,
       e164Number,
-      account,
+      accountAddress,
       authSigner,
       serviceContext,
       selfPhoneHash,
