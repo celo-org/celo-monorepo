@@ -235,11 +235,9 @@ function* getWalletAddressesAndUpdateCache(e164Number: string) {
   ])
 
   const accountAddresses: string[] = yield call(getAccountAddresses, e164Number)
-
+  // TODO: Update array item types when I've heard back from CAP
   const walletAddresses: Array<string | undefined> = yield all(
-    accountAddresses.map((accountAddress) =>
-      call(() => accountsWrapper.getWalletAddress(accountAddress))
-    )
+    accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
   )
 
   const registeredWalletAddresses: string[] = []

@@ -388,7 +388,7 @@ export const v5Schema = {
       phoneHashDetails: {
         e164Number: '',
         phoneHash: '',
-        salt: '',
+        pepper: '',
       },
       actionableAttestations: [],
       status: {
@@ -411,7 +411,7 @@ export const v6Schema = {
   ...v5Schema,
   web3: {
     ...v5Schema.web3,
-    scwAccount: null,
+    mtwAddress: null,
   },
   identity: {
     ...v5Schema.identity,

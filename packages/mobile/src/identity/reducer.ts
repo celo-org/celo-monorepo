@@ -141,7 +141,7 @@ const initialState: State = {
     phoneHashDetails: {
       e164Number: '',
       phoneHash: '',
-      salt: '',
+      pepper: '',
     },
     actionableAttestations: [],
     status: {

@@ -17,7 +17,7 @@ const TAG = 'identity/matchmaking'
 
 // Uses the phone number privacy service to find mutual matches between Celo users
 export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) {
-  const account: string = yield call(getConnectedUnlockedAccount)
+  const walletAddress: string = yield call(getConnectedUnlockedAccount)
   Logger.debug(TAG, 'Starting contact matchmaking')
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
     getUserSelfPhoneHashDetails
@@ -28,7 +28,7 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     return
   }
 
-  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, account)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount)
 
   const { odisPubKey, odisUrl } = networkConfig
   const serviceContext: ServiceContext = {
@@ -41,7 +41,8 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
       OdisUtils.Matchmaking.getContactMatches,
       selfPhoneDetails.e164Number,
       Object.keys(e164NumberToRecipients),
-      account,
+      // TODO: Check with Cody whether this should be MTW or EOA address
+      walletAddress,
       selfPhoneDetails.phoneHash,
       authSigner,
       serviceContext,

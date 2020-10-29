@@ -4,9 +4,10 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { OdisUtils } from '@celo/contractkit'
+import { CeloTransactionObject, OdisUtils } from '@celo/contractkit'
 import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { compressedPubKey, deriveDek } from '@celo/utils/src/dataEncryptionKey'
@@ -28,11 +29,11 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { registerDataEncryptionKey, setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import {
   dataEncryptionKeySelector,
   isDekRegisteredSelector,
-  scwAccountSelector,
+  mtwAddressSelector,
 } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -103,9 +104,13 @@ export function* registerAccountDek(walletAddress: string) {
       contractKit.contracts.getAccounts,
     ])
 
+    const mtwAddress: string | null = yield select(mtwAddressSelector)
+    const accountAddress: string = mtwAddress || walletAddress
+
     const upToDate: boolean = yield call(
       isAccountUpToDate,
       accountsWrapper,
+      accountAddress,
       walletAddress,
       publicDataKey
     )
@@ -121,26 +126,55 @@ export function* registerAccountDek(walletAddress: string) {
     }
 
     // Generate and send a transaction to set the DEK on-chain.
-    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
+    let setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
     const context = newTransactionContext(TAG, 'Set wallet address & DEK')
-    const scwAddress: string | null = yield select(scwAccountSelector)
-    // If SCW has been created, use it to register user's DEK so that scwAddress
-    // will be set to accountAddress on-chain
-    if (scwAddress) {
-      const wallet = contractKit.contracts.getMetaTransactionWallet(walletAddress)
-      const setAccountTxViaMTW = yield call(wallet.signAndExecuteMetaTransaction(setAccountTx.txo))
-      yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
+    // If MTW has been created, route the user's DEK/wallet registration through it
+    // because accountAddress is determined by msg.sender
+    if (mtwAddress) {
+      try {
+        const mtwWrapper: MetaTransactionWalletWrapper = yield call(
+          [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
+          mtwAddress
+        )
+
+        if (!mtwWrapper) {
+          throw Error(`MetaTransactionWallet not found for address: ${mtwAddress}`)
+        }
+
+        const proofOfPossession: {
+          v: number
+          r: string
+          s: string
+        } = yield call(accountsWrapper.generateProofOfKeyPossession, mtwAddress, walletAddress)
+
+        setAccountTx = accountsWrapper.setAccount(
+          '',
+          publicDataKey,
+          walletAddress,
+          proofOfPossession
+        )
+
+        const setAccountTxViaMTW: CeloTransactionObject<string> = yield call(
+          mtwWrapper.signAndExecuteMetaTransaction,
+          setAccountTx.txo
+        )
+        yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
+        yield put(updateWalletToAccountAddress({ walletAddress: mtwAddress }))
+      } catch (error) {
+        Logger.debug(
+          `${TAG}@registerAccountDek`,
+          'Failed to register mtwAddress as accountAddress, defaulting to walletAddress. Error: ',
+          error
+        )
+        yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
+      }
     } else {
       yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
     }
 
+    // TODO: Make sure this action is also triggered after the DEK registration
+    // that will happen via Komenci
     yield put(registerDataEncryptionKey())
-    // TODO: Move this update to the end of the onboarding flow
-    // right after the `setAccount` transaction
-
-    if (scwAddress) {
-      yield put(updateWalletToAccountAddress({ walletAddress: scwAddress }))
-    }
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
       newRegistration: true,
     })
@@ -155,19 +189,25 @@ export function* registerAccountDek(walletAddress: string) {
 // the Accounts contract
 export async function isAccountUpToDate(
   accountsWrapper: AccountsWrapper,
-  address: string,
+  accountAddress: string,
+  walletAddress: string,
   dataKey: string
 ) {
-  if (!address || !dataKey) {
+  if (!accountAddress || !dataKey) {
     return false
   }
 
-  const [currentWalletAddress, currentDEK] = await Promise.all([
-    accountsWrapper.getWalletAddress(address),
-    accountsWrapper.getDataEncryptionKey(address),
+  const [onchainWalletAddress, onchainDEK] = await Promise.all([
+    accountsWrapper.getWalletAddress(accountAddress),
+    accountsWrapper.getDataEncryptionKey(accountAddress),
   ])
-  Logger.debug(`${TAG}/isAccountUpToDate`, `DEK associated with account ${currentDEK}`)
-  return eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK, dataKey)
+  Logger.debug(`${TAG}/isAccountUpToDate`, `DEK associated with account ${onchainDEK}`)
+  return (
+    onchainWalletAddress &&
+    onchainDEK &&
+    eqAddress(onchainWalletAddress, walletAddress) &&
+    eqAddress(onchainDEK, dataKey)
+  )
 }
 
 export async function getRegisterDekTxGas(account: string, currency: CURRENCY_ENUM) {
@@ -186,7 +226,7 @@ export async function getRegisterDekTxGas(account: string, currency: CURRENCY_EN
   }
 }
 
-export function* getAuthSignerForAccount(account: string) {
+export function* getAuthSignerForAccount() {
   const contractKit = yield call(getContractKit)
 
   if (features.PNP_USE_DEK_FOR_AUTH) {
@@ -200,10 +240,14 @@ export function* getAuthSignerForAccount(account: string) {
       Logger.error(TAG + '/getAuthSignerForAccount', 'Missing comment key, should never happen.')
     } else {
       const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+      const mtwAddress: string | null = yield select(mtwAddressSelector)
+      const walletAddress: string = yield call(getAccount)
+      const accountAddress: string = mtwAddress || walletAddress
       const upToDate: boolean = yield call(
         isAccountUpToDate,
         accountsWrapper,
-        account,
+        accountAddress,
+        walletAddress,
         publicDataKey
       )
       if (!upToDate) {
