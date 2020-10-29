@@ -16,6 +16,7 @@
 * [getPepperFromThresholdSignature](_identity_odis_phone_number_identifier_.md#getpepperfromthresholdsignature)
 * [getPhoneNumberIdentifier](_identity_odis_phone_number_identifier_.md#getphonenumberidentifier)
 * [isBalanceSufficientForSigRetrieval](_identity_odis_phone_number_identifier_.md#isbalancesufficientforsigretrieval)
+* [performGetPhoneNumberIdentifier](_identity_odis_phone_number_identifier_.md#performgetphonenumberidentifier)
 
 ## Variables
 
@@ -39,7 +40,7 @@ ___
 
 ▸ **getPepperFromThresholdSignature**(`sigBuf`: Buffer): *string*
 
-*Defined in [packages/contractkit/src/identity/odis/phone-number-identifier.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L87)*
+*Defined in [packages/contractkit/src/identity/odis/phone-number-identifier.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L109)*
 
 **Parameters:**
 
@@ -79,7 +80,7 @@ ___
 
 ▸ **isBalanceSufficientForSigRetrieval**(`dollarBalance`: BigNumber.Value, `celoBalance`: BigNumber.Value): *boolean*
 
-*Defined in [packages/contractkit/src/identity/odis/phone-number-identifier.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L98)*
+*Defined in [packages/contractkit/src/identity/odis/phone-number-identifier.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L120)*
 
 Check if balance is sufficient for quota retrieval
 
@@ -91,3 +92,26 @@ Name | Type |
 `celoBalance` | BigNumber.Value |
 
 **Returns:** *boolean*
+
+___
+
+###  performGetPhoneNumberIdentifier
+
+▸ **performGetPhoneNumberIdentifier**(`account`: string, `signer`: [AuthSigner](_identity_odis_query_.md#authsigner), `context`: [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md), `base64BlindedMessage`: string, `selfPhoneHash?`: undefined | string, `clientVersion?`: undefined | string): *Promise‹string›*
+
+*Defined in [packages/contractkit/src/identity/odis/phone-number-identifier.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/phone-number-identifier.ts#L81)*
+
+Retrieve the on-chain identifier for the provided phone number
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`account` | string |
+`signer` | [AuthSigner](_identity_odis_query_.md#authsigner) |
+`context` | [ServiceContext](../interfaces/_identity_odis_query_.servicecontext.md) |
+`base64BlindedMessage` | string |
+`selfPhoneHash?` | undefined &#124; string |
+`clientVersion?` | undefined &#124; string |
+
+**Returns:** *Promise‹string›*
