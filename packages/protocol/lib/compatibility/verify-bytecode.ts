@@ -26,9 +26,6 @@ interface VerificationContext {
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
-
-  // TODO: remove this after first smart contracts release
-  isBeforeRelease1: boolean
 }
 
 // Checks if the given transaction is a repointing of the Proxy for the given
@@ -81,19 +78,14 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     return getProposedImplementationAddress(contract, context)
   }
 
-  let proxyAddress: string
   if (isLibrary(contract, context)) {
-    proxyAddress = context.libraryAddresses.addresses[contract]
-    // Before the first contracts upgrade libraries are not proxied.
-    if (context.isBeforeRelease1) {
-      return `0x${proxyAddress}`
-    }
-  } else {
-    // contract is registered but we need to check if the proxy is affected by the proposal
-    proxyAddress = isProxyChanged(contract, context)
-      ? getProposedProxyAddress(contract, context)
-      : await context.registry.getAddressForString(contract)
+    return `0x${context.libraryAddresses.addresses[contract]}`
   }
+
+  // contract is registered but we need to check if the proxy is affected by the proposal
+  const proxyAddress = isProxyChanged(contract, context)
+    ? getProposedProxyAddress(contract, context)
+    : await context.registry.getAddressForString(contract)
 
   // at() returns a promise despite Typescript labelling the await as extraneous
   const proxy: ProxyInstance = await context.Proxy.at(
@@ -155,8 +147,7 @@ export const verifyBytecodes = async (
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
-  web3: Web3,
-  isBeforeRelease1: boolean = false
+  web3: Web3
 ) => {
   const invalidTransactions = proposal.filter(
     (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
@@ -175,7 +166,6 @@ export const verifyBytecodes = async (
     proposal,
     Proxy,
     web3,
-    isBeforeRelease1,
   }
 
   while (queue.length > 0) {
