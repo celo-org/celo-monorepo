@@ -47,7 +47,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const showSkipDialog = route.params?.showSkipDialog || false
   const [showLearnMoreDialog, setShowLearnMoreDialog] = useState(false)
   const [isCaptchaVisible, setIsCaptchaVisible] = useState(false)
-  const [safetyNetAttestation, setSafetyNetAttestation] = useState()
+  const [, setSafetyNetAttestation] = useState()
   const e164PhoneNumber = useSelector(e164NumberSelector)
   const { t } = useTranslation(Namespaces.onboarding)
   const dispatch = useDispatch()
