@@ -131,6 +131,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --force                                            Ignore URL validity checks
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
@@ -147,12 +149,12 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --url=https://www.celo.org                         (required) The url you want to claim
+  --url=https://www.celo.org                         (required) The URL you want to claim. Should begin http://
 
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
-  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
+  claim-attestation-service-url ~/metadata.json --url https://test.com/myurl --from
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
@@ -660,6 +662,40 @@ EXAMPLES
 ```
 
 _See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
+
+### Register-data-encryption-key
+
+Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments
+
+```
+USAGE
+  $ celocli account:register-data-encryption-key
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set the data encryption key for
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --publicKey=publicKey                              (required) The public key you want to register
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  register-data-encryption-key --publicKey 0x...  --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+```
+
+_See code: [packages/cli/src/commands/account/register-data-encryption-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-data-encryption-key.ts)_
 
 ### Register-metadata
 
