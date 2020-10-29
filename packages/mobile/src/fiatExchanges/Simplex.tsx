@@ -1,6 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -16,7 +15,7 @@ import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const SIMPLEX_URI = 'https://stage-dot-clabs-valora-web.uc.r.appspot.com/simplex'
+const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 
 export const simplexOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
