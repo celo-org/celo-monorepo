@@ -78,6 +78,20 @@ const parseUrl: ParseFn<string> = (input) => {
   }
 }
 
+function parseArray<T>(parseElement: ParseFn<T>): ParseFn<T[]> {
+  return (input) => {
+    const array = JSON.parse(input)
+    if (Array.isArray(array)) {
+      return array.map(parseElement)
+    } else {
+      throw new CLIError(`"${input}" is not a valid array`)
+    }
+  }
+}
+
+export const parseIntArray = parseArray(flags.integer().parse as ParseFn<number>)
+export const parseAddressArray = parseArray(parseAddress)
+
 type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>
 type ArgBuilder<T> = (name: string, args?: Partial<Omit<IArg<T>, 'name' | 'parse'>>) => IArg<T>
 export function argBuilder<T>(parser: ParseFn<T>): ArgBuilder<T> {
@@ -90,6 +104,10 @@ export function argBuilder<T>(parser: ParseFn<T>): ArgBuilder<T> {
 }
 
 export const Flags = {
+  intArray: flags.build({
+    parse: parseIntArray,
+    helpValue: '"[0, 1, 99]"',
+  }),
   address: flags.build({
     parse: parseAddress,
     description: 'Account Address',

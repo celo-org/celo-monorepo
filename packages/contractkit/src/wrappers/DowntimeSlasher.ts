@@ -122,6 +122,8 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    */
   isBitmapSetForInterval = proxyCall(this.contract.methods.isBitmapSetForInterval)
 
+  lastSlashedBlock = proxyCall(this.contract.methods.lastSlashedBlock, undefined, valueToInt)
+
   /**
    * Tests if the given validator or signer did not sign any blocks in the interval.
    * @param validatorOrSignerAddress Address of the validator account or signer.
