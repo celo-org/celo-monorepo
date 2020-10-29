@@ -175,7 +175,7 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 First we are going to set up the main environment variables related to the mainnet network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/gcreth:mainnet
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 export NETWORK_ID=42220
 ```
 
