@@ -1,6 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
-import { call, delay, race, select, take } from 'redux-saga/effects'
+import { call, cancel, delay, fork, join, race, select, take } from 'redux-saga/effects'
 import { TransactionEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -25,7 +25,8 @@ const TAG = 'transactions/send'
 // causing failures when a tx times out (rare but can happen on slow devices)
 const TX_NUM_TRIES = 1 // Try txs up to this many times
 const TX_RETRY_DELAY = 2000 // 2s
-const TX_TIMEOUT = 90000 // 90s
+const TX_TIMEOUT = 90000 // 90s. Maximum total time to wait for confirmation when sending a transaction. (Includes grace period)
+const TX_TIMEOUT_GRACE_PERIOD = 500 // 500 ms. After a timeout triggers, time to wait before throwing an error.
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
@@ -189,13 +190,32 @@ export function* wrapSendTransactionWithRetry(
 ) {
   for (let i = 1; i <= TX_NUM_TRIES; i++) {
     try {
-      const { result, timeout, cancel } = yield race({
-        result: call(sendTxMethod),
-        timeout: delay(TX_TIMEOUT * i),
+      const task = yield fork(sendTxMethod)
+      let { result, timeout, cancelled } = yield race({
+        result: join(task),
+        timeout: delay(TX_TIMEOUT * i - TX_TIMEOUT_GRACE_PERIOD),
         ...(cancelAction && {
-          cancel: take(cancelAction),
+          cancelled: take(cancelAction),
         }),
       })
+
+      // In some conditions (e.g. app backgrounding) the app may become suspended, preventing the
+      // send task from making progress. If this occurs for long enough that the timeout elapses, a
+      // timeout may be triggered even if the transaction send is complete. A second race is
+      // triggered here to handle these cases by giving the send task a grace period to return a
+      // result after the initial timeout fires.
+      if (timeout && TX_TIMEOUT_GRACE_PERIOD > 0) {
+        ;({ result, timeout, cancelled } = yield race({
+          result: join(task),
+          timeout: delay(TX_TIMEOUT_GRACE_PERIOD),
+          ...(cancelAction && {
+            cancelled: take(cancelAction),
+          }),
+        }))
+      }
+
+      // Cancel the send task if it is still running. If terminated, this is a no-op.
+      yield cancel(task)
 
       if (timeout) {
         Logger.error(
@@ -203,7 +223,7 @@ export function* wrapSendTransactionWithRetry(
           `tx ${context.id} timeout for attempt ${i}`
         )
         throw new Error(ErrorMessages.TRANSACTION_TIMEOUT)
-      } else if (cancel) {
+      } else if (cancelled) {
         Logger.warn(
           `${TAG}@wrapSendTransactionWithRetry`,
           `tx ${context.id} cancelled for attempt ${i}`
