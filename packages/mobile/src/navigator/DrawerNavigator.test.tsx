@@ -38,7 +38,7 @@ describe('DrawerNavigator', () => {
   it('renders only with the cUSD balance when the CELO balance is (almost) 0', () => {
     const store = createMockStore({
       stableToken: { balance: '10' },
-      goldToken: { balance: '0.0001' },
+      goldToken: { balance: '0.001' },
       exchange: { exchangeRatePair },
     })
 

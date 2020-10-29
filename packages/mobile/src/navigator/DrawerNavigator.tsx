@@ -42,6 +42,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
@@ -127,8 +128,6 @@ function CustomDrawerItemList({
   }) as React.ReactNode) as React.ReactElement
 }
 
-const SHOW_CELO_BALANCE_MIN_AMOUNT = 0.0001
-
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
   const e164PhoneNumber = useSelector(e164NumberSelector)
@@ -144,7 +143,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     value: new BigNumber(celoBalance ?? '0'),
     currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
   }
-  const hasCeloBalance = celoAmount.value.isGreaterThan(SHOW_CELO_BALANCE_MIN_AMOUNT)
+  const hasCeloBalance = celoAmount.value.isGreaterThan(GOLD_TRANSACTION_MIN_AMOUNT)
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
 
