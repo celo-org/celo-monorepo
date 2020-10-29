@@ -15,7 +15,7 @@ export abstract class SmsProvider {
   abstract sendSms(attestation: AttestationModel): Promise<string>
 
   // if this provider supports delivery status updates to an endpoint delivery_<providername>/, should return 'GET' or 'POST'
-  abstract deliveryStatusMethod(): string
+  abstract deliveryStatusMethod(): string | null
 
   abstract deliveryStatusHandlers(): express.Handler[]
 
