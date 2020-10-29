@@ -3,7 +3,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
 import { TokenTransactionType } from 'src/apollo/types'
-import { setTobinTax } from 'src/exchange/actions'
+import { Actions, ExchangeTokensAction, setTobinTax } from 'src/exchange/actions'
 import { exchangeRatePairSelector } from 'src/exchange/reducer'
 import { doFetchTobinTax, exchangeGoldAndStableTokens } from 'src/exchange/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -47,7 +47,8 @@ describe(doFetchTobinTax, () => {
 
 describe(exchangeGoldAndStableTokens, () => {
   it('makes the exchange', async () => {
-    const exchangeGoldAndStableTokensAction = {
+    const exchangeGoldAndStableTokensAction: ExchangeTokensAction = {
+      type: Actions.EXCHANGE_TOKENS,
       makerToken: CURRENCY_ENUM.GOLD,
       makerAmount: new BigNumber(SELL_AMOUNT),
     }

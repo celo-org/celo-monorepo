@@ -185,7 +185,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       throw new Error('Invalid exchange rate')
     }
 
-    context = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
+    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate, account)
 
     const contractKit = yield call(getContractKit)
 
@@ -293,7 +293,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     contractKit.defaultAccount = account
 
-    const tx: CeloTransactionObject<string> = yield exchangeContract.exchange(
+    const tx: CeloTransactionObject<string> = yield call(
+      exchangeContract.exchange,
       convertedMakerAmount.toString(),
       convertedTakerAmount.toString(),
       sellGold
