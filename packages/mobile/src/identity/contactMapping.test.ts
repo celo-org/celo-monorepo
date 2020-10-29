@@ -175,6 +175,54 @@ describe('Fetch Addresses Saga', () => {
       .run()
   })
 
+  it('fetches and caches addresses correctly when there is not a registered walletAddress', async () => {
+    const contractKit = await getContractKitAsync()
+
+    const mockE164NumberToAddress = {
+      [mockE164Number]: [mockAccount.toLowerCase()],
+    }
+
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
+      [mockE164NumberHash]: { [mockAccount]: { completed: 3, total: 3 } },
+    }
+
+    const mockAttestationsWrapper = {
+      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+    }
+
+    const mockAccountsWrapper = {
+      getWalletAddress: jest.fn(() => nullAddress),
+    }
+
+    await expectSaga(fetchAddressesAndValidateSaga, {
+      e164Number: mockE164Number,
+    })
+      .provide([
+        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
+        [call(fetchPhoneHashPrivate, mockE164Number), { phoneHash: mockE164NumberHash }],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [select(currentAccountSelector), mockAccount],
+        [select(secureSendPhoneNumberMappingSelector), {}],
+      ])
+      .put(updateE164PhoneNumberAddresses({ [mockE164Number]: undefined }, {}))
+      .put(updateWalletToAccountAddress({ [mockAccount.toLowerCase()]: mockAccount.toLowerCase() }))
+      .put(
+        updateE164PhoneNumberAddresses(
+          {
+            [mockE164Number]: [mockAccount.toLowerCase()],
+          },
+          {
+            [mockAccount.toLowerCase()]: mockE164Number,
+          }
+        )
+      )
+      .run()
+  })
+
   it('requires SecureSend with partial verification when a new adddress is added and last 4 digits are unique', async () => {
     const contractKit = await getContractKitAsync()
 
@@ -186,6 +234,10 @@ describe('Fetch Addresses Saga', () => {
         [mockAccount]: { completed: 3, total: 3 },
         [mockAccount2]: { completed: 3, total: 3 },
       },
+    }
+
+    const mockAttestationsWrapper = {
+      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
     }
 
     const mockAccountsWrapper = {
@@ -200,10 +252,6 @@ describe('Fetch Addresses Saga', () => {
 
         return nullAddress
       }),
-    }
-
-    const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
     }
 
     await expectSaga(fetchAddressesAndValidateSaga, {
@@ -255,6 +303,10 @@ describe('Fetch Addresses Saga', () => {
       },
     }
 
+    const mockAttestationsWrapper = {
+      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+    }
+
     const mockAccountsWrapper = {
       getWalletAddress: jest.fn((address) => {
         if (eqAddress(address, mockAccount)) {
@@ -267,10 +319,6 @@ describe('Fetch Addresses Saga', () => {
 
         return nullAddress
       }),
-    }
-
-    const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
     }
 
     await expectSaga(fetchAddressesAndValidateSaga, {

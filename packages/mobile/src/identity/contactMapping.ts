@@ -240,19 +240,23 @@ function* getWalletAddressesAndUpdateCache(e164Number: string) {
     accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
   )
 
-  const registeredWalletAddresses: string[] = []
+  const possibleUserAddresses: string[] = []
   const walletToAccountAddress: WalletToAccountAddressType = {}
-  walletAddresses.forEach((walletAddress, i) => {
-    const address = walletAddress.toLowerCase()
+  walletAddresses.forEach((address, i) => {
+    const walletAddress = address.toLowerCase()
+    const accountAddress = accountAddresses[i]
     // `getWalletAddress` returns 0x0 when there isn't a wallet registered
-    // to a given account
-    if (address !== '0x0') {
-      walletToAccountAddress[address] = accountAddresses[i]
-      registeredWalletAddresses.push(address)
+    if (walletAddress !== '0x0') {
+      walletToAccountAddress[walletAddress] = accountAddress
+      possibleUserAddresses.push(walletAddress)
+    } else {
+      // NOTE: Only need this else block if we are not confident all wallets are registered
+      walletToAccountAddress[accountAddress] = accountAddress
+      possibleUserAddresses.push(accountAddress)
     }
   })
   yield put(updateWalletToAccountAddress(walletToAccountAddress))
-  return registeredWalletAddresses
+  return possibleUserAddresses
 }
 
 // Returns IdentifierLookupResult
