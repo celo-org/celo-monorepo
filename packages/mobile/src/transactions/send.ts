@@ -25,12 +25,16 @@ const TAG = 'transactions/send'
 // causing failures when a tx times out (rare but can happen on slow devices)
 const TX_NUM_TRIES = 1 // Try txs up to this many times
 const TX_RETRY_DELAY = 2000 // 2s
-const TX_TIMEOUT = 90000 // 90s. Maximum total time to wait for confirmation when sending a transaction. (Includes grace period)
-const TX_TIMEOUT_GRACE_PERIOD = 500 // 500 ms. After a timeout triggers, time to wait before throwing an error.
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
+
+// 90s. Maximum total time to wait for confirmation when sending a transaction. (Includes grace period)
+const TX_TIMEOUT = 90000
+// 5000 ms. After a timeout triggers, time to wait before throwing an error.
+// Gives time reconnect and fetch receipts in case network conditions change while the app is suspended.
+const TX_TIMEOUT_GRACE_PERIOD = 5000
 
 const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
   const txId = context.id
@@ -205,6 +209,10 @@ export function* wrapSendTransactionWithRetry(
       // triggered here to handle these cases by giving the send task a grace period to return a
       // result after the initial timeout fires.
       if (timeout && TX_TIMEOUT_GRACE_PERIOD > 0) {
+        Logger.debug(
+          `${TAG}@wrapSendTransactionWithRetry`,
+          `tx ${context.id} entering timeout grace period for attempt ${i}`
+        )
         ;({ result, timeout, cancelled } = yield race({
           result: join(task),
           timeout: delay(TX_TIMEOUT_GRACE_PERIOD),
