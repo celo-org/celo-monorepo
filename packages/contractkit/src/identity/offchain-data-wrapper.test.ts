@@ -197,6 +197,9 @@ testWithGanache('Offchain Data', (web3) => {
 
   describe('with a reader that has a dataEncryptionKey registered', () => {
     it('encrypted data can be read and written', async () => {
+      const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
+      await writerNameAccessor.write(testPayload, [reader.address])
+
       const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
       const receivedName = await readerNameAccessor.readAsResult(writer.address)
 
@@ -225,8 +228,8 @@ testWithGanache('Offchain Data', (web3) => {
 
     it('can re-encrypt data to more recipients', async () => {
       const nameAccessor = new PrivateNameAccessor(writer.wrapper)
-      console.log(1, await nameAccessor.write(testPayload, [reader.address]))
-      console.log(2, await nameAccessor.write(testPayload, [reader2.address]))
+      await nameAccessor.write(testPayload, [reader.address])
+      await nameAccessor.write(testPayload, [reader2.address])
 
       const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
       const receivedName = await readerNameAccessor.readAsResult(writer.address)
