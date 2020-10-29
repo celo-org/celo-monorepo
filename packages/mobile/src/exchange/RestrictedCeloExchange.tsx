@@ -1,63 +1,49 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
-import ItemSeparator from '@celo/react-components/components/ItemSeparator'
-import fontStyles from '@celo/react-components/styles/fonts'
 import { Spacing } from '@celo/react-components/styles/styles'
+import BigNumber from 'bignumber.js'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { useSelector } from 'react-redux'
+import { GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
+import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Namespaces } from 'src/i18n'
-import InfoIcon from 'src/icons/InfoIcon'
 
 interface Props {
   onPressWithdraw: () => void
 }
 
+// Actions container for CP-DOTO restricted countries
 export default function RestrictedCeloExchange({ onPressWithdraw }: Props) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
+  const goldBalance = useSelector(celoTokenBalanceSelector)
+
+  const hasGold = new BigNumber(goldBalance || 0).isGreaterThan(GOLD_TRANSACTION_MIN_AMOUNT)
+
+  if (!hasGold) {
+    return <View style={styles.emptyContainer} />
+  }
+
   return (
-    <>
-      <View style={styles.topSpacing} />
-      <ItemSeparator />
-      <View style={styles.textContainer}>
-        <Text style={styles.text}>{t('countryRestrictedExchange')}</Text>
-        <View style={styles.infoIconContainer}>
-          <InfoIcon size={14} />
-        </View>
-      </View>
-      <ItemSeparator />
-      <Button
-        size={BtnSizes.FULL}
-        text={t('withdrawCelo')}
-        onPress={onPressWithdraw}
-        style={styles.button}
-        type={BtnTypes.TERTIARY}
-        testID="WithdrawCELO"
-      />
-    </>
+    <Button
+      size={BtnSizes.FULL}
+      text={t('withdrawCelo')}
+      onPress={onPressWithdraw}
+      style={styles.button}
+      type={BtnTypes.TERTIARY}
+      testID="WithdrawCELO"
+    />
   )
 }
 
 const styles = StyleSheet.create({
-  topSpacing: {
+  emptyContainer: {
     marginTop: Spacing.Thick24,
   },
-  textContainer: {
-    marginVertical: Spacing.Regular16,
-    marginHorizontal: Spacing.Regular16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    flexShrink: 1,
-    ...fontStyles.small,
-  },
-  infoIconContainer: {
-    marginLeft: Spacing.Smallest8,
-  },
   button: {
-    marginVertical: Spacing.Regular16,
+    marginTop: Spacing.Thick24,
+    marginBottom: Spacing.Regular16,
     marginHorizontal: Spacing.Regular16,
   },
 })
