@@ -192,20 +192,34 @@ export function* handleSendPaymentData(
       Logger.warn(TAG, '@handleSendPaymentData null amount')
       return
     }
-    const transactionData: TransactionDataInput = {
-      recipient,
-      amount: dollarAmount,
-      reason: data.comment,
-      type: TokenTransactionType.PayPrefill,
-    }
 
-    navigate(Screens.SendConfirmation, {
-      transactionData,
-      isFromScan: true,
-      currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
-    })
+    if (data.asset === 'CELO') {
+      navigate(Screens.WithdrawCeloReviewScreen, {
+        amount: dollarAmount,
+        recipientAddress: data.address.toLowerCase(),
+        feeEstimate: new BigNumber(0),
+      })
+    } else if (data.asset === 'cUSD' || !data.asset) {
+      const transactionData: TransactionDataInput = {
+        recipient,
+        amount: dollarAmount,
+        reason: data.comment,
+        type: TokenTransactionType.PayPrefill,
+      }
+
+      navigate(Screens.SendConfirmation, {
+        transactionData,
+        isFromScan: true,
+        currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
+      })
+    }
   } else {
-    navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    if (data.asset === 'CELO') {
+      Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
+      return
+    } else if (data.asset === 'cUSD' || !data.asset) {
+      navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    }
   }
 }
 
