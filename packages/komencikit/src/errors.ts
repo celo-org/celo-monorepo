@@ -104,6 +104,7 @@ export class AuthenticationFailed extends RootError<KomenciErrorTypes.Authentica
 }
 
 export enum KomenciKitErrorTypes {
+  KomenciDown = 'KomenciDown',
   LoginSignatureError = 'LoginSignatureError',
   InvalidWallet = 'InvalidWallet',
 }
@@ -117,6 +118,12 @@ export class LoginSignatureError extends RootError<KomenciKitErrorTypes.LoginSig
 export class InvalidWallet extends RootError<KomenciKitErrorTypes.InvalidWallet> {
   constructor(public readonly error: WalletValidationError) {
     super(KomenciKitErrorTypes.InvalidWallet)
+  }
+}
+
+export class KomenciDown extends RootError<KomenciKitErrorTypes.KomenciDown> {
+  constructor() {
+    super(KomenciKitErrorTypes.KomenciDown)
   }
 }
 

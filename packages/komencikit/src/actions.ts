@@ -7,6 +7,7 @@ export enum ActionTypes {
   DistributedBlindedPepper = 'DistributedBlindedPepper',
   SubmitMetaTransaction = 'SubmitMetaTransaction',
   RequestSubsidisedAttestation = 'RequestSubsidisedAttestation',
+  CheckService = 'CheckService',
 }
 
 export enum RequestMethod {
@@ -36,10 +37,23 @@ export const action = <TAction, TPayload, TResp>(
   path,
   action: actionType,
   codec,
-  payload: {
-    ...payload,
-  },
+  payload,
 })
+
+export const CheckServiceResponse = t.type({
+  status: t.string,
+})
+
+export type CheckServiceResponse = t.TypeOf<typeof CheckServiceResponse>
+
+const _checkService = action<ActionTypes.CheckService, null, CheckServiceResponse>(
+  ActionTypes.CheckService,
+  RequestMethod.GET,
+  'v1/health',
+  CheckServiceResponse
+)
+
+export const checkService = () => _checkService(null)
 
 export interface StartSessionPayload {
   captchaResponseToken: string
