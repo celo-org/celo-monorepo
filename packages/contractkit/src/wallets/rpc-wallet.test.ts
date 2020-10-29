@@ -1,12 +1,12 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { Encrypt } from '@celo/utils/lib/ecies'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import {
   normalizeAddressWith0x,
   privateKeyToAddress,
   privateKeyToPublicKey,
   trimLeading0x,
-} from '@celo/utils/src/address'
+} from '@celo/utils/lib/address'
+import { Encrypt } from '@celo/utils/lib/ecies'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import net from 'net'
 import Web3 from 'web3'
 import { Tx } from 'web3-core'
