@@ -10,6 +10,14 @@ export function computeSharedSecret(privateKey: string, publicKey: string): Buff
   return ecdh.computeSecret(Buffer.from(ensureCompressed(publicKey), 'hex'))
 }
 
+export function isCompressed(publicKey: string) {
+  const noLeading0x = trimLeading0x(publicKey)
+  if (noLeading0x.length === 64) {
+    return true
+  }
+  return noLeading0x.length === 66 && (noLeading0x.startsWith('02') || noLeading0x.startsWith('03'))
+}
+
 export function ensureCompressed(publicKey: string): string {
   return secp256k1.keyFromPublic(ensureUncompressedPrefix(publicKey), 'hex').getPublic(true, 'hex')
 }
