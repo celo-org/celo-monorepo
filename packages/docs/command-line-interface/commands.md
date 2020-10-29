@@ -17,7 +17,7 @@ Celo CLI includes the following commands:
 - [Multisig](multisig.md)
 - [Network](network.md)
 - [Node](node.md)
-- [Oracle](oracle.md.md)
+- [Oracle](oracle.md)
 - [ReleaseGold](releasegold.md)
 - [Reserve](reserve.md)
 - [Rewards](rewards.md)

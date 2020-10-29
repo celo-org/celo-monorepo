@@ -31,6 +31,7 @@
 
 ## Validator Guide
 
+- [Overview](operations-manual/overview.md)
 - [Attestation Service](operations-manual/attestation-service.md)
 - [Key Management](operations-manual/key-management/summary.md)
   - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
@@ -43,6 +44,7 @@
 
 ## Developer Guide
 
+- [Overview](developer-resources/overview.md)
 - [Code Examples](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
@@ -50,7 +52,6 @@
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
-- [Overview](developer-resources/overview.md)
   <!-- - [The Celo Protocol]()
     - [Architecture]()
     - [Similarities with Ethereum]()

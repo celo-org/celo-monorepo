@@ -9,31 +9,18 @@ In this documentation you’ll find information on:
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
-## Quick Navigation
+## Quick Navigation Reference
 
-#### Celo Holders
-
-Are you a Celo Native asset holder looking for information about how to access your account and earn rewards for participating in the network? [Start here](celo-holder-guide/quick-start.md)
-
-#### Validator & Node Operators
-
-Are you looking for more information about how to run a validating node or a full node?
-
-- Check out the [Validator overview page](operations-manual/overview.md)
-- Consider running a node on the [Baklava testnet](getting-started/baklava-testnet) before getting started on mainnet.
-- Learn more about running nodes on [mainnet](getting-started/mainnet)
-
-#### Developers
-
-Are you interested in building a dapp or service on the Celo network?
-
-- Check out the [developer tools page](developer-resources/overview.md)
-
-#### Integration Guide
-
-This section includes some guides about common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
-
-- Check out the [integration guide](developer-resources/integrations/integrations.md)
+- CELO Holders
+  - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
+- Validator & Node Operators
+  - Check out the [Validator overview page](operations-manual/overview.md)
+  - Consider running a node on the [Baklava testnet](getting-started/baklava-testnet.md) before getting started on mainnet.
+  - Learn more about running nodes on [mainnet](getting-started/mainnet.md)
+- Developers
+  - Start at the [developer tools page](developer-resources/overview.md) for help building a dapp or service on the Celo network.
+- Integration Guide
+  - [This section](developer-resources/integrations/integrations.md) includes guides on common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
 
 ### About Celo
 
