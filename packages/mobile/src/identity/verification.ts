@@ -720,7 +720,6 @@ function* completeAttestation(
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
   // Report reveal status from validator
-  yield put(completeAttestationCode(code))
   yield put(
     reportRevealStatus(
       attestation.attestationServiceURL,
@@ -731,6 +730,7 @@ function* completeAttestation(
     )
   )
   Logger.debug(TAG + '@completeAttestation', `Attestation for issuer ${issuer} completed`)
+  yield put(completeAttestationCode(code))
 }
 
 function* tryRevealPhoneNumber(
@@ -881,8 +881,32 @@ export function* reportRevealStatusSaga({
   issuer,
   pepper,
 }: ReportRevealStatus) {
+  let aggregatedResponse: undefined | { ok: boolean; status: number; body: any }
   if (shouldUseProxy()) {
-    // TODO We need to set proxy for this
+    Logger.debug(
+      `${TAG}@reportRevealStatusSaga`,
+      `Posting to proxy for service url ${attestationServiceUrl}`
+    )
+    const fullUrl = attestationServiceUrl + '/get_attestations'
+    const body = {
+      attestationServiceUrl: fullUrl,
+      account,
+      phoneNumber: e164Number,
+      issuer,
+      pepper,
+    }
+    try {
+      const proxyReveal = functions().httpsCallable('proxyRevealStatus')
+      const response = yield call(proxyReveal, body)
+      const { status, data } = response.data
+      const ok = status >= 200 && status < 300
+      aggregatedResponse = { ok, status, body: JSON.parse(data) }
+    } catch (error) {
+      Logger.error(`${TAG}@reportAttestationRevealStatus`, 'Error calling proxyRevealStatus', error)
+      // The httpsCallable throws on any HTTP error code instead of
+      // setting response.ok like fetch does, so catching errors here
+      aggregatedResponse = { ok: false, status: 500, body: error }
+    }
   } else {
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -893,27 +917,36 @@ export function* reportRevealStatusSaga({
       `${TAG}@reportAttestationRevealStatus`,
       `Start for service url ${attestationServiceUrl}`
     )
-    const response = yield call(
-      attestationsWrapper.getRevealStatus,
-      e164Number,
-      account,
-      issuer,
-      attestationServiceUrl,
-      pepper
-    )
-    const body = yield call(response.json.bind(response))
-    if (response.ok) {
-      Logger.debug(
-        `${TAG}@reportAttestationRevealStatus`,
-        `Successful for service url ${attestationServiceUrl}`
+    try {
+      const response = yield call(
+        attestationsWrapper.getRevealStatus,
+        e164Number,
+        account,
+        issuer,
+        attestationServiceUrl,
+        pepper
       )
-      ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_status, body)
-    } else {
-      Logger.debug(
-        `${TAG}@reportAttestationRevealStatus`,
-        `Failed for service url ${attestationServiceUrl} with Status: ${response.status}`
-      )
+      const body = yield call(response.json.bind(response))
+      aggregatedResponse = { ok: response.ok, body, status: response.status }
+    } catch (error) {
+      Logger.error(`${TAG}@reportAttestationRevealStatus`, 'Error calling proxyRevealStatus', error)
+      aggregatedResponse = { ok: false, status: 500, body: error }
     }
+  }
+  if (aggregatedResponse.ok) {
+    Logger.debug(
+      `${TAG}@reportAttestationRevealStatus`,
+      `Successful for service url ${attestationServiceUrl}`
+    )
+    ValoraAnalytics.track(
+      VerificationEvents.verification_reveal_attestation_status,
+      aggregatedResponse.body
+    )
+  } else {
+    Logger.debug(
+      `${TAG}@reportAttestationRevealStatus`,
+      `Failed for service url ${attestationServiceUrl} with Status: ${aggregatedResponse.status}`
+    )
   }
 }
 
