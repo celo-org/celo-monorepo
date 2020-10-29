@@ -5,6 +5,7 @@
 ### Classes
 
 * [GitStorageWriter](../classes/_identity_offchain_storage_writers_.gitstoragewriter.md)
+* [GoogleStorageWriter](../classes/_identity_offchain_storage_writers_.googlestoragewriter.md)
 * [LocalStorageWriter](../classes/_identity_offchain_storage_writers_.localstoragewriter.md)
 * [MockStorageWriter](../classes/_identity_offchain_storage_writers_.mockstoragewriter.md)
 * [StorageWriter](../classes/_identity_offchain_storage_writers_.storagewriter.md)

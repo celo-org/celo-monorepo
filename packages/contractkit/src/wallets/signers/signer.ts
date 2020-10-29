@@ -15,4 +15,5 @@ export interface Signer {
   signTypedData: (typedData: EIP712TypedData) => Promise<{ v: number; r: Buffer; s: Buffer }>
   getNativeKey: () => string
   decrypt: (ciphertext: Buffer) => Promise<Buffer>
+  computeSharedSecret: (publicKey: string) => Promise<Buffer>
 }
