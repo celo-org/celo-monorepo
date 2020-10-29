@@ -21,6 +21,7 @@
 ### Methods
 
 * [addAccount](_wallets_rpc_wallet_.rpcwallet.md#addaccount)
+* [computeSharedSecret](_wallets_rpc_wallet_.rpcwallet.md#computesharedsecret)
 * [decrypt](_wallets_rpc_wallet_.rpcwallet.md#decrypt)
 * [getAccounts](_wallets_rpc_wallet_.rpcwallet.md#getaccounts)
 * [hasAccount](_wallets_rpc_wallet_.rpcwallet.md#hasaccount)
@@ -28,6 +29,7 @@
 * [isAccountUnlocked](_wallets_rpc_wallet_.rpcwallet.md#isaccountunlocked)
 * [isSetupFinished](_wallets_rpc_wallet_.rpcwallet.md#issetupfinished)
 * [loadAccountSigners](_wallets_rpc_wallet_.rpcwallet.md#loadaccountsigners)
+* [removeAccount](_wallets_rpc_wallet_.rpcwallet.md#removeaccount)
 * [signPersonalMessage](_wallets_rpc_wallet_.rpcwallet.md#signpersonalmessage)
 * [signTransaction](_wallets_rpc_wallet_.rpcwallet.md#signtransaction)
 * [signTypedData](_wallets_rpc_wallet_.rpcwallet.md#signtypeddata)
@@ -68,13 +70,34 @@ Name | Type |
 
 ___
 
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`address`: [Address](../modules/_base_.md#address), `publicKey`: string): *Promise‹Buffer›*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[computeSharedSecret](_wallets_wallet_.walletbase.md#computesharedsecret)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L157)*
+
+Computes the shared secret (an ECDH key exchange object) between two accounts
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+`publicKey` | string |
+
+**Returns:** *Promise‹Buffer›*
+
+___
+
 ###  decrypt
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L130)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L149)*
 
 **Parameters:**
 
@@ -175,6 +198,26 @@ ___
 *Defined in [packages/contractkit/src/wallets/rpc-wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L26)*
 
 **Returns:** *Promise‹Map‹string, [RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)››*
+
+___
+
+###  removeAccount
+
+▸ **removeAccount**(`_address`: string): *void*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[removeAccount](_wallets_wallet_.walletbase.md#removeaccount)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L52)*
+
+Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_address` | string |
+
+**Returns:** *void*
 
 ___
 
