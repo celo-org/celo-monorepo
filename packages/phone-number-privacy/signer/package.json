@@ -18,8 +18,8 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.16",
-    "@celo/phone-number-privacy-common": "1.0.12",
+    "@celo/contractkit": "0.4.17",
+    "@celo/phone-number-privacy-common": "1.0.13",
     "@celo/utils": "0.1.21",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/elliptic": "^6.4.12",

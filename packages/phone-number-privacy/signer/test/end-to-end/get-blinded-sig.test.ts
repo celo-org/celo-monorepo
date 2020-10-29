@@ -5,17 +5,11 @@ import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/add
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import {
-  getBlindedPhoneNumber,
-  registerWalletAddress,
-  replenishQuota,
-} from '../../../common/src/test/utils'
-
 import config from '../../src/config'
 
 require('dotenv').config()
 
-const { replenishQuota, getBlindedPhoneNumber } = TestUtils.Utils
+const { replenishQuota, getBlindedPhoneNumber, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
@@ -182,7 +176,7 @@ describe('When using walletAddress', () => {
   let timestamp: number
   beforeAll(async () => {
     // ACCOUNT_ADDRESS2 is the wallet address
-    await registerWalletAddress(ACCOUNT_ADDRESS3, ACCOUNT_ADDRESS2, contractkit)
+    await registerWalletAddress(ACCOUNT_ADDRESS2, contractkit)
     initialQueryCount = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
     timestamp = Date.now()
   })

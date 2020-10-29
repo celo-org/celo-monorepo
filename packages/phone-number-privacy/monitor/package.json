@@ -20,8 +20,8 @@
     "lint": "tslint --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.16",
-    "@celo/phone-number-privacy-common": "1.0.12",
+    "@celo/contractkit": "0.4.17",
+    "@celo/phone-number-privacy-common": "1.0.13",
     "@celo/utils": "0.1.21",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0"
