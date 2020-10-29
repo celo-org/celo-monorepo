@@ -1,7 +1,8 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { computeSharedSecret as computeECDHSecret } from '@celo/utils/lib/ecdh'
 import { Decrypt } from '@celo/utils/lib/ecies'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-// @ts-ignore-next-line
+// @ts-ignore
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
 import { decodeSig, getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
@@ -65,5 +66,9 @@ export class LocalSigner implements Signer {
       ciphertext
     )
     return Promise.resolve(decryptedPlaintext)
+  }
+
+  computeSharedSecret(publicKey: string): Promise<Buffer> {
+    return Promise.resolve(computeECDHSecret(this.privateKey, publicKey))
   }
 }
