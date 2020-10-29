@@ -106,7 +106,7 @@ target "celo" do
   permissions_path = '../../../node_modules/react-native-permissions/ios'
   pod 'Permission-Camera', :path => "#{permissions_path}/Camera.podspec"
 
-  pod 'RNSecureRandom', :path => '../node_modules/react-native-securerandom'
+  pod 'RNSecureRandom', :path => '../../../node_modules/react-native-securerandom'
 
   target "celoTests" do
     inherit! :search_paths
