@@ -7440,11 +7440,6 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-7.0.2.tgz#b17f16cf933597e10d6d78eae3251e692ce8b0ce"
   integrity sha512-ZvO2tAcjmMi8V/5Z3JsyofMe3hasRcaw88cto5etSVMwVQfeivGAlEYmaQgceUSVYFofVjT+ioHsATjdWcFt1w==
 
-"@types/mocha@^8.0.3":
-  version "8.0.3"
-  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-8.0.3.tgz#51b21b6acb6d1b923bbdc7725c38f9f455166402"
-  integrity sha512-vyxR57nv8NfcU0GZu8EUXZLTbCMupIUwy95LJ6lllN+JRPG25CwMHoB1q5xKh8YKhQnHYRAn4yW2yuHbf/5xgg==
-
 "@types/morgan@^1.9.1":
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/@types/morgan/-/morgan-1.9.1.tgz#6457872df95647c1dbc6b3741e8146b71ece74bf"
@@ -14530,10 +14525,10 @@ detect-node@2.0.3:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.3.tgz#a2033c09cc8e158d37748fbde7507832bd6ce127"
   integrity sha1-ogM8CcyOFY03dI+951B4Mr1s4Sc=
 
-detox@^17.10.4:
-  version "17.10.4"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-17.10.4.tgz#5b1642949136f206005f862fe5f7eb14e1a8522a"
-  integrity sha512-rzCCtTx3ZHfA8EUEehRtM2GKfBDDOmtwjcOvd+z/79Y6uU4Z5Zszf9HBmwQNeWdNsxAfhVzAxQaNxI4w6NhF1w==
+detox@^17.4.5:
+  version "17.10.5"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-17.10.5.tgz#c2d922668db952186cc81ead8dd3f905ba7f00da"
+  integrity sha512-g8ZJrADT3c2wRp1sq/Tt5I6e8Bm8voHij+tQxfo2AXJLrCD09nt02ifjcvPo3CxDO968Q59ZZwsyCLJZVvTFuA==
   dependencies:
     bunyan "^1.8.12"
     bunyan-debug-stream "^1.1.0"
@@ -38001,13 +37996,10 @@ yaml@^1.7.2:
   dependencies:
     "@babel/runtime" "^7.6.3"
 
-yargs-parser@10.1.0, yargs-parser@13.1.2, yargs-parser@18.x, yargs-parser@^10.0.0, yargs-parser@^11.1.1, yargs-parser@^13.0.0, yargs-parser@^13.1.0, yargs-parser@^13.1.1, yargs-parser@^13.1.2, yargs-parser@^15.0.0, yargs-parser@^15.0.1, yargs-parser@^18.1.1, yargs-parser@^18.1.2, yargs-parser@^2.4.0, yargs-parser@^2.4.1, yargs-parser@^20.2.2, yargs-parser@^5.0.0, yargs-parser@^7.0.0, yargs-parser@^8.0.0, yargs-parser@^8.1.0, yargs-parser@^9.0.2:
-  version "13.1.2"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-13.1.2.tgz#130f09702ebaeef2650d54ce6e3e5706f7a4fb38"
-  integrity sha512-3lbsNRf/j+A4QuSZfDRA7HRSfWrzO0YjqTJd5kjAq37Zep1CEgaYmrH9Q3GwPiB9cHyd1Y1UwggGhJGoxipbzg==
-  dependencies:
-    camelcase "^5.0.0"
-    decamelize "^1.2.0"
+yargs-parser@10.1.0, yargs-parser@13.1.2, yargs-parser@18.x, yargs-parser@^10.0.0, yargs-parser@^11.1.1, yargs-parser@^13.0.0, yargs-parser@^13.1.0, yargs-parser@^13.1.1, yargs-parser@^13.1.2, yargs-parser@^15.0.0, yargs-parser@^15.0.1, yargs-parser@^18.1.1, yargs-parser@^18.1.2, yargs-parser@^2.4.0, yargs-parser@^2.4.1, yargs-parser@^20.2.2, yargs-parser@^20.2.3, yargs-parser@^5.0.0, yargs-parser@^7.0.0, yargs-parser@^8.0.0, yargs-parser@^8.1.0, yargs-parser@^9.0.2:
+  version "20.2.3"
+  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-20.2.3.tgz#92419ba867b858c868acf8bae9bf74af0dd0ce26"
+  integrity sha512-emOFRT9WVHw03QSvN5qor9QQT9+sw5vwxfYweivSMHTcAXPefwVae2FjO7JJjj8hCE4CzPOPeFM83VwT29HCww==
 
 yargs-unparser@1.6.0:
   version "1.6.0"

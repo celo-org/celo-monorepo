@@ -97,7 +97,7 @@
     "randomatic": "^3.1.1",
     "logkitty": "^0.7.1",
     "minimist": "^1.2.5",
-    "yargs-parser": "^13.1.2",
+    "yargs-parser": "^20.2.3",
     "npm": "^5.10.0",
     "npmi": "^4.0.0",
     "websocket-extensions": "^0.1.4",
