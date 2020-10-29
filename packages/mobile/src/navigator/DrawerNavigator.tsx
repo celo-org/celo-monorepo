@@ -22,9 +22,11 @@ import {
 import { TransitionPresets } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
+import { useDispatch } from 'react-redux'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import {
@@ -40,6 +42,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
@@ -144,6 +147,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   const hasCeloBalance = celoAmount.value.isGreaterThan(SHOW_CELO_BALANCE_MIN_AMOUNT)
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
+
+  const dispatch = useDispatch()
+  useEffect(() => {
+    // Needed for the local CELO balance display
+    dispatch(fetchExchangeRate())
+  }, [])
 
   return (
     <DrawerContentScrollView {...props}>
