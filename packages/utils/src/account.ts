@@ -5,7 +5,6 @@ import {
   MnemonicStrength,
   RandomNumberGenerator,
 } from '@celo/base/lib/account'
-import { Address } from '@celo/base/lib/address'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import { keccak256 } from 'ethereumjs-util'
@@ -76,12 +75,11 @@ export async function generateKeys(
 
 export function generateDeterministicInviteCode(
   pepper: string,
-  senderAddress: Address,
   changeIndex: number = 0,
   addressIndex: number = 0,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): { privateKey: string; publicKey: string } {
-  const seed = keccak256(pepper + senderAddress) as Buffer
+  const seed = keccak256(pepper) as Buffer
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 
