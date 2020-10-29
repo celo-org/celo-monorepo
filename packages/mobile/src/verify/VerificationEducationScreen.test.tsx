@@ -64,4 +64,44 @@ describe('VerificationEducationScreen', () => {
     expect(queryByTestId('VerificationEducationContinue')).toBeFalsy()
     expect(queryByTestId('VerificationEducationAlready')).toBeFalsy()
   })
+
+  it('allows to skip if verification is loading', () => {
+    const defaultVerificationState = {
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: 3,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+    }
+    const store = createMockStore({
+      stableToken: {
+        balance: '0',
+      },
+      identity: {
+        verificationState: {
+          ...defaultVerificationState,
+          isLoading: true,
+        },
+      },
+    })
+    const { getByTestId, toJSON } = render(
+      <Provider store={store}>
+        <VerificationEducationScreen
+          {...getMockStackScreenProps(Screens.VerificationEducationScreen, {
+            showSkipDialog: true,
+          })}
+        />
+      </Provider>
+    )
+    expect(toJSON()).toMatchSnapshot()
+    expect(getByTestId('VerificationSkipDialog').props.isVisible).toBe(true)
+  })
 })

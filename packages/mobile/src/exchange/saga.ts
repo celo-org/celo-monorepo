@@ -47,7 +47,7 @@ import * as util from 'util'
 
 const TAG = 'exchange/saga'
 
-const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
+const EXCHANGE_DIFFERENCE_PERCENT_TOLERATED = 0.01 // Maximum % difference between actual and displayed takerAmount
 
 export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
   try {
@@ -185,7 +185,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       throw new Error('Invalid exchange rate')
     }
 
-    context = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
+    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate, account)
 
     const contractKit = yield call(getContractKit)
 
@@ -230,7 +230,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
     const minimumTakerAmount = BigNumber.maximum(
-      getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
+      getTakerAmount(makerAmount, exchangeRate).multipliedBy(
+        1 - EXCHANGE_DIFFERENCE_PERCENT_TOLERATED
+      ),
       0
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
@@ -282,13 +284,17 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       sendTransaction,
       approveTx.txo,
       account,
-      newTransactionContext(TAG, `Approve exchange of ${makerToken}`)
+      newTransactionContext(TAG, `Approve exchange of ${makerToken}`),
+      undefined, // staticGas
+      undefined, // cancelAction
+      makerToken
     )
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 
     contractKit.defaultAccount = account
 
-    const tx: CeloTransactionObject<string> = yield exchangeContract.exchange(
+    const tx: CeloTransactionObject<string> = yield call(
+      exchangeContract.exchange,
       convertedMakerAmount.toString(),
       convertedTakerAmount.toString(),
       sellGold
@@ -301,7 +307,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, 'No transaction ID. Did not exchange.')
       return
     }
-    yield call(sendAndMonitorTransaction, tx, account, context)
+    yield call(
+      sendAndMonitorTransaction,
+      tx,
+      account,
+      context,
+      undefined, // currency, undefined because it's an exchange and we need both.
+      makerToken
+    )
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
       txId: context.id,
       currency: makerToken,
@@ -395,7 +408,14 @@ function* withdrawCelo(action: WithdrawCeloAction) {
       }
     )
 
-    yield call(sendAndMonitorTransaction, tx, account, context, CURRENCY_ENUM.GOLD)
+    yield call(
+      sendAndMonitorTransaction,
+      tx,
+      account,
+      context,
+      CURRENCY_ENUM.GOLD,
+      CURRENCY_ENUM.GOLD
+    )
 
     const dollarAmount = yield call(celoToDollarAmount, amount)
     yield put(sendPaymentOrInviteSuccess(dollarAmount))
