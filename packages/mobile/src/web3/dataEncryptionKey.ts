@@ -137,15 +137,14 @@ export function* registerAccountDek(walletAddress: string) {
           mtwAddress
         )
 
-        if (!mtwWrapper) {
-          throw Error(`MetaTransactionWallet not found for address: ${mtwAddress}`)
-        }
-
         const proofOfPossession: {
           v: number
           r: string
           s: string
         } = yield call(accountsWrapper.generateProofOfKeyPossession, mtwAddress, walletAddress)
+
+        // TODO: There should be a branching off point here depending on if there
+        // is an active Komenci session (i.e., submit through KomenciKit or not)
 
         setAccountTx = accountsWrapper.setAccount(
           '',
@@ -159,11 +158,11 @@ export function* registerAccountDek(walletAddress: string) {
           setAccountTx.txo
         )
         yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
-        yield put(updateWalletToAccountAddress({ walletAddress: mtwAddress }))
+        yield put(updateWalletToAccountAddress({ [walletAddress.toLowerCase()]: mtwAddress }))
       } catch (error) {
         Logger.debug(
           `${TAG}@registerAccountDek`,
-          'Failed to register mtwAddress as accountAddress, defaulting to walletAddress. Error: ',
+          'Failed to register via the MTW, will attempt with EOA. Error: ',
           error
         )
         yield call(sendTransaction, setAccountTx.txo, walletAddress, context)

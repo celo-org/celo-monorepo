@@ -193,6 +193,7 @@ export function* fetchAddressesAndValidateSaga({
     if (requesterAddress && !secureSendPossibleAddresses.includes(requesterAddress)) {
       secureSendPossibleAddresses.push(requesterAddress)
     }
+
     const addressValidationType = checkIfValidationRequired(
       oldAddresses,
       secureSendPossibleAddresses,
@@ -235,17 +236,19 @@ function* getWalletAddressesAndUpdateCache(e164Number: string) {
   ])
 
   const accountAddresses: string[] = yield call(getAccountAddresses, e164Number)
-  // TODO: Update array item types when I've heard back from CAP
-  const walletAddresses: Array<string | undefined> = yield all(
+  const walletAddresses: string[] = yield all(
     accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
   )
 
   const registeredWalletAddresses: string[] = []
   const walletToAccountAddress: WalletToAccountAddressType = {}
   walletAddresses.forEach((walletAddress, i) => {
-    if (walletAddress) {
-      walletToAccountAddress[walletAddress] = accountAddresses[i]
-      registeredWalletAddresses.push(walletAddress)
+    const address = walletAddress.toLowerCase()
+    // `getWalletAddress` returns 0x0 when there isn't a wallet registered
+    // to a given account
+    if (address !== '0x0') {
+      walletToAccountAddress[address] = accountAddresses[i]
+      registeredWalletAddresses.push(address)
     }
   })
   yield put(updateWalletToAccountAddress(walletToAccountAddress))

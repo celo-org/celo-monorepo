@@ -56,7 +56,7 @@ export const reducer = (
         ...state,
         account: action.address.toLowerCase(),
       }
-    case Actions.SET_SCW_ACCOUNT:
+    case Actions.SET_MTW_ADDRESS:
       return {
         ...state,
         mtwAddress: action.address.toLowerCase(),

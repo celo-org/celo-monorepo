@@ -1,7 +1,7 @@
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
   SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
-  SET_SCW_ACCOUNT = 'WEB3/SET_SCW_ACCOUNT',
+  SET_MTW_ADDRESS = 'WEB3/SET_MTW_ADDRESS',
   SET_DATA_ENCRYPTION_KEY = 'WEB3/SET_DATA_ENCRYPTION_KEY',
   REGISTER_DATA_ENCRYPTION_KEY = 'WEB3/REGISTER_DATA_ENCRYPTION_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
@@ -19,7 +19,7 @@ export interface SetAccountAction {
 }
 
 export interface SetScwAccountAction {
-  type: Actions.SET_SCW_ACCOUNT
+  type: Actions.SET_MTW_ADDRESS
   address: string
 }
 
@@ -81,7 +81,7 @@ export const setAccount = (address: string): SetAccountAction => {
 
 export const setScwAccount = (address: string): SetScwAccountAction => {
   return {
-    type: Actions.SET_SCW_ACCOUNT,
+    type: Actions.SET_MTW_ADDRESS,
     address: address.toLowerCase(),
   }
 }
