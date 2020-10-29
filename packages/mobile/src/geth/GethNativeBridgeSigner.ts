@@ -113,6 +113,10 @@ export class GethNativeBridgeSigner implements Signer {
     return Promise.reject(new Error('Decryption operation is not supported on this signer'))
   }
 
+  computeSharedSecret(_publicKey: string): Promise<Buffer> {
+    return Promise.reject(new Error('computeSharedSecret is not supported on this signer'))
+  }
+
   hexToBase64(hex: string) {
     return Buffer.from(hex.replace('0x', ''), 'hex').toString('base64')
   }

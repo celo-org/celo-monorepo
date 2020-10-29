@@ -15,6 +15,7 @@
 * [kit](_identity_offchain_data_wrapper_.offchaindatawrapper.md#kit)
 * [readDataFrom](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readdatafrom)
 * [self](_identity_offchain_data_wrapper_.offchaindatawrapper.md#self)
+* [signer](_identity_offchain_data_wrapper_.offchaindatawrapper.md#signer)
 * [storageWriter](_identity_offchain_data_wrapper_.offchaindatawrapper.md#storagewriter)
 
 ### Methods
@@ -26,9 +27,9 @@
 
 ###  constructor
 
-\+ **new OffchainDataWrapper**(`self`: string, `kit`: [ContractKit](_kit_.contractkit.md)): *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
+\+ **new OffchainDataWrapper**(`self`: string, `kit`: [ContractKit](_kit_.contractkit.md), `signer?`: undefined | string): *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L42)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L56)*
 
 **Parameters:**
 
@@ -36,6 +37,7 @@ Name | Type |
 ------ | ------ |
 `self` | string |
 `kit` | [ContractKit](_kit_.contractkit.md) |
+`signer?` | undefined &#124; string |
 
 **Returns:** *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
@@ -45,25 +47,15 @@ Name | Type |
 
 • **kit**: *[ContractKit](_kit_.contractkit.md)*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L44)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L58)*
 
 ___
 
 ###  readDataFrom
 
-• **readDataFrom**: *function* = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
+• **readDataFrom**: *Object* = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L75)*
-
-#### Type declaration:
-
-▸ (...`args`: TArgs): *Promise‹TResult›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | TArgs |
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L93)*
 
 ___
 
@@ -71,7 +63,15 @@ ___
 
 • **self**: *string*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L44)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L58)*
+
+___
+
+###  signer
+
+• **signer**: *string*
+
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L56)*
 
 ___
 
@@ -79,38 +79,45 @@ ___
 
 • **storageWriter**: *[StorageWriter](_identity_offchain_storage_writers_.storagewriter.md) | undefined*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L42)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L55)*
 
 ## Methods
 
 ###  readDataFromAsResult
 
-▸ **readDataFromAsResult**(`account`: string, `dataPath`: string): *Promise‹Result‹string, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
+▸ **readDataFromAsResult**<**DataType**>(`account`: [Address](../modules/_base_.md#address), `dataPath`: string, `checkOffchainSigners`: boolean, `type?`: t.Type‹DataType›): *Promise‹Result‹Buffer, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L46)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L62)*
+
+**Type parameters:**
+
+▪ **DataType**
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`account` | string |
+`account` | [Address](../modules/_base_.md#address) |
 `dataPath` | string |
+`checkOffchainSigners` | boolean |
+`type?` | t.Type‹DataType› |
 
-**Returns:** *Promise‹Result‹string, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
+**Returns:** *Promise‹Result‹Buffer, [OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)››*
 
 ___
 
 ###  writeDataTo
 
-▸ **writeDataTo**(`data`: string, `dataPath`: string): *Promise‹void›*
+▸ **writeDataTo**(`data`: Buffer, `signature`: Buffer, `dataPath`: string): *Promise‹[OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors) | void›*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L77)*
+*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L95)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`data` | string |
+`data` | Buffer |
+`signature` | Buffer |
 `dataPath` | string |
 
-**Returns:** *Promise‹void›*
+**Returns:** *Promise‹[OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors) | void›*
