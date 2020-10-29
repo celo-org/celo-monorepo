@@ -754,7 +754,7 @@ function* tryRevealPhoneNumber(
       account,
       issuer,
       phoneNumber: phoneHashDetails.e164Number,
-      salt: phoneHashDetails.salt,
+      salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
     }
 

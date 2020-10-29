@@ -123,11 +123,21 @@ export function* registerAccountDek(walletAddress: string) {
     // Generate and send a transaction to set the DEK on-chain.
     const setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
     const context = newTransactionContext(TAG, 'Set wallet address & DEK')
-    yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
+    const scwAddress: string | null = yield select(scwAccountSelector)
+    // If SCW has been created, use it to register user's DEK so that scwAddress
+    // will be set to accountAddress on-chain
+    if (scwAddress) {
+      const wallet = contractKit.contracts.getMetaTransactionWallet(walletAddress)
+      const setAccountTxViaMTW = yield call(wallet.signAndExecuteMetaTransaction(setAccountTx.txo))
+      yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
+    } else {
+      yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
+    }
 
     yield put(registerDataEncryptionKey())
     // TODO: Move this update to the end of the onboarding flow
-    const scwAddress: string | null = yield select(scwAccountSelector)
+    // right after the `setAccount` transaction
+
     if (scwAddress) {
       yield put(updateWalletToAccountAddress({ walletAddress: scwAddress }))
     }
