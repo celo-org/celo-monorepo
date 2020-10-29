@@ -14,6 +14,7 @@ const SAMPLE_AMOUNT = new BigNumber(5.001)
 const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloReviewScreen, {
   recipientAddress: SAMPLE_ADDRESS,
   amount: SAMPLE_AMOUNT,
+  feeEstimate: new BigNumber(1),
 })
 
 const store = createMockStore()

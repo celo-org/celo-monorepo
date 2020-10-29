@@ -21,7 +21,7 @@ import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
 
-export default class AwsHsmSigner implements Signer {
+export class AwsHsmSigner implements Signer {
   private kms: KMS
   private keyId: string
   private publicKey: BigNumber
@@ -113,5 +113,10 @@ export default class AwsHsmSigner implements Signer {
     throw new Error('Decryption operation is not supported on this signer')
     // To make the compiler happy
     return Promise.resolve(_ciphertext)
+  }
+
+  computeSharedSecret(_publicKey: string) {
+    throw new Error('Not implemented')
+    return Promise.resolve(Buffer.from([]))
   }
 }

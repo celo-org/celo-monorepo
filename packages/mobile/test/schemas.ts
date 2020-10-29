@@ -405,6 +405,10 @@ export const v5Schema = {
     ...v3Schema.exchange,
     isLoading: false,
   },
+  app: {
+    ...v3Schema.app,
+    minVersion: null,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

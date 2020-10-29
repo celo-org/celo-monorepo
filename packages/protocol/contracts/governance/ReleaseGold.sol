@@ -1,19 +1,20 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IReleaseGold.sol";
-import "./interfaces/IValidators.sol";
+
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
 contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
+  using Address for address payable; // prettier-ignore
 
   struct ReleaseSchedule {
     // Timestamp (in UNIX time) that releasing begins.
@@ -355,7 +356,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "Insufficient unlocked balance to withdraw amount"
     );
     totalWithdrawn = totalWithdrawn.add(amount);
-    beneficiary.transfer(amount);
+    beneficiary.sendValue(amount);
     if (getRemainingTotalBalance() == 0) {
       emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
       selfdestruct(refundAddress);
@@ -369,9 +370,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
     uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
     require(address(this).balance >= beneficiaryAmount, "Inconsistent balance");
-    beneficiary.transfer(beneficiaryAmount);
+    beneficiary.sendValue(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
-    refundAddress.transfer(revokerAmount);
+    refundAddress.sendValue(revokerAmount);
     emit ReleaseGoldInstanceDestroyed(beneficiary, address(this));
     selfdestruct(refundAddress);
   }
@@ -432,8 +433,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function getRemainingLockedBalance() public view returns (uint256) {
     if (getAccounts().isAccount(address(this))) {
-      uint256 pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
-      return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
+      ILockedGold lockedGold = getLockedGold();
+      uint256 pendingWithdrawalSum = lockedGold.getTotalPendingWithdrawals(address(this));
+      return lockedGold.getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
     }
     return 0;
   }
@@ -510,7 +512,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     // Fund signer account with 1 cGLD.
     uint256 value = 1 ether;
     require(address(this).balance >= value, "no available cGLD to fund signer");
-    signer.transfer(value);
+    signer.sendValue(value);
     require(getRemainingTotalBalance() > 0, "no remaining balance");
   }
 

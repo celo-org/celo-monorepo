@@ -21,4 +21,5 @@ module.exports = {
     decimalSeparator: '.',
     groupingSeparator: ',',
   })),
+  getTimeZone: jest.fn(() => 'America/New_York'),
 }

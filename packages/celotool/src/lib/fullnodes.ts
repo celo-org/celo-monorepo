@@ -95,8 +95,10 @@ export async function removeFullNodeChart(celoEnv: string, context: string) {
 }
 
 function uploadStaticNodeEnodes(celoEnv: string, context: string, enodes: string[]) {
+  // Use mainnet instead of rc1
+  const env = celoEnv === 'rc1' ? 'mainnet' : celoEnv
   return uploadStaticNodesToGoogleStorage(
-    `${celoEnv}.${readableContext(context)}`,
+    `${env}.${readableContext(context)}`,
     enodes
   )
 }
