@@ -124,6 +124,8 @@ function CustomDrawerItemList({
   }) as React.ReactNode) as React.ReactElement
 }
 
+const SHOW_CELO_BALANCE_MIN_AMOUNT = 0.0001
+
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
   const e164PhoneNumber = useSelector(e164NumberSelector)
@@ -139,7 +141,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     value: new BigNumber(celoBalance ?? '0'),
     currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
   }
-  const hasCeloBalance = celoAmount.value.isGreaterThan(0)
+  const hasCeloBalance = celoAmount.value.isGreaterThan(SHOW_CELO_BALANCE_MIN_AMOUNT)
   const account = useSelector(currentAccountSelector)
   const appVersion = deviceInfoModule.getVersion()
 
@@ -159,6 +161,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           style={fontStyles.regular500}
           amount={dollarAmount}
           showLocalAmount={true}
+          testID="LocalDollarBalance"
         />
         <CurrencyDisplay
           style={styles.amountLabelSmall}
@@ -166,6 +169,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           showLocalAmount={false}
           hideFullCurrencyName={false}
           hideSymbol={true}
+          testID="DollarBalance"
         />
         <View style={styles.borderBottom} />
         {hasCeloBalance && (
@@ -174,6 +178,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
               style={fontStyles.regular500}
               amount={celoAmount}
               showLocalAmount={true}
+              testID="LocalCeloBalance"
             />
             <CurrencyDisplay
               style={styles.amountLabelSmall}
@@ -181,6 +186,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
               showLocalAmount={false}
               hideFullCurrencyName={false}
               hideSymbol={true}
+              testID="CeloBalance"
             />
             <View style={styles.borderBottom} />
           </>

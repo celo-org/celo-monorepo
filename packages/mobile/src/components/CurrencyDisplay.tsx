@@ -51,6 +51,7 @@ interface Props {
   hideFullCurrencyName: boolean
   style?: StyleProp<TextStyle>
   currencyInfo?: CurrencyInfo
+  testID?: string
 }
 
 const BIG_SIGN_RATIO = 34 / 48
@@ -145,6 +146,7 @@ export default function CurrencyDisplay({
   hideFullCurrencyName,
   style,
   currencyInfo,
+  testID,
 }: Props) {
   let localCurrencyCode = useLocalCurrencyCode()
   let dollarToLocalRate = useDollarToLocalRate()
@@ -201,7 +203,7 @@ export default function CurrencyDisplay({
     const codeStyle = { fontSize: Math.round(fontSize * BIG_CODE_RATIO), lineHeight, color }
 
     return (
-      <View style={[styles.bigContainer, style]}>
+      <View style={[styles.bigContainer, style]} testID={testID}>
         {!hideSign && (
           <Text numberOfLines={1} style={[fontStyles.regular, signStyle]}>
             {sign}
@@ -225,7 +227,7 @@ export default function CurrencyDisplay({
   }
 
   return (
-    <Text numberOfLines={1} style={[style, { color }]}>
+    <Text numberOfLines={1} style={[style, { color }]} testID={testID}>
       {!hideSign && sign}
       {!hideSymbol && currencySymbol}
       {formattedValue}
