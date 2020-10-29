@@ -81,7 +81,7 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
-  var walletAddress = await getWalletAddress(account)
+  let walletAddress = await getWalletAddress(account)
   if (account === walletAddress) {
     walletAddress = '0x0'
   }
