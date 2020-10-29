@@ -6,6 +6,7 @@ import {
   publicKeyToAddress,
   toChecksumAddress,
 } from '@celo/utils/lib/address'
+import { ensureCompressed } from '@celo/utils/lib/ecdh'
 import { NativeSigner, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
 import { ContractKit, newKitFromWeb3 } from '../kit'
@@ -45,6 +46,7 @@ testWithGanache('Offchain Data', (web3) => {
   const readerEncryptionKeyPrivate = ensureLeading0x(randomBytes(32).toString('hex'))
   const readerEncryptionKeyPublic = privateKeyToPublicKey(readerEncryptionKeyPrivate)
 
+  const METADATA_URL = 'http://example.com'
   const WRITER_METADATA_URL = 'http://example.com/writer'
   const WRITER_STORAGE_ROOT = 'http://example.com/root'
   const WRITER_LOCAL_STORAGE_ROOT = `/tmp/offchain/${writerAddress}`
@@ -52,6 +54,42 @@ testWithGanache('Offchain Data', (web3) => {
   let wrapper: OffchainDataWrapper
   let readerWrapper: OffchainDataWrapper
   let reader2Wrapper: OffchainDataWrapper
+
+  async function setupAccount(
+    privateKey: string,
+    dek: string
+  ): Promise<{
+    wrapper: OffchainDataWrapper
+    privateKey: string
+    publicKey: string
+    account: string
+  }> {
+    const cKit = newKitFromWeb3(web3)
+    const publicKey = privateKeyToPublicKey(privateKey)
+    const from = publicKeyToAddress(publicKey)
+    const metadataURL = `${METADATA_URL}/${from}/metadata`
+    const storageRoot = `${METADATA_URL}/${from}/root`
+    const localStorageRoot = `/tmp/offchain/${from}`
+
+    accounts = await cKit.contracts.getAccounts()
+    await accounts.createAccount().sendAndWaitForReceipt({ from })
+
+    await accounts.setAccountDataEncryptionKey(dek).sendAndWaitForReceipt({ from })
+
+    const metadata = IdentityMetadataWrapper.fromEmpty(from)
+    await metadata.addClaim(createStorageClaim(storageRoot), NativeSigner(web3.eth.sign, from))
+
+    fetchMock.mock(metadataURL, metadata.toString())
+    await accounts.setMetadataURL(metadataURL).sendAndWaitForReceipt({ from })
+
+    cKit.addAccount(privateKey)
+    cKit.addAccount(privateKey)
+
+    const wrapper = new OffchainDataWrapper(from, kit)
+    wrapper.storageWriter = new MockStorageWriter(localStorageRoot, storageRoot, fetchMock)
+
+    return { wrapper, privateKey, publicKey, account: from }
+  }
 
   beforeEach(async () => {
     kit = newKitFromWeb3(web3)
@@ -306,6 +344,92 @@ testWithGanache('Offchain Data', (web3) => {
         }
 
         expect(receivedName.error.errorType).toEqual(SchemaErrorTypes.UnavailableKey)
+      })
+    })
+
+    describe('when data encryption keys are compressed', () => {
+      it('works when the writer has a compressed key', async () => {
+        const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[4]
+        const writerDEK = randomBytes(32).toString('hex')
+        const writer = await setupAccount(
+          writerPrivateKey,
+          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(writerDEK)))
+        )
+        writer.wrapper.kit.addAccount(writerDEK)
+
+        const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[5]
+        const readerDEK = randomBytes(32).toString('hex')
+        const reader = await setupAccount(readerPrivateKey, privateKeyToPublicKey(readerDEK))
+        reader.wrapper.kit.addAccount(readerDEK)
+
+        const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
+        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+
+        await writerNameAccessor.write(testPayload, [reader.account])
+        const receivedName = await readerNameAccessor.readAsResult(writer.account)
+        if (receivedName.ok) {
+          expect(receivedName.result.name).toEqual(testname)
+        } else {
+          console.error(receivedName.error)
+          throw new Error('should not get here')
+        }
+      })
+
+      it('works when the reader has a compressed key', async () => {
+        const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[6]
+        const writerDEK = randomBytes(32).toString('hex')
+        const writer = await setupAccount(writerPrivateKey, privateKeyToPublicKey(writerDEK))
+        writer.wrapper.kit.addAccount(writerDEK)
+
+        const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[7]
+        const readerDEK = randomBytes(32).toString('hex')
+        const reader = await setupAccount(
+          readerPrivateKey,
+          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(readerDEK)))
+        )
+        reader.wrapper.kit.addAccount(readerDEK)
+
+        const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
+        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+
+        await writerNameAccessor.write(testPayload, [reader.account])
+        const receivedName = await readerNameAccessor.readAsResult(writer.account)
+        if (receivedName.ok) {
+          expect(receivedName.result.name).toEqual(testname)
+        } else {
+          console.error(receivedName.error)
+          throw new Error('should not get here')
+        }
+      })
+
+      it('works when both the reader and the writer have compressed keys', async () => {
+        const writerPrivateKey = ACCOUNT_PRIVATE_KEYS[8]
+        const writerDEK = randomBytes(32).toString('hex')
+        const writer = await setupAccount(
+          writerPrivateKey,
+          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(writerDEK)))
+        )
+        writer.wrapper.kit.addAccount(writerDEK)
+
+        const readerPrivateKey = ACCOUNT_PRIVATE_KEYS[9]
+        const readerDEK = randomBytes(32).toString('hex')
+        const reader = await setupAccount(
+          readerPrivateKey,
+          ensureLeading0x(ensureCompressed(privateKeyToPublicKey(readerDEK)))
+        )
+        reader.wrapper.kit.addAccount(readerDEK)
+
+        const writerNameAccessor = new PrivateNameAccessor(writer.wrapper)
+        const readerNameAccessor = new PrivateNameAccessor(reader.wrapper)
+
+        await writerNameAccessor.write(testPayload, [reader.account])
+        const receivedName = await readerNameAccessor.readAsResult(writer.account)
+        if (receivedName.ok) {
+          expect(receivedName.result.name).toEqual(testname)
+        } else {
+          console.error(receivedName.error)
+          throw new Error('should not get here')
+        }
       })
     })
   })
