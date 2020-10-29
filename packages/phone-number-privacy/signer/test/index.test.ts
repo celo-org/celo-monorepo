@@ -1,3 +1,4 @@
+import { authenticateUser } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import request from 'supertest'
 import { ErrorMessage, WarningMessage } from '../../common/src/interfaces/error-utils'
@@ -9,7 +10,6 @@ import {
   createMockToken,
   createMockWeb3,
 } from '../../common/src/test/utils'
-import { authenticateUser } from '../../common/src/utils/authentication'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
@@ -26,7 +26,10 @@ import { getBlockNumber, getContractKit } from '../src/web3/contracts'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
-jest.mock('../../common/src/utils/authentication')
+jest.mock('@celo/phone-number-privacy-common', () => ({
+  ...jest.requireActual('@celo/phone-number-privacy-common'),
+  authenticateUser: jest.fn(),
+}))
 const mockAuthenticateUser = authenticateUser as jest.Mock
 
 jest.mock('../src/signing/query-quota')

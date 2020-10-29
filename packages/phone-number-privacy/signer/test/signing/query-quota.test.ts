@@ -1,3 +1,4 @@
+import { isVerified } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import {
   ContractRetrieval,
@@ -8,7 +9,6 @@ import {
   createMockWeb3,
 } from '../../../common/src/test/utils'
 import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
-import { isVerified } from '../../../common/src/utils/authentication'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit } from '../../src/web3/contracts'
@@ -17,7 +17,10 @@ jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock
 jest.mock('../../src/database/wrappers/account')
 const mockPerformedQueryCount = getPerformedQueryCount as jest.Mock
-jest.mock('../../../common/src/utils/authentication')
+jest.mock('@celo/phone-number-privacy-common', () => ({
+  ...jest.requireActual('@celo/phone-number-privacy-common'),
+  isVerified: jest.fn(),
+}))
 const mockIsVerified = isVerified as jest.Mock
 // tslint:disable-next-line: no-object-literal-type-assertion
 

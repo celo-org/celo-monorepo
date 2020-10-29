@@ -248,6 +248,7 @@ function getMajorityErrorCode(errorCodes: Map<number, number>) {
 }
 
 function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boolean {
+  //console.log(requestBody)
   return (
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&

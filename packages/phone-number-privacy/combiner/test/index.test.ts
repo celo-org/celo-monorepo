@@ -1,5 +1,5 @@
+import { isVerified } from '@celo/phone-number-privacy-common'
 import { Response } from 'node-fetch'
-import { authenticateUser, isVerified } from '../../common/src/utils/authentication'
 import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { VERSION } from '../src/config'
@@ -10,9 +10,11 @@ import { getBlindedMessageSig, getContactMatches } from '../src/index'
 
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
-jest.mock('../../common/src/utils/authentication')
-const mockAuthenticateUser = authenticateUser as jest.Mock
-mockAuthenticateUser.mockReturnValue(true)
+jest.mock('@celo/phone-number-privacy-common', () => ({
+  ...jest.requireActual('@celo/phone-number-privacy-common'),
+  authenticateUser: jest.fn().mockReturnValue(true),
+  isVerified: jest.fn(),
+}))
 const mockIsVerified = isVerified as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
