@@ -128,6 +128,11 @@ export function* sendTransactionPromises(
       ? CURRENCY_ENUM.DOLLAR
       : CURRENCY_ENUM.GOLD
 
+  const feeCurrencyAddress =
+    feeCurrency === CURRENCY_ENUM.DOLLAR
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined // Pass undefined to use CELO to pay for gas.
+
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
     `Sending tx ${context.id} in ${fornoMode ? 'forno' : 'geth'} mode`
@@ -143,10 +148,6 @@ export function* sendTransactionPromises(
     gasPrice = yield getGasPrice(feeCurrency)
   }
 
-  const feeCurrencyAddress =
-    feeCurrency === CURRENCY_ENUM.DOLLAR
-      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
-      : undefined // Pass undefined to use CELO to pay for gas.
   const transactionPromises = yield call(
     sendTransactionAsync,
     tx,
@@ -154,7 +155,7 @@ export function* sendTransactionPromises(
     feeCurrencyAddress,
     getLogger(context, fornoMode),
     staticGas,
-    gasPrice ? gasPrice.toString() : gasPrice,
+    gasPrice?.toString(),
     nonce
   )
   return transactionPromises
