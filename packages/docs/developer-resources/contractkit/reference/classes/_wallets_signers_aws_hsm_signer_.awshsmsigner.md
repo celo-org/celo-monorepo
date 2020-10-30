@@ -16,6 +16,7 @@
 
 ### Methods
 
+* [computeSharedSecret](_wallets_signers_aws_hsm_signer_.awshsmsigner.md#computesharedsecret)
 * [decrypt](_wallets_signers_aws_hsm_signer_.awshsmsigner.md#decrypt)
 * [getNativeKey](_wallets_signers_aws_hsm_signer_.awshsmsigner.md#getnativekey)
 * [signPersonalMessage](_wallets_signers_aws_hsm_signer_.awshsmsigner.md#signpersonalmessage)
@@ -41,6 +42,22 @@ Name | Type |
 **Returns:** *[AwsHsmSigner](_wallets_signers_aws_hsm_signer_.awshsmsigner.md)*
 
 ## Methods
+
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
+
+*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L118)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_publicKey` | string |
+
+**Returns:** *Promise‹Buffer‹››*
+
+___
 
 ###  decrypt
 
