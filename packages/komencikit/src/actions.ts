@@ -145,10 +145,7 @@ export interface RequestSubsidisedAttestationsPayload {
   identifier: string
   attestationsRequested: number
   walletAddress: string
-  transactions: {
-    approve: RawTransaction
-    request: RawTransaction
-  }
+  requestTx: RawTransaction
 }
 
 export const requestSubsidisedAttestations = action<

@@ -209,20 +209,15 @@ export class KomenciKit {
     },
   })
   public async requestAttestations(
-    identifier: string,
     metaTxWalletAddress: string,
+    identifier: string,
     attestationsRequested: number
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
     const attestations = await this.contractKit.contracts.getAttestations()
     const wallet = await this.getWallet(metaTxWalletAddress)
-    let nonce = await wallet.nonce()
-
-    const approveTx = await attestations.approveAttestationFee(attestationsRequested)
-    const approveTxSig = await wallet.signMetaTransaction(approveTx.txo, nonce++)
-    const approveMetaTx = wallet.executeMetaTransaction(approveTx.txo, approveTxSig)
 
     const requestTx = await attestations.request(identifier, attestationsRequested)
-    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo, nonce++)
+    const requestTxSig = await wallet.signMetaTransaction(requestTx.txo)
     const requestMetaTx = wallet.executeMetaTransaction(requestTx.txo, requestTxSig)
 
     const resp = await this.client.exec(
@@ -230,10 +225,7 @@ export class KomenciKit {
         identifier,
         attestationsRequested,
         walletAddress: metaTxWalletAddress,
-        transactions: {
-          request: toRawTransaction(requestMetaTx.txo),
-          approve: toRawTransaction(approveMetaTx.txo),
-        },
+        requestTx: toRawTransaction(requestMetaTx.txo),
       })
     )
 
@@ -243,6 +235,22 @@ export class KomenciKit {
 
     const txHash = resp.result.txHash
     return this.waitForReceipt(txHash)
+  }
+
+  /**
+   * selectIssuers: wraps the `submitMetaTransaction` action in order
+   * to execute cUSD.approve(attestations, fee)
+   *
+   * @param metaTxWalletAddress - The MetaTxWallet selecting issuers
+   * @param identifier - the phone number identifier
+   */
+  public async approveAttestations(
+    metaTxWalletAddress: string,
+    attestationsRequested: number
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+    const attestations = await this.contractKit.contracts.getAttestations()
+    const approveTx = await attestations.approveAttestationFee(attestationsRequested)
+    return this.submitMetaTransaction(metaTxWalletAddress, approveTx)
   }
 
   /**

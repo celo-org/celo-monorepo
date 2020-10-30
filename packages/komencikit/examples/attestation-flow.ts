@@ -57,10 +57,15 @@ const run = async () => {
   }
   const identifier = getIdentifier.result.identifier
   const pepper = getIdentifier.result.pepper
+  const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
+  console.log(approveRes)
+  if (!approveRes.ok) {
+    return
+  }
   const statsBefore = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('Before ===== ')
   console.log(statsBefore)
-  const requestAttestations = await komenciKit.requestAttestations(identifier, walletAddress, 3)
+  const requestAttestations = await komenciKit.requestAttestations(walletAddress, identifier, 3)
   const statsAfter = await attestations.getAttestationStat(identifier, walletAddress)
   console.log('After ===== ')
   console.log(statsAfter)
@@ -75,7 +80,7 @@ const run = async () => {
   })
   console.log(events)
 
-  const selectIssuers = await komenciKit.selectIssuers(identifier, walletAddress)
+  const selectIssuers = await komenciKit.selectIssuers(walletAddress, identifier)
   if (!selectIssuers.ok) {
     return
   }
@@ -145,8 +150,8 @@ const run = async () => {
         }
 
         const completeResult = await komenciKit.completeAttestation(
-          identifier,
           walletAddress,
+          identifier,
           matchingIssuer,
           code
         )
