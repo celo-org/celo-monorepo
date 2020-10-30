@@ -279,7 +279,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           phoneHashDetails,
           attestations
         )
-        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
         // count how much more attestations we need to request
         const attestationsToRequest =
@@ -316,7 +315,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
             attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
           )
 
-          ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
           // Request codes for the new list of attestations. We ignore unsuccessfull reveals here,
           // cause we do not want to go into a loop of re-requesting more and more attestations
           yield call(
@@ -326,8 +324,8 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
             phoneHashDetails,
             attestations
           )
-          ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
         }
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
       }
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
