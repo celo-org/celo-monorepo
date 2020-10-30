@@ -523,7 +523,7 @@ ___
 
 ▸ **hasAccountForIdentifier**(`identifer`: string, `account`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:661](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L661)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:662](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L662)*
 
 **Parameters:**
 
