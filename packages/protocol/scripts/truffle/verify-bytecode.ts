@@ -1,8 +1,8 @@
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
+import { readJsonSync } from 'fs-extra'
 import { ProxyInstance, RegistryInstance } from 'types'
-
 import fs = require('fs')
 
 /*
