@@ -50,17 +50,17 @@ A second option is to swap in a new validator behind the same set of proxies.
 
 Validators can be configured as primaries or replicas. By default validators start as primaries and will persist all changes around starting or stopping. Through the istanbul management RPC API the validator can be configured to start or stop at a specified block. The validator will participate in consensus for block numbers in the range [start, stop).
 
-**RPC Methods** 
+#### RPC Methods
 * `istanbul.start()` and `istanbul.startAtBlock()` start validating immediately or at a block
 * `istanbul.stop()` and `istanbul.stopAtBlock()` stop validating immediately or at a block
 * `istanbul.replicaState` will give you the state of the node and the start/stop blocks
 * `istanbul.validating` will give you true/false if the node is validating
 
-**Geth Flags**
+#### Geth Flags
 * `--replica` flag which starts a validator in replica mode
 * `--replicaStateDBPath`. Path to save information on if the node is a replica or not and when to start/stop. This will override geth's flags. If this is set to an empty string it will use an in-memory (non-persistent) database.
 
-Steps to upgrade
+#### Steps to upgrade
 1. Pull the latest docker image.
 2. Start a new validator node on a second host in replica mode (`--istanbul.replica` flag). It should be otherwise configured exactly the same as the existing validator.
     * It needs to connect to the exisiting proxies and the validator signing key to connect to other validators in listen mode.
