@@ -101,7 +101,7 @@ function* getPhoneHashPrivate(e164Number: string, selfPhoneHash?: string) {
   const mtwAddress: string | null = yield select(mtwAddressSelector)
   const walletAddress: string = yield call(getAccount)
   const accountAddress: string = mtwAddress || walletAddress
-  const authSigner: AuthSigner = yield call(getAuthSignerForAccount)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, accountAddress, walletAddress)
 
   // Unlock the account if the authentication is signed by the wallet
   if (authSigner.authenticationMethod === OdisUtils.Query.AuthenticationMethod.WALLET_KEY) {

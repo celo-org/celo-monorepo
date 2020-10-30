@@ -29,7 +29,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { registerDataEncryptionKey, setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
-import { getAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import {
   dataEncryptionKeySelector,
   isDekRegisteredSelector,
@@ -225,7 +225,7 @@ export async function getRegisterDekTxGas(account: string, currency: CURRENCY_EN
   }
 }
 
-export function* getAuthSignerForAccount() {
+export function* getAuthSignerForAccount(accountAddress: string, walletAddress: string) {
   const contractKit = yield call(getContractKit)
 
   if (features.PNP_USE_DEK_FOR_AUTH) {
@@ -239,9 +239,6 @@ export function* getAuthSignerForAccount() {
       Logger.error(TAG + '/getAuthSignerForAccount', 'Missing comment key, should never happen.')
     } else {
       const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
-      const mtwAddress: string | null = yield select(mtwAddressSelector)
-      const walletAddress: string = yield call(getAccount)
-      const accountAddress: string = mtwAddress || walletAddress
       const upToDate: boolean = yield call(
         isAccountUpToDate,
         accountsWrapper,

@@ -18,7 +18,7 @@ export interface SetAccountAction {
   address: string
 }
 
-export interface SetScwAccountAction {
+export interface SetMtwAddressAction {
   type: Actions.SET_MTW_ADDRESS
   address: string
 }
@@ -63,7 +63,7 @@ export interface UpdateWeb3SyncProgressAction {
 
 export type ActionTypes =
   | SetAccountAction
-  | SetScwAccountAction
+  | SetMtwAddressAction
   | SetAccountInWeb3KeystoreAction
   | SetIsFornoAction
   | ToggleIsFornoAction
@@ -79,7 +79,7 @@ export const setAccount = (address: string): SetAccountAction => {
   }
 }
 
-export const setScwAccount = (address: string): SetScwAccountAction => {
+export const setMtwAddress = (address: string): SetMtwAddressAction => {
   return {
     type: Actions.SET_MTW_ADDRESS,
     address: address.toLowerCase(),

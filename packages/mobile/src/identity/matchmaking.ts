@@ -32,7 +32,7 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     return
   }
 
-  const authSigner: AuthSigner = yield call(getAuthSignerForAccount)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, accountAddress, walletAddress)
 
   const { odisPubKey, odisUrl } = networkConfig
   const serviceContext: ServiceContext = {
