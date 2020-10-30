@@ -178,6 +178,9 @@ if [[ ${geth_metrics} == "true" ]]; then
   METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
 fi
 
+# Using bootnode so their enode url will be published to the discv5 DHT (and light clients can discover them)
+BOOTNODE_FLAG="--bootnodes=enode://$BOOTNODE_ENODE"
+
 DATA_DIR=/root/.celo
 
 mkdir -p $DATA_DIR/account
@@ -194,8 +197,6 @@ echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
 docker run \
   -v $DATA_DIR:$DATA_DIR \
-  -p 8545:8545/tcp \
-  -p 8546:8546/tcp \
   --name geth \
   --net=host \
   --restart always \
@@ -208,7 +209,8 @@ docker run \
     ) ; \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
     geth \
-      --bootnodes=enode://$BOOTNODE_ENODE \
+      --$BOOTNODE_FLAG \
+      --datadir $DATA_DIR \
       --light.serve 90 \
       --light.maxpeers ${max_light_peers} \
       --maxpeers=${max_peers} \

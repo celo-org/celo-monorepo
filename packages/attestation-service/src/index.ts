@@ -79,11 +79,18 @@ async function init() {
 
   for (const p of smsProvidersWithDeliveryStatus()) {
     const path = `/delivery_status_${p.type}`
+    const method = p.deliveryStatusMethod()
     rootLogger.info(
-      { url: deliveryStatusURLForProviderType(p.type) },
+      { method, url: deliveryStatusURLForProviderType(p.type) },
       'Registered delivery status handler'
     )
-    app.post(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+    if (method === 'POST') {
+      app.post(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+    } else if (method === 'GET') {
+      app.get(path, ...p.deliveryStatusHandlers(), handleAttestationDeliveryStatus(p.type))
+    } else {
+      throw new Error(`Unknown method ${method} for ${path}`)
+    }
   }
 }
 
