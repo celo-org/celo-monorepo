@@ -19,7 +19,7 @@ export const UriDataType = ioType({
   currencyCode: ioUnion([ioUndefined, ioKeyof(LocalCurrencyCode)]),
   amount: ioUnion([ioUndefined, ioString]),
   comment: ioUnion([ioUndefined, ioString]),
-  asset: ioUnion([ioUndefined, ioString]),
+  token: ioUnion([ioUndefined, ioString]),
 })
 export type UriData = ioTypeOf<typeof UriDataType>
 

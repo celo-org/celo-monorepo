@@ -199,13 +199,13 @@ export function* handleSendPaymentData(
       return
     }
 
-    if (data.asset === 'CELO') {
+    if (data.token === 'CELO') {
       navigate(Screens.WithdrawCeloReviewScreen, {
         amount: new BigNumber(data.amount),
         recipientAddress: data.address.toLowerCase(),
         feeEstimate: new BigNumber(0),
       })
-    } else if (data.asset === 'cUSD' || !data.asset) {
+    } else if (data.token === 'cUSD' || !data.token) {
       const transactionData: TransactionDataInput = {
         recipient,
         amount: dollarAmount,
@@ -220,10 +220,10 @@ export function* handleSendPaymentData(
       })
     }
   } else {
-    if (data.asset === 'CELO') {
+    if (data.token === 'CELO') {
       Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
       return
-    } else if (data.asset === 'cUSD' || !data.asset) {
+    } else if (data.token === 'cUSD' || !data.token) {
       navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
     }
   }
