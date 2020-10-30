@@ -878,8 +878,3 @@ export async function checkHelmVersion() {
     process.exit(1)
   }
 }
-
-// export async function execHelmCmd<T>(exec: () => T): Promise<T> {
-//   await checkHelmVersion()
-//   return exec()
-// }
