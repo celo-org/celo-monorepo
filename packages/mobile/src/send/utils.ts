@@ -188,9 +188,6 @@ export function* handleSendPaymentData(
   yield put(storeLatestInRecents(recipient))
 
   if (data.amount) {
-    const currency = data.currencyCode
-      ? (data.currencyCode as LocalCurrencyCode)
-      : yield select(getLocalCurrencyCode)
     const exchangeRate: string = yield call(fetchExchangeRate, currency)
     const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
     if (!dollarAmount) {
@@ -205,6 +202,9 @@ export function* handleSendPaymentData(
         feeEstimate: new BigNumber(0),
       })
     } else if (data.token === 'cUSD' || !data.token) {
+      const currency = data.currencyCode
+        ? (data.currencyCode as LocalCurrencyCode)
+        : yield select(getLocalCurrencyCode)
       const transactionData: TransactionDataInput = {
         recipient,
         amount: dollarAmount,
