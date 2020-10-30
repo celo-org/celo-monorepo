@@ -3,7 +3,7 @@ import {
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyLibraryPrefix,
+  verifyLibraryPrefix
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
@@ -34,6 +34,9 @@ const isProxyRepointTransaction = (tx: ProposalTx) =>
   tx.contract.endsWith('Proxy') &&
   (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
 
+const isProxyRepointAndInitializeTransaction = (tx: ProposalTx) =>
+  tx.contract.endsWith('Proxy') &&
+    tx.function === '_setAndInitializeImplementation'
 const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
   tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
@@ -136,6 +139,49 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   )
 }
 
+const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
+  const invalidTransactions = proposal.filter(
+    (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
+  )
+  if (invalidTransactions.length > 0) {
+    throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
+  }
+
+  console.info("Proposal contains only valid release transactions!")
+}
+
+interface InitializationData {
+  [contractName: string]: any[]
+}
+
+const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
+
+const assertValidInitializationData = (proposal: ProposalTx[], initializationData: InitializationData) => {
+  const initializingProposals = proposal.filter(isProxyRepointAndInitializeTransaction)
+  const contractsInitialized = new Set()
+  for (const proposalTx of initializingProposals) {
+    const contractName = ContractNameExtractorRegex.exec(proposalTx.contract)[1]
+
+    if (!initializationData[contractName]) {
+      throw new Error(`Initialization Data for ${contractName} could not be found in reference file`)
+    }
+
+    if (initializationData[contractName] !== proposalTx.args) {
+      throw new Error(`Intialization Data for ${contractName} in proposal (${proposalTx.args}) does not match reference file ${initializationData[contractName]}`)
+    }
+
+    contractsInitialized.add(contractName)
+  }
+
+  for (const referenceContractName of Object.keys(initializationData)) {
+    if (!contractsInitialized.has(referenceContractName)) {
+      throw new Error(`Reference file has initialization data for ${referenceContractName}, but proposal does not specify initialization`)
+    }
+  }
+
+  console.info('Initialization Data was verified!')
+}
+
 /*
  * This function will visit all contracts in `contracts` as well as any
  * linked libraries and verify that the compiled and linked source code matches
@@ -147,14 +193,11 @@ export const verifyBytecodes = async (
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
-  web3: Web3
+  web3: Web3,
+  initializationData: InitializationData = {}
 ) => {
-  const invalidTransactions = proposal.filter(
-    (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
-  )
-  if (invalidTransactions.length > 0) {
-    throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
-  }
+  assertValidProposalTransactions(proposal)
+  assertValidInitializationData(proposal, initializationData)
 
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
