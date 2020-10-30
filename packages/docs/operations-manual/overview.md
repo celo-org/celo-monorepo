@@ -1,8 +1,10 @@
 # Validator Guide Overview
 
-In this section you will find information about the
+## Validator Guide
 
-- [Attestation Service](attestation-service.md), a core piece of the Celo identity protocol.
+In this section you will find information about:
+
+- [Attestation Service](attestation-service.md), a core piece of the Celo identity protocol
 - [Key Management](key-management/summary.md) best practices for Validators
 - [Securing Celo Nodes and Services](securing-nodes-and-services.md)
 - [Monitoring](monitoring.md) Celo nodes
