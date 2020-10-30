@@ -22,7 +22,7 @@
     "dev:emulator:run": "$ANDROID_HOME/emulator/emulator -avd",
     "test": "export TZ=UTC && ./scripts/sync_branding.sh -b celo && jest --silent",
     "test:all": "yarn lint && yarn build:ts && yarn test",
-    "test:ci": "yarn test --coverage --runInBand",
+    "test:ci": "yarn test --coverage",
     "test:watch": "yarn test --watch --maxWorkers=4",
     "test:verbose": "export TZ=UTC && jest --verbose",
     "test:e2e:android": "./scripts/run_e2e.sh -p android",
