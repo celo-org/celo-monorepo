@@ -3,5 +3,5 @@
 {{- end -}}
 
 {{- define "komenci-pod-name" -}}
-{{- .Values.environment.name -}}-komenci-{{- .index -}}
+{{- .Values.environment.name -}}-relayer-{{- .index -}}
 {{- end -}}

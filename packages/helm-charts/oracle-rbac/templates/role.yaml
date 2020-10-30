@@ -7,7 +7,7 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["pods"]
-  resourceNames: ["{{ template "komenci-pod-name" $index_counter }}"]
+  resourceNames: ["{{ template "oracle-pod-name" $index_counter }}"]
   verbs: ["get", "patch"]
 ---
 {{ end }}

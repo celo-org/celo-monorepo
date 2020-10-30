@@ -8,6 +8,9 @@ metadata:
 spec:
   clusterIP: None
   selector:
+  ports:
+  - name: http
+    port: 3000
 {{ include "komenci-onboarding-component-label" . | indent 4 }}
 ---
 apiVersion: apps/v1
@@ -40,26 +43,32 @@ spec:
           imagePullPolicy: {{ .Values.onboarding.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+              containerPort: 3000
           resources:
             {{- toYaml .Values.onboarding.resources | nindent 12 }}
           env:
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgresql-password
+                name: {{ .Release.Name }}-postgresql
           - name: REPLICA_NAME
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db.host "value_name" "host" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db.port "value_name" "port" "optional" true) | indent 8 }}
-{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db.username "value_name" "username") | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db "value_name" "host" "optional" true) | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db "value_name" "port" "optional" true) | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db "value_name" "username") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_DATABASE" "dict" .Values.onboarding.db "value_name" "database") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.onboarding.db "value_name" "synchronize") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 10 }}
+{{ include "common.env-var" (dict "name" "FUND_ADDRESS" "dict" .Values.onboarding.onchain "value_name" "fundAddress") | indent 10 }}
+{{ include "common.env-var" (dict "name" "MTW_IMPLEMENTATION_ADDRESS" "dict" .Values.onboarding.onchain "value_name" "mtwImplementationAddress") | indent 10 }}
+{{ include "common.env-var" (dict "name" "MTW_DEPLOYER_ADDRESS" "dict" .Values.onboarding.onchain "value_name" "mtwDeployerAddress") | indent 10 }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 10 }}
+{{ include "common.env-var" (dict "name" "NODE_PROVIDER_TYPE" "dict" .Values.onboarding.onchain "value_name" "nodeProviderType") | indent 10 }}
+{{ include "common.env-var" (dict "name" "NODE_URL" "dict" .Values.onboarding.onchain "value_name" "nodeUrl") | indent 10 }}
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
