@@ -307,7 +307,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
           }
         }
       >
-        verificationEducation.feelessBody
+        verificationEducation.body
       </Text>
       <View
         style={
