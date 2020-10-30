@@ -188,13 +188,6 @@ export function* handleSendPaymentData(
   yield put(storeLatestInRecents(recipient))
 
   if (data.amount) {
-    const exchangeRate: string = yield call(fetchExchangeRate, currency)
-    const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
-    if (!dollarAmount) {
-      Logger.warn(TAG, '@handleSendPaymentData null amount')
-      return
-    }
-
     if (data.token === 'CELO') {
       navigate(Screens.WithdrawCeloReviewScreen, {
         amount: new BigNumber(data.amount),
@@ -205,6 +198,12 @@ export function* handleSendPaymentData(
       const currency = data.currencyCode
         ? (data.currencyCode as LocalCurrencyCode)
         : yield select(getLocalCurrencyCode)
+      const exchangeRate: string = yield call(fetchExchangeRate, currency)
+      const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
+      if (!dollarAmount) {
+        Logger.warn(TAG, '@handleSendPaymentData null amount')
+        return
+      }
       const transactionData: TransactionDataInput = {
         recipient,
         amount: dollarAmount,
