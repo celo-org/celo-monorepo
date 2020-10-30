@@ -19,7 +19,13 @@ Other Changes
 
 ### **[0.4.18]** -- 2020-10-30
 Features
-- ODIS Client Update - [#5621](https://github.com/celo-org/celo-monorepo/pull/5621)]
+- CIP encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
+- ODIS Client Update - [#5621](https://github.com/celo-org/celo-monorepo/pull/5621)
+- KomenciKit - [#5436](https://github.com/celo-org/celo-monorepo/pull/5436)
+
+Other Changes
+- Small change for attestation service - [#5270](https://github.com/celo-org/celo-monorepo/pull/5270)
+- CIP-08 Compressed key support - [#5624](https://github.com/celo-org/celo-monorepo/pull/5624)
 
 ### **[0.4.17]** -- 2020-10-27
 Bug Fixes
