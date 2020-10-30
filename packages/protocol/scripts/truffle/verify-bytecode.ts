@@ -27,12 +27,13 @@ const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
-  string: ['build_artifacts', 'proposal'],
+  string: ['build_artifacts', 'proposal', 'initialize_data'],
   boolean: ['before_release_1'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
 const proposal = argv.proposal ? JSON.parse(fs.readFileSync(argv.proposal).toString()) : []
+const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
@@ -44,7 +45,8 @@ module.exports = async (callback: (error?: any) => number) => {
       registry,
       proposal,
       Proxy,
-      web3
+      web3,
+      initializationData
     )
 
     // tslint:disable-next-line: no-console
