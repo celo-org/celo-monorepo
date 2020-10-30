@@ -150,6 +150,7 @@ describe('send/utils', () => {
           .provide([[matchers.call.fn(fetchExchangeRate), mockUriData[0].currencyCode]])
           .run()
         expect(navigate).toHaveBeenCalledWith(Screens.WithdrawCeloReviewScreen, {
+          // @ts-ignore
           amount: new BigNumber(mockUriData[0].amount.valueOf()),
           recipientAddress: mockUriData[0].address.toLowerCase(),
           feeEstimate: new BigNumber(0),
