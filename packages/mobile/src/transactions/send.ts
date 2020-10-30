@@ -5,8 +5,7 @@ import { TransactionEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
-import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
-import { getCurrencyAddress } from 'src/tokens/saga'
+import { getCurrencyAddress, getTokenContract } from 'src/tokens/saga'
 import {
   sendTransactionAsync,
   SendTransactionLogEvent,
@@ -115,7 +114,9 @@ export function* sendTransactionPromises(
     `Going to send a transaction with id ${context.id}`
   )
 
-  const stableTokenBalance = new BigNumber(yield select(stableTokenBalanceSelector))
+  const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
+  const stableTokenBalance = yield call([stableToken, stableToken.balanceOf], account)
+
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
 
