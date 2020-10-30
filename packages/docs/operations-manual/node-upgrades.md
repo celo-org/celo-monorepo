@@ -48,20 +48,35 @@ A second option is to swap in a new validator behind the same set of proxies.
 
 ### Hotswapping Validator Nodes
 
-The hotswap mechanism provides several RPC methods to running validators.
+Validators can be configured as primaries or replicas. By default validators start as primaries and will persist all changes around starting or stopping. Through the istanbul management RPC API the validator can be configured to start or stop at a specified block. The validator will participate in consensus for block numbers in the range [start, stop).
 
+**RPC Methods** 
 * `istanbul.start()` and `istanbul.startAtBlock()` start validating immediately or at a block
 * `istanbul.stop()` and `istanbul.stopAtBlock()` stop validating immediately or at a block
-* The validator will validate when in the range [start, stop)
 * `istanbul.replicaState` will give you the state of the node and the start/stop blocks
 * `istanbul.validating` will give you true/false if the node is validating
-* `istanbul.valEnodeTableInfo`: if there are non-empty entries for encrypted enode urls the validator can connect to the other validators.
+
+**Geth Flags**
 * `--replica` flag which starts a validator in replica mode
-* `--replicaStateDBPath`. By default validators save if their state and try to return to it (so a node configured as a validator that was then stopped should stay stopped on a restart). An empty string as the path results in an in memory (non-persistant) replica state DB.
+* `--replicaStateDBPath`. Path to save information on if the node is a replica or not and when to start/stop. This will override geth's flags. If this is set to an empty string it will use an in-memory (non-persistent) database.
 
-To upgrade a validating node without key rotation when running behind proxies, pull the latest Docker image, as mentioned above. 
-
-Then start the validator on a second host in replica mode (with `istanbul.replica` flag). The replica needs to be provided with the validator signing key to decrypt enode urls of it's peer validators/proxies prior to starting to participate in consensus. The replica will connect to the proxies and sync. With `geth attach` or via the management RPC API, verify that it is synced and has enode urls for each validator peer, then schedule the primary to stop and the replica to start. To have the replica start on block 1250, run `istanbul.stopAtBlock(1250)` on the primary validator and run `istanbul.startAtBlock(1250)` on the replica. You can verify that these change are registered with `istanbul.replicaState`. `istanbul.stop()` and `istanbul.start()` will immediately take effect if changing the node's state and will clear pending start/stop blocks.
+Steps to upgrade
+1. Pull the latest docker image.
+2. Start a new validator node on a second host in replica mode (`--istanbul.replica` flag). It should be otherwise configured exactly the same as the existing validator.
+    * It needs to connect to the exisiting proxies and the validator signing key to connect to other validators in listen mode.
+3. Once the replica is synced and has validator enode urls for all validators, it is ready to swapped in.
+    * Check validator enode urls with `istanbul.valEnodeTableInfo` in the geth console. The field `encryptedEnodeURLs` **(TODO check)** should be filled in for each validator peer.
+4. In the geth console on the primary run `istanbul.stopAtBlock(xxxx)`
+    * Make sure to select a block number comfortably in the future.
+    * You can check what the stop block is with `istanbul.replicaState` in the geth console.
+    * You can run `istanbul.start()` to clear the stop block
+5. In the geth console of the replica run `istanbul.startAtBlock(xxxx)`
+    * You can check what the start block is with `istanbul.replicaState` in the geth console.
+    * You can run `istanbul.stop()` to clear the start block
+6. Confirm that the transition occurred with `istanbul.replicaState` 
+    * The last block that the old primary will sign is block number `xxxx - 1`
+    * The first block that the new primary will sign is block number `xxxx`
+7. Tear down the old primary once the transition has occurred.
 
 ```bash
 TODO: geth console view
@@ -69,6 +84,6 @@ TODO: geth console view
 
 ### Upgrading Proxy Nodes
 
-With multi-proxy, you can upgrade proxies one by one or can add newly synced proxies with the latest Docker image and can remove the old proxies. If upgrading the proxies in place, a rolling upgrade is recommended as the validator will re-assign direct connections as proxies are added and removed. These re-assignments will allow the validator to continue to participate in consensus.  
+With multi-proxy, you can upgrade proxies one by one or can add newly synced proxies with the latest Docker image and can remove the old proxies. If upgrading the proxies in place, a rolling upgrade is recommended as the validator will re-assign direct connections as proxies are added and removed. These re-assignments will allow the validator to continue to participate in consensus.
 
 
