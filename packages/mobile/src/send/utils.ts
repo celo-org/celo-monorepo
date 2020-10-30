@@ -185,7 +185,6 @@ export function* handleSendPaymentData(
     thumbnailPath: cachedRecipient?.thumbnailPath,
     contactId: cachedRecipient?.contactId,
   }
-
   yield put(storeLatestInRecents(recipient))
 
   if (data.amount) {
@@ -212,7 +211,6 @@ export function* handleSendPaymentData(
         reason: data.comment,
         type: TokenTransactionType.PayPrefill,
       }
-
       navigate(Screens.SendConfirmation, {
         transactionData,
         isFromScan: true,

@@ -7,9 +7,11 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { StackParamList } from 'src/navigator/types'
 import { NotificationTypes } from 'src/notifications/types'
 import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
+import { UriData } from 'src/qrcode/schema'
 import {
   RecipientKind,
   RecipientWithContact,
@@ -282,5 +284,35 @@ export const mockPaymentRequests: PaymentRequest[] = [
     currency,
     notified: true,
     type: NotificationTypes.PAYMENT_REQUESTED,
+  },
+]
+
+export const mockUriData: UriData[] = [
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'CELO',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: undefined,
+    amount: undefined,
+    comment: undefined,
+    token: 'CELO',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'BTC',
   },
 ]
