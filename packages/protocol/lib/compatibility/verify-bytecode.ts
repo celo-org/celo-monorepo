@@ -27,6 +27,12 @@ interface VerificationContext {
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
 }
+interface InitializationData {
+  [contractName: string]: any[]
+}
+
+const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
+
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
@@ -149,13 +155,6 @@ const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
 
   console.info("Proposal contains only valid release transactions!")
 }
-
-interface InitializationData {
-  [contractName: string]: any[]
-}
-
-const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
-
 
 const assertValidInitializationData = (
   artifacts: BuildArtifacts,
