@@ -22,7 +22,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.18-dev",
+    "@celo/contractkit": "0.4.19-dev",
     "@celo/base": "0.0.4-dev",
     "@celo/utils": "0.1.22-dev",
     "cross-fetch": "^3.0.6",
