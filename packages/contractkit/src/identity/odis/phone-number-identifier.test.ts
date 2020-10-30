@@ -18,6 +18,7 @@ import {
 } from './query'
 
 jest.mock('./bls-blinding-client', () => {
+  // tslint:disable-next-line:no-shadowed-variable
   class WasmBlsBlindingClient {
     blindMessage = (m: string) => m
     unblindAndVerifyMessage = (m: string) => m
