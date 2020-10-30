@@ -94,7 +94,7 @@ export class NexmoSmsProvider extends SmsProvider {
     return AttestationStatus.Other
   }
 
-  supportsDeliveryStatus = () => true
+  deliveryStatusMethod = () => 'POST'
 
   deliveryStatusHandlers = () => [bodyParser.json()]
 
