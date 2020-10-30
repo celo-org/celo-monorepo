@@ -29180,13 +29180,13 @@ react-native-gesture-handler@^1.6.1:
   version "1.0.0"
   resolved "https://github.com/celo-org/react-native-geth#5864c09ce2ab4f112b46fa56f399a72fb9b5c966"
 
-"react-native-google-safetynet@https://github.com/celo-org/react-native-google-safetynet#e698d70":
+"react-native-google-safetynet@https://github.com/celo-org/react-native-google-safetynet#8a0355f":
   version "1.0.0"
-  resolved "https://github.com/celo-org/react-native-google-safetynet#e698d7000b1ef7911ebb15fbf324b33ec1860972"
+  resolved "https://github.com/celo-org/react-native-google-safetynet#8a0355f38123182533b7fc559951a82af59f68a9"
   dependencies:
     base64-js "^1.3.0"
     jwt-decode "^2.2.0"
-    react-native-securerandom "^0.1.1"
+    react-native-securerandom "^1.0.0"
 
 react-native-iphone-x-helper@^1.0.3, react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"
@@ -29317,13 +29317,6 @@ react-native-secure-randombytes@^3.0.2:
   integrity sha512-PEtT0fXyYt3GsXLG+ONeE+/pRVDRiMnrnuXXvXACAs/eQPGNJRMNcDmbUuLJ/HqRPHQAQl0Im00erVhp0h5JEQ==
   dependencies:
     buffer "^4.9.1"
-
-react-native-securerandom@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/react-native-securerandom/-/react-native-securerandom-0.1.1.tgz#f130623a412c338b0afadedbc204c5cbb8bf2070"
-  integrity sha1-8TBiOkEsM4sK+t7bwgTFy7i/IHA=
-  dependencies:
-    base64-js "*"
 
 react-native-securerandom@^1.0.0:
   version "1.0.0"
