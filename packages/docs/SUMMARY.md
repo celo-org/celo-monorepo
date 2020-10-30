@@ -92,6 +92,7 @@
   - [General](developer-resources/integrations/general.md)
   - [Checklist](developer-resources/integrations/checklist.md)
   - [Custody](developer-resources/integrations/custody.md)
+  - [Listings](developer-resources/integrations/listings.md)
   - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
 - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
   <!-- contractkit-reference-start -->

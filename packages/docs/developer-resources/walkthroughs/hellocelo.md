@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 # Hello Celo: sending value with Celo
 
-TODO
-=======
 ---
 description: >-
   In this guide we are going to learn how to connect to the Celo test network
@@ -274,12 +271,10 @@ Congratulations! You have accomplished a lot in this short introduction to devel
 
 We covered:
 
-* Installing and setting up ContractKit 
+* Installing and setting up ContractKit
 * Connecting to the Celo Alfajores network
 * Getting the CELO contract wrapper
 * Reading account balances using the CELO wrapper
 * Generating a new account in Celo
 * Funding an account using the Celo Alfajores Faucet
 * Sending CELO
-
->>>>>>> e85dcb5b46cd848c7cff485580a2e9d573de9475
