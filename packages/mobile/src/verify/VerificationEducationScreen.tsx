@@ -235,7 +235,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         <GoogleReCaptcha
           siteKey={RECAPTCHA_SITE_KEY}
           url={WEB_LINK}
-          languageCode="en"
+          languageCode={i18n.language}
           onMessage={handleCaptchaResolved}
           style={styles.recaptcha}
         />
