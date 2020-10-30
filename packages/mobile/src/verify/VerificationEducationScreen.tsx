@@ -169,7 +169,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     )
   } else if (isBalanceSufficient) {
     // Sufficient balance
-    bodyText = t('verificationEducation.body')
+    bodyText = t(`verificationEducation.${features.KOMENCI ? 'feelessBody' : 'body'}`)
     firstButton = (
       <Button
         text={

@@ -45,7 +45,8 @@
   "verificationEducation": {
     "title": "Número de Teléfono",
     "header": "Conectá tu número de teléfono",
-    "body": "Confirmar tu número tomará unos tres minutos. Para confirmar tu número, recibirás tres mensajes.",
+    "body": "Para asegurarnos de que tu número sea realmente tuyo, te enviaremos tres mensajes de texto que costarán alrededor de 0.05 cUSD cada uno.\n\nConfirmar tu número tomará unos tres minutos.",
+    "feelessBody": "Confirmar tu número tomará unos tres minutos. Para confirmar tu número, recibirás tres mensajes.",
     "start": "Comenzar",
     "resume": "Reanudar",
     "doINeedToConfirm": "¿Necesito confirmar?",
