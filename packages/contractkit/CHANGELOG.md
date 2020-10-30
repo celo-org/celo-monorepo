@@ -5,9 +5,9 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.4.18--dev]**
+### **[0.4.19--dev]**
 Features
-- ODIS Client Update - [#5621](https://github.com/celo-org/celo-monorepo/pull/5621)]
+- [one-line summary] - ( [link PR] )
 
 Bug Fixes
 - [one-line summary] - ( [link PR] )
@@ -16,6 +16,10 @@ Other Changes
 - [one-line summary - ( [link PR] )
 
 ## Published
+
+### **[0.4.18]** -- 2020-10-30
+Features
+- ODIS Client Update - [#5621](https://github.com/celo-org/celo-monorepo/pull/5621)]
 
 ### **[0.4.17]** -- 2020-10-27
 Bug Fixes
