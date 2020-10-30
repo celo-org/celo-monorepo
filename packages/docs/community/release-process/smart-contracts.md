@@ -25,6 +25,9 @@ Celo Core Contracts deployed to a live network without the `getVersion()` functi
 
 Mixin contracts and libraries are considered part of the contracts that consume them. When a mixin or library has changed, all contracts that consume them should be considered to have changed as well, and thus the contracts should have their version numbers incremented and should be re-deployed as part of the next smart contract release.
 
+### Initialize Data
+
+Whenever Celo Core Contracts need to be re-initialized, their initialization arguments should be checked into version control under `packages/protocol/releaseData/initializationData/release${N}.json`.
 
 ### Release management in Git/Github
 
@@ -91,7 +94,7 @@ STORAGE updates are adopted by deploying a new proxy/implementation pair. These 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
-yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "initialize_data.json" -p "proposal.json"
+yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
 ```
 
 The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
