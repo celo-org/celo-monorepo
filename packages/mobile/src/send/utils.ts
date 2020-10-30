@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -15,7 +15,11 @@ import { RecipientVerificationStatus } from 'src/identity/types'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
 import { fetchExchangeRate } from 'src/localCurrency/saga'
-import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import {
+  getLocalCurrencyCode,
+  getLocalCurrencyExchangeRate,
+  getLocalCurrencySymbol,
+} from 'src/localCurrency/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
@@ -184,8 +188,10 @@ export function* handleSendPaymentData(
 
   yield put(storeLatestInRecents(recipient))
 
-  if (data.amount && data.currencyCode) {
-    const currency = data.currencyCode as LocalCurrencyCode
+  if (data.amount) {
+    const currency = data.currencyCode
+      ? (data.currencyCode as LocalCurrencyCode)
+      : yield select(getLocalCurrencyCode)
     const exchangeRate: string = yield call(fetchExchangeRate, currency)
     const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
     if (!dollarAmount) {
@@ -195,7 +201,7 @@ export function* handleSendPaymentData(
 
     if (data.asset === 'CELO') {
       navigate(Screens.WithdrawCeloReviewScreen, {
-        amount: dollarAmount,
+        amount: new BigNumber(data.amount),
         recipientAddress: data.address.toLowerCase(),
         feeEstimate: new BigNumber(0),
       })
