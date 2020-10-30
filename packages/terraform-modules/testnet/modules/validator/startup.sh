@@ -241,6 +241,12 @@ if [ "${ip_address}" ]; then
   NAT_FLAG="--nat=extip:${ip_address}"
 fi
 
+if [[ "${network_name}" == "alfajores" || "${network_name}" == "baklava" ]]; then
+  BOOTNODE_FLAG="--${network_name}"
+else
+  BOOTNODE_FLAG="--bootnodes=enode://$BOOTNODE_ENODE"
+fi
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
@@ -262,7 +268,8 @@ docker run \
   geth account import --password $DATA_DIR/account/accountSecret \$TMP_PRIVATE_KEY_FILE ; \
   rm \$TMP_PRIVATE_KEY_FILE ; \
   geth \
-    --bootnodes=enode://$BOOTNODE_ENODE \
+    --$BOOTNODE_FLAG \
+    --datadir $DATA_DIR \
     --nousb \
     --password=$DATA_DIR/account/accountSecret \
     --unlock=$ACCOUNT_ADDRESS \
