@@ -1,12 +1,13 @@
-import { getPhoneHash, hexToBuffer } from '@celo/base'
+import { hexToBuffer } from '@celo/base'
 import { ec as EC } from 'elliptic'
-import { sha3 } from 'web3-utils'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
+  getBlindedPhoneNumber,
+  getBlindedPhoneNumberSignature,
   getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
+  getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
-  performGetPhoneNumberIdentifier,
 } from './phone-number-identifier'
 import {
   AuthenticationMethod,
@@ -108,25 +109,23 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
+      const base64BlindedMessage = await getBlindedPhoneNumber(mockE164Number, blsBlindingClient)
 
-      const base64PhoneNumber = Buffer.from(mockE164Number).toString('base64')
-      const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
-
-      const base64BlindSig = await performGetPhoneNumberIdentifier(
+      const base64BlindSig = await getBlindedPhoneNumberSignature(
         mockAccount,
         authSigner,
         serviceContext,
         base64BlindedMessage
       )
 
-      const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
-      const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
+      const phoneNumberHashDetails = await getPhoneNumberIdentifierFromSignature(
+        mockE164Number,
+        base64BlindSig,
+        blsBlindingClient
+      )
 
-      const pepper = getPepperFromThresholdSignature(sigBuf)
-      const phoneHash = getPhoneHash(sha3, mockE164Number, pepper)
-
-      expect(phoneHash).toEqual(expectedPhoneHash)
-      expect(pepper).toEqual(expectedPepper)
+      expect(phoneNumberHashDetails.phoneHash).toEqual(expectedPhoneHash)
+      expect(phoneNumberHashDetails.pepper).toEqual(expectedPepper)
     })
   })
 
