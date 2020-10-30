@@ -45,7 +45,7 @@ async function init() {
 
   await startPeriodicHealthCheck()
 
-  const rateLimitReqsPerMin = parseInt(fetchEnvOrDefault('RATE_LIMIT_REQS_PER_MIN', '300'), 10)
+  const rateLimitReqsPerMin = parseInt(fetchEnvOrDefault('RATE_LIMIT_REQS_PER_MIN', '100'), 10)
   const rateLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
     max: rateLimitReqsPerMin,
