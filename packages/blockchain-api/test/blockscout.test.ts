@@ -86,7 +86,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566345797000,
-                "value": "-0.010091957572465625",
+                "value": "0.010091957572465625",
               },
               "type": "SECURITY_FEE",
             },
@@ -134,7 +134,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566345866000,
-                "value": "-0.01102543453093182",
+                "value": "0.01102543453093182",
               },
               "type": "SECURITY_FEE",
             },
@@ -173,7 +173,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566346276000,
-                "value": "-0.01",
+                "value": "0.01",
               },
               "type": "GATEWAY_FEE",
             },
@@ -181,7 +181,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566346276000,
-                "value": "-0.0056589",
+                "value": "0.0056589",
               },
               "type": "SECURITY_FEE",
             },
@@ -217,7 +217,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566483998000,
-                "value": "-0.0005911869963022",
+                "value": "0.0005911869963022",
               },
               "type": "SECURITY_FEE",
             },
@@ -240,7 +240,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566484000000,
-                "value": "-0.00795255",
+                "value": "0.00795255",
               },
               "type": "SECURITY_FEE",
             },
@@ -288,7 +288,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566345797000,
-                "value": "-0.010091957572465625",
+                "value": "0.010091957572465625",
               },
               "type": "SECURITY_FEE",
             },
@@ -336,7 +336,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cUSD",
                 "timestamp": 1566345866000,
-                "value": "-0.01102543453093182",
+                "value": "0.01102543453093182",
               },
               "type": "SECURITY_FEE",
             },
@@ -375,7 +375,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cGLD",
                 "timestamp": 1566481000000,
-                "value": "-1e-8",
+                "value": "0.00000001",
               },
               "type": "GATEWAY_FEE",
             },
@@ -383,7 +383,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cGLD",
                 "timestamp": 1566481000000,
-                "value": "-0.00023713",
+                "value": "0.00023713",
               },
               "type": "SECURITY_FEE",
             },
@@ -406,7 +406,7 @@ describe('Blockscout', () => {
               "amount": Object {
                 "currencyCode": "cGLD",
                 "timestamp": 1566481000000,
-                "value": "-0.00023713",
+                "value": "0.00023713",
               },
               "type": "SECURITY_FEE",
             },

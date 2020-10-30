@@ -106,10 +106,7 @@ export class EventBuilder {
       amount: {
         currencyCode: fee.currencyCode,
         timestamp,
-        value: fee.value
-          .multipliedBy(-1)
-          .dividedBy(WEI_PER_GOLD)
-          .toString(),
+        value: fee.value.dividedBy(WEI_PER_GOLD).toFixed(),
       },
     }))
   }
