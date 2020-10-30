@@ -156,7 +156,13 @@ interface InitializationData {
 
 const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
 
-const assertValidInitializationData = (proposal: ProposalTx[], initializationData: InitializationData) => {
+
+const assertValidInitializationData = (
+  artifacts: BuildArtifacts,
+  proposal: ProposalTx[],
+  web3: Web3,
+  initializationData: InitializationData
+) => {
   const initializingProposals = proposal.filter(isProxyRepointAndInitializeTransaction)
   const contractsInitialized = new Set()
   for (const proposalTx of initializingProposals) {
@@ -166,8 +172,14 @@ const assertValidInitializationData = (proposal: ProposalTx[], initializationDat
       throw new Error(`Initialization Data for ${contractName} could not be found in reference file`)
     }
 
-    if (initializationData[contractName] !== proposalTx.args) {
-      throw new Error(`Intialization Data for ${contractName} in proposal (${proposalTx.args}) does not match reference file ${initializationData[contractName]}`)
+    const contract = artifacts.getArtifactByName(contractName)
+    const initializeAbi = contract.abi.find(
+      (abi: any) => abi.type === 'function' && abi.name === 'initialize')
+    const args = initializationData[contractName]
+    const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+
+    if (callData !== proposalTx.args[1]) {
+      throw new Error(`Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`)
     }
 
     contractsInitialized.add(contractName)
@@ -197,7 +209,7 @@ export const verifyBytecodes = async (
   initializationData: InitializationData = {}
 ) => {
   assertValidProposalTransactions(proposal)
-  assertValidInitializationData(proposal, initializationData)
+  assertValidInitializationData(artifacts, proposal, web3, initializationData)
 
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
