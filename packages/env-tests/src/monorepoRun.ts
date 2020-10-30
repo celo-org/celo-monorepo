@@ -11,7 +11,7 @@ function runTests() {
   if (!process.env.MNEMONIC) {
     throw new Error('No MNEMONIC was set, envName was parsed as ' + envName)
   }
-  const kit = newKit('http://localhost:8545')
+  const kit = newKit(process.env.CELO_PROVIDER || 'http://localhost:8545')
   const mnemonic = process.env.MNEMONIC!
 
   describe('Run tests in context of monorepo', () => {
