@@ -11,6 +11,7 @@
 * [concurrentProposals](_wrappers_governance_.governanceconfig.md#concurrentproposals)
 * [dequeueFrequency](_wrappers_governance_.governanceconfig.md#dequeuefrequency)
 * [minDeposit](_wrappers_governance_.governanceconfig.md#mindeposit)
+* [participationParameters](_wrappers_governance_.governanceconfig.md#participationparameters)
 * [queueExpiry](_wrappers_governance_.governanceconfig.md#queueexpiry)
 * [stageDurations](_wrappers_governance_.governanceconfig.md#stagedurations)
 
@@ -20,7 +21,7 @@
 
 • **concurrentProposals**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L39)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L54)*
 
 ___
 
@@ -28,7 +29,7 @@ ___
 
 • **dequeueFrequency**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L40)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L55)*
 
 ___
 
@@ -36,7 +37,15 @@ ___
 
 • **minDeposit**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L41)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L56)*
+
+___
+
+###  participationParameters
+
+• **participationParameters**: *[ParticipationParameters](_wrappers_governance_.participationparameters.md)*
+
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L59)*
 
 ___
 
@@ -44,7 +53,7 @@ ___
 
 • **queueExpiry**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L42)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L57)*
 
 ___
 
@@ -52,4 +61,4 @@ ___
 
 • **stageDurations**: *[ProposalStageDurations](_wrappers_governance_.proposalstagedurations.md)*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L43)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L58)*

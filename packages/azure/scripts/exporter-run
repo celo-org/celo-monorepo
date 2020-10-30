@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+. /etc/default/celo
+
+set -x
+
+/usr/bin/docker run \
+  --name $1 \
+  --restart=always \
+  -v $DATA_DIR:$DATA_DIR \
+  --net=host \
+  $GETH_EXPORTER_DOCKER_IMAGE \
+  /usr/local/bin/geth_exporter \
+    -ipc $DATA_DIR/geth.ipc \
+    -filter "(.*overall|percentiles_95)"

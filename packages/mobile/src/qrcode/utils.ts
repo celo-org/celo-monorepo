@@ -1,20 +1,19 @@
-import { isValidAddress } from '@celo/utils/src/address'
-import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { put } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { call, put } from 'redux-saga/effects'
+import { showError, showMessage } from 'src/alert/actions'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { validateRecipientAddressSuccess } from 'src/identity/actions'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import {
-  getRecipientFromAddress,
-  NumberToRecipient,
-  Recipient,
-  RecipientKind,
-} from 'src/recipients/recipient'
-import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
+import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
+import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
+import { QrCode, SVG } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
+import { handleSendPaymentData } from 'src/send/utils'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -29,66 +28,118 @@ export async function shareSVGImage(svg: SVG) {
   if (!svg) {
     return
   }
-  svg.toDataURL(async (data: string) => {
-    const path = RNFS.DocumentDirectoryPath + QRFileName
-    try {
-      await RNFS.writeFile(path, data, 'base64')
-      Share.open({
-        url: 'file://' + path,
-        type: 'image/png',
-      }).catch((err: Error) => {
-        throw err
-      })
-    } catch (e) {
-      Logger.warn(TAG, e)
-    }
+  const data = await new Promise<string>((resolve, reject) => {
+    svg.toDataURL((dataURL: string | undefined) => {
+      if (dataURL) {
+        resolve(dataURL)
+      } else {
+        // Not supposed to happen, but throw in case it does :)
+        reject(new Error('Got invalid SVG data'))
+      }
+    })
   })
+
+  const path = RNFS.DocumentDirectoryPath + QRFileName
+  await RNFS.writeFile(path, data, 'base64')
+  return Share.open({
+    url: 'file://' + path,
+    type: 'image/png',
+    failOnCancel: false, // don't throw if user cancels share
+  })
+}
+
+function* handleSecureSend(
+  address: string,
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData: TransactionDataInput,
+  requesterAddress?: string
+) {
+  if (!secureSendTxData.recipient.e164PhoneNumber) {
+    throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
+  }
+
+  const userScannedAddress = address.toLowerCase()
+  const { e164PhoneNumber } = secureSendTxData.recipient
+  const possibleReceivingAddresses = e164NumberToAddress[e164PhoneNumber]
+  // This should never happen. Secure Send is triggered when there are
+  // multiple addresses for a given phone number
+  if (!possibleReceivingAddresses) {
+    throw Error("No addresses associated with recipient's phone number")
+  }
+
+  // Need to add the requester address to the option set in the event
+  // a request is coming from an unverified account
+  if (requesterAddress && !possibleReceivingAddresses.includes(requesterAddress)) {
+    possibleReceivingAddresses.push(requesterAddress)
+  }
+  const possibleReceivingAddressesFormatted = possibleReceivingAddresses.map((addr) =>
+    addr.toLowerCase()
+  )
+  if (!possibleReceivingAddressesFormatted.includes(userScannedAddress)) {
+    const error = ErrorMessages.QR_FAILED_INVALID_RECIPIENT
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
+      confirmByScan: true,
+      error,
+    })
+    yield put(showMessage(error))
+    return false
+  }
+
+  ValoraAnalytics.track(SendEvents.send_secure_complete, { confirmByScan: true })
+  yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
+  return true
 }
 
 export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
+  recipientCache: NumberToRecipient,
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData?: TransactionDataInput,
+  isOutgoingPaymentRequest?: true,
+  requesterAddress?: string
 ) {
-  let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
+  let qrData: UriData
   try {
-    data = JSON.parse(barcode.data)
+    qrData = uriDataFromUrl(barcode.data)
   } catch (e) {
-    Logger.warn(TAG, 'QR code read failed with ' + e)
-  }
-  if (typeof data !== 'object' || isEmpty(data.address)) {
-    yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
-    return
-  }
-  if (!isValidAddress(data.address)) {
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
+    Logger.error(TAG, 'qr scan failed', e)
     return
   }
-  if (typeof data.e164PhoneNumber !== 'string') {
-    // Default for invalid e164PhoneNumber
-    data.e164PhoneNumber = ''
-  }
-  if (typeof data.displayName !== 'string') {
-    // Default for invalid displayName
-    data.displayName = ''
-  }
-  const cachedRecipient = getRecipientFromAddress(data.address, addressToE164Number, recipientCache)
 
-  const recipient: Recipient = cachedRecipient
-    ? {
-        ...data,
-        kind: RecipientKind.QrCode,
-        displayId: data.e164PhoneNumber,
-        phoneNumberLabel: 'QR Code',
-        thumbnailPath: cachedRecipient.thumbnailPath,
-        contactId: cachedRecipient.contactId,
-      }
-    : {
-        ...data,
-        kind: RecipientKind.QrCode,
-        displayId: data.e164PhoneNumber,
-      }
-  yield put(storeLatestInRecents(recipient))
+  if (secureSendTxData) {
+    const success = yield call(
+      handleSecureSend,
+      qrData.address,
+      e164NumberToAddress,
+      secureSendTxData,
+      requesterAddress
+    )
+    if (!success) {
+      return
+    }
 
-  navigate(Screens.SendAmount, { recipient })
+    if (isOutgoingPaymentRequest) {
+      navigate(Screens.PaymentRequestConfirmation, {
+        transactionData: secureSendTxData,
+        addressJustValidated: true,
+      })
+    } else {
+      navigate(Screens.SendConfirmation, {
+        transactionData: secureSendTxData,
+        addressJustValidated: true,
+      })
+    }
+
+    return
+  }
+
+  const cachedRecipient = getRecipientFromAddress(
+    qrData.address,
+    addressToE164Number,
+    recipientCache
+  )
+
+  yield call(handleSendPaymentData, qrData, cachedRecipient, isOutgoingPaymentRequest)
 }

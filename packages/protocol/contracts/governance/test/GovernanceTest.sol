@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "../Governance.sol";
 
@@ -7,6 +7,10 @@ contract GovernanceTest is Governance {
 
   // Minimally override core functions from UsingPrecompiles
   function numberValidatorsInCurrentSet() public view returns (uint256) {
+    return validatorSet.length;
+  }
+
+  function numberValidatorsInSet(uint256) public view returns (uint256) {
     return validatorSet.length;
   }
 

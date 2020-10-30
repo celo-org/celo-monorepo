@@ -1,4 +1,5 @@
 import sleep from 'sleep-promise'
+import { execCmd } from './cmd-utils'
 import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -7,6 +8,7 @@ import {
   generatePublicKey,
   getAddressFromEnv,
   privateKeyToAddress,
+  privateKeyToPublicKey
 } from './generate_utils'
 import {
   applyTerraformModule,
@@ -17,10 +19,20 @@ import {
   showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
-  untaintTerraformModuleResource,
+  untaintTerraformModuleResource
 } from './terraform'
-import { uploadDataToGoogleStorage, uploadTestnetInfoToGoogleStorage } from './testnet-utils'
-import { execCmd } from './utils'
+import {
+  getGenesisBlockFromGoogleStorage,
+  getProxiesPerValidator,
+  getProxyName,
+  uploadDataToGoogleStorage,
+  uploadTestnetInfoToGoogleStorage
+} from './testnet-utils'
+
+export interface ProxyIndex {
+  validatorIndex: number
+  proxyIndex: number
+}
 
 // Keys = gcloud project name
 const projectConfig = {
@@ -42,7 +54,7 @@ interface NodeSecrets {
   BOOTNODE_ENODE_ADDRESS: string
   PRIVATE_KEY: string
   PROXIED_VALIDATOR_ADDRESS?: string
-  PROXY_ENODE_ADDRESS?: string
+  PROXY_ENODE_ADDRESSES?: string
   [envVar.GETH_ACCOUNT_SECRET]: string
   [envVar.MNEMONIC]: string
 }
@@ -57,14 +69,14 @@ const testnetEnvVars: TerraformVars = {
   geth_verbosity: envVar.GETH_VERBOSITY,
   geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
-  geth_exporter_docker_image_repository: envVar.GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY,
-  geth_exporter_docker_image_tag: envVar.GETH_EXPORTER_DOCKER_IMAGE_TAG,
+  geth_metrics: envVar.GETH_ENABLE_METRICS,
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
   in_memory_discovery_table: envVar.IN_MEMORY_DISCOVERY_TABLE,
   istanbul_request_timeout_ms: envVar.ISTANBUL_REQUEST_TIMEOUT_MS,
   network_id: envVar.NETWORK_ID,
-  proxied_validator_count: envVar.PROXIED_VALIDATORS,
+  private_tx_node_count: envVar.PRIVATE_TX_NODES,
+  node_disk_size_gb: envVar.NODE_DISK_SIZE_GB,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
 }
@@ -92,6 +104,11 @@ const testnetResourcesToReset = [
   'module.tx_node.google_compute_instance.full_node.*',
   'module.tx_node.random_id.full_node_disk.*',
   'module.tx_node.google_compute_disk.full_node.*',
+  // private tx-nodes
+  'module.tx_node_private.random_id.full_node.*',
+  'module.tx_node_private.google_compute_instance.full_node.*',
+  'module.tx_node_private.random_id.full_node_disk.*',
+  'module.tx_node_private.google_compute_disk.full_node.*',
   // tx-node load balancer instance group
   'module.tx_node_lb.random_id.external',
   'module.tx_node_lb.google_compute_instance_group.external',
@@ -101,7 +118,8 @@ const testnetResourcesToReset = [
 
 export async function deploy(
   celoEnv: string,
-  generateSecrets: boolean = true,
+  generateSecrets: boolean,
+  useExistingGenesis: boolean,
   onConfirmFailed?: () => Promise<void>
 ) {
   // If we are not using the default network, we want to create/upgrade our network
@@ -112,17 +130,18 @@ export async function deploy(
     await deployModule(celoEnv, testnetNetworkTerraformModule, networkVars, onConfirmFailed)
   }
 
-  const testnetVars: TerraformVars = getTestnetVars(celoEnv)
+  const testnetVars: TerraformVars = await getTestnetVars(celoEnv, useExistingGenesis)
   await deployModule(celoEnv, testnetTerraformModule, testnetVars, onConfirmFailed, async () => {
     if (generateSecrets) {
       console.info('Generating and uploading secrets env files to Google Storage...')
       await generateAndUploadSecrets(celoEnv)
     }
   })
-  await uploadTestnetInfoToGoogleStorage(celoEnv)
+  // TODO change this true value
+  await uploadTestnetInfoToGoogleStorage(celoEnv, !useExistingGenesis)
 }
 
-async function deployModule(
+export async function deployModule(
   celoEnv: string,
   terraformModule: string,
   vars: TerraformVars,
@@ -158,7 +177,7 @@ async function deployModule(
 }
 
 export async function destroy(celoEnv: string) {
-  const testnetVars: TerraformVars = getTestnetVars(celoEnv)
+  const testnetVars: TerraformVars = await getTestnetVars(celoEnv, true)
 
   await destroyModule(celoEnv, testnetTerraformModule, testnetVars)
 
@@ -171,7 +190,7 @@ export async function destroy(celoEnv: string) {
   }
 }
 
-async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+export async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
   const envType = fetchEnv(envVar.ENV_TYPE)
@@ -198,7 +217,7 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
 // force the recreation of various resources upon the next deployment
 export async function taintTestnet(celoEnv: string) {
   console.info('Tainting testnet...')
-  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const vars: TerraformVars = await getTestnetVars(celoEnv, true)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
     testnetTerraformModule
@@ -215,7 +234,7 @@ export async function taintTestnet(celoEnv: string) {
 
 export async function untaintTestnet(celoEnv: string) {
   console.info('Untainting testnet...')
-  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const vars: TerraformVars = await getTestnetVars(celoEnv, true)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
     testnetTerraformModule
@@ -231,7 +250,7 @@ export async function untaintTestnet(celoEnv: string) {
 }
 
 export async function getTestnetOutputs(celoEnv: string) {
-  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const vars: TerraformVars = await getTestnetVars(celoEnv, true)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
     testnetTerraformModule
@@ -260,15 +279,19 @@ export async function getInternalTxNodeIPs(celoEnv: string) {
   return outputs.tx_node_internal_ip_addresses.value
 }
 
-function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
+export function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     bucket: stateBucketName(),
     prefix: `${celoEnv}/${terraformModule}`,
   }
 }
 
-function getTestnetVars(celoEnv: string) {
-  const genesisBuffer = Buffer.from(generateGenesisFromEnv())
+async function getTestnetVars(celoEnv: string, useExistingGenesis: boolean) {
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
+  const genesisBuffer = Buffer.from(genesisContent)
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   return {
     ...getEnvVarValues(testnetEnvVars),
@@ -287,10 +310,11 @@ function getTestnetVars(celoEnv: string) {
     // forno is the name for our setup that has tx-nodes reachable via a domain name
     letsencrypt_email: 'n@celo.org',
     network_name: networkName(celoEnv),
+    proxies_per_validator: JSON.stringify(getProxiesPerValidator()),
   }
 }
 
-function getTestnetNetworkVars(celoEnv: string) {
+function getTestnetNetworkVars(celoEnv: string): TerraformVars {
   return {
     ...getEnvVarValues(testnetNetworkEnvVars),
     network_name: networkName(celoEnv),
@@ -315,6 +339,13 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i)
     await uploadSecrets(celoEnv, secrets, `tx-node-${i}`)
   }
+  // Private tx Nodes
+  const privateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  for (let i = 0; i < privateTxNodeCount; i++) {
+    // Ensure there is no overlap with tx node keys
+    const secrets = generateNodeSecretEnvVars(AccountType.TX_NODE, i, 1000 + i)
+    await uploadSecrets(celoEnv, secrets, `tx-node-private-${i}`)
+  }
   // Validators
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   for (let i = 0; i < validatorCount; i++) {
@@ -322,11 +353,14 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     await uploadSecrets(celoEnv, secrets, `validator-${i}`)
   }
   // Proxies
-  // Assumes only 1 proxy per validator
-  const proxyCount = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
-  for (let i = 0; i < proxyCount; i++) {
-    const secrets = generateNodeSecretEnvVars(AccountType.PROXY, i)
-    await uploadSecrets(celoEnv, secrets, `proxy-${i}`)
+  const proxiesPerValidator = getProxiesPerValidator()
+  let validatorIndex = 0
+  for (const proxyCount of proxiesPerValidator) {
+    for (let i = 0; i < proxyCount; i++) {
+      const secrets = generateProxySecretEnvVars(validatorIndex, i)
+      await uploadSecrets(celoEnv, secrets, `validator-${validatorIndex}-proxy-${i}`)
+    }
+    validatorIndex++
   }
 }
 
@@ -348,27 +382,52 @@ function generateBootnodeSecretEnvVars() {
   })
 }
 
-function generateNodeSecretEnvVars(accountType: AccountType, index: number) {
+function generateNodeSecretEnvVars(
+  accountType: AccountType,
+  index: number,
+  keyIndex: number = index
+) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const privateKey = generatePrivateKey(mnemonic, accountType, index)
-  const secrets: NodeSecrets = {
+  const privateKey = generatePrivateKey(mnemonic, accountType, keyIndex)
+  const secrets = getNodeSecrets(privateKey)
+  // If this is meant to be a proxied validator, also generate the enode of its proxy
+  if (accountType === AccountType.VALIDATOR) {
+    const proxiesPerValidator = getProxiesPerValidator()
+    if (index < proxiesPerValidator.length) {
+      const proxyEnodeAddresses = []
+      for (let proxyIndex = 0; proxyIndex < proxiesPerValidator[index]; proxyIndex++) {
+        proxyEnodeAddresses.push(privateKeyToPublicKey(generateProxyPrivateKey(index, proxyIndex)))
+      }
+      secrets.PROXY_ENODE_ADDRESSES = proxyEnodeAddresses.join(',')
+    }
+  }
+  return formatEnvVars(secrets)
+}
+
+function generateProxySecretEnvVars(validatorIndex: number, proxyIndex: number) {
+  const privateKey = generateProxyPrivateKey(validatorIndex, proxyIndex)
+  const secrets = getNodeSecrets(privateKey)
+  secrets.PROXIED_VALIDATOR_ADDRESS = getAddressFromEnv(AccountType.VALIDATOR, validatorIndex)
+  return formatEnvVars(secrets)
+}
+
+function generateProxyPrivateKey(validatorIndex: number, proxyIndex: number) {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  // To allow a validator to have many proxies and to be able to easily
+  // adjust the number of proxies it has, the following index is calculated
+  const index = validatorIndex * 10000 + proxyIndex
+  return generatePrivateKey(mnemonic, AccountType.PROXY, index)
+}
+
+function getNodeSecrets(privateKey: string): NodeSecrets {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  return {
     ACCOUNT_ADDRESS: privateKeyToAddress(privateKey),
     BOOTNODE_ENODE_ADDRESS: generatePublicKey(mnemonic, AccountType.BOOTNODE, 0),
     PRIVATE_KEY: privateKey,
     [envVar.GETH_ACCOUNT_SECRET]: fetchEnv(envVar.GETH_ACCOUNT_SECRET),
     [envVar.MNEMONIC]: mnemonic,
   }
-  // If this is meant to be a proxied validator, also generate the enode of its proxy
-  if (accountType === AccountType.VALIDATOR) {
-    const proxiedValidators = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
-    if (index < proxiedValidators) {
-      secrets.PROXY_ENODE_ADDRESS = generatePublicKey(mnemonic, AccountType.PROXY, index)
-    }
-  }
-  if (accountType === AccountType.PROXY) {
-    secrets.PROXIED_VALIDATOR_ADDRESS = getAddressFromEnv(AccountType.VALIDATOR, index)
-  }
-  return formatEnvVars(secrets)
 }
 
 // Formats an object into a multi-line string with each line as KEY=VALUE
@@ -423,10 +482,13 @@ export function getVmSshCommand(instanceName: string) {
   return `gcloud beta compute --project '${project}' ssh --zone '${zone}' ${instanceName} --tunnel-through-iap`
 }
 
-export async function getNodeVmName(celoEnv: string, nodeType: string, index?: number) {
-  const nodeTypesWithRandomSuffixes = ['tx-node', 'proxy']
+export async function getNodeVmName(
+  celoEnv: string,
+  nodeType: string,
+  index?: number | ProxyIndex
+) {
+  const nodeTypesWithRandomSuffixes = ['tx-node', 'tx-node-private', 'proxy']
   const nodeTypesWithNoIndex = ['bootnode']
-
   let instanceName
   if (nodeTypesWithRandomSuffixes.includes(nodeType)) {
     instanceName = await getNodeVmNameWithRandomSuffix(celoEnv, nodeType, index || 0)
@@ -441,11 +503,42 @@ export async function getNodeVmName(celoEnv: string, nodeType: string, index?: n
 
 // Some VM names have a randomly generated suffix. This returns the full name
 // of the instance given only the celoEnv and index.
-async function getNodeVmNameWithRandomSuffix(celoEnv: string, nodeType: string, index: number) {
+async function getNodeVmNameWithRandomSuffix(
+  celoEnv: string,
+  nodeType: string,
+  index: number | ProxyIndex
+) {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
 
+  const baseName =
+    typeof index === 'number'
+      ? `${celoEnv}-${nodeType}-${index}`
+      : getProxyName(celoEnv, index.validatorIndex, index.proxyIndex)
+
   const [nodeName] = await execCmd(
-    `gcloud compute instances list --project '${project}' --filter="NAME ~ ${celoEnv}-${nodeType}-${index}-.*" --format get\\(NAME\\)`
+    `gcloud compute instances list --project '${project}' --filter="NAME ~ ${baseName}-.*" --format get\\(NAME\\)`
   )
   return nodeName.trim()
+}
+
+// indexCoercer is a yargs coercer that parses numeric indices and colon-separated
+// indices (<validator index>:<proxy index>) into a ProxyIndex type.
+export function indexCoercer(value: string) {
+  if (!value) {
+    return value
+  }
+  const splitValues = value.split(':').filter((v) => v)
+  // Then it's just a single index number
+  if (splitValues.length === 1) {
+    return parseInt(value, 10)
+  } else if (splitValues.length === 2) {
+    const parsedValues = splitValues.map((v) => parseInt(v, 10))
+    const proxyIndex: ProxyIndex = {
+      validatorIndex: parsedValues[0],
+      proxyIndex: parsedValues[1],
+    }
+    return proxyIndex
+  } else {
+    throw new Error('Incorrect index')
+  }
 }

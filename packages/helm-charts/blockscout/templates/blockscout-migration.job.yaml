@@ -12,17 +12,24 @@ spec:
   template:
     spec:
       containers:
-      - name: blockscout-web
+      - name: blockscout-migration
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ["/bin/sh"]
-        args: ["-c", "echo Sleeping for 15; sleep 15; mix ecto.migrate"]
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+           [ ${DROP_DB} == "true" ] && mix do ecto.drop, ecto.create
+           mix do ecto.migrate
         resources:
           requests:
             memory: 250M
             cpu: 200m
         env:
-{{ include "celo.blockscout-env-vars" .  | indent 10 }}
+        - name: DROP_DB
+          value: "{{ default "false" .Values.blockscout.db.drop }}"
+{{ include "celo.blockscout-env-vars" .  | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
       restartPolicy: Never
   backoffLimit: 0

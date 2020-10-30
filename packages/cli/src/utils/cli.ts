@@ -5,7 +5,15 @@ import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import Table from 'cli-table'
 import { cli } from 'cli-ux'
-import { Tx } from 'web3/eth/types'
+import { EventLog, Tx } from 'web3-core'
+
+// TODO: How can we deploy contracts with the Celo provider w/o a CeloTransactionObject?
+export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'data'>) {
+  cli.action.start(`Sending Transaction: ${name}`)
+  const result = await txObj.send(tx)
+  console.log(result)
+  cli.action.stop()
+}
 
 export async function displaySendTx<A>(
   name: string,
@@ -28,14 +36,14 @@ export async function displaySendTx<A>(
     Object.entries(txReceipt.events)
       .filter(([eventName]) => eventName === displayEventName)
       .forEach(([eventName, log]) => {
-        const { params } = parseDecodedParams(log.returnValues)
+        const { params } = parseDecodedParams((log as EventLog).returnValues)
         console.log(chalk.magenta.bold(`${eventName}:`))
         printValueMap(params, chalk.magenta)
       })
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>, color = chalk.red.bold) {
+export function printValueMap(valueMap: Record<string, any>, color = chalk.yellowBright.bold) {
   console.log(
     Object.keys(valueMap)
       .map((key) => color(`${key}: `) + valueMap[key])
@@ -60,7 +68,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
     return chalk`${v}`
   }
   return Object.keys(valueMap)
-    .map((key) => prefix + chalk`{red.bold ${key}:} ${printValue(valueMap[key])}`)
+    .map((key) => prefix + chalk.yellowBright.bold(`${key}: `) + printValue(valueMap[key]))
     .join('\n')
 }
 
@@ -76,7 +84,10 @@ export function failWith(msg: string): never {
   throw new CLIError(msg)
 }
 
-export async function binaryPrompt(promptMessage: string) {
-  const resp = await cli.prompt(promptMessage + ' [y/yes, n/no]')
-  return ['y', 'yes'].includes(resp)
+export async function binaryPrompt(promptMessage: string, defaultToNo?: boolean) {
+  const resp: string = await cli.prompt(
+    promptMessage + ` [y/yes, n/no${defaultToNo ? ' (default)' : ''}]`,
+    { required: !defaultToNo }
+  )
+  return ['y', 'yes'].includes(resp.toLowerCase())
 }

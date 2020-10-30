@@ -24,7 +24,7 @@
 
 • **SINGULAR_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.NAME, ClaimTypes.ATTESTATION_SERVICE_URL]
 
-*Defined in [packages/contractkit/src/identity/claims/types.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L23)*
+*Defined in [packages/contractkit/src/identity/claims/types.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L24)*
 
 ___
 
@@ -48,15 +48,15 @@ ___
 
 • **VALIDATABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.ATTESTATION_SERVICE_URL]
 
-*Defined in [packages/contractkit/src/identity/claims/types.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L21)*
+*Defined in [packages/contractkit/src/identity/claims/types.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L22)*
 
 ___
 
 ### `Const` VERIFIABLE_CLAIM_TYPES
 
-• **VERIFIABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT]
+• **VERIFIABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT, ClaimTypes.DOMAIN]
 
-*Defined in [packages/contractkit/src/identity/claims/types.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L18)*
+*Defined in [packages/contractkit/src/identity/claims/types.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L19)*
 
 ## Functions
 

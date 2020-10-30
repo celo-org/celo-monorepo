@@ -1,21 +1,28 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { fireEvent, render } from 'react-native-testing-library'
+import { ActivityIndicator } from 'react-native'
+import * as RNLocalize from 'react-native-localize'
+import { fireEvent, render, RenderAPI } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
-import { FeeType } from 'src/fees/actions'
-import { fetchPhoneAddresses } from 'src/identity/actions'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
-import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
+import { ErrorDisplayType } from 'src/alert/reducer'
+import { TokenTransactionType } from 'src/apollo/types'
+import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import SendAmount from 'src/send/SendAmount'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import {
+  mockAccount2Invite,
+  mockAccountInvite,
+  mockE164NumberInvite,
+  mockTransactionData,
+} from 'test/values'
 
 const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
 const BALANCE_VALID = '23.85'
-
-const numeral = require('numeral')
+const REQUEST_OVER_LIMIT = '670'
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
@@ -24,142 +31,324 @@ const storeData = {
       send: {
         feeInWei: '1',
       },
+      invite: {
+        feeInWei: '1',
+      },
     },
   },
 }
 
-const TEXT_PLACEHOLDER = 'groceriesRent'
-const AMOUNT_PLACEHOLDER = 'amount'
+const mockE164NumberToAddress: E164NumberToAddressType = {
+  [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
+}
+
+const mockTransactionData2 = {
+  type: mockTransactionData.type,
+  recipient: mockTransactionData.recipient,
+  amount: new BigNumber('3.706766917293233083'),
+  reason: '',
+}
+
+const mockScreenProps = (isOutgoingPaymentRequest?: true) =>
+  getMockStackScreenProps(Screens.SendAmount, {
+    recipient: mockTransactionData.recipient,
+    isOutgoingPaymentRequest,
+  })
+
+const enterAmount = (wrapper: RenderAPI, text: string) => {
+  for (const letter of text) {
+    const digitButton = wrapper.getByTestId(`digit${letter}`)
+    fireEvent.press(digitButton)
+  }
+}
 
 describe('SendAmount', () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
 
-  describe('when commenting', () => {
+  describe('enter amount with balance', () => {
     const store = createMockStore(storeData)
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
-        </Provider>
-      )
-
-    it('updates the comment/reason', () => {
-      const wrapper = getWrapper()
-      const input = wrapper.getByPlaceholder(TEXT_PLACEHOLDER)
-      const comment = 'A comment!'
-      fireEvent.changeText(input, comment)
-      expect(wrapper.queryAllByDisplayValue(comment)).toHaveLength(1)
-    })
-
-    it('limits the comment/reason to 70 characters', () => {
-      const longComment =
-        'This is a long comment with 🌈👏.It will be longer than most comments.In fact, it will be far more than our limit.'
-
-      const showMessage = jest.fn()
-      const wrapper = render(
-        <Provider store={createMockStore()}>
-          <SendAmountClass
-            navigation={mockNavigation}
-            {...getMockI18nProps()}
-            fetchDollarBalance={jest.fn()}
-            showMessage={showMessage}
-            showError={jest.fn()}
-            hideAlert={jest.fn()}
-            fetchPhoneAddresses={fetchPhoneAddresses}
-            dollarBalance={'1'}
-            estimateFeeDollars={new BigNumber(1)}
-            e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
-            defaultCountryCode={'+1'}
-            feeType={FeeType.SEND}
-            localCurrencyCode={LocalCurrencyCode.MXN}
-            localCurrencyExchangeRate={'1.33'}
-          />
-        </Provider>
-      )
-      const input = wrapper.getByPlaceholder(TEXT_PLACEHOLDER)
-      fireEvent.changeText(input, longComment)
-      expect(wrapper.queryAllByDisplayValue(longComment)).toHaveLength(1)
-      expect(showMessage).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('enter amount with balance', () => {
-    afterAll(() => {
-      numeral.locale('en')
-    })
-
-    const store = createMockStore(storeData)
-    const getWrapper = (lng?: string) =>
-      render(
-        <Provider store={store}>
-          <SendAmount navigation={mockNavigation} lng={lng} />
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
 
     it('updates the amount', () => {
       const wrapper = getWrapper()
-      const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      fireEvent.changeText(input, AMOUNT_VALID)
-      expect(wrapper.queryAllByDisplayValue(AMOUNT_VALID)).toHaveLength(1)
+      enterAmount(wrapper, AMOUNT_VALID)
+      expect(wrapper.queryAllByText(AMOUNT_VALID)).toHaveLength(1)
     })
 
-    // TODO would need to modify react-i18next mock for this or rewrite test
-    // with raw class instead of wrapped class
     it.skip('handles commas', () => {
-      numeral.locale('es')
-      const wrapper = getWrapper('es_419')
-      const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      fireEvent.changeText(input, '4,0')
-      expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)
+      // TODO figure out how to mock RNLocalize.getNumberFormatSettings
+      // from react-components properly
+      ;(RNLocalize.getNumberFormatSettings as jest.Mock).mockReturnValue({
+        decimalSeparator: ',',
+      })
+      const wrapper = getWrapper()
+      enterAmount(wrapper, '4,0')
+      expect(wrapper.queryAllByText('4,0')).toHaveLength(1)
+      ;(RNLocalize.getNumberFormatSettings as jest.Mock).mockReturnValue({
+        decimalSeparator: '.',
+      })
     })
 
     it('handles decimals', () => {
-      numeral.locale('en')
       const wrapper = getWrapper()
-      const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      fireEvent.changeText(input, '4.0')
-      expect(wrapper.queryAllByDisplayValue('4.0')).toHaveLength(1)
+      enterAmount(wrapper, '4.0')
+      expect(wrapper.queryAllByText('4.0')).toHaveLength(1)
     })
   })
 
-  describe('enter amount ', () => {
-    const store = createMockStore(storeData)
-    const getWrapper = () =>
-      render(
+  describe('enter amount', () => {
+    it('shows an error when tapping the send button with not enough balance', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
         <Provider store={store}>
-          {/*
-          // @ts-ignore */}
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+      enterAmount(wrapper, AMOUNT_TOO_MUCH)
+
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(reviewButton)
+      expect(store.getActions()).toEqual([
+        {
+          action: null,
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
+          message: 'needMoreFundsToSend',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'needMoreFundsToSend',
+        },
+      ])
+    })
+
+    it('shows an error when requesting more than the daily limit', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(wrapper, REQUEST_OVER_LIMIT)
+
+      const sendButton = wrapper.getByTestId('Review')
+      expect(sendButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(sendButton)
+      expect(store.getActions()).toEqual([
+        {
+          action: null,
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
+          message: 'requestLimitError',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'requestLimitError',
+        },
+      ])
+    })
+
+    it('disables the send button with 0 as amount', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+      enterAmount(wrapper, AMOUNT_ZERO)
+
+      const reviewButton = wrapper.getByTestId('Review')
+      expect(reviewButton.props.disabled).toBe(true)
+    })
+
+    it('displays the loading spinner when review button is pressed and verification status is unknown', () => {
+      let store = createMockStore({
+        identity: {
+          e164NumberToAddress: {},
+          secureSendPhoneNumberMapping: {},
+        },
+        ...storeData,
+      })
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
         </Provider>
       )
 
-    it('is disabled with not enough balance', () => {
-      const wrapper = getWrapper()
-      const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      fireEvent.changeText(input, AMOUNT_TOO_MUCH)
-      expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
-    })
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
 
-    it('is disabled with 0 as amount', () => {
-      const wrapper = getWrapper()
-      const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      fireEvent.changeText(input, AMOUNT_ZERO)
-      expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
+      expect(tree.getByType(ActivityIndicator)).toBeTruthy()
+
+      store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
+        },
+        ...storeData,
+      })
+
+      tree.rerender(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+
+      expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        transactionData: mockTransactionData2,
+      })
     })
   })
 
-  it('renders correctly for request payment confirmation', () => {
-    const store = createMockStore({
-      ...storeData,
-      stableToken: { balance: AMOUNT_ZERO },
+  describe('Navigation', () => {
+    it('navigates to ValidateRecipientIntro screen on Send click when a manual address check is needed', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.FULL,
+            },
+          },
+        },
+        ...storeData,
+      })
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+      expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+        transactionData: mockTransactionData2,
+        addressValidationType: AddressValidationType.FULL,
+      })
     })
-    const tree = renderer.create(
-      <Provider store={store}>
-        <SendAmount navigation={mockNavigation} />
-      </Provider>
-    )
-    expect(tree).toMatchSnapshot()
+
+    it('navigates to SendConfirmation screen on Send click when a manual address check is not needed', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
+        },
+        ...storeData,
+      })
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps()} />
+        </Provider>
+      )
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+      expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
+        transactionData: mockTransactionData2,
+      })
+    })
+
+    it('navigates to ValidatRecipientIntro screen on Request click when a manual address check is needed', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.FULL,
+            },
+          },
+        },
+        ...storeData,
+      })
+      mockTransactionData2.type = TokenTransactionType.PayRequest
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+
+      expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
+        transactionData: mockTransactionData2,
+        addressValidationType: AddressValidationType.FULL,
+        isOutgoingPaymentRequest: true,
+      })
+    })
+
+    it('navigates to PaymentRequestUnavailable screen on Request click when address is unverified', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: {
+            [mockE164NumberInvite]: null,
+          },
+          secureSendPhoneNumberMapping: {},
+        },
+        ...storeData,
+      })
+      mockTransactionData2.type = TokenTransactionType.PayRequest
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+      expect(navigate).toHaveBeenCalledWith(Screens.PaymentRequestUnavailable, {
+        transactionData: mockTransactionData2,
+      })
+    })
+
+    it('navigates to PaymentRequestConfirmation screen on Request click when a manual address check is not needed', () => {
+      const store = createMockStore({
+        identity: {
+          e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
+        },
+        ...storeData,
+      })
+      mockTransactionData2.type = TokenTransactionType.PayRequest
+
+      const tree = render(
+        <Provider store={store}>
+          <SendAmount {...mockScreenProps(true)} />
+        </Provider>
+      )
+      enterAmount(tree, AMOUNT_VALID)
+      fireEvent.press(tree.getByTestId('Review'))
+      expect(navigate).toHaveBeenCalledWith(Screens.PaymentRequestConfirmation, {
+        transactionData: mockTransactionData2,
+      })
+    })
   })
 })

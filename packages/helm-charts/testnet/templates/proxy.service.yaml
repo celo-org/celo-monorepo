@@ -1,6 +1,6 @@
-{{ range $index, $e := until (.Values.geth.proxiedValidators | int) }}
-
-{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "svc_name" "proxy-internal" "node_name" "proxy" "name_suffix" "" "component_label" "proxy" "load_balancer_ip" "" ) }}
+{{ range $validatorIndex, $proxyCount := .Values.geth.proxiesPerValidator }}
+{{ range $index, $e := until ($proxyCount | int) }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "ClusterIP" "svc_name" (print "validators-" $validatorIndex "-proxy-internal") "node_name" (print "validators-" $validatorIndex "-proxy") "name_suffix" "" "component_label" "proxy" "load_balancer_ip" "" ) }}
   ports:
   - name: internal-tcp
     port: 30503
@@ -18,19 +18,20 @@
 {{ end }}
 ---
 {{ if $.Values.geth.static_ips }}
-{{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
-{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "proxy" "component_label" "proxy" "load_balancer_ip" $loadBalancerIP ) }}
+{{ $proxyIpAddresses := (splitList "/" (index $.Values.geth.proxyIPAddressesPerValidatorArray $validatorIndex)) }}
+{{ $loadBalancerIP := index $proxyIpAddresses $index }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" (print "validators-" $validatorIndex "-proxy") "component_label" "proxy" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
   - name: discovery
     port: 30303
     protocol: UDP
 ---
-{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "proxy" "svc_name_suffix" "-tcp" "component_label" "proxy" "load_balancer_ip" $loadBalancerIP ) }}
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" (print "validators-" $validatorIndex "-proxy") "svc_name_suffix" "-tcp" "component_label" "proxy" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
-  - name: discovery
+  - name: celo
     port: 30303
     protocol: TCP
 ---
 {{ end }}
-
+{{ end }}
 {{ end }}

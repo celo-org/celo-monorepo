@@ -1,6 +1,7 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 contract UsingPrecompiles {
   using SafeMath for uint256;
@@ -34,7 +35,7 @@ contract UsingPrecompiles {
     uint256 exponent,
     uint256 _decimals
   ) public view returns (uint256, uint256) {
-    require(aDenominator != 0 && bDenominator != 0);
+    require(aDenominator != 0 && bDenominator != 0, "a denominator is zero");
     uint256 returnNumerator;
     uint256 returnDenominator;
     bool success;
@@ -42,10 +43,7 @@ contract UsingPrecompiles {
     (success, out) = FRACTION_MUL.staticcall(
       abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
     );
-    require(
-      success,
-      "UsingPrecompiles :: fractionMulExp Unsuccessful invocation of fraction exponent"
-    );
+    require(success, "error calling fractionMulExp precompile");
     returnNumerator = getUint256FromBytes(out, 0);
     returnDenominator = getUint256FromBytes(out, 32);
     return (returnNumerator, returnDenominator);
@@ -59,7 +57,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked());
-    require(success);
+    require(success, "error calling getEpochSize precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -69,8 +67,7 @@ contract UsingPrecompiles {
    * @return Epoch number.
    */
   function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
-    uint256 sz = getEpochSize();
-    return blockNumber.sub(1) / sz;
+    return epochNumberOfBlock(blockNumber, getEpochSize());
   }
 
   /**
@@ -82,6 +79,26 @@ contract UsingPrecompiles {
   }
 
   /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @param epochSize The epoch size in blocks.
+   * @return Epoch number.
+   */
+  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
+    internal
+    pure
+    returns (uint256)
+  {
+    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    uint256 epochNumber = blockNumber / epochSize;
+    if (blockNumber % epochSize == 0) {
+      return epochNumber;
+    } else {
+      return epochNumber.add(1);
+    }
+  }
+
+  /**
    * @notice Gets a validator address from the current validator set.
    * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
@@ -90,7 +107,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
-    require(success);
+    require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
     return address(getUint256FromBytes(out, 0));
   }
 
@@ -108,7 +125,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
-    require(success);
+    require(success, "error calling validatorSignerAddressFromSet precompile");
     return address(getUint256FromBytes(out, 0));
   }
 
@@ -120,7 +137,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
-    require(success);
+    require(success, "error calling numberValidatorsInCurrentSet precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -133,7 +150,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
-    require(success);
+    require(success, "error calling numberValidatorsInSet precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -165,7 +182,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
-    require(success);
+    require(success, "error calling getBlockNumberFromHeader precompile");
     return getUint256FromBytes(out, 0);
   }
 
@@ -178,20 +195,20 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
-    require(success);
+    require(success, "error calling hashHeader precompile");
     return getBytes32FromBytes(out, 0);
   }
 
   /**
    * @notice Gets the parent seal bitmap from the header at the given block number.
    * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
-   * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
+   * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
    */
   function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
     bytes memory out;
     bool success;
     (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
-    require(success);
+    require(success, "error calling getParentSealBitmap precompile");
     return getBytes32FromBytes(out, 0);
   }
 
@@ -206,7 +223,7 @@ contract UsingPrecompiles {
     bytes memory out;
     bool success;
     (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
-    require(success);
+    require(success, "error calling getVerifiedSealBitmapFromHeader precompile");
     return getBytes32FromBytes(out, 0);
   }
 
@@ -227,11 +244,28 @@ contract UsingPrecompiles {
    * @return bytes32 data
    */
   function getBytes32FromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
-    require(bs.length >= start + 32, "slicing out of range");
+    require(bs.length >= start.add(32), "slicing out of range");
     bytes32 x;
     assembly {
       x := mload(add(bs, add(start, 32)))
     }
     return x;
   }
+
+  /**
+   * @notice Returns the minimum number of required signers for a given block number.
+   * @dev Computed in celo-blockchain as int(math.Ceil(float64(2*valSet.Size()) / 3))
+   */
+  function minQuorumSize(uint256 blockNumber) public view returns (uint256) {
+    return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function minQuorumSizeInCurrentSet() public view returns (uint256) {
+    return minQuorumSize(block.number);
+  }
+
 }

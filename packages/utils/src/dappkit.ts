@@ -184,6 +184,8 @@ export function parseDappkitResponseDeeplink(url: string): DappKitResponse & { r
   }
 
   const requestId = rawParams.query.requestId as string
+  const address = rawParams.query.account as string
+  const phoneNumber = rawParams.query.phoneNumber as string
 
   switch (rawParams.query.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
@@ -192,8 +194,8 @@ export function parseDappkitResponseDeeplink(url: string): DappKitResponse & { r
         return {
           type: DappKitRequestTypes.ACCOUNT_ADDRESS,
           status: DappKitResponseStatus.SUCCESS,
-          address: rawParams.query.account,
-          phoneNumber: rawParams.query.phoneNumber,
+          address,
+          phoneNumber,
           requestId,
         }
       } else {

@@ -1,8 +1,46 @@
 ---
-description: Transfer Celo Gold and Celo Dollars
+description: Transfer CELO and Celo Dollars
 ---
 
 ## Commands
+
+### Celo
+
+Transfer CELO to a specified address. (Note: this is the equivalent of the old transfer:gold)
+
+```
+USAGE
+  $ celocli transfer:celo
+
+OPTIONS
+  --comment=comment                                  Transfer comment
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
+
+  --useLedger                                        Set it to use a ledger wallet
+
+  --value=value                                      (required) Amount to transfer (in wei)
+
+EXAMPLE
+  celo --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --value
+  10000000000000000000
+```
+
+_See code: [packages/cli/src/commands/transfer/celo.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/celo.ts)_
 
 ### Dollars
 
@@ -13,8 +51,26 @@ USAGE
   $ celocli transfer:dollars
 
 OPTIONS
+  --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --value=value                                      (required) Amount to transfer (in wei)
 
 EXAMPLE
@@ -26,19 +82,37 @@ _See code: [packages/cli/src/commands/transfer/dollars.ts](https://github.com/ce
 
 ### Gold
 
-Transfer Celo Gold to a specified address.
+Transfer CELO to a specified address. _DEPRECATION WARNING_ Use the "transfer:celo" command instead
 
 ```
 USAGE
   $ celocli transfer:gold
 
 OPTIONS
+  --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --value=value                                      (required) Amount to transfer (in wei)
 
 EXAMPLE
-  transfergold --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --value
+  gold --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --value
   10000000000000000000
 ```
 

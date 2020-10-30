@@ -4,23 +4,27 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import celoHero from 'src/home/celo-hero.png'
 import HomeBackers from 'src/home/HomeBackers'
-import HomeCarousel from 'src/home/HomeCarousel'
-import HomeSystems from 'src/home/HomeSystems'
+import HomeBenefits from 'src/home/HomeBenefits'
+import ImagePanes from 'src/home/ImagePanes'
+import Involvement from 'src/home/Involvement'
+import { TwoAssets } from 'src/home/TwoAssets'
 import HomeCover from 'src/home/version3/HomeCover'
-import HomeEmail from 'src/home/version3/HomeEmail'
-import HomeHero from 'src/home/version3/HomeHero'
-import HomeWork from 'src/home/version3/HomeWork'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
+import FlowerArea from './FlowerArea'
 
 interface State {
   mobile: boolean
 }
 
 const DESCRIPTION =
-  'Celo is building a monetary system that creates the conditions for prosperity for all. Our stablecoin uses phone numbers as identity and is built on a secure and proven platform.'
+  'Celo is an open platform that makes financial tools accessible to anyone with a mobile phone'
 
 export class Home extends React.Component<I18nProps, State> {
+  static getInitialProps() {
+    return { namespacesRequired: [NameSpaces.home, NameSpaces.common] }
+  }
+
   state: State
 
   render() {
@@ -47,13 +51,13 @@ export class Home extends React.Component<I18nProps, State> {
           <meta name="twitter:card" content="summary_large_image" />
         </Head>
         <HomeCover />
-        <HomeHero />
+        <ImagePanes />
+        <HomeBenefits />
+        <FlowerArea />
+        <TwoAssets />
         <Press />
-        <HomeSystems />
-        <HomeWork />
-        <HomeCarousel />
+        <Involvement />
         <HomeBackers />
-        <HomeEmail />
       </View>
     )
   }
@@ -69,4 +73,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('home')(Home)
+export default withNamespaces(NameSpaces.home)(Home)

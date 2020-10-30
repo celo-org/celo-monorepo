@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
+import prompts from 'prompts'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -11,6 +12,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "ValidatorGroup's address" }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
     accept: flags.boolean({
       exclusive: ['remove', 'reorder'],
       description: 'Accept a validator whose affiliation is already set to the group',
@@ -21,7 +23,7 @@ export default class ValidatorGroupMembers extends BaseCommand {
     }),
     reorder: flags.integer({
       exclusive: ['accept', 'remove'],
-      description: 'Reorder a validator within the members list',
+      description: 'Reorder a validator within the members list. Indices are 0 based',
     }),
   }
 
@@ -36,12 +38,11 @@ export default class ValidatorGroupMembers extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupMembers)
 
-    if (!(res.flags.accept || res.flags.remove || res.flags.reorder)) {
+    if (!(res.flags.accept || res.flags.remove || typeof res.flags.reorder === 'number')) {
       this.error(`Specify action: --accept, --remove or --reorder`)
       return
     }
 
-    this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this, res.flags.from)
@@ -53,6 +54,19 @@ export default class ValidatorGroupMembers extends BaseCommand {
 
     const validatorGroup = await validators.signerToAccount(res.flags.from)
     if (res.flags.accept) {
+      if (!res.flags.yes) {
+        const response = await prompts({
+          type: 'confirm',
+          name: 'confirmation',
+          message:
+            'Are you sure you want to accept this member?\nValidator Group Locked Gold requirements increase per member. Adding an additional member could result in an increase in Locked Gold requirements of up to 10,000 CELO for 180 days. (y/n)',
+        })
+
+        if (!response.confirmation) {
+          console.info('Aborting due to user response')
+          process.exit(0)
+        }
+      }
       const tx = await validators.addMember(validatorGroup, res.args.validatorAddress)
       await displaySendTx('addMember', tx)
     } else if (res.flags.remove) {

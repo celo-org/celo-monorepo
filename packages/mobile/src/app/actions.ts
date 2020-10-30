@@ -1,14 +1,17 @@
-import { NavigationParams } from 'react-navigation'
 import i18n from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-const numeral = require('numeral')
-require('numeral/locales/es')
 
 const TAG = 'app/actions'
 
+// https://facebook.github.io/react-native/docs/appstate
+export enum AppState {
+  Background = 'Background',
+  Active = 'Active',
+  Inactive = 'Inactive',
+}
+
 export enum Actions {
+  SET_APP_STATE = 'APP/SET_APP_STATE',
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
@@ -18,9 +21,17 @@ export enum Actions {
   EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
-  NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
-  START_PIN_VERIFICATION = 'APP/START_PIN_VERIFICATION',
-  FINISH_PIN_VERIFICATION = 'APP/FINISH_PIN_VERIFICATION',
+  SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
+  LOCK = 'APP/LOCK',
+  UNLOCK = 'APP/UNLOCK',
+  SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
+  MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+}
+
+export interface SetAppState {
+  type: Actions.SET_APP_STATE
+  state: string
 }
 
 interface SetLoggedIn {
@@ -60,21 +71,36 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-export interface NavigatePinProtected {
-  type: Actions.NAVIGATE_PIN_PROTECTED
-  routeName: string
-  params?: NavigationParams
+interface SetRequirePinOnAppOpen {
+  type: Actions.SET_LOCK_WITH_PIN_ENABLED
+  enabled: boolean
 }
 
-interface StartPinVerification {
-  type: Actions.START_PIN_VERIFICATION
+export interface Lock {
+  type: Actions.LOCK
 }
 
-interface FinishPinVerification {
-  type: Actions.FINISH_PIN_VERIFICATION
+export interface Unlock {
+  type: Actions.UNLOCK
+}
+
+export interface SetSessionId {
+  type: Actions.SET_SESSION_ID
+  sessionId: string
+}
+
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+}
+
+interface MinAppVersionDeterminedAction {
+  type: Actions.MIN_APP_VERSION_DETERMINED
+  minVersion: string | null
 }
 
 export type ActionTypes =
+  | SetAppState
   | SetLoggedIn
   | SetNumberVerifiedAction
   | ResetAppOpenedState
@@ -83,9 +109,17 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | NavigatePinProtected
-  | StartPinVerification
-  | FinishPinVerification
+  | SetRequirePinOnAppOpen
+  | Lock
+  | Unlock
+  | SetSessionId
+  | OpenUrlAction
+  | MinAppVersionDeterminedAction
+
+export const setAppState = (state: string) => ({
+  type: Actions.SET_APP_STATE,
+  state,
+})
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,
@@ -97,22 +131,18 @@ export const setNumberVerified = (numberVerified: boolean) => ({
   numberVerified,
 })
 
-export const setLanguage = (language: string, nextScreen?: Screens) => {
-  numeral.locale(language.substring(0, 2))
+export const setLanguage = (language: string) => {
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 
-  if (nextScreen) {
-    navigate(nextScreen)
-  }
   return {
     type: Actions.SET_LANGUAGE,
     language,
   }
 }
 
-export const openDeepLink = (deepLink: string) => {
+export const openDeepLink = (deepLink: string): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
@@ -136,19 +166,32 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const navigatePinProtected = (
-  routeName: string,
-  params?: NavigationParams
-): NavigatePinProtected => ({
-  type: Actions.NAVIGATE_PIN_PROTECTED,
-  routeName,
-  params,
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
+  type: Actions.SET_LOCK_WITH_PIN_ENABLED,
+  enabled,
 })
 
-export const startPinVerification = (): StartPinVerification => ({
-  type: Actions.START_PIN_VERIFICATION,
+export const appLock = (): Lock => ({
+  type: Actions.LOCK,
 })
 
-export const finishPinVerification = (): FinishPinVerification => ({
-  type: Actions.FINISH_PIN_VERIFICATION,
+export const appUnlock = (): Unlock => ({
+  type: Actions.UNLOCK,
+})
+
+export const setSessionId = (sessionId: string) => ({
+  type: Actions.SET_SESSION_ID,
+  sessionId,
+})
+
+export const openUrl = (url: string): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
+})
+
+export const minAppVersionDetermined = (
+  minVersion: string | null
+): MinAppVersionDeterminedAction => ({
+  type: Actions.MIN_APP_VERSION_DETERMINED,
+  minVersion,
 })

@@ -1,6 +1,6 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-bot'
 
@@ -41,6 +41,7 @@ function helmParameters(celoEnv: string) {
     `--set twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
     `--set initialWaitSeconds=${fetchEnv(envVar.ATTESTATION_BOT_INITIAL_WAIT_SECONDS)}`,
     `--set inBetweenWaitSeconds=${fetchEnv(envVar.ATTESTATION_BOT_IN_BETWEEN_WAIT_SECONDS)}`,
+    `--set salt=${fetchEnvOrFallback(envVar.ATTESTATION_BOT_SKIP_ODIS_SALT, '')}`,
     `--set maxAttestations=${fetchEnv(envVar.ATTESTATION_BOT_MAX_ATTESTATIONS)}`,
     `--set networkID=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnv('GETH_VERBOSITY')}`,

@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
-import { execCmd } from './utils'
+import sleep from 'sleep-promise'
+import { execCmd } from './cmd-utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 
@@ -86,6 +87,8 @@ async function taintEveryResourceWithPrefix(moduleName: string, resourceName: st
   const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
   for (const match of matches) {
     await taintResource(moduleName, match)
+    // To avoid hitting rate limits
+    await sleep(100)
   }
 }
 
@@ -93,6 +96,8 @@ async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: 
   const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
   for (const match of matches) {
     await untaintResource(moduleName, match)
+    // To avoid hitting rate limits
+    await sleep(100)
   }
 }
 
@@ -104,7 +109,13 @@ async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: st
 // Allow failures
 function taintResource(moduleName: string, resourceName: string) {
   try {
-    return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
+    // escape quotes
+    const escapedResourceName = resourceName.replace(/"/g, '\\"')
+    return execTerraformCmd(
+      `terraform taint ${escapedResourceName}`,
+      getModulePath(moduleName),
+      false
+    )
   } catch (e) {
     console.info(`Could not taint ${resourceName}`, e)
     return Promise.resolve()
@@ -114,7 +125,13 @@ function taintResource(moduleName: string, resourceName: string) {
 // Allow failures
 function untaintResource(moduleName: string, resourceName: string) {
   try {
-    return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
+    // escape quotes
+    const escapedResourceName = resourceName.replace(/"/g, '\\"')
+    return execTerraformCmd(
+      `terraform untaint ${escapedResourceName}`,
+      getModulePath(moduleName),
+      false
+    )
   } catch (e) {
     console.info(`Could not taint ${resourceName}`, e)
     return Promise.resolve()

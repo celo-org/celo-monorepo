@@ -32,6 +32,7 @@ exports[`Terms renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -88,6 +89,7 @@ exports[`Terms renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -101,12 +103,13 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        gameOfStakesTermsTitle
+        The Great Celo Stake Off
       </h1>
       <h3
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -120,7 +123,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        termsAndConditions
+        Terms and Conditions
       </h3>
     </div>
   </div>
@@ -137,6 +140,7 @@ exports[`Terms renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -165,6 +169,7 @@ exports[`Terms renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -201,6 +206,7 @@ exports[`Terms renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -211,7 +217,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        Thank you for joining the Great Celo Stake Off (“TGCSO”), the incentivized testnet for the Celo Protocol. TGCSO allows eligible participants (“Participants”) to engage with the betanet version of the Celo Protocol (“Protocol”) and, related to that participation and subject to these Terms and Conditions, Participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol.   TGCSO will commence on the date prescribed by C Labs (the “Company”) and continue until terminated by the Company in its sole discretion (“TGCSO Period”). Participation in TGCSO is subject to these Terms and Conditions (the “Terms”) and the Company’s Privacy Policy (“Privacy Policy”), and all other agreements or terms as set forth by the Company. These Terms constitute a binding obligation between you and the Company. As used herein, “Celo Gold” means the native unit of value on the Mainnet Celo Protocol. 
+        Thank you for joining the Great Celo Stake Off (“TGCSO”), the incentivized testnet for the Celo Protocol. TGCSO allows eligible participants (“Participants”) to engage with the betanet version of the Celo Protocol (“Protocol”) and, related to that participation and subject to these Terms and Conditions, Participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol.   TGCSO will commence on the date prescribed by cLabs (the “Company”) and continue until terminated by the Company in its sole discretion (“TGCSO Period”). Participation in TGCSO is subject to these Terms and Conditions (the “Terms”) and the Company’s Privacy Policy (“Privacy Policy”), and all other agreements or terms as set forth by the Company. These Terms constitute a binding obligation between you and the Company. As used herein, “Celo Gold” means the native unit of value on the Mainnet Celo Protocol. 
               
 YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING IN TGCSO, YOU MUST STRICTLY ADHERE TO THE TERMS. IF, AS PART OF YOUR VOLUNTARY PARTICIPATION, YOU MEET THE CRITERIA LISTED BELOW, YOU MAY BE ELIGIBLE TO RECEIVE CERTAIN AMOUNTS OF CELO GOLD UNITS AND/OR CELO GOLD UPON THE MAINNET LAUNCH OF THE CELO PROTOCOL. YOU AGREE THAT ANY CELO GOLD UNITS OR CELO GOLD RECEIVED BY YOU WILL BE FOR YOUR SERVICES IN TESTING AND CONTRIBUTING TO THE CELO TECHNOLOGIES AS DEFINED BELOW AND AS PART OF THIS TGCSO.
               
@@ -221,6 +227,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         role="list"
         style={
           Object {
+            "listStyle": "disc",
             "marginTop": "20px",
             "paddingLeft": "20px",
           }
@@ -229,6 +236,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -248,6 +256,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -271,8 +280,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "display": "inline",
@@ -282,15 +289,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
               data-focusable={true}
-              dir="auto"
               href="https://celo.org/privacy"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -302,6 +311,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -319,6 +329,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -341,8 +352,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "display": "inline",
@@ -352,15 +361,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
               data-focusable={true}
-              dir="auto"
-              href="https://forum.celo.org"
+              href="https://forum.celo.org/"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -372,6 +383,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -393,6 +405,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -417,6 +430,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -424,7 +438,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -444,7 +458,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -466,6 +480,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -487,6 +502,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -494,7 +510,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -513,7 +529,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -533,7 +549,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -552,7 +568,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -571,7 +587,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -590,7 +606,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -612,6 +628,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -631,6 +648,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -653,8 +671,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "display": "inline",
@@ -664,15 +680,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
               data-focusable={true}
-              dir="auto"
               href="mailto:stakeoff@celo.org"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -684,6 +702,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -705,6 +724,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -712,7 +732,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -736,8 +756,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -747,15 +765,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="https://celo.org/code-of-conduct"
+                  onClick={[Function]}
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "cursor": "pointer",
                       "display": "inline",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                     }
                   }
                 >
@@ -765,7 +785,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -785,7 +805,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -804,7 +824,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -824,7 +844,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -843,7 +863,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -862,7 +882,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -885,6 +905,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -906,6 +927,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -913,7 +935,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -935,6 +957,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -956,6 +979,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -963,7 +987,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -982,7 +1006,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1001,7 +1025,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1020,7 +1044,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1039,7 +1063,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1058,7 +1082,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1077,7 +1101,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1096,7 +1120,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1118,6 +1142,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1137,6 +1162,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1158,6 +1184,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -1165,7 +1192,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1184,7 +1211,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1203,7 +1230,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1225,6 +1252,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1244,6 +1272,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1263,6 +1292,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1284,6 +1314,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -1291,7 +1322,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
           >
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1308,7 +1339,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "fontWeight": "bold",
@@ -1321,7 +1352,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1338,7 +1369,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "fontWeight": "bold",
@@ -1351,7 +1382,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             </li>
             <li
               className="css-reset-4rbku5 css-text-901oao css-textHasAncestor-16my406"
-              dir="auto"
+              onClick={[Function]}
               role="listitem"
               style={
                 Object {
@@ -1368,7 +1399,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             >
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "fontWeight": "bold",
@@ -1384,6 +1415,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         <li
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="listitem"
           style={
             Object {
@@ -1406,8 +1438,6 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "display": "inline",
@@ -1417,15 +1447,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
               data-focusable={true}
-              dir="auto"
               href="mailto:stakeoff@celo.org"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >

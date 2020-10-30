@@ -7,130 +7,28 @@ import {
   Text,
   View,
 } from 'react-native'
-import Fade from 'react-reveal/Fade'
-import { H2, H3, H4 } from 'src/fonts/Fonts'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { H3, H4 } from 'src/fonts/Fonts'
+import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
 
-const Engage = React.memo(function _Engage({ t, screen }: I18nProps & ScreenProps) {
+export default React.memo(function _Engage() {
   return (
     <>
-      <GridRow
-        desktopStyle={standardStyles.sectionMarginTop}
-        tabletStyle={standardStyles.sectionMarginTopTablet}
-        mobileStyle={standardStyles.sectionMarginTopMobile}
-        allStyle={styles.alignOut}
-      >
-        <Cell span={Spans.half}>
-          <H2 style={standardStyles.elementalMarginBottom}>{t('engage.topTitle')}</H2>
-          <Content
-            image={require('src/dev/cakeLayering.jpg')}
-            screen={screen}
-            noun={t('engage.developers.noun')}
-            verb={t('engage.developers.verb')}
-            network={t('engage.developers.network')}
-            caption={t('engage.developers.caption')}
-            primaryAction={{
-              text: t('engage.developers.primaryAction'),
-              href: CeloLinks.walletApp,
-            }}
-          />
-        </Cell>
-        <Cell span={Spans.half} style={[styles.asides]}>
-          <Aside
-            screen={screen}
-            text={t('engage.faucet.copy')}
-            title={t('engage.faucet.title')}
-            href={CeloLinks.faucet}
-            btnText={t('engage.faucet.btnText')}
-            image={require('src/icons/faucet-dark.png')}
-          />
-          <Aside
-            screen={screen}
-            text={t('engage.docs.copy')}
-            title={t('engage.docs.title')}
-            href={CeloLinks.docs}
-            btnText={t('engage.docs.btnText')}
-            image={require('src/icons/documentation-dark.png')}
-          />
-        </Cell>
-      </GridRow>
-      <GridRow
-        allStyle={styles.alignOut}
-        desktopStyle={standardStyles.blockMarginTop}
-        tabletStyle={standardStyles.blockMarginTopTablet}
-        mobileStyle={standardStyles.blockMarginTopMobile}
-      >
-        <Cell span={Spans.half}>
-          <Content
-            image={require('src/dev/chefs.png')}
-            screen={screen}
-            noun={t('engage.validators.noun')}
-            verb={t('engage.validators.verb')}
-            network={t('engage.validators.network')}
-            caption={t('engage.validators.caption')}
-            primaryAction={{
-              text: t('engage.validators.primaryAction'),
-              href: 'https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0',
-            }}
-          />
-        </Cell>
-        <Cell span={Spans.half} style={[styles.asides]}>
-          <Aside
-            screen={screen}
-            text={t('engage.tutorial.copy')}
-            title={t('engage.tutorial.title')}
-            href="https://docs.celo.org/getting-started/running-a-validator"
-            btnText={t('engage.tutorial.btnText')}
-            image={require('src/icons/download-dark.png')}
-          />
-          <Aside
-            screen={screen}
-            text={t('engage.blog.copy')}
-            title={t('engage.blog.title')}
-            href="https://medium.com/celohq/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
-            btnText={t('engage.blog.btnText')}
-            image={require('src/icons/blog-dark.png')}
-          />
-        </Cell>
-      </GridRow>
-      <GridRow
-        allStyle={[standardStyles.elementalMarginBottom, styles.alignOut]}
-        desktopStyle={standardStyles.blockMarginTop}
-        tabletStyle={standardStyles.blockMarginTopTablet}
-        mobileStyle={standardStyles.blockMarginTopMobile}
-      >
-        <Cell span={Spans.half}>
-          <H3>{t('engage.contributeTitle')}</H3>
-          <Text style={[fonts.p, standardStyles.elementalMargin]}>
-            {t('engage.contributeText')}
-          </Text>
-          <Button disabled={true} text={'Coming Soon'} kind={BTN.PRIMARY} />
-        </Cell>
-        <Cell span={Spans.half} style={standardStyles.centered}>
-          <AspectRatio ratio={309 / 360} style={[standardStyles.image, styles.feastImage]}>
-            <Image
-              source={require('src/dev/Feast.png')}
-              style={styles.graphic}
-              resizeMode="contain"
-            />
-          </AspectRatio>
-        </Cell>
-      </GridRow>
+      <EngageAsValidator />
+      <Meet />
     </>
   )
 })
 
-export default withNamespaces(NameSpaces.dev)(withScreenSize(Engage))
-
 interface ContentProps {
-  noun: string
-  verb: string
+  h3Text?: string
+  h4Text: string
   network: string
   caption: string
   primaryAction: { text: string; href: string }
@@ -141,10 +39,10 @@ interface ContentProps {
 const Content = React.memo(function _Content(props: ContentProps) {
   return (
     <View style={styles.paragraphArea}>
-      <H3 style={standardStyles.elementalMarginBottom}>{props.noun}</H3>
-      <H4 style={standardStyles.elementalMarginBottom}>{props.verb}</H4>
+      {props.h3Text && <H3 style={standardStyles.elementalMarginBottom}>{props.h3Text}</H3>}
+      {props.h4Text && <H4 style={standardStyles.elementalMarginBottom}>{props.h4Text}</H4>}
       <Text style={fonts.h6}>{props.network}</Text>
-      <Fade fraction={0.5} bottom={true} distance={'10px'}>
+      <Fade fraction={0.5} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
           <Image style={styles.graphic} source={props.image} resizeMode="contain" />
         </AspectRatio>
@@ -191,7 +89,7 @@ const Aside = React.memo(function _Aside({
       ]}
     >
       <View style={styles.asideFrame}>
-        <Fade fraction={0.5} bottom={true} distance={'10px'}>
+        <Fade fraction={0.5} distance={'10px'}>
           <AspectRatio style={styles.asideGraphic} ratio={1}>
             <Image source={image} style={styles.graphic} />
           </AspectRatio>
@@ -206,6 +104,163 @@ const Aside = React.memo(function _Aside({
   )
 })
 
+export function Contribute() {
+  const { t } = useTranslation(NameSpaces.dev)
+  return (
+    <GridRow
+      allStyle={[styles.contributeContainer, standardStyles.elementalMarginBottom]}
+      desktopStyle={standardStyles.blockMarginTop}
+      tabletStyle={standardStyles.blockMarginTopTablet}
+      mobileStyle={standardStyles.blockMarginTopMobile}
+    >
+      <Cell span={Spans.half} style={styles.contributeContent}>
+        <H3>{t('engage.contributeTitle')}</H3>
+        <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('engage.contributeText')}</Text>
+        <Button
+          text={t('engage.contributeBtn')}
+          kind={BTN.PRIMARY}
+          href={CeloLinks.fundingRequest}
+        />
+      </Cell>
+      <Cell span={Spans.half} style={standardStyles.centered}>
+        <AspectRatio ratio={309 / 360} style={[styles.feastImage, standardStyles.image]}>
+          <Image
+            source={require('src/dev/Feast.png')}
+            style={styles.graphic}
+            resizeMode="contain"
+          />
+        </AspectRatio>
+      </Cell>
+    </GridRow>
+  )
+}
+
+export function Meet() {
+  const { t } = useTranslation(NameSpaces.dev)
+  return (
+    <GridRow
+      allStyle={[styles.contributeContainer, standardStyles.elementalMarginBottom]}
+      desktopStyle={standardStyles.blockMarginTop}
+      tabletStyle={standardStyles.blockMarginTopTablet}
+      mobileStyle={standardStyles.blockMarginTopMobile}
+    >
+      <Cell span={Spans.half} style={styles.contributeContent}>
+        <H3>{t('engage.meetTitle')}</H3>
+        <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('engage.meetText')}</Text>
+        <Button text={t('engage.meetBtn')} kind={BTN.PRIMARY} href="https://discord.gg/jYRrHDQ" />
+      </Cell>
+      <Cell span={Spans.half} style={standardStyles.centered}>
+        <AspectRatio ratio={309 / 360} style={[styles.feastImage, standardStyles.image]}>
+          <Image
+            source={require('src/dev/Feast.png')}
+            style={styles.graphic}
+            resizeMode="contain"
+          />
+        </AspectRatio>
+      </Cell>
+    </GridRow>
+  )
+}
+
+interface EngageProps {
+  children: React.ReactNode
+  action?: string
+  noun?: string
+}
+
+export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
+  const { screen } = useScreenSize()
+  const { t } = useTranslation(NameSpaces.dev)
+  return (
+    <GridRow
+      desktopStyle={standardStyles.sectionMarginTop}
+      tabletStyle={standardStyles.sectionMarginTopTablet}
+      mobileStyle={standardStyles.sectionMarginTopMobile}
+      allStyle={styles.alignOut}
+    >
+      <Cell span={Spans.half}>
+        {children}
+        <Content
+          image={require('src/dev/cakeLayering.jpg')}
+          screen={screen}
+          h3Text={noun}
+          h4Text={action}
+          network={t('engage.developers.network')}
+          caption={t('engage.developers.caption')}
+          primaryAction={{
+            text: t('engage.developers.primaryAction'),
+            href: CeloLinks.walletApp,
+          }}
+        />
+      </Cell>
+      <Cell span={Spans.half} style={[styles.asides]}>
+        <Aside
+          screen={screen}
+          text={t('engage.faucet.copy')}
+          title={t('engage.faucet.title')}
+          href={CeloLinks.faucet}
+          btnText={t('engage.faucet.btnText')}
+          image={require('src/icons/faucet-dark.png')}
+        />
+        <Aside
+          screen={screen}
+          text={t('engage.docs.copy')}
+          title={t('engage.docs.title')}
+          href={CeloLinks.docs}
+          btnText={t('engage.docs.btnText')}
+          image={require('src/icons/documentation-dark.png')}
+        />
+      </Cell>
+    </GridRow>
+  )
+}
+
+export function EngageAsValidator() {
+  const { screen } = useScreenSize()
+  const { t } = useTranslation(NameSpaces.dev)
+  return (
+    <GridRow
+      allStyle={styles.alignOut}
+      desktopStyle={standardStyles.blockMarginTop}
+      tabletStyle={standardStyles.blockMarginTopTablet}
+      mobileStyle={standardStyles.blockMarginTopMobile}
+    >
+      <Cell span={Spans.half}>
+        <Content
+          image={require('src/dev/chefs.png')}
+          screen={screen}
+          h3Text={t('engage.validators.noun')}
+          h4Text={t('engage.validators.verb')}
+          network={t('engage.validators.network')}
+          caption={t('engage.validators.caption')}
+          primaryAction={{
+            text: t('engage.validators.primaryAction'),
+            href: 'https://docs.celo.org/getting-started/choosing-a-network',
+          }}
+        />
+      </Cell>
+      <Cell span={Spans.half} style={[styles.asides]}>
+        <Aside
+          screen={screen}
+          text={t('engage.tutorial.copy')}
+          title={t('engage.tutorial.title')}
+          href="https://docs.celo.org/getting-started/running-a-validator-in-mainnet"
+          btnText={t('engage.tutorial.btnText')}
+          image={require('src/icons/download-dark.png')}
+        />
+        <Aside
+          screen={screen}
+          text={t('engage.blog.copy')}
+          title={t('engage.blog.title')}
+          href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
+          btnText={t('engage.blog.btnText')}
+          image={require('src/icons/blog-dark.png')}
+        />
+      </Cell>
+    </GridRow>
+  )
+}
+
 const styles = StyleSheet.create({
   asides: {
     justifyContent: 'center',
@@ -215,6 +270,9 @@ const styles = StyleSheet.create({
   },
   primaryButtonContainer: {
     marginEnd: 20,
+  },
+  contributeContainer: {
+    justifyContent: 'space-between',
   },
   buttons: {
     alignItems: 'center',
@@ -248,4 +306,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'space-between',
   },
+  contributeContent: { justifyContent: 'center' },
 })

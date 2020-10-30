@@ -1,32 +1,31 @@
-import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
-import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
-import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
+import { addressToDisplayNameSelector, AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
+import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
-import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
-import { getNetworkFeeDisplayValue } from 'src/utils/formatting'
-import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
+import {
+  getDecryptedTransferFeedComment,
+  getTransferFeedParams,
+} from 'src/transactions/transferFeedUtils'
+import { TransactionStatus } from 'src/transactions/types'
 
 type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
-  invitees: Invitees
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  commentKey: Buffer | null
+  recentTxRecipientsCache: NumberToRecipient
+  invitees: InviteDetails[]
+  commentKey: string | null
 }
 
 function navigateToTransactionReview({
@@ -36,7 +35,6 @@ function navigateToTransactionReview({
   commentKey,
   timestamp,
   amount,
-  invitees,
   addressToE164Number,
   recipientCache,
 }: Props) {
@@ -45,29 +43,26 @@ function navigateToTransactionReview({
     return
   }
 
-  const recipient = getRecipientFromAddress(
-    address,
-    type === TokenTransactionType.InviteSent ? invitees : addressToE164Number,
-    recipientCache
-  )
+  const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+  const e164PhoneNumber = addressToE164Number[address] || undefined
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
-    comment: decryptComment(comment, commentKey, type),
+    comment: getDecryptedTransferFeedComment(comment, commentKey, type),
     amount,
     recipient,
     type,
+    e164PhoneNumber,
     // fee TODO: add fee here.
   })
 }
 
-// TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
-// so the parts that need to be identical stay the same as we change the code (main layout)
 export function TransferFeedItem(props: Props) {
-  const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+  const { t } = useTranslation(Namespaces.walletFlow5)
 
-  const onItemPress = () => {
+  const onPress = () => {
     navigateToTransactionReview(props)
+    ValoraAnalytics.track(HomeEvents.transaction_feed_item_select)
   }
 
   const {
@@ -78,68 +73,39 @@ export function TransferFeedItem(props: Props) {
     comment,
     commentKey,
     status,
-    invitees,
     addressToE164Number,
     recipientCache,
+    recentTxRecipientsCache,
+    invitees,
   } = props
 
-  const isSent = new BigNumber(amount.value).isNegative()
-  const timeFormatted = formatFeedTime(timestamp, i18n)
-  const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-  const isPending = status === TransactionStatus.Pending
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
-    invitees,
     recipientCache,
+    recentTxRecipientsCache,
     address,
     addressToE164Number,
+    addressToDisplayName,
     comment,
-    commentKey
+    commentKey,
+    timestamp,
+    invitees
   )
 
   return (
-    <Touchable onPress={onItemPress}>
-      <View style={styles.container}>
-        <View style={styles.iconContainer}>
-          <TransferFeedIcon type={type} recipient={recipient} address={address} />
-        </View>
-        <View style={styles.contentContainer}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
-            <CurrencyDisplay
-              amount={amount}
-              formatAmount={
-                type === TokenTransactionType.NetworkFee ? getNetworkFeeDisplayValue : undefined
-              }
-              style={[
-                styles.amount,
-                isSent ? fontStyles.activityCurrencySent : fontStyles.activityCurrencyReceived,
-              ]}
-            />
-          </View>
-          {!!info && <Text style={styles.info}>{info}</Text>}
-          <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
-            {isPending && (
-              <Text style={styles.transactionStatus}>
-                <Text style={styles.textPending}>{t('confirmingPayment')}</Text>
-                {' ' + timeFormatted}
-              </Text>
-            )}
-            {status === TransactionStatus.Complete && (
-              <Text style={styles.transactionStatus}>{dateTimeFormatted}</Text>
-            )}
-            {status === TransactionStatus.Failed && (
-              <Text style={styles.transactionStatus}>
-                <Text style={styles.textStatusFailed}>{t('paymentFailed')}</Text>
-                {' ' + timeFormatted}
-              </Text>
-            )}
-          </View>
-        </View>
-      </View>
-    </Touchable>
+    <TransactionFeedItem
+      type={type}
+      amount={amount}
+      title={title}
+      info={info}
+      icon={<TransferFeedIcon type={type} recipient={recipient} address={address} />}
+      timestamp={timestamp}
+      status={status}
+      onPress={onPress}
+    />
   )
 }
 
@@ -164,63 +130,5 @@ TransferFeedItem.fragments = {
     }
   `,
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flex: 1,
-    padding: variables.contentPadding,
-  },
-  iconContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  contentContainer: {
-    flex: 1,
-    marginLeft: variables.contentPadding,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    marginTop: -1,
-  },
-  title: {
-    ...fontStyles.semiBold,
-    fontSize: 15,
-    color: colors.dark,
-  },
-  info: {
-    ...fontStyles.comment,
-    marginTop: -2,
-  },
-  amount: {
-    marginLeft: 'auto',
-    paddingLeft: 10,
-  },
-  statusContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusContainerUnderComment: {
-    marginTop: 8,
-  },
-  textPending: {
-    ...fontStyles.bodySmallBold,
-    fontSize: 13,
-    lineHeight: 18,
-    color: colors.celoGreen,
-  },
-  transactionStatus: {
-    ...fontStyles.bodySmall,
-    color: colors.lightGray,
-  },
-  textStatusFailed: {
-    ...fontStyles.semiBold,
-    fontSize: 13,
-    lineHeight: 17,
-    color: colors.darkSecondary,
-  },
-})
 
 export default TransferFeedItem

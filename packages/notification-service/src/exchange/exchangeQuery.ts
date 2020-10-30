@@ -5,9 +5,12 @@ import { writeExchangeRatePair } from '../firebase'
 import { getContractKit } from '../util/utils'
 
 // Amounts to estimate the exchange rate, as the rate varies based on transaction size
+// A small amount returns a rate closer to the median rate
+// TODO: Use CELO_AMOUNT_FOR_ESTIMATE and DOLLAR_AMOUNT_FOR_ESTIMATE from `@celo/utils`
+const WEI_PER_UNIT = 1000000000000000000
 const SELL_AMOUNTS = {
-  [CURRENCY_ENUM.DOLLAR]: new BigNumber(10000 * 1000000000000000000), // 100 dollars
-  [CURRENCY_ENUM.GOLD]: new BigNumber(10 * 1000000000000000000), // 10 gold
+  [CURRENCY_ENUM.DOLLAR]: new BigNumber(0.01 * WEI_PER_UNIT), // 0.01 dollar
+  [CURRENCY_ENUM.GOLD]: new BigNumber(0.01 * WEI_PER_UNIT), // 0.01 gold
 }
 
 export async function handleExchangeQuery() {
@@ -32,6 +35,8 @@ export async function handleExchangeQuery() {
   )
 }
 
+// Note difference in gold vs dollar rate due the Exchange's forced spread of 0.5%
+// TODO: Fetch this data by listening directly for a MedianUpdated event on chain
 async function getExchangeRate(makerToken: CURRENCY_ENUM, contractKitInstance: ContractKit) {
   const exchange = await contractKitInstance.contracts.getExchange()
   const rate = await exchange.getExchangeRate(

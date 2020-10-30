@@ -1,0 +1,18 @@
+{
+  "addFunds": "Add Funds",
+  "exchanges": "Exchanges",
+  "buySellOnExchanges": "Buy/Sell on Exchanges",
+  "cashOut": "Cash Out",
+  "cashOutComingSoon": "Cash Out (Coming Soon)",
+  "celoDollarsAt": "Celo Dollars @ <1></1>",
+  "amountCelo": "Amount (CELO)",
+  "disclaimerCeloDollars": "Celo dollar values are estimates.",
+  "dollarsNotYetEnabledNote": "Celo Dollars are not yet available on any providers. To get Celo Dollars, purchase CELO and exchange it for Celo Dollars in the CELO tab.",
+  "pleaseSelectProvider": "Please select a provider below. These links connect to a third party service.",
+  "explanationModal": {
+    "title": "About Providers",
+    "body": "Providers allow you to add funds to or cash out from your account. They determine their own rates and restrictions depending on location, amount, and other factors. Please visit the provider website for specific help. Visit the FAQ to learn more."
+  },
+  "otherFundingOptions": "For more ways to add and withdraw funds, visit <0>How to fund your account</0>",
+  "youCanTransfer": "You can transfer CELO and Celo Dollars to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy."
+}

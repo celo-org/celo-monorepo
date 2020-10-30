@@ -2,9 +2,9 @@
 
 {{ range $index, $e := until (.Values.geth.validators | int) }}
 
-{{ if (ge $index ($.Values.geth.proxiedValidators | int)) }}
+{{ if (ge $index (len $.Values.geth.proxiesPerValidator)) }}
 
-{{ $loadBalancerIP := index $.Values.geth (print "validators_" $index "IpAddress") }}
+{{ $loadBalancerIP := index $.Values.geth.validatorsIPAddressArray $index }}
 
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "validators" "component_label" "validators" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
@@ -14,7 +14,7 @@
 ---
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "node_name" "validators" "svc_name_suffix" "-tcp" "component_label" "validators" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
-  - name: discovery
+  - name: celo
     port: 30303
     protocol: TCP
 ---

@@ -1,18 +1,26 @@
 import { E164Number } from '@celo/utils/lib/io'
-import { PhoneNumberUtil } from 'google-libphonenumber'
+import Logger from 'bunyan'
+import express from 'express'
 import { fetchEnvOrDefault } from '../env'
-const phoneUtil = PhoneNumberUtil.getInstance()
+import { AttestationModel } from '../models/attestation'
 
 export abstract class SmsProvider {
   abstract type: SmsProviderType
-  blacklistedRegionCodes: string[] = []
+  unsupportedRegionCodes: string[] = []
 
-  canServePhoneNumber(phoneNumber: E164Number) {
-    const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
-    return !!countryCode && !this.blacklistedRegionCodes.includes(countryCode)
+  canServePhoneNumber(countryCode: string, _: E164Number) {
+    return !this.unsupportedRegionCodes.includes(countryCode.toUpperCase())
   }
   // Should throw Error when unsuccesful, return if successful
-  abstract sendSms(phoneNumber: E164Number, message: string): Promise<void>
+  abstract sendSms(attestation: AttestationModel): Promise<string>
+
+  // True if this provider supports delivery status updates as POSTs to an endpoint delivery_<providername>/
+  abstract supportsDeliveryStatus(): boolean
+
+  abstract deliveryStatusHandlers(): express.Handler[]
+
+  // Should throw Error when unsuccesful, return if successful
+  abstract receiveDeliveryStatusReport(req: express.Request, logger: Logger): Promise<void>
 }
 
 export enum SmsProviderType {
@@ -21,8 +29,21 @@ export enum SmsProviderType {
   TWILIO = 'twilio',
 }
 
-export function readBlacklistFromEnv(envVarName: string) {
-  return fetchEnvOrDefault(envVarName, '')
-    .split(',')
-    .filter((code) => code !== '')
+export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {
+  return envVarNames
+    .map((envVarName) =>
+      fetchEnvOrDefault(envVarName, '')
+        .toUpperCase()
+        .split(',')
+        .filter((code) => code !== '')
+    )
+    .reduce((acc, v) => acc.concat(v), [])
+}
+
+export function obfuscateNumber(phoneNumber: string): string {
+  try {
+    return phoneNumber.slice(0, 7) + '...'
+  } catch {
+    return ''
+  }
 }

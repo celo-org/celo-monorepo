@@ -33,31 +33,30 @@ function getAttestationKeys() {
   ).map(ensure0x)
 }
 
-export function migrationOverrides() {
-  const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
-  const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
-  const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
+export function migrationOverrides(faucet: boolean) {
+  let overrides = {}
+  if (faucet) {
+    const mnemonic = fetchEnv(envVar.MNEMONIC)
+    const faucetedAccountAddresses = getFaucetedAccounts(mnemonic).map((account) => account.address)
+    const attestationBotAddresses = getAddressesFor(AccountType.ATTESTATION_BOT, mnemonic, 10)
+    const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses]
 
-  const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
+    const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
+
+    overrides = {
+      ...overrides,
+      stableToken: {
+        initialBalances: {
+          addresses: initialAddresses,
+          values: initialAddresses.map(() => initialBalance),
+        },
+        oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv()],
+      }
+    }
+  }
 
   return {
-    election: {
-      minElectableValidators: '1',
-    },
-    epochRewards: {
-      frozen: false,
-    },
-    exchange: {
-      frozen: false,
-    },
-    stableToken: {
-      initialBalances: {
-        addresses: initialAddresses,
-        values: initialAddresses.map(() => initialBalance),
-      },
-      oracles: getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
-    },
+    ...overrides,
     validators: {
       validatorKeys: validatorKeys(),
       attestationKeys: getAttestationKeys(),

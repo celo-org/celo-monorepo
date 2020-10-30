@@ -17,8 +17,9 @@ Contract for handling reserve for stable currencies
 ### Properties
 
 * [escrowedPayments](_wrappers_escrow_.escrowwrapper.md#escrowedpayments)
+* [events](_wrappers_escrow_.escrowwrapper.md#events)
 * [getReceivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#getreceivedpaymentids)
-* [getSentPaymentId](_wrappers_escrow_.escrowwrapper.md#getsentpaymentid)
+* [getSentPaymentIds](_wrappers_escrow_.escrowwrapper.md#getsentpaymentids)
 * [receivedPaymentIds](_wrappers_escrow_.escrowwrapper.md#receivedpaymentids)
 * [revoke](_wrappers_escrow_.escrowwrapper.md#revoke)
 * [sentPaymentIds](_wrappers_escrow_.escrowwrapper.md#sentpaymentids)
@@ -29,6 +30,10 @@ Contract for handling reserve for stable currencies
 
 * [address](_wrappers_escrow_.escrowwrapper.md#address)
 
+### Methods
+
+* [getPastEvents](_wrappers_escrow_.escrowwrapper.md#getpastevents)
+
 ## Constructors
 
 ###  constructor
@@ -37,7 +42,7 @@ Contract for handling reserve for stable currencies
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L14)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -68,9 +73,19 @@ Name | Type |
 
 ___
 
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
+
+___
+
 ###  getReceivedPaymentIds
 
-• **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
+• **getReceivedPaymentIds**: *function* = proxyCall(this.contract.methods.getReceivedPaymentIds)
 
 *Defined in [packages/contractkit/src/wrappers/Escrow.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Escrow.ts#L14)*
 
@@ -86,9 +101,9 @@ Name | Type |
 
 ___
 
-###  getSentPaymentId
+###  getSentPaymentIds
 
-• **getSentPaymentId**: *function* = proxyCall(this.contract.methods.sentPaymentIds)
+• **getSentPaymentIds**: *function* = proxyCall(this.contract.methods.getSentPaymentIds)
 
 *Defined in [packages/contractkit/src/wrappers/Escrow.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Escrow.ts#L16)*
 
@@ -200,8 +215,29 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L18)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 
 **Returns:** *string*
+
+## Methods
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

@@ -1,14 +1,19 @@
-import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
-import { zip } from '@celo/utils/lib/collections'
+import { bufferToHex, ensureLeading0x } from '@celo/base/lib/address'
+import { zip } from '@celo/base/lib/collections'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import Contract from 'web3/eth/contract'
-import { BlockType, TransactionObject, Tx } from 'web3/eth/types'
-import { EventLog, TransactionReceipt } from 'web3/types'
+import { EventLog, TransactionReceipt, Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
+import { Contract, PastEventOptions } from 'web3-eth-contract'
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
+
+export interface Filter {
+  [key: string]: number | string | string[] | number[]
+}
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
@@ -21,22 +26,21 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   /** Contract getPastEvents */
-  protected getPastEvents(
-    event: string,
-    options?: {
-      filter?: object
-      fromBlock?: BlockType
-      toBlock?: BlockType
-      topics?: string[]
-    }
-  ): Promise<EventLog[]> {
+  public getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
     return this.contract.getPastEvents(event, options)
   }
+
+  events = this.contract.events
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
 
+export const fixidityValueToBigNumber = (input: BigNumber.Value) => fromFixed(new BigNumber(input))
+
 export const valueToString = (input: BigNumber.Value) => valueToBigNumber(input).toFixed()
+
+export const valueToFixidityString = (input: BigNumber.Value) =>
+  toFixed(valueToBigNumber(input)).toFixed()
 
 export const valueToInt = (input: BigNumber.Value) =>
   valueToBigNumber(input)
@@ -46,24 +50,27 @@ export const valueToInt = (input: BigNumber.Value) =>
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
 
-export const stringToBuffer = hexToBuffer
-
-export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
-
-type SolBytes = Array<string | number[]>
-const toBytes = (input: any): SolBytes => input
-const fromBytes = (input: SolBytes): any => input as any
-
-export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
-
-export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
-
-export const bytesToString = (input: SolBytes): string => fromBytes(input)
+// Type of bytes in solidity gets repesented as a string of number array by typechain and web3
+// Hopefull this will improve in the future, at which point we can make improvements here
+type SolidityBytes = string | number[]
+export const stringToSolidityBytes = (input: string) => ensureLeading0x(input) as SolidityBytes
+export const bufferToSolidityBytes = (input: Buffer) => stringToSolidityBytes(bufferToHex(input))
+export const solidityBytesToString = (input: SolidityBytes): string => {
+  if (input === null || input === undefined || typeof input === 'string') {
+    return input
+  } else if (Array.isArray(input)) {
+    const hexString = input.reduce((acc, num) => acc + num.toString(16).padStart(2, '0'), '')
+    return ensureLeading0x(hexString)
+  } else {
+    throw new Error('Unexpected input type for solidity bytes')
+  }
+}
 
 type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
 export const identity = <A>(a: A) => a
+export const stringIdentity = (x: string) => x
 
 /**
  * Tuple parser

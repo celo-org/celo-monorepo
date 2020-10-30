@@ -1,0 +1,171 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "apiVersion": "2018-02-14",
+      "name": "[variables('validatorKeyVaultName')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enableRbacAuthorization": false,
+        "accessPolicies": [
+          {
+            "objectId":
+              "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('validatorUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
+            "tenantId": "[subscription().tenantId]",
+            "permissions": {
+              "keys": [],
+              "secrets": ["Get"],
+              "certificates": []
+            }
+          }
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "Standard",
+          "family": "A"
+        },
+        "networkAcls": {
+          "defaultAction": "allow",
+          "bypass": "AzureServices",
+          "ipRules": [],
+          "virtualNetworkRules": []
+        }
+      },
+      "tags": {},
+      "dependsOn": ["[variables('validatorUserAssignedIdentityName')]"]
+    },
+    {
+      "apiVersion": "2018-02-14",
+      "name": "[variables('proxyKeyVaultName')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enableRbacAuthorization": false,
+        "accessPolicies": [
+          {
+            "objectId":
+              "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('proxyUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
+            "tenantId": "[subscription().tenantId]",
+            "permissions": {
+              "keys": [],
+              "secrets": ["Get"],
+              "certificates": []
+            }
+          }
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "Standard",
+          "family": "A"
+        },
+        "networkAcls": {
+          "defaultAction": "allow",
+          "bypass": "AzureServices",
+          "ipRules": [],
+          "virtualNetworkRules": []
+        }
+      },
+      "tags": {},
+      "dependsOn": ["[variables('proxyUserAssignedIdentityName')]"]
+    },
+    {
+      "apiVersion": "2018-02-14",
+      "name": "[variables('attesterKeyVaultName')]",
+      "location": "[parameters('location')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enableRbacAuthorization": false,
+        "accessPolicies": [
+          {
+            "objectId":
+              "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('attesterUserAssignedIdentityName')), '2018-11-30', 'Full').properties.principalId]",
+            "tenantId": "[subscription().tenantId]",
+            "permissions": {
+              "keys": [],
+              "secrets": ["Get"],
+              "certificates": []
+            }
+          }
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "Standard",
+          "family": "A"
+        },
+        "networkAcls": {
+          "defaultAction": "allow",
+          "bypass": "AzureServices",
+          "ipRules": [],
+          "virtualNetworkRules": []
+        }
+      },
+      "tags": {},
+      "dependsOn": ["[variables('attesterUserAssignedIdentityName')]"]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name":
+        "[concat(variables('proxyKeyVaultName'), '/', variables('proxyPrivateKeyName'))]",
+      "apiVersion": "2018-02-14",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[variables('proxyKeyVaultName')]"],
+      "properties": {
+        "value": "[parameters('proxyPrivateKey')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name":
+        "[concat(variables('validatorKeyVaultName'), '/', variables('validatorPrivateKeyName'))]",
+      "apiVersion": "2018-02-14",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[variables('validatorKeyVaultName')]"],
+      "properties": {
+        "value": "[parameters('validatorPrivateKey')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('attesterKeyVaultName'), '/attesterPostgreSQLPassword')]",
+      "apiVersion": "2018-02-14",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[variables('attesterKeyVaultName')]"],
+      "properties": {
+        "value": "[parameters('attesterPostgreSQLPassword')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name":
+        "[concat(variables('attesterKeyVaultName'), '/', variables('attesterPrivateKeyName'))]",
+      "apiVersion": "2018-02-14",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[variables('attesterKeyVaultName')]"],
+      "properties": {
+        "value": "[parameters('attesterPrivateKey')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name":
+        "[concat(variables('attesterKeyVaultName'), '/', variables('attesterTwilioAuthTokenName'))]",
+      "apiVersion": "2018-02-14",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[variables('attesterKeyVaultName')]"],
+      "properties": {
+        "value": "[parameters('attesterTwilioAuthToken')]"
+      }
+    }
+  ]
+}

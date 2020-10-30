@@ -1,14 +1,14 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { retryTx, setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
-import { TransactionObject } from 'web3/eth/types'
+import Web3 from 'web3'
+import { TransactionObject } from 'web3-eth'
 
-import Web3 = require('web3')
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
@@ -19,7 +19,7 @@ export async function sendTransactionWithPrivateKey<T>(
   const address = privateKeyToAddress(privateKey)
 
   // Encode data and estimate gas or use default values for a transfer.
-  let encodedTxData: string|undefined
+  let encodedTxData: string | undefined
   let estimatedGas = 21000 // Gas cost of a basic transfer.
 
   if (tx !== null) {
@@ -147,21 +147,48 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
+  return Contract.at(proxy.address) as ContractInstance
+}
 
+export async function _setInitialProxyImplementation<
+  ContractInstance extends Truffle.ContractInstance
+>(
+  web3: Web3,
+  implementation: ContractInstance,
+  proxy: ProxyInstance,
+  contractName: string,
+  txOptions: {
+    from: Address,
+    value: string,
+  },
+  ...args: any[]
+) {
   const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
+  let receipt: any
   if (initializerAbi) {
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
-    console.log(`  Setting initial ${Contract.contractName} implementation on proxy`)
-    await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+    console.log(`  Setting initial ${contractName} implementation on proxy`)
+    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
-    await proxy._setImplementation(implementation.address)
+    if (txOptions.from != null) {
+      receipt = await retryTx(proxy._setImplementation, [implementation.address, { from: txOptions.from }])
+      if (txOptions.value != null) {
+        await retryTx(web3.eth.sendTransaction, [{
+          from: txOptions.from,
+          to: proxy.address,
+          value: txOptions.value,
+        }])
+      }
+    } else {
+      receipt = await retryTx(proxy._setImplementation, [implementation.address])
+    }
   }
-
-  return Contract.at(proxy.address) as ContractInstance
+  return receipt.tx
 }
 
 export async function getDeployedProxiedContract<ContractInstance extends Truffle.ContractInstance>(
@@ -200,6 +227,28 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
+  return deploymentForContract(web3, artifacts, name, args, true, then);
+}
+
+export function deploymentForProxiedContract<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
+  return deploymentForContract(web3, artifacts, name, args, false, then);
+
+}
+
+export function deploymentForContract<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  registerAddress: boolean,
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
@@ -208,13 +257,15 @@ export function deploymentForCoreContract<ContractInstance extends Truffle.Contr
     deployer.deploy(Contract)
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
-      await proxy._transferOwnership(_accounts[0])
+      await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
       >(web3, artifacts, name, ...(await args(networkName)))
 
-      const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
-      await registry.setAddressFor(name, proxiedContract.address)
+      if (registerAddress) {
+        const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+        await registry.setAddressFor(name, proxiedContract.address)
+      }
 
       if (then) {
         await then(proxiedContract, web3, networkName)
@@ -310,4 +361,27 @@ export async function sendEscrowedPayment(
   await contract.approve(escrow.address, value.toString())
   const expirySeconds = 60 * 60 * 24 * 5 // 5 days
   await escrow.transfer(phoneHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
+}
+
+/*
+* Builds and returns mapping of function names to selectors.
+* Each function name maps to an array of selectors to account for overloading.
+*/
+export function getFunctionSelectorsForContract(contract: any, contractName: string, artifacts: Truffle.Artifacts) {
+  const selectors: { [index: string]: string[] } = {}
+  const proxy: any = artifacts.require(contractName + 'Proxy')
+  proxy.abi
+    .concat(contract.abi)
+    .filter((abiEntry: any) => abiEntry.type === 'function')
+    .forEach((func: any) => {
+      if (typeof selectors[func.name] === 'undefined') {
+        selectors[func.name] = []
+      }
+      if (typeof func.signature === 'undefined') {
+        selectors[func.name].push(web3.eth.abi.encodeFunctionSignature(func))
+      } else {
+        selectors[func.name].push(func.signature)
+      }
+    })
+  return selectors
 }

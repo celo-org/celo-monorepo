@@ -1,7 +1,6 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 interface IFeeCurrencyWhitelist {
-  function initialize() external;
   function addToken(address) external;
   function getWhitelist() external view returns (address[] memory);
 }

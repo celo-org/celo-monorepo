@@ -1,0 +1,1 @@
+{"__schema":{"types":[{"kind":"UNION","name":"Event","possibleTypes":[{"name":"Exchange"},{"name":"Transfer"}]},{"kind":"INTERFACE","name":"TokenTransaction","possibleTypes":[{"name":"TokenTransfer"},{"name":"TokenExchange"}]}]}}

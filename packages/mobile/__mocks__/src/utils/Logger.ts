@@ -1,3 +1,5 @@
+const createCombinedLogs = jest.fn()
+
 class Logger {
   error = (tag: string, statement: string, error?: any) => {
     console.info(`${tag}/${statement}`, error)
@@ -23,6 +25,8 @@ class Logger {
     console.log(message)
   }
 
+  sanitizeError = jest.fn((error) => error)
+
   overrideConsoleLogs = () => {}
 
   showError = (message: string) => {
@@ -32,6 +36,10 @@ class Logger {
   showMessage = (message: string) => {
     console.log(message)
   }
+
+  createCombinedLogs = createCombinedLogs
+  getGethLogFilePath = jest.fn(() => 'geth_logs.txt')
+  getReactNativeLogsFilePath = jest.fn(() => 'rn_logs.txt')
 }
 
 export default new Logger()

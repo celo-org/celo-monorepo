@@ -1,265 +1,148 @@
-import hexRgba from 'hex-rgba'
 import * as React from 'react'
-import { StyleSheet, View, ViewStyle } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { H1 } from 'src/fonts/Fonts'
-import Responsive from 'src/shared/Responsive'
-import { colors, textStyles } from 'src/styles'
-const words = ['universal', 'move', 'sustainable', 'connected', 'accessible']
+import { useScreenSize } from 'src/layout/ScreenSize'
+import { colors, fonts, textStyles } from 'src/styles'
 
-const textTransitionTime = 800
+export const WORDS = [
+  'finance',
+  'saving',
+  'education',
+  'sending',
+  'giving',
+  'lending',
+  'regeneration',
+]
 
-const timings = {
-  universal: {
-    length: 4400,
-    pause: 600,
-  },
-  move: {
-    length: 4250,
-    pause: 200,
-  },
-  sustainable: {
-    length: 4600,
-    pause: 200,
-  },
-  connected: {
-    length: 3200,
-    pause: 600,
-  },
-  accessible: {
-    length: 6350,
-    pause: 200,
-  },
-}
-
-const animations = {}
-
-Object.keys(timings).forEach((key) => {
-  const duration = timings[key].length + timings[key].pause
-  const fadeIn = textTransitionTime / duration
-  const fadeOut = (timings[key].length - textTransitionTime) / duration
-  const fadeOutStop = timings[key].length / duration
-
-  animations[key] = {
-    duration: `${duration}ms`,
-    in: [
-      {
-        '0%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-        [`${fadeIn * 100}%`]: {
-          transform: [
-            {
-              translateX: '100%',
-            },
-          ],
-        },
-        '100%': {
-          transform: [
-            {
-              translateX: '100%',
-            },
-          ],
-        },
-      },
-    ],
-    out: [
-      {
-        '0%': {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
-        },
-        [`${fadeOut * 100}%`]: {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
-        },
-        [`${fadeOutStop * 100}%`]: {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-        '100%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-      },
-    ],
-  }
-})
+const DURATION = 8510
+const START_SLIDE = 600
+const SLIDE_IN_DURATION = 2100
+const PAUSE = 6600
+const SLIDE_IN_START = START_SLIDE / DURATION
+const SLIDE_IN_END = (SLIDE_IN_DURATION + START_SLIDE) / DURATION
+const FADE_OUT_START = PAUSE / DURATION
+const FADE_OUT_STOP = 1
 
 interface Props {
-  playing: boolean
-  stillMode: boolean
-  willTransition: boolean
-}
-
-interface State {
   currentWord: number
-  initial: boolean
+  isAnimating: boolean
 }
 
-class TextAnimation extends React.PureComponent<Props, State> {
-  state = {
-    currentWord: 0,
-    initial: true,
-  }
-
-  timeout: number
-
-  componentDidUpdate(prevProps: Props) {
-    if (!prevProps.playing && this.props.playing && !this.props.stillMode) {
-      this.startAnimation()
-    }
-  }
-
-  startAnimation = () => {
-    clearTimeout(this.timeout)
-    this.setState({ currentWord: 0 }, this.changeWord)
-  }
-
-  changeWord = () => {
-    const word = words[this.state.currentWord]
-    const duration = timings[word].length + timings[word].pause
-    this.timeout = setTimeout(() => {
-      if (this.state.currentWord !== 4) {
-        this.setState({ currentWord: (this.state.currentWord + 1) % 5, initial: false })
-        this.changeWord()
-      }
-    }, duration)
-  }
-
-  render() {
-    const word = words[this.state.currentWord]
-
-    const fadeOut: ViewStyle = this.props.playing
-      ? {
-          animationDuration: animations[word].duration,
-          animationKeyframes: animations[word].out,
-        }
-      : {}
-
-    const fadeIn: ViewStyle = this.props.playing
-      ? {
-          animationDuration: animations[word].duration,
-          animationKeyframes: animations[word].in,
-        }
-      : {}
-
-    return (
-      <Responsive large={[styles.textContainer, styles.textContainerLarge]}>
-        <View style={styles.textContainer}>
+export default React.memo(function TextAnimation({ currentWord, isAnimating }: Props) {
+  const { isMobile } = useScreenSize()
+  return (
+    <View>
+      <H1
+        ariaLevel={'2'}
+        accessibilityRole={'heading'}
+        style={[fonts.h1, !isMobile && styles.title, styles.letsMake]}
+      >
+        A new story in
+      </H1>
+      <View style={styles.textContainer}>
+        {isAnimating && (
           <>
-            <H1
-              ariaLevel={'2'}
-              accessibilityRole={'heading'}
-              style={[styles.white, styles.letsMake]}
-            >
-              Let's make money{' '}
-            </H1>
-            <View>
-              {this.props.stillMode ? (
-                <View
-                  style={this.props.willTransition && [styles.mask, styles.stillOut]}
-                  key={`stillmode-mask1`}
-                />
-              ) : (
-                <>
-                  <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-
-                  <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
-                </>
-              )}
-              <H1
-                ariaLevel={'2'}
-                accessibilityRole={'heading'}
-                style={[styles.white, textStyles.heavy, textStyles.center]}
-              >
-                {this.props.stillMode ? 'serve everyone' : words[this.state.currentWord]}
-              </H1>
-            </View>
+            <View style={[styles.mask, styles.fadeOut]} key={`${currentWord}-mask1`} />
+            <View style={[styles.mask2, styles.slideIn]} key={`${currentWord}-mask2`} />
           </>
-        </View>
-      </Responsive>
-    )
-  }
-}
-
-export default TextAnimation
-
-const gradientOpaque = hexRgba(colors.dark, 100)
-const gradientTransparent = hexRgba(colors.dark, 0)
+        )}
+        <H1
+          ariaLevel={'2'}
+          accessibilityRole={'heading'}
+          style={[fonts.h1, !isMobile && styles.title, textStyles.medium]}
+        >
+          {WORDS[currentWord]}
+        </H1>
+      </View>
+    </View>
+  )
+})
 
 const styles = StyleSheet.create({
-  stillOut: {
+  title: {
+    fontSize: 52,
+    lineHeight: 58,
+  },
+  textContainer: {
+    display: 'inline-flex',
+    width: 'fit-content',
+  },
+  letsMake: {
+    zIndex: 1,
+  },
+  mask: {
+    animationDuration: `${DURATION}ms`,
+    height: 56,
+    bottom: 0,
+    left: 0,
+    right: -30,
+    top: 8,
+    position: 'absolute',
     animationFillMode: 'both',
-    animationDelay: '3s',
-    animationDuration: '1000ms',
+    animationIterationCount: 1,
+    backgroundColor: colors.white,
+  },
+  mask2: {
+    animationDuration: `${DURATION}ms`,
+    height: 56,
+    bottom: 0,
+    left: -20,
+    right: 0,
+    top: 8,
+    position: 'absolute',
+    backgroundColor: colors.white,
+    animationIterationCount: 1,
+  },
+  fadeOut: {
+    animationKeyframes: [
+      {
+        '0%': {
+          opacity: 0,
+        },
+        [`${FADE_OUT_START * 100}%`]: {
+          opacity: 0,
+        },
+        [`${FADE_OUT_STOP * 100}%`]: {
+          opacity: 1,
+        },
+        '100%': {
+          opacity: 1,
+        },
+      },
+    ],
+  },
+  slideIn: {
     animationKeyframes: [
       {
         '0%': {
           transform: [
             {
-              translateX: '-100%',
+              translateX: 0,
             },
           ],
         },
-        '100%': {
+        [`${SLIDE_IN_START * 100}%`]: {
           transform: [
             {
               translateX: 0,
             },
           ],
         },
+        [`${SLIDE_IN_END * 100}%`]: {
+          transform: [
+            {
+              translateX: '100%',
+            },
+          ],
+        },
+        '100%': {
+          transform: [
+            {
+              translateX: '100%',
+            },
+          ],
+        },
       },
     ],
-  },
-  textContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  textContainerLarge: {
-    flexDirection: 'row',
-    marginLeft: 25,
-  },
-  white: {
-    color: colors.white,
-  },
-  letsMake: {
-    textAlign: 'center',
-    zIndex: 1,
-  },
-  mask: {
-    height: 60,
-    bottom: 0,
-    left: 0,
-    right: -30,
-    top: 0,
-    backgroundImage: `linear-gradient(90deg, ${gradientOpaque} 0%, ${gradientOpaque} 90%, ${gradientTransparent} 100%)`,
-    position: 'absolute',
-    animationIterationCount: 1,
-  },
-  mask2: {
-    bottom: 0,
-    left: -20,
-    right: 0,
-    top: 0,
-    backgroundImage: `linear-gradient(90deg, ${gradientTransparent} 0%, ${gradientOpaque} 10%, ${gradientOpaque} 100%)`,
-    position: 'absolute',
-    animationIterationCount: 1,
   },
 })

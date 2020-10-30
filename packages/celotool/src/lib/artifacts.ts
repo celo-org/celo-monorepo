@@ -1,8 +1,8 @@
 /* tslint:disable: no-console */
 import { existsSync, mkdirSync, readFileSync, writeFile } from 'fs'
 import { promisify } from 'util'
+import { execCmd } from './cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv, isProduction } from './env-utils'
-import { execCmd } from './utils'
 
 export const CONTRACTS_TO_COPY = [
   'Attestations',

@@ -20,17 +20,20 @@
 
 ###  newKit
 
-▸ **newKit**(`url`: string): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
+▸ **newKit**(`url`: string, `wallet?`: [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [packages/contractkit/src/kit.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L28)*
+*Defined in [packages/contractkit/src/kit.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L38)*
 
 Creates a new instance of `ContractKit` give a nodeUrl
+
+**`optional`** wallet to reuse or add a wallet different that the default (example ledger-wallet)
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`url` | string | CeloBlockchain node url  |
+`url` | string | CeloBlockchain node url |
+`wallet?` | [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md) | - |
 
 **Returns:** *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
@@ -38,16 +41,19 @@ ___
 
 ###  newKitFromWeb3
 
-▸ **newKitFromWeb3**(`web3`: Web3): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
+▸ **newKitFromWeb3**(`web3`: Web3, `wallet?`: [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [packages/contractkit/src/kit.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L36)*
+*Defined in [packages/contractkit/src/kit.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L50)*
 
 Creates a new instance of `ContractKit` give a web3 instance
+
+**`optional`** wallet to reuse or add a wallet different that the default (example ledger-wallet)
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`web3` | Web3 | Web3 instance  |
+`web3` | Web3 | Web3 instance |
+`wallet?` | [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md) | - |
 
 **Returns:** *[ContractKit](../classes/_kit_.contractkit.md)‹›*

@@ -4,17 +4,12 @@ import * as chai from 'chai'
 import * as chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import {
-  ProxyInstance,
-  RegistryInstance,
-  ReserveInstance,
-  UsingRegistryInstance,
-} from 'types'
+import { ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
+import Web3 from 'web3'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
-import Web3 = require('web3')
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -38,23 +33,27 @@ export function assertContainSubset(superset: any, subset: any) {
 
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
-    web3.currentProvider.send(
-      {
-        jsonrpc: '2.0',
-        method,
-        params,
-        // salt id generation, milliseconds might not be
-        // enough to generate unique ids
-        id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
-      },
-      // @ts-ignore
-      (err: any, result: any) => {
-        if (err) {
-          return reject(err)
+    if (typeof web3.currentProvider !== 'string') {
+      web3.currentProvider.send(
+        {
+          jsonrpc: '2.0',
+          method,
+          params,
+          // salt id generation, milliseconds might not be
+          // enough to generate unique ids
+          id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
+        },
+        // @ts-ignore
+        (err: any, result: any) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(result)
         }
-        return resolve(result)
-      }
-    )
+      )
+    } else {
+      reject(new Error('Invalid Provider'))
+    }
   })
 }
 
@@ -69,15 +68,35 @@ export async function mineBlocks(blocks: number, web3: Web3) {
   }
 }
 
-export async function currentEpochNumber(web3) {
+export async function currentEpochNumber(web3: Web3, epochSize: number = EPOCH) {
   const blockNumber = await web3.eth.getBlockNumber()
-  return Math.floor((blockNumber - 1) / EPOCH)
+
+  return getEpochNumberOfBlock(blockNumber, epochSize)
 }
 
-export async function mineToNextEpoch(web3) {
+export function getEpochNumberOfBlock(blockNumber: number, epochSize: number = EPOCH) {
+  // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+  const epochNumber = Math.floor(blockNumber / epochSize)
+  if (blockNumber % epochSize === 0) {
+    return epochNumber
+  } else {
+    return epochNumber + 1
+  }
+}
+
+// Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+export function getFirstBlockNumberForEpoch(epochNumber: number, epochSize: number = EPOCH) {
+  if (epochNumber === 0) {
+    // No first block for epoch 0
+    return 0
+  }
+  return (epochNumber - 1) * epochSize + 1
+}
+
+export async function mineToNextEpoch(web3: Web3, epochSize: number = EPOCH) {
   const blockNumber = await web3.eth.getBlockNumber()
-  const epochNumber = await currentEpochNumber(web3)
-  const blocksUntilNextEpoch = (epochNumber + 1) * EPOCH - blockNumber
+  const epochNumber = await currentEpochNumber(web3, epochSize)
+  const blocksUntilNextEpoch = getFirstBlockNumberForEpoch(epochNumber + 1, epochSize) - blockNumber
   await mineBlocks(blocksUntilNextEpoch, web3)
 }
 
@@ -90,6 +109,17 @@ export async function assertBalance(address: string, balance: BigNumber) {
   } else {
     assertEqualBN(web3balance, balance)
   }
+}
+
+export const assertThrowsAsync = async (promise: any, errorMessage: string = '') => {
+  let failed = false
+  try {
+    await promise
+  } catch (_) {
+    failed = true
+  }
+
+  assert.isTrue(failed, errorMessage)
 }
 
 // TODO: Use assertRevert directly from openzeppelin-solidity
@@ -263,6 +293,19 @@ export function assertEqualBN(
   )
 }
 
+export function assertAlmostEqualBN(
+  actual: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  margin: number | BN | BigNumber,
+  msg?: string
+) {
+  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
+  assert(
+    web3.utils.toBN(margin).gte(diff),
+    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(10)}. ${msg || ''}`
+  )
+}
+
 export function assertEqualDpBN(
   value: number | BN | BigNumber,
   expected: number | BN | BigNumber,
@@ -293,11 +336,6 @@ export function assertGteBN(
     `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
       ''}`
   )
-}
-
-export const getReserveBalance = async (web3: Web3, getContract: any): Promise<string> => {
-  const reserve: ReserveInstance = await getContract('Reserve', 'proxiedContract')
-  return (await web3.eth.getBalance(reserve.address)).toString()
 }
 
 export const isSameAddress = (minerAddress, otherAddress) => {
@@ -370,4 +408,9 @@ export default {
   assertRevert,
   timeTravel,
   isSameAddress,
+}
+
+export async function addressMinedLatestBlock(address: string) {
+  const block = await web3.eth.getBlock('latest')
+  return isSameAddress(block.miner, address)
 }

@@ -26,31 +26,16 @@ Clean the Android application
 fastlane android build
 ```
 Build the Android application - requires environment param
-### android integration
-```
-fastlane android integration
-```
-Ship Integration to Playstore Internal
-### android staging
-```
-fastlane android staging
-```
-Ship Staging to Playstore Internal
-### android production
-```
-fastlane android production
-```
-Ship Production to Playstore Alpha.
 ### android alfajores
 ```
 fastlane android alfajores
 ```
 Ship Alfajores to Playstore Internal
-### android pilotapp
+### android mainnet
 ```
-fastlane android pilotapp
+fastlane android mainnet
 ```
-Ship Pilot to Playstore Internal
+Ship Mainnet to Playstore Internal
 ### android build_apk
 ```
 fastlane android build_apk
@@ -61,6 +46,25 @@ Build an Android apk
 fastlane android build_bundle
 ```
 Build an Android bundle
+
+----
+
+## iOS
+### ios build
+```
+fastlane ios build
+```
+Build the iOS application - requires environment param
+### ios alfajores
+```
+fastlane ios alfajores
+```
+Ship Alfajores to TestFlight
+### ios mainnet
+```
+fastlane ios mainnet
+```
+Ship Mainnet to TestFlight
 
 ----
 

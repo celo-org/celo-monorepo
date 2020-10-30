@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles {
   using SafeMath for uint256;
@@ -75,7 +76,7 @@ contract SlasherUtil is Ownable, Initializable, UsingRegistry, UsingPrecompiles 
       validatorElectionIndices
     );
     address group = groupMembershipAtBlock(validator, startBlock, groupMembershipHistoryIndex);
-    if (group == address(0)) return; // Should never be true
+    assert(group != address(0));
     lockedGold.slash(
       group,
       slashingIncentives.penalty,

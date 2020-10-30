@@ -1,12 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PaymentRequestConfirmation renders correctly for request payment confirmation 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "paddingTop": 20,
+      "padding": 8,
     }
   }
 >
@@ -16,7 +20,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -25,69 +28,32 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "alignItems": "center",
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
           style={
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-              "marginTop": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "alignSelf": "center",
-                  "color": "#2E3338",
-                  "padding": 10,
-                  "paddingBottom": 10,
-                },
-              ]
-            }
-          >
-            requestPayment
-          </Text>
-        </View>
-        <View
-          style={
-            Object {
-              "margin": 20,
+              "marginHorizontal": 16,
             }
           }
         >
           <View
             style={
               Object {
-                "flex": 1,
-                "flexDirection": "column",
-                "justifyContent": "flex-start",
-                "paddingHorizontal": 40,
-                "paddingVertical": 25,
+                "alignItems": "flex-start",
+                "paddingBottom": 24,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flexDirection": "column",
-                  "justifyContent": "center",
-                  "marginBottom": 10,
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
                 }
               }
             >
@@ -99,10 +65,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -122,303 +85,107 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
-              <Text
-                ellipsizeMode="tail"
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "marginHorizontal": 20,
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                John Doe
-              </Text>
               <View
                 style={
                   Object {
-                    "alignItems": "center",
-                    "alignSelf": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
+                    "paddingLeft": 8,
                   }
                 }
               >
                 <Text
                   style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 14,
-                        "textAlignVertical": "center",
-                      },
-                      Object {
-                        "alignItems": "center",
-                        "backgroundColor": "#EEEEEE",
-                        "borderRadius": 3,
-                        "justifyContent": "center",
-                        "marginRight": 5,
-                        "paddingLeft": 6,
-                        "paddingRight": 3,
-                      },
-                    ]
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    }
                   }
                 >
-                  🇺🇸 +1
+                  requesting
                 </Text>
                 <Text
                   style={
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     }
                   }
                 >
-                  (415) 555-0000
+                  Jane Doe
                 </Text>
               </View>
             </View>
-            <View
+            <Text
+              numberOfLines={1}
               style={
-                Object {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "marginHorizontal": 25,
-                  "marginTop": 15,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 32,
+                    "lineHeight": 40,
+                    "paddingVertical": 8,
+                  },
+                  Object {
+                    "color": "#2E3338",
+                  },
+                ]
               }
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                +
-              </Text>
-              <Text
-                ellipsizeMode="tail"
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 48,
-                      "lineHeight": 64,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                13.30
-              </Text>
-              <Text
-                style={
-                  Object {
-                    "alignSelf": "flex-end",
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 64,
-                    "marginLeft": 7,
-                  }
-                }
-              >
-                MXN
-              </Text>
-            </View>
-            <View
+              
+              $
+              1.33
+            </Text>
+            <TextInput
+              allowFontScaling={true}
+              autoFocus={false}
+              blurOnSubmit={true}
+              maxLength={70}
+              multiline={true}
+              numberOfLines={5}
+              onBlur={[Function]}
+              onChangeText={[Function]}
+              placeholder="addDescription"
+              placeholderTextColor="#1AB775"
+              rejectResponderTermination={true}
+              returnKeyType="done"
               style={
                 Object {
-                  "alignItems": "stretch",
-                  "flexDirection": "column",
-                  "marginTop": 5,
+                  "alignSelf": "stretch",
+                  "color": "#2E3338",
+                  "flex": 1,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 18,
+                  "height": 100,
+                  "lineHeight": 24,
+                  "textAlignVertical": "top",
                 }
               }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                      "textAlign": "center",
-                    },
-                    Object {
-                      "paddingTop": 5,
-                    },
-                  ]
-                }
-              >
-                My Reason
-              </Text>
-              <View
-                style={
-                  Object {
-                    "borderStyle": "solid",
-                    "borderTopColor": "#EEEEEE",
-                    "borderTopWidth": 1,
-                    "marginTop": 10,
-                    "width": "100%",
-                  }
-                }
-              />
-              <View
-                style={
-                  Object {
-                    "alignItems": "stretch",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                    "marginTop": 10,
-                  }
-                }
-              >
-                <View
-                  style={
-                    Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "marginTop": 5,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "alignItems": "flex-start",
-                        "flexDirection": "row",
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 14,
-                          "lineHeight": 20,
-                        }
-                      }
-                    >
-                      amountInCelloDollars
-                    </Text>
-                  </View>
-                  <Text
-                    style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
-                    }
-                  >
-                    10.00
-                  </Text>
-                </View>
-                <Text
-                  style={
-                    Object {
-                      "color": "#BDBDBD",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "lineHeight": 20,
-                      "marginBottom": 3,
-                    }
-                  }
-                >
-                  localValueHint
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
-                      "marginTop": 5,
-                    }
-                  }
-                >
-                  <View
-                    style={
-                      Object {
-                        "alignItems": "flex-start",
-                        "flexDirection": "row",
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Regular",
-                          "fontSize": 14,
-                          "lineHeight": 20,
-                        }
-                      }
-                    >
-                      newAccountBalance
-                    </Text>
-                  </View>
-                  <Text
-                    style={
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 14,
-                        "lineHeight": 20,
-                      }
-                    }
-                  >
-                    10.00
-                  </Text>
-                </View>
-              </View>
-            </View>
+              testID="commentInput/request"
+              underlineColorAndroid="transparent"
+              value=""
+            />
           </View>
         </View>
       </View>
@@ -426,7 +193,8 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "padding": 16,
+          "paddingBottom": 8,
         }
       }
     >
@@ -434,87 +202,245 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
               "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
+              "justifyContent": "space-between",
+              "marginVertical": 5,
             },
             undefined,
+          ]
+        }
+      >
+        <View
+          style={
             Object {
-              "backgroundColor": "#42D689",
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+              ]
+            }
+          >
+            total
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            $
+            1.33
+          </Text>
+        </Text>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            Object {
+              "marginVertical": 0,
             },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
+          style={
             Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
             }
           }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+              ]
+            }
+          >
+            Celo Dollars @
+             
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              0.75
+            </Text>
+          </Text>
+        </View>
+        <Text
           style={
             Array [
               Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "backgroundColor": "#42D689",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            1.00
+          </Text>
+        </Text>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "flexDirection": "column",
+            },
+            Object {
+              "marginBottom": 16,
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "overflow": "hidden",
               },
               Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
+                "borderRadius": 100,
               },
             ]
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#1AB775",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "opacity": undefined,
+                "paddingHorizontal": 24,
+                "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="request"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               request
@@ -522,95 +448,23 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
           </View>
         </View>
       </View>
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            null,
-            null,
-            Object {
-              "marginBottom": 10,
-            },
-            Object {
-              "backgroundColor": "transparent",
-            },
-          ]
-        }
-      >
-        <View
-          accessible={true}
-          focusable={true}
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
-          }
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              accessibilityLabel="edit"
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              edit
-            </Text>
-          </View>
-        </View>
-      </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

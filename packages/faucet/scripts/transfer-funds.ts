@@ -69,11 +69,10 @@ async function transferFunds(args: {
   gold?: string
   dollar?: string
 }) {
-  const web3 = await new Web3(args.nodeUrl)
   const pk = args.pk
   const to = args.recipientAddress
   // Escrow address is an empty string, because we don't need that contract in this function
-  const celo = new CeloAdapter(web3, pk, args.stableTokenAddress, '', args.goldTokenAddress)
+  const celo = new CeloAdapter({ pk, nodeUrl: args.nodeUrl })
 
   const printBalance = async (addr: string) => {
     console.log(`Account: ${addr}`)
@@ -94,15 +93,13 @@ async function transferFunds(args: {
   if (args.gold) {
     const goldAmount = Web3.utils.toBN(args.gold)
     const tx = await celo.transferGold(to, goldAmount.toString())
-    console.log('txhash', await tx.getHash())
-    console.log('receipt', await tx.waitReceipt())
+    console.log('receipt', await tx.sendAndWaitForReceipt())
   }
 
   if (args.dollar) {
     const dollarAmount = Web3.utils.toBN(args.dollar)
     const tx2 = await celo.transferDollars(to, dollarAmount.toString())
-    console.log('txhash', await tx2.getHash())
-    console.log('receipt', await tx2.waitReceipt())
+    console.log('receipt', await tx2.sendAndWaitForReceipt())
   }
 
   console.log('Funder')

@@ -1,48 +1,84 @@
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import 'react-native'
-import * as renderer from 'react-test-renderer'
+import { render } from 'react-native-testing-library'
+import { Provider } from 'react-redux'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { createMockStore, getElementText } from 'test/utils'
 
-const EXCHANGE_RATE = '0.1'
+const store = createMockStore({})
 
-it('renders correctly with no exchange rate', () => {
-  const tree = renderer.create(
-    <ExchangeRate rate={new BigNumber(0)} makerToken={CURRENCY_ENUM.DOLLAR} showFinePrint={false} />
+it('renders correctly for cUSD->cGLD exchanges without local amounts', () => {
+  const { getByTestId, toJSON } = render(
+    <Provider store={store}>
+      <ExchangeRate
+        makerAmount={{ value: '20', currencyCode: 'cUSD' }}
+        takerAmount={{ value: '2', currencyCode: 'cGLD' }}
+      />
+    </Provider>
   )
-  expect(tree).toMatchSnapshot()
+  expect(toJSON()).toMatchSnapshot()
+
+  const element = getByTestId('ExchangeRateRatio')
+  expect(getElementText(element)).toBe('10 cUSD : 1 cGLD')
 })
 
-it('renders correctly with infinity exchange rate', () => {
-  const tree = renderer.create(
-    <ExchangeRate
-      rate={new BigNumber('Infinity')}
-      makerToken={CURRENCY_ENUM.DOLLAR}
-      showFinePrint={false}
-    />
+it('renders correctly for cGLD->cUSD exchanges without local amounts', () => {
+  const { getByTestId, toJSON } = render(
+    <Provider store={store}>
+      <ExchangeRate
+        makerAmount={{ value: '2', currencyCode: 'cGLD' }}
+        takerAmount={{ value: '20', currencyCode: 'cUSD' }}
+      />
+    </Provider>
   )
-  expect(tree).toMatchSnapshot()
+  expect(toJSON()).toMatchSnapshot()
+
+  const element = getByTestId('ExchangeRateRatio')
+  expect(getElementText(element)).toBe('0.1 cGLD : 1 cUSD')
 })
 
-it('renders correctly with an exchange rate  and show fine print', () => {
-  const tree = renderer.create(
-    <ExchangeRate
-      rate={new BigNumber(EXCHANGE_RATE)}
-      makerToken={CURRENCY_ENUM.GOLD}
-      showFinePrint={true}
-    />
+it('renders correctly for cUSD->cGLD exchanges with local amounts', () => {
+  const { getByTestId, toJSON } = render(
+    <Provider store={store}>
+      <ExchangeRate
+        makerAmount={{
+          value: '20',
+          currencyCode: 'cUSD',
+          localAmount: { value: '15', currencyCode: 'EUR', exchangeRate: '0.75' },
+        }}
+        takerAmount={{
+          value: '2',
+          currencyCode: 'cGLD',
+          localAmount: { value: '15', currencyCode: 'EUR', exchangeRate: '0.75' },
+        }}
+      />
+    </Provider>
   )
-  expect(tree).toMatchSnapshot()
+  expect(toJSON()).toMatchSnapshot()
+
+  const element = getByTestId('ExchangeRateRatio')
+  expect(getElementText(element)).toBe('7.5 EUR : 1 cGLD')
 })
 
-it('isnt overly precise, it rounds', () => {
-  const tree = renderer.create(
-    <ExchangeRate
-      rate={new BigNumber('0.857252921001027301873637373')}
-      makerToken={CURRENCY_ENUM.DOLLAR}
-      showFinePrint={false}
-    />
+it('renders correctly for cGLD->cUSD exchanges with local amounts', () => {
+  const { getByTestId, toJSON } = render(
+    <Provider store={store}>
+      <ExchangeRate
+        makerAmount={{
+          value: '2',
+          currencyCode: 'cGLD',
+          localAmount: { value: '15', currencyCode: 'EUR', exchangeRate: '0.75' },
+        }}
+        takerAmount={{
+          value: '20',
+          currencyCode: 'cUSD',
+          localAmount: { value: '15', currencyCode: 'EUR', exchangeRate: '0.75' },
+        }}
+      />
+    </Provider>
   )
-  expect(tree).toMatchSnapshot()
+  expect(toJSON()).toMatchSnapshot()
+
+  const element = getByTestId('ExchangeRateRatio')
+  expect(getElementText(element)).toBe('0.1333 cGLD : 1 EUR')
 })

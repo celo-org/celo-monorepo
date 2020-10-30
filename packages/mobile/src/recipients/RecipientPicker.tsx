@@ -1,7 +1,7 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
@@ -14,6 +14,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -40,7 +41,7 @@ interface Props {
   testID?: string
   searchQuery: string
   sections: Section[]
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   listHeaderComponent?: React.ComponentType<any>
   onSelectRecipient(recipient: Recipient): void
 }
@@ -58,11 +59,19 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class RecipientPicker extends React.Component<RecipientProps> {
+  state = {
+    keyboardVisible: false,
+  }
+
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
+  }
+
   renderItem = ({ item, index }: ListRenderItemInfo<Recipient>) => (
     <RecipientItem recipient={item} onSelectRecipient={this.props.onSelectRecipient} />
   )
 
-  renderSectionHeader = (info: { section: SectionListData<Section> }) => (
+  renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
     <SectionHead text={info.section.key as string} />
   )
 
@@ -82,10 +91,13 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     }
   }
 
-  renderItemSeparator = () => <View style={style.separator} />
+  renderItemSeparator = () => <View style={styles.separator} />
 
   renderEmptyView = () => {
-    const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
+    const parsedNumber = parsePhoneNumber(
+      this.props.searchQuery,
+      this.props.defaultCountryCode ? this.props.defaultCountryCode : undefined
+    )
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
     }
@@ -96,22 +108,20 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   renderNoContentEmptyView = () => (
-    <View style={style.emptyView}>
+    <View style={styles.emptyView}>
       {this.props.searchQuery !== '' ? (
         <>
-          <View style={style.emptyViewBody}>
-            <Text style={fontStyles.body}>{this.props.t('noResultsFor')}</Text>
-            <Text style={[fontStyles.body, style.emptyViewBodyDark]}>
-              {` "${this.props.searchQuery}"`}
+          <View style={styles.emptyViewBody}>
+            <Text style={fontStyles.emptyState}>
+              {this.props.t('noResultsFor')}
+              <Text style={fontStyles.emptyState}>{` "${this.props.searchQuery}"`}</Text>
             </Text>
+            <Text style={styles.emptyStateBody}>{this.props.t('searchForSomeone')}</Text>
           </View>
-          <Text style={[fontStyles.subSmall, style.footer]}>
-            {this.props.t('searchForSomeone')}
-          </Text>
         </>
       ) : (
-        <View style={style.emptyViewBody}>
-          <Text style={fontStyles.body}>{this.props.t('noContacts')}</Text>
+        <View style={styles.emptyViewBody}>
+          <Text style={fontStyles.emptyState}>{this.props.t('noContacts')}</Text>
         </View>
       )}
     </View>
@@ -135,8 +145,9 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const searchedAddress = searchQuery.toLowerCase()
     const existingContact = getRecipientFromAddress(
-      searchQuery,
+      searchedAddress,
       addressToE164Number,
       recipientCache
     )
@@ -151,8 +162,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       const recipient: RecipientWithAddress = {
         kind: RecipientKind.Address,
         displayName: t('walletAddress'),
-        displayId: searchQuery.substring(2, 17) + '...',
-        address: searchQuery,
+        displayId: searchedAddress.substring(2, 17) + '...',
+        address: searchedAddress,
       }
 
       return (
@@ -168,55 +179,60 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const { sections, listHeaderComponent } = this.props
 
     return (
-      <View style={style.body} testID={this.props.testID}>
-        <SectionList
-          renderItem={this.renderItem}
-          renderSectionHeader={this.renderSectionHeader}
-          sections={sections}
-          ItemSeparatorComponent={this.renderItemSeparator}
-          ListHeaderComponent={listHeaderComponent}
-          ListEmptyComponent={this.renderEmptyView()}
-          keyExtractor={this.keyExtractor}
-          initialNumToRender={30}
-          keyboardShouldPersistTaps="always"
-        />
-        <KeyboardSpacer />
+      <View style={styles.body} testID={this.props.testID}>
+        <SafeAreaInsetsContext.Consumer>
+          {(insets) => (
+            <SectionList
+              // Note: contentInsetAdjustmentBehavior="always" would be simpler
+              // but leaves an incorrect top offset for the scroll bar after hiding the keyboard
+              // so here we manually adjust the padding
+              contentContainerStyle={
+                !this.state.keyboardVisible &&
+                insets && {
+                  paddingBottom: insets.bottom,
+                }
+              }
+              renderItem={this.renderItem}
+              renderSectionHeader={this.renderSectionHeader}
+              sections={sections}
+              ItemSeparatorComponent={this.renderItemSeparator}
+              ListHeaderComponent={listHeaderComponent}
+              ListEmptyComponent={this.renderEmptyView()}
+              keyExtractor={this.keyExtractor}
+              initialNumToRender={30}
+              keyboardShouldPersistTaps="always"
+            />
+          )}
+        </SafeAreaInsetsContext.Consumer>
+        <KeyboardSpacer onToggle={this.onToggleKeyboard} />
       </View>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   body: {
     flex: 1,
   },
-  separator: {
-    backgroundColor: colors.darkLightest,
-    height: 1,
-    marginLeft: 60,
-  },
-  footer: {
+  separator: {},
+  emptyStateBody: {
+    ...fontStyles.regular,
+    color: colors.gray3,
     textAlign: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 50,
+    marginTop: 12,
   },
   emptyView: {
-    paddingHorizontal: 50,
+    paddingHorizontal: 24,
     justifyContent: 'center',
   },
   emptyViewBody: {
-    flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: 20,
-    textAlign: 'center',
-  },
-  emptyViewBodyDark: {
-    color: colors.dark,
-  },
-  emptyViewBodySmall: {
-    justifyContent: 'center',
+    paddingVertical: 24,
     textAlign: 'center',
   },
 })
 
-export default connect(mapStateToProps, {})(withTranslation(Namespaces.sendFlow7)(RecipientPicker))
+export default connect(
+  mapStateToProps,
+  {}
+)(withTranslation<RecipientProps>(Namespaces.sendFlow7)(RecipientPicker))

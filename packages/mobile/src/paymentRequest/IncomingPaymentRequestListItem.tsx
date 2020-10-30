@@ -1,107 +1,157 @@
-import BaseNotification from '@celo/react-components/components/BaseNotification'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import fontStyles from '@celo/react-components/styles/fonts'
+import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import BigNumber from 'bignumber.js'
-import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { errorSelector } from 'src/alert/reducer'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
-import { declinePaymentRequest } from 'src/firebase/actions'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { unknownUserIcon } from 'src/images/Images'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
+import { Namespaces } from 'src/i18n'
+import { fetchAddressesAndValidate } from 'src/identity/actions'
+import { AddressValidationType, SecureSendDetails } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { declinePaymentRequest } from 'src/paymentRequest/actions'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
+import { RootState } from 'src/redux/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
-interface OwnProps {
+interface Props {
+  id: string
   requester: Recipient
   amount: string
-  comment: string
-  id: string
-  declinePaymentRequest: typeof declinePaymentRequest
+  comment?: string
 }
 
-type Props = OwnProps & WithTranslation
+export default function IncomingPaymentRequestListItem({ id, amount, comment, requester }: Props) {
+  const { t } = useTranslation(Namespaces.paymentRequestFlow)
+  const dispatch = useDispatch()
+  const [isLoading, setIsLoading] = useState(false)
+  const error = useSelector(errorSelector)
 
-const AVATAR_SIZE = 40
+  const { e164PhoneNumber } = requester
+  const requesterAddress = requester.address
 
-export class IncomingPaymentRequestListItem extends React.Component<Props> {
-  onPay = () => {
-    const { id, amount, comment: reason, requester: recipient } = this.props
-    navigate(Screens.SendConfirmation, {
-      confirmationInput: {
-        reason,
-        recipient,
-        amount: new BigNumber(amount),
-        recipientAddress: recipient.address,
-        type: TokenTransactionType.PayRequest,
-        firebasePendingRequestUid: id,
-      },
+  const secureSendDetails: SecureSendDetails | undefined = useSelector(
+    (state: RootState) => state.identity.secureSendPhoneNumberMapping[e164PhoneNumber || '']
+  )
+  const prevSecureSendDetailsRef = useRef(secureSendDetails)
+
+  const onPay = () => {
+    if (e164PhoneNumber) {
+      setIsLoading(true)
+      // Need to check latest mapping to prevent user from accepting fradulent requests
+      dispatch(fetchAddressesAndValidate(e164PhoneNumber, requesterAddress))
+    } else {
+      navigateToNextScreen()
+    }
+
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.incoming_tx_request,
+      selectedAction: NotificationBannerCTATypes.pay,
     })
   }
 
-  onPaymentDecline = () => {
-    const { id } = this.props
-    this.props.declinePaymentRequest(id)
-    Logger.showMessage(this.props.t('requestDeclined'))
+  const onPaymentDecline = () => {
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.incoming_tx_request,
+      selectedAction: NotificationBannerCTATypes.decline,
+    })
+    dispatch(declinePaymentRequest(id))
+    Logger.showMessage(t('requestDeclined'))
   }
 
-  getCTA = () => {
-    return [
-      {
-        text: this.props.t('global:pay'),
-        onPress: this.onPay,
-      },
-      {
-        text: this.props.t('global:decline'),
-        onPress: this.onPaymentDecline,
-      },
-    ]
+  const navigateToNextScreen = () => {
+    const transactionData: TransactionDataInput = {
+      reason: comment,
+      recipient: requester,
+      amount: new BigNumber(amount),
+      type: TokenTransactionType.PayRequest,
+      firebasePendingRequestUid: id,
+    }
+
+    const addressValidationType =
+      secureSendDetails?.addressValidationType || AddressValidationType.NONE
+
+    if (addressValidationType === AddressValidationType.NONE) {
+      navigate(Screens.SendConfirmation, { transactionData })
+    } else {
+      navigate(Screens.ValidateRecipientIntro, {
+        transactionData,
+        addressValidationType,
+        requesterAddress,
+      })
+    }
   }
 
-  render() {
-    const { requester, t } = this.props
-    return (
-      <View style={styles.container}>
-        <BaseNotification
-          icon={
-            <ContactCircle
-              size={AVATAR_SIZE}
-              address={requester.address}
-              name={requester.displayName}
-              thumbnailPath={getRecipientThumbnail(requester)}
-            >
-              <Image source={unknownUserIcon} style={styles.unknownUser} />
-            </ContactCircle>
-          }
-          title={t('incomingPaymentRequestNotificationTitle', {
-            name: requester.displayName,
-            amount:
-              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
-          })}
-          ctas={this.getCTA()}
-          onPress={this.onPay}
-        >
-          <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>
-        </BaseNotification>
-      </View>
-    )
-  }
+  React.useEffect(() => {
+    // Need this to make sure it's only triggered on click
+    if (!isLoading) {
+      return
+    }
+
+    const prevSecureSendDetails: SecureSendDetails | undefined = prevSecureSendDetailsRef.current
+    prevSecureSendDetailsRef.current = secureSendDetails
+    const wasFetchingAddresses = prevSecureSendDetails?.isFetchingAddresses
+    const isFetchingAddresses = secureSendDetails?.isFetchingAddresses
+
+    if (wasFetchingAddresses === true && isFetchingAddresses === false) {
+      setIsLoading(false)
+      if (!error) {
+        navigateToNextScreen()
+      }
+    }
+  }, [secureSendDetails, error])
+
+  return (
+    <View style={styles.container}>
+      <RequestMessagingCard
+        testID={`IncomingPaymentRequestNotification/${id}`}
+        title={t('incomingPaymentRequestNotificationTitle', { name: requester.displayName })}
+        details={comment}
+        amount={
+          <CurrencyDisplay
+            amount={{
+              value: amount,
+              currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+            }}
+          />
+        }
+        icon={
+          <ContactCircle
+            address={requester.address}
+            name={requester.displayName}
+            thumbnailPath={getRecipientThumbnail(requester)}
+          />
+        }
+        callToActions={[
+          {
+            text: isLoading ? (
+              <ActivityIndicator testID={'loading/paymentRequest'} />
+            ) : (
+              t('global:send')
+            ),
+            onPress: onPay,
+          },
+          {
+            text: t('global:decline'),
+            onPress: onPaymentDecline,
+          },
+        ]}
+      />
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
-  unknownUser: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 })
-
-export default withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListItem)

@@ -1,6 +1,6 @@
 import { DataSource, DataSourceConfig } from 'apollo-datasource'
 import BigNumber from 'bignumber.js'
-import { CurrencyConversionArgs } from '../schema'
+import { CurrencyConversionArgs, MoneyAmount } from '../schema'
 import { CGLD, CUSD, USD } from './consts'
 import ExchangeRateAPI from './ExchangeRateAPI'
 import GoldExchangeRateAPI from './GoldExchangeRateAPI'
@@ -22,6 +22,7 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     sourceCurrencyCode,
     currencyCode,
     timestamp,
+    impliedExchangeRates,
   }: CurrencyConversionArgs): Promise<BigNumber> {
     const fromCode = sourceCurrencyCode || USD
     const toCode = currencyCode
@@ -32,7 +33,9 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
     for (let i = 1; i < steps.length; i++) {
       const prevCode = steps[i - 1]
       const code = steps[i]
-      ratesPromises.push(this.getSupportedExchangeRate(prevCode, code, timestamp))
+      ratesPromises.push(
+        this.getSupportedExchangeRate(prevCode, code, timestamp, impliedExchangeRates)
+      )
     }
 
     const rates = await Promise.all(ratesPromises)
@@ -74,13 +77,18 @@ export default class CurrencyConversionAPI<TContext = any> extends DataSource {
   private getSupportedExchangeRate(
     fromCode: string,
     toCode: string,
-    timestamp?: number
-  ): Promise<BigNumber> {
+    timestamp?: number,
+    impliedExchangeRates?: MoneyAmount['impliedExchangeRates']
+  ): BigNumber | Promise<BigNumber> {
     const pair = `${fromCode}/${toCode}`
+
+    if (impliedExchangeRates && impliedExchangeRates[pair]) {
+      return new BigNumber(impliedExchangeRates[pair])
+    }
 
     if (pair === 'cUSD/USD' || pair === 'USD/cUSD') {
       // TODO: use real rates once we have the data
-      return Promise.resolve(new BigNumber(1))
+      return new BigNumber(1)
     } else if (pair === 'cGLD/cUSD' || pair === 'cUSD/cGLD') {
       return this.goldExchangeRateAPI.getExchangeRate({
         sourceCurrencyCode: fromCode,

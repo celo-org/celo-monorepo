@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -28,6 +28,10 @@ contract MockAttestations {
 
   function complete(bytes32 identifier, uint8, bytes32, bytes32) external {
     identifiers[identifier].attestations[msg.sender].completed++;
+  }
+
+  function getMaxAttestations() external pure returns (uint256) {
+    return 20;
   }
 
   function getAttestationStats(bytes32 identifier, address account)

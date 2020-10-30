@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { createElement } from 'react-native-web'
+import { unstable_createElement as createElement } from 'react-native-web'
 import HomeOracle from 'src/home/HomeOracle'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Responsive from 'src/shared/Responsive'
@@ -25,24 +25,25 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
   video: any
   started = false
 
-  videoLoaded = () => {
-    try {
-      if (this.video) {
-        if (!this.started) {
+  startVideo = async () => {
+    if (this.video) {
+      if (!this.started) {
+        try {
+          this.started = true
+          await this.video.play()
+
           this.props.onLoaded()
-          this.video.play()
+        } catch {
+          this.props.onError()
         }
-        this.started = true
       }
-    } catch {
-      this.props.onError()
     }
   }
 
   videoRef = (ref) => {
     this.video = ref
     if (this.video) {
-      this.video.oncanplaythrough = () => this.videoLoaded()
+      this.video.oncanplaythrough = () => this.startVideo()
       this.video.load()
       this.video.onended = () => this.restartVideo()
     }
@@ -50,11 +51,12 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
 
   restartVideo = () => {
     this.props.onFinished()
-    setTimeout(() => {
+
+    setTimeout(async () => {
       if (this.video) {
         this.video.currentTime = 0
         this.started = false
-        this.videoLoaded()
+        await this.startVideo()
       }
     }, 200)
   }
@@ -94,6 +96,7 @@ class HomeAnimation extends React.Component<Props & ScreenProps> {
           style={styles.videoSmall}
           preload={'auto'}
           muted={true}
+          autoPlay={true}
           playsInline={true}
         >
           <Source src={this.source()} type="video/mp4" />

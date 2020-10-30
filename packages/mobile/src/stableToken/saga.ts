@@ -1,4 +1,3 @@
-import { getStableTokenContract } from '@celo/walletkit'
 import { spawn } from 'redux-saga/effects'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, fetchDollarBalance, setBalance } from 'src/stableToken/actions'
@@ -15,7 +14,6 @@ export const stableTokenFetch = tokenFetchFactory({
 
 export const stableTokenTransfer = tokenTransferFactory({
   actionName: Actions.TRANSFER,
-  contractGetter: getStableTokenContract,
   tag,
   currency: CURRENCY_ENUM.DOLLAR,
   fetchAction: fetchDollarBalance,

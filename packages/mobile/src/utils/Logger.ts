@@ -1,8 +1,6 @@
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
-import DeviceInfo from 'react-native-device-info'
+import { Platform } from 'react-native'
 import * as RNFS from 'react-native-fs'
-import Mailer from 'react-native-mail'
-import { CELO_SUPPORT_EMAIL_ADDRESS } from 'src/config'
 
 class Logger extends ReactNativeLogger {
   getGethLogFilePath = () => {
@@ -10,15 +8,16 @@ class Logger extends ReactNativeLogger {
   }
 
   getCombinedLogsFilePath = () => {
-    return RNFS.ExternalDirectoryPath + '/celo_logs.txt'
+    const path = Platform.OS === 'ios' ? RNFS.TemporaryDirectoryPath : RNFS.ExternalDirectoryPath
+    return `${path}/celo_logs.txt`
   }
 
   /**
    * @override
    */
   getLogs = async (): Promise<any> => {
-    // TODO(Rossy) Does this technique of passing logs back as a string
-    // fail when the logs get o big?
+    // TODO(Rossy) This approach of passing logs back as a string
+    // fails when the logs get too big
     try {
       const rnLogsSrc = this.getReactNativeLogsFilePath()
       const gethLogsSrc = this.getGethLogFilePath()
@@ -63,38 +62,6 @@ class Logger extends ReactNativeLogger {
       this.showError('Failed to  copy files: ' + e)
       return false
     }
-  }
-
-  emailLogsToSupport = async (userId: string) => {
-    const combinedLogsPath = await this.createCombinedLogs()
-    if (!combinedLogsPath) {
-      return
-    }
-
-    const deviceInfo = {
-      version: DeviceInfo.getVersion(),
-      buildNumber: DeviceInfo.getBuildNumber(),
-      apiLevel: DeviceInfo.getApiLevel(),
-      deviceId: DeviceInfo.getDeviceId(),
-    }
-
-    const emailSubject = 'Celo support for ' + (userId || 'unknownUser')
-    Mailer.mail(
-      {
-        subject: emailSubject,
-        recipients: [CELO_SUPPORT_EMAIL_ADDRESS],
-        body: `<b>Support logs are attached...</b><b>${JSON.stringify(deviceInfo)}</b>`,
-        isHTML: true,
-        attachment: {
-          path: combinedLogsPath, // The absolute path of the file from which to read data.
-          type: 'txt', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-          name: '', // Optional: Custom filename for attachment
-        },
-      },
-      (error: any, event: any) => {
-        this.showError(error + ' ' + event)
-      }
-    )
   }
 }
 

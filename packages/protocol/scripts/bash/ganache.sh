@@ -9,5 +9,5 @@ yarn run ganache-cli \
   --gasPrice 0 \
   --networkId 1101 \
   --gasLimit 20000000 \
-  --defaultBalanceEther 1000000 \
+  --defaultBalanceEther 200000000 \
   --allowUnlimitedContractSize

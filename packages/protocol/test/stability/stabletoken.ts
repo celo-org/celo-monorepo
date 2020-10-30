@@ -9,16 +9,25 @@ import {
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
-import { RegistryInstance, StableTokenInstance } from 'types'
+import {
+  FreezerContract,
+  FreezerInstance,
+  RegistryContract,
+  RegistryInstance,
+  StableTokenContract,
+  StableTokenInstance,
+} from 'types'
 
-const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
-const StableToken: Truffle.Contract<StableTokenInstance> = artifacts.require('StableToken')
+const Freezer: FreezerContract = artifacts.require('Freezer')
+const Registry: RegistryContract = artifacts.require('Registry')
+const StableToken: StableTokenContract = artifacts.require('StableToken')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN.js
 StableToken.numberFormat = 'BigNumber'
 
 contract('StableToken', (accounts: string[]) => {
+  let freezer: FreezerInstance
   let stableToken: StableTokenInstance
   let registry: RegistryInstance
   let initializationTime
@@ -28,6 +37,8 @@ contract('StableToken', (accounts: string[]) => {
 
   beforeEach(async () => {
     registry = await Registry.new()
+    freezer = await Freezer.new()
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     stableToken = await StableToken.new()
     const response = await stableToken.initialize(
       'Celo Dollar',
@@ -39,7 +50,6 @@ contract('StableToken', (accounts: string[]) => {
       [],
       []
     )
-    await stableToken.unfreeze()
     initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
 
@@ -134,6 +144,14 @@ contract('StableToken', (accounts: string[]) => {
       assert.equal(balance, amountToMint)
       const supply = (await stableToken.totalSupply()).toNumber()
       assert.equal(supply, amountToMint)
+    })
+
+    it('should allow minting 0 value', async () => {
+      await stableToken.mint(validators, 0, { from: validators })
+      const balance = (await stableToken.balanceOf(validators)).toNumber()
+      assert.equal(balance, 0)
+      const supply = (await stableToken.totalSupply()).toNumber()
+      assert.equal(supply, 0)
     })
 
     it('should not allow anyone else to mint', async () => {

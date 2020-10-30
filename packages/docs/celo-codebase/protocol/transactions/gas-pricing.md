@@ -9,7 +9,7 @@ The gas price minimum will respond to demand, increasing during periods of susta
 In the Celo protocol, the gas price minimum for the next block is calculated based on the current block:
 
 ```
-gas_price_minimum' = gas_price_minimum * (1 + ((total_gas_used / block_gas_limit) − target_density) * adjustment_speed)
+gas_price_minimum' = gas_price_minimum * (1 + ((total_gas_used / block_gas_limit) − target_density) * adjustment_speed) + 1
 ```
 
 Every transaction is required to pay for gas at or above the gas price minimum in order to be processed. Full nodes will reject transactions whose gas price is below the current gas price minimum, and will discard outstanding transactions if the gas price minimum subsequently falls below the gas price that the transactions specify.

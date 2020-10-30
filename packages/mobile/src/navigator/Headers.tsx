@@ -1,73 +1,162 @@
+import Times from '@celo/react-components/icons/Times'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import { StackNavigationOptions } from '@react-navigation/stack'
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Trans } from 'react-i18next'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import BackButton from 'src/components/BackButton'
 import CancelButton from 'src/components/CancelButton'
-import { CURRENCY_ENUM } from 'src/geth/consts'
-import i18n from 'src/i18n'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import i18n, { Namespaces } from 'src/i18n'
+import { navigateBack } from 'src/navigator/NavigationService'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
+import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
-export const noHeader = {
-  headerLeft: <View />,
+export const noHeader: StackNavigationOptions = {
+  headerShown: false,
 }
 
-export const nuxNavigationOptions = {
-  headerLeftContainerStyle: { paddingHorizontal: 10 },
-  headerLeft: <BackButton />,
-  headerRightContainerStyle: { paddingHorizontal: 10 },
-  headerRight: <View />,
-  headerTitle: <DisconnectBanner />,
+export const noHeaderGestureDisabled: StackNavigationOptions = {
+  headerShown: false,
+  gestureEnabled: false,
+}
+
+const styles = StyleSheet.create({
+  headerTitle: {
+    ...fontStyles.navigationHeader,
+  },
+  headerSubTitle: {
+    ...fontStyles.small,
+    color: colors.gray4,
+  },
+  header: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  screenHeader: {
+    textAlign: 'center',
+    fontWeight: undefined,
+  },
+})
+
+export const nuxNavigationOptions: StackNavigationOptions = {
+  headerShown: true,
+  headerTransparent: true,
+  headerLeft: ({ canGoBack }) => (canGoBack ? <BackButton /> : <View />),
+  headerRight: () => <View />,
+  headerTitle: () => <DisconnectBanner />,
   headerTitleContainerStyle: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
   },
+  headerStyle: {
+    backgroundColor: colors.light,
+  },
 }
 
-export const nuxNavigationOptionsNoBackButton = {
+export const nuxNavigationOptionsNoBackButton: StackNavigationOptions = {
   ...nuxNavigationOptions,
-  headerLeft: <View />,
+  headerLeft: () => <View />,
 }
 
-export const headerWithBackButton = {
-  headerTitle: '',
-  headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-  headerLeftContainerStyle: { paddingHorizontal: 20 },
-  headerLeft: <BackButton />,
-  headerRight: <View />, // This helps vertically center the title
+export const emptyHeader: StackNavigationOptions = {
+  headerTitle: ' ',
+  headerShown: true,
+  headerTitleStyle: [styles.headerTitle, styles.screenHeader],
+  headerTitleContainerStyle: {
+    alignItems: 'center',
+  },
+  headerTitleAlign: 'center',
+  cardStyle: { backgroundColor: colors.light },
+  headerStyle: {
+    backgroundColor: colors.light,
+    shadowRadius: 0,
+    shadowOffset: {
+      height: 0,
+      width: 0,
+    },
+    ...Platform.select({
+      android: {
+        elevation: 0,
+        backgroundColor: 'transparent',
+      },
+      ios: {
+        borderBottomWidth: 0,
+        borderBottomColor: 'transparent',
+      },
+    }),
+  },
 }
 
-// TODO(Rossy) align designs to consistently use back button
-export const headerWithCancelButton = {
-  ...headerWithBackButton,
-  headerLeftContainerStyle: { paddingHorizontal: 0 },
-  headerLeft: <CancelButton />,
+export const drawerHeader: StackNavigationOptions = {
+  ...emptyHeader,
 }
 
-export const exchangeHeader = (makerToken: CURRENCY_ENUM, makerTokenBalance: string) => {
-  const title =
-    makerToken === CURRENCY_ENUM.DOLLAR
-      ? i18n.t('exchangeFlow9:buyGold')
-      : i18n.t('exchangeFlow9:sellGold')
-  return {
-    ...headerWithCancelButton,
-    headerTitle: (
-      <View style={styles.headerTextContainer}>
-        <Text style={fontStyles.headerTitle}>{title}</Text>
-        <View>
-          <Text style={fontStyles.subSmall}>
-            {i18n.t('exchangeFlow9:moneyAvailable', {
-              moneyAmount: getMoneyDisplayValue(makerTokenBalance, makerToken, true),
-            })}
-          </Text>
-        </View>
-      </View>
-    ),
-  }
+export const headerWithBackButton: StackNavigationOptions = {
+  ...emptyHeader,
+  headerLeft: ({ canGoBack }) => (canGoBack ? <BackButton /> : null),
 }
 
-const styles = StyleSheet.create({
-  headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
-})
+export const headerWithCancelButton: StackNavigationOptions = {
+  ...emptyHeader,
+  headerLeft: () => <CancelButton />,
+}
+
+export const headerWithCloseButton: StackNavigationOptions = {
+  ...emptyHeader,
+  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,
+  headerLeftContainerStyle: { paddingLeft: 20 },
+}
+
+interface Props {
+  title: string
+  token: CURRENCY_ENUM
+}
+
+export function HeaderTitleWithBalance({ title, token }: Props) {
+  const dollarBalance = useSelector((state) => state.stableToken.balance)
+  const goldBalance = useSelector((state) => state.goldToken.balance)
+
+  const balance = token === CURRENCY_ENUM.GOLD ? goldBalance : dollarBalance
+
+  const subTitle =
+    balance != null ? (
+      <Trans i18nKey="balanceAvailable" ns={Namespaces.global}>
+        <CurrencyDisplay
+          amount={{
+            value: balance,
+            currencyCode: CURRENCIES[token].code,
+          }}
+        />{' '}
+        available
+      </Trans>
+    ) : (
+      // TODO: a null balance doesn't necessarily mean it's loading
+      i18n.t('global:loading')
+    )
+
+  return <HeaderTitleWithSubtitle title={title} subTitle={subTitle} />
+}
+
+export function HeaderTitleWithSubtitle({
+  title,
+  subTitle,
+}: {
+  title: string | JSX.Element
+  subTitle: string | JSX.Element
+}) {
+  return (
+    <View style={styles.header}>
+      {title && <Text style={styles.headerTitle}>{title}</Text>}
+      {subTitle && <Text style={styles.headerSubTitle}>{subTitle}</Text>}
+    </View>
+  )
+}
+
+HeaderTitleWithBalance.defaultProps = {
+  token: CURRENCY_ENUM.DOLLAR,
+}

@@ -1,15 +1,24 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./AddressLinkedList.sol";
+
 import "./SortedLinkedList.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedList {
+  using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   function toBytes(address a) public pure returns (bytes32) {
     return bytes32(uint256(a) << 96);
@@ -21,6 +30,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -38,6 +48,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(SortedLinkedList.List storage list, address key) public {
@@ -46,6 +57,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -64,6 +76,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -73,6 +86,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
@@ -92,7 +106,7 @@ library AddressSortedLinkedList {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
-    for (uint256 i = 0; i < byteKeys.length; i++) {
+    for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.values[byteKeys[i]];
     }
@@ -101,6 +115,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns the minimum of `max` and the  number of elements in the list > threshold.
+   * @param list A storage pointer to the underlying list.
    * @param threshold The number that the element must exceed to be included.
    * @param max The maximum number returned by this function.
    * @return The minimum of `max` and the  number of elements in the list > threshold.
@@ -112,7 +127,7 @@ library AddressSortedLinkedList {
   ) public view returns (uint256) {
     uint256 revisedMax = Math.min(max, list.list.numElements);
     bytes32 key = list.list.head;
-    for (uint256 i = 0; i < revisedMax; i++) {
+    for (uint256 i = 0; i < revisedMax; i = i.add(1)) {
       if (list.getValue(key) < threshold) {
         return i;
       }
@@ -123,6 +138,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Returns the N greatest elements of the list.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to return.
    * @return The keys of the greatest elements.
    */
@@ -133,7 +149,7 @@ library AddressSortedLinkedList {
   {
     bytes32[] memory byteKeys = list.headN(n);
     address[] memory keys = new address[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
     }
     return keys;
@@ -141,6 +157,7 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
   function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {

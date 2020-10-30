@@ -1,0 +1,7 @@
+dist/
+
+# Firebase cache
+.firebase/
+
+# Only check in encrypted .env file
+.env

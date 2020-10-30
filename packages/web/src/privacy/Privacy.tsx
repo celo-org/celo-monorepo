@@ -31,11 +31,11 @@ export default class Privacy extends React.Component {
         </GridRow>
         <GridRow>
           <Cell span={Spans.fourth}>
-            <Text style={fonts.h6}>Valid as of Jan 7, 2019</Text>
+            <Text style={fonts.h6}>Valid as of May 17, 2020</Text>
           </Cell>
           <Cell span={Spans.three4th}>
             <P>
-              This Privacy Policy and Cookies Statement describes how A Protocol Inc. and its
+              This Privacy Policy and Cookies Statement describes how the Celo Foundation and its
               affiliated companies (referred to in this document as “Celo,” “we,” “us” or “our”)
               collects, uses, shares and otherwise processes Personal Data (defined below)
               including:
@@ -57,18 +57,18 @@ export default class Privacy extends React.Component {
         </GridRow>
         <SideTitledSection span={Spans.three4th} title="Overview">
           <P>
-            Unless we specifically state otherwise, Celo is the data processor of the Personal Data
+            Unless we specifically state otherwise, the Celo Foundation is the data processor of the Personal Data
             we process, and is therefore responsible for ensuring that the systems and processes we
             use are compliant with data protection laws, to the extent applicable to us.
           </P>
           <P>
-            Celo personnel are required to comply with this Privacy Policy and complete data
+            Celo Foundation personnel are required to comply with this Privacy Policy and complete data
             protection training, where appropriate.
           </P>
         </SideTitledSection>
         <SideTitledSection span={Spans.three4th} title="Collection of Personal Data">
           <P>
-            Celo collects information that you provide directly to us when you browse our Site,
+            The Celo Foundation collects information that you provide directly to us when you browse our Site,
             register to receive newsletter requests or other information, provide feedback through
             surveys, participate in any interactive features on our Sites including contests,
             promotions, challenges, activities or events.
@@ -182,7 +182,7 @@ export default class Privacy extends React.Component {
             </Li>
           </Ul>
         </SideTitledSection>
-        <SideTitledSection span={Spans.three4th} title="Celo Sub-Processors">
+        <SideTitledSection span={Spans.three4th} title="Celo Foundation Sub-Processors">
           <P>We use the following sub-processors to operate our Services:</P>
           <TABLE>
             <TR>
@@ -214,6 +214,11 @@ export default class Privacy extends React.Component {
               <TD>Mixpanel</TD>
               <TD>Site Visitor Analytics</TD>
               <TD>United States</TD>
+            </TR>
+            <TR>
+              <TD>ipstack</TD>
+              <TD>IP Address Geolocation</TD>
+              <TD>Austria</TD>
             </TR>
           </TABLE>
         </SideTitledSection>

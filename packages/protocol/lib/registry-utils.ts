@@ -1,3 +1,5 @@
+export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
+
 export enum CeloContractName {
   Accounts = 'Accounts',
   Attestations = 'Attestations',
@@ -9,17 +11,20 @@ export enum CeloContractName {
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
+  Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
+  GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   LockedGold = 'LockedGold',
   Random = 'Random',
   Reserve = 'Reserve',
+  ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
+  TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
-  VestingFactory = 'VestingFactory',
 }
 
 // TODO(amy): Pull this list from the build artifacts instead
@@ -40,6 +45,7 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Escrow,
   CeloContractName.Exchange,
   CeloContractName.FeeCurrencyWhitelist,
+  CeloContractName.Freezer,
   CeloContractName.GasPriceMinimum,
   CeloContractName.GoldToken,
   CeloContractName.GovernanceSlasher,
@@ -47,5 +53,4 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Reserve,
   CeloContractName.SortedOracles,
   CeloContractName.StableToken,
-  CeloContractName.VestingFactory,
 ]

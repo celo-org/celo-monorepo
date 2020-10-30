@@ -4,26 +4,43 @@
 
 ### Functions
 
-* [addLocalAccount](_utils_web3_utils_.md#addlocalaccount)
+* [estimateGas](_utils_web3_utils_.md#const-estimategas)
 * [getAbiTypes](_utils_web3_utils_.md#const-getabitypes)
 * [parseDecodedParams](_utils_web3_utils_.md#const-parsedecodedparams)
 
 ## Functions
 
-###  addLocalAccount
+### `Const` estimateGas
 
-▸ **addLocalAccount**(`web3`: Web3, `privateKey`: string): *Web3*
+▸ **estimateGas**(`tx`: Tx, `gasEstimator`: function, `caller`: function): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/utils/web3-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L10)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L21)*
+
+**Parameters:**
+
+▪ **tx**: *Tx*
+
+▪ **gasEstimator**: *function*
+
+▸ (`tx`: Tx): *Promise‹number›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`web3` | Web3 |
-`privateKey` | string |
+`tx` | Tx |
 
-**Returns:** *Web3*
+▪ **caller**: *function*
+
+▸ (`tx`: Tx): *Promise‹string›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`tx` | Tx |
+
+**Returns:** *Promise‹number›*
 
 ___
 
@@ -31,7 +48,7 @@ ___
 
 ▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *string[]*
 
-*Defined in [packages/contractkit/src/utils/web3-utils.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L24)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L5)*
 
 **Parameters:**
 
@@ -48,7 +65,7 @@ ___
 
 ▸ **parseDecodedParams**(`params`: DecodedParamsObject): *object*
 
-*Defined in [packages/contractkit/src/utils/web3-utils.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L27)*
+*Defined in [packages/contractkit/src/utils/web3-utils.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L8)*
 
 **Parameters:**
 

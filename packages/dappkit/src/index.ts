@@ -6,17 +6,13 @@ import {
   DappKitRequestTypes,
   DappKitResponseStatus,
   parseDappkitResponseDeeplink,
-  PhoneNumberUtils,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
   SignTxResponseSuccess,
   TxToSignParam,
 } from '@celo/utils'
 import { Linking } from 'expo'
-import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
-import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
-import { chunk, find, flatMap, flatten, fromPairs, zipObject } from 'lodash'
-import { TransactionObject } from 'web3/eth/types'
+import { ContractSendMethod } from 'web3-eth-contract'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -117,8 +113,8 @@ async function getFeeCurrencyContractAddress(
   }
 }
 
-export interface TxParams<T> {
-  tx: TransactionObject<T>
+export interface TxParams {
+  tx: ContractSendMethod
   from: string
   to?: string
   feeCurrency?: FeeCurrency
@@ -126,9 +122,9 @@ export interface TxParams<T> {
   value?: string
 }
 
-export async function requestTxSig<T>(
+export async function requestTxSig(
   kit: ContractKit,
-  txParams: TxParams<T>[],
+  txParams: TxParams[],
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
@@ -162,123 +158,4 @@ export async function requestTxSig<T>(
   const request = SignTxRequest(txs, meta)
 
   Linking.openURL(serializeDappKitRequestDeeplink(request))
-}
-
-function isValidPhoneNumber(phoneNumber: PhoneNumber): E164Number | undefined {
-  if (phoneNumber.number === undefined) {
-    return undefined
-  }
-  const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber.number)
-
-  if (parsedPhoneNumber === undefined) {
-    return undefined
-  }
-
-  if (!parsedPhoneNumber.isValid()) {
-    return undefined
-  }
-
-  return parsedPhoneNumber.number
-}
-
-export interface PhoneNumberMappingEntry {
-  address: string
-  phoneNumber: string
-  id: string
-  attestationStat: {
-    total: number
-    completed: number
-  }
-}
-
-function createPhoneNumberToContactMapping(contacts: Contact[]) {
-  const phoneNumberObjects = (flatMap(contacts, (contact) => {
-    return contact.phoneNumbers
-      ? flatMap(contact.phoneNumbers, (phoneNumber) => {
-          const e164Number = isValidPhoneNumber(phoneNumber)
-          return e164Number ? { e164Number, id: contact.id } : []
-        })
-      : []
-  }) as unknown) as [{ e164Number: E164Number; id: string }]
-  const flattened = phoneNumberObjects.map(({ e164Number, id }) => [e164Number.toString(), id])
-  return fromPairs(flattened)
-}
-
-async function lookupPhoneNumbersOnAttestations(
-  kit: ContractKit,
-  allPhoneNumbers: { [phoneNumber: string]: string }
-): Promise<{ [address: string]: PhoneNumberMappingEntry }> {
-  const attestations = await kit.contracts.getAttestations()
-  const nestedResult = await Promise.all(
-    chunk(Object.keys(allPhoneNumbers), 20).map(async (phoneNumbers) => {
-      const hashedPhoneNumbers = phoneNumbers.map(PhoneNumberUtils.getPhoneHash)
-
-      const phoneNumbersByHash = zipObject(hashedPhoneNumbers, phoneNumbers)
-
-      const result = await attestations.lookupPhoneNumbers(hashedPhoneNumbers)
-
-      return flatMap(Object.keys(result), (phoneHash) => {
-        const attestationStats = result[phoneHash]
-        return Object.keys(attestationStats).map((address) => ({
-          address,
-          phoneNumber: phoneNumbersByHash[phoneHash],
-          id: allPhoneNumbers[phoneNumbersByHash[phoneHash]],
-          attestationStat: attestationStats[address],
-        }))
-      })
-    })
-  )
-
-  return fromPairs(flatten(nestedResult).map((entry) => [entry.address, entry]))
-}
-
-export interface ContactsById {
-  [id: string]: Contact
-}
-export interface PhoneNumberMappingEntryByAddress {
-  [address: string]: PhoneNumberMappingEntry
-}
-export async function fetchContacts(
-  kit: ContractKit
-): Promise<{ rawContacts: ContactsById; phoneNumbersByAddress: PhoneNumberMappingEntryByAddress }> {
-  const contacts = await getContactsAsync({
-    fields: [Fields.PhoneNumbers, Fields.Image],
-  })
-
-  const filteredContacts = contacts.data.filter((contact) => {
-    return (
-      contact.phoneNumbers && find(contact.phoneNumbers, (p) => isValidPhoneNumber(p) !== undefined)
-    )
-  })
-
-  const rawContacts = fromPairs(filteredContacts.map((contact) => [contact.id, contact]))
-
-  // @ts-ignore
-  const phoneNumbersToContacts = createPhoneNumberToContactMapping(filteredContacts)
-
-  const phoneNumbersByAddress = await lookupPhoneNumbersOnAttestations(kit, phoneNumbersToContacts)
-
-  return {
-    rawContacts,
-    phoneNumbersByAddress,
-  }
-}
-
-export function getContactForAddress(
-  address: string,
-  rawContacts: ContactsById,
-  addressMapping: PhoneNumberMappingEntryByAddress
-): Contact | undefined {
-  const entry = addressMapping[address]
-
-  if (entry === undefined) {
-    return undefined
-  }
-
-  const contact = rawContacts[entry.id]
-  if (contact === undefined) {
-    return undefined
-  }
-
-  return contact
 }

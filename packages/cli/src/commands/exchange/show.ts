@@ -6,7 +6,7 @@ export default class ExchangeShow extends BaseCommand {
   static description = 'Show the current exchange rates offered by the Exchange'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     amount: flags.string({
       description: 'Amount of the token being exchanged to report rates for',
       default: '1000000000000000000',
@@ -26,7 +26,7 @@ export default class ExchangeShow extends BaseCommand {
     const goldForDollar = await exchange.getBuyTokenAmount(parsedFlags.amount as string, false)
     cli.action.stop()
 
-    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toFixed()} cUSD`)
-    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toFixed()} cGLD`)
+    this.log(`${parsedFlags.amount} CELO => ${dollarForGold.toFixed()} cUSD`)
+    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toFixed()} CELO`)
   }
 }

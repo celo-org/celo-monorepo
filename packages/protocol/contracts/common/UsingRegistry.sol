@@ -1,17 +1,17 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import "./interfaces/IERC20Token.sol";
-import "./interfaces/IRegistry.sol";
 import "./interfaces/IAccounts.sol";
 import "./interfaces/IFeeCurrencyWhitelist.sol";
+import "./interfaces/IFreezer.sol";
+import "./interfaces/IRegistry.sol";
 
 import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/IGovernance.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
-import "../governance/interfaces/IVestingFactory.sol";
 
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
@@ -20,11 +20,6 @@ import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
-
-// Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
-// setRegistry(). TypeChain currently has problems resolving overloaded functions, so this is not
-// possible right now.
-// TODO(amy): Fix this when the TypeChain issue resolves.
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
@@ -41,6 +36,7 @@ contract UsingRegistry is Ownable {
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );
+  bytes32 constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
   bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
@@ -52,7 +48,6 @@ contract UsingRegistry is Ownable {
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
   bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
   bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-  bytes32 constant VESTING_FACTORY_REGISTRY_ID = keccak256(abi.encodePacked("VestingFactory"));
   // solhint-enable state-visibility
 
   IRegistry public registry;
@@ -97,8 +92,12 @@ contract UsingRegistry is Ownable {
     return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
   }
 
-  function getGoldToken() internal view returns (IERC20Token) {
-    return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  function getFreezer() internal view returns (IFreezer) {
+    return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
+  }
+
+  function getGoldToken() internal view returns (IERC20) {
+    return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
   function getGovernance() internal view returns (IGovernance) {
@@ -127,9 +126,5 @@ contract UsingRegistry is Ownable {
 
   function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-  }
-
-  function getVestingFactory() internal view returns (IVestingFactory) {
-    return IVestingFactory(registry.getAddressForOrDie(VESTING_FACTORY_REGISTRY_ID));
   }
 }

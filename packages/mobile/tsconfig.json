@@ -16,7 +16,7 @@
     "target": "es2015",
     "strict": true
   },
-  "include": ["src"],
+  "include": ["src", "../contractkit/types"],
   "exclude": ["node_modules", "vendor", ".bundle"],
   "references": [{ "path": "../utils" }]
 }

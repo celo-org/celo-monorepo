@@ -32,6 +32,7 @@ exports[`UserAgreement renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -88,6 +89,7 @@ exports[`UserAgreement renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -101,7 +103,8 @@ exports[`UserAgreement renders 1`] = `
           }
         }
       >
-        agreementTitle
+        User Agreement and Terms:
+ Celo Platform
       </h1>
     </div>
   </div>
@@ -118,6 +121,7 @@ exports[`UserAgreement renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -146,6 +150,7 @@ exports[`UserAgreement renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -182,6 +187,7 @@ exports[`UserAgreement renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -192,7 +198,7 @@ exports[`UserAgreement renders 1`] = `
           }
         }
       >
-        This User Agreement and Test Terms (“Agreement”) constitute a contract between you and A Protocol Inc. (“Company” or “Celo” and including all affiliates) and applies to your use of the Celo Products, including the Celo Wallet, and other features, technologies and functionalities offered by the Company to you through a website, app, or through other means (the “Celo Services.”) as part of a limited test. The Celo Services are provided to you subject to this Agreement as well as the Celo Privacy Policy available at 
+        This User Agreement and Test Terms (“Agreement”) constitute a contract between you and the Celo Foundation (“Company” or “Celo” and including all affiliates) and applies to your use of the Celo Products, including the Celo Wallet, and other features, technologies and functionalities offered by the Company to you through a website, app, or through other means (the “Celo Services.”) as part of a limited test. The Celo Services are provided to you subject to this Agreement as well as the Celo Privacy Policy available at 
          
         <div
           className="css-view-1dbjc4n"
@@ -201,8 +207,6 @@ exports[`UserAgreement renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -212,15 +216,17 @@ exports[`UserAgreement renders 1`] = `
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="/privacy"
+            onClick={[Function]}
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -247,8 +253,6 @@ You understand that you are participating in a test, and that the Celo Services 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -258,15 +262,17 @@ You understand that you are participating in a test, and that the Celo Services 
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores"
+            onClick={[Function]}
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >
@@ -298,8 +304,6 @@ The Company reserves the right in its sole and absolute discretion to terminate 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -309,15 +313,17 @@ The Company reserves the right in its sole and absolute discretion to terminate 
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="/privacy"
+            onClick={[Function]}
             role="link"
             style={
               Object {
+                "WebkitTextDecorationStyle": "solid",
                 "cursor": "pointer",
                 "display": "inline",
                 "opacity": 1,
                 "textDecoration": "underline",
+                "textDecorationStyle": "solid",
               }
             }
           >

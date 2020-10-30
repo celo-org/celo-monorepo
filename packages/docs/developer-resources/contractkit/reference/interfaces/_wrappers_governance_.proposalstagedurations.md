@@ -18,7 +18,7 @@
 
 • **[ProposalStage.Approval]**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L33)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L41)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **[ProposalStage.Execution]**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L35)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L43)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **[ProposalStage.Referendum]**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L34)*
+*Defined in [packages/contractkit/src/wrappers/Governance.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L42)*

@@ -18,8 +18,9 @@ const modifiedLocalSummary = localSummary
 const globalSummaryPath = '../docs/SUMMARY.md'
 const globalSummary = readFileSync(globalSummaryPath).toString()
 
-const startTag = `<!--${pkgName}-reference-start-->`
-const endTag = `<!--${pkgName}-reference-end-->`
+// Adding the indent to the tag, otherwise the markdows has poor preview
+const startTag = `${indent}<!-- ${pkgName}-reference-start -->`
+const endTag = `${indent}<!-- ${pkgName}-reference-end -->`
 
 const modifiedGlobalSummary =
   globalSummary.slice(0, globalSummary.search(startTag) + startTag.length) +

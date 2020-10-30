@@ -18,6 +18,7 @@ export default class Show extends BaseCommand {
     const { args } = this.parse(Show)
 
     const accounts = await this.kit.contracts.getAccounts()
-    printValueMapRecursive(await accounts.getAccountSummary(args.address))
+    const address = await accounts.signerToAccount(args.address)
+    printValueMapRecursive(await accounts.getAccountSummary(address))
   }
 }

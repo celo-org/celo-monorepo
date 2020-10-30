@@ -1,83 +1,58 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { AccountAuthRequest } from '@celo/utils/src/dappkit'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationParams, NavigationScreenProp } from 'react-navigation'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
+import AccountNumber from 'src/components/AccountNumber'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
-import DappkitExchangeIcon from 'src/icons/DappkitExchange'
+import { noHeader } from 'src/navigator/Headers'
 import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'dappkit/DappKitAccountScreen'
 
-interface State {
-  dappName: string | null
-}
-interface OwnProps {
-  errorMessage?: string
-  navigation?: NavigationScreenProp<NavigationParams>
-}
-
 interface StateProps {
   account: string | null
   phoneNumber: string | null
 }
 
-type Props = OwnProps & StateProps & WithTranslation
+interface DispatchProps {
+  approveAccountAuth: typeof approveAccountAuth
+}
+
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.DappKitAccountAuth>
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
   phoneNumber: e164NumberSelector(state),
 })
 
-class DappKitAccountAuthScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-  state = {
-    dappName: null,
-  }
+const mapDispatchToProps = {
+  approveAccountAuth,
+}
 
-  componentDidMount() {
-    if (!this.props.navigation) {
-      Logger.error(TAG, 'Missing navigation props')
-      return
-    }
-
-    const request: AccountAuthRequest = this.props.navigation.getParam('dappKitRequest', null)
-
-    if (!request) {
-      Logger.error(TAG, 'No request found in navigation props')
-      return
-    }
-
-    this.setState({ dappName: request.dappName })
-  }
-
-  getErrorMessage() {
-    return (
-      this.props.errorMessage ||
-      (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
-      ''
-    )
-  }
+class DappKitAccountAuthScreen extends React.Component<Props> {
+  static navigationOptions = noHeader
 
   linkBack = () => {
-    const { account, navigation, phoneNumber } = this.props
+    const { account, route, phoneNumber } = this.props
 
-    if (!navigation) {
-      Logger.error(TAG, 'Missing navigation props')
-      return
-    }
-
-    const request: AccountAuthRequest = navigation.getParam('dappKitRequest', null)
+    const request = route.params.dappKitRequest
 
     if (!request) {
       Logger.error(TAG, 'No request found in navigation props')
@@ -91,8 +66,7 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
       Logger.error(TAG, 'No phone number set up for this wallet')
       return
     }
-
-    navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
+    navigateHome({ onAfterNavigate: () => this.props.approveAccountAuth(request) })
   }
 
   cancel = () => {
@@ -100,40 +74,35 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account } = this.props
-    const { dappName } = this.state
+    const { t, account, phoneNumber, route } = this.props
+    const { dappName } = route.params.dappKitRequest
     return (
       <SafeAreaView style={styles.container}>
+        <TopBarTextButton
+          title={t('cancel')}
+          onPress={this.cancel}
+          titleStyle={styles.cancelButton}
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.logo}>
-            <DappkitExchangeIcon />
-          </View>
-          {dappName && (
-            <Text style={styles.header}>{t('connectToWallet', { dappname: dappName })}</Text>
-          )}
+          {!!dappName && <Text style={styles.header}>{t('connectToWallet', { dappName })}</Text>}
 
           <Text style={styles.share}>{t('shareInfo')}</Text>
 
           <View style={styles.sectionDivider}>
+            <Text style={styles.sectionHeaderText}>{t('phoneNumber')}</Text>
+            <PhoneNumberWithFlag e164PhoneNumber={phoneNumber || ''} />
             <Text style={styles.sectionHeaderText}>{t('address')}</Text>
-            <Text style={styles.bodyText}>{account}</Text>
+            <AccountNumber address={account || ''} location={Screens.DrawerNavigator} />
           </View>
-        </ScrollView>
-
-        <View style={styles.footer}>
           <Button
-            text={t('connect')}
-            onPress={this.linkBack}
-            standard={false}
+            style={styles.button}
             type={BtnTypes.PRIMARY}
+            size={BtnSizes.MEDIUM}
+            text={t('allow')}
+            onPress={this.linkBack}
           />
-          <Button
-            text={t('cancel')}
-            onPress={this.cancel}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-          />
-        </View>
+        </ScrollView>
       </SafeAreaView>
     )
   }
@@ -142,53 +111,40 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
   },
   scrollContainer: {
     flex: 1,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: '15%',
   },
   header: {
     ...fontStyles.h1,
-    alignItems: 'center',
-    paddingBottom: 30,
-  },
-  footer: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
     textAlign: 'center',
-  },
-  logo: {
-    marginBottom: 20,
+    paddingBottom: 16,
   },
   share: {
-    ...fontStyles.bodySecondary,
-    fontSize: 13,
-    alignSelf: 'center',
+    ...fontStyles.regular,
+    color: colors.gray4,
+    textAlign: 'center',
   },
   sectionDivider: {
     alignItems: 'center',
     width: 200,
   },
   sectionHeaderText: {
-    ...fontStyles.bodyBold,
-    textTransform: 'uppercase',
-    fontSize: 12,
-    marginTop: 20,
-    marginBottom: 5,
+    ...fontStyles.label,
+    marginTop: 16,
+    marginBottom: 4,
   },
-  bodyText: {
-    ...fontStyles.paragraph,
-    fontSize: 15,
-    color: colors.darkSecondary,
-    textAlign: 'center',
+  button: {
+    marginTop: 24,
+  },
+  cancelButton: {
+    color: colors.dark,
   },
 })
 
-export default connect<StateProps, null, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.dappkit)(DappKitAccountAuthScreen)
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation<Props>(Namespaces.dappkit)(DappKitAccountAuthScreen))
