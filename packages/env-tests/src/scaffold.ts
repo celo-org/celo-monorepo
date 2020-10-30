@@ -1,7 +1,7 @@
 import { concurrentMap } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
+import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { generateKeys } from '@celo/utils/src/account'
 import BigNumber from 'bignumber.js'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
