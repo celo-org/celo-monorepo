@@ -9,7 +9,7 @@ In this documentation you’ll find information on:
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
-## Quick Navigation Reference
+## Quick Reference
 
 - CELO Holders
   - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
