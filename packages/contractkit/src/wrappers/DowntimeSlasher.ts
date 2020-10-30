@@ -112,6 +112,20 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
    */
   setBitmapForInterval = proxySend(this.kit, this.contract.methods.setBitmapForInterval)
 
+  async intervalsForSlashableDowntimeWindowBeforeBlock(block?: number) {
+    const window = await this.getSlashableDowntimeWindow(undefined, block)
+    let end = window.end
+    const intervals = []
+    while (end > window.start) {
+      const epochNumber = await this.kit.getEpochNumberOfBlock(end)
+      const firstBlock = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
+      const start = Math.max(firstBlock, window.start)
+      intervals.push({ start, end })
+      end = await this.kit.getLastBlockNumberForEpoch(epochNumber - 1)
+    }
+    return intervals
+  }
+
   /**
    * Shows if the user already called the `setBitmapForInterval` for
    * the specific interval.
