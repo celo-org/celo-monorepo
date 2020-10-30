@@ -116,7 +116,7 @@
     "react-native-permissions": "^2.1.5",
     "react-native-progress": "^4.1.2",
     "react-native-qrcode-svg": "^6.0.6",
-    "react-native-reanimated": "^1.9.0",
+    "react-native-reanimated": "^1.13.1",
     "react-native-restart-android": "^0.0.7",
     "react-native-safe-area-context": "^3.0.6",
     "react-native-screens": "^2.7.0",
