@@ -440,7 +440,7 @@ jobs:
           command: |
             mkdir -p test-results/jest
             # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
-            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
+            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci --maxWorkers=2
           environment:
             JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
 
