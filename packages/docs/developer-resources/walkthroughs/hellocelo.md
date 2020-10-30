@@ -1,5 +1,3 @@
-# Hello Celo: sending value with Celo
-
 ---
 description: >-
   In this guide we are going to learn how to connect to the Celo test network
