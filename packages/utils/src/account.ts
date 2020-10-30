@@ -7,8 +7,8 @@ import {
 } from '@celo/base/lib/account'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
+import { keccak256 } from 'ethereumjs-util'
 import randomBytes from 'randombytes'
-
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
 export {
@@ -70,6 +70,16 @@ export async function generateKeys(
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): Promise<{ privateKey: string; publicKey: string }> {
   const seed: Buffer = await generateSeed(mnemonic, password, bip39ToUse)
+  return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
+}
+
+export function generateDeterministicInviteCode(
+  pepper: string,
+  changeIndex: number = 0,
+  addressIndex: number = 0,
+  derivationPath: string = CELO_DERIVATION_PATH_BASE
+): { privateKey: string; publicKey: string } {
+  const seed = keccak256(pepper) as Buffer
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 

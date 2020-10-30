@@ -24,6 +24,7 @@ const GoldToken = {
   balanceOf: jest.fn(async () => new BigNumber(1e18)),
   decimals: jest.fn(async () => '10'),
   transferWithComment: jest.fn(async () => ({ txo: txo() })),
+  approve: jest.fn(() => ({ txo: txo() })),
 }
 
 const Attestations = {
@@ -38,6 +39,11 @@ const Reserve = {
   getOrComputeTobinTax: jest.fn(() => ({ txo: txo(TOBIN_TAX) })),
 }
 
+const Exchange = {
+  getExchangeRate: jest.fn(() => new BigNumber(2)),
+  exchange: jest.fn(),
+}
+
 const web3 = new Web3()
 
 const kit = {
@@ -48,6 +54,7 @@ const kit = {
     getAttestations: jest.fn(async () => Attestations),
     getAccounts: jest.fn(async () => Accounts),
     getReserve: jest.fn(async () => Reserve),
+    getExchange: jest.fn(async () => Exchange),
   },
   registry: {
     addressFor: async (address: string) => 1000,
