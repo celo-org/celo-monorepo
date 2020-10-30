@@ -194,6 +194,7 @@ export function* wrapSendTransactionWithRetry(
 ) {
   for (let i = 1; i <= TX_NUM_TRIES; i++) {
     try {
+      // Spin tx send into a Task so that it does not get cancelled automatically on timeout.
       const task = yield fork(sendTxMethod)
       let { result, timeout, cancelled } = yield race({
         result: join(task),
