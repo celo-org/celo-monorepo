@@ -25,7 +25,8 @@ export async function getRequestExists(
       .first()
     return !!existingRequest
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return false
   }
 }
@@ -42,7 +43,8 @@ export async function storeRequest(request: GetBlindedMessagePartialSigRequest) 
       .timeout(DB_TIMEOUT)
     return true
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return null
   }
 }

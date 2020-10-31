@@ -18,7 +18,8 @@ export async function getPerformedQueryCount(account: string): Promise<number> {
       .first()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error({ err })
     return 0
   }
 }
@@ -47,7 +48,8 @@ export async function incrementQueryCount(account: string) {
       return insertRecord(newAccount)
     }
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return null
   }
 }
@@ -66,7 +68,8 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return false
   }
 }
@@ -87,7 +90,8 @@ export async function setDidMatchmaking(account: string) {
       return insertRecord(newAccount)
     }
   } catch (err) {
-    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return null
   }
 }

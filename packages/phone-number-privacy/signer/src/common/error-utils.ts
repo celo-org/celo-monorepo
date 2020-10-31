@@ -11,18 +11,22 @@ export type ErrorType = ErrorMessage | WarningMessage
 export function respondWithError(
   res: Response,
   statusCode: number,
-  error: ErrorType,
+  err: ErrorType,
   performedQueryCount: number = -1,
   totalQuota: number = -1,
   blockNumber: number = -1,
   signature?: string
 ) {
-  const loggerMethod = error in WarningMessage ? logger.warn : logger.error
-  loggerMethod({ err: error }, 'Responding with error')
+  logger.info('Responding with error')
+  if (err in WarningMessage) {
+    logger.warn({ err })
+  } else {
+    logger.error({ err })
+  }
   const response: SignMessageResponseFailure = {
     success: false,
     version: getVersion(),
-    error,
+    error: err,
     performedQueryCount,
     totalQuota,
     blockNumber,

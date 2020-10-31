@@ -57,13 +57,15 @@ export async function handleGetBlindedMessagePartialSig(
       performedQueryCount = queryCount.performedQueryCount
       totalQuota = queryCount.totalQuota
     } catch (err) {
-      logger.error({ err }, 'Failed to get user quota')
+      logger.error('Failed to get user quota')
+      logger.error({ err })
       errorMsg = ErrorMessage.DATABASE_GET_FAILURE
     }
     try {
       blockNumber = await getBlockNumber()
     } catch (err) {
-      logger.error({ err }, 'Failed to get latest block number')
+      logger.error('Failed to get latest block number')
+      logger.error({ err })
       errorMsg = ErrorMessage.CONTRACT_GET_FAILURE
     }
 
@@ -121,7 +123,8 @@ export async function handleGetBlindedMessagePartialSig(
     logger.debug('Signature retrieval success')
     response.json(signMessageResponse)
   } catch (err) {
-    logger.error({ err }, 'Failed to get signature')
+    logger.error('Failed to get signature')
+    logger.error({ err })
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
   }
 }

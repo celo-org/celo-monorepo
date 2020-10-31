@@ -38,7 +38,8 @@ export class AWSKeyProvider extends KeyProviderBase {
       }
       this.setPrivateKey(privateKey)
     } catch (err) {
-      logger.error({ err }, 'Error retrieving key')
+      logger.info('Error retrieving key')
+      logger.error({ err })
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
   }

@@ -50,7 +50,8 @@ export async function handleGetQuota(
       totalQuota: queryCount.totalQuota,
     })
   } catch (err) {
-    logger.error({ err }, 'Failed to get user quota')
+    logger.error('Failed to get user quota')
+    logger.error({ err })
     respondWithError(response, 500, ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
@@ -181,7 +182,8 @@ export async function getWalletAddress(account: string): Promise<string> {
       RETRY_DELAY_IN_MS
     )
   } catch (err) {
-    logger.error({ err, account }, 'failed to get wallet address for account')
+    logger.error({ account }, 'failed to get wallet address for account')
+    logger.error({ err })
     return NULL_ADDRESS
   }
 }

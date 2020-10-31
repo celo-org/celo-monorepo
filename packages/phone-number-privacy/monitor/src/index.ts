@@ -14,9 +14,13 @@ export const odisMonitorScheduleFunction = functions
       logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
     } catch (err) {
       if ((err as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
-        logger.info({ err }, 'ODIS salt request out of quota. This is expected. System is healthy.')
+        logger.info(
+          { error: err },
+          'ODIS salt request out of quota. This is expected. System is healthy.'
+        )
       } else {
-        logger.error({ err }, 'ODIS salt request failed.')
+        logger.error('ODIS salt request failed.')
+        logger.error({ err })
         throw err
       }
     }

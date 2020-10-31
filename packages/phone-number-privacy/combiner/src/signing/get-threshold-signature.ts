@@ -96,9 +96,11 @@ async function requestSignatures(request: Request, response: Response) {
       })
       .catch((err) => {
         if (err.name === 'AbortError') {
-          logger.error({ err, signer: service }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+          logger.error(ErrorMessage.TIMEOUT_FROM_SIGNER)
+          logger.error({ err, signer: service })
         } else {
-          logger.error({ err, signer: service }, ErrorMessage.ERROR_REQUESTING_SIGNATURE)
+          logger.error(ErrorMessage.ERROR_REQUESTING_SIGNATURE)
+          logger.error({ err, signer: service })
         }
       })
       .finally(() => {
@@ -128,13 +130,11 @@ async function handleSuccessResponse(
   const signResponse = (await res.json()) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
-    logger.error(
-      {
-        err: signResponse.error,
-        signer: serviceUrl,
-      },
-      'Signer responded with error'
-    )
+    logger.info('Signer responded with error')
+    logger.error({
+      err: signResponse.error,
+      signer: serviceUrl,
+    })
   }
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
