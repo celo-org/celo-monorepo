@@ -1,4 +1,3 @@
-import { RECAPTCHA_SITE_KEY, WEB_LINK } from '@celo/mobile/src/config'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import TextButton from '@celo/react-components/components/TextButton'
@@ -19,6 +18,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
+import { RECAPTCHA_SITE_KEY, WEB_LINK } from 'src/config'
 import { features } from 'src/flags'
 import i18n, { Namespaces } from 'src/i18n'
 import {

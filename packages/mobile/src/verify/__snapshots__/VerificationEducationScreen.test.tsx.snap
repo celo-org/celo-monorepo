@@ -761,7 +761,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
           scalesPageToFit={true}
           source={
             Object {
-              "baseUrl": "undefined",
+              "baseUrl": "https://celo.org/",
               "html": "
   <!DOCTYPE html>
   <html>
@@ -1783,7 +1783,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when already veri
           scalesPageToFit={true}
           source={
             Object {
-              "baseUrl": "undefined",
+              "baseUrl": "https://celo.org/",
               "html": "
   <!DOCTYPE html>
   <html>
@@ -2805,7 +2805,7 @@ exports[`VerificationEducationScreen shows the \`skip\` button when user is not 
           scalesPageToFit={true}
           source={
             Object {
-              "baseUrl": "undefined",
+              "baseUrl": "https://celo.org/",
               "html": "
   <!DOCTYPE html>
   <html>
