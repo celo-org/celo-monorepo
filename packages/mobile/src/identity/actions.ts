@@ -198,7 +198,7 @@ export interface SetLastRevealAttempt {
   time: number
 }
 
-export interface ReportRevealStatus {
+export interface ReportRevealStatusAction {
   type: Actions.REPORT_REVEAL_STATUS
   attestationServiceUrl: string
   account: string
@@ -236,7 +236,7 @@ export type ActionTypes =
   | UpdateVerificationState
   | ResendAttestations
   | SetLastRevealAttempt
-  | ReportRevealStatus
+  | ReportRevealStatusAction
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -431,7 +431,7 @@ export const reportRevealStatus = (
   issuer: string,
   e164Number: string,
   pepper: string
-): ReportRevealStatus => {
+): ReportRevealStatusAction => {
   return {
     type: Actions.REPORT_REVEAL_STATUS,
     attestationServiceUrl,

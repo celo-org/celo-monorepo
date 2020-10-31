@@ -30,7 +30,7 @@ import {
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   reportRevealStatus,
-  ReportRevealStatus,
+  ReportRevealStatusAction,
   resetVerification,
   setCompletedCodes,
   setLastRevealAttempt,
@@ -110,9 +110,9 @@ export function* fetchVerificationState() {
       return
     }
 
-    const { phoneHash, phoneHashDetails } = yield call(getPhoneHashData, e164Number)
+    const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
     ValoraAnalytics.track(VerificationEvents.verification_hash_retrieved, {
-      phoneHash,
+      phoneHash: phoneHashDetails.phoneHash,
       address: account,
     })
 
@@ -123,7 +123,7 @@ export function* fetchVerificationState() {
       getAttestationsStatus,
       attestationsWrapper,
       account,
-      phoneHash
+      phoneHashDetails.phoneHash
     )
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
@@ -132,7 +132,7 @@ export function* fetchVerificationState() {
     const actionableAttestations: ActionableAttestation[] = yield call(
       getActionableAttestations,
       attestationsWrapper,
-      phoneHash,
+      phoneHashDetails.phoneHash,
       account
     )
 
@@ -880,7 +880,7 @@ export function* reportRevealStatusSaga({
   account,
   issuer,
   pepper,
-}: ReportRevealStatus) {
+}: ReportRevealStatusAction) {
   let aggregatedResponse: undefined | { ok: boolean; status: number; body: any }
   if (shouldUseProxy()) {
     Logger.debug(
@@ -958,11 +958,11 @@ export function* reportActionableAttestationsStatuses() {
     contractKit.contracts,
     contractKit.contracts.getAttestations,
   ])
-  const { phoneHash, phoneHashDetails } = yield call(getPhoneHashData, e164Number)
+  const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
   const actionableAttestations: ActionableAttestation[] = yield call(
     getActionableAttestations,
     attestationsWrapper,
-    phoneHash,
+    phoneHashDetails.phoneHash,
     account
   )
 
@@ -995,12 +995,8 @@ function* waitForAttestationCode(issuer: string) {
   }
 }
 
-function* getPhoneHashData(e164Number: string) {
-  let phoneHash: string
-  let phoneHashDetails: PhoneNumberHashDetails
-  phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-  phoneHash = phoneHashDetails.phoneHash
-  return { phoneHash, phoneHashDetails }
+function* getPhoneHashDetails(e164Number: string) {
+  return yield call(fetchPhoneHashPrivate, e164Number)
 }
 
 function shouldUseProxy() {
