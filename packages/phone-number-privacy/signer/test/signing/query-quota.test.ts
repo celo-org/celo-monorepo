@@ -40,7 +40,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 2,
-      totalQuota: 42,
+      totalQuota: 52,
     })
   })
   it('Calculates remaining query count for unverified account', async () => {
@@ -76,7 +76,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 10,
-      totalQuota: 232,
+      totalQuota: 432,
     })
   })
   it('Calculates remaining query count for unverified account with many txs', async () => {
@@ -94,7 +94,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 0,
-      totalQuota: 202,
+      totalQuota: 402,
     })
   })
   it('Calculates remaining query count for unverified account without any balance', async () => {
