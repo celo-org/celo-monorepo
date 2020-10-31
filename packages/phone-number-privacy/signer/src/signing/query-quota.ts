@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/contractkit'
 import {
   authenticateUser,
   ErrorMessage,
@@ -83,7 +84,7 @@ export async function getRemainingQueryCount(
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   let walletAddress = await getWalletAddress(account)
   if (account === walletAddress) {
-    walletAddress = '0x0'
+    walletAddress = NULL_ADDRESS
   }
 
   if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber, getContractKit()))) {
@@ -129,7 +130,7 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
 export async function getTransactionCount(...addresses: string[]): Promise<number> {
   return Promise.all(
     addresses
-      .filter((address) => address !== '0x0')
+      .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
           () => getContractKit().web3.eth.getTransactionCount(address),
@@ -144,7 +145,7 @@ export async function getTransactionCount(...addresses: string[]): Promise<numbe
 export async function getDollarBalance(...addresses: string[]): Promise<BigNumber> {
   return Promise.all(
     addresses
-      .filter((address) => address !== '0x0')
+      .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
           async () => (await getContractKit().contracts.getStableToken()).balanceOf(address),
@@ -159,7 +160,7 @@ export async function getDollarBalance(...addresses: string[]): Promise<BigNumbe
 export async function getCeloBalance(...addresses: string[]): Promise<BigNumber> {
   return Promise.all(
     addresses
-      .filter((address) => address !== '0x0')
+      .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
           async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
@@ -181,6 +182,6 @@ export async function getWalletAddress(account: string): Promise<string> {
     )
   } catch (err) {
     logger.error({ err, account }, 'failed to get wallet address for account')
-    return '0x0'
+    return NULL_ADDRESS
   }
 }

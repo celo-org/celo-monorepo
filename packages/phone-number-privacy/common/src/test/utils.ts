@@ -1,3 +1,4 @@
+import { Signature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
@@ -73,8 +74,19 @@ export async function replenishQuota(account: string, contractKit: any) {
   await selfTransferTx.sendAndWaitForReceipt()
 }
 
-export async function registerWalletAddress(walletAddress: string, contractKit: any) {
-  await (await contractKit.contracts.getAccounts())
-    .setWalletAddress(walletAddress)
-    .sendAndWaitForReceipt()
+export async function registerWalletAddress(
+  accountAddress: string,
+  walletAddress: string,
+  walletAddressPk: string,
+  contractKit: any
+) {
+  const accounts = await contractKit.contracts.getAccounts()
+  const pop = await accounts.generateProofOfKeyPossessionLocally(
+    accountAddress,
+    walletAddress,
+    walletAddressPk
+  )
+  await accounts
+    .setWalletAddress(walletAddress, pop as Signature)
+    .sendAndWaitForReceipt({ from: accountAddress } as any)
 }

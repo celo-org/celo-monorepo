@@ -47,7 +47,8 @@ export async function authenticateUser(
           return true
         }
       } catch (err) {
-        logger.error({ err, dek: registeredEncryptionKey }, 'Failed to verify auth sig with DEK')
+        logger.error('Failed to verify auth sig with DEK')
+        logger.error({ err, dek: registeredEncryptionKey })
         return false
       }
     }

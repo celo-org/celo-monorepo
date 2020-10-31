@@ -2814,10 +2814,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.13":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.13.tgz#f9a95ebf5b490306b8782dbcaee6ee784dac66bb"
-  integrity sha512-iSo21h25+bk4365MajfEausehqOT7yfh5wz6xeJZWo1hDEo3GCHzOg7VWCUCaMqMK4zAsQ6l57G/7EnZkK/BFg==
+"@celo/phone-number-privacy-common@1.0.14":
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.14.tgz#1c62962054b294d063cd42b0577ce69b6b6100a8"
+  integrity sha512-szTdAAIxiMUsMB0B/c/JUh1UGjJgWZe5rWosN6LnQvshdjI0Tk8hUtaCDG+QZ7HGpiBWydX1ZXgZ+sBZnVF/pg==
   dependencies:
     "@celo/contractkit" "0.4.17"
     "@celo/utils" "0.1.21"
