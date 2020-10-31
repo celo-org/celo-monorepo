@@ -5,9 +5,10 @@ import {
   installHelmChart,
 } from 'src/lib/blockscout'
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
-  createCloudSQLInstance,
+  createCloudSQLInstanceIfNotExists,
   getServiceAccountName,
   grantRoles,
 } from 'src/lib/helm_deploy'
@@ -47,12 +48,13 @@ export const handler = async (argv: BlockscoutInitialArgv) => {
 
   const instanceName = getInstanceName(argv.celoEnv)
   const helmReleaseName = getReleaseName(argv.celoEnv)
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
 
   const [
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName,
-  ] = await createCloudSQLInstance(argv.celoEnv, instanceName)
+  ] = await createCloudSQLInstanceIfNotExists(argv.celoEnv, instanceName, dbSuffix)
 
   await installHelmChart(
     argv.celoEnv,

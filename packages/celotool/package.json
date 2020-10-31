@@ -19,6 +19,7 @@
     "bunyan-gke-stackdriver": "0.1.2",
     "dotenv": "^8.2.0",
     "ecurve": "^1.0.6",
+    "generate-password": "^1.5.1",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.14",
     "moment": "^2.22.1",

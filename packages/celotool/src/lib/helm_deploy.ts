@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
@@ -14,6 +15,7 @@ import {
   getProxyName
 } from './testnet-utils'
 import { outputIncludes } from './utils'
+const generator = require('generate-password')
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -50,30 +52,26 @@ async function copySecret(secretName: string, srcNamespace: string, destNamespac
   sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
-export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {
+export async function createCloudSQLInstanceIfNotExists(celoEnv: string, instanceName: string, dbSuffix: string) {
   await ensureAuthenticatedGcloudAccount()
   console.info('Creating Cloud SQL database, this might take a minute or two ...')
 
   await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
 
-  try {
-    await execCmd(`gcloud sql instances describe ${instanceName}`)
-    // if we get to here, that means the instance already exists
-    console.warn(
-      `A Cloud SQL instance named ${instanceName} already exists, so in all likelihood you cannot deploy initial with ${instanceName}`
+  const DBExists = await outputIncludes(
+    `gcloud sql instances list`,
+    `${instanceName} `,
+    `DB exists, skipping creation: ${instanceName}`
+  )
+
+  if (DBExists) {
+    console.info(
+      `A Cloud SQL instance named ${instanceName} already exists, so we skip the database ${instanceName} creation`
     )
-  } catch (error) {
-    if (
-      error.message.trim() !==
-      `Command failed: gcloud sql instances describe ${instanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
-    ) {
-      console.error(error.message.trim())
-      process.exit(1)
-    }
+    return retrieveCloudSQLConnectionInfo(celoEnv, instanceName, dbSuffix)
   }
 
   // Quite often these commands timeout, but actually succeed anyway. By ignoring errors we allow them to be re-run.
-
   try {
     await execCmd(
       `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
@@ -101,12 +99,17 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random()
-    .toString(36)
-    .slice(-8)
-  const blockscoutDBPassword = Math.random()
-    .toString(36)
-    .slice(-8)
+  const passwordOptions = {
+    length: 22,
+    numbers: true,
+    symbols: false,
+    lowercase: true,
+    uppercase: true,
+    strict: true
+  }
+
+  const blockscoutDBUsername = generator.generate(passwordOptions)
+  const blockscoutDBPassword = generator.generate(passwordOptions)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -292,10 +295,10 @@ export async function retrieveCloudSQLConnectionInfo(
   await validateExistingCloudSQLInstance(instanceName)
   const secretName = `${celoEnv}-blockscout${dbSuffix}`
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} --namespace ${celoEnv} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} --namespace ${celoEnv} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -326,6 +329,7 @@ export async function resetCloudSQLInstance(instanceName: string) {
 
   console.info('Creating blockscout database')
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
+
 }
 
 export async function registerIPAddress(name: string, zone?: string) {
@@ -682,6 +686,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
         `--set pprof.enabled="false"`,
       ]
 
+
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
     : generateGenesisFromEnv()
@@ -740,6 +745,7 @@ async function helmCommand(command: string) {
 
 function buildHelmChartDependencies(chartDir: string) {
   console.info(`Building any chart dependencies...`)
+  console.info(`helm dep build ${chartDir}`)
   return helmCommand(`helm dep build ${chartDir}`)
 }
 
@@ -770,6 +776,21 @@ export async function upgradeGenericHelmChart(
     `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
   )
   console.info(`Upgraded helm release ${releaseName}`)
+}
+
+export async function installUpgradeGenericChart(
+  celoEnv: string,
+  releaseName: string,
+  chartDir: string,
+  parameters: string[]
+) {
+  await buildHelmChartDependencies(chartDir)
+
+  console.info(`Installing or Upgrading helm release ${releaseName}`)
+  await helmCommand(
+    `helm upgrade ${releaseName} --install ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
+  )
+  console.info(`Installed or Upgraded helm release ${releaseName}`)
 }
 
 export function isCelotoolVerbose() {
@@ -889,9 +910,22 @@ export function setHelmArray(paramName: string, arr: any[]) {
 export async function deleteFromCluster(celoEnv: string) {
   await removeHelmRelease(celoEnv)
   console.info(`Deleting namespace ${celoEnv}`)
+  // Todo: Clean the testnet resources (pvc) and do not delete the namespace if there is any other resource on it
   await execCmdWithExitOnFailure(`kubectl delete namespace ${celoEnv}`)
 }
 
 function useStaticIPsForGethNodes() {
   return fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true'
+}
+
+export async function saveHelmValuesFile(celoEnv:string, valueFilePath: string, useExistingGenesis: boolean) {
+  const genesisContent = useExistingGenesis
+  ? await getGenesisBlockFromGoogleStorage(celoEnv)
+  : generateGenesisFromEnv()
+
+  const valueFileContent = `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }
