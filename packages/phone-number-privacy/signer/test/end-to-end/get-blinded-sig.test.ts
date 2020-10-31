@@ -6,7 +6,7 @@ import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import config from '../../src/config'
-import { getWalletAddress } from '../../src/signing/query-quota'
+import { GetQuotaResponse, getWalletAddress } from '../../src/signing/query-quota'
 
 require('dotenv').config()
 
@@ -128,7 +128,7 @@ describe('Running against a deployed service', () => {
 
       contractkit.defaultAccount = ACCOUNT_ADDRESS2
 
-      initialQueryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      initialQueryCount = await getQueryCount(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       timestamp = Date.now()
     })
 
@@ -144,7 +144,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns count when querying with unused request increments query count', async () => {
-      const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      const queryCount = await getQueryCount(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
 
@@ -160,7 +160,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns count when querying with used request does not increment query count', async () => {
-      const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      const queryCount = await getQueryCount(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
 
@@ -171,7 +171,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns count when querying with missing timestamp increments query count', async () => {
-      const queryCount = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
+      const queryCount = await getQueryCount(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 2)
     })
   })
@@ -180,6 +180,7 @@ describe('Running against a deployed service', () => {
     // if these tests are failing, it may just be that the address needs to be fauceted:
     // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
     // NOTE: DO NOT FAUCET ACCOUNT_ADDRESS3
+    let initialQuota: number
     let initialQueryCount: number
     let timestamp: number
     beforeAll(async () => {
@@ -187,12 +188,14 @@ describe('Running against a deployed service', () => {
       await registerWalletAddress(ACCOUNT_ADDRESS3, ACCOUNT_ADDRESS2, PRIVATE_KEY2, contractkit)
       // ACCOUNT_ADDRESS2 is now the wallet address (has quota)
       // and ACCOUNT_ADDRESS3 is account address (does not have quota on it's own, only bc of walletAddress)
-      initialQueryCount = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
+      initialQuota = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
+      initialQueryCount = await getQueryCount(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
       timestamp = Date.now()
     })
 
     it('Check that accounts are set up correctly', async () => {
-      expect(await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)).toBe(initialQueryCount)
+      // TODO Make this check more precise
+      expect(await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
       expect(await getWalletAddress(ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
@@ -208,7 +211,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns count when querying with unused request increments query count', async () => {
-      const queryCount = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
+      const queryCount = await getQueryCount(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
 
@@ -224,7 +227,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns count when querying with used request does not increment query count', async () => {
-      const queryCount = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
+      const queryCount = await getQueryCount(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 1)
     })
 
@@ -235,19 +238,8 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns count when querying with missing timestamp increments query count', async () => {
-      const queryCount = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
+      const queryCount = await getQueryCount(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
       expect(queryCount).toEqual(initialQueryCount + 2)
-    })
-  })
-
-  describe('When walletAddress is the same as accountAddress', () => {
-    it('Returns the same quota before and after account registers as its own walletAddress', async () => {
-      contractkit.defaultAccount = ACCOUNT_ADDRESS2
-      const quotaBefore = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
-      await registerWalletAddress(ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS2, PRIVATE_KEY2, contractkit)
-      // ACCOUNT_ADDRESS2 is now the wallet address and the accountAddress
-      const quotaAfter = await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)
-      expect(quotaAfter).toEqual(quotaBefore)
     })
   })
 })
@@ -258,6 +250,26 @@ async function getQuota(
   hashedPhoneNumber?: string,
   authHeader?: string
 ): Promise<number> {
+  const res = await queryQuotaEndpoint(privateKey, account, hashedPhoneNumber, authHeader)
+  return res.totalQuota
+}
+
+async function getQueryCount(
+  privateKey: string,
+  account: string,
+  hashedPhoneNumber?: string,
+  authHeader?: string
+): Promise<number> {
+  const res = await queryQuotaEndpoint(privateKey, account, hashedPhoneNumber, authHeader)
+  return res.performedQueryCount
+}
+
+async function queryQuotaEndpoint(
+  privateKey: string,
+  account: string,
+  hashedPhoneNumber?: string,
+  authHeader?: string
+): Promise<GetQuotaResponse> {
   const body = JSON.stringify({
     account,
     hashedPhoneNumber,
@@ -273,7 +285,7 @@ async function getQuota(
     body,
   })
 
-  return (await res.json()).performedQueryCount
+  return await res.json()
 }
 
 async function postToSignMessage(

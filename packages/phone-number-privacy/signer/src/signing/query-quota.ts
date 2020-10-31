@@ -24,6 +24,13 @@ export interface GetQuotaRequest {
   hashedPhoneNumber?: string
 }
 
+export interface GetQuotaResponse {
+  success: boolean
+  version: string
+  performedQueryCount: number
+  totalQuota: number
+}
+
 export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,
   response: Response
@@ -199,7 +206,7 @@ export async function getDollarBalance(...addresses: string[]): Promise<BigNumbe
         )
       )
   ).then((values) => {
-    logger.trace({ addresses, txCounts: values }, 'Fetched cusd balances for addresses')
+    logger.trace({ addresses, balances: values }, 'Fetched cusd balances for addresses')
     return values.reduce((a, b) => a.plus(b))
   })
 }
@@ -217,7 +224,7 @@ export async function getCeloBalance(...addresses: string[]): Promise<BigNumber>
         )
       )
   ).then((values) => {
-    logger.trace({ addresses, txCounts: values }, 'Fetched celo balances for addresses')
+    logger.trace({ addresses, balances: values }, 'Fetched celo balances for addresses')
     return values.reduce((a, b) => a.plus(b))
   })
 }
