@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "@celo/contractkit": "0.4.19-dev",
-    "@celo/utils": "0.1.22-dev",
+    "@celo/utils": "0.1.23-dev",
     "bignumber.js": "^9.0.0",
     "express": "^4.17.1",
     "elliptic": "6.5.3",
