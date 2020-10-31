@@ -84,18 +84,29 @@ export async function getRemainingQueryCount(
  */
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   let walletAddress = await getWalletAddress(account)
+  logger.debug({ account, walletAddress }, 'begin getQueryQuota')
   if (account === walletAddress) {
+    logger.debug('walletAddress is the same as accountAddress')
     walletAddress = NULL_ADDRESS
   }
 
   if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber, getContractKit()))) {
-    logger.debug('Account is verified')
+    logger.debug({ account }, 'Account is verified')
     const transactionCount = await getTransactionCount(account, walletAddress)
-    return (
+    const quota =
       config.quota.unverifiedQueryMax +
       config.quota.additionalVerifiedQueryMax +
       config.quota.queryPerTransaction * transactionCount
-    )
+
+    logger.trace({
+      unverifiedQueryMax: config.quota.unverifiedQueryMax,
+      additionalVerifiedQueryMax: config.quota.additionalVerifiedQueryMax,
+      queryPerTransaction: config.quota.queryPerTransaction,
+      transactionCount,
+      quota,
+    })
+
+    return quota
   }
 
   let cUSDAccountBalance = new BigNumber(0)
@@ -118,13 +129,42 @@ async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
     cUSDAccountBalance.isGreaterThanOrEqualTo(config.quota.minDollarBalance) ||
     celoAccountBalance.isGreaterThanOrEqualTo(config.quota.minCeloBalance)
   ) {
-    logger.debug({ account }, 'Account is not verified but meets min balance')
+    logger.debug(
+      {
+        account,
+        cUSDAccountBalance,
+        celoAccountBalance,
+        minDollarBalance: config.quota.minDollarBalance,
+        minCeloBalance: config.quota.minCeloBalance,
+      },
+      'Account is not verified but meets min balance'
+    )
     // TODO consider granting these unverified users slightly less queryPerTx
     const transactionCount = await getTransactionCount(account, walletAddress)
-    return config.quota.unverifiedQueryMax + config.quota.queryPerTransaction * transactionCount
+
+    const quota =
+      config.quota.unverifiedQueryMax + config.quota.queryPerTransaction * transactionCount
+
+    logger.trace({
+      unverifiedQueryMax: config.quota.unverifiedQueryMax,
+      queryPerTransaction: config.quota.queryPerTransaction,
+      transactionCount,
+      quota,
+    })
+
+    return quota
   }
 
-  logger.debug({ account }, 'Account does not meet query quota criteria')
+  logger.trace({
+    account,
+    cUSDAccountBalance,
+    celoAccountBalance,
+    minDollarBalance: config.quota.minDollarBalance,
+    minCeloBalance: config.quota.minCeloBalance,
+    quota: 0,
+  })
+  logger.debug({ account }, 'Account is not verified and does not meet min balance')
+
   return 0
 }
 
@@ -140,7 +180,10 @@ export async function getTransactionCount(...addresses: string[]): Promise<numbe
           RETRY_DELAY_IN_MS
         )
       )
-  ).then((values) => values.reduce((a, b) => a + b))
+  ).then((values) => {
+    logger.trace({ addresses, txCounts: values }, 'Fetched txCounts for addresses')
+    return values.reduce((a, b) => a + b)
+  })
 }
 
 export async function getDollarBalance(...addresses: string[]): Promise<BigNumber> {
@@ -155,7 +198,10 @@ export async function getDollarBalance(...addresses: string[]): Promise<BigNumbe
           RETRY_DELAY_IN_MS
         )
       )
-  ).then((values) => values.reduce((a, b) => a.plus(b)))
+  ).then((values) => {
+    logger.trace({ addresses, txCounts: values }, 'Fetched cusd balances for addresses')
+    return values.reduce((a, b) => a.plus(b))
+  })
 }
 
 export async function getCeloBalance(...addresses: string[]): Promise<BigNumber> {
@@ -170,7 +216,10 @@ export async function getCeloBalance(...addresses: string[]): Promise<BigNumber>
           RETRY_DELAY_IN_MS
         )
       )
-  ).then((values) => values.reduce((a, b) => a.plus(b)))
+  ).then((values) => {
+    logger.trace({ addresses, txCounts: values }, 'Fetched celo balances for addresses')
+    return values.reduce((a, b) => a.plus(b))
+  })
 }
 
 export async function getWalletAddress(account: string): Promise<string> {

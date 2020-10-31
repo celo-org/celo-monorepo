@@ -182,9 +182,7 @@ describe('Running against a deployed service', () => {
     // NOTE: DO NOT FAUCET ACCOUNT_ADDRESS3
     let initialQueryCount: number
     let timestamp: number
-    let accountAddressOnlyQuota: number
     beforeAll(async () => {
-      accountAddressOnlyQuota = await getQuota(PRIVATE_KEY3, ACCOUNT_ADDRESS3, IDENTIFIER)
       contractkit.defaultAccount = ACCOUNT_ADDRESS3
       await registerWalletAddress(ACCOUNT_ADDRESS3, ACCOUNT_ADDRESS2, PRIVATE_KEY2, contractkit)
       // ACCOUNT_ADDRESS2 is now the wallet address (has quota)
@@ -194,7 +192,7 @@ describe('Running against a deployed service', () => {
     })
 
     it('Check that accounts are set up correctly', async () => {
-      expect(accountAddressOnlyQuota).toBe(0)
+      expect(await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)).toBe(initialQueryCount)
       expect(await getWalletAddress(ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
