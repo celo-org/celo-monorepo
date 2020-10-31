@@ -92,7 +92,7 @@ export async function getRemainingQueryCount(
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
   let walletAddress = await getWalletAddress(account)
   logger.debug({ account, walletAddress }, 'begin getQueryQuota')
-  if (account === walletAddress) {
+  if (account.toLowerCase() === walletAddress.toLowerCase()) {
     logger.debug('walletAddress is the same as accountAddress')
     walletAddress = NULL_ADDRESS
   }
