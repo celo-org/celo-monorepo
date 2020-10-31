@@ -12,22 +12,22 @@ import {
 
 export const verifyWallet = async (
   contractKit: ContractKit,
-  walletAddress: Address,
+  metaTxWalletAddress: Address | string,
   allowedImplementations: Address[],
-  expectedSigner: Address
+  expectedSigner: Address | string
 ): Promise<Result<true, WalletValidationError>> => {
-  const code = await contractKit.web3.eth.getCode(walletAddress)
+  const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
   // XXX: I'm unsure whether this is safe or if we should store the
   // bytecode as a constant in `mobile` and pass it into KomenciKit
   // I'm unsure if we should protect from the `Proxy` contract output
   // in protocol from changing, or there are already constraints put in
   // place for that not to happen.
   if (stripBzz(code) !== stripBzz(Proxy.deployedBytecode)) {
-    return Err(new InvalidBytecode(walletAddress))
+    return Err(new InvalidBytecode(metaTxWalletAddress))
   }
 
   const actualImplementationRaw = await contractKit.web3.eth.call({
-    to: walletAddress,
+    to: metaTxWalletAddress,
     data: GET_IMPLEMENTATION_ABI.signature,
   })
   const actualImplementation = normalizeAddress(
@@ -42,18 +42,18 @@ export const verifyWallet = async (
   if (normalizedAllowedImplementations.indexOf(actualImplementation) === -1) {
     return Err(
       new InvalidImplementation(
-        walletAddress,
+        metaTxWalletAddress,
         actualImplementation,
         normalizedAllowedImplementations
       )
     )
   }
 
-  const wallet = await contractKit.contracts.getMetaTransactionWallet(walletAddress)
+  const wallet = await contractKit.contracts.getMetaTransactionWallet(metaTxWalletAddress)
   const actualSigner = normalizeAddress(await wallet.signer())
   const normalizedExpectedSigner = normalizeAddress(expectedSigner)
   if (actualSigner !== normalizedExpectedSigner) {
-    return Err(new InvalidSigner(walletAddress, actualSigner, normalizedExpectedSigner))
+    return Err(new InvalidSigner(metaTxWalletAddress, actualSigner, normalizedExpectedSigner))
   }
 
   return Ok(true)

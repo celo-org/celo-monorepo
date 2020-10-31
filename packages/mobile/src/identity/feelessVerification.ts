@@ -1,12 +1,17 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { Result } from '@celo/base/lib/result'
+import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
   AttesationServiceRevealRequest,
   AttestationsWrapper,
+  IdentifierLookupResult,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { retryAsync } from '@celo/utils/src/async'
+import { WalletValidationError } from '@celo/komencikit/src/errors'
+import { KomenciKit } from '@celo/komencikit/src/kit'
+import { verifyWallet } from '@celo/komencikit/src/verifyWallet'
+import { Address } from '@celo/utils/src/address'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
@@ -23,7 +28,6 @@ import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
 import { features } from 'src/flags'
-import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -33,111 +37,223 @@ import {
   ReceiveAttestationMessageAction,
   resetVerification,
   setCompletedCodes,
+  setFeelessVerificationStatus,
   setLastRevealAttempt,
   setVerificationStatus,
   StartVerificationAction,
-  udpateVerificationState,
+  udpateFeelessVerificationState,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
+import {
+  getAddressesFromLookupResult,
+  lookupAttestationIdentifiers,
+} from 'src/identity/contactMapping'
 import {
   acceptedAttestationCodesSelector,
   attestationCodesSelector,
-  isBalanceSufficientForSigRetrievalSelector,
+  e164NumberToSaltSelector,
+  FeelessVerificationState,
+  feelessVerificationStateSelector,
   isVerificationStateExpiredSelector,
   VerificationState,
   verificationStateSelector,
 } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
+import {
+  ANDROID_DELAY_REVEAL_ATTESTATION,
+  AttestationCode,
+  CodeInputType,
+  ESTIMATED_COST_PER_ATTESTATION,
+  getActionableAttestations,
+  getAttestationsStatus,
+  NUM_ATTESTATIONS_REQUIRED,
+  REVEAL_RETRY_DELAY,
+  VERIFICATION_TIMEOUT,
+} from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
-const TAG = 'identity/verification'
+const TAG = 'identity/feelessVerification'
 
-export const NUM_ATTESTATIONS_REQUIRED = 3
-export const ESTIMATED_COST_PER_ATTESTATION = 0.051
-export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
-export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
-export const MAX_ACTIONABLE_ATTESTATIONS = 5
-export const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
-export const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
+export const KOMENCI_MAX_ACTIONABLE_ATTESTATIONS = 5
+const KOMENCI_ERROR_WINDOW = 1000 * 60 * 60 * 3 // 3 hours
+const KOMENCI_ERROR_ALLOTMENT = 2
+const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = []
 
-export enum CodeInputType {
-  AUTOMATIC = 'automatic',
-  MANUAL = 'manual',
-  DEEP_LINK = 'deepLink',
+// If a user has already encountered too many errors within a given window,
+// do not allow them try using Komenci again
+const hasExceededErrorAllotment = (komenciErrorTimestamps: number[]) => {
+  const currentTime = Date.now()
+  const recentErrors = komenciErrorTimestamps.filter((timestamp) => {
+    // Filter to the errors that have happened within the relevant window
+    if (currentTime - timestamp < KOMENCI_ERROR_WINDOW) {
+      return true
+    }
+
+    return false
+  })
+
+  return recentErrors.length > KOMENCI_ERROR_ALLOTMENT
 }
 
-export interface AttestationCode {
-  code: string
-  issuer: string
+function* checkKomenciReadiness(
+  komenciKit: KomenciKit,
+  feelessVerificationState: FeelessVerificationState
+) {
+  const featureEnabled = features.KOMENCI
+  if (!featureEnabled) {
+    throw Error('Komenci not available: Feature not enabled')
+  }
+
+  const serviceStatus = yield call(komenciKit.checkService)
+  if (!serviceStatus.ok) {
+    throw Error(`Komenci not available: ${serviceStatus.error.message}`)
+  }
+
+  const { komenciErrorTimestamps } = feelessVerificationState
+  const exceededErrorAllotment = hasExceededErrorAllotment(komenciErrorTimestamps)
+  if (exceededErrorAllotment) {
+    throw Error('Komenci not available: Flow has failed more than allowed within given timeframe')
+  }
+
+  return true
 }
 
-export function* fetchVerificationState() {
+function* getPhoneHashIfCached(e164Number: string) {
+  const pepperCache = yield select(e164NumberToSaltSelector)
+  const cachedPepper = pepperCache[e164Number]
+
+  // If the user has started feeless verification, pepper will have been
+  // queried for and cached by Komenci
+  if (!cachedPepper) {
+    throw Error('No pepper in cache yet')
+  }
+
+  const phoneHash = getPhoneHash(e164Number, cachedPepper)
+  const phoneHashDetails: PhoneNumberHashDetails = { e164Number, phoneHash, pepper: cachedPepper }
+  return phoneHashDetails
+}
+
+function* fetchVerifiedMtwAddress(
+  contractKit: ContractKit,
+  phoneHash: string,
+  walletAddress: string
+) {
+  const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
+  const possibleMtwAddresses = getAddressesFromLookupResult(lookupResult, phoneHash) || []
+  if (!possibleMtwAddresses.length) {
+    throw Error('No MTW addresses found corresponding to user phone number')
+  }
+
+  const verificationResults: Array<Result<true, WalletValidationError>> = yield all(
+    possibleMtwAddresses.map((possibleMtwAddress) => {
+      return call(
+        verifyWallet,
+        contractKit,
+        possibleMtwAddress,
+        ALLOWED_MTW_IMPLEMENTATIONS,
+        walletAddress
+      )
+    })
+  )
+
+  const verifiedMtwAddresses = possibleMtwAddresses.filter(
+    (mtwAddress, i) => verificationResults[i].ok
+  )
+
+  if (verifiedMtwAddresses.length > 2) {
+    throw Error(
+      'More than one verified MTW with walletAddress as signer found. Should never happen'
+    )
+  }
+
+  return verifiedMtwAddresses[0] || null
+}
+
+export function* fetchFeelessVerificationState() {
   try {
-    const account: string = yield call(getConnectedUnlockedAccount)
+    const contractKit: ContractKit = yield call(getContractKit)
+    const walletAddress: string = yield call(getConnectedUnlockedAccount)
+    const komenciKit = new KomenciKit(contractKit, walletAddress, {
+      url: 'http://localhost:3000',
+    })
+    const feelessVerificationState: FeelessVerificationState = yield select(
+      feelessVerificationStateSelector
+    )
+
+    // Throws error if Komenci is not ready for user
+    yield call(checkKomenciReadiness, komenciKit, feelessVerificationState)
+
     const e164Number: string = yield select(e164NumberSelector)
-    const contractKit = yield call(getContractKit)
+
+    // Throws error if unable to retreive phone hash
+    const phoneHashDetails: PhoneNumberHashDetails = yield call(getPhoneHashIfCached, e164Number)
+    const { phoneHash } = phoneHashDetails
+    const { lastFetch, unverifiedMtwAddress } = feelessVerificationState
+    yield put(setFeelessVerificationStatus(VerificationStatus.GettingStatus))
+
+    // If we have not checked before, see if there is already a verified
+    // MTW associated with the user's phone number and walletAddress
+    if (!lastFetch) {
+      const verifiedMtwAddress: string | null = yield call(
+        fetchVerifiedMtwAddress,
+        contractKit,
+        phoneHash,
+        walletAddress
+      )
+
+      if (verifiedMtwAddress) {
+        yield put(setMtwAddress(verifiedMtwAddress))
+        yield put(
+          udpateFeelessVerificationState({
+            ...feelessVerificationState,
+            phoneHashDetails,
+            status: {
+              isVerified: true,
+              numAttestationsRemaining: 0,
+              total: NUM_ATTESTATIONS_REQUIRED,
+              completed: NUM_ATTESTATIONS_REQUIRED,
+            },
+          })
+        )
+        return
+      }
+    }
+
+    // If there is no unverifiedMtwAddress in state, that means verification
+    // hasn't been attempted yet
+    if (!unverifiedMtwAddress) {
+      yield put(
+        udpateFeelessVerificationState({
+          ...feelessVerificationState,
+          phoneHashDetails,
+          attemptFeelessVerification: true,
+        })
+      )
+      return
+    }
+
+    // Get all relevant info about the account's verification status
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
     ])
 
-    let phoneHash: string
-    let phoneHashDetails: PhoneNumberHashDetails
-    const { timeout } = yield race({
-      balances: all([
-        call(waitFor, stableTokenBalanceSelector),
-        call(waitFor, celoTokenBalanceSelector),
-      ]),
-      timeout: delay(BALANCE_CHECK_TIMEOUT),
-    })
-    if (timeout) {
-      Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
-      return
-    }
-    const isBalanceSufficientForSigRetrieval = yield select(
-      isBalanceSufficientForSigRetrievalSelector
-    )
-    if (!isBalanceSufficientForSigRetrieval) {
-      Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
-      return
-    }
-
-    if (features.USE_PHONE_NUMBER_PRIVACY) {
-      phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-      phoneHash = phoneHashDetails.phoneHash
-    } else {
-      phoneHash = getPhoneHash(e164Number)
-      phoneHashDetails = {
-        e164Number,
-        phoneHash,
-        // @ts-ignore
-        salt: undefined,
-      }
-    }
-    ValoraAnalytics.track(VerificationEvents.verification_hash_retrieved, {
-      phoneHash,
-      address: account,
-    })
-
-    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
-    yield put(setVerificationStatus(VerificationStatus.GettingStatus))
-    // Get all relevant info about the account's verification status
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsWrapper,
-      account,
+      unverifiedMtwAddress,
       phoneHash
     )
+
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
     })
@@ -146,14 +262,17 @@ export function* fetchVerificationState() {
       getActionableAttestations,
       attestationsWrapper,
       phoneHash,
-      account
+      unverifiedMtwAddress
     )
 
     yield put(
-      udpateVerificationState({
+      udpateFeelessVerificationState({
         phoneHashDetails,
         actionableAttestations,
         status,
+        komenciErrorTimestamps: feelessVerificationState.komenciErrorTimestamps,
+        unverifiedMtwAddress,
+        attemptFeelessVerification: true,
       })
     )
   } catch (error) {
@@ -202,7 +321,7 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
     yield put(resetVerification())
     yield call(getConnectedAccount)
     if (isRestarted || (yield select(isVerificationStateExpiredSelector))) {
-      yield call(fetchVerificationState)
+      yield call(fetchFeelessVerificationState)
     }
 
     const { verification, restart } = yield race({
@@ -283,7 +402,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           status.numAttestationsRemaining - reveals.filter((r: boolean) => r).length
 
         // check if we hit the limit for max actionable attestations at the same time
-        if (attestationsToRequest + attestations.length > MAX_ACTIONABLE_ATTESTATIONS) {
+        if (attestationsToRequest + attestations.length > KOMENCI_MAX_ACTIONABLE_ATTESTATIONS) {
           throw new Error(ErrorMessages.MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED)
         }
 
@@ -424,44 +543,6 @@ export function* requestAndRetrieveAttestations(
   }
 
   return attestations
-}
-
-export async function getActionableAttestations(
-  attestationsWrapper: AttestationsWrapper,
-  phoneHash: string,
-  account: string
-) {
-  const attestations = await retryAsync(
-    attestationsWrapper.getActionableAttestations.bind(attestationsWrapper),
-    NUM_ATTESTATIONS_REQUIRED,
-    [phoneHash, account]
-  )
-  return attestations
-}
-
-export async function getAttestationsStatus(
-  attestationsWrapper: AttestationsWrapper,
-  account: string,
-  phoneHash: string
-): Promise<AttestationsStatus> {
-  Logger.debug(TAG + '@getAttestationsStatus', 'Getting verification status from contract')
-
-  const attestationStatus = await attestationsWrapper.getVerifiedStatus(
-    phoneHash,
-    account,
-    NUM_ATTESTATIONS_REQUIRED
-  )
-
-  Logger.debug(
-    TAG + '@getAttestationsStatus',
-    `${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
-  )
-
-  if (attestationStatus.numAttestationsRemaining <= 0) {
-    Logger.debug(TAG + '@getAttestationsStatus', 'User is already verified')
-  }
-
-  return attestationStatus
 }
 
 function* requestAttestations(

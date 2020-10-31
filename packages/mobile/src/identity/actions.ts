@@ -4,6 +4,7 @@ import {
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
+  UpdatableFeelessVerificationState,
   UpdatableVerificationState,
   WalletToAccountAddressType,
 } from 'src/identity/reducer'
@@ -16,6 +17,7 @@ export enum Actions {
   CANCEL_VERIFICATION = 'IDENTITY/CANCEL_VERIFICATION',
   RESET_VERIFICATION = 'IDENTITY/RESET_VERIFICATION',
   SET_VERIFICATION_STATUS = 'IDENTITY/SET_VERIFICATION_STATUS',
+  SET_FEELESS_VERIFICATION_STATUS = 'IDENTITY/SET_FEELESS_VERIFICATION_STATUS',
   SET_SEEN_VERIFICATION_NUX = 'IDENTITY/SET_SEEN_VERIFICATION_NUX',
   SET_COMPLETED_CODES = 'IDENTITY/SET_COMPLETED_CODES',
   REVOKE_VERIFICATION = 'IDENTITY/REVOKE_VERIFICATION',
@@ -41,6 +43,7 @@ export enum Actions {
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
   FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
+  UPDATE_FEELESS_VERIFICATION_STATE = 'IDENTITY/UPDATE_FEELESS_VERIFICATION_STATE',
   RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
   SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
 }
@@ -52,6 +55,11 @@ export interface StartVerificationAction {
 
 export interface SetVerificationStatusAction {
   type: Actions.SET_VERIFICATION_STATUS
+  status: VerificationStatus
+}
+
+export interface SetFeelessVerificationStatusAction {
+  type: Actions.SET_FEELESS_VERIFICATION_STATUS
   status: VerificationStatus
 }
 
@@ -195,6 +203,11 @@ export interface UpdateVerificationState {
   state: UpdatableVerificationState
 }
 
+export interface UpdateFeelessVerificationState {
+  type: Actions.UPDATE_FEELESS_VERIFICATION_STATE
+  state: UpdatableFeelessVerificationState
+}
+
 export interface ResendAttestations {
   type: Actions.RESEND_ATTESTATIONS
 }
@@ -209,6 +222,7 @@ export type ActionTypes =
   | CancelVerificationAction
   | ResetVerificationAction
   | SetVerificationStatusAction
+  | SetFeelessVerificationStatusAction
   | SetHasSeenVerificationNux
   | SetCompletedCodesAction
   | ReceiveAttestationMessageAction
@@ -232,6 +246,7 @@ export type ActionTypes =
   | UpdateAddressDekMapAction
   | FetchVerificationState
   | UpdateVerificationState
+  | UpdateFeelessVerificationState
   | ResendAttestations
   | SetLastRevealAttempt
 
@@ -250,6 +265,13 @@ export const resetVerification = (): ResetVerificationAction => ({
 
 export const setVerificationStatus = (status: VerificationStatus): SetVerificationStatusAction => ({
   type: Actions.SET_VERIFICATION_STATUS,
+  status,
+})
+
+export const setFeelessVerificationStatus = (
+  status: VerificationStatus
+): SetFeelessVerificationStatusAction => ({
+  type: Actions.SET_FEELESS_VERIFICATION_STATUS,
   status,
 })
 
@@ -417,6 +439,13 @@ export const udpateVerificationState = (
   state: UpdatableVerificationState
 ): UpdateVerificationState => ({
   type: Actions.UPDATE_VERIFICATION_STATE,
+  state,
+})
+
+export const udpateFeelessVerificationState = (
+  state: UpdatableFeelessVerificationState
+): UpdateFeelessVerificationState => ({
+  type: Actions.UPDATE_FEELESS_VERIFICATION_STATE,
   state,
 })
 

@@ -80,6 +80,17 @@ export interface UpdatableVerificationState {
   status: AttestationsStatus
 }
 
+export type UpdatableFeelessVerificationState = {
+  komenciErrorTimestamps: number[]
+  unverifiedMtwAddress: string | null
+  attemptFeelessVerification: boolean
+} & UpdatableVerificationState
+
+export type FeelessVerificationState = {
+  isLoading: boolean
+  lastFetch: number | null
+} & UpdatableFeelessVerificationState
+
 export type VerificationState = State['verificationState'] & {
   isBalanceSufficient: boolean
 }
@@ -92,6 +103,7 @@ export interface State {
   // numCompleteAttestations is controlled locally
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
+  feelessVerificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
   addressToE164Number: AddressToE164NumberType
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
@@ -113,6 +125,7 @@ export interface State {
     isLoading: boolean
     lastFetch: number | null
   } & UpdatableVerificationState
+  feelessVerificationState: FeelessVerificationState
   lastRevealAttempt: number | null
 }
 
@@ -121,6 +134,7 @@ const initialState: State = {
   acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
   verificationStatus: VerificationStatus.Stopped,
+  feelessVerificationStatus: VerificationStatus.Stopped,
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
@@ -151,6 +165,25 @@ const initialState: State = {
       completed: 0,
     },
     lastFetch: null,
+  },
+  feelessVerificationState: {
+    isLoading: false,
+    phoneHashDetails: {
+      e164Number: '',
+      phoneHash: '',
+      pepper: '',
+    },
+    actionableAttestations: [],
+    status: {
+      isVerified: false,
+      numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+      total: 0,
+      completed: 0,
+    },
+    lastFetch: null,
+    komenciErrorTimestamps: [],
+    unverifiedMtwAddress: null,
+    attemptFeelessVerification: false,
   },
   lastRevealAttempt: null,
 }
@@ -186,6 +219,11 @@ export const reducer = (
       return {
         ...state,
         verificationStatus: action.status,
+      }
+    case Actions.SET_FEELESS_VERIFICATION_STATUS:
+      return {
+        ...state,
+        feelessVerificationStatus: action.status,
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
       return {
@@ -367,6 +405,15 @@ export const reducer = (
           ...action.state,
         },
       }
+    case Actions.UPDATE_FEELESS_VERIFICATION_STATE:
+      return {
+        ...state,
+        feelessVerificationState: {
+          lastFetch: Date.now(),
+          isLoading: false,
+          ...action.state,
+        },
+      }
     case Actions.SET_LAST_REVEAL_ATTEMPT:
       return {
         ...state,
@@ -444,6 +491,9 @@ export const verificationStateSelector = createSelector(
     isBalanceSufficient,
   })
 )
+
+export const feelessVerificationStateSelector = (state: RootState) =>
+  state.identity.feelessVerificationState
 
 export const isVerificationStateExpiredSelector = (state: RootState) => {
   return (
