@@ -199,16 +199,18 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
       verification: call(doVerificationFlow, withoutRevealing),
       restart: take(Actions.RESEND_ATTESTATIONS),
     })
+
     if (restart) {
       isRestarted = true
       const { status }: VerificationState = yield select(verificationStateSelector)
       ValoraAnalytics.track(VerificationEvents.verification_resend_messages, {
         count: status.numAttestationsRemaining,
       })
-    } else {
-      return verification
+      Logger.debug(TAG, 'Verification has been restarted')
+      continue
     }
-    Logger.debug(TAG, 'Verification has been restarted')
+
+    return verification
   }
 }
 
@@ -267,7 +269,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           phoneHashDetails,
           attestations
         )
-        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
 
         // count how much more attestations we need to request
         const attestationsToRequest =
@@ -304,7 +305,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
             attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
           )
 
-          ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
           // Request codes for the new list of attestations. We ignore unsuccessfull reveals here,
           // cause we do not want to go into a loop of re-requesting more and more attestations
           yield call(
@@ -314,8 +314,8 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
             phoneHashDetails,
             attestations
           )
-          ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
         }
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
       }
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
@@ -467,6 +467,7 @@ function* requestAttestations(
     return
   }
 
+  // Check for attestation requests that need an issuer to be selected.
   const unselectedRequest: UnselectedRequest = yield call(
     [attestationsWrapper, attestationsWrapper.getUnselectedRequest],
     phoneHash,
@@ -480,12 +481,15 @@ function* requestAttestations(
     ))
   }
 
+  // If any attestations require issuer selection, no new requests can be made
+  // until the issuers are selected or the request expires.
   if (isUnselectedRequestValid) {
     Logger.debug(
       `${TAG}@requestAttestations`,
       `Valid unselected request found, skipping approval/request`
     )
   } else {
+    // Approve the attestation fee to be paid from the user's cUSD account.
     Logger.debug(
       `${TAG}@requestAttestations`,
       `Approving ${numAttestationsRequestsNeeded} new attestations`
@@ -503,11 +507,11 @@ function* requestAttestations(
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
+    // Request the required number of attestations.
     Logger.debug(
       `${TAG}@requestAttestations`,
       `Requesting ${numAttestationsRequestsNeeded} new attestations`
     )
-
     const requestTx: CeloTransactionObject<void> = yield call(
       [attestationsWrapper, attestationsWrapper.request],
       phoneHash,
@@ -523,6 +527,7 @@ function* requestAttestations(
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   }
 
+  // Wait for the issuer selection delay to elapse, then select issuers for the attestations.
   Logger.debug(`${TAG}@requestAttestations`, 'Waiting for block to select issuers')
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
 
