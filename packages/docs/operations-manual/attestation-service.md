@@ -168,6 +168,7 @@ Optional environment variables:
 | Variable                       | Explanation    |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
+| `RATE_LIMIT_REQS_PER_MIN`        | Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
 | `MAX_DELIVERY_ATTEMPTS`          | Number of total delivery attempts when sending SMS. Each attempt tries the next available provider in the order specified. If omitted, the deprecated `MAX_PROVIDER_RETRIES` option will be used. Default value is `3`.  |
 | `MAX_REREQUEST_MINS`       | Number of minutes during which the client can rerequest the same attestation. Default value is `55`.
