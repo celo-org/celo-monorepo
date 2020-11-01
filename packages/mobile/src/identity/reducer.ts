@@ -87,6 +87,7 @@ export type FeelessUpdatableVerificationState = {
     serviceAvailable: boolean
     sessionActive: boolean
     sessionToken: string
+    captchaToken: string
     pepperQuotaRemaining: number
     smsRequestsRemaining: number
   }
@@ -200,6 +201,7 @@ const initialState: State = {
       serviceAvailable: false,
       sessionActive: false,
       sessionToken: '',
+      captchaToken: '',
       pepperQuotaRemaining: 1,
       smsRequestsRemaining: 10,
     },

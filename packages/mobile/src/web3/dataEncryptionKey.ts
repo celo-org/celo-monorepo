@@ -75,7 +75,8 @@ export function* createAccountDek(mnemonic: string) {
 
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
-export function* registerAccountDek(walletAddress: string) {
+// pendingMtwAddress is only passed during feeless verification flow
+export function* registerAccountDek(walletAddress: string, pendingMtwAddress?: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
@@ -105,7 +106,7 @@ export function* registerAccountDek(walletAddress: string) {
     ])
 
     const mtwAddress: string | null = yield select(mtwAddressSelector)
-    const accountAddress: string = mtwAddress || walletAddress
+    const accountAddress: string = pendingMtwAddress || mtwAddress || walletAddress
 
     const upToDate: boolean = yield call(
       isAccountUpToDate,

@@ -328,6 +328,8 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       }
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
+      // NOTE: I think we want the DEK registration out of the race because
+      // we want that to happen no matter what
       yield race({
         actionableAttestationCompleted: all([
           call(completeAttestations, attestationsWrapper, account, phoneHashDetails, attestations),
@@ -678,7 +680,7 @@ function* completeAttestations(
   )
 }
 
-function* revealAttestation(
+export function* revealAttestation(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
@@ -730,7 +732,7 @@ function* completeAttestation(
   Logger.debug(TAG + '@completeAttestation', `Attestation for issuer ${issuer} completed`)
 }
 
-function* tryRevealPhoneNumber(
+export function* tryRevealPhoneNumber(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
