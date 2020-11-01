@@ -4,7 +4,7 @@ import { privateKeyToAddress } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Linking, Platform } from 'react-native'
+import { Linking, Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -15,12 +15,14 @@ import {
   delay,
   put,
   race,
+  select,
   spawn,
   take,
   TakeEffect,
   takeLeading,
 } from 'redux-saga/effects'
 import { Actions as AccountActions } from 'src/account/actions'
+import { nameSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -109,20 +111,20 @@ export async function getInviteFee(
 }
 
 export function getInvitationVerificationFeeInDollars() {
-  return new BigNumber(INVITE_FEE)
+  return new BigNumber(features.KOMENCI ? 0 : INVITE_FEE)
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(INVITE_FEE).multipliedBy(1e18)
+  return getInvitationVerificationFeeInDollars().multipliedBy(1e18)
 }
 
-export async function generateInviteLink(inviteCode: string) {
+export async function generateInviteLink(inviteCode?: string) {
   let bundleId = DeviceInfo.getBundleId()
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
 
   // trying to fetch appStoreId needed to build a dynamic link
   const shortUrl = await generateShortInviteLink({
-    link: `https://valoraapp.com/?invite-code=${inviteCode}`,
+    link: `https://valoraapp.com/${inviteCode ? `?invite-code=${inviteCode}` : ''}`,
     appStoreId: APP_STORE_ID,
     bundleId,
   })
@@ -174,12 +176,14 @@ export function* sendInvite(
     const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
+    const name = yield select(nameSelector)
 
     const link = yield call(generateInviteLink, inviteCode)
     const message = i18n.t(
-      amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS',
+      amount ? 'sendFlow7:inviteWithEscrowedPayment' : 'sendFlow7:inviteWithoutPayment',
       {
-        code: inviteCode,
+        name,
+        amount: amount?.toString(),
         link,
       }
     )
@@ -197,19 +201,20 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
-    const context = newTransactionContext(TAG, 'Transfer to invite address')
-    yield put(
-      transferStableToken({
-        recipientAddress: temporaryAddress,
-        amount: INVITE_FEE,
-        comment: SENTINEL_INVITE_COMMENT,
-        context,
-      })
-    )
-
-    yield call(waitForTransactionWithId, context.id)
-    ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
-    Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
+    if (!features.KOMENCI) {
+      const context = newTransactionContext(TAG, 'Transfer to invite address')
+      yield put(
+        transferStableToken({
+          recipientAddress: temporaryAddress,
+          amount: INVITE_FEE,
+          comment: SENTINEL_INVITE_COMMENT,
+          context,
+        })
+      )
+      yield call(waitForTransactionWithId, context.id)
+      ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
+      Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
+    }
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
@@ -220,7 +225,11 @@ export function* sendInvite(
 
     const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
-    yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+    if (features.KOMENCI) {
+      yield call(Share.share, { message })
+    } else {
+      yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+    }
   } catch (e) {
     ValoraAnalytics.track(InviteEvents.invite_tx_error, { escrowIncluded, error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)

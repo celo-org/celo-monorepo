@@ -27,6 +27,7 @@ export enum Actions {
   SET_SESSION_ID = 'SET_SESSION_ID',
   OPEN_URL = 'APP/OPEN_URL',
   MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+  INVITE_MODAL_TEXT = 'APP/INVITE_MODAL_TEXT',
 }
 
 export interface SetAppState {
@@ -76,6 +77,11 @@ interface SetRequirePinOnAppOpen {
   enabled: boolean
 }
 
+interface InviteModalAction {
+  type: Actions.INVITE_MODAL_TEXT
+  inviteModalText: string | null
+}
+
 export interface Lock {
   type: Actions.LOCK
 }
@@ -115,6 +121,7 @@ export type ActionTypes =
   | SetSessionId
   | OpenUrlAction
   | MinAppVersionDeterminedAction
+  | InviteModalAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -194,4 +201,9 @@ export const minAppVersionDetermined = (
 ): MinAppVersionDeterminedAction => ({
   type: Actions.MIN_APP_VERSION_DETERMINED,
   minVersion,
+})
+
+export const toggleInviteModal = (inviteModalText: string | null): InviteModalAction => ({
+  type: Actions.INVITE_MODAL_TEXT,
+  inviteModalText,
 })

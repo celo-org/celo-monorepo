@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import AsyncStorage from '@react-native-community/async-storage'
 import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import AlertBanner from 'src/alert/AlertBanner'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -10,6 +10,7 @@ import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { isVersionBelowMinimum } from 'src/firebase/firebase'
+import InviteFriendModal from 'src/invite/InviteFriendModal'
 import { navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import PincodeLock from 'src/pincode/PincodeLock'
@@ -50,6 +51,7 @@ export const NavigatorWrapper = () => {
   const [initialState, setInitialState] = React.useState()
   const appLocked = useTypedSelector(getAppLocked)
   const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
+  const inviteModalText = useTypedSelector((state) => state.app.inviteModalText)
   const routeNameRef = React.useRef()
 
   const updateRequired = React.useMemo(() => {
@@ -128,6 +130,15 @@ export const NavigatorWrapper = () => {
     routeNameRef.current = currentRouteName
   }
 
+  const onInvite = async () => {
+    if (!inviteModalText) {
+      throw new Error('Invite has no text for message. Should never happen.')
+    }
+    await Share.share({
+      message: inviteModalText || '',
+    })
+  }
+
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -143,6 +154,7 @@ export const NavigatorWrapper = () => {
         <View style={styles.floating}>
           {!appLocked && !updateRequired && <BackupPrompt />}
           <AlertBanner />
+          <InviteFriendModal isVisible={!!inviteModalText} onInvite={onInvite} />
         </View>
       </View>
     </NavigationContainer>

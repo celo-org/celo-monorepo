@@ -22,6 +22,7 @@ import {
 import { TransitionPresets } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect } from 'react'
+import { useAsync } from 'react-async-hook'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
@@ -38,12 +39,14 @@ import SettingsScreen from 'src/account/Settings'
 import Support from 'src/account/Support'
 import { HomeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { toggleInviteModal } from 'src/app/actions'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import AccountNumber from 'src/components/AccountNumber'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
+import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
@@ -52,12 +55,15 @@ import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
 import { Gold } from 'src/icons/navigator/Gold'
 import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
+import { Invite } from 'src/icons/navigator/Invite'
 import { Settings } from 'src/icons/navigator/Settings'
+import InviteFriendModal from 'src/invite/InviteFriendModal'
+import { generateInviteLink } from 'src/invite/saga'
 import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
 import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
 import { Screens } from 'src/navigator/Screens'
-import useSelector from 'src/redux/useSelector'
+import { default as useSelector } from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -71,6 +77,10 @@ type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerSty
   navigation: DrawerNavigationHelpers
   descriptors: DrawerDescriptorMap
   protectedRoutes: string[]
+}
+
+interface DrawerItemParams {
+  onPress: () => void
 }
 
 // This component has been taken from here:
@@ -106,6 +116,9 @@ function CustomDrawerItemList({
           .catch((error) => {
             Logger.error(`${TAG}@onPress`, 'PIN ensure error', error)
           })
+      } else if (route.params && (route.params as DrawerItemParams).onPress) {
+        const drawerParams = route.params as DrawerItemParams
+        drawerParams.onPress()
       } else {
         navigateToItem()
       }
@@ -216,6 +229,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
 export default function DrawerNavigator() {
   const { t } = useTranslation(Namespaces.global)
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
+  const name = useSelector(nameSelector)
+  const dispatch = useDispatch()
+  const inviteLink = useAsync(generateInviteLink, []).result
 
   const drawerContent = (props: DrawerContentComponentProps<DrawerContentOptions>) => (
     <CustomDrawerContent {...props} />
@@ -263,6 +279,24 @@ export default function DrawerNavigator() {
         component={FiatExchange}
         options={{ title: t('addAndWithdraw'), drawerIcon: AddWithdraw }}
       />
+      {features.KOMENCI && inviteLink && (
+        <Drawer.Screen
+          name={'InviteModal'}
+          component={InviteFriendModal}
+          initialParams={{
+            onPress: () =>
+              dispatch(
+                toggleInviteModal(
+                  t('sendFlow7:inviteWithoutPayment', {
+                    name,
+                    link: inviteLink,
+                  })
+                )
+              ),
+          }}
+          options={{ title: t('invite'), drawerIcon: Invite }}
+        />
+      )}
       <Drawer.Screen
         name={Screens.Settings}
         component={SettingsScreen}

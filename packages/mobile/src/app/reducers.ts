@@ -16,6 +16,7 @@ export interface State {
   lastTimeBackgrounded: number
   sessionId: string
   minVersion: string | null
+  inviteModalText: string | null
 }
 
 const initialState = {
@@ -31,6 +32,7 @@ const initialState = {
   lastTimeBackgrounded: 0,
   sessionId: '',
   minVersion: null,
+  inviteModalText: null,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language || i18n.language
@@ -134,6 +136,11 @@ export const appReducer = (
       return {
         ...state,
         minVersion: action.minVersion,
+      }
+    case Actions.INVITE_MODAL_TEXT:
+      return {
+        ...state,
+        inviteModalText: action.inviteModalText,
       }
     default:
       return state
