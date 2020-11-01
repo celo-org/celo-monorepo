@@ -8,6 +8,7 @@ export enum ActionTypes {
   SubmitMetaTransaction = 'SubmitMetaTransaction',
   RequestSubsidisedAttestation = 'RequestSubsidisedAttestation',
   CheckService = 'CheckService',
+  CheckSession = 'CheckSession',
 }
 
 export enum RequestMethod {
@@ -54,6 +55,32 @@ const _checkService = action<ActionTypes.CheckService, null, CheckServiceRespons
 )
 
 export const checkService = () => _checkService(null)
+
+export enum TrackedAction {
+  DistributedBlindedPepper = 'distributedBlindedPepper',
+  RequestSubsidisedAttestation = 'requestSubsidisedAttestation',
+  SubmitMetaTransaction = 'submitMetaTransaction',
+}
+
+export const CheckSessionResp = t.type({
+  quotaLeft: t.type({
+    distributedBlindedPepper: t.number,
+    requestSubsidisedAttestation: t.number,
+    submitMetaTransaction: t.number,
+  }),
+  metaTxWalletAddress: t.union([t.undefined, t.string]),
+})
+
+export type CheckSessionResp = t.TypeOf<typeof CheckSessionResp>
+
+export const _checkSession = action<ActionTypes.CheckSession, null, CheckSessionResp>(
+  ActionTypes.CheckSession,
+  RequestMethod.GET,
+  'v1/checkSession',
+  CheckSessionResp
+)
+
+export const checkSession = () => _checkSession(null)
 
 export interface StartSessionPayload {
   captchaResponseToken: string

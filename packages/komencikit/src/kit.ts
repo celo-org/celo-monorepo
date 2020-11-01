@@ -8,6 +8,7 @@ import {
 import { TransactionReceipt } from 'web3-core'
 import {
   checkService,
+  CheckSessionResp,
   deployWallet,
   getDistributedBlindedPepper,
   GetDistributedBlindedPepperResp,
@@ -15,6 +16,7 @@ import {
   startSession,
   StartSessionPayload,
   submitMetaTransaction,
+  checkSession,
 } from './actions'
 import { KomenciClient } from './client'
 import {
@@ -84,6 +86,17 @@ export class KomenciKit {
     }
 
     return Err(new KomenciDown())
+  }
+
+  /**
+   * checkSession: uses the /v1/checkSession endpoint to check the current session
+   * It returns the current quota usage and optionally a wallet address
+   * if one was deployed during the session
+   *
+   * @return Result<CheckSessionResp, FetchError>
+   */
+  checkSession = async (): Promise<Result<CheckSessionResp, FetchError>> => {
+    return this.client.exec(checkSession())
   }
 
   /**
