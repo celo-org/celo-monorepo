@@ -8,6 +8,7 @@ import {
 import { TransactionReceipt } from 'web3-core'
 import {
   checkService,
+  checkSession,
   CheckSessionResp,
   deployWallet,
   getDistributedBlindedPepper,
@@ -16,7 +17,6 @@ import {
   startSession,
   StartSessionPayload,
   submitMetaTransaction,
-  checkSession,
 } from './actions'
 import { KomenciClient } from './client'
 import {
@@ -141,10 +141,21 @@ export class KomenciKit {
    * @param clientVersion
    * @returns the identifier and the pepper
    */
-  getDistributedBlindedPepper = async (
+  @retry({
+    tries: 3,
+    bailOnErrorTypes: [
+      FetchErrorTypes.Unauthorised,
+      FetchErrorTypes.ServiceUnavailable,
+      FetchErrorTypes.QuotaExceededError,
+    ],
+    onRetry: (_args, error, attempt) => {
+      console.debug(`${TAG}/getDistributedBlindPepper attempt#${attempt} error: `, error)
+    },
+  })
+  public async getDistributedBlindedPepper(
     e164Number: string,
     clientVersion: string
-  ): Promise<Result<GetDistributedBlindedPepperResp, FetchError>> => {
+  ): Promise<Result<GetDistributedBlindedPepperResp, FetchError>> {
     return this.client.exec(getDistributedBlindedPepper({ e164Number, clientVersion }))
   }
 
@@ -215,6 +226,7 @@ export class KomenciKit {
     bailOnErrorTypes: [
       FetchErrorTypes.Unauthorised,
       FetchErrorTypes.ServiceUnavailable,
+      FetchErrorTypes.QuotaExceededError,
       TxErrorTypes.Revert,
     ],
     onRetry: (_args, error, attempt) => {
@@ -342,6 +354,7 @@ export class KomenciKit {
     bailOnErrorTypes: [
       FetchErrorTypes.Unauthorised,
       FetchErrorTypes.ServiceUnavailable,
+      FetchErrorTypes.QuotaExceededError,
       TxErrorTypes.Revert,
     ],
     onRetry: (_args, error, attempt) => {
