@@ -8,6 +8,7 @@ export enum FetchErrorTypes {
   NetworkError = 'NetworkError',
   DecodeError = 'DecodeError',
   NotFoundError = 'NotFoundError',
+  QuotaExceededError = 'QuotaExceededError',
 }
 
 export class Unauthorised extends RootError<FetchErrorTypes.Unauthorised> {
@@ -58,6 +59,12 @@ export class NotFoundError extends RootError<FetchErrorTypes.NotFoundError> {
   }
 }
 
+export class QuotaExceededError extends RootError<FetchErrorTypes.QuotaExceededError> {
+  constructor() {
+    super(FetchErrorTypes.QuotaExceededError)
+  }
+}
+
 export type FetchError =
   | Unauthorised
   | RequestError
@@ -66,6 +73,7 @@ export type FetchError =
   | NetworkError
   | ResponseDecodeError
   | NotFoundError
+  | QuotaExceededError
 
 export enum TxErrorTypes {
   Timeout = 'Timeout',
