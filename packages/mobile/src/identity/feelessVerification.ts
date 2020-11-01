@@ -77,7 +77,7 @@ import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
-import { registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { TransactionReceipt } from 'web3-eth'
 
@@ -369,31 +369,31 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
   let receiveMessageTask: Task | undefined
   let autoRetrievalTask: Task | undefined
 
-  const feelessVerificationState: FeelessVerificationState = yield select(
-    feelessVerificationStateSelector
-  )
-  let { unverifiedMtwAddress } = feelessVerificationState.komenci
   try {
     yield put(feelessSetVerificationStatus(VerificationStatus.Prepping))
 
+    const feelessVerificationState: FeelessVerificationState = yield select(
+      feelessVerificationStateSelector
+    )
+    let { unverifiedMtwAddress } = feelessVerificationState.komenci
+    const { serviceAvailable } = feelessVerificationState.komenci
+
+    // Flow should never start if service is unavailable but including this
+    // as an extra precaution
+    if (!serviceAvailable) {
+      throw Error('Komenci not available: Error thrown in flow, should never happen')
+    }
+
+    const [walletAddress, contractKit]: [string, ContractKit] = yield all([
+      call(getConnectedUnlockedAccount),
+      call(getContractKit),
+    ])
+
+    const komenciKit = new KomenciKit(contractKit, walletAddress, {
+      url: KOMENCI_URL,
+    })
+
     if (!feelessVerificationState.status.isVerified || !unverifiedMtwAddress) {
-      const { serviceAvailable } = feelessVerificationState.komenci
-
-      // Flow should never start if service is unavailable but including this
-      // as an extra precaution
-      if (!serviceAvailable) {
-        throw Error('Komenci not available: Error thrown in flow, should never happen')
-      }
-
-      const [walletAddress, contractKit]: [string, ContractKit] = yield all([
-        call(getConnectedUnlockedAccount),
-        call(getContractKit),
-      ])
-
-      const komenciKit = new KomenciKit(contractKit, walletAddress, {
-        url: KOMENCI_URL,
-      })
-
       // If there isn't a sessionToken, you need to start a new Komenci session
       if (!feelessVerificationState.komenci.sessionToken.length) {
         const { captchaToken } = feelessVerificationState.komenci
@@ -459,7 +459,6 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           throw Error('No pepper quota remaining, must redo captcha')
         }
 
-        // NOTE: This is returning the identifier in addition to the pepper, which I believe is not desired
         const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
           komenciKit.getDistributedBlindedPepper,
           e164Number,
@@ -546,7 +545,12 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
         })
       )
 
-      // ====== Below this point feeless verification flow is largely the same as the original ====== //
+      // Registering the DEK and wallet before beginning verification to guarantee that every
+      // verified MTW address (i.e., accountAddress) has an EOA (i.e., walletAddress)
+      // registered to it. If that's not guaranteed, users are at risk of sending to MTWs
+      yield call(registerWalletAndDekViaKomenci, komenciKit, unverifiedMtwAddress, walletAddress)
+
+      // ====== Below this point feeless verification has a similar structure to the original ====== //
 
       const { status, actionableAttestations } = feelessVerificationState
       const { phoneHash } = phoneHashDetails
@@ -650,7 +654,6 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
         call(
           feelessCompleteAttestations,
           komenciKit,
-          attestationsWrapper,
           unverifiedMtwAddress,
           phoneHashDetails,
           attestations
@@ -659,15 +662,15 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
         call(requiredAttestationsCompleted),
       ])
 
-      // Set acccount and data encryption key in Accounts contract
-      // This is done in other places too, intentionally keeping it for more coverage
-      yield call(registerAccountDek, walletAddress, unverifiedMtwAddress)
-
       receiveMessageTask?.cancel()
       if (Platform.OS === 'android') {
         autoRetrievalTask?.cancel()
       }
     }
+
+    // Intentionally calling this a second time because it's critical that this is successful
+    // so user shouldn't be considered verified until we are sure it has been done
+    yield call(registerWalletAndDekViaKomenci, komenciKit, unverifiedMtwAddress, walletAddress)
 
     yield call(endFeelessVerification, unverifiedMtwAddress)
     return true
@@ -957,7 +960,6 @@ function* feelessRevealAttestations(
 
 function* feelessCompleteAttestations(
   komenciKit: KomenciKit,
-  attestationsWrapper: AttestationsWrapper,
   mtwAddress: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestations: ActionableAttestation[]
@@ -968,21 +970,13 @@ function* feelessCompleteAttestations(
   )
   yield all(
     attestations.map((attestation) => {
-      return call(
-        feelessCompleteAttestation,
-        komenciKit,
-        attestationsWrapper,
-        mtwAddress,
-        phoneHashDetails,
-        attestation
-      )
+      return call(feelessCompleteAttestation, komenciKit, mtwAddress, phoneHashDetails, attestation)
     })
   )
 }
 
 function* feelessCompleteAttestation(
   komenciKit: KomenciKit,
-  attestationsWrapper: AttestationsWrapper,
   mtwAddress: string,
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation
