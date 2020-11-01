@@ -1,12 +1,27 @@
-// tslint:disable: no-console
+import Logger, { createLogger, levelFromName, LogLevelString, stdSerializers } from 'bunyan'
+import bunyanDebugStream from 'bunyan-debug-stream'
+import { createStream } from 'bunyan-gke-stackdriver'
+import { fetchEnv, fetchEnvOrDefault } from './config-utils'
 
-const now = () => new Date().toISOString()
+const logLevel = fetchEnvOrDefault('LOG_LEVEL', 'info') as LogLevelString
+const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
+const serviceName = fetchEnv('SERVICE_NAME')
 
-const logger = {
-  debug: (...args: any[]) => console.debug(`${now()}::`, ...args),
-  info: (...args: any[]) => console.info(`${now()}::`, ...args),
-  warn: (...args: any[]) => console.warn(`${now()}::`, ...args),
-  error: (...args: any[]) => console.error(`${now()}::`, ...args),
+let stream: any
+switch (logFormat) {
+  case 'stackdriver':
+    stream = createStream(levelFromName[logLevel])
+    break
+  case 'json':
+    stream = { stream: process.stdout, level: logLevel }
+    break
+  default:
+    stream = { level: logLevel, stream: bunyanDebugStream() }
+    break
 }
 
-export default logger
+export const logger: Logger = createLogger({
+  name: serviceName,
+  serializers: stdSerializers,
+  streams: [stream],
+})
