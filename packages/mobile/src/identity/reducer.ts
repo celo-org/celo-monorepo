@@ -80,28 +80,37 @@ export interface UpdatableVerificationState {
   status: AttestationsStatus
 }
 
-export type UpdatableFeelessVerificationState = {
-  komenciErrorTimestamps: number[]
-  unverifiedMtwAddress: string | null
-  attemptFeelessVerification: boolean
+export type FeelessUpdatableVerificationState = {
+  komenci: {
+    errorTimestamps: number[]
+    unverifiedMtwAddress: string | null
+    serviceAvailable: boolean
+    sessionActive: boolean
+    sessionToken: string
+    pepperQuotaRemaining: number
+    smsRequestsRemaining: number
+  }
 } & UpdatableVerificationState
-
-export type FeelessVerificationState = {
-  isLoading: boolean
-  lastFetch: number | null
-} & UpdatableFeelessVerificationState
 
 export type VerificationState = State['verificationState'] & {
   isBalanceSufficient: boolean
 }
 
+export type FeelessVerificationState = {
+  isLoading: boolean
+  lastFetch: number | null
+} & FeelessUpdatableVerificationState
+
 export interface State {
   attestationCodes: AttestationCode[]
+  feelessAttestationCodes: AttestationCode[]
   // we store acceptedAttestationCodes to tell user if code
   // was already used even after Actions.RESET_VERIFICATION
   acceptedAttestationCodes: AttestationCode[]
+  feelessAcceptedAttestationCodes: AttestationCode[]
   // numCompleteAttestations is controlled locally
   numCompleteAttestations: number
+  feelessNumCompleteAttestations: number
   verificationStatus: VerificationStatus
   feelessVerificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
@@ -127,12 +136,16 @@ export interface State {
   } & UpdatableVerificationState
   feelessVerificationState: FeelessVerificationState
   lastRevealAttempt: number | null
+  feelessLastRevealAttempt: number | null
 }
 
 const initialState: State = {
   attestationCodes: [],
+  feelessAttestationCodes: [],
   acceptedAttestationCodes: [],
+  feelessAcceptedAttestationCodes: [],
   numCompleteAttestations: 0,
+  feelessNumCompleteAttestations: 0,
   verificationStatus: VerificationStatus.Stopped,
   feelessVerificationStatus: VerificationStatus.Stopped,
   hasSeenVerificationNux: false,
@@ -181,11 +194,18 @@ const initialState: State = {
       completed: 0,
     },
     lastFetch: null,
-    komenciErrorTimestamps: [],
-    unverifiedMtwAddress: null,
-    attemptFeelessVerification: false,
+    komenci: {
+      errorTimestamps: [],
+      unverifiedMtwAddress: null,
+      serviceAvailable: false,
+      sessionActive: false,
+      sessionToken: '',
+      pepperQuotaRemaining: 1,
+      smsRequestsRemaining: 10,
+    },
   },
   lastRevealAttempt: null,
+  feelessLastRevealAttempt: null,
 }
 
 export const reducer = (
@@ -199,12 +219,14 @@ export const reducer = (
         ...state,
         ...getRehydratePayload(action, 'identity'),
         verificationStatus: VerificationStatus.Stopped,
+        feelessVerificationStatus: VerificationStatus.Stopped,
         importContactsProgress: {
           status: ImportContactsStatus.Stopped,
           current: 0,
           total: 0,
         },
         verificationState: initialState.verificationState,
+        feelessVerificationState: initialState.feelessVerificationState,
         isFetchingAddresses: false,
       }
     }
@@ -215,12 +237,19 @@ export const reducer = (
         numCompleteAttestations: 0,
         verificationStatus: VerificationStatus.Stopped,
       }
+    case Actions.FEELESS_RESET_VERIFICATION:
+      return {
+        ...state,
+        feelessAttestationCodes: [],
+        feelessNumCompleteAttestations: 0,
+        feelessVerificationStatus: VerificationStatus.Stopped,
+      }
     case Actions.SET_VERIFICATION_STATUS:
       return {
         ...state,
         verificationStatus: action.status,
       }
-    case Actions.SET_FEELESS_VERIFICATION_STATUS:
+    case Actions.FEELESS_SET_VERIFICATION_STATUS:
       return {
         ...state,
         feelessVerificationStatus: action.status,
@@ -235,17 +264,32 @@ export const reducer = (
         ...state,
         ...completeCodeReducer(state, action.numComplete),
       }
-
+    case Actions.FEELESS_SET_COMPLETED_CODES:
+      return {
+        ...state,
+        ...feelessCompleteCodeReducer(state, action.numComplete),
+      }
     case Actions.INPUT_ATTESTATION_CODE:
       return {
         ...state,
         attestationCodes: [...state.attestationCodes, action.code],
+      }
+    case Actions.FEELESS_INPUT_ATTESTATION_CODE:
+      return {
+        ...state,
+        feelessAttestationCodes: [...state.feelessAttestationCodes, action.code],
       }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
         ...completeCodeReducer(state, state.numCompleteAttestations + 1),
         acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
+      }
+    case Actions.FEELESS_COMPLETE_ATTESTATION_CODE:
+      return {
+        ...state,
+        ...feelessCompleteCodeReducer(state, state.feelessNumCompleteAttestations + 1),
+        feelessAcceptedAttestationCodes: [...state.feelessAcceptedAttestationCodes, action.code],
       }
     case Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES:
       return {
@@ -396,6 +440,14 @@ export const reducer = (
           isLoading: true,
         },
       }
+    case Actions.FEELESS_FETCH_VERIFICATION_STATE:
+      return {
+        ...state,
+        feelessVerificationState: {
+          ...initialState.feelessVerificationState,
+          isLoading: true,
+        },
+      }
     case Actions.UPDATE_VERIFICATION_STATE:
       return {
         ...state,
@@ -405,7 +457,7 @@ export const reducer = (
           ...action.state,
         },
       }
-    case Actions.UPDATE_FEELESS_VERIFICATION_STATE:
+    case Actions.FEELESS_UPDATE_VERIFICATION_STATE:
       return {
         ...state,
         feelessVerificationState: {
@@ -418,6 +470,11 @@ export const reducer = (
       return {
         ...state,
         lastRevealAttempt: action.time,
+      }
+    case Actions.FEELESS_SET_LAST_REVEAL_ATTEMPT:
+      return {
+        ...state,
+        feelessLastRevealAttempt: action.time,
       }
     default:
       return state
@@ -439,9 +496,28 @@ const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
   }
 }
 
+const feelessCompleteCodeReducer = (state: State, feelessNumCompleteAttestations: number) => {
+  const { feelessAttestationCodes, feelessAcceptedAttestationCodes } = state
+  // Ensure numCompleteAttestations many codes are filled
+  for (let i = 0; i < feelessNumCompleteAttestations; i++) {
+    feelessAttestationCodes[i] = feelessAcceptedAttestationCodes[i] || {
+      code: ATTESTATION_CODE_PLACEHOLDER,
+      issuer: ATTESTATION_ISSUER_PLACEHOLDER,
+    }
+  }
+  return {
+    feelessNumCompleteAttestations,
+    feelessAttestationCodes: [...feelessAttestationCodes],
+  }
+}
+
 export const attestationCodesSelector = (state: RootState) => state.identity.attestationCodes
+export const feelessAttestationCodesSelector = (state: RootState) =>
+  state.identity.feelessAttestationCodes
 export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
+export const feelessAcceptedAttestationCodesSelector = (state: RootState) =>
+  state.identity.feelessAcceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
 export const walletToAccountAddressSelector = (state: RootState) =>
@@ -503,9 +579,21 @@ export const isVerificationStateExpiredSelector = (state: RootState) => {
   )
 }
 
+export const isFeelessVerificationStateExpiredSelector = (state: RootState) => {
+  const { lastFetch } = state.identity.feelessVerificationState
+  return !lastFetch || timeDeltaInSeconds(Date.now(), lastFetch) > VERIFICATION_STATE_EXPIRY_SECONDS
+}
+
 export const isRevealAllowed = ({ identity: { lastRevealAttempt } }: RootState) => {
   return (
     !lastRevealAttempt ||
     timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
+  )
+}
+
+export const feelessIsRevealAllowed = ({ identity: { feelessLastRevealAttempt } }: RootState) => {
+  return (
+    !feelessLastRevealAttempt ||
+    timeDeltaInSeconds(Date.now(), feelessLastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
   )
 }

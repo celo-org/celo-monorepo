@@ -10,7 +10,6 @@ import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
-import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -376,13 +375,6 @@ export function* requiredAttestationsCompleted() {
       return
     }
   }
-}
-
-export function* balanceSufficientForAttestations(attestationsRemaining: number) {
-  const userBalance = yield select(stableTokenBalanceSelector)
-  return new BigNumber(userBalance).isGreaterThan(
-    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
-  )
 }
 
 // Requests if necessary additional attestations and returns all revealable attestations
