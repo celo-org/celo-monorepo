@@ -1,12 +1,11 @@
 {
-  "name": "@celo/phone-number-privacy-combiner",
-  "version": "1.1.2",
-  "description": "Orchestrates and combines threshold signatures for use in ODIS",
+  "name": "@celo/phone-number-privacy-monitor",
+  "version": "1.0.0",
+  "description": "Regularly queries ODIS to ensure the system is functioning properly",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "yarn build && firebase serve --only functions",
     "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
     "deploy:alfajores": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
     "deploy:mainnet": "yarn build && firebase deploy --only functions --project celo-pgpnp-mainnet",
@@ -18,32 +17,14 @@
     "config:set:mainnet": "firebase functions:config:set --project celo-pgpnp-mainnet",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
-    "lint": "tslint --project .",
-    "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
-    "test:e2e": "jest test/end-to-end --verbose",
-    "db:migrate": "NODE_ENV=dev ts-node scripts/run-migrations.ts"
+    "lint": "tslint --project ."
   },
   "dependencies": {
     "@celo/contractkit": "0.4.17",
     "@celo/phone-number-privacy-common": "1.0.14",
     "@celo/utils": "0.1.21",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
-    "elliptic": "6.5.3",
     "firebase-admin": "^8.10.0",
-    "firebase-functions": "^3.6.0",
-    "knex": "^0.21.1",
-    "node-fetch": "^2.6.1",
-    "pg": "^8.2.1",
-    "uuid": "^7.0.3"
-  },
-  "devDependencies": {
-    "@types/btoa": "^1.2.3",
-    "@types/uuid": "^7.0.3",
-    "dotenv": "^8.2.0",
-    "firebase-functions-test": "^0.2.0"
-  },
-  "peerDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev"
+    "firebase-functions": "^3.6.0"
   },
   "engines": {
     "node": "10"
