@@ -260,8 +260,9 @@ export async function getTestnetOutputs(celoEnv: string) {
 }
 
 export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
-  const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.tx_node_lb_internal_ip_address.value
+  const fullCmd = getInternalTxNodeLoadBalancerIpCommand(celoEnv)
+  const [output] = await execCmd(fullCmd)
+  return output.trim()
 }
 
 export async function getInternalValidatorIPs(celoEnv: string) {
@@ -480,6 +481,11 @@ export function getVmSshCommand(instanceName: string) {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   return `gcloud beta compute --project '${project}' ssh --zone '${zone}' ${instanceName} --tunnel-through-iap`
+}
+
+export function getInternalTxNodeLoadBalancerIpCommand(celoEnv: string) {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  return `gcloud compute forwarding-rules list --project '${project}' --filter="name~'${celoEnv}-tx-node-lb-internal-fwd-rule'" --format='get(IPAddress)'`
 }
 
 export async function getNodeVmName(
