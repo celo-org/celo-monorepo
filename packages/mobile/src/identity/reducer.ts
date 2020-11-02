@@ -91,7 +91,7 @@ export type FeelessUpdatableVerificationState = {
     sessionToken: string
     captchaToken: string
     pepperQuotaRemaining: number
-    smsRequestsRemaining: number
+    requestQuotaRemaining: number
   }
 } & UpdatableVerificationState
 
@@ -205,7 +205,7 @@ const initialState: State = {
       sessionToken: '',
       captchaToken: '',
       pepperQuotaRemaining: 1,
-      smsRequestsRemaining: 10,
+      requestQuotaRemaining: 10,
     },
   },
   lastRevealAttempt: null,

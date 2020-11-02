@@ -12,9 +12,9 @@ import {
 
 export const verifyWallet = async (
   contractKit: ContractKit,
-  metaTxWalletAddress: Address | string,
+  metaTxWalletAddress: Address,
   allowedImplementations: Address[],
-  expectedSigner: Address | string
+  expectedSigner: Address
 ): Promise<Result<true, WalletValidationError>> => {
   const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
   // XXX: I'm unsure whether this is safe or if we should store the

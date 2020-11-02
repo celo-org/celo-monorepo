@@ -83,23 +83,22 @@ export function* storeTimestampIfKomenciError(error: Error) {
 
   // These errors should not be considered fatal Komenci errors
   if (
+    !unexpectedError ||
     error.message === FetchErrorTypes.QuotaExceededError ||
     error.message === FeelessVerificationErrors.PepperNotCachedError
   ) {
-    unexpectedError = false
+    return
   }
 
-  if (unexpectedError) {
-    const { errorTimestamps } = feelessVerificationState.komenci
-    errorTimestamps.push(Date.now())
-    yield put(
-      feelessUpdateVerificationState({
-        ...feelessVerificationState,
-        komenci: {
-          ...feelessVerificationState.komenci,
-          errorTimestamps,
-        },
-      })
-    )
-  }
+  const { errorTimestamps } = feelessVerificationState.komenci
+  errorTimestamps.push(Date.now())
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      komenci: {
+        ...feelessVerificationState.komenci,
+        errorTimestamps,
+      },
+    })
+  )
 }

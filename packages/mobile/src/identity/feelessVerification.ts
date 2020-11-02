@@ -91,7 +91,6 @@ import { TransactionReceipt } from 'web3-eth'
 const TAG = 'identity/feelessVerification'
 
 const KOMENCI_URL = 'http://localhost:3000'
-export const KOMENCI_MAX_ACTIONABLE_ATTESTATIONS = 5
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = []
 const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = ''
@@ -172,6 +171,7 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
 
   let sessionActive = true
   let unverifiedMtwAddress = null
+  let { requestQuotaRemaining, pepperQuotaRemaining } = feelessVerificationState.komenci
 
   // An inactive session is not fatal, it just means we will need to start one
   if (!sessionStatusResult.ok) {
@@ -185,6 +185,8 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
 
     sessionActive = true
     unverifiedMtwAddress = metaTxWalletAddress || null
+    pepperQuotaRemaining = distributedBlindedPepper
+    requestQuotaRemaining = requestSubsidisedAttestation
 
     // No pepper quota remaining is only bad if it's not already cached. Given Komenci will fetch
     // a pepper for you once, a session could be invalid due to the pepper condition if a user
@@ -205,6 +207,8 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
         ...feelessVerificationState.komenci,
         unverifiedMtwAddress,
         sessionActive,
+        requestQuotaRemaining,
+        pepperQuotaRemaining,
       },
     })
   )
@@ -705,11 +709,6 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
         // Count how many more attestations we need to request
         const attestationsToRequest =
           status.numAttestationsRemaining - reveals.filter((r: boolean) => r).length
-
-        // Check if we hit the limit for max actionable attestations at the same time
-        if (attestationsToRequest + attestations.length > KOMENCI_MAX_ACTIONABLE_ATTESTATIONS) {
-          throw new Error(ErrorMessages.MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED)
-        }
 
         if (attestationsToRequest) {
           yield put(feelessSetVerificationStatus(VerificationStatus.RequestingAttestations))
