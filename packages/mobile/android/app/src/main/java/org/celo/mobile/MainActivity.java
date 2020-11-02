@@ -59,6 +59,11 @@ public class MainActivity extends ReactActivity {
 
   @Override
   public void onNewIntent(Intent intent) {
+    // if firebase is not enabled this would cause a crash because of the firebase app not being inited
+    // the better fix would be to have a test firebase running in CI
+    // this is just a temporary fix until we get firebase working in all environments
+    // the crash is on the native side. It looks like the react activity tries to call
+    // firebase dynamic links, which in turn complains about firebase app not being initialized
     Boolean firebaseEnabled = Boolean.parseBoolean(BuildConfig.FIREBASE_ENABLED);
     if (firebaseEnabled) {
       super.onNewIntent(intent);
