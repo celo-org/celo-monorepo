@@ -1,6 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
