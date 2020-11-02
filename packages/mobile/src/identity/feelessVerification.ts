@@ -7,11 +7,12 @@ import {
   IdentifierLookupResult,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { GetDistributedBlindedPepperResp } from '@celo/komencikit/src/actions'
+import { CheckSessionResp, GetDistributedBlindedPepperResp } from '@celo/komencikit/src/actions'
 import {
   AuthenticationFailed,
   FetchError,
   InvalidWallet,
+  KomenciDown,
   LoginSignatureError,
   TxError,
   WalletValidationError,
@@ -19,7 +20,7 @@ import {
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { verifyWallet } from '@celo/komencikit/src/verifyWallet'
 import { Address } from '@celo/utils/src/address'
-import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -36,14 +37,11 @@ import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
   feelessCompleteAttestationCode,
-  feelessInputAttestationCode,
   FeelessInputAttestationCodeAction,
   feelessResetVerification,
   feelessSetCompletedCodes,
-  feelessSetLastRevealAttempt,
   feelessSetVerificationStatus,
   feelessUpdateVerificationState,
-  ReceiveAttestationMessageAction,
   StartVerificationAction,
   updateE164PhoneNumberSalts,
 } from 'src/identity/actions'
@@ -51,6 +49,14 @@ import {
   getAddressesFromLookupResult,
   lookupAttestationIdentifiers,
 } from 'src/identity/contactMapping'
+import {
+  checkIfUnexpectedKomenciError,
+  hasExceededKomenciErrorQuota,
+  KomenciDisabledError,
+  KomenciQuotaExceededError,
+  KomenciSessionInvalidError,
+  PepperNotCachedError,
+} from 'src/identity/feelessVerificationErrors'
 import {
   e164NumberToSaltSelector,
   E164NumberToSaltType,
@@ -63,13 +69,14 @@ import {
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import {
-  ANDROID_DELAY_REVEAL_ATTESTATION,
   AttestationCode,
-  CodeInputType,
+  attestationCodeReceiver,
+  completeAttestations,
   getActionableAttestations,
   getAttestationsStatus,
   NUM_ATTESTATIONS_REQUIRED,
-  revealAttestation,
+  requestAndRetrieveAttestations,
+  revealAttestations,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
@@ -85,77 +92,135 @@ const TAG = 'identity/feelessVerification'
 
 const KOMENCI_URL = 'http://localhost:3000'
 export const KOMENCI_MAX_ACTIONABLE_ATTESTATIONS = 5
-const KOMENCI_ERROR_WINDOW = 1000 * 60 * 60 * 3 // 3 hours
-const KOMENCI_ERROR_ALLOTMENT = 2
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = []
 const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = ''
 
-// If a user has already encountered too many errors within a given window,
-// do not allow them try verifing using Komenci again
-const hasExceededErrorAllotment = (komenciErrorTimestamps: number[]) => {
-  const currentTime = Date.now()
-  const recentErrors = komenciErrorTimestamps.filter(
-    (timestamp) => currentTime - timestamp < KOMENCI_ERROR_WINDOW
-  )
-
-  return recentErrors.length > KOMENCI_ERROR_ALLOTMENT
-}
-
-function* checkKomenciReadiness(
-  komenciKit: KomenciKit,
-  feelessVerificationState: FeelessVerificationState
-) {
-  const featureEnabled = features.KOMENCI
-  if (!featureEnabled) {
-    throw Error('Komenci not available: Feature not enabled')
-  }
-
-  const serviceStatus = yield call(komenciKit.checkService)
-  if (!serviceStatus.ok) {
-    throw Error(`Komenci not available: ${serviceStatus.error.message}`)
-  }
-
-  const {
-    komenci: { errorTimestamps },
-  } = feelessVerificationState
-  const exceededErrorAllotment = hasExceededErrorAllotment(errorTimestamps)
-  if (exceededErrorAllotment) {
-    throw Error(
-      `Komenci not available: Flow has failed more than ${KOMENCI_ERROR_ALLOTMENT} times within ${KOMENCI_ERROR_WINDOW /
-        1000 /
-        60 /
-        60} hours`
-    )
-  }
-
-  return true
-}
-
-function* getPhoneHashDetails(e164Number: string) {
-  const pepperCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
-  const cachedPepper = pepperCache[e164Number]
-
-  // If the user has started feeless verification, pepper will have been
-  // queried for and cached by Komenci already
-  if (!cachedPepper) {
-    throw Error('No pepper in cache yet')
-  }
-
-  const phoneHash = getPhoneHash(e164Number, cachedPepper)
-  const phoneHashDetails: PhoneNumberHashDetails = { e164Number, phoneHash, pepper: cachedPepper }
-  return phoneHashDetails
-}
-
-function* fetchVerifiedMtwAddress(
-  contractKit: ContractKit,
-  phoneHashDetails: PhoneNumberHashDetails,
-  walletAddress: string
-) {
+function* fetchKomenciReadiness(komenciKit: KomenciKit) {
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
-  const { phoneHash } = phoneHashDetails
+  const { komenci } = feelessVerificationState
+
+  if (!features.KOMENCI) {
+    throw new KomenciDisabledError()
+  }
+
+  const serviceStatusResult: Result<true, KomenciDown> = yield call(komenciKit.checkService)
+  if (!serviceStatusResult.ok) {
+    throw serviceStatusResult.error
+  }
+
+  if (hasExceededKomenciErrorQuota(komenci.errorTimestamps)) {
+    throw new KomenciQuotaExceededError()
+  }
+
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      komenci: {
+        ...feelessVerificationState.komenci,
+        serviceAvailable: true,
+      },
+    })
+  )
+}
+
+function* fetchPhoneHashDetailsFromCache(e164Number: string) {
+  const [feelessVerificationState, pepperCache]: [
+    FeelessVerificationState,
+    E164NumberToSaltType
+  ] = yield all([select(feelessVerificationStateSelector), select(e164NumberToSaltSelector)])
+
+  let { phoneHashDetails } = feelessVerificationState
+  let { phoneHash } = feelessVerificationState.phoneHashDetails
+  const ownPepper = pepperCache[e164Number]
+
+  // If we already know the phoneHash, we can bail without updating state
+  if (phoneHash.length) {
+    return phoneHashDetails
+  }
+
+  // Pepper will be queried as part of feeless verification flow but cache
+  // may be empty if the user hasn't initiated a Komenci session before
+  if (!ownPepper) {
+    throw new PepperNotCachedError()
+  }
+
+  phoneHash = getPhoneHash(e164Number, ownPepper)
+  phoneHashDetails = { e164Number, phoneHash, pepper: ownPepper }
+
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      phoneHashDetails,
+    })
+  )
+  return phoneHashDetails
+}
+
+function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
+  const [feelessVerificationState, pepperCache, sessionStatusResult]: [
+    FeelessVerificationState,
+    E164NumberToSaltType,
+    Result<CheckSessionResp, FetchError>
+  ] = yield all([
+    select(feelessVerificationStateSelector),
+    select(e164NumberToSaltSelector),
+    call(komenciKit.checkSession),
+  ])
+
+  let sessionActive = true
+  let unverifiedMtwAddress = null
+
+  // An inactive session is not fatal, it just means we will need to start one
+  if (!sessionStatusResult.ok) {
+    sessionActive = false
+  } else {
+    const {
+      quotaLeft: { distributedBlindedPepper, requestSubsidisedAttestation, submitMetaTransaction },
+      metaTxWalletAddress,
+    } = sessionStatusResult.result
+    const ownPepper = pepperCache[e164Number]
+
+    sessionActive = true
+    unverifiedMtwAddress = metaTxWalletAddress || null
+
+    // No pepper quota remaining is only bad if it's not already cached. Given Komenci will fetch
+    // a pepper for you once, a session could be invalid due to the pepper condition if a user
+    // fetched their pepper once this session then uninstalled without starting a new session
+    if (
+      (!ownPepper && !distributedBlindedPepper) ||
+      !requestSubsidisedAttestation ||
+      !submitMetaTransaction
+    ) {
+      sessionActive = false
+    }
+  }
+
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      komenci: {
+        ...feelessVerificationState.komenci,
+        unverifiedMtwAddress,
+        sessionActive,
+      },
+    })
+  )
+}
+
+function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164Number: string) {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+
+  const phonHashDetails: PhoneNumberHashDetails = yield call(
+    fetchPhoneHashDetailsFromCache,
+    e164Number
+  )
+  const { phoneHash } = phonHashDetails
+
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
   const possibleMtwAddresses = getAddressesFromLookupResult(lookupResult, phoneHash)
   if (!possibleMtwAddresses) {
@@ -163,15 +228,15 @@ function* fetchVerifiedMtwAddress(
   }
 
   const verificationResults: Array<Result<true, WalletValidationError>> = yield all(
-    possibleMtwAddresses.map((possibleMtwAddress) => {
-      return call(
+    possibleMtwAddresses.map((possibleMtwAddress) =>
+      call(
         verifyWallet,
         contractKit,
         possibleMtwAddress,
         ALLOWED_MTW_IMPLEMENTATIONS,
         walletAddress
       )
-    })
+    )
   )
 
   const verifiedMtwAddresses = possibleMtwAddresses.filter(
@@ -184,15 +249,15 @@ function* fetchVerifiedMtwAddress(
     )
   }
 
-  if (null) {
-    return
+  const verifiedMtwAddress = verifiedMtwAddresses[0]
+
+  if (!verifiedMtwAddress) {
+    return null
   }
 
-  const mtwAddress = verifiedMtwAddresses[0]
   yield put(
     feelessUpdateVerificationState({
-      phoneHashDetails,
-      actionableAttestations: feelessVerificationState.actionableAttestations,
+      ...feelessVerificationState,
       status: {
         isVerified: true,
         numAttestationsRemaining: 0,
@@ -201,100 +266,102 @@ function* fetchVerifiedMtwAddress(
       },
       komenci: {
         ...feelessVerificationState.komenci,
-        serviceAvailable: true,
+        unverifiedMtwAddress: verifiedMtwAddress,
       },
     })
   )
 
-  yield put(setMtwAddress(mtwAddress))
-  return mtwAddress
+  return verifiedMtwAddress
+}
+
+function* fetchAttestationStatus(contractKit: ContractKit) {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+
+  const { phoneHashDetails, komenci } = feelessVerificationState
+  const { phoneHash } = phoneHashDetails
+  const { unverifiedMtwAddress } = komenci
+
+  // If there isn't an address stored in state or we already know that the
+  // MTW is verified, then there is nothing to check the progress of
+  if (!unverifiedMtwAddress || feelessVerificationState.status.isVerified) {
+    return
+  }
+
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  const status: AttestationsStatus = yield call(
+    getAttestationsStatus,
+    attestationsWrapper,
+    unverifiedMtwAddress,
+    phoneHash
+  )
+
+  const actionableAttestations: ActionableAttestation[] = yield call(
+    getActionableAttestations,
+    attestationsWrapper,
+    phoneHash,
+    unverifiedMtwAddress
+  )
+
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      actionableAttestations,
+      status,
+    })
+  )
+
+  return status
 }
 
 export function* feelessFetchVerificationState() {
   try {
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
-    const contractKit: ContractKit = yield call(getContractKit)
-    const walletAddress: string = yield call(getConnectedUnlockedAccount)
+    const [contractKit, walletAddress, e164Number]: [ContractKit, string, string] = yield all([
+      call(getContractKit),
+      call(getConnectedUnlockedAccount),
+      select(e164NumberSelector),
+      put(feelessSetVerificationStatus(VerificationStatus.GettingStatus)),
+    ])
+
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
       url: KOMENCI_URL,
     })
-    const feelessVerificationState: FeelessVerificationState = yield select(
-      feelessVerificationStateSelector
-    )
 
-    // Throws error if Komenci is not ready for user
-    yield call(checkKomenciReadiness, komenciKit, feelessVerificationState)
-
-    const e164Number: string = yield select(e164NumberSelector)
-
-    // Throws error if unable to retreive phone hash
-    const phoneHashDetails: PhoneNumberHashDetails = yield call(getPhoneHashDetails, e164Number)
-    const { phoneHash } = phoneHashDetails
-    const { unverifiedMtwAddress } = feelessVerificationState.komenci
-
-    yield put(feelessSetVerificationStatus(VerificationStatus.GettingStatus))
-
-    // If there is no unverifiedMtwAddress in state, that means a new wallet
-    // hasn't been deployed yet. First check if there is a verified one
-    if (!unverifiedMtwAddress) {
-      yield call(fetchVerifiedMtwAddress, contractKit, phoneHashDetails, walletAddress)
-
-      // If a wallet hasn't deployed yet, there is no point in checking the
-      // Attestations contract for progress. Save state and bail
-      yield put(
-        feelessUpdateVerificationState({
-          ...feelessVerificationState,
-          phoneHashDetails,
-          komenci: {
-            ...feelessVerificationState.komenci,
-            serviceAvailable: true,
-          },
-        })
-      )
-
-      return
+    try {
+      // Checks if a MTW was verified in a previous attempt and updates state.
+      // This check will likely fail because the pepper hasn't been cached yet
+      // but needs to happen for the edge case that a user has a cached pepper
+      // and Komenci is down
+      yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
+    } catch (error) {
+      Logger.debug(TAG, 'Unable to check it MTW is verified on first attempt')
     }
+    // Throws error if Komenci is not ready for user, otherwise it updates state
+    yield call(fetchKomenciReadiness, komenciKit)
 
-    // Get all relevant info about the account's verification status
-    const attestationsWrapper: AttestationsWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getAttestations,
-    ])
+    // Throws error if unable to retreive phone hash, otherwise it updates state
+    yield call(fetchPhoneHashDetailsFromCache, e164Number)
 
-    const status: AttestationsStatus = yield call(
-      getAttestationsStatus,
-      attestationsWrapper,
-      unverifiedMtwAddress,
-      phoneHash
-    )
+    // Updates state with sessionStatus and the mtwAddress associated with the session
+    yield call(fetchSessionState, komenciKit, e164Number)
 
-    const actionableAttestations: ActionableAttestation[] = yield call(
-      getActionableAttestations,
-      attestationsWrapper,
-      phoneHash,
-      unverifiedMtwAddress
-    )
+    // Checks if a MTW was verified in a previous attempt and updates state
+    yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
 
-    // TODO: Check komenci session status here and add to state update. That way, if there is a valid
-    // live session, we dont have to make the user do the reCAPTCHA again
-
-    yield put(
-      feelessUpdateVerificationState({
-        phoneHashDetails,
-        actionableAttestations,
-        status,
-        komenci: {
-          ...feelessVerificationState.komenci,
-          serviceAvailable: true,
-        },
-      })
-    )
-
+    // Updates state with any attestation progress that's been made
+    const status: AttestationsStatus = yield call(fetchAttestationStatus, contractKit)
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
     })
   } catch (error) {
-    Logger.error(TAG, 'Error occured during fetching verification state', error)
+    Logger.error(TAG, 'Error occured while fetching verification state', error)
+    yield call(checkIfUnexpectedKomenciError, error)
   }
 }
 
@@ -359,10 +426,178 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
   }
 }
 
-function* endFeelessVerification(mtwAddress: string) {
+function* endFeelessVerification() {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+  const mtwAddress = feelessVerificationState.komenci.unverifiedMtwAddress
+
+  if (!mtwAddress) {
+    throw Error('Dev error: Tried ending feeless verification too early')
+  }
+
   yield put(setNumberVerified(true))
   yield put(setMtwAddress(mtwAddress))
   yield put(feelessSetVerificationStatus(VerificationStatus.Done))
+}
+
+function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string) {
+  // Start by doing a fresh pull of the session state
+  yield call(fetchSessionState, komenciKit, e164Number)
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+
+  const { sessionActive, captchaToken } = feelessVerificationState.komenci
+
+  if (sessionActive) {
+    return
+  }
+
+  // Should never get here without a captcha token
+  if (!captchaToken.length) {
+    throw new KomenciSessionInvalidError()
+  }
+
+  const komenciSessionResult: Result<
+    string,
+    FetchError | AuthenticationFailed | LoginSignatureError
+  > = yield call(komenciKit.startSession, captchaToken)
+
+  if (!komenciSessionResult.ok) {
+    throw komenciSessionResult.error
+  }
+
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      komenci: {
+        ...feelessVerificationState.komenci,
+        sessionToken: komenciSessionResult.result,
+      },
+    })
+  )
+}
+
+// Checks if phoneHash is in cache, if it's not it asks Komenci to get it,
+// puts it in the cache, then checks again
+function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
+  try {
+    yield call(fetchPhoneHashDetailsFromCache, e164Number)
+  } catch (error) {
+    const feelessVerificationState: FeelessVerificationState = yield select(
+      feelessVerificationStateSelector
+    )
+    const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
+      komenciKit.getDistributedBlindedPepper,
+      e164Number,
+      DeviceInfo.getVersion()
+    )
+
+    if (!pepperQueryResult.ok) {
+      throw pepperQueryResult.error
+    }
+
+    const pepperQuotaRemaining = feelessVerificationState.komenci.pepperQuotaRemaining - 1
+    yield put(
+      feelessUpdateVerificationState({
+        ...feelessVerificationState,
+        komenci: {
+          ...feelessVerificationState.komenci,
+          pepperQuotaRemaining,
+        },
+      })
+    )
+
+    yield put(updateE164PhoneNumberSalts({ [e164Number]: pepperQueryResult.result.pepper }))
+    yield call(fetchPhoneHashDetailsFromCache, e164Number)
+  }
+}
+
+function* reFetchVerifiedMtw(
+  contractKit: ContractKit,
+  walletAddress: string,
+  e164Number: string,
+  startingPepperQuota: number
+) {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+
+  const { pepperQuotaRemaining } = feelessVerificationState.komenci
+  // If Komenci was used to fetch their pepper, check if the they have a verified
+  // account. If user already had their pepper, then check would have happened
+  // in `feelessFetchVerificationState`
+  if (startingPepperQuota > pepperQuotaRemaining) {
+    yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
+  }
+}
+
+function* isMtwVerified() {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+
+  return feelessVerificationState.status.isVerified
+}
+
+function* fetchMtw(contractKit: ContractKit, komenciKit: KomenciKit, walletAddress: string) {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+  let { unverifiedMtwAddress } = feelessVerificationState.komenci
+
+  // If there isn't a MTW for this session, ask Komenci to deploy one
+  if (!unverifiedMtwAddress) {
+    const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
+      komenciKit.deployWallet,
+      CURRENT_MTW_IMPLEMENTATION_ADDRESS
+    )
+
+    if (!deployWalletResult.ok) {
+      throw deployWalletResult.error
+    }
+
+    unverifiedMtwAddress = deployWalletResult.result
+  }
+
+  // Check if MTW we have is a valid implementation
+  const validityCheckResult: Result<true, WalletValidationError> = yield call(
+    verifyWallet,
+    contractKit,
+    unverifiedMtwAddress,
+    ALLOWED_MTW_IMPLEMENTATIONS,
+    walletAddress
+  )
+
+  if (!validityCheckResult.ok) {
+    throw validityCheckResult.error
+  }
+
+  yield put(
+    feelessUpdateVerificationState({
+      ...feelessVerificationState,
+      komenci: {
+        ...feelessVerificationState.komenci,
+        unverifiedMtwAddress,
+      },
+    })
+  )
+}
+
+function* feelessDekAndWalletRegistration(komenciKit: KomenciKit, walletAddress: string) {
+  const feelessVerificationState: FeelessVerificationState = yield select(
+    feelessVerificationStateSelector
+  )
+
+  const { unverifiedMtwAddress } = feelessVerificationState.komenci
+
+  // Should never happen
+  if (!unverifiedMtwAddress) {
+    throw Error('Tried registering DEK and walletAddress without a MTW')
+  }
+
+  yield call(registerWalletAndDekViaKomenci, komenciKit, unverifiedMtwAddress, walletAddress)
 }
 
 export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
@@ -370,190 +605,67 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
   let autoRetrievalTask: Task | undefined
 
   try {
-    yield put(feelessSetVerificationStatus(VerificationStatus.Prepping))
-
-    const feelessVerificationState: FeelessVerificationState = yield select(
-      feelessVerificationStateSelector
-    )
-    let { unverifiedMtwAddress } = feelessVerificationState.komenci
-    const { serviceAvailable } = feelessVerificationState.komenci
-
-    // Flow should never start if service is unavailable but including this
-    // as an extra precaution
-    if (!serviceAvailable) {
-      throw Error('Komenci not available: Error thrown in flow, should never happen')
-    }
-
-    const [walletAddress, contractKit]: [string, ContractKit] = yield all([
+    const [walletAddress, contractKit, e164Number]: [string, ContractKit, string] = yield all([
       call(getConnectedUnlockedAccount),
       call(getContractKit),
+      select(e164NumberSelector),
+      put(feelessSetVerificationStatus(VerificationStatus.Prepping)),
     ])
+
+    let feelessVerificationState: FeelessVerificationState = yield select(
+      feelessVerificationStateSelector
+    )
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
       url: KOMENCI_URL,
     })
 
-    if (!feelessVerificationState.status.isVerified || !unverifiedMtwAddress) {
-      // If there isn't a sessionToken, you need to start a new Komenci session
-      if (!feelessVerificationState.komenci.sessionToken.length) {
-        const { captchaToken } = feelessVerificationState.komenci
-        if (!captchaToken.length) {
-          // TODO: Add an explanation for the user to understand why they are being sent back to
-          // QUESTION: Does this have unintended consequences for the screen stack?
-          yield call(navigate, Screens.VerificationEducationScreen, {
-            hideOnboardingStep: true,
-            showSkipDialog: false,
-          })
-          throw Error('No captchaToken stored. Should never happen')
-        }
+    // Start by checking again to make sure Komenci is ready. Throws error if not
+    yield call(fetchKomenciReadiness, komenciKit)
 
-        const komenciSessionResult: Result<
-          string,
-          FetchError | AuthenticationFailed | LoginSignatureError
-        > = yield call(komenciKit.startSession, captchaToken)
+    // There should be no instances where the first param is truethy but the second isn't.
+    // Mainly including the second param to satisfy typescript
+    if (
+      !feelessVerificationState.status.isVerified ||
+      !feelessVerificationState.komenci.unverifiedMtwAddress
+    ) {
+      // Start or resume a Komenci session and update state. Throws error if unable to do so
+      yield call(startOrResumeKomenciSession, komenciKit, e164Number)
 
-        if (!komenciSessionResult.ok) {
-          throw Error('Komenci unable to start session')
-        }
+      // Adds phoneHash into verification state, will ping Komenci for it only if needed.
+      // Throws an error if unable to get phoneHash
+      yield call(fetchPhoneHashDetails, komenciKit, e164Number)
 
-        const sessionToken = komenciSessionResult.result
-        yield put(
-          feelessUpdateVerificationState({
-            ...feelessVerificationState,
-            komenci: {
-              ...feelessVerificationState.komenci,
-              sessionToken,
-              sessionActive: true,
-            },
-          })
-        )
+      const startingPepperQuota = feelessVerificationState.komenci.pepperQuotaRemaining
+      // Now that we are guarnateed to have the phoneHash, check again to see if the
+      // user already has a verified MTW
+      yield call(reFetchVerifiedMtw, contractKit, walletAddress, e164Number, startingPepperQuota)
+
+      const mtwIsVerified = yield call(isMtwVerified)
+
+      if (mtwIsVerified) {
+        yield call(endFeelessVerification)
+        return true
       }
 
-      // TODO: Use KomenciKit to ping Komenci to check if the current session is still active
-      const sessionActive = true
-
-      // If Komenci session is not active, navigate back to the education screen
-      // so they can do the reCAPTCHA again
-      if (!sessionActive) {
-        // TODO: Add an explanation for the user to understand why they are being sent back to
-        // QUESTION: Does this have unintended consequences for the screen stack?
-        // this screen
-        yield call(navigate, Screens.VerificationEducationScreen, {
-          hideOnboardingStep: true,
-          showSkipDialog: false,
-        })
-
-        throw Error('Komenci session expired')
-      }
-
-      const e164Number: string = yield select(e164NumberSelector)
-      const pepperCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
-      let ownPepper = pepperCache[e164Number]
-      let {
-        phoneHashDetails,
-        komenci: { pepperQuotaRemaining },
-      } = feelessVerificationState
-
-      if (!ownPepper) {
-        if (!pepperQuotaRemaining) {
-          throw Error('No pepper quota remaining, must redo captcha')
-        }
-
-        const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
-          komenciKit.getDistributedBlindedPepper,
-          e164Number,
-          DeviceInfo.getVersion()
-        )
-
-        if (!pepperQueryResult.ok) {
-          throw Error(
-            `Komenci failed to query for pepper. Error: ${pepperQueryResult.error.message}`
-          )
-        }
-
-        pepperQuotaRemaining -= 1
-        ownPepper = pepperQueryResult.result.pepper
-        yield put(updateE164PhoneNumberSalts({ [e164Number]: ownPepper }))
-      }
-
-      phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
-
-      yield put(
-        feelessUpdateVerificationState({
-          phoneHashDetails,
-          actionableAttestations: feelessVerificationState.actionableAttestations,
-          status: feelessVerificationState.status,
-          komenci: {
-            ...feelessVerificationState.komenci,
-            pepperQuotaRemaining,
-          },
-        })
-      )
-
-      // If the user used the Komenci quota to fetch the pepper, check if the they
-      // have a verified account. If user already had their pepper, then check would have
-      // already happened in `feelessFetchVerificationState`
-      if (pepperQuotaRemaining < feelessVerificationState.komenci.pepperQuotaRemaining) {
-        const verifiedMtwAddress: string | null = yield call(
-          fetchVerifiedMtwAddress,
-          contractKit,
-          phoneHashDetails,
-          walletAddress
-        )
-
-        if (verifiedMtwAddress) {
-          yield call(endFeelessVerification, verifiedMtwAddress)
-          return true
-        }
-      }
-
-      // If there isn't a wallet in verification state, ask Komenci to deploy one
-      if (!unverifiedMtwAddress) {
-        const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
-          komenciKit.deployWallet,
-          CURRENT_MTW_IMPLEMENTATION_ADDRESS
-        )
-        if (!deployWalletResult.ok) {
-          throw Error(`Komenci failed to deploy MTW. Error: ${deployWalletResult.error.message}`)
-        }
-
-        unverifiedMtwAddress = deployWalletResult.result
-      }
-
-      // Check if MTW that was deployed is what we expected
-      const validityCheckResult: Result<true, WalletValidationError> = yield call(
-        verifyWallet,
-        contractKit,
-        unverifiedMtwAddress,
-        ALLOWED_MTW_IMPLEMENTATIONS,
-        walletAddress
-      )
-
-      if (!validityCheckResult.ok) {
-        throw Error(
-          `Deployed wallet did not meet expectations. Error: ${validityCheckResult.error.message}`
-        )
-      }
-
-      yield put(
-        feelessUpdateVerificationState({
-          ...feelessVerificationState,
-          komenci: {
-            ...feelessVerificationState.komenci,
-            unverifiedMtwAddress,
-          },
-        })
-      )
+      yield call(fetchMtw, contractKit, komenciKit, walletAddress)
 
       // Registering the DEK and wallet before beginning verification to guarantee that every
       // verified MTW address (i.e., accountAddress) has an EOA (i.e., walletAddress)
       // registered to it. If that's not guaranteed, users are at risk of sending to MTWs
-      yield call(registerWalletAndDekViaKomenci, komenciKit, unverifiedMtwAddress, walletAddress)
+      yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
 
-      // ====== Below this point feeless verification has a similar structure to the original ====== //
+      // ====== Below this point feeless verification has the same structure as the original ====== //
 
-      const { status, actionableAttestations } = feelessVerificationState
+      feelessVerificationState = yield select(feelessVerificationStateSelector)
+      const { status, actionableAttestations, phoneHashDetails, komenci } = feelessVerificationState
       const { phoneHash } = phoneHashDetails
+      const { unverifiedMtwAddress } = komenci
+
+      if (!unverifiedMtwAddress) {
+        throw Error('MTW not yet deploy. Should never happen')
+      }
+
       const attestationsWrapper: AttestationsWrapper = yield call([
         contractKit.contracts,
         contractKit.contracts.getAttestations,
@@ -574,12 +686,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       // Start listening for manual and/or auto message inputs
       receiveMessageTask = yield takeEvery(
         Actions.RECEIVE_ATTESTATION_MESSAGE,
-        feelessAttestationCodeReceiver(
-          attestationsWrapper,
-          phoneHash,
-          unverifiedMtwAddress,
-          issuers
-        )
+        attestationCodeReceiver(attestationsWrapper, phoneHash, unverifiedMtwAddress, issuers, true)
       )
 
       if (!withoutRevealing) {
@@ -587,18 +694,19 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
         // Request codes for the already existing attestations if any.
         // We check after which ones were successful
         const reveals: boolean[] = yield call(
-          feelessRevealAttestations,
+          revealAttestations,
           attestationsWrapper,
           unverifiedMtwAddress,
           phoneHashDetails,
-          attestations
+          attestations,
+          true
         )
 
         // Count how many more attestations we need to request
         const attestationsToRequest =
           status.numAttestationsRemaining - reveals.filter((r: boolean) => r).length
 
-        // check if we hit the limit for max actionable attestations at the same time
+        // Check if we hit the limit for max actionable attestations at the same time
         if (attestationsToRequest + attestations.length > KOMENCI_MAX_ACTIONABLE_ATTESTATIONS) {
           throw new Error(ErrorMessages.MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED)
         }
@@ -610,13 +718,14 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             attestationsToRequest,
           })
           attestations = yield call(
-            feelessRequestAndRetrieveAttestations,
-            komenciKit,
+            requestAndRetrieveAttestations,
             attestationsWrapper,
             phoneHash,
             unverifiedMtwAddress,
             attestations,
-            attestations.length + attestationsToRequest
+            attestations.length + attestationsToRequest,
+            true,
+            komenciKit
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
             issuers,
@@ -627,22 +736,24 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           issuers = attestations.map((a) => a.issuer)
           receiveMessageTask = yield takeEvery(
             Actions.RECEIVE_ATTESTATION_MESSAGE,
-            feelessAttestationCodeReceiver(
+            attestationCodeReceiver(
               attestationsWrapper,
               phoneHash,
               unverifiedMtwAddress,
-              issuers
+              issuers,
+              true
             )
           )
 
           // Request codes for the new list of attestations. We ignore unsuccessfull reveals here,
           // cause we do not want to go into a loop of re-requesting more and more attestations
           yield call(
-            feelessRevealAttestations,
+            revealAttestations,
             attestationsWrapper,
             unverifiedMtwAddress,
             phoneHashDetails,
-            attestations
+            attestations,
+            true
           )
         }
         ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
@@ -652,14 +763,16 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
 
       yield race([
         call(
-          feelessCompleteAttestations,
-          komenciKit,
+          completeAttestations,
+          attestationsWrapper,
           unverifiedMtwAddress,
           phoneHashDetails,
-          attestations
+          attestations,
+          true,
+          komenciKit
         ),
         // This is needed, because we can have more actionableAttestations than NUM_ATTESTATIONS_REQUIRED
-        call(requiredAttestationsCompleted),
+        call(feelessRequiredAttestationsCompleted),
       ])
 
       receiveMessageTask?.cancel()
@@ -669,15 +782,17 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
     }
 
     // Intentionally calling this a second time because it's critical that this is successful
-    // so user shouldn't be considered verified until we are sure it has been done
-    yield call(registerWalletAndDekViaKomenci, komenciKit, unverifiedMtwAddress, walletAddress)
+    // so user shouldn't be considered verified until we are sure it has been done. No-op if
+    // they already registered so no harm done either way
+    yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
 
-    yield call(endFeelessVerification, unverifiedMtwAddress)
+    yield call(endFeelessVerification)
     return true
   } catch (error) {
     // TODO: catch the errors and decide which ones should trigger recpatcha and which one should be added
     // to the komenciErrorTimestamps array in feelessVerificationState. Probably also need some way to formally
     // end the feeless flow. Also decide what errors should be sending user to the home screen
+    // Probably should reset verification status on failures?
     Logger.error(TAG, 'Error occured during verification flow', error)
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
       yield put(feelessSetVerificationStatus(VerificationStatus.SaltQuotaExceeded))
@@ -696,7 +811,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
   }
 }
 
-export function* requiredAttestationsCompleted() {
+export function* feelessRequiredAttestationsCompleted() {
   while (true) {
     yield take(Actions.FEELESS_COMPLETE_ATTESTATION_CODE)
     const acceptedAttestationCodes: AttestationCode[] = yield select(
@@ -708,45 +823,7 @@ export function* requiredAttestationsCompleted() {
   }
 }
 
-// Requests if necessary additional attestations and returns all revealable attestations
-export function* feelessRequestAndRetrieveAttestations(
-  komenciKit: KomenciKit,
-  attestationsWrapper: AttestationsWrapper,
-  phoneHash: string,
-  mtwAddress: string,
-  currentActionableAttestations: ActionableAttestation[],
-  attestationsNeeded: number
-) {
-  let attestations = currentActionableAttestations
-  while (attestations.length < attestationsNeeded) {
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_start, {
-      currentAttestation: attestations.length,
-    })
-    // Request any additional attestations beyond the original set
-    yield call(
-      feelessRequestAttestations,
-      komenciKit,
-      attestationsWrapper,
-      attestationsNeeded - attestations.length,
-      phoneHash,
-      mtwAddress
-    )
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_complete)
-
-    // Check if we have a sufficient set now by fetching the new total set
-    attestations = yield call(getActionableAttestations, attestationsWrapper, phoneHash, mtwAddress)
-    ValoraAnalytics.track(
-      VerificationEvents.verification_request_all_attestations_refresh_progress,
-      {
-        attestationsRemaining: attestationsNeeded - attestations.length,
-      }
-    )
-  }
-
-  return attestations
-}
-
-function* feelessRequestAttestations(
+export function* feelessRequestAttestations(
   komenciKit: KomenciKit,
   attestationsWrapper: AttestationsWrapper,
   numAttestationsRequestsNeeded: number,
@@ -838,144 +915,12 @@ function* feelessRequestAttestations(
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
 
-function feelessAttestationCodeReceiver(
-  attestationsWrapper: AttestationsWrapper,
-  phoneHash: string,
-  mtwAddress: string,
-  allIssuers: string[]
-) {
-  return function*(action: ReceiveAttestationMessageAction) {
-    if (!action || !action.message) {
-      Logger.error(TAG + '@feelessAttestationCodeReceiver', 'Received empty code. Ignoring.')
-      ValoraAnalytics.track(VerificationEvents.verification_code_received, {
-        context: 'Empty code',
-      })
-      return
-    }
-
-    try {
-      const code = extractAttestationCodeFromMessage(action.message)
-      if (!code) {
-        throw new Error('No code extracted from message')
-      }
-
-      const existingCode = yield call(feelessIsCodeAlreadyAccepted, code)
-      if (existingCode) {
-        Logger.warn(
-          TAG + '@feelessAttestationCodeReceiver',
-          'Code already exists in store, skipping.'
-        )
-        ValoraAnalytics.track(VerificationEvents.verification_code_received, {
-          context: 'Code already exists',
-        })
-        if (
-          CodeInputType.MANUAL === action.inputType ||
-          CodeInputType.DEEP_LINK === action.inputType
-        ) {
-          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE))
-        }
-        return
-      }
-      ValoraAnalytics.track(VerificationEvents.verification_code_received)
-      const issuer = yield call(
-        [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
-        phoneHash,
-        mtwAddress,
-        code,
-        allIssuers
-      )
-      if (!issuer) {
-        throw new Error('No issuer found for attestion code')
-      }
-
-      Logger.debug(TAG + '@feelessAttestationCodeReceiver', `Received code for issuer ${issuer}`)
-
-      ValoraAnalytics.track(VerificationEvents.verification_code_validate_start, { issuer })
-      const isValidRequest = yield call(
-        [attestationsWrapper, attestationsWrapper.validateAttestationCode],
-        phoneHash,
-        mtwAddress,
-        issuer,
-        code
-      )
-      ValoraAnalytics.track(VerificationEvents.verification_code_validate_complete, { issuer })
-
-      if (!isValidRequest) {
-        throw new Error('Code is not valid')
-      }
-
-      yield put(feelessInputAttestationCode({ code, issuer }))
-    } catch (error) {
-      Logger.error(
-        TAG + '@feelessAttestationCodeReceiver',
-        'Error processing attestation code',
-        error
-      )
-      yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
-    }
-  }
-}
-
 function* feelessGetCodeForIssuer(issuer: string) {
   const existingCodes: AttestationCode[] = yield select(feelessAttestationCodesSelector)
   return existingCodes.find((c) => c.issuer === issuer)
 }
 
-function* feelessIsCodeAlreadyAccepted(code: string) {
-  const existingCodes: AttestationCode[] = yield select(feelessAcceptedAttestationCodesSelector)
-  return existingCodes.find((c) => c.code === code)
-}
-
-function* feelessRevealAttestations(
-  attestationsWrapper: AttestationsWrapper,
-  mtwAddress: string,
-  phoneHashDetails: PhoneNumberHashDetails,
-  attestations: ActionableAttestation[]
-) {
-  Logger.debug(TAG + '@feelessRevealAttestations', `Revealing ${attestations.length} attestations`)
-  const reveals = []
-  for (const attestation of attestations) {
-    const success = yield call(
-      revealAttestation,
-      attestationsWrapper,
-      mtwAddress,
-      phoneHashDetails,
-      attestation
-    )
-    // TODO (i1skn): remove this clause when
-    // https://github.com/celo-org/celo-labs/issues/578 is resolved.
-    // This sends messages with 5000ms delay on Android if reveals is successful
-    if (success && Platform.OS === 'android') {
-      Logger.debug(
-        TAG + '@feelessRevealAttestations',
-        `Delaying the next one for: ${ANDROID_DELAY_REVEAL_ATTESTATION}ms`
-      )
-      yield delay(ANDROID_DELAY_REVEAL_ATTESTATION)
-    }
-    reveals.push(success)
-  }
-  yield put(feelessSetLastRevealAttempt(Date.now()))
-  return reveals
-}
-
-function* feelessCompleteAttestations(
-  komenciKit: KomenciKit,
-  mtwAddress: string,
-  phoneHashDetails: PhoneNumberHashDetails,
-  attestations: ActionableAttestation[]
-) {
-  Logger.debug(
-    TAG + '@completeNeededAttestations',
-    `Completing ${attestations.length} attestations`
-  )
-  yield all(
-    attestations.map((attestation) => {
-      return call(feelessCompleteAttestation, komenciKit, mtwAddress, phoneHashDetails, attestation)
-    })
-  )
-}
-
-function* feelessCompleteAttestation(
+export function* feelessCompleteAttestation(
   komenciKit: KomenciKit,
   mtwAddress: string,
   phoneHashDetails: PhoneNumberHashDetails,

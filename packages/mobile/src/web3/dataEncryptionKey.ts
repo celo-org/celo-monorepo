@@ -191,7 +191,7 @@ export function* registerAccountDek(walletAddress: string) {
 
 // Unlike normal DEK registration, registration via Komenci should be considered fatal. If there
 // is no on-chain mapping of accountAddresss => walletAddress, then senders will erroneously
-// send to MTW instead of EOA
+// send to MTW instead of EOA. A no-op if registration has already been done
 export function* registerWalletAndDekViaKomenci(
   komenciKit: KomenciKit,
   accountAddress: string,

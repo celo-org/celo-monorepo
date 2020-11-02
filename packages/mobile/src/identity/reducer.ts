@@ -10,8 +10,10 @@ import { RehydrateAction } from 'redux-persist'
 import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
 import { ATTESTATION_REVEAL_TIMEOUT_SECONDS, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
+import { hasExceededKomenciErrorQuota } from 'src/identity/feelessVerificationErrors'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
@@ -270,6 +272,17 @@ export const reducer = (
       return {
         ...state,
         ...feelessCompleteCodeReducer(state, action.numComplete),
+      }
+    case Actions.SET_CAPTCHA_TOKEN:
+      return {
+        ...state,
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          komenci: {
+            ...state.feelessVerificationState.komenci,
+            captchaToken: action.token,
+          },
+        },
       }
     case Actions.INPUT_ATTESTATION_CODE:
       return {
@@ -598,4 +611,13 @@ export const feelessIsRevealAllowed = ({ identity: { feelessLastRevealAttempt } 
     !feelessLastRevealAttempt ||
     timeDeltaInSeconds(Date.now(), feelessLastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
   )
+}
+
+// TODO: Use this as part of the notification display logic
+export const userCanTryFeelessOnboarding = ({
+  identity: { feelessVerificationState },
+}: RootState) => {
+  const { errorTimestamps } = feelessVerificationState.komenci
+
+  return !hasExceededKomenciErrorQuota(errorTimestamps) && features.KOMENCI
 }

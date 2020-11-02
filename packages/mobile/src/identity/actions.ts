@@ -23,6 +23,7 @@ export enum Actions {
   SET_SEEN_VERIFICATION_NUX = 'IDENTITY/SET_SEEN_VERIFICATION_NUX',
   SET_COMPLETED_CODES = 'IDENTITY/SET_COMPLETED_CODES',
   FEELESS_SET_COMPLETED_CODES = 'IDENTITY/FEELESS_SET_COMPLETED_CODES',
+  SET_CAPTCHA_TOKEN = 'IDENTITY/SET_CAPTCHA_TOKEN',
   REVOKE_VERIFICATION = 'IDENTITY/REVOKE_VERIFICATION',
   RECEIVE_ATTESTATION_MESSAGE = 'IDENTITY/RECEIVE_ATTESTATION_MESSAGE',
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
@@ -111,6 +112,11 @@ export interface SetCompletedCodesAction {
 export interface FeelessSetCompletedCodesAction {
   type: Actions.FEELESS_SET_COMPLETED_CODES
   numComplete: number
+}
+
+export interface SetCaptchaTokenAction {
+  type: Actions.SET_CAPTCHA_TOKEN
+  token: string
 }
 
 export interface InputAttestationCodeAction {
@@ -273,6 +279,7 @@ export type ActionTypes =
   | SetHasSeenVerificationNux
   | SetCompletedCodesAction
   | FeelessSetCompletedCodesAction
+  | SetCaptchaTokenAction
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | FeelessInputAttestationCodeAction
@@ -365,6 +372,11 @@ export const setCompletedCodes = (numComplete: number): SetCompletedCodesAction 
 export const feelessSetCompletedCodes = (numComplete: number): FeelessSetCompletedCodesAction => ({
   type: Actions.FEELESS_SET_COMPLETED_CODES,
   numComplete,
+})
+
+export const setCaptchaToken = (token: string): SetCaptchaTokenAction => ({
+  type: Actions.SET_CAPTCHA_TOKEN,
+  token,
 })
 
 export const inputAttestationCode = (code: AttestationCode): InputAttestationCodeAction => ({
