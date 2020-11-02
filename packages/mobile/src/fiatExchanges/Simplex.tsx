@@ -16,7 +16,7 @@ import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const SIMPLEX_URI = 'https://stage-dot-clabs-valora-web.uc.r.appspot.com/simplex'
+const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 
 export const simplexOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
