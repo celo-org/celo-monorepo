@@ -65,7 +65,7 @@ export const hasExceededKomenciErrorQuota = (komenciErrorTimestamps: number[]) =
 // If the error is unexpected, add it to state. If we encounter more errors than
 // allowed within a given window, we won't allow the user to attempt verifciation
 // via Komenci until a certain amount of time has passed
-export function* checkIfUnexpectedKomenciError(error: Error) {
+export function* storeTimestampIfKomenciError(error: Error) {
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
@@ -81,6 +81,7 @@ export function* checkIfUnexpectedKomenciError(error: Error) {
     unexpectedError = true
   }
 
+  // These errors should not be considered fatal Komenci errors
   if (
     error.message === FetchErrorTypes.QuotaExceededError ||
     error.message === FeelessVerificationErrors.PepperNotCachedError

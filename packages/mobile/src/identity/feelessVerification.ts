@@ -50,12 +50,12 @@ import {
   lookupAttestationIdentifiers,
 } from 'src/identity/contactMapping'
 import {
-  checkIfUnexpectedKomenciError,
   hasExceededKomenciErrorQuota,
   KomenciDisabledError,
   KomenciQuotaExceededError,
   KomenciSessionInvalidError,
   PepperNotCachedError,
+  storeTimestampIfKomenciError,
 } from 'src/identity/feelessVerificationErrors'
 import {
   e164NumberToSaltSelector,
@@ -361,7 +361,7 @@ export function* feelessFetchVerificationState() {
     })
   } catch (error) {
     Logger.error(TAG, 'Error occured while fetching verification state', error)
-    yield call(checkIfUnexpectedKomenciError, error)
+    yield call(storeTimestampIfKomenciError, error)
   }
 }
 
@@ -781,27 +781,17 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       }
     }
 
-    // Intentionally calling this a second time because it's critical that this is successful
-    // so user shouldn't be considered verified until we are sure it has been done. No-op if
-    // they already registered so no harm done either way
+    // Intentionally calling this a second time. No-op if they already registered so no harm done
     yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
-
     yield call(endFeelessVerification)
     return true
   } catch (error) {
-    // TODO: catch the errors and decide which ones should trigger recpatcha and which one should be added
-    // to the komenciErrorTimestamps array in feelessVerificationState. Probably also need some way to formally
-    // end the feeless flow. Also decide what errors should be sending user to the home screen
-    // Probably should reset verification status on failures?
-    Logger.error(TAG, 'Error occured during verification flow', error)
-    if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
-      yield put(feelessSetVerificationStatus(VerificationStatus.SaltQuotaExceeded))
-    } else if (error.message === ErrorMessages.ODIS_INSUFFICIENT_BALANCE) {
-      yield put(feelessSetVerificationStatus(VerificationStatus.InsufficientBalance))
-    } else {
-      yield put(feelessSetVerificationStatus(VerificationStatus.Failed))
-      yield put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE))
-    }
+    Logger.error(TAG, 'Error occured during feeless verification flow', error)
+    yield all([
+      call(storeTimestampIfKomenciError, error),
+      put(feelessSetVerificationStatus(VerificationStatus.Failed)),
+      put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE)),
+    ])
     return error.message
   } finally {
     receiveMessageTask?.cancel()
