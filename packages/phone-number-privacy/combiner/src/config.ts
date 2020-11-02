@@ -1,7 +1,5 @@
-import { toBool } from '@celo/phone-number-privacy-common'
+import { logger, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
-import logger from './common/logger'
-
 export const VERSION = process.env.npm_package_version
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'

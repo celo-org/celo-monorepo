@@ -41,6 +41,11 @@ const run = async () => {
   if (!startSession.ok) {
     return
   }
+  const checkSession = await komenciKit.checkSession()
+  console.log(checkSession)
+  if (!checkSession.ok) {
+    return
+  }
   const deployWallet = await komenciKit.deployWallet(WALLET_IMPLEMENTATION_ADDRESS)
   console.log('DeployWallet: ', deployWallet)
   if (!deployWallet.ok) {
@@ -57,6 +62,11 @@ const run = async () => {
   }
   const identifier = getIdentifier.result.identifier
   const pepper = getIdentifier.result.pepper
+  const checkSession2 = await komenciKit.checkSession()
+  console.log(checkSession2)
+  if (!checkSession2.ok) {
+    return
+  }
   const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
   console.log(approveRes)
   if (!approveRes.ok) {
