@@ -476,6 +476,8 @@ PODS:
     - React
   - RNScreens (2.7.0):
     - React
+  - RNSecureRandom (1.0.0):
+    - React
   - RNSentry (1.7.1):
     - React
     - Sentry (~> 5.2.0)
@@ -568,6 +570,7 @@ DEPENDENCIES:
   - RNPermissions (from `../../../node_modules/react-native-permissions`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
+  - RNSecureRandom (from `../../../node_modules/react-native-securerandom`)
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
@@ -738,6 +741,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../../../node_modules/react-native-screens"
+  RNSecureRandom:
+    :path: "../../../node_modules/react-native-securerandom"
   RNSentry:
     :path: "../../../node_modules/@sentry/react-native"
   RNShare:
@@ -839,6 +844,7 @@ SPEC CHECKSUMS:
   RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
   RNReanimated: dd8c286ab5dd4ba36d3a7fef8bff7e08711b5476
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
+  RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNSentry: 2bae4ffee2e66376ef42cb845a494c3bde17bc56
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
@@ -847,6 +853,6 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: 470c646f25b89e063843bdec1cd889a649b38781
+PODFILE CHECKSUM: e38c669823181b25b0d68e1d32554a4d8041b562
 
 COCOAPODS: 1.9.1
