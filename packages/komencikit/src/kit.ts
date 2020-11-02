@@ -1,6 +1,11 @@
 import { Address, normalizeAddressWith0x, serializeSignature, Signature, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
+import { BlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
+import {
+  getBlindedPhoneNumber,
+  getPhoneNumberIdentifierFromSignature,
+} from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   MetaTransactionWalletWrapper,
   toRawTransaction,
@@ -154,9 +159,30 @@ export class KomenciKit {
   })
   public async getDistributedBlindedPepper(
     e164Number: string,
-    clientVersion: string
+    clientVersion: string,
+    blsBlindingClient: BlsBlindingClient
   ): Promise<Result<GetDistributedBlindedPepperResp, FetchError>> {
-    return this.client.exec(getDistributedBlindedPepper({ e164Number, clientVersion }))
+    // Blind the phone number
+    const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient)
+    const resp = await this.client.exec(
+      getDistributedBlindedPepper({ base64BlindedMessage, clientVersion })
+    )
+
+    if (resp.ok) {
+      this.client.setToken(resp.result.combinedSignature)
+
+      const phoneNumberHashDetails = await getPhoneNumberIdentifierFromSignature(
+        e164Number,
+        resp.result.combinedSignature,
+        blsBlindingClient
+      )
+      return Ok({
+        identifier: phoneNumberHashDetails.phoneHash,
+        pepper: phoneNumberHashDetails.pepper,
+      })
+    }
+
+    return resp
   }
 
   /**

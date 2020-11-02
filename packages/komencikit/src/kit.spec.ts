@@ -1,6 +1,7 @@
 import { normalizeAddressWith0x } from '@celo/base'
 import { Err, Ok } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
+import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
 import Web3 from 'web3'
 import { ActionTypes } from './actions'
 import { AuthenticationFailed, KomenciErrorTypes, ServiceUnavailable, Unauthorised } from './errors'
@@ -11,6 +12,8 @@ jest.mock('./verifyWallet', () => ({
   verifyWallet: () => Promise.resolve(Ok(true)),
 }))
 
+const ODIS_PUB_KEY =
+  '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
 // @ts-ignore
@@ -117,7 +120,8 @@ describe('KomenciKit', () => {
         .spyOn((kit as any).client, 'exec')
         .mockResolvedValue(Err(new Unauthorised()))
 
-      await kit.getDistributedBlindedPepper('phone-number', 'client-version')
+      const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
+      await kit.getDistributedBlindedPepper('phone-number', 'client-version', blsBlindingClient)
 
       expect(execSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -136,8 +140,9 @@ describe('KomenciKit', () => {
         const kit = kitWithOptions()
         jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Err(new Unauthorised()))
 
+        const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
         await expect(
-          kit.getDistributedBlindedPepper('phone-number', 'client-version')
+          kit.getDistributedBlindedPepper('phone-number', 'client-version', blsBlindingClient)
         ).resolves.toEqual(Err(new Unauthorised()))
       })
     })
@@ -149,8 +154,9 @@ describe('KomenciKit', () => {
           .spyOn((kit as any).client, 'exec')
           .mockResolvedValue(Ok({ identifier: 'pn-identifier', pepper: 'pn-pepper' }))
 
+        const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
         await expect(
-          kit.getDistributedBlindedPepper('phone-number', 'client-version')
+          kit.getDistributedBlindedPepper('phone-number', 'client-version', blsBlindingClient)
         ).resolves.toEqual(
           Ok({
             identifier: 'pn-identifier',
