@@ -84,6 +84,13 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
 
+  // Ignore SIGPIPE signals
+  // SIGPIPE is sent when a process attempts to write to a socket that is no longer open for reading
+  // this is to handle crashes that happen when the app tries to make network requests after it has been
+  // backgrounded; the reason we need to do this after react has been inited is sentry sets up its own
+  // signal handlers which would overwrite our own
+  signal(SIGPIPE, SIG_IGN);
+
   return YES;
 }
 
