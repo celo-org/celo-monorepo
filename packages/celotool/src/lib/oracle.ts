@@ -99,7 +99,7 @@ export async function upgradeOracleChart(
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
   await removeOracleRBACHelmRelease(celoEnv)
   const oracleConfig = getOracleConfig(context)
   for (const identity of oracleConfig.identities) {
@@ -360,7 +360,7 @@ async function upgradeOracleRBACHelmChart(celoEnv: string, context: string) {
 }
 
 function removeOracleRBACHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(rbacReleaseName(celoEnv))
+  return removeGenericHelmChart(rbacReleaseName(celoEnv), celoEnv)
 }
 
 function rbacHelmParameters(celoEnv: string,  context: string) {
