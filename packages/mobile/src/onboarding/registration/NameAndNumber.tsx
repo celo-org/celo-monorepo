@@ -24,7 +24,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
-import { isCountryBanned } from 'src/utils/countryFeatures'
+import { getCountryFeatures } from 'src/utils/countryFeatures'
 
 interface StateProps {
   cachedName: string | null
@@ -168,7 +168,8 @@ export class NameAndNumber extends React.Component<Props, State> {
       return
     }
 
-    if (isCountryBanned(countryCodeAlpha2)) {
+    const { SANCTIONED_COUNTRY } = getCountryFeatures(countryCodeAlpha2)
+    if (SANCTIONED_COUNTRY) {
       this.props.showError(ErrorMessages.COUNTRY_NOT_AVAILABLE)
       return
     }

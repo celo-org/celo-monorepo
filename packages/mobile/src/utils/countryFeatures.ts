@@ -9,7 +9,7 @@ type SpecificCountryFeatures = { [K in keyof CountryFeatures]: boolean }
 
 type Entries<T> = Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>
 
-function getCountryFeatures(countryCodeAlpha2: string | null): SpecificCountryFeatures {
+export function getCountryFeatures(countryCodeAlpha2: string | null): SpecificCountryFeatures {
   // tslint:disable-next-line: no-object-literal-type-assertion
   const features = {} as SpecificCountryFeatures
   for (const [key, value] of Object.entries(countryFeatures) as Entries<CountryFeatures>) {
@@ -30,11 +30,4 @@ export const getCountryFeaturesSelector = createSelector(
 
 export function useCountryFeatures() {
   return useSelector(getCountryFeaturesSelector)
-}
-
-// Iran, Cuba, North Korea, Sudan, Syria
-const bannedCountryCodeAlpha2 = ['IR', 'CU', 'KP', 'SD', 'SY']
-
-export const isCountryBanned = (countryCodeAlpha2: string) => {
-  return bannedCountryCodeAlpha2.indexOf(countryCodeAlpha2) >= 0
 }
