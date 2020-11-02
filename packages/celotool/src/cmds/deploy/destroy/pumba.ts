@@ -11,5 +11,5 @@ export const builder = {}
 
 export const handler = async (argv: DestroyArgv) => {
   await switchToClusterFromEnv()
-  await removeGenericHelmChart(helmReleaseName(argv.celoEnv))
+  await removeGenericHelmChart(helmReleaseName(argv.celoEnv), argv.celoEnv)
 }
