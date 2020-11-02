@@ -47,7 +47,6 @@ export enum TestAccounts {
 export const ONE = new BigNumber('1000000000000000000')
 
 export async function clearAllFundsToRoot(kit: ContractKit, mnemonic: string) {
-  Array.from
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
