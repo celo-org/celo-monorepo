@@ -440,7 +440,7 @@ jobs:
           command: |
             mkdir -p test-results/jest
             # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
-            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
+            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci --runInBand
           environment:
             JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
 
@@ -981,7 +981,7 @@ jobs:
             sudo apt-get update || sudo apt-get update
             sudo apt-get install -y software-properties-common
             sudo apt-get install python3-pip
-            pip3 install certora-cli==0.1.1
+            pip3 install certora-cli-beta
             wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
             chmod +x solc-static-linux
             sudo mv solc-static-linux /usr/bin/solc
