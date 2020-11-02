@@ -8,6 +8,7 @@ import {
   FetchErrorTypes,
   NetworkError,
   NotFoundError,
+  QuotaExceededError,
   RequestError,
   ResponseDecodeError,
   ServiceUnavailable,
@@ -68,10 +69,12 @@ export class KomenciClient {
         } else {
           return Err(new ResponseDecodeError(payload))
         }
-      } else if (resp.status === 404) {
-        return Err(new NotFoundError(this.url + action.path))
       } else if (resp.status === 403) {
         return Err(new Unauthorised())
+      } else if (resp.status === 404) {
+        return Err(new NotFoundError(this.url + action.path))
+      } else if (resp.status === 429) {
+        return Err(new QuotaExceededError())
       } else if (resp.status === 400) {
         const payload = await resp.json()
         return Err(new RequestError(payload))
