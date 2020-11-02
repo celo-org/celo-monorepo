@@ -119,7 +119,7 @@
   "encryption": {
     "warningLabel": "Este comentario no será encriptado",
     "warningModalHeader": "Sobre Cifrado",
-    "warningModalBody": "El cifrado garantiza que tus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe tuprimera transacción.",
+    "warningModalBody": "El cifrado garantiza que tus comentarios se mantengan privados. {{appName}} utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe tuprimera transacción.",
     "feeLabel": "Tarifa de Cifrado Unica",
     "feeModalHeader": "Tarifa de Cifrado Unica",
     "feeModalBody": "El cifrado ayuda a mantener la privacidad de tus datos confidenciales. Se agrega una pequeña tarifa única a tu primera transacción para configurar el cifrado. Esto garantiza que tus comentarios se envíen de forma segura y privada."

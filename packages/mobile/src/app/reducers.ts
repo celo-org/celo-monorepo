@@ -137,7 +137,7 @@ export const appReducer = (
         ...state,
         minVersion: action.minVersion,
       }
-    case Actions.INVITE_MODAL_TEXT:
+    case Actions.TOGGLE_INVITE_MODAL:
       return {
         ...state,
         inviteModalText: action.inviteModalText,

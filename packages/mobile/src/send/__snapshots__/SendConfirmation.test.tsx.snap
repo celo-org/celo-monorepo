@@ -4774,6 +4774,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="InviteFriendModal/SecondaryAction"
                     >
                       <Text
                         style={
@@ -4810,6 +4811,7 @@ exports[`SendConfirmation with Komenci enabled renders correct modal for invitat
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="InviteFriendModal/PrimaryAction"
                     >
                       <Text
                         style={

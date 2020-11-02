@@ -167,7 +167,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         testID="VerificationEducationSkip"
       />
     )
-  } else if (isBalanceSufficient) {
+  } else if (isBalanceSufficient || features.KOMENCI) {
     // Sufficient balance
     bodyText = t(`verificationEducation.${features.KOMENCI ? 'feelessBody' : 'body'}`)
     firstButton = (

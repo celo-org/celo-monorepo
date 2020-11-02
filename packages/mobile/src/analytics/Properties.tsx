@@ -326,12 +326,15 @@ interface InviteEventsProperties {
   }
   [InviteEvents.invite_start]: {
     escrowIncluded: boolean
+    amount: string | undefined
   }
   [InviteEvents.invite_complete]: {
     escrowIncluded: boolean
+    amount: string | undefined
   }
   [InviteEvents.invite_error]: {
     escrowIncluded: boolean
+    amount: string | undefined
     error: string
   }
   [InviteEvents.invite_method_sms]: undefined

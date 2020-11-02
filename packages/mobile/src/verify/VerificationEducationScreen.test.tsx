@@ -11,7 +11,7 @@ describe('VerificationEducationScreen', () => {
   const komenciEnabled = features.KOMENCI
 
   beforeAll(() => {
-    features.KOMENCI = true
+    features.KOMENCI = false
   })
 
   afterAll(() => {
@@ -114,5 +114,37 @@ describe('VerificationEducationScreen', () => {
     )
     expect(toJSON()).toMatchSnapshot()
     expect(getByTestId('VerificationSkipDialog').props.isVisible).toBe(true)
+  })
+})
+
+describe('VerificationEducationScreen with KOMENCI enabled', () => {
+  const komenciEnabled = features.KOMENCI
+
+  beforeAll(() => {
+    features.KOMENCI = true
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
+  })
+
+  it('shows the `continue` button when the user is not already verified and doesnt have enough balance', () => {
+    const store = createMockStore({
+      stableToken: {
+        balance: '0',
+      },
+    })
+    const { toJSON, queryByTestId, queryByText } = render(
+      <Provider store={store}>
+        <VerificationEducationScreen
+          {...getMockStackScreenProps(Screens.VerificationEducationScreen)}
+        />
+      </Provider>
+    )
+    expect(toJSON()).toMatchSnapshot()
+    expect(queryByText('verificationEducation.bodyInsufficientBalance')).toBeFalsy()
+    expect(queryByTestId('VerificationEducationSkip')).toBeFalsy()
+    expect(queryByTestId('VerificationEducationContinue')).toBeTruthy()
+    expect(queryByTestId('VerificationEducationAlready')).toBeFalsy()
   })
 })

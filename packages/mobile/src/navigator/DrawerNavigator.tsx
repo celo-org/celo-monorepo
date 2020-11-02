@@ -80,7 +80,7 @@ type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerSty
 }
 
 interface DrawerItemParams {
-  onPress: () => void
+  onPress?: () => void
 }
 
 // This component has been taken from here:
@@ -118,7 +118,7 @@ function CustomDrawerItemList({
           })
       } else if (route.params && (route.params as DrawerItemParams).onPress) {
         const drawerParams = route.params as DrawerItemParams
-        drawerParams.onPress()
+        drawerParams.onPress?.()
       } else {
         navigateToItem()
       }

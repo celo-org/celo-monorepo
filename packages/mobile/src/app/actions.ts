@@ -27,7 +27,7 @@ export enum Actions {
   SET_SESSION_ID = 'SET_SESSION_ID',
   OPEN_URL = 'APP/OPEN_URL',
   MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
-  INVITE_MODAL_TEXT = 'APP/INVITE_MODAL_TEXT',
+  TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
 }
 
 export interface SetAppState {
@@ -78,7 +78,7 @@ interface SetRequirePinOnAppOpen {
 }
 
 interface InviteModalAction {
-  type: Actions.INVITE_MODAL_TEXT
+  type: Actions.TOGGLE_INVITE_MODAL
   inviteModalText: string | null
 }
 
@@ -204,6 +204,6 @@ export const minAppVersionDetermined = (
 })
 
 export const toggleInviteModal = (inviteModalText: string | null): InviteModalAction => ({
-  type: Actions.INVITE_MODAL_TEXT,
+  type: Actions.TOGGLE_INVITE_MODAL,
   inviteModalText,
 })

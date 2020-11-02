@@ -10,7 +10,7 @@ export const features = {
   SHOW_CASH_OUT: false,
   PNP_USE_DEK_FOR_AUTH: true,
   USE_PHONE_NUMBER_PRIVACY: true,
-  KOMENCI: false,
+  KOMENCI: true,
 }
 
 export const pausedFeatures = {
