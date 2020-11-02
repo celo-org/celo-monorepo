@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import AlertBanner from 'src/alert/AlertBanner'
+import { InviteEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -134,6 +135,7 @@ export const NavigatorWrapper = () => {
     if (!inviteModalText) {
       throw new Error('Invite has no text for message. Should never happen.')
     }
+    ValoraAnalytics.track(InviteEvents.invite_from_menu)
     await Share.share({
       message: inviteModalText || '',
     })

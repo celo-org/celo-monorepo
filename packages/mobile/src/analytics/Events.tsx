@@ -176,9 +176,13 @@ export enum InviteEvents {
   invite_tx_start = 'invite_tx_start',
   invite_tx_complete = 'invite_tx_complete',
   invite_tx_error = 'invite_tx_error',
+  invite_start = 'invite_start',
+  invite_complete = 'invite_complete',
+  invite_error = 'invite_error',
   invite_method_sms = 'invite_method_sms',
   invite_method_whatsapp = 'invite_method_whatsapp',
   invite_method_error = 'invite_method_error',
+  invite_from_menu = 'invite_from_menu',
 }
 
 export enum EscrowEvents {
