@@ -1,5 +1,5 @@
 {
-  "name": "env-tests",
+  "name": "@celo/env-tests",
   "version": "1.0.0",
   "description": "Environment tests",
   "main": "index.js",
