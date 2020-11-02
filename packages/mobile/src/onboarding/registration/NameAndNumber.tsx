@@ -3,7 +3,7 @@ import FormInput from '@celo/react-components/components/FormInput'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import colors from '@celo/react-components/styles/colors'
-import { Countries, isCountryBanned } from '@celo/utils/src/countries'
+import { Countries } from '@celo/utils/src/countries'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -24,6 +24,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
+import { isCountryBanned } from 'src/utils/countryFeatures'
 
 interface StateProps {
   cachedName: string | null

@@ -31,3 +31,10 @@ export const getCountryFeaturesSelector = createSelector(
 export function useCountryFeatures() {
   return useSelector(getCountryFeaturesSelector)
 }
+
+// Iran, Cuba, North Korea, Sudan, Syria
+const bannedCountryCodeAlpha2 = ['IR', 'CU', 'KP', 'SD', 'SY']
+
+export const isCountryBanned = (countryCodeAlpha2: string) => {
+  return bannedCountryCodeAlpha2.indexOf(countryCodeAlpha2) >= 0
+}

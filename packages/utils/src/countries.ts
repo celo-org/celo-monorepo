@@ -33,13 +33,6 @@ const matchCountry = (country: LocalizedCountry, query: string) => {
   )
 }
 
-// Iran, Cuba, North Korea, Sudan, Syria
-const bannedCountryCodeAlpha2 = ['IR', 'CU', 'KP', 'SD', 'SY']
-
-export const isCountryBanned = (countryCodeAlpha2: string) => {
-  return bannedCountryCodeAlpha2.indexOf(countryCodeAlpha2) >= 0
-}
-
 export class Countries {
   language: string
   countryMap: Map<string, LocalizedCountry>
