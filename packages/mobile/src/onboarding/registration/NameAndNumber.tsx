@@ -3,7 +3,7 @@ import FormInput from '@celo/react-components/components/FormInput'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import colors from '@celo/react-components/styles/colors'
-import { Countries } from '@celo/utils/src/countries'
+import { Countries, isCountryBanned } from '@celo/utils/src/countries'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -164,6 +164,11 @@ export class NameAndNumber extends React.Component<Props, State> {
         obfuscatedPhoneNumber: e164Number.replace(/[1-9]/g, 'X'),
       })
       this.props.showError(ErrorMessages.INVALID_PHONE_NUMBER)
+      return
+    }
+
+    if (isCountryBanned(countryCodeAlpha2)) {
+      this.props.showError(ErrorMessages.COUNTRY_NOT_AVAILABLE)
       return
     }
 
