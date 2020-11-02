@@ -164,13 +164,14 @@ export class KomenciKit {
   ): Promise<Result<GetDistributedBlindedPepperResp, FetchError>> {
     // Blind the phone number
     const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient)
+
+    // Call Komenci to get the blinded pepper
     const resp = await this.client.exec(
       getDistributedBlindedPepper({ base64BlindedMessage, clientVersion })
     )
 
     if (resp.ok) {
-      this.client.setToken(resp.result.combinedSignature)
-
+      // Unblind the result to get the pepper and resulting identifier
       const phoneNumberHashDetails = await getPhoneNumberIdentifierFromSignature(
         e164Number,
         resp.result.combinedSignature,
