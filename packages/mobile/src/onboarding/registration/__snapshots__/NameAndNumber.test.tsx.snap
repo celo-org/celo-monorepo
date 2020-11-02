@@ -271,6 +271,7 @@ exports[`NameAndNumberScreen renders correctly 1`] = `
               <TextInput
                 allowFontScaling={true}
                 countryCallingCode="+1"
+                editable={true}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -670,6 +671,7 @@ exports[`NameAndNumberScreen renders with an error 1`] = `
               <TextInput
                 allowFontScaling={true}
                 countryCallingCode="+1"
+                editable={true}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}

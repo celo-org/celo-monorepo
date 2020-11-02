@@ -176,6 +176,14 @@
       "@celo/utils"
     ]
   },
+  "@celo/phone-number-privacy-monitor": {
+    "location": "packages/phone-number-privacy/monitor",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/phone-number-privacy-common",
+      "@celo/utils"
+    ]
+  },
   "@celo/phone-number-privacy-signer": {
     "location": "packages/phone-number-privacy/signer",
     "dependencies": [

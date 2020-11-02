@@ -20,12 +20,18 @@ export interface EncryptionKeySigner {
   rawKey: string
 }
 
+export interface CustomSigner {
+  authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER
+  customSigner: (body: string) => Promise<string>
+}
+
 // Support signing with the DEK or with the
-export type AuthSigner = WalletKeySigner | EncryptionKeySigner
+export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner
 
 export enum AuthenticationMethod {
   WALLET_KEY = 'wallet_key',
   ENCRYPTION_KEY = 'encryption_key',
+  CUSTOM_SIGNER = 'custom_signer',
 }
 
 export interface PhoneNumberPrivacyRequest {
@@ -127,8 +133,10 @@ export async function queryOdis<ResponseType>(
     const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
     const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
     debug(`Signature is valid: ${validSignature} signed by ${dek}`)
-  } else {
+  } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
+  } else {
+    authHeader = await signer.customSigner(bodyString)
   }
 
   const { odisUrl } = context
