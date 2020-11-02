@@ -92,6 +92,7 @@
     - [General](developer-resources/integrations/general.md)
     - [Checklist](developer-resources/integrations/checklist.md)
     - [Custody](developer-resources/integrations/custody.md)
+    - [Listings](developer-resources/integrations/listings.md)
     - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
@@ -135,6 +136,7 @@
       - [identity/odis/query](developer-resources/contractkit/reference/modules/_identity_odis_query_.md)
       - [AuthenticationMethod](developer-resources/contractkit/reference/enums/_identity_odis_query_.authenticationmethod.md)
       - [ErrorMessages](developer-resources/contractkit/reference/enums/_identity_odis_query_.errormessages.md)
+      - [CustomSigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.customsigner.md)
       - [EncryptionKeySigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.encryptionkeysigner.md)
       - [MatchmakingRequest](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingrequest.md)
       - [MatchmakingResponse](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingresponse.md)
@@ -455,6 +457,7 @@
       - [ProposalTransactionJSON](developer-resources/contractkit/reference/interfaces/_governance_proposals_.proposaltransactionjson.md)
       - [BlsBlindingClient](developer-resources/contractkit/reference/interfaces/_identity_odis_bls_blinding_client_.blsblindingclient.md)
       - [PhoneNumberHashDetails](developer-resources/contractkit/reference/interfaces/_identity_odis_phone_number_identifier_.phonenumberhashdetails.md)
+      - [CustomSigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.customsigner.md)
       - [EncryptionKeySigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.encryptionkeysigner.md)
       - [MatchmakingRequest](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingrequest.md)
       - [MatchmakingResponse](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingresponse.md)

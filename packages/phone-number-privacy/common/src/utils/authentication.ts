@@ -1,13 +1,14 @@
 import { ContractKit } from '@celo/contractkit'
 import { AuthenticationMethod } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
 import { RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
-import logger from './logger'
+import { logger } from './logger'
 
 const ec = new EC('secp256k1')
 
@@ -34,10 +35,10 @@ export async function authenticateUser(
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     const registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit)
     if (!registeredEncryptionKey) {
-      logger.warn(`Account ${signer} does not have registered encryption key`)
+      logger.warn({ account: signer }, 'Account does not have registered encryption key')
       return false
     } else {
-      logger.info(`Found DEK ${registeredEncryptionKey} for ${signer}`)
+      logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
       try {
         const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
         const parsedSig = JSON.parse(messageSignature)
@@ -45,8 +46,9 @@ export async function authenticateUser(
         if (validSignature) {
           return true
         }
-      } catch (error) {
-        logger.error(`Failed to verify auth sig ${error}`)
+      } catch (err) {
+        logger.error('Failed to verify auth sig with DEK')
+        logger.error({ err, dek: registeredEncryptionKey })
         return false
       }
     }
@@ -54,7 +56,8 @@ export async function authenticateUser(
 
   // Fallback to previous signing pattern
   logger.info(
-    `Message from ${signer} was not authenticated with DEK, attempting to authenticate using wallet key`
+    { account: signer },
+    'Message was not authenticated with DEK, attempting to authenticate using wallet key'
   )
   return verifySignature(message, messageSignature, signer)
 }
@@ -67,6 +70,36 @@ export async function getDataEncryptionKey(
     async () => {
       const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
       return accountWrapper.getDataEncryptionKey(address)
+    },
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS
+  )
+}
+
+export async function isVerified(
+  account: string,
+  hashedPhoneNumber: string,
+  contractKit: ContractKit
+): Promise<boolean> {
+  return retryAsyncWithBackOff(
+    async () => {
+      const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
+      const {
+        isVerified: _isVerified,
+        completed,
+        numAttestationsRemaining,
+        total,
+      } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
+
+      logger.debug({
+        account,
+        isVerified: _isVerified,
+        completedAttestations: completed,
+        remainingAttestations: numAttestationsRemaining,
+        totalAttestationsRequested: total,
+      })
+      return _isVerified
     },
     RETRY_COUNT,
     [],
