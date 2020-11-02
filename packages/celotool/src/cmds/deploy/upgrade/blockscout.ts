@@ -7,7 +7,7 @@ import {
   upgradeHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { execCmd } from 'src/lib/cmd-utils'
 import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
@@ -54,7 +54,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     console.info(`Delete blockscout-migration`)
     try {
       const jobName = `${argv.celoEnv}-blockscout${dbSuffix}-migration`
-      await execCmdWithExitOnFailure(`kubectl delete job ${jobName} -n ${argv.celoEnv}`)
+      await execCmd(`kubectl delete job ${jobName} -n ${argv.celoEnv}`)
     } catch (error) {
       console.error(error)
     }
