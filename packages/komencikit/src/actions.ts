@@ -96,7 +96,7 @@ export const startSession = action<ActionTypes.StartSession, StartSessionPayload
 )
 
 interface GetDistributedBlindedPepperPayload {
-  base64BlindedMessage: string
+  blindedPhoneNumber: string
   clientVersion: string
 }
 
