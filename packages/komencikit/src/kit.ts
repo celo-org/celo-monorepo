@@ -144,6 +144,7 @@ export class KomenciKit {
    *
    * @param e164Number - phone number
    * @param clientVersion
+   * @param blsBlindingClient - Either WasmBlsBlindingClient or ReactBlsBlindingClient (for mobile client)
    * @returns the identifier and the pepper
    */
   @retry({
