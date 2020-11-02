@@ -38,7 +38,7 @@ export class AKSClusterManager extends BaseClusterManager {
     // Until we upgrade to helm v3, we rely on our own helm chart adapted from:
     // https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment-rbac.yaml
     const aadPodIdentityExists = await outputIncludes(
-      `helm list`,
+      `helm list -A`,
       `aad-pod-identity`,
       `aad-pod-identity exists, skipping install`
     )

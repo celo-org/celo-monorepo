@@ -25,7 +25,7 @@ export const handler = async (argv: DestroyArgv) => {
 
 async function cleanDefaultIngress(celoEnv: string, ingressName: string) {
   const otherRelease = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     `${celoEnv}-blockscout`,
     `other blockscout instance exists, skipping removing common ingress: ${ingressName}`
   )

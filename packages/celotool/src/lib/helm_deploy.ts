@@ -182,7 +182,7 @@ export async function installGCPSSDStorageClass() {
 export async function installCertManagerAndNginx() {
   // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     `cert-manager-cluster-issuers`,
     `cert-manager-cluster-issuers exists, skipping install`
   )
@@ -190,7 +190,7 @@ export async function installCertManagerAndNginx() {
     await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     `nginx-ingress-release`,
     `nginx-ingress-release exists, skipping install`
   )
@@ -219,7 +219,7 @@ export async function installAndEnableMetricsDeps(
   clusterConfig?: BaseClusterConfig
 ) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
-    `helm list`,
+    `helm list -A`,
     `kube-state-metrics`,
     `kube-state-metrics exists, skipping install`
   )

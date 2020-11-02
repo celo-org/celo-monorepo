@@ -207,7 +207,7 @@ export interface HelmRelease {
 }
 
 export async function getNonSystemHelmReleases(): Promise<HelmRelease[]> {
-  const [json] = await execCmdWithExitOnFailure(`helm list --output json`)
+  const [json] = await execCmdWithExitOnFailure(`helm list -A --output json`)
   const releases: HelmRelease[] = JSON.parse(json).Releases
   return releases.filter((release) => !SYSTEM_HELM_RELEASES.includes(release.Name))
 }
