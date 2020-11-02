@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { Linking, Platform } from 'react-native'
+import { Linking, Platform, Share } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -10,6 +10,7 @@ import { PincodeType } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { features } from 'src/flags'
 import { refreshAllBalances } from 'src/home/actions'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
@@ -65,6 +66,7 @@ jest.mock('src/config', () => {
 
 SendIntentAndroid.sendSms = jest.fn()
 SendSMS.send = jest.fn()
+Share.share = jest.fn()
 
 const state = createMockStore({
   web3: { account: mockAccount },
@@ -72,8 +74,15 @@ const state = createMockStore({
 }).getState()
 
 describe(watchSendInvite, () => {
+  const komenciEnabled = features.KOMENCI
+
   beforeAll(() => {
     jest.useRealTimers()
+    features.KOMENCI = false
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
   })
 
   const dateNowStub = jest.fn(() => 1588200517518)
@@ -189,6 +198,43 @@ describe(watchSendInvite, () => {
       .run()
 
     expect(Linking.openURL).toHaveBeenCalled()
+  })
+})
+
+describe('watchSendInvite with Komenci enabled', () => {
+  const komenciEnabled = features.KOMENCI
+
+  beforeAll(() => {
+    jest.useRealTimers()
+    features.KOMENCI = true
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
+  })
+
+  const dateNowStub = jest.fn(() => 1588200517518)
+  global.Date.now = dateNowStub
+
+  it('sends an invite as expected', async () => {
+    await expectSaga(watchSendInvite)
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getConnectedUnlockedAccount), mockAccount],
+      ])
+      .withState(state)
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
+      .dispatch(transactionConfirmed('a uuid'))
+      .put(storeInviteeData(mockInviteDetails))
+      .put(
+        updateE164PhoneNumberAddresses(
+          {},
+          { [mockAccount.toLowerCase()]: mockInviteDetails.e164Number }
+        )
+      )
+      .run()
+
+    expect(Share.share).toHaveBeenCalled()
   })
 })
 

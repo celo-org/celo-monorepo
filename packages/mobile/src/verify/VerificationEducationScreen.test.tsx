@@ -2,11 +2,22 @@ import * as React from 'react'
 import 'react-native'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { features } from 'src/flags'
 import { Screens } from 'src/navigator/Screens'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 describe('VerificationEducationScreen', () => {
+  const komenciEnabled = features.KOMENCI
+
+  beforeAll(() => {
+    features.KOMENCI = true
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
+  })
+
   it('shows the `skip` button when already verified', () => {
     const store = createMockStore({
       app: { numberVerified: true },
