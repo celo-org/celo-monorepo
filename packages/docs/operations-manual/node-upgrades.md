@@ -65,8 +65,7 @@ Validators can be configured as primaries or replicas. By default validators sta
 {% hint style="info" %} `startAtBlock` and `stopAtBlock` must be given a block in the future. {% endhint %}
 
 #### Geth Flags
-* `--replica` flag which starts a validator in replica mode
-* `--replicaStateDBPath`. Path to save information on if the node is a replica or not and when to start/stop. This will override geth's flags. If this is set to an empty string it will use an in-memory (non-persistent) database.
+* `--istanbul.replica` flag which starts a validator in replica mode.
 
 #### Steps to upgrade
 1. Pull the latest docker image.
