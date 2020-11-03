@@ -1,9 +1,9 @@
-import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import {
   MetaTransactionWalletContract,
   MetaTransactionWalletDeployerContract,
   MetaTransactionWalletDeployerInstance,
   MetaTransactionWalletInstance,
+  ProxyContract,
 } from 'types'
 
 const MetaTransactionWalletDeployer: MetaTransactionWalletDeployerContract = artifacts.require(
@@ -14,71 +14,21 @@ const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
 )
 
+const Proxy: ProxyContract = artifacts.require('Proxy')
+
 contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
   let deployer: MetaTransactionWalletDeployerInstance
-  let initializeRes
   const deployerOwner = accounts[0]
-  const allowedDeployer = accounts[1]
-  const otherAllowedDeployer = accounts[2]
-  const valoraAccount = accounts[3]
-  const maliciousDeployer = accounts[4]
+  const valoraAccount = accounts[1]
 
   beforeEach(async () => {
     deployer = await MetaTransactionWalletDeployer.new()
-    initializeRes = await deployer.initialize([allowedDeployer])
+    await deployer.initialize()
   })
 
   describe('#initialize()', () => {
     it('should have set the owner to itself', async () => {
       assert.equal(await deployer.owner(), deployerOwner)
-    })
-
-    it('should have allowed the allowed deployer', async () => {
-      assert.equal(await deployer.canDeploy(allowedDeployer), true)
-    })
-
-    it('should emit the DeployerStatusGranted event', async () => {
-      assertLogMatches2(initializeRes.logs[1], {
-        event: 'DeployerStatusGranted',
-        args: {
-          addr: allowedDeployer,
-        },
-      })
-    })
-  })
-
-  describe('#changeDeployerPermission', async () => {
-    let changePermissionRes
-    describe('when permission is revoked', async () => {
-      beforeEach(async () => {
-        changePermissionRes = await deployer.changeDeployerPermission(allowedDeployer, false)
-      })
-
-      it('should have removed the allowance and emit an event', async () => {
-        assert.equal(await deployer.canDeploy(allowedDeployer), false)
-        assertLogMatches2(changePermissionRes.logs[0], {
-          event: 'DeployerStatusRevoked',
-          args: {
-            addr: allowedDeployer,
-          },
-        })
-      })
-    })
-
-    describe('when permission is granted', async () => {
-      beforeEach(async () => {
-        changePermissionRes = await deployer.changeDeployerPermission(otherAllowedDeployer, true)
-      })
-
-      it('should have added the allowance and emit an event', async () => {
-        assert.equal(await deployer.canDeploy(otherAllowedDeployer), true)
-        assertLogMatches2(changePermissionRes.logs[0], {
-          event: 'DeployerStatusGranted',
-          args: {
-            addr: otherAllowedDeployer,
-          },
-        })
-      })
     })
   })
 
@@ -91,71 +41,31 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
       implementation = await MetaTransactionWallet.new()
     })
 
-    describe('executed by the owner', async () => {
-      beforeEach(async () => {
+    beforeEach(async () => {
+      // @ts-ignore
+      deployRes = await deployer.deploy(
+        valoraAccount,
+        implementation.address,
         // @ts-ignore
-        deployRes = await deployer.deploy(
-          valoraAccount,
-          implementation.address,
-          // @ts-ignore
-          implementation.contract.methods.initialize(valoraAccount).encodeABI()
-        )
-        walletDeployedEvent = deployRes.logs.find((log) => log.event === 'WalletDeployed')
-      })
-
-      it('deploys a wallet', async () => {
-        assert.exists(walletDeployedEvent)
-        assert.equal(walletDeployedEvent.args.owner, valoraAccount)
-        assert.equal(walletDeployedEvent.args.implementation, implementation.address)
-      })
-
-      it('initializes the wallet with the correct signer', async () => {
-        const wallet = await MetaTransactionWallet.at(walletDeployedEvent.args.wallet)
-        assert.equal(await wallet.signer(), valoraAccount)
-      })
+        implementation.contract.methods.initialize(valoraAccount).encodeABI()
+      )
+      walletDeployedEvent = deployRes.logs.find((log) => log.event === 'WalletDeployed')
     })
 
-    describe('executed by an allowed deployer', async () => {
-      beforeEach(async () => {
-        deployRes = await deployer.deploy(
-          valoraAccount,
-          implementation.address,
-          // @ts-ignore
-          implementation.contract.methods.initialize(valoraAccount).encodeABI(),
-          {
-            from: allowedDeployer,
-          }
-        )
-        walletDeployedEvent = deployRes.logs.find((log) => log.event === 'WalletDeployed')
-      })
-
-      it('deploys a wallet', async () => {
-        assert.exists(walletDeployedEvent)
-        assert.equal(walletDeployedEvent.args.owner, valoraAccount)
-        assert.equal(walletDeployedEvent.args.implementation, implementation.address)
-      })
-
-      it('initializes the wallet with the correct signer', async () => {
-        const wallet = await MetaTransactionWallet.at(walletDeployedEvent.args.wallet)
-        assert.equal(await wallet.signer(), valoraAccount)
-      })
+    it('deploys a wallet', async () => {
+      assert.exists(walletDeployedEvent)
+      assert.equal(walletDeployedEvent.args.owner, valoraAccount)
+      assert.equal(walletDeployedEvent.args.implementation, implementation.address)
     })
 
-    describe('executed by a malicious deployer', async () => {
-      it('is caught by the guard', async () => {
-        await assertRevert(
-          deployer.deploy(
-            valoraAccount,
-            implementation.address,
-            // @ts-ignore
-            implementation.contract.methods.initialize(valoraAccount).encodeABI(),
-            {
-              from: maliciousDeployer,
-            }
-          ),
-          'sender not allowed to deploy'
-        )
-      })
+    it('initializes the wallet with the correct signer', async () => {
+      const wallet = await MetaTransactionWallet.at(walletDeployedEvent.args.wallet)
+      assert.equal(await wallet.signer(), valoraAccount)
+    })
+
+    it('sets the the right proxy implementation', async () => {
+      const proxy = await Proxy.at(walletDeployedEvent.args.wallet)
+      assert.equal(await proxy._getImplementation(), implementation.address)
     })
 
     describe('when the external account already owns a wallet', async () => {
