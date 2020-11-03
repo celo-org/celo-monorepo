@@ -109,6 +109,7 @@ export function* fetchVerificationState() {
     })
     if (timeout) {
       Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
+      yield put(setVerificationStatus(VerificationStatus.Stopped))
       return
     }
     const isBalanceSufficientForSigRetrieval = yield select(
@@ -116,6 +117,7 @@ export function* fetchVerificationState() {
     )
     if (!isBalanceSufficientForSigRetrieval) {
       Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
+      yield put(setVerificationStatus(VerificationStatus.Stopped))
       return
     }
 
@@ -163,8 +165,10 @@ export function* fetchVerificationState() {
         status,
       })
     )
+    yield put(setVerificationStatus(VerificationStatus.Stopped))
   } catch (error) {
     Logger.error(TAG, 'Error occured during fetching verification state', error)
+    yield put(setVerificationStatus(VerificationStatus.Stopped))
   }
 }
 

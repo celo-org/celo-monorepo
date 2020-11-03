@@ -40,8 +40,8 @@ import {
   FeelessInputAttestationCodeAction,
   feelessResetVerification,
   feelessSetCompletedCodes,
+  feelessSetVerificationStatus,
   feelessUpdateVerificationState,
-  setVerificationStatus,
   StartVerificationAction,
   updateE164PhoneNumberSalts,
 } from 'src/identity/actions'
@@ -90,7 +90,7 @@ import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
-const KOMENCI_URL = 'http://localhost:3000'
+const KOMENCI_URL = 'http://192.168.86.33:3000'
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
 const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
@@ -99,6 +99,7 @@ function* fetchKomenciReadiness(komenciKit: KomenciKit) {
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
+
   const { komenci } = feelessVerificationState
 
   if (!features.KOMENCI) {
@@ -107,10 +108,12 @@ function* fetchKomenciReadiness(komenciKit: KomenciKit) {
 
   const serviceStatusResult: Result<true, KomenciDown> = yield call(komenciKit.checkService)
   if (!serviceStatusResult.ok) {
+    Logger.debug(TAG, '@fetchKomenciReadiness', 'Service down')
     throw serviceStatusResult.error
   }
 
   if (hasExceededKomenciErrorQuota(komenci.errorTimestamps)) {
+    Logger.debug(TAG, '@fetchKomenciReadiness', 'Too  many errors')
     throw new KomenciQuotaExceededError()
   }
 
@@ -175,13 +178,19 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
 
   // An inactive session is not fatal, it just means we will need to start one
   if (!sessionStatusResult.ok) {
+    Logger.debug(TAG, '@fetchSessionState', 'No active sessions')
     sessionActive = false
   } else {
+    Logger.debug(TAG, '@fetchSessionState', 'Active session found')
     const {
       quotaLeft: { distributedBlindedPepper, requestSubsidisedAttestation, submitMetaTransaction },
       metaTxWalletAddress,
     } = sessionStatusResult.result
     const ownPepper = pepperCache[e164Number]
+
+    console.log(sessionStatusResult.result)
+    console.log('SESSION WALLET: ', metaTxWalletAddress)
+    console.log('SESSION TOKEN: ', feelessVerificationState.komenci.sessionToken)
 
     sessionActive = true
     unverifiedMtwAddress = metaTxWalletAddress || null
@@ -228,6 +237,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
   const possibleMtwAddresses = getAddressesFromLookupResult(lookupResult, phoneHash)
   if (!possibleMtwAddresses) {
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
     return null
   }
 
@@ -256,6 +266,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
   const verifiedMtwAddress = verifiedMtwAddresses[0]
 
   if (!verifiedMtwAddress) {
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
     return null
   }
 
@@ -326,15 +337,22 @@ function* fetchAttestationStatus(contractKit: ContractKit) {
 export function* feelessFetchVerificationState() {
   try {
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
-    const [contractKit, walletAddress, e164Number]: [ContractKit, string, string] = yield all([
+    const [contractKit, walletAddress, feelessVerificationState, e164Number]: [
+      ContractKit,
+      string,
+      FeelessVerificationState,
+      string
+    ] = yield all([
       call(getContractKit),
       call(getConnectedUnlockedAccount),
+      select(feelessVerificationStateSelector),
       select(e164NumberSelector),
-      put(setVerificationStatus(VerificationStatus.GettingStatus)),
+      put(feelessSetVerificationStatus(VerificationStatus.GettingStatus)),
     ])
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
       url: KOMENCI_URL,
+      token: feelessVerificationState.komenci.sessionToken,
     })
 
     try {
@@ -363,9 +381,11 @@ export function* feelessFetchVerificationState() {
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
     })
+    yield put(feelessSetVerificationStatus(VerificationStatus.Stopped))
   } catch (error) {
     Logger.error(TAG, 'Error occured while fetching verification state', error)
     yield call(storeTimestampIfKomenciError, error)
+    yield put(feelessSetVerificationStatus(VerificationStatus.Stopped))
   }
 }
 
@@ -393,7 +413,7 @@ export function* feelessStartVerification(action: StartVerificationAction) {
     ValoraAnalytics.track(VerificationEvents.verification_timeout)
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
-    yield put(setVerificationStatus(VerificationStatus.Failed))
+    yield put(feelessSetVerificationStatus(VerificationStatus.Failed))
   }
   Logger.debug(TAG, 'Done verification')
 
@@ -442,46 +462,47 @@ function* endFeelessVerification() {
 
   yield put(setNumberVerified(true))
   yield put(setMtwAddress(mtwAddress))
-  yield put(setVerificationStatus(VerificationStatus.Done))
+  yield put(feelessSetVerificationStatus(VerificationStatus.Done))
 }
 
 function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string) {
-  // Start by doing a fresh pull of the session state
-  yield call(fetchSessionState, komenciKit, e164Number)
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
 
-  const { sessionActive, captchaToken } = feelessVerificationState.komenci
+  const { sessionActive, captchaToken, sessionToken } = feelessVerificationState.komenci
 
-  // If the Komenci sesion is still active, no need to start a new one
-  if (sessionActive) {
-    return
+  // If there isn't an active session, start one
+  if (!sessionActive || !sessionToken.length) {
+    // Should never get here without a captcha token
+    if (!captchaToken.length) {
+      Logger.debug(TAG, '@startOrResumeKomenciSession', 'No captcha found')
+      throw new KomenciSessionInvalidError()
+    }
+
+    const komenciSessionResult: Result<
+      string,
+      FetchError | AuthenticationFailed | LoginSignatureError
+    > = yield call(komenciKit.startSession, captchaToken)
+
+    if (!komenciSessionResult.ok) {
+      Logger.debug(TAG, '@startOrResumeKomenciSession', 'Unable to start session')
+      throw komenciSessionResult.error
+    }
+
+    yield put(
+      feelessUpdateVerificationState({
+        ...feelessVerificationState,
+        komenci: {
+          ...feelessVerificationState.komenci,
+          sessionToken: komenciSessionResult.result,
+        },
+      })
+    )
   }
 
-  // Should never get here without a captcha token
-  if (!captchaToken.length) {
-    throw new KomenciSessionInvalidError()
-  }
-
-  const komenciSessionResult: Result<
-    string,
-    FetchError | AuthenticationFailed | LoginSignatureError
-  > = yield call(komenciKit.startSession, captchaToken)
-
-  if (!komenciSessionResult.ok) {
-    throw komenciSessionResult.error
-  }
-
-  yield put(
-    feelessUpdateVerificationState({
-      ...feelessVerificationState,
-      komenci: {
-        ...feelessVerificationState.komenci,
-        sessionToken: komenciSessionResult.result,
-      },
-    })
-  )
+  // Fetch session state now that we are sure to have a token
+  yield call(fetchSessionState, komenciKit, e164Number)
 }
 
 // Checks if phoneHash is in cache, if it's not it asks Komenci to get it,
@@ -493,13 +514,15 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
     const feelessVerificationState: FeelessVerificationState = yield select(
       feelessVerificationStateSelector
     )
+
     const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
-      komenciKit.getDistributedBlindedPepper,
+      async (phoneNumber, version) => komenciKit.getDistributedBlindedPepper(phoneNumber, version),
       e164Number,
       DeviceInfo.getVersion()
     )
 
     if (!pepperQueryResult.ok) {
+      Logger.debug(TAG, '@fetchPhoneHashDetails', 'Unable to query for pepper')
       throw pepperQueryResult.error
     }
 
@@ -559,11 +582,12 @@ function* fetchOrDeployMtw(
   // If there isn't a MTW for this session, ask Komenci to deploy one
   if (!unverifiedMtwAddress) {
     const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
-      komenciKit.deployWallet,
+      async (address) => komenciKit.deployWallet(address),
       CURRENT_MTW_IMPLEMENTATION_ADDRESS
     )
 
     if (!deployWalletResult.ok) {
+      Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to deploy MTW')
       throw deployWalletResult.error
     }
 
@@ -580,6 +604,7 @@ function* fetchOrDeployMtw(
   )
 
   if (!validityCheckResult.ok) {
+    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to valiad MTW')
     throw validityCheckResult.error
   }
 
@@ -618,7 +643,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       call(getConnectedUnlockedAccount),
       call(getContractKit),
       select(e164NumberSelector),
-      put(setVerificationStatus(VerificationStatus.Prepping)),
+      put(feelessSetVerificationStatus(VerificationStatus.Prepping)),
     ])
 
     let feelessVerificationState: FeelessVerificationState = yield select(
@@ -627,6 +652,8 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
       url: KOMENCI_URL,
+      token: feelessVerificationState.komenci.sessionToken,
+      txRetryTimeoutMs: 100000,
     })
 
     // Start by checking again to make sure Komenci is ready. Throws error if not
@@ -716,7 +743,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           status.numAttestationsRemaining - reveals.filter((r: boolean) => r).length
 
         if (attestationsToRequest) {
-          yield put(setVerificationStatus(VerificationStatus.RequestingAttestations))
+          yield put(feelessSetVerificationStatus(VerificationStatus.RequestingAttestations))
           // request more attestations
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
             attestationsToRequest,
@@ -763,7 +790,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
         ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
       }
 
-      yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
+      yield put(feelessSetVerificationStatus(VerificationStatus.CompletingAttestations))
 
       yield race([
         call(
@@ -793,7 +820,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
     Logger.error(TAG, 'Error occured during feeless verification flow', error)
     yield all([
       call(storeTimestampIfKomenciError, error),
-      put(setVerificationStatus(VerificationStatus.Failed)),
+      put(feelessSetVerificationStatus(VerificationStatus.Failed)),
       put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE)),
     ])
     return error.message
@@ -855,7 +882,7 @@ export function* feelessRequestAttestations(
     )
 
     const approveTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-      komenciKit.approveAttestations,
+      async (address, num) => komenciKit.approveAttestations(address, num),
       mtwAddress,
       numAttestationsRequestsNeeded
     )
@@ -872,7 +899,7 @@ export function* feelessRequestAttestations(
     )
 
     const requestTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-      komenciKit.requestAttestations,
+      async (address, hash, num) => komenciKit.requestAttestations(address, hash, num),
       mtwAddress,
       phoneHash,
       numAttestationsRequestsNeeded
@@ -897,7 +924,7 @@ export function* feelessRequestAttestations(
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
 
   const selectIssuersTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-    komenciKit.selectIssuers,
+    async (address, hash) => komenciKit.selectIssuers(address, hash),
     mtwAddress,
     phoneHash
   )
@@ -933,7 +960,7 @@ export function* feelessCompleteAttestation(
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
 
   const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-    komenciKit.completeAttestation,
+    async (address, hash, iss, cod) => komenciKit.completeAttestation(address, hash, iss, cod),
     mtwAddress,
     phoneHashDetails.phoneHash,
     code.issuer,

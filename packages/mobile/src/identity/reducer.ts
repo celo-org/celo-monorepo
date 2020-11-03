@@ -232,7 +232,6 @@ export const reducer = (
           total: 0,
         },
         verificationState: initialState.verificationState,
-        feelessVerificationState: initialState.feelessVerificationState,
         isFetchingAddresses: false,
       }
     }
@@ -259,30 +258,37 @@ export const reducer = (
         },
       }
     case Actions.SET_VERIFICATION_STATUS:
-      const status = action.status
-      let feelessIsActive = state.feelessVerificationState.isActive
-      if (feelessIsActive) {
-        if (status < 1 || status === VerificationStatus.Done) {
-          feelessIsActive = false
-        }
-        return {
-          ...state,
-          feelessVerificationStatus: status,
-          feelessVerificationState: {
-            ...state.feelessVerificationState,
-            isActive: feelessIsActive,
-          },
-        }
+      let loading = state.feelessVerificationState.isLoading
+      if (action.status === VerificationStatus.Stopped) {
+        loading = false
       }
       return {
         ...state,
-        verificationStatus: status,
+        verificationStatus: action.status,
+        verificationState: {
+          ...state.verificationState,
+          isLoading: loading,
+        },
       }
-    // TODO: Delete if not using
     case Actions.FEELESS_SET_VERIFICATION_STATUS:
+      const newStatus = action.status
+      let { isActive, isLoading } = state.feelessVerificationState
+
+      if (newStatus < 1 || newStatus === VerificationStatus.Done) {
+        isActive = false
+      }
+
+      if (newStatus === VerificationStatus.Stopped) {
+        isLoading = false
+      }
       return {
         ...state,
-        feelessVerificationStatus: action.status,
+        feelessVerificationStatus: newStatus,
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          isActive,
+          isLoading,
+        },
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
       return {
@@ -485,7 +491,7 @@ export const reducer = (
       return {
         ...state,
         feelessVerificationState: {
-          ...initialState.feelessVerificationState,
+          ...state.feelessVerificationState,
           isLoading: true,
         },
       }
@@ -494,7 +500,7 @@ export const reducer = (
         ...state,
         verificationState: {
           lastFetch: Date.now(),
-          isLoading: false,
+          isLoading: state.verificationState.isLoading,
           ...action.state,
         },
       }
@@ -503,7 +509,7 @@ export const reducer = (
         ...state,
         feelessVerificationState: {
           lastFetch: Date.now(),
-          isLoading: false,
+          isLoading: state.feelessVerificationState.isLoading,
           ...action.state,
         },
       }
