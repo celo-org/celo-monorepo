@@ -19,7 +19,6 @@ contract MetaTransactionWalletDeployer is
   using SafeMath for uint256;
   using BytesLib for bytes;
 
-  mapping(address => address) public wallets;
   mapping(address => bool) public canDeploy;
 
   event WalletDeployed(address indexed owner, address indexed wallet, address implementation);
@@ -87,12 +86,9 @@ contract MetaTransactionWalletDeployer is
     external
     onlyCanDeploy
   {
-    require(wallets[owner] == address(0), "wallet already deployed");
-
     MetaTransactionWalletProxy proxy = new MetaTransactionWalletProxy();
     proxy._setAndInitializeImplementation(implementation, initCallData);
     proxy._transferOwnership(owner);
-    wallets[owner] = address(proxy);
 
     emit WalletDeployed(owner, address(proxy), implementation);
   }

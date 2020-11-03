@@ -129,35 +129,6 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
     })
   })
 
-  describe('#getWallet', () => {
-    describe('when a wallet was not deployed', () => {
-      it('is 0x0000000000000000000000000000000000000000', async () => {
-        const walletAddress = await walletDeployer.getWallet(beneficiary)
-        expect(walletAddress).toEqual('0x0000000000000000000000000000000000000000')
-      })
-    })
-
-    describe('when a wallet was deployed', () => {
-      let walletAddressFromEvent: string
-      beforeEach(async () => {
-        const result = await walletDeployer
-          .deploy(
-            beneficiary,
-            implementation.options.address,
-            implementation.methods.initialize(beneficiary).encodeABI()
-          )
-          .sendAndWaitForReceipt()
-
-        walletAddressFromEvent = result.events?.WalletDeployed.returnValues.wallet
-      })
-
-      it('is set to the same value as the event', async () => {
-        const walletAddress = await walletDeployer.getWallet(beneficiary)
-        expect(walletAddress).toEqual(walletAddressFromEvent)
-      })
-    })
-  })
-
   describe('#changeDeployerPermission', () => {
     describe('as a rando', () => {
       it('reverts', async () => {

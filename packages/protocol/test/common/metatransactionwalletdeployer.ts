@@ -107,7 +107,6 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
         assert.exists(walletDeployedEvent)
         assert.equal(walletDeployedEvent.args.owner, valoraAccount)
         assert.equal(walletDeployedEvent.args.implementation, implementation.address)
-        assert.equal(await deployer.wallets(valoraAccount), walletDeployedEvent.args.wallet)
       })
 
       it('initializes the wallet with the correct signer', async () => {
@@ -134,7 +133,6 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
         assert.exists(walletDeployedEvent)
         assert.equal(walletDeployedEvent.args.owner, valoraAccount)
         assert.equal(walletDeployedEvent.args.implementation, implementation.address)
-        assert.equal(await deployer.wallets(valoraAccount), walletDeployedEvent.args.wallet)
       })
 
       it('initializes the wallet with the correct signer', async () => {
@@ -162,24 +160,25 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
 
     describe('when the external account already owns a wallet', async () => {
       beforeEach(async () => {
+        await deployer.deploy(
+          valoraAccount,
+          implementation.address,
+          // @ts-ignore
+          implementation.contract.methods.initialize(valoraAccount).encodeABI()
+        )
         deployRes = await deployer.deploy(
           valoraAccount,
           implementation.address,
           // @ts-ignore
           implementation.contract.methods.initialize(valoraAccount).encodeABI()
         )
+        walletDeployedEvent = deployRes.logs.find((log) => log.event === 'WalletDeployed')
       })
 
-      it('does not redeploy', async () => {
-        await assertRevert(
-          deployer.deploy(
-            valoraAccount,
-            implementation.address,
-            // @ts-ignore
-            implementation.contract.methods.initialize(valoraAccount).encodeABI()
-          ),
-          'wallet already deployed'
-        )
+      it('does redeploy', async () => {
+        assert.exists(walletDeployedEvent)
+        assert.equal(walletDeployedEvent.args.owner, valoraAccount)
+        assert.equal(walletDeployedEvent.args.implementation, implementation.address)
       })
     })
   })

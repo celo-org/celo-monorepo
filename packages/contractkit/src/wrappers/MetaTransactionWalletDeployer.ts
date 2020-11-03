@@ -4,7 +4,6 @@ import { BaseWrapper, identity, proxyCall, proxySend, stringIdentity } from './B
 export class MetaTransactionWalletDeployerWrapper extends BaseWrapper<
   MetaTransactionWalletDeployer
 > {
-  getWallet = proxyCall(this.contract.methods.wallets, undefined, stringIdentity)
   canDeploy = proxyCall(this.contract.methods.canDeploy, undefined, identity)
   owner = proxyCall(this.contract.methods.owner, undefined, stringIdentity)
 
