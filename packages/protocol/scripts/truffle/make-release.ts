@@ -72,6 +72,19 @@ class ContractAddresses {
 
 const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
+const isCoreContract = async (contractName: string) => {
+  if (contractName.endsWith('Proxy')) {
+    return false
+  }
+
+  try {
+    await artifacts.require(`${contractName}Proxy`)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 const deployImplementation = async (
   contractName: string,
   Contract: Truffle.Contract<Truffle.ContractInstance>,
@@ -210,7 +223,9 @@ module.exports = async (callback: (error?: any) => number) => {
       }
     }
     for (const contractName of contracts) {
-      await release(contractName)
+      if (await isCoreContract(contractName)) {
+        await release(contractName)
+      }
     }
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
