@@ -33,8 +33,9 @@ interface Props {
   style?: StyleProp<ViewStyle>
   country: LocalizedCountry | undefined
   nationalPhoneNumber: string
-  onPressCountry: () => void
-  onChange: (nationalPhoneNumber: string, countryCallingCode: string) => void
+  onPressCountry?: () => void
+  onChange?: (nationalPhoneNumber: string, countryCallingCode: string) => void
+  editable?: boolean
 }
 
 export default function PhoneNumberInput({
@@ -44,6 +45,7 @@ export default function PhoneNumberInput({
   nationalPhoneNumber,
   onPressCountry,
   onChange,
+  editable = true,
 }: Props) {
   const shouldRequestPhoneNumberRef = useRef(nationalPhoneNumber.length === 0)
   const flagEmoji = country?.emoji
@@ -52,7 +54,7 @@ export default function PhoneNumberInput({
 
   async function onPressCountryInternal() {
     const handled = await requestPhoneNumberIfNecessary()
-    if (handled) {
+    if (handled || !onPressCountry) {
       return
     }
 
@@ -67,7 +69,7 @@ export default function PhoneNumberInput({
     shouldRequestPhoneNumberRef.current = false
 
     const parsedPhoneNumber = await requestPhoneNumber()
-    if (!parsedPhoneNumber) {
+    if (!parsedPhoneNumber || !onChange) {
       return false
     }
 
@@ -76,7 +78,9 @@ export default function PhoneNumberInput({
   }
 
   function onChangePhoneNumber(newNationalPhoneNumber: string) {
-    onChange(newNationalPhoneNumber, countryCallingCode)
+    if (onChange) {
+      onChange(newNationalPhoneNumber, countryCallingCode)
+    }
   }
 
   return (
@@ -86,9 +90,10 @@ export default function PhoneNumberInput({
           onPress={onPressCountryInternal}
           style={styles.countryCodeContainer}
           testID="CountrySelectionButton"
+          disabled={!editable}
         >
           <View style={styles.countryCodeContent}>
-            <Expandable isExpandable={true} isExpanded={false}>
+            <Expandable isExpandable={editable} isExpanded={false}>
               <Text style={styles.flag} testID={'countryCodeFlag'}>
                 {flagEmoji}
               </Text>
@@ -109,6 +114,7 @@ export default function PhoneNumberInput({
           countryCallingCode={countryCallingCode}
           onFocus={requestPhoneNumberIfNecessary}
           onChangeText={onChangePhoneNumber}
+          editable={editable}
         />
       </View>
     </FormField>

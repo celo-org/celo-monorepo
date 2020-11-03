@@ -1,5 +1,4 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -27,8 +26,9 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
       return false
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error({ err })
     return false
   }
 }
@@ -37,7 +37,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
 export async function setDidMatchmaking(account: string) {
-  logger.debug('Setting did matchmaking')
+  logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
       return accounts()
@@ -48,8 +48,9 @@ export async function setDidMatchmaking(account: string) {
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
       return insertRecord(newAccount)
     }
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return null
   }
 }

@@ -401,6 +401,10 @@ export const v5Schema = {
     },
     addressToDisplayName: {},
   },
+  exchange: {
+    ...v3Schema.exchange,
+    isLoading: false,
+  },
   app: {
     ...v3Schema.app,
     minVersion: null,
