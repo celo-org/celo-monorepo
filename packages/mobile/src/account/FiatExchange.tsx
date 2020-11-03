@@ -21,7 +21,9 @@ import { navigateToURI } from 'src/utils/linking'
 
 function FiatExchange() {
   function goToAddFunds() {
-    navigation.navigate(Screens.FiatExchangeAmount, { isAddFunds: true })
+    navigation.navigate(Screens.FiatExchangeOptions, {
+      isAddFunds: true,
+    })
   }
 
   function goToExternalExchanges() {
