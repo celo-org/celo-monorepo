@@ -3,7 +3,6 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
 import { ProxyInstance, RegistryInstance } from 'types'
-import fs = require('fs')
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds
@@ -32,7 +31,7 @@ const argv = require('minimist')(process.argv.slice(2), {
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
-const proposal = argv.proposal ? JSON.parse(fs.readFileSync(argv.proposal).toString()) : []
+const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
 
 module.exports = async (callback: (error?: any) => number) => {
