@@ -114,13 +114,11 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       }
     }
     // TODO: Get rates from other providers when they are added
-    if (amount) {
+    if (amount.isGreaterThan(0)) {
       getMoonpayRates().catch((error) => {
         Logger.error(TAG, `Failed to fetch Moonpay rate for ${localCurrency} at ${amount}`, error)
         dispatch(showError(ErrorMessages.PROVIDER_RATE_FETCH_FAILED))
       })
-    } else {
-      Logger.debug('skipped')
     }
   }, [localCurrency, amount])
 

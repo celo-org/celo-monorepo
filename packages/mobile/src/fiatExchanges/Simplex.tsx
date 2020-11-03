@@ -1,19 +1,17 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 import AccountNumber from 'src/components/AccountNumber'
+import { SIMPLEX_URI } from 'src/config'
 import i18n from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 
 export const simplexOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
