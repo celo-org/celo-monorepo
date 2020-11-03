@@ -269,10 +269,10 @@ export class KomenciKit {
    * @param metaTxWalletAddress - The MetaTxWallet selecting issuers
    * @param identifier - the phone number identifier
    */
-  public async approveAttestations(
+  public approveAttestations = async (
     metaTxWalletAddress: string,
     attestationsRequested: number
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     const approveTx = await attestations.approveAttestationFee(attestationsRequested)
     return this.submitMetaTransaction(metaTxWalletAddress, approveTx)
@@ -285,10 +285,10 @@ export class KomenciKit {
    * @param metaTxWalletAddress - The MetaTxWallet selecting issuers
    * @param identifier - the phone number identifier
    */
-  public async selectIssuers(
+  public selectIssuers = async (
     metaTxWalletAddress: string,
     identifier: string
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     await attestations.waitForSelectingIssuers(identifier, metaTxWalletAddress)
     return this.submitMetaTransaction(metaTxWalletAddress, attestations.selectIssuers(identifier))
@@ -303,12 +303,12 @@ export class KomenciKit {
    * @param issuer - the issuer ID
    * @param code - the code
    */
-  public async completeAttestation(
+  public completeAttestation = async (
     metaTxWalletAddress: string,
     identifier: string,
     issuer: Address,
     code: string
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     return this.submitMetaTransaction(
       metaTxWalletAddress,
@@ -326,13 +326,13 @@ export class KomenciKit {
    * @param walletAddress The wallet address to set for the account
    * @param proofOfPossession Signature from the wallet address key over the sender's address
    */
-  public async setAccount(
+  public setAccount = async (
     metaTxWalletAddress: string,
     name: string,
     dataEncryptionKey: string,
     walletAddress: Address,
     proofOfPossession: Signature | null = null
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const accounts = await this.contractKit.contracts.getAccounts()
     return this.submitMetaTransaction(
       metaTxWalletAddress,
