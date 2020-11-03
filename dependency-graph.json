@@ -76,6 +76,7 @@
     "location": "packages/komencikit",
     "dependencies": [
       "@celo/base",
+      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
@@ -167,8 +168,10 @@
     "location": "packages/phone-number-privacy/monitor",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/identity",
       "@celo/phone-number-privacy-common",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/phone-number-privacy-signer": {
@@ -239,7 +242,8 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/network-utils": {
