@@ -18,18 +18,10 @@ const Proxy: ProxyContract = artifacts.require('Proxy')
 
 contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
   let deployer: MetaTransactionWalletDeployerInstance
-  const deployerOwner = accounts[0]
   const valoraAccount = accounts[1]
 
   beforeEach(async () => {
     deployer = await MetaTransactionWalletDeployer.new()
-    await deployer.initialize()
-  })
-
-  describe('#initialize()', () => {
-    it('should have set the owner to itself', async () => {
-      assert.equal(await deployer.owner(), deployerOwner)
-    })
   })
 
   describe('#deploy', async () => {

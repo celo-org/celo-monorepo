@@ -10,12 +10,7 @@ import "./ExternalCall.sol";
 import "./Initializable.sol";
 import "./MetaTransactionWallet.sol";
 
-contract MetaTransactionWalletDeployer is
-  IMetaTransactionWalletDeployer,
-  ICeloVersionedContract,
-  Initializable,
-  Ownable
-{
+contract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloVersionedContract {
   using SafeMath for uint256;
   using BytesLib for bytes;
 
@@ -27,13 +22,6 @@ contract MetaTransactionWalletDeployer is
      */
   function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
-  }
-
-  /**
-     * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-     */
-  function initialize() external initializer {
-    _transferOwnership(msg.sender);
   }
 
   /**

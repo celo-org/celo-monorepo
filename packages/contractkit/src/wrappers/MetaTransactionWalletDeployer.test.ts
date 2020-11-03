@@ -23,7 +23,6 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
 
   const deployWalletDeployer = async (from: Address): Promise<Address> => {
     const instance = await MetaTransactionWalletDeployer.new({ from })
-    await instance.initialize({ from })
     return instance.address
   }
 
