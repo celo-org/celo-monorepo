@@ -229,7 +229,7 @@
       },
       "ios.sim.debug": {
         "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Debug -derivedDataPath ios/build | bundle exec xcpretty",
+        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build  | bundle exec xcpretty",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"
@@ -237,7 +237,7 @@
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Release -derivedDataPath ios/build | bundle exec xcpretty",
+        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Release -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"
