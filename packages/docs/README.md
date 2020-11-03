@@ -18,7 +18,7 @@ In this documentation you’ll find information on:
   - Consider running a node on the [Baklava testnet](getting-started/baklava-testnet.md) before getting started on Mainnet.
   - Learn more about running nodes on [Mainnet](getting-started/mainnet.md).
 - Developers
-  - Start at the [developer tools page](developer-resources/overview.md) for help building a dapp or service on the Celo network.
+  - Start at the [developer tools page](developer-resources/overview.md) for help building a DApp or service on the Celo network.
 - Integration Guide
   - [This section](developer-resources/integrations/integrations.md) includes guides on common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
 
