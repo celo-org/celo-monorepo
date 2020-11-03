@@ -19,10 +19,10 @@
 - [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
-## CELO Holder Guide
+## CELO Owner Guide
 
 - [Quick Start](celo-holder-guide/quick-start.md)
-- [cUSD Holder Guide](celo-holder-guide/cusd.md)
+- [cUSD Owner Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
 - [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
