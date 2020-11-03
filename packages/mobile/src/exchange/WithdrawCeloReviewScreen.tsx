@@ -7,7 +7,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -26,6 +26,7 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
+import useTypedSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
@@ -33,16 +34,13 @@ type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
 function WithdrawCeloReviewScreen({ route }: Props) {
   const { amount, recipientAddress, feeEstimate } = route.params
   const { t } = useTranslation(Namespaces.exchangeFlow9)
-  // loading is never set to false, when the withdrawal is complete or after a short while,
-  // withdrawCelo saga will navigate to |ExchangeHomeScreen|.
-  const [loading, setLoading] = useState(false)
+  const isLoading = useTypedSelector((state) => state.exchange.isLoading)
   const dispatch = useDispatch()
 
   const onConfirmWithdraw = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_confirm, {
       amount: amount.toString(),
     })
-    setLoading(true)
     dispatch(withdrawCelo(amount, recipientAddress))
   }
 
@@ -69,7 +67,7 @@ function WithdrawCeloReviewScreen({ route }: Props) {
         size={BtnSizes.FULL}
         style={styles.reviewBtn}
         testID="ConfirmWithdrawButton"
-        showLoading={loading}
+        showLoading={isLoading}
         loadingColor={colors.light}
       />
     </SafeAreaView>

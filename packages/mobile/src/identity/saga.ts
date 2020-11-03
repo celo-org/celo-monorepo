@@ -21,7 +21,11 @@ import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/iden
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { fetchVerificationState, startVerification } from 'src/identity/verification'
+import {
+  fetchVerificationState,
+  reportRevealStatusSaga,
+  startVerification,
+} from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
@@ -111,6 +115,10 @@ function* watchFetchDataEncryptionKey() {
   yield takeLeading(Actions.FETCH_DATA_ENCRYPTION_KEY, fetchDataEncryptionKeyWrapper)
 }
 
+function* watchReportRevealStatus() {
+  yield takeEvery(Actions.REPORT_REVEAL_STATUS, reportRevealStatusSaga)
+}
+
 export function* identitySaga() {
   Logger.debug(TAG, 'Initializing identity sagas')
   try {
@@ -119,6 +127,7 @@ export function* identitySaga() {
     yield spawn(watchValidateRecipientAddress)
     yield spawn(watchNewFeedTransactions)
     yield spawn(watchFetchDataEncryptionKey)
+    yield spawn(watchReportRevealStatus)
   } catch (error) {
     Logger.error(TAG, 'Error initializing identity sagas', error)
   } finally {
