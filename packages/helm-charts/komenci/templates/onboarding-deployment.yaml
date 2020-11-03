@@ -8,10 +8,10 @@ metadata:
 spec:
   clusterIP: None
   selector:
+{{ include "komenci-onboarding-component-label" . | indent 4 }}
   ports:
   - name: http
     port: 3000
-{{ include "komenci-onboarding-component-label" . | indent 4 }}
 ---
 apiVersion: apps/v1
 kind: Deployment

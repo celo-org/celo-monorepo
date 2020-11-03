@@ -14,7 +14,7 @@ kubectl:
 relayer:
   image:
     repository: celotestnet.azurecr.io/komenci/relayer
-    tag: c978085b25b9735e6232c793a33f28a9abd79789
+    tag: ef3a2c9dcfe59fcf5b7004bb218a83e4cb77f9aa
   replicas: 2
   identities:
   - address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
@@ -43,13 +43,12 @@ relayer:
     nodeProviderType: http
     nodeUrl: https://alfajores-forno.celo-testnet.org
     walletAddress: 0xa7d74cb4fca9458757cfc8b90d9b38a126f68b47
-    walletPrivateKey: 0x7403568bea8a303d7645bb66f10c9df31fe549cb07a7a908cb9a6cc17b1d6415
-    walletType: local
+    walletType: azure-hsm
 
 onboarding:
   image: 
     repository: celotestnet.azurecr.io/komenci/onboarding
-    tag: c978085b25b9735e6232c793a33f28a9abd79789
+    tag: ef3a2c9dcfe59fcf5b7004bb218a83e4cb77f9aa
   replicas: 2
   relayer:
     host: komenci-relayer

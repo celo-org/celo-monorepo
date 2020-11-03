@@ -99,7 +99,7 @@ export async function upgradeKomenciChart(
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
   await removeKomenciRBACHelmRelease(celoEnv)
   const komenciConfig = getKomenciConfig(context)
   for (const identity of komenciConfig.identities) {
@@ -123,6 +123,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   return [
+    `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_TAG)}`,
@@ -189,9 +190,11 @@ async function createKomenciAzureIdentityIfNotExists(
   // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
   let assigneeObjectId = await getAKSServicePrincipalObjectId(clusterConfig)
   let assigneePrincipalType = 'ServicePrincipal'
+  //TODO Check how to manage the MSI type
   if (!assigneeObjectId) {
     assigneeObjectId = await getAKSManagedServiceIdentityObjectId(clusterConfig)
-    assigneePrincipalType = 'MSI'
+    //assigneePrincipalType = 'MSI'
+    assigneePrincipalType = 'ServicePrincipal'
   }
   await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
   // Allow the komenci identity to access the correct key vault
@@ -363,7 +366,7 @@ async function upgradeKomenciRBACHelmChart(celoEnv: string, context: string) {
 }
 
 function removeKomenciRBACHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(rbacReleaseName(celoEnv))
+  return removeGenericHelmChart(rbacReleaseName(celoEnv), celoEnv)
 }
 
 function rbacHelmParameters(celoEnv: string,  context: string) {

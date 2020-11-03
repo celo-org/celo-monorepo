@@ -97,11 +97,12 @@ spec:
             # Get the correct key vault name. If this relayer's identity is not
             # using Azure HSM signing, the key vault name will be empty and ignored
             AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.relayer.identities -}}{{- if (hasKey $identity "azure" ) -}}{{ $identity.azure.keyVaultName | default "" }}{{- end }},{{- end }}
-            export AZURE_KEY_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
+            export WALLET_AZURE_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
 
             # Get the correct relayer account address
             ADDRESSES={{- range $index, $identity := .Values.relayer.identities -}}{{ $identity.address }},{{- end }}
-            export ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
+            export WALLET_ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
+            
             exec yarn start relayer
         env:
         - name: REPLICA_NAME
@@ -122,11 +123,7 @@ spec:
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.relayer.onchain "value_name" "network") | indent 8 }}
 {{ include "common.env-var" (dict "name" "NODE_PROVIDER_TYPE" "dict" .Values.relayer.onchain "value_name" "nodeProviderType") | indent 8 }}
 {{ include "common.env-var" (dict "name" "NODE_URL" "dict" .Values.relayer.onchain "value_name" "nodeUrl") | indent 8 }}
-{{ include "common.env-var" (dict "name" "WALLET_ADDRESS" "dict" .Values.relayer.onchain "value_name" "walletAddress") | indent 8 }}
-{{ include "common.env-var" (dict "name" "WALLET_PRIVATE_KEY" "dict" .Values.relayer.onchain "value_name" "walletPrivateKey") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer.onchain "value_name" "walletType") | indent 8 }}
-          initialDelaySeconds: 10
-          periodSeconds: 5
         volumeMounts:
         - name: private-key-volume
           readOnly: true
