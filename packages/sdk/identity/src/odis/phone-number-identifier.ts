@@ -31,6 +31,7 @@ export interface PhoneNumberHashDetails {
 
 /**
  * Retrieve the on-chain identifier for the provided phone number
+ * Performs blinding, querying, and unblinding
  */
 export async function getPhoneNumberIdentifier(
   e164Number: string,
@@ -52,10 +53,46 @@ export async function getPhoneNumberIdentifier(
     blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
   }
 
+  const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient)
+
+  const base64BlindSig = await getBlindedPhoneNumberSignature(
+    account,
+    signer,
+    context,
+    base64BlindedMessage,
+    selfPhoneHash,
+    clientVersion
+  )
+
+  return getPhoneNumberIdentifierFromSignature(e164Number, base64BlindSig, blsBlindingClient)
+}
+
+/**
+ * Blinds the phone number in preparation for the ODIS request
+ * Caller should use the same blsBlindingClient instance for unblinding
+ */
+export async function getBlindedPhoneNumber(
+  e164Number: string,
+  blsBlindingClient: BlsBlindingClient
+): Promise<string> {
   debug('Retrieving blinded message')
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
-  const base64BlindedMessage = await blsBlindingClient.blindMessage(base64PhoneNumber)
+  return blsBlindingClient.blindMessage(base64PhoneNumber)
+}
 
+/**
+ * Query ODIS for the blinded signature
+ * Response can be passed into getPhoneNumberIdentifierFromSignature
+ * to retrieve the on-chain identifier
+ */
+export async function getBlindedPhoneNumberSignature(
+  account: string,
+  signer: AuthSigner,
+  context: ServiceContext,
+  base64BlindedMessage: string,
+  selfPhoneHash?: string,
+  clientVersion?: string
+): Promise<string> {
   const body: SignMessageRequest = {
     account,
     timestamp: Date.now(),
@@ -71,9 +108,19 @@ export async function getPhoneNumberIdentifier(
     context,
     SIGN_MESSAGE_ENDPOINT
   )
-  const base64BlindSig = response.combinedSignature
+  return response.combinedSignature
+}
+
+/**
+ * Unblind the response and return the on-chain identifier
+ */
+export async function getPhoneNumberIdentifierFromSignature(
+  e164Number: string,
+  base64BlindedSignature: string,
+  blsBlindingClient: BlsBlindingClient
+): Promise<PhoneNumberHashDetails> {
   debug('Retrieving unblinded signature')
-  const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
+  const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindedSignature)
   const sigBuf = Buffer.from(base64UnblindedSig, 'base64')
 
   debug('Converting sig to pepper')

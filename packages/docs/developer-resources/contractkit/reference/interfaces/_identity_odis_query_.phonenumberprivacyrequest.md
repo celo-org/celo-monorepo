@@ -22,7 +22,7 @@
 
 • **account**: *string*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L32)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L38)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **authenticationMethod**: *[AuthenticationMethod](../enums/_identity_odis_query_.authenticationmethod.md)*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L33)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L39)*
 
 ___
 
@@ -38,4 +38,4 @@ ___
 
 • **version**? : *undefined | string*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L34)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L40)*

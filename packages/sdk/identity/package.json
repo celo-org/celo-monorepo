@@ -23,9 +23,9 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.4-dev",
-    "@celo/utils": "0.1.22-dev",
-    "@celo/contractkit": "0.4.16-dev",
+    "@celo/base": "0.0.5-dev",
+    "@celo/utils": "0.1.23-dev",
+    "@celo/contractkit": "0.4.19-dev",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "cross-fetch": "3.0.4",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
+    "@celo/wallet-local": "0.0.1-dev",
     "@types/debug": "^4.1.5",
     "fetch-mock": "9.10.4",
     "@types/elliptic": "^6.4.12",

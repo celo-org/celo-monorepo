@@ -45,12 +45,16 @@ export class CeloProvider implements Provider {
     this.connection.addAccount(privateKey)
   }
 
+  // Used for backwards compatibility. Use the `removeAccount` from the Connection
+  removeAccount(address: string) {
+    this.connection.removeAccount(address)
+  }
+
   // Used for backwards compatibility. Use the `getAccounts` from the Connection
   async getAccounts(): Promise<string[]> {
     return this.connection.getAccounts()
   }
 
-  // Used for backwards compatibility. Use the `getAccounts` from the Connection
   isLocalAccount(address?: string): boolean {
     return this.connection.wallet != null && this.connection.wallet.hasAccount(address)
   }

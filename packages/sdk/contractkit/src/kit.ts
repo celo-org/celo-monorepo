@@ -68,6 +68,10 @@ export class ContractKit {
     this.contracts = new WrapperCache(this)
   }
 
+  getWallet() {
+    return this.connection.wallet
+  }
+
   async getTotalBalance(address: string): Promise<AccountBalance> {
     const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()

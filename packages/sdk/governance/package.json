@@ -19,10 +19,10 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.4-dev",
-    "@celo/utils": "0.1.22-dev",
+    "@celo/base": "0.0.5-dev",
+    "@celo/utils": "0.1.23-dev",
     "@celo/connect": "0.0.2-dev",
-    "@celo/contractkit": "0.4.16-dev",
+    "@celo/contractkit": "0.4.19-dev",
     "@celo/explorer": "0.0.1-dev",
     "ethereumjs-util": "^5.2.0"
   },

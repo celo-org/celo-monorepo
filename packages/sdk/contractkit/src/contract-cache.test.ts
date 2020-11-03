@@ -29,6 +29,14 @@ describe('getContract()', () => {
       expect(contract).toBeDefined()
     })
   }
+
+  test('should create a new instance when an address is provided', async () => {
+    const address1 = Web3.utils.randomHex(20)
+    const address2 = Web3.utils.randomHex(20)
+    const contract1 = await contractCache.getContract(CeloContract.MultiSig, address1)
+    const contract2 = await contractCache.getContract(CeloContract.MultiSig, address2)
+    expect(contract1?.address).not.toEqual(contract2?.address)
+  })
 })
 
 test('should cache contracts', async () => {

@@ -3,11 +3,13 @@ import { Address, CeloTx, EncodedTransaction, RLPEncodedTx } from './types'
 
 export interface ReadOnlyWallet {
   getAccounts: () => Address[]
+  removeAccount: (address: Address) => void
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: CeloTx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
+  computeSharedSecret: (address: Address, publicKey: string) => Promise<Buffer>
 }
 
 export interface Signer {
@@ -24,4 +26,5 @@ export interface Signer {
   signTypedData: (typedData: EIP712TypedData) => Promise<{ v: number; r: Buffer; s: Buffer }>
   getNativeKey: () => string
   decrypt: (ciphertext: Buffer) => Promise<Buffer>
+  computeSharedSecret: (publicKey: string) => Promise<Buffer>
 }

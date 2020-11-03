@@ -142,6 +142,18 @@ export class Connection {
     }
   }
 
+  removeAccount(address: string) {
+    if (this.wallet) {
+      if (hasProperty<{ removeAccount: (address: string) => void }>(this.wallet, 'removeAccount')) {
+        this.wallet.removeAccount(address)
+      } else {
+        throw new Error("The wallet used, can't remove accounts")
+      }
+    } else {
+      throw new Error('No wallet set')
+    }
+  }
+
   async getNodeAccounts(): Promise<string[]> {
     const nodeAccountsResp = await this.rpcCaller.call('eth_accounts', [])
     return this.toChecksumAddresses(nodeAccountsResp.result ?? [])

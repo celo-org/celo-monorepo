@@ -82,7 +82,7 @@ export default class Propose extends BaseCommand {
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),
-      { value: res.flags.deposit },
+      { value: deposit.toString() },
       'ProposalQueued'
     )
   }

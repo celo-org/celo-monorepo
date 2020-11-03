@@ -992,7 +992,7 @@ describe('governance tests', () => {
           if (
             header.number % 10 === 0 &&
             errorWhileChangingValidatorSet === '' &&
-            lastRotated + 30 <= header.number
+            lastRotated + 60 <= header.number
           ) {
             // 1. Swap validator0 and validator1 so one is a member of the group and the other is not.
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
@@ -1009,7 +1009,7 @@ describe('governance tests', () => {
       subscription.on('data', changeValidatorSet)
 
       // Wait for a few epochs while changing the validator set.
-      while (blockNumbers.length < 90) {
+      while (blockNumbers.length < 180) {
         // Prepare for member swapping.
         await sleep(epoch)
       }

@@ -19,7 +19,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/utils": "0.1.22-dev",
+    "@celo/utils": "0.1.23-dev",
     "debug": "^4.1.1"
   },
   "devDependencies": {

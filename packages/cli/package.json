@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.59-dev",
+  "version": "0.0.61-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -31,11 +31,11 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.16-dev",
+    "@celo/contractkit": "0.4.19-dev",
     "@celo/explorer": "0.0.1-dev",
     "@celo/identity": "0.0.1-dev",
     "@celo/governance": "0.0.1-dev",
-    "@celo/utils": "0.1.22-dev",
+    "@celo/utils": "0.1.23-dev",
     "@celo/wallet-local": "0.0.1-dev",
     "@celo/wallet-hsm-azure": "0.0.1-dev",
     "@celo/wallet-ledger": "0.0.1-dev",

@@ -29,6 +29,14 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   }
 
   /**
+   * Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+   * @param address The address of the account to be removed
+   */
+  removeAccount(_address: string) {
+    throw new Error('removeAccount is not supported for this wallet')
+  }
+
+  /**
    * Returns true if account has been registered
    * @param address Account to check
    */
@@ -49,6 +57,15 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   protected addSigner(address: Address, signer: TSigner) {
     const normalizedAddress = normalizeAddressWith0x(address)
     this.accountSigners.set(normalizedAddress, signer)
+  }
+
+  /**
+   * Removes the account-signer
+   * @param address Account address
+   */
+  protected removeSigner(address: Address) {
+    const normalizedAddress = normalizeAddressWith0x(address)
+    this.accountSigners.delete(normalizedAddress)
   }
 
   /**
@@ -115,5 +132,13 @@ export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWall
   async decrypt(address: string, ciphertext: Buffer) {
     const signer = this.getSigner(address)
     return signer.decrypt(ciphertext)
+  }
+
+  /**
+   * Computes the shared secret (an ECDH key exchange object) between two accounts
+   */
+  computeSharedSecret(address: Address, publicKey: string): Promise<Buffer> {
+    const signer = this.getSigner(address)
+    return signer.computeSharedSecret(publicKey)
   }
 }

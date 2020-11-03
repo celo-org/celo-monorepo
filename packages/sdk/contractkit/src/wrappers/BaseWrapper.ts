@@ -15,6 +15,12 @@ import { ContractKit } from '../kit'
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => CeloTxObject<O>
 
+type Events<T extends Contract> = keyof T['events']
+type Methods<T extends Contract> = keyof T['methods']
+type EventsEnum<T extends Contract> = {
+  [event in Events<T>]: event
+}
+
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
@@ -26,11 +32,30 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   /** Contract getPastEvents */
-  public getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
-    return this.contract.getPastEvents(event, options)
+  public getPastEvents(event: Events<T>, options: PastEventOptions): Promise<EventLog[]> {
+    return this.contract.getPastEvents(event as string, options)
   }
 
-  events = this.contract.events
+  events: T['events'] = this.contract.events
+
+  eventTypes = Object.keys(this.events).reduce<EventsEnum<T>>(
+    (acc, key) => ({ ...acc, [key]: key }),
+    {} as any
+  )
+
+  methodIds = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+    (acc, method: Methods<T>) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined
+          ? '0x'
+          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)

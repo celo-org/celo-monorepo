@@ -55,6 +55,11 @@ class MockWallet implements ReadOnlyWallet {
   decrypt(_address: string, _ciphertext: Buffer): Promise<Buffer> {
     return Promise.resolve(new Buffer('mock'))
   }
+  // tslint:disable-next-line: no-empty
+  removeAccount(_address: string): void {}
+  computeSharedSecret(_address: string, _publicKey: string): Promise<Buffer> {
+    return Promise.resolve(new Buffer('mock'))
+  }
 }
 
 // These tests verify the signTransaction WITHOUT the ParamsPopulator

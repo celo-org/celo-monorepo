@@ -22,7 +22,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.4-dev",
+    "@celo/base": "0.0.5-dev",
     "@celo/connect": "0.0.2-dev",
     "bn.js": "4.11.8",
     "qrcode": "^1.4.4",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/contractkit": "0.4.16-dev",
+    "@celo/contractkit": "0.4.19-dev",
     "@types/debug": "^4.1.5",
     "@types/qrcode": "^1.3.4",
     "dotenv": "^8.2.0",

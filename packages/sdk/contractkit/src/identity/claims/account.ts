@@ -21,7 +21,7 @@ export const AccountClaimType = new t.Type<AccountClaim, any, unknown>(
       if (claim.publicKey === undefined) {
         return t.success(claim)
       }
-      const derivedAddress = publicKeyToAddress(claim.publicKey, true)
+      const derivedAddress = publicKeyToAddress(claim.publicKey)
       return derivedAddress === claim.address
         ? t.success(claim)
         : t.failure(claim, context, 'public key did not match the address in the claim')
