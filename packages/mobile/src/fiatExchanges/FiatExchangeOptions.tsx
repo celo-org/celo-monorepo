@@ -46,6 +46,7 @@ type Props = RouteProps
 interface Provider {
   image: React.ReactNode
   screen: keyof StackParamList
+  supportedCurrenciesNote?: string
 }
 
 export const fiatExchangesOptionsScreenOptions = ({
@@ -58,25 +59,11 @@ export const fiatExchangesOptionsScreenOptions = ({
   function showExplanation() {
     navigation.setParams({ isExplanationOpen: true })
   }
-  const amount = (
-    <CurrencyDisplay
-      amount={{
-        value: route.params.amount,
-        currencyCode: features.CUSD_MOONPAY_ENABLED
-          ? CURRENCIES[CURRENCY_ENUM.DOLLAR].code
-          : CURRENCIES[CURRENCY_ENUM.GOLD].code,
-      }}
-    />
-  )
+
   return {
     ...emptyHeader,
     headerLeft: () => <BackButton />,
-    headerTitle: () => (
-      <HeaderTitleWithSubtitle
-        title={amount}
-        subTitle={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`)}
-      />
-    ),
+    headerTitle: i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`),
     headerRight: () => (
       <TopBarIconButton icon={<QuestionIcon color={colors.greenUI} />} onPress={showExplanation} />
     ),
@@ -93,7 +80,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   // different providers may provide different fiat, CELO and cUSD rates
 
   const localCurrency = useSelector(getLocalCurrencyCode)
-  const { amount } = route.params
+  const amount = route.params.amount || new BigNumber(0)
 
   const goToProvider = (screen: keyof StackParamList) => {
     return () =>
@@ -127,10 +114,14 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       }
     }
     // TODO: Get rates from other providers when they are added
-    getMoonpayRates().catch((error) => {
-      Logger.error(TAG, `Failed to fetch Moonpay rate for ${localCurrency} at ${amount}`, error)
-      dispatch(showError(ErrorMessages.PROVIDER_RATE_FETCH_FAILED))
-    })
+    if (amount) {
+      getMoonpayRates().catch((error) => {
+        Logger.error(TAG, `Failed to fetch Moonpay rate for ${localCurrency} at ${amount}`, error)
+        dispatch(showError(ErrorMessages.PROVIDER_RATE_FETCH_FAILED))
+      })
+    } else {
+      Logger.debug('skipped')
+    }
   }, [localCurrency, amount])
 
   const providers: {
@@ -145,12 +136,14 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     ],
     addFunds: [
       {
-        image: <Image source={moonpayLogo} style={styles.moonpayLogo} resizeMode={'contain'} />,
-        screen: Screens.MoonPay,
-      },
-      {
         image: <Image source={simplexLogo} style={styles.simplexLogo} resizeMode={'contain'} />,
         screen: Screens.Simplex,
+        supportedCurrenciesNote: 'cUSD only',
+      },
+      {
+        image: <Image source={moonpayLogo} style={styles.moonpayLogo} resizeMode={'contain'} />,
+        screen: Screens.MoonPay,
+        supportedCurrenciesNote: 'CELO only',
       },
     ],
   }
@@ -170,6 +163,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
                 style={styles.provider}
               >
                 {value.image}
+                <Text style={fontStyles.small}>{value.supportedCurrenciesNote}</Text>
               </TouchableOpacity>
             )
           })}
@@ -212,7 +206,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: variables.contentPadding,
+    paddingRight: variables.contentPadding,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray2,
     marginLeft: variables.contentPadding,

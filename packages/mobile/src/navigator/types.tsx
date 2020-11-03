@@ -91,7 +91,7 @@ export type StackParamList = {
   }
   [Screens.FiatExchangeOptions]: {
     isAddFunds: boolean
-    amount: BigNumber
+    amount?: BigNumber
     isExplanationOpen?: boolean
   }
   [Screens.MoonPay]: {
@@ -181,6 +181,7 @@ export type StackParamList = {
   [Screens.Settings]:
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
     | undefined
+  [Screens.Simplex]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined

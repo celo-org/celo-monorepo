@@ -11,8 +11,6 @@ import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
-import { StackParamList } from 'src/navigator/types'
-import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SIMPLEX_URI = 'https://valoraapp.com/simplex'
@@ -27,30 +25,15 @@ export const simplexOptions = () => {
   }
 }
 
-type RouteProps = StackScreenProps<StackParamList, Screens.Simplex>
-type Props = RouteProps
-
-function Simplex({ route }: Props) {
-  const { localAmount, currencyCode } = route.params
+function Simplex() {
   const account = useSelector(currentAccountSelector)
 
-  Logger.info(
-    `Loading Simplex widget for amount ${localAmount} with currency ${currencyCode} for account ${account}`
-  )
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderBottomWidth: 1,
-          borderBottomColor: colors.gray2,
-          paddingHorizontal: 10,
-          paddingBottom: 20,
-          backgroundColor: colors.gray1,
-        }}
-      >
-        <Text style={fontStyles.regular}>{`Tap to copy your Valora cUSD address`}</Text>
+      <View style={styles.addressBanner}>
+        <Text
+          style={[styles.tapToCopy, fontStyles.regular]}
+        >{`Tap to copy your Valora CUSD address`}</Text>
         <AccountNumber address={account || ''} />
       </View>
       <WebView style={styles.exchangeWebView} source={{ uri: SIMPLEX_URI }} />
@@ -63,6 +46,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     justifyContent: 'center',
+  },
+  addressBanner: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray2,
+    padding: 10,
+    backgroundColor: colors.gray1,
+  },
+  tapToCopy: {
+    marginBottom: 10,
   },
   exchangeWebView: {
     opacity: 0.99,
