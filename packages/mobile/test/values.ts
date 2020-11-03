@@ -16,6 +16,7 @@ import {
   RecipientKind,
   RecipientWithContact,
   RecipientWithMobileNumber,
+  RecipientWithQrCode,
 } from 'src/recipients/recipient'
 
 export const mockName = 'John Doe'
@@ -315,4 +316,42 @@ export const mockUriData: UriData[] = [
     comment: undefined,
     token: 'BTC',
   },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: undefined,
+    comment: undefined,
+    token: undefined,
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: undefined,
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'cUSD',
+  },
 ]
+
+export const mockQRCodeRecipient: RecipientWithQrCode = {
+  kind: RecipientKind.QrCode,
+  address: mockUriData[3].address.toLowerCase(),
+  displayId: mockUriData[3].e164PhoneNumber,
+  displayName: mockUriData[3].displayName || 'anonymous',
+  e164PhoneNumber: mockUriData[3].e164PhoneNumber,
+  phoneNumberLabel: undefined,
+  thumbnailPath: undefined,
+  contactId: undefined,
+}
