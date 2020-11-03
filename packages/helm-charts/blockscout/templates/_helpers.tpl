@@ -52,6 +52,8 @@ volumes:
   value: "5432"
 - name: WOBSERVER_ENABLED
   value: "false"
+- name: HEALTHY_BLOCKS_PERIOD
+  value: {{ .Values.blockscout.healthy_blocks_period }}
 - name: MIX_ENV
   value: prod
 - name: LOGO
