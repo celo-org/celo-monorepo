@@ -15,8 +15,8 @@ In this documentation you’ll find information on:
   - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
 - Validator & Node Operators
   - Check out the [Validator overview page](operations-manual/overview.md).
-  - Consider running a node on the [Baklava testnet.](getting-started/baklava-testnet.md) before getting started on mainnet.
-  - Learn more about running nodes on [mainnet.](getting-started/mainnet.md)
+  - Consider running a node on the [Baklava testnet](getting-started/baklava-testnet.md) before getting started on Mainnet.
+  - Learn more about running nodes on [Mainnet](getting-started/mainnet.md).
 - Developers
   - Start at the [developer tools page](developer-resources/overview.md) for help building a dapp or service on the Celo network.
 - Integration Guide
