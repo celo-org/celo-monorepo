@@ -1,14 +1,8 @@
 import { Address, normalizeAddress } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
-import { ABI as Proxy } from '@celo/contractkit/lib/generated/Proxy'
 import { GET_IMPLEMENTATION_ABI } from '@celo/contractkit/lib/governance/proxy'
-import {
-  InvalidBytecode,
-  InvalidImplementation,
-  InvalidSigner,
-  WalletValidationError,
-} from './errors'
+import { InvalidImplementation, InvalidSigner, WalletValidationError } from './errors'
 
 export const verifyWallet = async (
   contractKit: ContractKit,
@@ -16,15 +10,15 @@ export const verifyWallet = async (
   allowedImplementations: Address[],
   expectedSigner: Address
 ): Promise<Result<true, WalletValidationError>> => {
-  const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
+  // const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
   // XXX: I'm unsure whether this is safe or if we should store the
   // bytecode as a constant in `mobile` and pass it into KomenciKit
   // I'm unsure if we should protect from the `Proxy` contract output
   // in protocol from changing, or there are already constraints put in
   // place for that not to happen.
-  if (stripBzz(code) !== stripBzz(Proxy.deployedBytecode)) {
-    return Err(new InvalidBytecode(metaTxWalletAddress))
-  }
+  // if (stripBzz(code) !== stripBzz(Proxy.deployedBytecode)) {
+  //   return Err(new InvalidBytecode(metaTxWalletAddress))
+  // }
 
   const actualImplementationRaw = await contractKit.web3.eth.call({
     to: metaTxWalletAddress,
@@ -59,8 +53,8 @@ export const verifyWallet = async (
   return Ok(true)
 }
 
-function stripBzz(bytecode: string): string {
-  // The actual deployed bytecode always differs because of the BZZ prefix
-  // https://www.shawntabrizi.com/ethereum/verify-ethereum-contracts-using-web3-js-and-solc/
-  return bytecode.split('a265627a7a72315820')[0]
-}
+// function stripBzz(bytecode: string): string {
+//   // The actual deployed bytecode always differs because of the BZZ prefix
+//   // https://www.shawntabrizi.com/ethereum/verify-ethereum-contracts-using-web3-js-and-solc/
+//   return bytecode.split('a265627a7a72315820')[0]
+// }

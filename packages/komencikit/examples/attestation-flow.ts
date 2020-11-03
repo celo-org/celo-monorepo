@@ -22,8 +22,10 @@ const contractKit = new ContractKit(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
 const komenciKit = new KomenciKit(contractKit, account, {
-  url: 'http://localhost:3000',
+  url: 'http://192.168.86.33:3000',
 })
+
+console.log(komenciKit)
 
 const readline = require('readline')
 const rl = readline.createInterface({
@@ -32,6 +34,7 @@ const rl = readline.createInterface({
 })
 
 const run = async () => {
+  await komenciKit.checkService()
   const attestations = await contractKit.contracts.getAttestations()
   console.log('Attestations: ', attestations.address)
   console.log('Starting')
