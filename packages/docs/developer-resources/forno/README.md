@@ -2,7 +2,7 @@
 
 Forno is a cLabs hosted node service for interacting with the Celo network. This allows you to connect to the Celo Blockchain without having to run your own node.
 
-Forno has an HTTP endpoint that you can use to query current Celo data or post transactions that you would like to broadcast to the network. The service runs full nodes in non-archive mode, so you can query the current state of the blockchain, but cannot access historic state.
+Forno has HTTP and websocket endpoints that you can use to query current Celo data or post transactions that you would like to broadcast to the network. The service runs full nodes in non-archive mode, so you can query the current state of the blockchain, but cannot access historic state.
 
 Forno can be used as an `Http Provider` with [ContractKit](../contractkit/README.md).
 
@@ -18,11 +18,13 @@ Forno is a public node, so to send transactions from a Forno connection you will
 Consult [this page](../../getting-started/choosing-a-network.md) to determine which network is right for you.
 
 ```
-Alfajores = 'https://alfajores-forno.celo-testnet.org'
+Alfajores = 'https://alfajores-forno.celo-testnet.org' 
+            'wss://alfajores-forno.celo-testnet.org/ws' (for websocket support)
 
 Baklava = 'https://baklava-forno.celo-testnet.org'
 
-Mainnet = 'https://forno.celo.org' or 'wss://forno.celo.org/ws' (for websocket support)
+Mainnet = 'https://forno.celo.org'
+          'wss://forno.celo.org/ws' (for websocket support)
 ```
 
 ### Websocket connections & Event listeners

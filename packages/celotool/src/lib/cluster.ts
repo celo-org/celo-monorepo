@@ -2,13 +2,13 @@ import sleep from 'sleep-promise'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
+  checkHelmVersion,
   createAndUploadBackupSecretIfNotExists,
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
-  installGCPSSDStorageClass,
-  redeployTiller,
+  installGCPSSDStorageClass
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -25,6 +25,7 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
+  await checkHelmVersion()
 
   await switchToProjectFromEnv()
 
@@ -88,6 +89,8 @@ export async function createNamespaceIfNotExists(namespace: string) {
 export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   const envType = fetchEnv(envVar.ENV_TYPE)
 
+  await checkHelmVersion()
+
   await createNamespaceIfNotExists(celoEnv)
 
   const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
@@ -112,7 +115,6 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   console.info('Deploying Tiller and Cert Manager Helm chart...')
 
   await installGCPSSDStorageClass()
-  await redeployTiller()
 
   await installCertManagerAndNginx()
 
@@ -205,7 +207,7 @@ export interface HelmRelease {
 }
 
 export async function getNonSystemHelmReleases(): Promise<HelmRelease[]> {
-  const [json] = await execCmdWithExitOnFailure(`helm list --output json`)
+  const [json] = await execCmdWithExitOnFailure(`helm list -A --output json`)
   const releases: HelmRelease[] = JSON.parse(json).Releases
   return releases.filter((release) => !SYSTEM_HELM_RELEASES.includes(release.Name))
 }
