@@ -4,8 +4,7 @@ Validator uptime is essential for the health of the Celo blockchain.  To help wi
 
 Also, starting from the Celo client 1.2 release, we will support assigning multiple proxies per validator.  This provides better uptime for the validator for the case of a proxy going down.  Also, it will help with making each proxy enode URL less public by only sharing it with a subset of the other validators.
 
-**NOTES**
-The communication protocol between the validator and it's proxies implemented in release 1.2 is NOT backwards compatible to the pre-1.2 protocol.  So if the proxy or validator is being upgraded to 1.2, then both needs to be upgraded to that version.  Note that validators and proxies using release 1.2 are still compatible with remote nodes.
+{% hint style="danger" %}The communication protocol between the validator and it's proxies implemented in release 1.2 is NOT backwards compatible to the pre-1.2 protocol.  So if the proxy or validator is being upgraded to 1.2, then both needs to be upgraded to that version.  Note that validators and proxies using release 1.2 are still compatible with remote nodes.{% endhint %}
 
 There are two ways to specify the proxy information to a validator.  It can be done on validator startup via the command line argument, or by the rpc api when the validator is running.
 
