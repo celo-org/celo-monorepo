@@ -3,7 +3,7 @@ import {
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyLibraryPrefix
+  verifyLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
