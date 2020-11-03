@@ -9,7 +9,14 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
   }
 >
   <View>
-    <View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "flexDirection": "column",
+        }
+      }
+    >
       <Text
         style={
           Object {
@@ -24,57 +31,116 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
       >
         pleaseSelectProvider
       </Text>
-      <View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      >
         <View
+          accessible={true}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
-              "backgroundColor": "#FFFFFF",
+              "alignItems": "center",
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginLeft": 16,
+              "opacity": 1,
+              "paddingRight": 16,
+              "paddingVertical": 16,
             }
           }
         >
-          <View
-            accessible={true}
-            focusable={true}
-            nativeBackgroundAndroid={
+          <Image
+            resizeMode="contain"
+            source={
               Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
+                "testUri": "../../../packages/mobile/src/images/simplex.png",
               }
             }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
-            <View
-              style={
-                Object {
-                  "borderBottomColor": "#EDEEEF",
-                  "borderBottomWidth": 1,
-                  "marginLeft": 16,
-                  "paddingVertical": 16,
-                }
+            style={
+              Object {
+                "height": 59,
+                "width": 111,
               }
-            >
-              <Image
-                resizeMode="contain"
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/moonpay.png",
-                  }
-                }
-                style={
-                  Object {
-                    "height": 30,
-                    "width": 104,
-                  }
-                }
-              />
-            </View>
-          </View>
+            }
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            onlyCeloDollars
+          </Text>
+        </View>
+        <View
+          accessible={true}
+          focusable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginLeft": 16,
+              "opacity": 1,
+              "paddingRight": 16,
+              "paddingVertical": 16,
+            }
+          }
+        >
+          <Image
+            resizeMode="contain"
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/moonpay.png",
+              }
+            }
+            style={
+              Object {
+                "height": 30,
+                "width": 104,
+              }
+            }
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            onlyCelo
+          </Text>
         </View>
       </View>
       <Modal
