@@ -247,7 +247,7 @@ celocli lockedgold:show $CELO_RG_ADDRESS
 
 ## Vote for a Validator Group
 
-Similar to staking or delegating in other Proof of Stake cryptocurrency protocols, CELO holders can lock CELO and vote for Validator Groups on the Celo network. By doing this, not only do you contribute to the health and security of the network, but you can also earn [epoch rewards](../glossary.md#epoch-rewards).
+Similar to staking or delegating in other Proof of Stake cryptocurrency protocols, CELO holders can lock CELO and vote for Validator Groups on the Celo network. By doing this, not only do you contribute to the health and security of the network, but you can also earn [epoch rewards](../GLOSSARY.md#epoch-rewards).
 
 For more details, check out the [Voting for Validators page](voting-validators.md), which contains useful background on how voting Validator Elections work, as well as more guidance on how to select a Validator Group to vote for. For now, all you need to know is that:
 

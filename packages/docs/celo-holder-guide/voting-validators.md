@@ -12,7 +12,7 @@ If you hold CELO, or are a beneficiary of a [`ReleaseGold` contract](release-gol
 
 CELO that you lock and use to vote for a group that elects one or more Validators receives [epoch rewards](../celo-codebase/protocol/proof-of-stake/epoch-rewards.md) every epoch (approximately every day) once the community passes a governance proposal enabling rewards. The initial level of rewards is anticipated to be around 6% per annum equivalent (but is subject to change).
 
-Unlike a number of Proof of Stake protocols, **CELO used for voting is never at risk**. The actions of the Validator Groups or Validators you vote for can cause you to receive lower or higher rewards, but the CELO you locked will always be available to be unlocked in the future. [Slashing](../glossary.md#slashing) in the Celo protocol applies only to Validators and Validator Groups. 
+Unlike a number of Proof of Stake protocols, **CELO used for voting is never at risk**. The actions of the Validator Groups or Validators you vote for can cause you to receive lower or higher rewards, but the CELO you locked will always be available to be unlocked in the future. [Slashing](../GLOSSARY.md#slashing) in the Celo protocol applies only to Validators and Validator Groups. 
 
 ## Choosing a Validator Group
 
