@@ -87,7 +87,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
               }
             }
           >
-            cUSD only
+            onlyCeloDollars
           </Text>
         </View>
         <View
@@ -139,7 +139,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
               }
             }
           >
-            CELO only
+            onlyCelo
           </Text>
         </View>
       </View>
