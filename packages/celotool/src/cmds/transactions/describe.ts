@@ -38,7 +38,7 @@ export const handler = async (argv: DescribeArgv) => {
     console.info(receipt)
   }
 
-  const parsedTransaction = blockExplorer.tryParseTx(transaction)
+  const parsedTransaction = await blockExplorer.tryParseTx(transaction)
 
   if (parsedTransaction === null) {
     return

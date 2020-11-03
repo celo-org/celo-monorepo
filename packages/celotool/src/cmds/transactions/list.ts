@@ -63,7 +63,7 @@ async function fetchTx(
   const transaction = await web3.eth.getTransaction(blockscoutTx.hash)
   const receipt = await web3.eth.getTransactionReceipt(blockscoutTx.hash)
 
-  const parsedTransaction = blockExplorer.tryParseTx(transaction)
+  const parsedTransaction = await blockExplorer.tryParseTx(transaction)
 
   if (parsedTransaction === null) {
     console.info(`Unparsable Transaction: ${transaction.hash}`)

@@ -27,8 +27,7 @@ export abstract class BaseWrapper<T extends Contract> {
 
   /** Contract address */
   get address(): string {
-    // TODO fix typings
-    return (this.contract as any)._address
+    return this.contract.options.address
   }
 
   /** Contract getPastEvents */

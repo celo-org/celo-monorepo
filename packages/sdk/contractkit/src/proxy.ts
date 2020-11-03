@@ -1,5 +1,7 @@
-import { ABIDefinition, AbiItem } from '@celo/connect'
+import { ABIDefinition } from '@celo/connect'
 import Web3 from 'web3'
+import { CeloContract } from './base'
+import { ContractKit } from './kit'
 
 export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
   constant: true,
@@ -63,10 +65,18 @@ export const PROXY_SET_IMPLEMENTATION_SIGNATURE = SET_IMPLEMENTATION_ABI.signatu
 export const PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE =
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI.signature
 
-export const getInitializeAbiOfImplementation = (proxyContractName: string) => {
-  const implementationABI = require(`../generated/${proxyContractName.replace('Proxy', '')}`)
-    .ABI as AbiItem[]
-  const initializeAbi = implementationABI.find((item) => item.name === 'initialize')
+export const getInitializeAbiOfImplementation = async (
+  proxyContractName: string,
+  kit: ContractKit
+) => {
+  const contractName = `${proxyContractName.replace('Proxy', '')}`
+  const mayBeContract: CeloContract | undefined = (CeloContract as any)[contractName]
+  if (!mayBeContract) {
+    throw new Error("There's not implementation for that proxy contract name")
+  }
+  const initializeAbi = (
+    await kit._web3Contracts.getContract(mayBeContract)
+  ).options.jsonInterface.find((item) => item.name === 'initialize')
   if (!initializeAbi) {
     throw new Error(`Initialize method not found on implementation of ${proxyContractName}`)
   }

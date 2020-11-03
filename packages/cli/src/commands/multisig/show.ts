@@ -36,7 +36,7 @@ export default class ShowMultiSig extends BaseCommand {
     const explorer = await newBlockExplorer(this.kit)
     const process = async (txdata: TransactionData) => {
       if (raw) return txdata
-      return { ...txdata, data: explorer.tryParseTxInput(txdata.destination, txdata.data) }
+      return { ...txdata, data: await explorer.tryParseTxInput(txdata.destination, txdata.data) }
     }
     const txinfo =
       tx !== undefined

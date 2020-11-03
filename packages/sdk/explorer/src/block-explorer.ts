@@ -77,11 +77,11 @@ export class BlockExplorer {
     return results
   }
 
-  parseBlock(block: Block): ParsedBlock {
+  async parseBlock(block: Block): Promise<ParsedBlock> {
     const parsedTx: ParsedTx[] = []
     for (const tx of block.transactions) {
       if (typeof tx !== 'string') {
-        const maybeKnownCall = this.tryParseTx(tx)
+        const maybeKnownCall = await this.tryParseTx(tx)
         if (maybeKnownCall != null) {
           parsedTx.push(maybeKnownCall)
         }
@@ -94,8 +94,8 @@ export class BlockExplorer {
     }
   }
 
-  tryParseTx(tx: CeloTxPending): null | ParsedTx {
-    const callDetails = this.tryParseTxInput(tx.to!, tx.input)
+  async tryParseTx(tx: CeloTxPending): Promise<null | ParsedTx> {
+    const callDetails = await this.tryParseTxInput(tx.to!, tx.input)
     if (!callDetails) {
       return null
     }
@@ -106,7 +106,7 @@ export class BlockExplorer {
     }
   }
 
-  tryParseTxInput(address: string, input: string): null | CallDetails {
+  async tryParseTxInput(address: string, input: string): Promise<null | CallDetails> {
     const contractMapping = this.addressMapping.get(address)
     if (contractMapping == null) {
       return null
@@ -135,7 +135,7 @@ export class BlockExplorer {
       matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE &&
       args.length === 2
     ) {
-      const initializeAbi = getInitializeAbiOfImplementation(contract)
+      const initializeAbi = await getInitializeAbiOfImplementation(contract, this.kit)
       const encodedInitializeParameters = args[1].slice(10)
 
       const { params: initializeParams } = parseDecodedParams(

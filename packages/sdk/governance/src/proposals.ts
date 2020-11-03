@@ -73,7 +73,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
-    const parsedTx = blockExplorer.tryParseTx(tx as CeloTxPending)
+    const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
     }
@@ -193,7 +193,7 @@ export class ProposalBuilder {
     ) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.connection.web3.eth.abi.encodeFunctionCall(
-        getInitializeAbiOfImplementation(tx.contract),
+        await getInitializeAbiOfImplementation(tx.contract, this.kit),
         tx.args[1]
       )
     }
