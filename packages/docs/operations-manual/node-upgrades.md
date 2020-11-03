@@ -62,6 +62,8 @@ Validators can be configured as primaries or replicas. By default validators sta
 * `istanbul.replicaState` will give you the state of the node and the start/stop blocks
 * `istanbul.validating` will give you true/false if the node is validating
 
+{% hint style="info" %} `startAtBlock` and `stopAtBlock` must be given a block in the future. {% endhint %}
+
 #### Geth Flags
 * `--replica` flag which starts a validator in replica mode
 * `--replicaStateDBPath`. Path to save information on if the node is a replica or not and when to start/stop. This will override geth's flags. If this is set to an empty string it will use an in-memory (non-persistent) database.
@@ -71,7 +73,7 @@ Validators can be configured as primaries or replicas. By default validators sta
 2. Start a new validator node on a second host in replica mode (`--istanbul.replica` flag). It should be otherwise configured exactly the same as the existing validator.
     * It needs to connect to the exisiting proxies and the validator signing key to connect to other validators in listen mode.
 3. Once the replica is synced and has validator enode urls for all validators, it is ready to swapped in.
-    * Check validator enode urls with `istanbul.valEnodeTableInfo` in the geth console. The field `encryptedEnodeURLs` **(TODO check)** should be filled in for each validator peer.
+    * Check validator enode urls with `istanbul.valEnodeTableInfo` in the geth console. The field `enode` should be filled in for each validator peer.
 4. In the geth console on the primary run `istanbul.stopAtBlock(xxxx)`
     * Make sure to select a block number comfortably in the future.
     * You can check what the stop block is with `istanbul.replicaState` in the geth console.
@@ -84,8 +86,58 @@ Validators can be configured as primaries or replicas. By default validators sta
     * The first block that the new primary will sign is block number `xxxx`
 7. Tear down the old primary once the transition has occurred.
 
+Example geth console on the old primary.
 ```bash
-TODO: geth console view
+> istanbul.replicaState
+{
+  isPrimary: true,
+  startValidatingBlock: null,
+  state: "Primary",
+  stopValidatingBlock: null
+}
+> istanbul.stopAtBlock(21000)
+null
+> istanbul.replicaState  
+{
+  isPrimary: true,
+  startValidatingBlock: null,
+  state: "Primary in given range",
+  stopValidatingBlock: 21000
+}
+> istanbul.replicaState
+{
+  isPrimary: false,
+  startValidatingBlock: null,
+  state: "Replica",
+  stopValidatingBlock: null
+}
+```
+
+Example geth console on the replica being promoted to primary. Not shown is confirming the node is synced and connected to validator peers.
+```bash
+> istanbul.replicaState
+{
+  isPrimary: false,
+  startValidatingBlock: null,
+  state: "Replica",
+  stopValidatingBlock: null
+}
+> istanbul.startAtBlock(21000)
+null
+> istanbul.replicaState
+{
+  isPrimary: false,
+  startValidatingBlock: 21000,
+  state: "Replica waiting to start",
+  stopValidatingBlock: null
+}
+> istanbul.replicaState
+{
+  isPrimary: true,
+  startValidatingBlock: null,
+  state: "Primary",
+  stopValidatingBlock: null
+}
 ```
 
 ### Upgrading Proxy Nodes
