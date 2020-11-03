@@ -69,7 +69,7 @@ export class KomenciClient {
         } else {
           return Err(new ResponseDecodeError(payload))
         }
-      } else if (resp.status === 403) {
+      } else if (resp.status === 401) {
         return Err(new Unauthorised())
       } else if (resp.status === 404) {
         return Err(new NotFoundError(this.url + action.path))
