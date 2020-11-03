@@ -79,7 +79,7 @@ interface SetRequirePinOnAppOpen {
 
 interface InviteModalAction {
   type: Actions.TOGGLE_INVITE_MODAL
-  inviteModalText: string | null
+  inviteModalVisible: boolean
 }
 
 export interface Lock {
@@ -203,7 +203,7 @@ export const minAppVersionDetermined = (
   minVersion,
 })
 
-export const toggleInviteModal = (inviteModalText: string | null): InviteModalAction => ({
+export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
   type: Actions.TOGGLE_INVITE_MODAL,
-  inviteModalText,
+  inviteModalVisible,
 })

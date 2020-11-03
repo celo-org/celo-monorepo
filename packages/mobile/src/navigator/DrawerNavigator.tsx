@@ -22,7 +22,6 @@ import {
 import { TransitionPresets } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect } from 'react'
-import { useAsync } from 'react-async-hook'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
@@ -58,7 +57,6 @@ import { Home } from 'src/icons/navigator/Home'
 import { Invite } from 'src/icons/navigator/Invite'
 import { Settings } from 'src/icons/navigator/Settings'
 import InviteFriendModal from 'src/invite/InviteFriendModal'
-import { generateInviteLink } from 'src/invite/saga'
 import DrawerItem from 'src/navigator/DrawerItem'
 import { ensurePincode } from 'src/navigator/NavigationService'
 import { getActiveRouteName } from 'src/navigator/NavigatorWrapper'
@@ -229,9 +227,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
 export default function DrawerNavigator() {
   const { t } = useTranslation(Namespaces.global)
   const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
-  const name = useSelector(nameSelector)
   const dispatch = useDispatch()
-  const inviteLink = useAsync(generateInviteLink, []).result
 
   const drawerContent = (props: DrawerContentComponentProps<DrawerContentOptions>) => (
     <CustomDrawerContent {...props} />
@@ -279,20 +275,12 @@ export default function DrawerNavigator() {
         component={FiatExchange}
         options={{ title: t('addAndWithdraw'), drawerIcon: AddWithdraw }}
       />
-      {features.KOMENCI && inviteLink && (
+      {features.KOMENCI && (
         <Drawer.Screen
           name={'InviteModal'}
           component={InviteFriendModal}
           initialParams={{
-            onPress: () =>
-              dispatch(
-                toggleInviteModal(
-                  t('sendFlow7:inviteWithoutPayment', {
-                    name,
-                    link: inviteLink,
-                  })
-                )
-              ),
+            onPress: () => dispatch(toggleInviteModal(true)),
           }}
           options={{ title: t('invite'), drawerIcon: Invite }}
         />

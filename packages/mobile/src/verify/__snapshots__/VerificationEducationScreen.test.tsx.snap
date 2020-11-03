@@ -307,7 +307,7 @@ exports[`VerificationEducationScreen shows the \`continue\` button when the user
           }
         }
       >
-        verificationEducation.feelessBody
+        verificationEducation.body
       </Text>
       <View
         style={
@@ -3812,7 +3812,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
           cacheEnabled={true}
           javaScriptEnabled={true}
           messagingEnabled={true}
-          messagingModuleName="WebViewMessageHandler1"
+          messagingModuleName="WebViewMessageHandler4"
           mixedContentMode="always"
           onHttpError={[Function]}
           onLoadingError={[Function]}

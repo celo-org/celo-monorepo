@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { toggleInviteModal } from 'src/app/actions'
@@ -15,20 +15,23 @@ interface Props {
 
 const InviteFriendModal = ({ isVisible, onInvite, onCancel }: Props) => {
   const { t } = useTranslation(Namespaces.inviteFlow11)
+  const [loading, setLoading] = useState(false)
   const dispatch = useDispatch()
 
   const onPressInvite = async () => {
+    setLoading(true)
     try {
       await onInvite()
     } catch (error) {
       Logger.error('Failed to invite:', error)
     }
+    setLoading(false)
     closeModal()
   }
 
   const closeModal = () => {
     onCancel?.()
-    dispatch(toggleInviteModal(null))
+    dispatch(toggleInviteModal(false))
   }
 
   return (
@@ -40,6 +43,7 @@ const InviteFriendModal = ({ isVisible, onInvite, onCancel }: Props) => {
       secondaryActionText={t('global:cancel')}
       secondaryActionPress={closeModal}
       image={inviteModal}
+      showLoading={loading}
       testID="InviteFriendModal"
     >
       {t('inviteDialog.body')}

@@ -4,6 +4,7 @@ import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navig
 import * as React from 'react'
 import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { nameSelector } from 'src/account/selectors'
 import AlertBanner from 'src/alert/AlertBanner'
 import { InviteEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -11,7 +12,9 @@ import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { isVersionBelowMinimum } from 'src/firebase/firebase'
+import i18n from 'src/i18n'
 import InviteFriendModal from 'src/invite/InviteFriendModal'
+import { generateInviteLink } from 'src/invite/saga'
 import { navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
 import PincodeLock from 'src/pincode/PincodeLock'
@@ -52,7 +55,8 @@ export const NavigatorWrapper = () => {
   const [initialState, setInitialState] = React.useState()
   const appLocked = useTypedSelector(getAppLocked)
   const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
-  const inviteModalText = useTypedSelector((state) => state.app.inviteModalText)
+  const isInviteModalVisible = useTypedSelector((state) => state.app.inviteModalVisible)
+  const name = useTypedSelector(nameSelector)
   const routeNameRef = React.useRef()
 
   const updateRequired = React.useMemo(() => {
@@ -132,13 +136,12 @@ export const NavigatorWrapper = () => {
   }
 
   const onInvite = async () => {
-    if (!inviteModalText) {
-      throw new Error('Invite has no text for message. Should never happen.')
-    }
-    ValoraAnalytics.track(InviteEvents.invite_from_menu)
-    await Share.share({
-      message: inviteModalText || '',
+    const message = i18n.t('sendFlow7:inviteWithoutPayment', {
+      name,
+      link: await generateInviteLink(),
     })
+    ValoraAnalytics.track(InviteEvents.invite_from_menu)
+    await Share.share({ message })
   }
 
   return (
@@ -156,7 +159,7 @@ export const NavigatorWrapper = () => {
         <View style={styles.floating}>
           {!appLocked && !updateRequired && <BackupPrompt />}
           <AlertBanner />
-          <InviteFriendModal isVisible={!!inviteModalText} onInvite={onInvite} />
+          <InviteFriendModal isVisible={isInviteModalVisible} onInvite={onInvite} />
         </View>
       </View>
     </NavigationContainer>
