@@ -1,7 +1,6 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
@@ -29,7 +28,6 @@ import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
-import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
@@ -232,12 +230,8 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     let phoneHash: string
-    if (features.USE_PHONE_NUMBER_PRIVACY) {
-      const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-      phoneHash = phoneHashDetails.phoneHash
-    } else {
-      phoneHash = getPhoneHash(e164Number)
-    }
+    const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+    phoneHash = phoneHashDetails.phoneHash
     yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
