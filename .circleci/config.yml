@@ -459,6 +459,7 @@ jobs:
       - run:
           name: Upload to CodeCov
           command: yarn codecov -F mobile
+
   protocol-test-release:
     <<: *defaults
     resource_class: large

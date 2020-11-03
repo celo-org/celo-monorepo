@@ -75,4 +75,5 @@ export enum ErrorMessages {
   GETH_FETCH_ACCOUNTS = 'gethFetchAccounts',
   GETH_ACCOUNT_ALREADY_EXISTS = 'gethAccountAlreadyExists',
   GETH_UNEXPECTED_ADDRESS_ON_ADD = 'gethUnexpectedAddressOnAdd',
+  COUNTRY_NOT_AVAILABLE = 'countryNotAvailable',
 }
