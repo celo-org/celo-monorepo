@@ -73,7 +73,7 @@
     "location": "packages/docs",
     "dependencies": []
   },
-  "env-tests": {
+  "@celo/env-tests": {
     "location": "packages/env-tests",
     "dependencies": [
       "@celo/base",
