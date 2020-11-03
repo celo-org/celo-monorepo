@@ -481,16 +481,6 @@
   resolved "https://registry.yarnpkg.com/@azure/core-asynciterator-polyfill/-/core-asynciterator-polyfill-1.0.0.tgz#dcccebb88406e5c76e0e1d52e8cc4c43a68b3ee7"
   integrity sha512-kmv8CGrPfN9SwMwrkiBK9VTQYxdFQEGe0BmQk+M8io56P9KNzpAxcWE/1fxJj7uouwN4kXF0BHW8DNlgx+wtCg==
 
-"@azure/core-auth@^1.0.0":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@azure/core-auth/-/core-auth-1.0.2.tgz#7377c0cacf0e3c988ce321295bf5d2c174e0e288"
-  integrity sha512-zhPJObdrhz2ymIqGL1x8i3meEuaLz0UPjH9mOq9RGOlJB2Pb6K6xPtkHbRsfElgoO9USR4hH2XU5pLa4/JHHIw==
-  dependencies:
-    "@azure/abort-controller" "^1.0.0"
-    "@azure/core-tracing" "1.0.0-preview.7"
-    "@opentelemetry/types" "^0.2.0"
-    tslib "^1.9.3"
-
 "@azure/core-auth@^1.1.3":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@azure/core-auth/-/core-auth-1.1.3.tgz#94e7bbc207010e7a2fdba61565443e4e1cf1e131"
@@ -500,28 +490,6 @@
     "@azure/core-tracing" "1.0.0-preview.8"
     "@opentelemetry/api" "^0.6.1"
     tslib "^2.0.0"
-
-"@azure/core-http@^1.0.0":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@azure/core-http/-/core-http-1.0.4.tgz#11b4190007a269c6c2b54986d45b8af338e9b8b7"
-  integrity sha512-UhQ4Tpgv6a/7fmvleXEpyQAg8FWcemqzAPY2F75QBygEDD4Hsz2fFujTAEUBQ1an+eNQjzk7EC7TTbqXOmiwAw==
-  dependencies:
-    "@azure/abort-controller" "^1.0.0"
-    "@azure/core-auth" "^1.0.0"
-    "@azure/core-tracing" "1.0.0-preview.7"
-    "@azure/logger" "^1.0.0"
-    "@opentelemetry/types" "^0.2.0"
-    "@types/node-fetch" "^2.5.0"
-    "@types/tunnel" "^0.0.1"
-    cross-env "^6.0.3"
-    form-data "^3.0.0"
-    node-fetch "^2.6.0"
-    process "^0.11.10"
-    tough-cookie "^3.0.1"
-    tslib "^1.10.0"
-    tunnel "^0.0.6"
-    uuid "^3.3.2"
-    xml2js "^0.4.19"
 
 "@azure/core-http@^1.1.1", "@azure/core-http@^1.1.6":
   version "1.1.6"
@@ -544,17 +512,6 @@
     uuid "^8.1.0"
     xml2js "^0.4.19"
 
-"@azure/core-lro@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@azure/core-lro/-/core-lro-1.0.1.tgz#8a018fd76bc842475bd6bcb8a09d0cf45c62005b"
-  integrity sha512-RIrM6CTRoYoJEXpCuAr8vanXxlFBCCaHpa/PCSUfcYe6B9pAdSi1DTUZZ+2w2ysNIMHB9MyOLEAkzZ/4NCJIdQ==
-  dependencies:
-    "@azure/abort-controller" "^1.0.0"
-    "@azure/core-http" "^1.0.0"
-    "@opentelemetry/types" "^0.2.0"
-    events "^3.0.0"
-    tslib "^1.10.0"
-
 "@azure/core-lro@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@azure/core-lro/-/core-lro-1.0.2.tgz#b7b51ff7b84910b7eb152a706b0531d020864f31"
@@ -565,28 +522,12 @@
     events "^3.0.0"
     tslib "^1.10.0"
 
-"@azure/core-paging@^1.0.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@azure/core-paging/-/core-paging-1.1.0.tgz#568c0e6d6d7590902f1d9cbe7d7cefed427552f7"
-  integrity sha512-Di26joIBaa5E/YAIAcis2LytbNy/LKTmgj+CUYZ8aLnzrN8h9AgVNASYOFXf+weJFD0pyaTAeW4GAt6P9NDFWw==
-  dependencies:
-    "@azure/core-asynciterator-polyfill" "^1.0.0"
-
 "@azure/core-paging@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@azure/core-paging/-/core-paging-1.1.1.tgz#9639d2d5b6631d481d81040504e0e26c003f47b1"
   integrity sha512-hqEJBEGKan4YdOaL9ZG/GRG6PXaFd/Wb3SSjQW4LWotZzgl6xqG00h6wmkrpd2NNkbBkD1erLHBO3lPHApv+iQ==
   dependencies:
     "@azure/core-asynciterator-polyfill" "^1.0.0"
-
-"@azure/core-tracing@1.0.0-preview.7":
-  version "1.0.0-preview.7"
-  resolved "https://registry.yarnpkg.com/@azure/core-tracing/-/core-tracing-1.0.0-preview.7.tgz#e9ee9c88f0dcf50d8e5b468fc827203165ecbc3f"
-  integrity sha512-pkFCw6OiJrpR+aH1VQe6DYm3fK2KWCC5Jf3m/Pv1RxF08M1Xm08RCyQ5Qe0YyW5L16yYT2nnV48krVhYZ6SGFA==
-  dependencies:
-    "@opencensus/web-types" "0.0.7"
-    "@opentelemetry/types" "^0.2.0"
-    tslib "^1.9.3"
 
 "@azure/core-tracing@1.0.0-preview.8":
   version "1.0.0-preview.8"
@@ -606,22 +547,6 @@
     "@opentelemetry/api" "^0.10.2"
     tslib "^2.0.0"
 
-"@azure/identity@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-1.0.2.tgz#5290035149a89a231469a725fa158e5e1648b349"
-  integrity sha512-kGGiRT9pSlo7Op8I9gBtjufUaqe4AqQv+nPWVOmdDBaf3zD0rPa7zHnDT6dHP/oNdBjlxDczf7Ks+s9KdtAmag==
-  dependencies:
-    "@azure/core-http" "^1.0.0"
-    "@azure/core-tracing" "1.0.0-preview.7"
-    "@azure/logger" "^1.0.0"
-    "@opentelemetry/types" "^0.2.0"
-    events "^3.0.0"
-    jws "^3.2.2"
-    msal "^1.0.2"
-    qs "^6.7.0"
-    tslib "^1.9.3"
-    uuid "^3.3.2"
-
 "@azure/identity@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-1.1.0.tgz#e7c9a99d0408c7f8776d4f268a343d645971c662"
@@ -640,19 +565,6 @@
   optionalDependencies:
     keytar "^5.4.0"
 
-"@azure/keyvault-keys@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@azure/keyvault-keys/-/keyvault-keys-4.0.2.tgz#fdcf9e27f575b42537280fcce3f14c5133e6adea"
-  integrity sha512-X39tMVUNoMeex7MD9yC78AagAbgfcf1Sf8Nc0MrBikVkhp9iG+UCFeBhB5pmKyQm4a4G5AZmvJeSMgRqWtbojg==
-  dependencies:
-    "@azure/core-http" "^1.0.0"
-    "@azure/core-lro" "^1.0.0"
-    "@azure/core-paging" "^1.0.0"
-    "@azure/core-tracing" "1.0.0-preview.7"
-    "@azure/logger" "^1.0.0"
-    "@opentelemetry/types" "^0.2.0"
-    tslib "^1.9.3"
-
 "@azure/keyvault-keys@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@azure/keyvault-keys/-/keyvault-keys-4.1.0.tgz#3a55d819370bfe6bb6e6588125b0cf6734c18528"
@@ -665,20 +577,6 @@
     "@azure/logger" "^1.0.0"
     "@opentelemetry/api" "^0.10.2"
     tslib "^2.0.0"
-
-"@azure/keyvault-secrets@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@azure/keyvault-secrets/-/keyvault-secrets-4.0.2.tgz#b76375c31e54f903b07367d30ff9574a6bc87e34"
-  integrity sha512-WDOZ4uMRN3SqItHeW24MJYVbkptLojzbblFEVAR3q1dnpBEL6Ah4g/GVJcM9xJgEsPJR8fqt3WF/A0V25LbJZg==
-  dependencies:
-    "@azure/abort-controller" "^1.0.0"
-    "@azure/core-http" "^1.0.0"
-    "@azure/core-lro" "^1.0.0"
-    "@azure/core-paging" "^1.0.0"
-    "@azure/core-tracing" "1.0.0-preview.7"
-    "@azure/logger" "^1.0.0"
-    "@opentelemetry/types" "^0.2.0"
-    tslib "^1.9.3"
 
 "@azure/keyvault-secrets@^4.1.0":
   version "4.1.0"
@@ -2783,10 +2681,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/base@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.1.tgz#81e83aa430cba2a7424a4c016af58356404ea707"
-  integrity sha512-0hsd6hOUvt3o1DbiZKGpKghYhGQsu3eGApqHsXZtWRINHaakfxFGtZgI1r8u1iwqXenlAImCZ91P0WYNwsqI9A==
+"@celo/base@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.3.tgz#355199fe45d1f9e667ee66836a34e93828b3b5a5"
+  integrity sha512-3GeGcUHCzMxCpkBHywEuoXZp1VV+yN6uEHPowxGgH2VP++qO01HMw8G5J4wlP7jN5HFt3WsZaHWfIhor/irGKg==
 
 "@celo/base@0.0.3":
   version "0.0.3"
@@ -2842,18 +2740,21 @@
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
-"@celo/contractkit@0.4.12":
-  version "0.4.12"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.12.tgz#bee540fc38035b12c6517f2415d4c6934133d802"
-  integrity sha512-fkIKyqP3MmEk4RWtgohBQwHelFQLKg8ozTjKmsqOeZS4thtGJyqEgKvXOaMqhlgBLhDjnxHBVacv/heJAfmZMQ==
+"@celo/contractkit@0.4.17":
+  version "0.4.17"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.17.tgz#b07d3d8a6976ee5d0f8f3a99d39539e3092ad8d3"
+  integrity sha512-+ILrGZg9O5B42qfnGZwjgPSI4usl+yK7Mue+ImtcvsMZEo7+iPAMSfY0srSbAAissZJCZQglOdO5iTHgnMcd9Q==
   dependencies:
-    "@azure/identity" "^1.0.2"
-    "@azure/keyvault-keys" "^4.0.2"
-    "@azure/keyvault-secrets" "^4.0.2"
-    "@celo/base" "0.0.1"
-    "@celo/utils" "0.1.18"
+    "@azure/identity" "^1.1.0"
+    "@azure/keyvault-keys" "^4.1.0"
+    "@azure/keyvault-secrets" "^4.1.0"
+    "@celo/base" "0.0.3"
+    "@celo/utils" "0.1.21"
     "@ledgerhq/hw-app-eth" "^5.11.0"
     "@ledgerhq/hw-transport" "^5.11.0"
+    "@types/asn1js" "^0.0.2"
+    asn1js "^2.0.26"
+    aws-sdk "^2.705.0"
     bignumber.js "^9.0.0"
     blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
     cross-fetch "3.0.4"
@@ -2862,6 +2763,7 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
     fp-ts "2.1.1"
+    inquirer "^7.0.5"
     io-ts "2.0.1"
     qrcode "^1.4.4"
     secp256k1 "^4.0.0"
@@ -2952,12 +2854,24 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.7.tgz#8028f56e0865e7cd320f804ad0880f81edaa03d3"
-  integrity sha512-DpJOUWBHrKOHYiWOjTiSArnQoSCpmJdBKOC7hm0dCqeta85uKGxHGXEf/epEsD7VHf63EUYl7FCCg+HzRVmYdQ==
+"@celo/phone-number-privacy-common@1.0.14":
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.14.tgz#1c62962054b294d063cd42b0577ce69b6b6100a8"
+  integrity sha512-szTdAAIxiMUsMB0B/c/JUh1UGjJgWZe5rWosN6LnQvshdjI0Tk8hUtaCDG+QZ7HGpiBWydX1ZXgZ+sBZnVF/pg==
   dependencies:
+    "@celo/contractkit" "0.4.17"
+    "@celo/utils" "0.1.21"
+    "@types/btoa" "^1.2.3"
     bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "6.5.3"
+    express "^4.17.1"
+    web3 "1.2.4"
 
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
@@ -2972,12 +2886,12 @@
     typechain "1.0.5"
     web3 "1.2.4"
 
-"@celo/utils@0.1.18":
-  version "0.1.18"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.18.tgz#5b838d27a5edc0635d6915fb427a718c49c3dd72"
-  integrity sha512-gX4sLb6T78Qzf16Kr/79HfwjlP2778A+IFB900U/zY4EhGW+GwkyWtZTaC1f1ZfCVbFbEsEZpSOxKYYvZp12Vg==
+"@celo/utils@0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.21.tgz#820a3de80e2a6affaed2033e15ffead3bb3e0156"
+  integrity sha512-SByYSNvIg9X0m1xKFy5DYgE9CJ5lwgUHJEamwUHAe9mJdKrJftD2noTCc18xmkqF3X3Nyd7vArWJFaTT035T8A==
   dependencies:
-    "@celo/base" "0.0.1"
+    "@celo/base" "0.0.3"
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^9.0.0"
@@ -6234,11 +6148,6 @@
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/@opentelemetry/context-base/-/context-base-0.6.1.tgz#b260e454ee4f9635ea024fc83be225e397f15363"
   integrity sha512-5bHhlTBBq82ti3qPT15TRxkYTFPPQWbnkkQkmHPtqiS1XcTB69cEKd3Jm7Cfi/vkPoyxapmePE9tyA7EzLt8SQ==
-
-"@opentelemetry/types@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/types/-/types-0.2.0.tgz#2a0afd40fa7026e39ea56a454642bda72b172f80"
-  integrity sha512-GtwNB6BNDdsIPAYEdpp3JnOGO/3AJxjPvny53s3HERBdXSJTGQw8IRhiaTEX0b3w9P8+FwFZde4k+qkjn67aVw==
 
 "@openzeppelin/upgrades@^2.8.0":
   version "2.8.0"
@@ -11165,6 +11074,11 @@ base-x@^3.0.8:
   dependencies:
     safe-buffer "^5.0.1"
 
+base64-js@*:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.3.1.tgz#58ece8cb75dd07e71ed08c736abc5fac4dbf8df1"
+  integrity sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==
+
 base64-js@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-0.0.8.tgz#1101e9544f4a76b1bc3b26d452ca96d7a35e7978"
@@ -11694,7 +11608,7 @@ btoa-lite@^1.0.0:
   resolved "https://registry.yarnpkg.com/btoa-lite/-/btoa-lite-1.0.0.tgz#337766da15801210fdd956c22e9c6891ab9d0337"
   integrity sha1-M3dm2hWAEhD92VbCLpxokaudAzc=
 
-btoa@^1.2.1:
+btoa@1.2.1, btoa@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/btoa/-/btoa-1.2.1.tgz#01a9909f8b2c93f6bf680ba26131eb30f7fa3d73"
   integrity sha512-SB4/MIGlsiVkMcHmT+pSmIPoNDoHg+7cMzmt3Uxt628MTz2487DKSqK/fuhFBrkuqrYv5UCEnACpF4dTFNKc/g==
@@ -13837,13 +13751,6 @@ cross-env@5.2.0, cross-env@^5.1.3, cross-env@^5.1.6:
   dependencies:
     cross-spawn "^6.0.5"
     is-windows "^1.0.0"
-
-cross-env@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-6.0.3.tgz#4256b71e49b3a40637a0ce70768a6ef5c72ae941"
-  integrity sha512-+KqxF6LCvfhWvADcDPqo64yVIB31gv/jQulX2NGzKS/g3GEVz6/pt4wjHFtFWsHMddebWD/sDthJemzM4MaAag==
-  dependencies:
-    cross-spawn "^7.0.0"
 
 cross-fetch@2.2.2, cross-fetch@3.0.4, cross-fetch@3.0.5, cross-fetch@^2.1.0, cross-fetch@^2.1.1, cross-fetch@^2.2.2, cross-fetch@^3.0.2, cross-fetch@^3.0.4, cross-fetch@^3.0.6:
   version "3.0.5"
@@ -23307,6 +23214,11 @@ jws@^4.0.0:
     jwa "^2.0.0"
     safe-buffer "^5.0.1"
 
+jwt-decode@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-2.2.0.tgz#7d86bd56679f58ce6a84704a657dd392bba81a79"
+  integrity sha1-fYa9VmefWM5qhHBKZX3TkruoGnk=
+
 kapellmeister@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/kapellmeister/-/kapellmeister-3.0.1.tgz#419b715cd221acda3db79892caedf63e1c9f7d25"
@@ -29982,6 +29894,14 @@ react-native-gesture-handler@^1.6.1:
   version "1.0.0"
   resolved "https://github.com/celo-org/react-native-geth#5864c09ce2ab4f112b46fa56f399a72fb9b5c966"
 
+"react-native-google-safetynet@https://github.com/celo-org/react-native-google-safetynet#8a0355f":
+  version "1.0.0"
+  resolved "https://github.com/celo-org/react-native-google-safetynet#8a0355f38123182533b7fc559951a82af59f68a9"
+  dependencies:
+    base64-js "^1.3.0"
+    jwt-decode "^2.2.0"
+    react-native-securerandom "^1.0.0"
+
 react-native-iphone-x-helper@^1.0.3, react-native-iphone-x-helper@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
@@ -30111,6 +30031,13 @@ react-native-secure-randombytes@^3.0.2:
   integrity sha512-PEtT0fXyYt3GsXLG+ONeE+/pRVDRiMnrnuXXvXACAs/eQPGNJRMNcDmbUuLJ/HqRPHQAQl0Im00erVhp0h5JEQ==
   dependencies:
     buffer "^4.9.1"
+
+react-native-securerandom@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-securerandom/-/react-native-securerandom-1.0.0.tgz#1cff2f727c90c9ec3318b42dbf825a628b53b49b"
+  integrity sha512-lnhcsWloFzMN/HffyDBlh4VlqdhDH8uxEzUIH3aJPgC1PxV6OKZkvAk409EwsAhcmG/z3yZuVKegKpUr5IM9ug==
+  dependencies:
+    base64-js "*"
 
 "react-native-send-intent@git+https://github.com/celo-org/react-native-send-intent#a0f4b00":
   version "1.0.31"
