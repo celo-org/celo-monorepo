@@ -181,7 +181,7 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-          if [[ "${{ .Release.Name }}" == "alfajores" || "${{ .Release.Name }}" == "baklava" ]]; then
+          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
             BOOTNODE_FLAG="--${network_name}"
           else
             BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
