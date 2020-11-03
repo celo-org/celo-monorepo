@@ -440,7 +440,7 @@ jobs:
           command: |
             mkdir -p test-results/jest
             # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
-            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
+            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci --runInBand
           environment:
             JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
 
@@ -477,7 +477,7 @@ jobs:
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against first commit to contain version numbers"
             git fetch --all
-            RELEASE_TAG=celo-core-contracts-v1.rc1
+            RELEASE_TAG=celo-core-contracts-v2.pre-audit
             yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
             LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
             if [[ $LIBRARIES_CHANGED ]]; then

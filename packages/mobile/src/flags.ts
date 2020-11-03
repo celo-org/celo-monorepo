@@ -10,6 +10,7 @@ export const features = {
   SHOW_CASH_OUT: false,
   PNP_USE_DEK_FOR_AUTH: true,
   USE_PHONE_NUMBER_PRIVACY: true,
+  KOMENCI: false,
 }
 
 export const pausedFeatures = {
@@ -21,5 +22,12 @@ export const pausedFeatures = {
 export const countryFeatures = {
   RESTRICTED_CP_DOTO: {
     PH: true,
+  },
+  SANCTIONED_COUNTRY: {
+    IR: true,
+    CU: true,
+    KP: true,
+    SD: true,
+    SY: true,
   },
 }
