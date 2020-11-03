@@ -2,6 +2,10 @@
 
 When a new version of the Celo node is available, you can follow this guide to upgrade.
 
+## Recent Releases
+
+* [Blockchain Client 1.1.0](https://github.com/celo-org/celo-blockchain/releases/tag/v1.1.0) (Latest production release)
+
 ## When an upgrade is required
 
 Upgrades to the Celo node software will often be optional improvements, such as improvements to performance, new useful features, and non-critical bug fixes.
@@ -44,11 +48,13 @@ Upgrading a validating node is much the same, but requires extra care to be take
 
 One option to complete a validating node upgrade is to perform a key rotation onto a new node. Pull the latest Docker image, as mentioned above, then execute a Validator signing key rotation, using the latest image as the new Validator signing node. A recommended procedure for key rotation is documented in the [Key Management](key-management/key-rotation.md) guide.
 
-A second option is to swap in a new validator behind the same set of proxies.
+A second option is to perform a hot-swap to switch over to a new validator node. The new validator node **must** be configured with the same set of proxies as the existing validator node.
 
 ### Hotswapping Validator Nodes
 
-Validators can be configured as primaries or replicas. By default validators start as primaries and will persist all changes around starting or stopping. Through the istanbul management RPC API the validator can be configured to start or stop at a specified block. The validator will participate in consensus for block numbers in the range [start, stop).
+{% hint style="info" %} Hotswap is being introduced in version 1.2.0. When upgrading nodes that are not yet on 1.2.0 refer to the guide to perform a key rotation. {% endhint %}
+
+Validators can be configured as primaries or replicas. By default validators start as primaries and will persist all changes around starting or stopping. Through the istanbul management RPC API the validator can be configured to start or stop at a specified block. The validator will participate in consensus for block numbers in the range `[start, stop)`.
 
 #### RPC Methods
 * `istanbul.start()` and `istanbul.startAtBlock()` start validating immediately or at a block
@@ -84,6 +90,6 @@ TODO: geth console view
 
 ### Upgrading Proxy Nodes
 
+{% hint style="danger" %} Release 1.2.0 is backwards incompatible in the Validator and Proxy connection. Validators and proxies must be upgraded to 1.2.0 at the same time. {% endhint %}
+
 With multi-proxy, you can upgrade proxies one by one or can add newly synced proxies with the latest Docker image and can remove the old proxies. If upgrading the proxies in place, a rolling upgrade is recommended as the validator will re-assign direct connections as proxies are added and removed. These re-assignments will allow the validator to continue to participate in consensus.
-
-
