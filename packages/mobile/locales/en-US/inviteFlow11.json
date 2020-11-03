@@ -19,8 +19,8 @@
   "inviteReceived": "Invite Received",
   "escrowPaymentNotificationTitle": "Invited {{mobile}}",
   "inviteDialog": {
-    "title": "Share prosperity by inviting a friend",
-    "body": "Connect with your friends and family on {{appName}}. Then send money to each other in seconds.",
-    "button": "Invite a friend"
+    "title": "Invite a Friend",
+    "body": "Connect and share value with your friends and family on Valora.",
+    "button": "Invite"
   }
 }
