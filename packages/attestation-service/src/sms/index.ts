@@ -17,6 +17,7 @@ import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
 import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
+import { MessageBirdSmsProvider } from './messagebird'
 import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
 
@@ -81,6 +82,14 @@ export async function initializeSmsProviders(
       throw new Error(`Providers in SMS_PROVIDERS must be unique: dupe: ${configuredSmsProvider}`)
     }
     switch (configuredSmsProvider) {
+      case SmsProviderType.MESSAGEBIRD:
+        const messageBirdProvider = MessageBirdSmsProvider.fromEnv()
+        await messageBirdProvider.initialize(
+          deliveryStatusURLForProviderType(configuredSmsProvider)
+        )
+        smsProviders.push(messageBirdProvider)
+        smsProvidersByType[SmsProviderType.MESSAGEBIRD] = messageBirdProvider
+        break
       case SmsProviderType.NEXMO:
         const nexmoProvider = NexmoSmsProvider.fromEnv()
         await nexmoProvider.initialize()
@@ -148,7 +157,7 @@ export function configuredSmsProviders() {
 }
 
 export function smsProvidersWithDeliveryStatus() {
-  return smsProviders.filter((provider) => provider.supportsDeliveryStatus())
+  return smsProviders.filter((provider) => provider.deliveryStatusMethod())
 }
 
 export function unsupportedRegionCodes() {
@@ -180,7 +189,9 @@ function getProvidersFor(attestation: AttestationModel, logger: Logger) {
 export async function startSendSms(
   key: AttestationKey,
   phoneNumber: E164Number,
-  message: string,
+  messageToSend: string,
+  securityCode: string | null = null,
+  attestationCode: string | null = null,
   logger: Logger,
   sequelizeLogger: SequelizeLogger,
   onlyUseProvider: string | null = null
@@ -213,11 +224,14 @@ export async function startSendSms(
         phoneNumber,
         countryCode,
         status: AttestationStatus.NotSent,
-        message,
+        message: messageToSend,
+        attestationCode,
         providers: providersToCsv(providers),
         attempt: 0,
         errors: undefined,
         ongoingDeliveryId: null,
+        securityCode,
+        securityCodeAttempt: 0,
       },
       transaction
     )

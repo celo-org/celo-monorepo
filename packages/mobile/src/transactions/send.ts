@@ -1,6 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils/src'
 import { BigNumber } from 'bignumber.js'
-import { call, delay, race, select, take } from 'redux-saga/effects'
+import { call, cancel, delay, fork, join, race, select, take } from 'redux-saga/effects'
 import { TransactionEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -25,11 +25,16 @@ const TAG = 'transactions/send'
 // causing failures when a tx times out (rare but can happen on slow devices)
 const TX_NUM_TRIES = 1 // Try txs up to this many times
 const TX_RETRY_DELAY = 2000 // 2s
-const TX_TIMEOUT = 45000 // 45s
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
+
+// 90s. Maximum total time to wait for confirmation when sending a transaction. (Includes grace period)
+const TX_TIMEOUT = 90000
+// 5000 ms. After a timeout triggers, time to wait before throwing an error.
+// Gives time reconnect and fetch receipts in case network conditions change while the app is suspended.
+const TX_TIMEOUT_GRACE_PERIOD = 5000
 
 const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
   const txId = context.id
@@ -100,6 +105,7 @@ export function* sendTransactionPromises(
   tx: TransactionObject<any>,
   account: string,
   context: TransactionContext,
+  preferredFeeCurrency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
   nonce?: number,
   staticGas?: number
 ) {
@@ -114,6 +120,20 @@ export function* sendTransactionPromises(
   const fornoMode: boolean = yield select(fornoSelector)
   let gasPrice: BigNumber | undefined
 
+  // If stableToken is prefered to pay fee, use it unless its balance is Zero,
+  // in that case use CELO to pay fee.
+  // TODO: Make it transparent for the user.
+  // TODO: Check for balance should be more than fee instead of zero.
+  const feeCurrency =
+    preferredFeeCurrency === CURRENCY_ENUM.DOLLAR && stableTokenBalance.isGreaterThan(0)
+      ? CURRENCY_ENUM.DOLLAR
+      : CURRENCY_ENUM.GOLD
+
+  const feeCurrencyAddress =
+    feeCurrency === CURRENCY_ENUM.DOLLAR
+      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
+      : undefined // Pass undefined to use CELO to pay for gas.
+
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
     `Sending tx ${context.id} in ${fornoMode ? 'forno' : 'geth'} mode`
@@ -126,22 +146,17 @@ export function* sendTransactionPromises(
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
 
-    gasPrice = yield getGasPrice(CURRENCY_ENUM.DOLLAR)
+    gasPrice = yield getGasPrice(feeCurrency)
   }
+
   const transactionPromises = yield call(
     sendTransactionAsync,
     tx,
     account,
-    // Use stableToken to pay fee, unless its balance is Zero
-    // then use Celo (goldToken) to pay fee (pass undefined)
-    // TODO: make it transparent for a user
-    // TODO: check for balance should be more than fee instead of zero
-    stableTokenBalance.isGreaterThan(0)
-      ? yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
-      : undefined,
+    feeCurrencyAddress,
     getLogger(context, fornoMode),
     staticGas,
-    gasPrice ? gasPrice.toString() : gasPrice,
+    gasPrice?.toString(),
     nonce
   )
   return transactionPromises
@@ -154,7 +169,8 @@ export function* sendTransaction(
   account: string,
   context: TransactionContext,
   staticGas?: number,
-  cancelAction?: string
+  cancelAction?: string,
+  feeCurrency?: CURRENCY_ENUM
 ) {
   const sendTxMethod = function*(nonce?: number) {
     const { confirmation } = yield call(
@@ -162,6 +178,7 @@ export function* sendTransaction(
       tx,
       account,
       context,
+      feeCurrency,
       nonce,
       staticGas
     )
@@ -178,13 +195,37 @@ export function* wrapSendTransactionWithRetry(
 ) {
   for (let i = 1; i <= TX_NUM_TRIES; i++) {
     try {
-      const { result, timeout, cancel } = yield race({
-        result: call(sendTxMethod),
-        timeout: delay(TX_TIMEOUT * i),
+      // Spin tx send into a Task so that it does not get cancelled automatically on timeout.
+      const task = yield fork(sendTxMethod)
+      let { result, timeout, cancelled } = yield race({
+        result: join(task),
+        timeout: delay(TX_TIMEOUT * i - TX_TIMEOUT_GRACE_PERIOD),
         ...(cancelAction && {
-          cancel: take(cancelAction),
+          cancelled: take(cancelAction),
         }),
       })
+
+      // In some conditions (e.g. app backgrounding) the app may become suspended, preventing the
+      // send task from making progress. If this occurs for long enough that the timeout elapses, a
+      // timeout may be triggered even if the transaction send is complete. A second race is
+      // triggered here to handle these cases by giving the send task a grace period to return a
+      // result after the initial timeout fires.
+      if (timeout && TX_TIMEOUT_GRACE_PERIOD > 0) {
+        Logger.debug(
+          `${TAG}@wrapSendTransactionWithRetry`,
+          `tx ${context.id} entering timeout grace period for attempt ${i}`
+        )
+        ;({ result, timeout, cancelled } = yield race({
+          result: join(task),
+          timeout: delay(TX_TIMEOUT_GRACE_PERIOD),
+          ...(cancelAction && {
+            cancelled: take(cancelAction),
+          }),
+        }))
+      }
+
+      // Cancel the send task if it is still running. If terminated, this is a no-op.
+      yield cancel(task)
 
       if (timeout) {
         Logger.error(
@@ -192,7 +233,7 @@ export function* wrapSendTransactionWithRetry(
           `tx ${context.id} timeout for attempt ${i}`
         )
         throw new Error(ErrorMessages.TRANSACTION_TIMEOUT)
-      } else if (cancel) {
+      } else if (cancelled) {
         Logger.warn(
           `${TAG}@wrapSendTransactionWithRetry`,
           `tx ${context.id} cancelled for attempt ${i}`

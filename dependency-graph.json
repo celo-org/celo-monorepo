@@ -84,6 +84,14 @@
     "location": "packages/flake-tracker",
     "dependencies": []
   },
+  "@celo/komencikit": {
+    "location": "packages/komencikit",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
     "dependencies": [
@@ -165,6 +173,14 @@
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-monitor": {
+    "location": "packages/phone-number-privacy/monitor",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]
   },
