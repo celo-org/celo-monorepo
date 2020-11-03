@@ -45,12 +45,12 @@ describe('KomenciClient', () => {
       })
     })
 
-    describe('when the response is 403', () => {
+    describe('when the response is 401', () => {
       it('returns an Unauthorised error', async () => {
         const act = testAction({})
         fetchMock.mockIf(URL + act.path, () => {
           return Promise.resolve({
-            status: 403,
+            status: 401,
             body: 'Unauthorised',
           })
         })
