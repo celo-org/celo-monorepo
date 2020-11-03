@@ -24,6 +24,7 @@ export const onboardingEducation2 = require('src/images/onboarding-education-2.p
 export const onboardingEducation3 = require('src/images/onboarding-education-3.png')
 export const ringsPlusCircle = require('src/images/rings-plus-circle.png')
 export const sendFee = require('src/images/send-fee.png')
+export const simplexLogo = require('src/images/simplex.png')
 export const transactionExchange = require('src/images/transaction-exchange.png')
 export const transactionNetwork = require('src/images/transaction-network.png')
 export const verificationEducation1 = require('src/images/verification-education-1.png')
