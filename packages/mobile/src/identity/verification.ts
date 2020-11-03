@@ -509,11 +509,15 @@ function* requestAttestations(
       numAttestationsRequestsNeeded
     )
 
+    // Using hard-coded gas value to avoid running gas estimation.
+    // Note: This is fragile and needs be updated if there are significant
+    // changes to the contract implementation.
     yield call(
       sendTransaction,
       approveTx.txo,
       account,
-      newTransactionContext(TAG, 'Approve attestations')
+      newTransactionContext(TAG, 'Approve attestations'),
+      150000
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
@@ -528,11 +532,15 @@ function* requestAttestations(
       numAttestationsRequestsNeeded
     )
 
+    // Using hard-coded gas value to avoid running gas estimation.
+    // Note: This is fragile and needs be updated if there are significant
+    // changes to the contract implementation.
     yield call(
       sendTransaction,
       requestTx.txo,
       account,
-      newTransactionContext(TAG, 'Request attestations')
+      newTransactionContext(TAG, 'Request attestations'),
+      215000
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   }
@@ -548,11 +556,15 @@ function* requestAttestations(
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(phoneHash)
 
+  // Using hard-coded gas value to avoid running gas estimation.
+  // Note: This is fragile and needs be updated if there are significant
+  // changes to the contract implementation.
   yield call(
     sendTransaction,
     selectIssuersTx.txo,
     account,
-    newTransactionContext(TAG, 'Select attestation issuers')
+    newTransactionContext(TAG, 'Select attestation issuers'),
+    500000
   )
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
@@ -722,6 +734,9 @@ function* completeAttestation(
   Logger.debug(TAG + '@completeAttestation', `Completing code for issuer: ${code.issuer}`)
 
   // Generate and send the transaction to complete the attestation from the given issuer.
+  // Using hard-coded gas value to avoid running gas estimation.
+  // Note: This is fragile and needs be updated if there are significant
+  // changes to the contract implementation.
   const completeTx: CeloTransactionObject<void> = yield call(
     [attestationsWrapper, attestationsWrapper.complete],
     phoneHashDetails.phoneHash,
@@ -730,7 +745,7 @@ function* completeAttestation(
     code.code
   )
   const context = newTransactionContext(TAG, `Complete attestation from ${issuer}`)
-  yield call(sendTransaction, completeTx.txo, account, context)
+  yield call(sendTransaction, completeTx.txo, account, context, 250000)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
