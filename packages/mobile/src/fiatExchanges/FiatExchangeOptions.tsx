@@ -150,7 +150,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
-        <View style={{ flex: 1 }}>
+        <View style={styles.providersContainer}>
           {providers[isAddFunds ? 'addFunds' : 'cashOut'].map((value, idx) => {
             return (
               <TouchableOpacity
@@ -197,6 +197,9 @@ const styles = StyleSheet.create({
   simplexLogo: {
     height: 59,
     width: 111,
+  },
+  providersContainer: {
+    flex: 1,
   },
   provider: {
     flex: 1,
