@@ -4,7 +4,7 @@ import {
   AttestationsWrapper,
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { isValidAddress } from '@celo/utils/src/address'
+import { eqAddress, isValidAddress, NULL_ADDRESS } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
@@ -170,7 +170,7 @@ export function* fetchAddressesAndValidateSaga({
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const walletAddresses: string[] = yield call(getWalletAddressesAndUpdateCache, e164Number)
+    const walletAddresses: string[] = yield call(fetchWalletAddresses, e164Number)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
@@ -228,7 +228,7 @@ function* getAccountAddresses(e164Number: string) {
   return getAddressesFromLookupResult(lookupResult, phoneHash) || []
 }
 
-function* getWalletAddressesAndUpdateCache(e164Number: string) {
+function* fetchWalletAddresses(e164Number: string) {
   const contractKit = yield call(getContractKit)
   const accountsWrapper: AccountsWrapper = yield call([
     contractKit.contracts,
@@ -242,11 +242,10 @@ function* getWalletAddressesAndUpdateCache(e164Number: string) {
 
   const possibleUserAddresses: string[] = []
   const walletToAccountAddress: WalletToAccountAddressType = {}
-  walletAddresses.forEach((address, i) => {
-    const walletAddress = address.toLowerCase()
+  walletAddresses.forEach((walletAddress, i) => {
     const accountAddress = accountAddresses[i]
-    // `getWalletAddress` returns 0x0 when there isn't a wallet registered
-    if (walletAddress !== '0x0') {
+    // `getWalletAddress` returns a null address when there isn't a wallet registered
+    if (!eqAddress(walletAddress, NULL_ADDRESS)) {
       walletToAccountAddress[walletAddress] = accountAddress
       possibleUserAddresses.push(walletAddress)
     } else {

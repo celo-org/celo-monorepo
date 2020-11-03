@@ -4,7 +4,7 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { CeloTransactionObject, OdisUtils } from '@celo/contractkit'
+import { CeloTransactionObject, ContractKit, OdisUtils } from '@celo/contractkit'
 import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
@@ -29,7 +29,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { registerDataEncryptionKey, setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getAccountAddress, getConnectedUnlockedAccount } from 'src/web3/saga'
 import {
   dataEncryptionKeySelector,
   isDekRegisteredSelector,
@@ -73,6 +73,44 @@ export function* createAccountDek(mnemonic: string) {
   return newDek
 }
 
+function* sendUserFundedSetAccountTx(
+  contractKit: ContractKit,
+  accountsWrapper: AccountsWrapper,
+  publicDataKey: string,
+  accountAddress: string,
+  walletAddress: string
+) {
+  const mtwAddressCreated: boolean = !!(yield select(mtwAddressSelector))
+  // Generate and send a transaction to set the DEK on-chain.
+  let setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
+  const context = newTransactionContext(TAG, 'Set wallet address & DEK')
+  // If MTW has been created, route the user's DEK/wallet registration through it
+  // because accountAddress is determined by msg.sender
+  if (mtwAddressCreated) {
+    const mtwWrapper: MetaTransactionWalletWrapper = yield call(
+      [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
+      accountAddress
+    )
+
+    const proofOfPossession: {
+      v: number
+      r: string
+      s: string
+    } = yield call(accountsWrapper.generateProofOfKeyPossession, accountAddress, walletAddress)
+
+    setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress, proofOfPossession)
+
+    const setAccountTxViaMTW: CeloTransactionObject<string> = yield call(
+      mtwWrapper.signAndExecuteMetaTransaction,
+      setAccountTx.txo
+    )
+    yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
+    yield put(updateWalletToAccountAddress({ [walletAddress]: accountAddress }))
+  } else {
+    yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
+  }
+}
+
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
 export function* registerAccountDek(walletAddress: string) {
@@ -104,8 +142,7 @@ export function* registerAccountDek(walletAddress: string) {
       contractKit.contracts.getAccounts,
     ])
 
-    const mtwAddress: string | null = yield select(mtwAddressSelector)
-    const accountAddress: string = mtwAddress || walletAddress
+    const accountAddress: string = yield call(getAccountAddress)
 
     const upToDate: boolean = yield call(
       isAccountUpToDate,
@@ -125,51 +162,14 @@ export function* registerAccountDek(walletAddress: string) {
       return
     }
 
-    // Generate and send a transaction to set the DEK on-chain.
-    let setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
-    const context = newTransactionContext(TAG, 'Set wallet address & DEK')
-    // If MTW has been created, route the user's DEK/wallet registration through it
-    // because accountAddress is determined by msg.sender
-    if (mtwAddress) {
-      try {
-        const mtwWrapper: MetaTransactionWalletWrapper = yield call(
-          [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
-          mtwAddress
-        )
-
-        const proofOfPossession: {
-          v: number
-          r: string
-          s: string
-        } = yield call(accountsWrapper.generateProofOfKeyPossession, mtwAddress, walletAddress)
-
-        // TODO: There should be a branching off point here depending on if there
-        // is an active Komenci session (i.e., submit through KomenciKit or not)
-
-        setAccountTx = accountsWrapper.setAccount(
-          '',
-          publicDataKey,
-          walletAddress,
-          proofOfPossession
-        )
-
-        const setAccountTxViaMTW: CeloTransactionObject<string> = yield call(
-          mtwWrapper.signAndExecuteMetaTransaction,
-          setAccountTx.txo
-        )
-        yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
-        yield put(updateWalletToAccountAddress({ [walletAddress.toLowerCase()]: mtwAddress }))
-      } catch (error) {
-        Logger.debug(
-          `${TAG}@registerAccountDek`,
-          'Failed to register via the MTW, will attempt with EOA. Error: ',
-          error
-        )
-        yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
-      }
-    } else {
-      yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
-    }
+    yield call(
+      sendUserFundedSetAccountTx,
+      contractKit,
+      accountsWrapper,
+      publicDataKey,
+      accountAddress,
+      walletAddress
+    )
 
     // TODO: Make sure this action is also triggered after the DEK registration
     // that will happen via Komenci
