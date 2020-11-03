@@ -218,6 +218,10 @@ docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 3030
 You can detach from the running container by pressing `ctrl+p ctrl+q`, or start it with `-d` instead of `-it` to start detached. Access the logs for a container in the background with the `docker logs` command.
 {% endhint %}
 
+**NOTES**
+* For the proxy to be able to send stats to [Celostats](https://baklava-celostats.celo-testnet.org/), both the proxy and the validator should set the `celostats` flag
+* If you are deploying multiple proxies for the same validator, the `celostats` flag should be added in only one of them
+
 ### Get your Proxy's connection info
 
 Once the Proxy is running, we will need to retrieve its enode and IP address so that the Validator will be able to connect to it.
