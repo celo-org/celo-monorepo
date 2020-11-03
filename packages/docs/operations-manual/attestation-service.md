@@ -11,8 +11,9 @@ Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voti
 ## Outline
 
 This guide steps you through setting up an Attestation Service:
-* Follow the instructions to set up a validator on [mainnet](../getting-started/running-a-validator-in-mainnet.md) or [baklava](../getting-started/running-a-validator-in-baklava.md).
-* Configure Twilio and Nexmo, the two SMS providers used by Attestation Service
+
+* Follow the instructions to set up a validator on [mainnet](../getting-started/running-a-validator-in-mainnet.md) or [baklava](../getting-started/running-a-validator-in-baklava.md)
+* Configure Twilio, MessageBird and Nexmo, the SMS providers used by Attestation Service
 * Generate and register an attestation signer key
 * Deploy a Celo full node, with the attestation signer key unlocked
 * Deploy the attestation service
@@ -44,7 +45,15 @@ Every record in the database includes the issuer (i.e. validator) in its key, so
 
 ## SMS Providers
 
-Currently the Attestation Service supports two SMS providers: [Twilio](https://www.twilio.com/try-twilio) and [Nexmo](https://dashboard.nexmo.com/sign-up). It is strongly recommended that you sign up with both.
+Currently the Attestation Service supports three SMS providers:
+
+* [Twilio](https://www.twilio.com/try-twilio)
+* [Nexmo](https://dashboard.nexmo.com/sign-up)
+* [MessageBird](https://messagebird.com/en/)
+
+It is recommended that you sign up with all three.
+
+See the [Configuration](#configuration) section for information about how to specify configuration options.
 
 ### Twilio
 
@@ -65,6 +74,10 @@ Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US numb
 If you want to support a single Attestation Service from this account, under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
 
 If you want to support multiple Attestation Services from this account, for example for a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number. You will need a separate number for each application.  Finally, copy each application's `Application Id` value into the appropriate instance's `NEXMO_APPLICATION` configuration value.
+
+### MessageBird
+
+After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number to send SMS to US numbers. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Sending from a US number works well in practice.
 
 ## Installation
 
@@ -142,7 +155,7 @@ Lines beginning `#` are treated as comments. In addition, any options specified 
 
 Required options:
 
-| Variable                       |    |
+| Variable                       | Explanation   |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `DATABASE_URL`                   | The URL to access the local database, e.g. `sqlite://db/attestations.db` |
 | `CELO_PROVIDER`                  | The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! |
@@ -155,6 +168,7 @@ Optional environment variables:
 | Variable                       | Explanation    |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
+| `RATE_LIMIT_REQS_PER_MIN`        | Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
 | `MAX_DELIVERY_ATTEMPTS`          | Number of total delivery attempts when sending SMS. Each attempt tries the next available provider in the order specified. If omitted, the deprecated `MAX_PROVIDER_RETRIES` option will be used. Default value is `3`.  |
 | `MAX_REREQUEST_MINS`       | Number of minutes during which the client can rerequest the same attestation. Default value is `55`.
@@ -183,6 +197,12 @@ Nexmo configuration options:
 | `NEXMO_APPLICATION`  | If using a Nexmo application, the application id.  |
 | `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 | `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
+
+MessageBird configuration options:
+
+| Variable                    | Explanation                                                     |
+| --------------------------- | --------------------------------------------------------------- |
+| `MESSAGEBIRD_API_KEY`       | The API key to the MessageBird API                              |
 
 ## Running the Attestation Service
 
