@@ -207,7 +207,7 @@ export function parseDappkitResponseDeeplink(url: string): DappKitResponse & { r
       }
     case DappKitRequestTypes.SIGN_TX:
       if (rawParams.query.status === DappKitResponseStatus.SUCCESS) {
-        let rawTxs = rawParams.query.rawTxs
+        let rawTxs = rawParams.query.rawTxs!
         if (typeof rawTxs === 'string') {
           rawTxs = [rawTxs]
         }
