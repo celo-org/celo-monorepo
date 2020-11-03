@@ -83,6 +83,7 @@ export interface UpdatableVerificationState {
 }
 
 export type FeelessUpdatableVerificationState = {
+  isActive: boolean
   komenci: {
     errorTimestamps: number[]
     unverifiedMtwAddress: string | null
@@ -184,6 +185,7 @@ const initialState: State = {
   },
   feelessVerificationState: {
     isLoading: false,
+    isActive: false,
     phoneHashDetails: {
       e164Number: '',
       phoneHash: '',
@@ -248,11 +250,35 @@ export const reducer = (
         feelessNumCompleteAttestations: 0,
         feelessVerificationStatus: VerificationStatus.Stopped,
       }
-    case Actions.SET_VERIFICATION_STATUS:
+    case Actions.FEELESS_START_VERIFICATION:
       return {
         ...state,
-        verificationStatus: action.status,
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          isActive: true,
+        },
       }
+    case Actions.SET_VERIFICATION_STATUS:
+      const status = action.status
+      let feelessIsActive = state.feelessVerificationState.isActive
+      if (feelessIsActive) {
+        if (status < 1 || status === VerificationStatus.Done) {
+          feelessIsActive = false
+        }
+        return {
+          ...state,
+          feelessVerificationStatus: status,
+          feelessVerificationState: {
+            ...state.feelessVerificationState,
+            isActive: feelessIsActive,
+          },
+        }
+      }
+      return {
+        ...state,
+        verificationStatus: status,
+      }
+    // TODO: Delete if not using
     case Actions.FEELESS_SET_VERIFICATION_STATUS:
       return {
         ...state,

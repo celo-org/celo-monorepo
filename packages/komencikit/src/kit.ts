@@ -336,7 +336,7 @@ export class KomenciKit {
     const accounts = await this.contractKit.contracts.getAccounts()
     return this.submitMetaTransaction(
       metaTxWalletAddress,
-      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession).txo
+      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession)
     )
   }
 
