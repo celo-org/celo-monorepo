@@ -1,8 +1,11 @@
+import { ensureLeading0x, Signature } from '@celo/base'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import net from 'net'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
+import { HttpProvider, Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
@@ -115,6 +118,11 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  getWallet() {
+    assertIsCeloProvider(this.web3.currentProvider)
+    return this.web3.currentProvider.wallet
   }
 
   async getTotalBalance(address: string): Promise<AccountBalance> {
@@ -350,6 +358,30 @@ export class ContractKit {
         gas,
       })
     )
+  }
+
+  async signTypedData(signer: string, typedData: EIP712TypedData): Promise<Signature> {
+    const signature = await new Promise<string>((resolve, reject) => {
+      ;(this.web3.currentProvider as Pick<HttpProvider, 'send'>).send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_signTypedData',
+          params: [signer, typedData],
+        },
+        (error, resp) => {
+          if (error) {
+            reject(error)
+          } else if (resp) {
+            resolve(resp.result as string)
+          } else {
+            reject(new Error('empty-response'))
+          }
+        }
+      )
+    })
+
+    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
   private fillTxDefaults(tx?: Tx): Tx {

@@ -167,7 +167,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-org/celo-node:baklava` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/tree/master/packages/celotool/genesis_baklava.json) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-org/geth:baklava` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/tree/master/packages/celotool/genesis_baklava.json) in addition to the Celo Blockchain binary.
 
 ### Start your Accounts node
 
@@ -179,7 +179,7 @@ To run the node:
 # On your local machine
 mkdir celo-accounts-node
 cd celo-accounts-node
-docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --baklava 
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --baklava --datadir /root/.celo
 ```
 
 {% hint style="danger" %}
@@ -211,7 +211,7 @@ Notice the public address returned by this command, that can be exported and use
 ```bash
 # On the proxy machine
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --baklava --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --baklava --datadir /root/.celo --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
 ```
 
 {% hint style="info" %}
@@ -291,7 +291,7 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 # On the Validator machine
 cd celo-validator-node
 docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
---baklava
+--baklava --datadir /root/.celo
 ```
 
 The `networkid` parameter value of `62320` indicates we are connecting to the Baklava network.
