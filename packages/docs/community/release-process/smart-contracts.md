@@ -118,7 +118,7 @@ celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_pr
 
 ### Verify Proposed Release
 
-Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly.
+Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly. Include initialization data from the CGP to verify via (add `-i initialization_data.json` in that case)
 
 ```bash
 RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
@@ -235,6 +235,7 @@ Deploying a new contract release should occur with the following process. On-cha
         <li>If all issues in the audit report have straightforward fixes:
           <ol>
             <li> Submit a governance proposal draft using this format: https://github.com/celo-org/celo-proposals/blob/master/CGPs/template.md</li>
+            <li> Add any initialization data to the CGP that should be included as part of the proposal</li>
             <li> Announce forthcoming smart contract release on: https://forum.celo.org/c/governance</li>
           </ol>
         </li>
