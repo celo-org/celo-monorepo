@@ -22,4 +22,11 @@ export const countryFeatures = {
   RESTRICTED_CP_DOTO: {
     PH: true,
   },
+  SANCTIONED_COUNTRY: {
+    IR: true,
+    CU: true,
+    KP: true,
+    SD: true,
+    SY: true,
+  },
 }
