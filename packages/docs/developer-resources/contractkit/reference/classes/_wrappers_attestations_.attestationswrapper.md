@@ -40,6 +40,7 @@
 * [getConfig](_wrappers_attestations_.attestationswrapper.md#getconfig)
 * [getNonCompliantIssuers](_wrappers_attestations_.attestationswrapper.md#getnoncompliantissuers)
 * [getPastEvents](_wrappers_attestations_.attestationswrapper.md#getpastevents)
+* [getRevealStatus](_wrappers_attestations_.attestationswrapper.md#getrevealstatus)
 * [getVerifiedStatus](_wrappers_attestations_.attestationswrapper.md#getverifiedstatus)
 * [isAttestationExpired](_wrappers_attestations_.attestationswrapper.md#isattestationexpired)
 * [lookupIdentifiers](_wrappers_attestations_.attestationswrapper.md#lookupidentifiers)
@@ -424,7 +425,7 @@ ___
 
 ▸ **getAttestationServiceStatus**(`validator`: [Validator](../interfaces/_wrappers_validators_.validator.md)): *Promise‹[AttestationServiceStatusResponse](../interfaces/_wrappers_attestations_.attestationservicestatusresponse.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:541](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L541)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:577](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L577)*
 
 Gets the relevant attestation service status for a validator
 
@@ -493,6 +494,28 @@ Name | Type |
 `options` | PastEventOptions |
 
 **Returns:** *Promise‹EventLog[]›*
+
+___
+
+###  getRevealStatus
+
+▸ **getRevealStatus**(`phoneNumber`: string, `account`: [Address](../modules/_base_.md#address), `issuer`: [Address](../modules/_base_.md#address), `serviceURL`: string, `pepper?`: undefined | string): *Promise‹Response›*
+
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:524](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L524)*
+
+Returns reveal status from validator's attestation service
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`phoneNumber` | string |
+`account` | [Address](../modules/_base_.md#address) |
+`issuer` | [Address](../modules/_base_.md#address) |
+`serviceURL` | string |
+`pepper?` | undefined &#124; string |
+
+**Returns:** *Promise‹Response›*
 
 ___
 
@@ -575,7 +598,9 @@ ___
 
 ▸ **revealPhoneNumberToIssuer**(`phoneNumber`: string, `account`: [Address](../modules/_base_.md#address), `issuer`: [Address](../modules/_base_.md#address), `serviceURL`: string, `pepper?`: undefined | string, `smsRetrieverAppSig?`: undefined | string): *Promise‹Response›*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:483](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L483)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:492](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L492)*
+
+Reveal phone number to issuer
 
 **Parameters:**
 
@@ -596,7 +621,7 @@ ___
 
 ▸ **revoke**(`identifer`: string, `account`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:653](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L653)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:689](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L689)*
 
 **Parameters:**
 
@@ -652,7 +677,7 @@ ___
 
 ▸ **validateAttestationCode**(`identifier`: string, `account`: [Address](../modules/_base_.md#address), `issuer`: [Address](../modules/_base_.md#address), `code`: string): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:514](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L514)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:550](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L550)*
 
 Validates a given code by the issuer on-chain
 

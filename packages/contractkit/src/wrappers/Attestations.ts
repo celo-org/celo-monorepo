@@ -480,6 +480,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return this.selectIssuers(identifier)
   }
 
+  /**
+   * Reveal phone number to issuer
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   * @param smsRetrieverAppSig?: Android app's hash
+   */
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
@@ -501,6 +510,33 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+    })
+  }
+
+  /**
+   * Returns reveal status from validator's attestation service
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   */
+  getRevealStatus(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string,
+    pepper?: string
+  ) {
+    const urlParams = new URLSearchParams({
+      phoneNumber,
+      salt: pepper ?? '',
+      issuer,
+      account,
+    })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
