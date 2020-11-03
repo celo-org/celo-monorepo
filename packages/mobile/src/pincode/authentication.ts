@@ -7,7 +7,7 @@
 
 import { isValidAddress, normalizeAddress } from '@celo/utils/src/address'
 import { sha256 } from 'ethereumjs-util'
-import { asyncRandomBytes } from 'react-native-secure-randombytes'
+import { generateSecureRandom } from 'react-native-securerandom'
 import { call, select } from 'redux-saga/effects'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -69,8 +69,8 @@ export async function retrieveOrGeneratePepper() {
   if (!getCachedPepper(DEFAULT_CACHE_ACCOUNT)) {
     let storedPepper = await retrieveStoredItem(STORAGE_KEYS.PEPPER)
     if (!storedPepper) {
-      const randomBytes = await asyncRandomBytes(PEPPER_LENGTH)
-      const pepper = randomBytes.toString('hex')
+      const randomBytes = await generateSecureRandom(PEPPER_LENGTH)
+      const pepper = Buffer.from(randomBytes).toString('hex')
       await storeItem({ key: STORAGE_KEYS.PEPPER, value: pepper })
       storedPepper = pepper
     }
@@ -91,7 +91,7 @@ async function getPasswordHashForPin(pin: string) {
 }
 
 function getPasswordHash(password: string) {
-  return sha256(new Buffer(password, 'hex')).toString('hex')
+  return sha256(Buffer.from(password, 'hex')).toString('hex')
 }
 
 function passwordHashStorageKey(account: string) {
