@@ -13,6 +13,7 @@ describe(getCountryFeaturesSelector, () => {
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
         "RESTRICTED_CP_DOTO": false,
+        "SANCTIONED_COUNTRY": false,
       }
     `)
   })
@@ -27,6 +28,22 @@ describe(getCountryFeaturesSelector, () => {
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
         "RESTRICTED_CP_DOTO": true,
+        "SANCTIONED_COUNTRY": false,
+      }
+    `)
+  })
+
+  it('returns the appropriate features for CU accounts', () => {
+    const state = getMockStoreData({
+      account: {
+        defaultCountryCode: '+53',
+      },
+    })
+
+    expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
+      Object {
+        "RESTRICTED_CP_DOTO": false,
+        "SANCTIONED_COUNTRY": true,
       }
     `)
   })
