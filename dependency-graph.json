@@ -89,6 +89,7 @@
     "dependencies": [
       "@celo/base",
       "@celo/contractkit",
+      "@celo/protocol",
       "@celo/utils"
     ]
   },

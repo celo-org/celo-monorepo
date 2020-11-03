@@ -22,6 +22,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "@celo/protocol": "1.0.0",
     "@celo/contractkit": "0.4.19-dev",
     "@celo/base": "0.0.5-dev",
     "@celo/utils": "0.1.23-dev",
