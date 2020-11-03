@@ -1,4 +1,3 @@
-import ListItem from '@celo/react-components/components/ListItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -20,17 +19,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import { MOONPAY_RATE_API } from 'src/config'
 import { features } from 'src/flags'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import QuestionIcon from 'src/icons/QuestionIcon'
 import { moonpayLogo, simplexLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
-import { emptyHeader, HeaderTitleWithSubtitle } from 'src/navigator/Headers'
+import { emptyHeader } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
@@ -79,6 +76,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   // All currency exchange calculations handled here as
   // different providers may provide different fiat, CELO and cUSD rates
 
+  const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const localCurrency = useSelector(getLocalCurrencyCode)
   const amount = route.params.amount || new BigNumber(0)
 
@@ -136,23 +134,23 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       {
         image: <Image source={simplexLogo} style={styles.simplexLogo} resizeMode={'contain'} />,
         screen: Screens.Simplex,
-        supportedCurrenciesNote: 'cUSD only',
+        supportedCurrenciesNote: t('onlyCeloDollars'),
       },
       {
         image: <Image source={moonpayLogo} style={styles.moonpayLogo} resizeMode={'contain'} />,
         screen: Screens.MoonPay,
-        supportedCurrenciesNote: 'CELO only',
+        supportedCurrenciesNote: t('onlyCelo'),
       },
     ],
   }
 
   const { isAddFunds } = route.params
-  const { t } = useTranslation(Namespaces.fiatExchangeFlow)
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
-        <View style={{ flex: 1 }}>
+        <View style={styles.providersContainer}>
           {providers[isAddFunds ? 'addFunds' : 'cashOut'].map((value, idx) => {
             return (
               <TouchableOpacity
@@ -199,6 +197,9 @@ const styles = StyleSheet.create({
   simplexLogo: {
     height: 59,
     width: 111,
+  },
+  providersContainer: {
+    flex: 1,
   },
   provider: {
     flex: 1,

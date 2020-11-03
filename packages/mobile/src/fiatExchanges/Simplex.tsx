@@ -1,12 +1,13 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useSelector } from 'react-redux'
 import AccountNumber from 'src/components/AccountNumber'
 import { SIMPLEX_URI } from 'src/config'
-import i18n from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -24,14 +25,15 @@ export const simplexOptions = () => {
 }
 
 function Simplex() {
+  const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const account = useSelector(currentAccountSelector)
 
   return (
     <View style={styles.container}>
       <View style={styles.addressBanner}>
-        <Text
-          style={[styles.tapToCopy, fontStyles.regular]}
-        >{`Tap to copy your Valora CUSD address`}</Text>
+        <Text style={[styles.tapToCopy, fontStyles.regular]}>
+          {t('tapToCopyCeloDollarsAddress')}
+        </Text>
         <AccountNumber address={account || ''} />
       </View>
       <WebView style={styles.exchangeWebView} source={{ uri: SIMPLEX_URI }} />
