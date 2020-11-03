@@ -25613,12 +25613,41 @@ node-libs-browser@^2.2.1:
     util "^0.11.0"
     vm-browserify "^1.0.1"
 
-node-libs-react-native@1.0.3, node-libs-react-native@^1.0.3:
+node-libs-react-native@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.0.3.tgz#442b89ae93ca308f6464ff2f79686848bca85988"
   integrity sha512-2X/M/DMB4hij2L0tsnJOiDhYR2N0YtetIhb/eN5+5vksLxjXwaFgLbSXWT3XExnGJpISDn8dYuYz6yvdndjjkg==
   dependencies:
     assert "^1.4.1"
+    browserify-zlib "^0.2.0"
+    buffer "^5.0.6"
+    console-browserify "^1.1.0"
+    constants-browserify "^1.0.0"
+    domain-browser "^1.1.1"
+    events "^1.0.0"
+    https-browserify "^1.0.0"
+    os-browserify "^0.3.0"
+    path-browserify "0.0.0"
+    process "^0.11.0"
+    punycode "^2.1.0"
+    querystring-es3 "^0.2.0"
+    react-native-crypto "^2.0.1"
+    react-native-randombytes "^3.5.1"
+    readable-stream "^2.2.9"
+    stream-http "^2.3.1"
+    string_decoder "^1.0.3"
+    timers-browserify "^2.0.2"
+    tty-browserify "0.0.0"
+    url "^0.11.0"
+    util "^0.10.3"
+
+node-libs-react-native@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.2.0.tgz#e9eb419742f09166562d88008f439e3045c88097"
+  integrity sha512-D+g8Mj9OfsOYYFWZoSz4bmr/8g/QWOwUgDmi3Ux0EPU9Q41OvGsdzAzr0IGJmtuSAfyOTfnKx1XRQR9id8/EEw==
+  dependencies:
+    assert "^1.4.1"
+    base-64 "^0.1.0"
     browserify-zlib "^0.2.0"
     buffer "^5.0.6"
     console-browserify "^1.1.0"
@@ -28999,14 +29028,13 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@https://github.com/celo-org/react-native-bip39#765876f":
+"react-native-bip39@https://github.com/celo-org/react-native-bip39#93112e6":
   version "2.2.0"
-  resolved "https://github.com/celo-org/react-native-bip39#765876f5946ecdeca34ea9cdf697931a7a9bb8fb"
+  resolved "https://github.com/celo-org/react-native-bip39#93112e6dfd38ee826af7a55176f5be20d874ab6d"
   dependencies:
     create-hash "^1.1.0"
-    react-native-crypto "^2.0.1"
     react-native-fast-crypto "https://github.com/celo-org/react-native-fast-crypto#df1c171"
-    react-native-secure-randombytes "^2.2.3"
+    react-native-securerandom "1.0.0"
     unorm "^1.3.3"
 
 "react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#433c2c6":
@@ -29203,6 +29231,14 @@ react-native-randombytes@^3.5.1:
     buffer "^4.9.1"
     sjcl "^1.0.3"
 
+react-native-randombytes@^3.5.3:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/react-native-randombytes/-/react-native-randombytes-3.6.0.tgz#6134370f28a345d435fd0f42be6a7dc73d2311ae"
+  integrity sha512-ZUhqoHuJ51Fv/u74/1zt9/vz7Obu0q7BJ5sZ8j/pthHwRJu2B9Q9J+2R8/Gozkdli8QVed6bMH4kkeVG9xzEag==
+  dependencies:
+    buffer "^4.9.1"
+    sjcl "^1.0.3"
+
 react-native-reanimated@^1.13.1:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.13.1.tgz#c370c32cc4d447ae896cb029bb9c6a2f7608c5b4"
@@ -29232,21 +29268,7 @@ react-native-screens@^2.7.0:
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.7.0.tgz#2d3cf3c39a665e9ca1c774264fccdb90e7944047"
   integrity sha512-n/23IBOkrTKCfuUd6tFeRkn3lB2QZ3cmvoubRscR0JU/Zl4/ZyKmwnFmUv1/Fr+2GH/H8UTX59kEKDYYg3dMgA==
 
-react-native-secure-randombytes@^2.2.3:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/react-native-secure-randombytes/-/react-native-secure-randombytes-2.2.3.tgz#7fe68a8930051df34883689af99eee8614aac371"
-  integrity sha512-dnYLjDqwaxy/GC0BzSvZL2vJnJcsWcfNGmo4RgKGhhDX5yYn8dibMQ49iQjGTZU+uxp6jBQVYUiXEBKxF7Fwgg==
-  dependencies:
-    buffer "^4.9.1"
-
-react-native-secure-randombytes@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/react-native-secure-randombytes/-/react-native-secure-randombytes-3.0.2.tgz#eb0f14c492ecdca044d324fc4eeee5d9faa2f8d5"
-  integrity sha512-PEtT0fXyYt3GsXLG+ONeE+/pRVDRiMnrnuXXvXACAs/eQPGNJRMNcDmbUuLJ/HqRPHQAQl0Im00erVhp0h5JEQ==
-  dependencies:
-    buffer "^4.9.1"
-
-react-native-securerandom@^1.0.0:
+react-native-securerandom@1.0.0, react-native-securerandom@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-native-securerandom/-/react-native-securerandom-1.0.0.tgz#1cff2f727c90c9ec3318b42dbf825a628b53b49b"
   integrity sha512-lnhcsWloFzMN/HffyDBlh4VlqdhDH8uxEzUIH3aJPgC1PxV6OKZkvAk409EwsAhcmG/z3yZuVKegKpUr5IM9ug==
