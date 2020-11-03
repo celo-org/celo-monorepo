@@ -57,7 +57,7 @@ export default class SetBitmapsCommand extends BaseCommand {
     const unsetIntervals = intervals.filter((_, idx) => !bitmapsSet[idx])
     console.log(unsetIntervals)
 
-    for (const interval of unsetIntervals.reverse()) {
+    for (const interval of unsetIntervals) {
       const tx = downtimeSlasher.setBitmapForInterval(interval.start, interval.end)
       await displaySendTx('setBitmap', tx, undefined, 'BitmapSetForInterval')
     }

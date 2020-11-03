@@ -113,15 +113,20 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   setBitmapForInterval = proxySend(this.kit, this.contract.methods.setBitmapForInterval)
 
   async intervalsForSlashableDowntimeWindowBeforeBlock(block?: number) {
+    const MAX_BITMAP_SET_INTERVAL = 4000
     const window = await this.getSlashableDowntimeWindow(undefined, block)
     let end = window.end
     const intervals = []
     while (end > window.start) {
       const epochNumber = await this.kit.getEpochNumberOfBlock(end)
       const firstBlock = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
-      const start = Math.max(firstBlock, window.start)
+      const lowestPossible = end - MAX_BITMAP_SET_INTERVAL
+      const start = Math.max(firstBlock, window.start, lowestPossible)
       intervals.push({ start, end })
-      end = await this.kit.getLastBlockNumberForEpoch(epochNumber - 1)
+      end =
+        start === lowestPossible
+          ? start - 1
+          : await this.kit.getLastBlockNumberForEpoch(epochNumber - 1)
     }
     return intervals
   }

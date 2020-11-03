@@ -3,6 +3,7 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { cli } from 'cli-ux'
+import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
@@ -15,7 +16,14 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     ...BaseCommand.flagsWithoutLocalAddresses(),
     signer: Flags.address({
       description: 'address of the signer to check for signatures',
-      required: true,
+      exclusive: ['signersJson'],
+    }),
+    signersJson: flags.string({
+      description: 'path to json file with list of signers to check',
+      exclusive: ['signer'],
+    }),
+    wasDownWhileElected: flags.boolean({
+      description: 'indicate whether a validator was down while elected for range',
     }),
     'at-block': flags.integer({
       description: 'latest block to examine for signer activity',
@@ -24,6 +32,11 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     lookback: flags.integer({
       description: 'how many blocks to look back for signer activity',
       default: 120,
+      exclusive: ['slashableDowntime'],
+    }),
+    slashableDowntimeLookback: flags.boolean({
+      description: 'lookback of Validators.slashableDowntime',
+      exclusive: ['lookback'],
     }),
     width: flags.integer({
       description: 'line width for printing marks',
@@ -60,46 +73,85 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       ? res.flags['at-block'] + 1
       : (await this.web3.eth.getBlock('latest')).number
 
-    const blocks = await concurrentMap(10, [...Array(res.flags.lookback).keys()], (i) =>
-      this.web3.eth.getBlock(latest - res.flags.lookback! + i + 1)
+    let lookback: number
+    if (res.flags.slashableDowntimeLookback) {
+      const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
+      lookback = await downtimeSlasher.slashableDowntime()
+    } else {
+      lookback = res.flags.lookback
+    }
+
+    const blocks = await concurrentMap(10, [...Array(lookback).keys()], (i) =>
+      this.web3.eth.getBlock(latest - lookback! + i + 1)
     )
-    const printer = new MarkPrinter(res.flags.width!)
-    try {
-      for (const block of blocks) {
-        const elected = await electionCache.elected(res.flags.signer, block.number - 1)
-        const signed = elected && (await electionCache.signedParent(res.flags.signer, block))
-        printer.addMark(block.number - 1, elected, signed)
+
+    let signers: string[]
+    if (res.flags.signersJson) {
+      const signerObjectArray: any[] = JSON.parse(readFileSync(res.flags.signersJson).toString())
+      signers = signerObjectArray.map((o) => o.signer)
+    } else {
+      signers = [res.flags.signer!]
+    }
+
+    for (const signer of signers) {
+      let wasDown: boolean
+      let wasElected: boolean
+      let printer: MarkPrinter
+      if (res.flags.wasDownWhileElected) {
+        wasDown = true
+        wasElected = true
+      } else {
+        printer = new MarkPrinter(res.flags.width!)
       }
+      try {
+        for (const block of blocks) {
+          const elected = await electionCache.elected(signer, block.number - 1)
+          const signed = elected && (await electionCache.signedParent(signer, block))
+          if (res.flags.wasDownWhileElected) {
+            wasElected = wasElected! && elected
+            wasDown = wasDown! && !signed
+          } else {
+            printer!.addMark(block.number - 1, elected, signed)
+          }
+        }
 
-      if (res.flags.follow) {
-        const web3 = await this.newWeb3()
-        const subscription = web3.eth
-          .subscribe('newBlockHeaders', (error) => {
-            if (error) {
-              this.error(error)
-            }
-          })
-          .on('data', async (block) => {
-            const elected = await electionCache.elected(res.flags.signer, block.number - 1)
-            const signed = elected && (await electionCache.signedParent(res.flags.signer, block))
-            printer.addMark(block.number - 1, elected, signed)
-          })
-          .on('error', (error) => {
-            this.error(`error in block header subscription: ${error}`)
-          })
+        if (res.flags.follow) {
+          const web3 = await this.newWeb3()
+          const subscription = web3.eth
+            .subscribe('newBlockHeaders', (error) => {
+              if (error) {
+                this.error(error)
+              }
+            })
+            .on('data', async (block) => {
+              const elected = await electionCache.elected(signer, block.number - 1)
+              const signed = elected && (await electionCache.signedParent(signer, block))
+              if (!res.flags.wasDownWhileElected) {
+                printer!.addMark(block.number - 1, elected, signed)
+              }
+            })
+            .on('error', (error) => {
+              this.error(`error in block header subscription: ${error}`)
+            })
 
-        try {
-          let response: string
-          do {
-            response = await cli.prompt('', { prompt: '', type: 'single', required: false })
-          } while (response !== 'q' && response !== '\u0003' /* ctrl-c */)
-        } finally {
-          await subscription.unsubscribe()
-          await stopProvider(web3.currentProvider)
+          try {
+            let response: string
+            do {
+              response = await cli.prompt('', { prompt: '', type: 'single', required: false })
+            } while (response !== 'q' && response !== '\u0003' /* ctrl-c */)
+          } finally {
+            await subscription.unsubscribe()
+            await stopProvider(web3.currentProvider)
+          }
+        }
+      } finally {
+        if (res.flags.wasDownWhileElected) {
+          const was = (b: boolean) => 'was' + (b ? '' : ' not')
+          console.log(`signer ${signer} ${was(wasElected!)} elected and ${was(wasDown!)} down`)
+        } else {
+          await printer!.done()
         }
       }
-    } finally {
-      await printer.done()
     }
   }
 }

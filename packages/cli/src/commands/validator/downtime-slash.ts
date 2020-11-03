@@ -1,4 +1,6 @@
 import { zip } from '@celo/utils/lib/collections'
+import { flags } from '@oclif/command'
+import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
@@ -14,8 +16,12 @@ export default class DowntimeSlashCommand extends BaseCommand {
       description: 'From address to perform the slash (reward recipient)',
     }),
     validator: Flags.address({
-      required: true,
       description: 'Validator (signer or account) address',
+      exclusive: ['validatorsJson'],
+    }),
+    signersJson: flags.string({
+      description: 'path to json file with list of validators to slash',
+      exclusive: ['validator'],
     }),
     startBlocks: Flags.intArray({
       required: true,
@@ -38,49 +44,59 @@ export default class DowntimeSlashCommand extends BaseCommand {
 
   async run() {
     const res = this.parse(DowntimeSlashCommand)
-    const validator = res.flags.validator
     const startBlocks = res.flags.startBlocks
     const endBlocks = res.flags.endBlocks
     const intervals = zip((start, end) => ({ start, end }), startBlocks, endBlocks)
 
-    const checkBuilder = newCheckBuilder(this, validator)
-      .isSignerOrAccount()
-      .canSignValidatorTxs()
-      .signerAccountIsValidator()
-
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
     const slashableDowntime = await downtimeSlasher.slashableDowntime()
 
-    checkBuilder
-      .addCheck(
-        `validator not already slashed for span`,
-        async () =>
-          intervals[0].start > (await downtimeSlasher.lastSlashedBlock(res.flags.validator))
-      )
-      .addCheck(
-        `provided intervals span slashableDowntime blocks (${slashableDowntime})`,
-        () => slashableDowntime < intervals[intervals.length - 1].end - intervals[0].start + 1
-      )
-      .addCheck(
-        `bitmaps are set for intervals`,
-        async () => {
-          for (const interval of intervals) {
-            const set = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
-            if (!set) {
-              return false
+    const validators = await this.kit.contracts.getValidators()
+
+    let validatorsToSlash: string[]
+    if (res.flags.signersJson) {
+      const validatorObjectArray: any[] = JSON.parse(readFileSync(res.flags.signersJson).toString())
+      validatorsToSlash = validatorObjectArray.map((o) => o.signer)
+    } else {
+      validatorsToSlash = [res.flags.validator!]
+    }
+
+    for (const validatorOrSigner of validatorsToSlash) {
+      const validator = await validators.signerToAccount(validatorOrSigner)
+
+      const checkBuilder = newCheckBuilder(this, validator)
+        .isSignerOrAccount()
+        .canSignValidatorTxs()
+        .signerAccountIsValidator()
+        .addCheck(
+          `validator not already slashed for span`,
+          async () => intervals[0].start > (await downtimeSlasher.lastSlashedBlock(validator))
+        )
+        .addCheck(
+          `provided intervals span slashableDowntime blocks (${slashableDowntime})`,
+          () => slashableDowntime <= Math.max(...endBlocks) - Math.min(...startBlocks) + 1
+        )
+        .addCheck(
+          `bitmaps are set for intervals`,
+          async () => {
+            for (const interval of intervals) {
+              const set = await downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
+              if (!set) {
+                return false
+              }
             }
-          }
-          return true
-        },
-        'some bitmaps are not set, please use validator:set-bitmaps'
-      )
-      .addCheck(`validator was down for intervals`, () =>
-        downtimeSlasher.wasValidatorDown(validator, startBlocks, endBlocks)
-      )
+            return true
+          },
+          'some bitmaps are not set, please use validator:set-bitmaps'
+        )
+        .addCheck(`validator was down for intervals`, () =>
+          downtimeSlasher.wasValidatorDown(validator, startBlocks, endBlocks)
+        )
 
-    await checkBuilder.runChecks()
+      await checkBuilder.runChecks()
 
-    const tx = await downtimeSlasher.slashValidator(validator, startBlocks, endBlocks)
-    await displaySendTx('slash', tx, undefined, 'DowntimeSlashPerformed')
+      const tx = await downtimeSlasher.slashValidator(validator, startBlocks, endBlocks)
+      await displaySendTx('slash', tx, undefined, 'DowntimeSlashPerformed')
+    }
   }
 }
