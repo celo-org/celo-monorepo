@@ -17,6 +17,8 @@ export class NexmoSmsProvider extends SmsProvider {
       fetchEnv('NEXMO_KEY'),
       fetchEnv('NEXMO_SECRET'),
       fetchEnvOrDefault('NEXMO_APPLICATION', ''),
+      fetchEnvOrDefault('NEXMO_APPLICATION_PRIVATE_KEY_PATH', ''),
+      isYes(fetchEnvOrDefault('NEXMO_APPLICATION_SPECIFIC_NUMBERS', '0')),
       readUnsupportedRegionsFromEnv('NEXMO_UNSUPPORTED_REGIONS', 'NEXMO_BLACKLIST'),
       isYes(fetchEnvOrDefault('NEXMO_ACCOUNT_BALANCE_METRIC', ''))
     )
@@ -28,20 +30,28 @@ export class NexmoSmsProvider extends SmsProvider {
     phoneNumber: string
   }> = []
   balanceMetric: boolean
+  deliveryStatusURL: string | undefined
+  applicationId: string | null = null
+  useOnlyApplicationNumbers: boolean | null
 
   constructor(
     apiKey: string,
     apiSecret: string,
     applicationId: string,
+    privateKey: string,
+    useOnlyApplicationNumbers: boolean,
     unsupportedRegionCodes: string[],
     balanceMetric: boolean
   ) {
     super()
-    if (applicationId) {
+    this.applicationId = applicationId
+    this.useOnlyApplicationNumbers = useOnlyApplicationNumbers
+    if (applicationId && privateKey) {
       this.client = new Nexmo({
         apiKey,
         apiSecret,
         applicationId,
+        privateKey,
       })
     } else {
       this.client = new Nexmo({
@@ -53,7 +63,9 @@ export class NexmoSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  initialize = async () => {
+  initialize = async (deliveryStatusURL: string) => {
+    this.deliveryStatusURL = deliveryStatusURL
+
     const availableNumbers = await this.getAvailableNumbers()
 
     if (!availableNumbers) {
@@ -105,6 +117,7 @@ export class NexmoSmsProvider extends SmsProvider {
         nexmoNumber,
         attestation.phoneNumber,
         attestation.message,
+        { callback: this.deliveryStatusURL },
         (err: Error, responseData: any) => {
           if (err) {
             reject(err)
@@ -130,7 +143,11 @@ export class NexmoSmsProvider extends SmsProvider {
 
   private getAvailableNumbers = async (): Promise<any> => {
     return new Promise((resolve, reject) => {
-      this.client.number.get(null, (err: Error, responseData: any) => {
+      const options =
+        this.applicationId && this.useOnlyApplicationNumbers
+          ? { applicationId: this.applicationId, has_application: true }
+          : null
+      this.client.number.get(options, (err: Error, responseData: any) => {
         if (err) {
           reject(err)
         } else {
