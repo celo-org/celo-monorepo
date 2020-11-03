@@ -97,7 +97,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 Private keys are the central primitive of any cryptographic system and need to be handled with extreme care. Loss of your private key can lead to irreversible loss of value.
 
-This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../operations-manual/key-management/summary.md)
+This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../validator-guide/key-management/summary.md)
 
 #### Unlocking
 
@@ -402,7 +402,7 @@ celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator
 
-In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/key-management/detailed.md#authorized-validator-signers) for the `ReleaseGold` contract account.
+In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../validator-guide/key-management/detailed.md#authorized-validator-signers) for the `ReleaseGold` contract account.
 
 ```bash
 # On the Validator machine
@@ -649,7 +649,7 @@ celocli validator:show $CELO_VALIDATOR_RG_ADDRESS
 
 ## Running the Attestation Service
 
-Validators are expected to run an [Attestation Service](../operations-manual/attestation-service.md) to provide attestations that allow users to map their phone number to an account on Celo. Follow the instructions now to [set up the service](../operations-manual/attestation-service.md).
+Validators are expected to run an [Attestation Service](../validator-guide/attestation-service.md) to provide attestations that allow users to map their phone number to an account on Celo. Follow the instructions now to [set up the service](../validator-guide/attestation-service.md).
 
 ## Deployment Tips
 

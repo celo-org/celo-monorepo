@@ -31,16 +31,16 @@
 
 ## Validator Guide
 
-- [Overview](operations-manual/overview.md)
-- [Attestation Service](operations-manual/attestation-service.md)
-- [Key Management](operations-manual/key-management/summary.md)
-  - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
-  - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
-- [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
-- [Monitoring](operations-manual/monitoring.md)
-- [Upgrading a Node](operations-manual/node-upgrades.md)
-- [Validator Explorer](operations-manual/validator-explorer.md)
-- [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
+- [Overview](validator-guide/overview.md)
+- [Attestation Service](validator-guide/attestation-service.md)
+- [Key Management](validator-guide/key-management/summary.md)
+  - [Detailed Role Descriptions](validator-guide/key-management/detailed.md)
+  - [Validator Signer Key Rotation](validator-guide/key-management/key-rotation.md)
+- [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
+- [Monitoring](validator-guide/monitoring.md)
+- [Upgrading a Node](validator-guide/node-upgrades.md)
+- [Validator Explorer](validator-guide/validator-explorer.md)
+- [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
 
 ## Developer Guide
 

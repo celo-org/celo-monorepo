@@ -21,7 +21,7 @@ The Celo ecosystem includes a number of great services for browsing registered V
 {% hint style="warning" %}
 **Warning**: Exercise caution in relying on Validator-supplied names to determine their real-world identity. Malicious participants may attempt to impersonate other Validators in order to attract votes.
 
-Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
+Validators and groups can also supply [verifiable DNS claims](../validator-guide/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
 {% endhint %}
 
 ### [Celo Validator Explorer](https://validators.celo.org) (cLabs)
@@ -76,7 +76,7 @@ You might consider these factors when choosing a Validator Group for whom to vot
 
 - **Runs a Validator on Baklava**: A group that runs a Validator on the [Baklava Testnet](../getting-started/baklava-testnet.md) has more opportunity to improve their setup and verify that upgrades to the Celo Blockchain software can be deployed smoothly. They are also contributing to a community resource.
 
-- **Receives Celo Foundation votes**: The Celo Foundation has a [Validator Group voting policy](../operations-manual/celo-foundation-voting-policy.md) that it applies in order to promote the long-term security and decentralization of the network. You may weigh the Celo Foundation's judgement as one factor in selecting a Validator Group.
+- **Receives Celo Foundation votes**: The Celo Foundation has a [Validator Group voting policy](../validator-guide/celo-foundation-voting-policy.md) that it applies in order to promote the long-term security and decentralization of the network. You may weigh the Celo Foundation's judgement as one factor in selecting a Validator Group.
 
 - **Promotes the Celo mission**: Celo's mission is to [build a monetary system that creates the conditions of prosperity for all](https://medium.com/celoorg/an-introductory-guide-to-celo-b185c62d3067). Consider Validator Groups that further this mission through their own activities or initiatives around financial inclusion, education and sustainability.
 
