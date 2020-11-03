@@ -11,7 +11,7 @@ In this documentation you’ll find information on:
 
 ## Quick Reference
 
-- CELO Holders
+- CELO Owners
   - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
 - Validator & Node Operators
   - Check out the [Validator overview page.](operations-manual/overview.md)
