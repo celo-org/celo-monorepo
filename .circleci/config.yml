@@ -12,7 +12,7 @@ reference:
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport'
       GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
