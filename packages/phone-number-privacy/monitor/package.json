@@ -1,0 +1,32 @@
+{
+  "name": "@celo/phone-number-privacy-monitor",
+  "version": "1.0.0",
+  "description": "Regularly queries ODIS to ensure the system is functioning properly",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
+    "deploy:alfajores": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
+    "deploy:mainnet": "yarn build && firebase deploy --only functions --project celo-pgpnp-mainnet",
+    "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
+    "config:get:alfajores": "firebase functions:config:get --project celo-phone-number-privacy",
+    "config:get:mainnet": "firebase functions:config:get --project celo-pgpnp-mainnet",
+    "config:set:staging": "firebase functions:config:set --project celo-phone-number-privacy-stg",
+    "config:set:alfajores": "firebase functions:config:set --project celo-phone-number-privacy",
+    "config:set:mainnet": "firebase functions:config:set --project celo-pgpnp-mainnet",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project ."
+  },
+  "dependencies": {
+    "@celo/contractkit": "0.4.17",
+    "@celo/phone-number-privacy-common": "1.0.14",
+    "@celo/utils": "0.1.21",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0"
+  },
+  "engines": {
+    "node": "10"
+  }
+}
