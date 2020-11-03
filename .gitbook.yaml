@@ -1,10 +1,10 @@
 root: ./packages/docs/
 
 redirects:
-  validator-guide/key-management/using-a-ledger-wallet: celo-holder-guide/ledger.md
-  validator-guide/key-management/ledger: celo-holder-guide/ledger.md
-  validator-guide/summary/ledger: celo-holder-guide/ledger.md
-  validator-guide/using-a-ledger-wallet: celo-holder-guide/ledger.md
+  operations-manual/key-management/using-a-ledger-wallet: celo-holder-guide/ledger.md
+  operations-manual/key-management/ledger: celo-holder-guide/ledger.md
+  operations-manual/summary/ledger: celo-holder-guide/ledger.md
+  operations-manual/using-a-ledger-wallet: celo-holder-guide/ledger.md
   validator-guide/key-management/using-a-ledger-wallet: celo-holder-guide/ledger.md
   validator-guide/key-management/ledger: celo-holder-guide/ledger.md
   validator-guide/summary/ledger: celo-holder-guide/ledger.md
