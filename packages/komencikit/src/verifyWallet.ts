@@ -1,8 +1,8 @@
 import { Address, normalizeAddress } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
+import { ABI as Proxy } from '@celo/contractkit/lib/generated/Proxy'
 import { GET_IMPLEMENTATION_ABI } from '@celo/contractkit/lib/governance/proxy'
-import Proxy from '@celo/protocol/build/contracts/Proxy.json'
 import {
   InvalidBytecode,
   InvalidImplementation,

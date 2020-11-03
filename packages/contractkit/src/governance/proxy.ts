@@ -1,5 +1,4 @@
 import { ABIDefinition } from 'web3-eth-abi'
-import { AbiItem } from 'web3-utils'
 
 export const GET_IMPLEMENTATION_ABI: ABIDefinition = {
   constant: true,
@@ -64,9 +63,9 @@ export const PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE =
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI.signature
 
 export const getInitializeAbiOfImplementation = (proxyContractName: string) => {
-  const implementationABI = require(`../generated/${proxyContractName.replace('Proxy', '')}`)
-    .ABI as AbiItem[]
-  const initializeAbi = implementationABI.find((item) => item.name === 'initialize')
+  const implementationABI: any = undefined /* require(`../generated/${proxyContractName.replace('Proxy', '')}`)
+    .ABI as AbiItem[] */
+  const initializeAbi = implementationABI.find((item: any) => item.name === 'initialize')
   if (!initializeAbi) {
     throw new Error(`Initialize method not found on implementation of ${proxyContractName}`)
   }

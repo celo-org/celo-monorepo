@@ -19,5 +19,5 @@
   },
   "include": ["src", "../contractkit/types"],
   "exclude": ["node_modules", "vendor", ".bundle"],
-  "references": [{ "path": "../utils" }, { "path": "../komencikit" }]
+  "references": [{ "path": "../utils" }, { "path": "../komencikit" }, { "path": "../contractkit" }]
 }
