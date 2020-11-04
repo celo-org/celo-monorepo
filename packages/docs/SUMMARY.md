@@ -38,6 +38,7 @@
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Monitoring](operations-manual/monitoring.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
+- [Proxy Overview](operations-manual/proxy.md)
 - [Validator Explorer](operations-manual/validator-explorer.md)
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 
