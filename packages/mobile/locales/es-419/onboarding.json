@@ -1,11 +1,11 @@
 {
   "education": {
-    "step1": "Envía y recibe dinero al instante",
-    "step2": "Paga a cualquiera, en cualquier lugar con tarifas muy bajas",
-    "step3": "Usa {{appName}} con confianza y seguridad"
+    "step1": "{{appName}} es una nueva forma de enviar y recibir valor en todo el mundo",
+    "step2": "Envía fondos a través de las fronteras",
+    "step3": "Conveniente, confiable y seguro. Tu teléfono es tu billetera"
   },
   "welcome": {
-    "title": "Tu valor,\nen tu celular",
+    "title": "Comparta dinero con aquellos que valora",
     "createAccount": "Crear una cuenta",
     "restoreAccount": "Tengo una cuenta"
   },
