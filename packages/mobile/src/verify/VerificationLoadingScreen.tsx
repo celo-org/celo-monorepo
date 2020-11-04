@@ -34,9 +34,9 @@ import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import useBackHandler from 'src/utils/useBackHandler'
+import AlternatingText from 'src/verify/AlternatingText'
 import VerificationCountdown from 'src/verify/VerificationCountdown'
 import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
-import AlternatingText from 'src/verify/AlternatingText'
 
 const TAG = 'VerificationLoadingScreen'
 
@@ -224,7 +224,7 @@ export default function VerificationLoadingScreen({ route }: Props) {
               style={styles.statusText}
               primaryText={t('loading.confirming')}
               secondaryText={t('loading.pleaseKeepAppOpen')}
-            ></AlternatingText>
+            />
             {!route.params.withoutRevealing && (
               <VerificationCountdown startTime={countdownStartTime} onFinish={onFinishCountdown} />
             )}
