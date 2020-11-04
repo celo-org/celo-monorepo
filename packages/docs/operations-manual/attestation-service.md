@@ -6,34 +6,54 @@ The Attestation Service is part of the [Celo identity protocol](../celo-codebase
 
 ![](https://storage.googleapis.com/celo-website/docs/attestations-flow.jpg)
 
-Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, the Attestation Service will automatically claim and withdraw this fee.
+Validators receive a fee (set by [on-chain governance](../celo-holder-guide/voting-governance.md), currently 0.05 cUSD) for every attestation that they process and that is then successfully redeemed on-chain by the user. In a future release, validators will be able claim and withdraw this fee.
 
 ## Outline
 
 This guide steps you through setting up an Attestation Service:
-* Follow the instructions to set up a validator on [mainnet](../getting-started/running-a-validator-in-mainnet.md) or [baklava](../getting-started/running-a-validator-in-baklava.md).
-* Configure Twilio and Nexmo, the two SMS providers used by Attestation Service
+
+* Follow the instructions to set up a validator on [mainnet](../getting-started/running-a-validator-in-mainnet.md) or [baklava](../getting-started/running-a-validator-in-baklava.md)
+* Configure Twilio, MessageBird and Nexmo, the SMS providers used by Attestation Service
 * Generate and register an attestation signer key
 * Deploy a Celo full node, with the attestation signer key unlocked
 * Deploy the attestation service
 * Configure and publish validator metadata so that clients can find your attestation service
 * Configure monitoring for the full node and attestation service
 
-## Network configuration
+## Recent releases
+
+* [Attestation Service v1.1.0](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-v1.1.0) (latest release for testnets)
+* [Attestation Service v1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5) (latest production release)
+* [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4)
+* [Attestation Service v1.0.3](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-3)
+
+## Deployment Architecture
 
 Attestation Service needs to expose a HTTP or HTTPS endpoint to the public Internet. This means it should not be deployed on the same physical host as a Validator, which should be firewalled to allow incoming connections only from its proxy.
 
 The `PORT` environment variable sets the listening port for the service on the local instance. Note that depending on your setup, this may be different from the port exposed to the public Internet.
 
-Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS.
+Attestation Service exposes a HTTP endpoint, but it is strongly recommended that you adopt a setup that implements TLS. Attestation Service must expose the following routes to the public Internet: POST `/attestations`, POST `/test_attestations`, GET `/get_attestations`, POST `/delivery_status_twilio`, POST `/delivery_status_nexmo`. It should also expose GET `/status`. Optionally you may choose to expose GET `/healthz` and GET `/metrics`. Note that the URL provided in the validator metadata should not include any of these suffixes.
 
 An Attestation Service is usually deployed alongside a Celo full node instance, which needs to have the attestation signer key unlocked. This can be either deployed on the same physical machine, or in a VM or container on a different host. It is possible but not recommended to use a proxy node as the associated full node, but in this case ensure RPC access is locked down only to the Attestation Service.
 
-Attestation Service currently does not support setups where multiple instances reside behind a load balancer. This will be addressed in a future release.
+Attestation Service is a stateless service that uses a database to persist status of current and recently completed SMS delivery attempts. The most straightforward deployment architecture is to have a single machine or VM running three containers: one the attestation service, a Celo Blockchain node, and a single database instance.
+
+For a high availability setup, multiple instances can be deployed behind a load balancer and sharing a single database service. The load balancer should be configured with a round robin routing policy using the instances' `/healthz` endpoint as a healthcheck. Deploying a high availability database setup is beyond the scope of these instructions, but is straightforward with most cloud providers.  In this setup, if a delivery report for an SMS issued by one instance is received by another instance, that instance can identify the matching record in the shared database and act on the receipt to resend if necessary.
+
+Every record in the database includes the issuer (i.e. validator) in its key, so a single setup like the above can be used to provide attestations for multiple validators.
 
 ## SMS Providers
 
-Currently the Attestation Service supports two SMS providers: [Twilio](https://www.twilio.com/try-twilio) and [Nexmo](https://dashboard.nexmo.com/sign-up). It is strongly recommended that you sign up with both.
+Currently the Attestation Service supports three SMS providers:
+
+* [Twilio](https://www.twilio.com/try-twilio)
+* [Nexmo](https://dashboard.nexmo.com/sign-up)
+* [MessageBird](https://messagebird.com/en/)
+
+It is recommended that you sign up with all three.
+
+See the [Configuration](#configuration) section for information about how to specify configuration options.
 
 ### Twilio
 
@@ -49,13 +69,15 @@ Now that you have provisioned your messaging service, you need to buy at least 1
 
 After signing up for [Nexmo](https://dashboard.nexmo.com/sign-up), click the balance in the top-left to go to [Billing and Payments](https://dashboard.nexmo.com/billing-and-payments), where you can add funds. It is strongly recommended that you use a credit or debit card (as opposed to other forms of payment) as you will then be able to enable `Auto reload`. You should also enable `Low balance alerts`. Both of these will help avoid failing to deliver SMS when your funds are exhausted. It appears that these options may not be immediately available for all new accounts due to fraud checks: try sending a few SMS, checking back after a few days, or raising a support ticket.
 
-Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS.
+Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US number and ensure that is enabled for SMS. Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
 
 If you want to support a single Attestation Service from this account, under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`. (You'll come back to this page later to fill in the `Delivery Receipts` setting).
 
-If you want to support multiple Attestation Services from this account, for example for a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number.
+If you want to support multiple Attestation Services from this account, for example for a setup where you have multiple validators and one service for each validator, or validators in different environments using the same account, you will need to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number. You will need a separate number for each application.  Finally, copy each application's `Application Id` value into the appropriate instance's `NEXMO_APPLICATION` configuration value.
 
-Note that Nexmo numbers appear to have a rate limit of 250 SMS per day.
+### MessageBird
+
+After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number to send SMS to US numbers. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Sending from a US number works well in practice.
 
 ## Installation
 
@@ -133,7 +155,7 @@ Lines beginning `#` are treated as comments. In addition, any options specified 
 
 Required options:
 
-| Variable                       |    |
+| Variable                       | Explanation   |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `DATABASE_URL`                   | The URL to access the local database, e.g. `sqlite://db/attestations.db` |
 | `CELO_PROVIDER`                  | The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! |
@@ -146,11 +168,13 @@ Optional environment variables:
 | Variable                       | Explanation    |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
+| `RATE_LIMIT_REQS_PER_MIN`        | Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
-| `MAX_PROVIDER_RETRIES`           | Number of retries (after first) when sending SMS before considering next provider Default `3`.  |
+| `MAX_DELIVERY_ATTEMPTS`          | Number of total delivery attempts when sending SMS. Each attempt tries the next available provider in the order specified. If omitted, the deprecated `MAX_PROVIDER_RETRIES` option will be used. Default value is `3`.  |
+| `MAX_REREQUEST_MINS`       | Number of minutes during which the client can rerequest the same attestation. Default value is `55`.
 | `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
-| `TIMEOUT_CLEANUP_NO_RECEIPT_MIN` | If a delivery report appears to be supported but is not received within this number of minutes, assume delivery success                                               |
 | `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
+| `DB_RECORD_EXPIRY_MINS`          | Time in minutes before a record of an attestation in the database may be deleted. Default 60 minutes. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
 | `APP_SIGNATURE`                  | A value that is shown under the key `appSignature` field in the `/status` endpoint that you can use to identify multiple instances. |
@@ -170,8 +194,15 @@ Nexmo configuration options:
 | --------------------------- | --------------------------------------------------------------- |
 | `NEXMO_KEY`                 | The API key to the Nexmo API                                    |
 | `NEXMO_SECRET`              | The API secret to the Nexmo API                                 |
+| `NEXMO_APPLICATION`  | If using a Nexmo application, the application id.  |
 | `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 | `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
+
+MessageBird configuration options:
+
+| Variable                    | Explanation                                                     |
+| --------------------------- | --------------------------------------------------------------- |
+| `MESSAGEBIRD_API_KEY`       | The API key to the MessageBird API                              |
 
 ## Running the Attestation Service
 
@@ -186,9 +217,12 @@ The following command for running the Attestation Service uses `--network host` 
 
 It assumes all of the configuration options needed have been added to the config file located under `$CONFIG` which Docker will process. Alternatively, you can pass the config file for the service to read on startup using `-e CONFIG=<docker-path-to-config-file>`, and other environment variables directly by adding arguments of the form `-e DATABASE_URL=$DATABASE_URL`.
 
+Set the `TAG` environment variable to determine which image to install. Use `attestation-service-mainnet` for the latest image suitable for mainnet (as below), `attestation-service-baklava` for the latest image suitable for baklava, or specify a specific build as given in the release notes linked above.
+
 ```bash
 # On the Attestation machine
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-4 -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
+export TAG=attestation-service-mainnet
+docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host --env-file $CONFIG -e PORT=80 -p 80:80 us.gcr.io/celo-testnet/celo-monorepo:$TAG -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
 ### Registering Metadata
@@ -202,7 +236,7 @@ Run the following commands on your local machine. This section uses several envi
 celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
+The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is. Note that the URL provided in the validator metadata should be the base path at which the serice is accessible; it should NOT include `/attestations`.
 
 ```bash
 # On your local machine
@@ -246,10 +280,12 @@ Attestation Service provides a test endpoint.
 You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
 
 ```bash
-celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
+celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE> [--provider <PROVIDER>]
 ```
 
 You need the attestation signer key available and unlocked on your local machine.
+
+You may wish to do this once for each provider you have configured (`--provider=twilio` and `--provider=nexmo`). (If this option is not recognized, try upgrading `celocli`).
 
 Note that this does not use an identical code path to real attestations (since those require specific on-chain state) so this endpoint should not be used in place of monitoring logs and metrics.
 
@@ -267,7 +303,9 @@ The Attestation Service provides JSON-format structured logs.
 
 ### Healthcheck
 
-The `/healthz` endpoint will respond with status `200` when all of the following are true: the attestation signer key is available and unlocked, the node is not syncing, the latest block is recent, and the database is online. Otherwise it will respond with status `500`.
+The `/healthz` endpoint will respond with status `200` when all of the following are true: the attestation signer key is available and unlocked, the node is not syncing, the latest block is recent, and the database is accessible. Otherwise it will respond with status `500`.
+
+Use this endpoint when configuring a load balancer in front of multiple instances.  The results of the last healthcheck are reported via the `attestation_service_healthy` metric.
 
 Attestation Service also has a `/status` endpoint for configuration information.
 
@@ -277,7 +315,15 @@ Attestation Service exposes the following Prometheus format metrics at `/metrics
 
 Please note that monitoring endpoints including metrics are exposed as a path on the usual host port. This means they are public by default. If you want metrics to be internal only, you will need to configure a load balancer appropriately.
 
+Metrics for the service:
+
+- `attestation_service_healthy`: Gauge with value `0` or `1` indicating whether the instance failed or passed its last [healthcheck](#healthcheck). Calls to `/healthz` update this gauge, and the process also runs a background healthcheck every minute. It is strongly recommended that you monitor this metric.
+
+Metrics for attestation requests:
+
 - `attestation_requests_total`: Counter for the number of attestation requests.
+
+- `attestation_requests_rerequest`: Counter for the number of attestation re-requests. A client that rerequests the same attestation is similar to the service receiving a delivery failure notification.
 
 - `attestation_requests_already_sent`: Counter for the number of attestation requests that were received but dropped because the local database records that they have already been completed.
 
@@ -290,6 +336,8 @@ Please note that monitoring endpoints including metrics are exposed as a path on
 - `attestation_requests_attestation_errors`: Counter for the number of requests for which producing the attestation failed. This could be due to phone number or salt that does not match the hash, or the attestation was recorded fewer than 4 blocks ago.
 
 - `attestation_requests_unable_to_serve`: Counters for the number of requests that could not be served because no SMS provider was configured for the phone number in the request. Label `country` breaks down the count by country code.
+
+- `attestation_requests_number_type`: Counter for attestation requests by the type of the phone number. Label `country` breaks down the counny by country code. Label `type` has values including: `fixed_line`, `mobile`, `fixed_line_or_mobile`, `toll_free`, `premium_rate`, `shared_cost`, `voip`, `personal_number`, `pager`, `uan`, `voicemail`, `unknown`.
 
 - `attestation_requests_sent_sms`: Counter for the number of SMS successfully sent.
 
@@ -319,4 +367,6 @@ Administrative metrics:
 
 ### Blockchain
 
-The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen by entering the Validator's address on the [Celo Explorer](https://explorer.celo.org) and clicking the 'Celo Info' tab.  
+The number of requested and entirely completed attestations is in effect recorded on the blockchain. The values can be seen at [Celo Explorer](https://explorer.celo.org): enter the Validator's address and click the 'Celo Info' tab.  
+
+[TheCelo](https://thecelo.com/?tab=attestations) tracks global attestation counts and success rates, and shows detailed information about recent attestation attempts.

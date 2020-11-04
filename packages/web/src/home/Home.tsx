@@ -11,6 +11,7 @@ import { TwoAssets } from 'src/home/TwoAssets'
 import HomeCover from 'src/home/version3/HomeCover'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
+import FlowerArea from './FlowerArea'
 
 interface State {
   mobile: boolean
@@ -20,6 +21,10 @@ const DESCRIPTION =
   'Celo is an open platform that makes financial tools accessible to anyone with a mobile phone'
 
 export class Home extends React.Component<I18nProps, State> {
+  static getInitialProps() {
+    return { namespacesRequired: [NameSpaces.home, NameSpaces.common] }
+  }
+
   state: State
 
   render() {
@@ -48,6 +53,7 @@ export class Home extends React.Component<I18nProps, State> {
         <HomeCover />
         <ImagePanes />
         <HomeBenefits />
+        <FlowerArea />
         <TwoAssets />
         <Press />
         <Involvement />

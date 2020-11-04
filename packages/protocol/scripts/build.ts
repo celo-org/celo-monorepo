@@ -25,12 +25,13 @@ export const ProxyContracts = [
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
   'LockedGoldProxy',
+  'MetaTransactionWalletProxy',
+  'MetaTransactionWalletDeployerProxy',
+  'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
-  'RegistryProxy',
-  'BlockchainParametersProxy',
 ]
 export const CoreContracts = [
   // common
@@ -38,9 +39,12 @@ export const CoreContracts = [
   'GasPriceMinimum',
   'FeeCurrencyWhitelist',
   'GoldToken',
+  'MetaTransactionWallet',
+  'MetaTransactionWalletDeployer',
   'MultiSig',
   'Registry',
   'Freezer',
+  'MetaTransactionWallet',
   'TransferWhitelist',
 
   // governance

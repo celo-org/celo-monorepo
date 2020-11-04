@@ -48,7 +48,6 @@ exports[`CBE renders 1`] = `
         style={
           Object {
             "backgroundColor": "rgba(0,0,0,0.00)",
-            "backgroundImage": "url(\\"image.png\\")",
             "backgroundPosition": "center",
             "backgroundRepeat": "no-repeat",
             "backgroundSize": "cover",
@@ -62,12 +61,6 @@ exports[`CBE renders 1`] = `
             "zIndex": -1,
           }
         }
-      />
-      <img
-        alt=""
-        className="css-accessibilityImage-9pa8cd"
-        draggable={false}
-        src="image.png"
       />
     </div>
   </div>
@@ -93,6 +86,7 @@ exports[`CBE renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -122,6 +116,7 @@ exports[`CBE renders 1`] = `
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -142,6 +137,7 @@ exports[`CBE renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -174,6 +170,7 @@ exports[`CBE renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -226,7 +223,6 @@ exports[`CBE renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
-                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -241,16 +237,11 @@ exports[`CBE renders 1`] = `
               }
             }
           />
-          <img
-            alt=""
-            className="css-accessibilityImage-9pa8cd"
-            draggable={false}
-            src="image.png"
-          />
         </div>
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -269,6 +260,7 @@ exports[`CBE renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -289,8 +281,6 @@ exports[`CBE renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <div
           className="css-view-1dbjc4n"
@@ -425,7 +415,6 @@ exports[`CBE renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
-                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -440,16 +429,11 @@ exports[`CBE renders 1`] = `
               }
             }
           />
-          <img
-            alt=""
-            className="css-accessibilityImage-9pa8cd"
-            draggable={false}
-            src="image.png"
-          />
         </div>
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -468,6 +452,7 @@ exports[`CBE renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -488,8 +473,6 @@ exports[`CBE renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <div
           className="css-view-1dbjc4n"
@@ -624,7 +607,6 @@ exports[`CBE renders 1`] = `
             style={
               Object {
                 "backgroundColor": "rgba(0,0,0,0.00)",
-                "backgroundImage": "url(\\"image.png\\")",
                 "backgroundPosition": "center",
                 "backgroundRepeat": "no-repeat",
                 "backgroundSize": "contain",
@@ -639,16 +621,11 @@ exports[`CBE renders 1`] = `
               }
             }
           />
-          <img
-            alt=""
-            className="css-accessibilityImage-9pa8cd"
-            draggable={false}
-            src="image.png"
-          />
         </div>
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -667,6 +644,7 @@ exports[`CBE renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -687,8 +665,6 @@ exports[`CBE renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <div
           className="css-view-1dbjc4n"
@@ -792,6 +768,7 @@ exports[`CBE renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -845,7 +822,6 @@ exports[`CBE renders 1`] = `
           style={
             Object {
               "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
               "backgroundPosition": "center",
               "backgroundRepeat": "no-repeat",
               "backgroundSize": "contain",
@@ -860,17 +836,12 @@ exports[`CBE renders 1`] = `
             }
           }
         />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
       </div>
       <h4
         aria-level="4"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -900,6 +871,7 @@ exports[`CBE renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -981,7 +953,6 @@ exports[`CBE renders 1`] = `
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "cover",
@@ -996,12 +967,6 @@ exports[`CBE renders 1`] = `
                   }
                 }
               />
-              <img
-                alt=""
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
         </div>
@@ -1011,6 +976,7 @@ exports[`CBE renders 1`] = `
         data-focusable={true}
         dir="auto"
         href="https://coinbase.com/earn/celo/lesson/1"
+        onClick={[Function]}
         rel=" noopener noreferrer"
         role="link"
         style={
@@ -1030,6 +996,7 @@ exports[`CBE renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(171,173,175,1.00)",
@@ -1120,7 +1087,6 @@ exports[`CBE renders 1`] = `
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "cover",
@@ -1135,12 +1101,6 @@ exports[`CBE renders 1`] = `
                   }
                 }
               />
-              <img
-                alt=""
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
         </div>
@@ -1150,6 +1110,7 @@ exports[`CBE renders 1`] = `
         data-focusable={true}
         dir="auto"
         href="https://coinbase.com/earn/celo/lesson/2"
+        onClick={[Function]}
         rel=" noopener noreferrer"
         role="link"
         style={
@@ -1169,6 +1130,7 @@ exports[`CBE renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(171,173,175,1.00)",
@@ -1259,7 +1221,6 @@ exports[`CBE renders 1`] = `
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "cover",
@@ -1274,12 +1235,6 @@ exports[`CBE renders 1`] = `
                   }
                 }
               />
-              <img
-                alt=""
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
         </div>
@@ -1289,6 +1244,7 @@ exports[`CBE renders 1`] = `
         data-focusable={true}
         dir="auto"
         href="https://coinbase.com/earn/celo/lesson/3"
+        onClick={[Function]}
         rel=" noopener noreferrer"
         role="link"
         style={
@@ -1308,6 +1264,7 @@ exports[`CBE renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(171,173,175,1.00)",

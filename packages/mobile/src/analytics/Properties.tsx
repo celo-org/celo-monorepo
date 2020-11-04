@@ -6,6 +6,7 @@ import {
   ContractKitEvents,
   EscrowEvents,
   FeeEvents,
+  FiatExchangeEvents,
   GethEvents,
   HomeEvents,
   IdentityEvents,
@@ -272,10 +273,25 @@ interface VerificationEventsProperties {
     issuer: any
     error: string
   }
+  [VerificationEvents.verification_reveal_attestation_status]: {
+    success: boolean
+    identifier: string
+    account: string
+    issuer: string
+    attempt: number
+    countryCode: string
+    status: string
+    provider: string
+    duration: number
+    errors: any
+  }
   [VerificationEvents.verification_revoke_start]: undefined
   [VerificationEvents.verification_revoke_finish]: undefined
   [VerificationEvents.verification_revoke_error]: {
     error: string
+  }
+  [VerificationEvents.verification_resend_messages]: {
+    count: number
   }
 }
 
@@ -577,6 +593,13 @@ interface CeloExchangeEventsProperties {
   }
 }
 
+interface FiatExchangeEventsProperties {
+  [FiatExchangeEvents.external_exchange_link]: {
+    name: string
+    link: string
+  }
+}
+
 interface GethEventsProperties {
   [GethEvents.blockchain_corruption]: undefined
   [GethEvents.geth_init_success]: undefined
@@ -616,7 +639,9 @@ interface NetworkEventsProperties {
     latestBlock: number
     latestTimestamp: number
   }
-  [NetworkEvents.network_sync_waiting]: undefined
+  [NetworkEvents.network_sync_waiting]: {
+    latestBlock?: number
+  }
   [NetworkEvents.network_sync_start]: {
     startingBlock: number
     currentBlock: number
@@ -658,6 +683,7 @@ export type AnalyticsPropertiesList = AppEventsProperties &
   FeeEventsProperties &
   TransactionEventsProperties &
   CeloExchangeEventsProperties &
+  FiatExchangeEventsProperties &
   GethEventsProperties &
   NetworkEventsProperties &
   ContractKitEventsProperties

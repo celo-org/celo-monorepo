@@ -1,0 +1,10 @@
+{
+  "extends": "../typescript/tsconfig.library.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "types/**/*", "src/utils/timezones.json", "../../node_modules/@celo/contractkit/types"],
+  "references": [{ "path": "../utils" }]
+}

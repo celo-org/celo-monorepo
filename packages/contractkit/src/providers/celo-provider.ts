@@ -50,6 +50,10 @@ export class CeloProvider {
     }
   }
 
+  removeAccount(address: string) {
+    this.wallet.removeAccount(address)
+  }
+
   async getAccounts(): Promise<string[]> {
     const nodeAccountsResp = await this.rpcCaller.call('eth_accounts', [])
 

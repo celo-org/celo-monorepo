@@ -197,7 +197,7 @@ function createDirIfMissing(dir: string) {
 }
 
 function runMigrations(opts: { upto?: number; migrationOverride?: string } = {}) {
-  const cmdArgs = ['truffle', 'migrate', '--reset']
+  const cmdArgs = ['truffle', 'migrate', '--reset', '--network', 'development']
 
   if (opts.upto) {
     cmdArgs.push('--to')

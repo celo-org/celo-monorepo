@@ -12,7 +12,7 @@ const getServerSideProps: GetServerSideProps<
   const preview = publicRuntimeConfig.ENV === 'development'
   const locale = query.locale || 'en-US'
   const kit = await getKit(params.kit, params.kitPage, { preview, locale })
-  const page = await getPage(params.kitPage, kit.pageID, { preview, locale })
+  const page = await getPage(kit.pageID, { preview, locale })
 
   const sidebar = kit.sidebar.map((entry) => {
     if (entry.href === req.url) {

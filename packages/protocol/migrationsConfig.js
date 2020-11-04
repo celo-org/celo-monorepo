@@ -299,6 +299,10 @@ const NetworkConfigs = {
     stableToken: {
       oracles: [network.from],
       frozen: false,
+      initialBalances: {
+        addresses: [network.from],
+        values: ['5000000000000000000000000'],
+      },
     },
   },
   testing: {
@@ -508,17 +512,6 @@ NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
-  FixidityLib: [
-    'LockedGold',
-    'Exchange',
-    'GasPriceMinimum',
-    'Governance',
-    'GovernanceTest',
-    'Proposals',
-    'SortedOracles',
-    'StableToken',
-    'Validators',
-  ],
   Proposals: ['Governance', 'GovernanceTest', 'ProposalsTest'],
   AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election', 'ElectionTest'],

@@ -9,7 +9,7 @@ import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
-import { VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { ATTESTATION_REVEAL_TIMEOUT_SECONDS, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
@@ -20,6 +20,7 @@ import {
 } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { Actions as SendActions, StoreLatestInRecentsAction } from 'src/send/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { timeDeltaInSeconds } from 'src/utils/time'
 
@@ -40,6 +41,10 @@ export interface E164NumberToSaltType {
 
 export interface AddressToDataEncryptionKeyType {
   [address: string]: string | null // null means no DEK registered
+}
+
+export interface AddressToDisplayNameType {
+  [address: string]: string | undefined
 }
 
 export interface ImportContactProgress {
@@ -89,6 +94,9 @@ export interface State {
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
+  // Doesn't contain all known addresses, use only as a fallback.
+  // TODO: Remove if unused after CIP-8 implementation.
+  addressToDisplayName: AddressToDisplayNameType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
@@ -100,6 +108,7 @@ export interface State {
     isLoading: boolean
     lastFetch: number | null
   } & UpdatableVerificationState
+  lastRevealAttempt: number | null
 }
 
 const initialState: State = {
@@ -112,6 +121,7 @@ const initialState: State = {
   e164NumberToAddress: {},
   e164NumberToSalt: {},
   addressToDataEncryptionKey: {},
+  addressToDisplayName: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -136,11 +146,12 @@ const initialState: State = {
     },
     lastFetch: null,
   },
+  lastRevealAttempt: null,
 }
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction | StoreLatestInRecentsAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -205,6 +216,17 @@ export const reducer = (
       return {
         ...state,
         e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
+      }
+    case SendActions.STORE_LATEST_IN_RECENTS:
+      if (!action.recipient.address) {
+        return state
+      }
+      return {
+        ...state,
+        addressToDisplayName: {
+          ...state.addressToDisplayName,
+          [action.recipient.address]: action.recipient.displayName,
+        },
       }
     case Actions.IMPORT_CONTACTS:
       return {
@@ -331,16 +353,21 @@ export const reducer = (
           ...action.state,
         },
       }
+    case Actions.SET_LAST_REVEAL_ATTEMPT:
+      return {
+        ...state,
+        lastRevealAttempt: action.time,
+      }
     default:
       return state
   }
 }
 
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
-  const { attestationCodes } = state
+  const { attestationCodes, acceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
   for (let i = 0; i < numCompleteAttestations; i++) {
-    attestationCodes[i] = attestationCodes[i] || {
+    attestationCodes[i] = acceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
       issuer: ATTESTATION_ISSUER_PLACEHOLDER,
     }
@@ -356,12 +383,16 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
+export const addressToDataEncryptionKeySelector = (state: RootState) =>
+  state.identity.addressToDataEncryptionKey
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
   state.identity.secureSendPhoneNumberMapping
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const addressToDisplayNameSelector = (state: RootState) =>
+  state.identity.addressToDisplayName
 
 export const isBalanceSufficientForSigRetrievalSelector = (state: RootState) => {
   const dollarBalance = stableTokenBalanceSelector(state) || 0
@@ -403,5 +434,12 @@ export const isVerificationStateExpiredSelector = (state: RootState) => {
     !state.identity.verificationState.lastFetch ||
     timeDeltaInSeconds(Date.now(), state.identity.verificationState.lastFetch) >
       VERIFICATION_STATE_EXPIRY_SECONDS
+  )
+}
+
+export const isRevealAllowed = ({ identity: { lastRevealAttempt } }: RootState) => {
+  return (
+    !lastRevealAttempt ||
+    timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
   )
 }
