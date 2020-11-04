@@ -325,6 +325,7 @@ describe(fetchVerificationState, () => {
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
+        [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
@@ -368,6 +369,7 @@ describe(fetchVerificationState, () => {
     await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
+        [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
