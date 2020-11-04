@@ -60,7 +60,6 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const { isBalanceSufficient, isLoading, status, actionableAttestations } = useSelector(
     verificationStateSelector
   )
-  console.log('ZXC', isBalanceSufficient, isLoading, status, actionableAttestations)
   const { numAttestationsRemaining } = status
   const numberVerified = useSelector(numberVerifiedSelector)
   const partOfOnboarding = !route.params?.hideOnboardingStep

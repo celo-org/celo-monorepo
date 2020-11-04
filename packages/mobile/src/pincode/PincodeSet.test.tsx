@@ -44,7 +44,7 @@ describe('Pincode', () => {
     mockPin.split('').forEach((number) => fireEvent.press(getByTestId(`digit${number}`)))
     jest.runAllTimers()
     await flushMicrotasksQueue()
-    expect(mockScreenProps.navigation.navigate).toBeCalledWith(Screens.EnterInviteCode)
+    expect(mockScreenProps.navigation.navigate).toBeCalledWith(Screens.VerificationEducationScreen)
   })
 
   it("displays an error text when the pins don't match", async () => {
