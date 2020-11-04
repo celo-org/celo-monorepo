@@ -73,6 +73,14 @@
     "location": "packages/docs",
     "dependencies": []
   },
+  "@celo/env-tests": {
+    "location": "packages/env-tests",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
   "@celo/faucet-app": {
     "location": "packages/faucet",
     "dependencies": [

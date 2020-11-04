@@ -8,7 +8,6 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import functions from '@react-native-firebase/functions'
 import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
@@ -22,7 +21,6 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
-import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
 import {
@@ -31,6 +29,8 @@ import {
   inputAttestationCode,
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
+  reportRevealStatus,
+  ReportRevealStatusAction,
   resetVerification,
   setCompletedCodes,
   setLastRevealAttempt,
@@ -91,8 +91,6 @@ export function* fetchVerificationState() {
       contractKit.contracts.getAttestations,
     ])
 
-    let phoneHash: string
-    let phoneHashDetails: PhoneNumberHashDetails
     const { timeout } = yield race({
       balances: all([
         call(waitFor, stableTokenBalanceSelector),
@@ -112,20 +110,9 @@ export function* fetchVerificationState() {
       return
     }
 
-    if (features.USE_PHONE_NUMBER_PRIVACY) {
-      phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-      phoneHash = phoneHashDetails.phoneHash
-    } else {
-      phoneHash = getPhoneHash(e164Number)
-      phoneHashDetails = {
-        e164Number,
-        phoneHash,
-        // @ts-ignore
-        salt: undefined,
-      }
-    }
+    const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
     ValoraAnalytics.track(VerificationEvents.verification_hash_retrieved, {
-      phoneHash,
+      phoneHash: phoneHashDetails.phoneHash,
       address: account,
     })
 
@@ -136,7 +123,7 @@ export function* fetchVerificationState() {
       getAttestationsStatus,
       attestationsWrapper,
       account,
-      phoneHash
+      phoneHashDetails.phoneHash
     )
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
@@ -145,7 +132,7 @@ export function* fetchVerificationState() {
     const actionableAttestations: ActionableAttestation[] = yield call(
       getActionableAttestations,
       attestationsWrapper,
-      phoneHash,
+      phoneHashDetails.phoneHash,
       account
     )
 
@@ -178,14 +165,17 @@ export function* startVerification(action: StartVerificationAction) {
   } else if (result) {
     ValoraAnalytics.track(VerificationEvents.verification_error, { error: result })
     Logger.debug(TAG, 'Verification failed')
+    yield call(reportActionableAttestationsStatuses)
   } else if (cancel) {
     ValoraAnalytics.track(VerificationEvents.verification_cancel)
     Logger.debug(TAG, 'Verification cancelled')
+    yield call(reportActionableAttestationsStatuses)
   } else if (timeout) {
     ValoraAnalytics.track(VerificationEvents.verification_timeout)
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
     yield put(setVerificationStatus(VerificationStatus.Failed))
+    yield call(reportActionableAttestationsStatuses)
   }
   Logger.debug(TAG, 'Done verification')
 
@@ -734,8 +724,18 @@ function* completeAttestation(
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
-  yield put(completeAttestationCode(code))
+  // Report reveal status from validator
+  yield put(
+    reportRevealStatus(
+      attestation.attestationServiceURL,
+      account,
+      issuer,
+      phoneHashDetails.e164Number,
+      phoneHashDetails.pepper
+    )
+  )
   Logger.debug(TAG + '@completeAttestation', `Attestation for issuer ${issuer} completed`)
+  yield put(completeAttestationCode(code))
 }
 
 function* tryRevealPhoneNumber(
@@ -753,7 +753,6 @@ function* tryRevealPhoneNumber(
 
     // Proxy required for any network where attestation service domains are not static
     // This works around TLS issues
-    const useProxy = DEFAULT_TESTNET === 'mainnet'
 
     const revealRequestBody: AttesationServiceRevealRequest = {
       account,
@@ -767,8 +766,7 @@ function* tryRevealPhoneNumber(
       postToAttestationService,
       attestationsWrapper,
       attestation.attestationServiceURL,
-      revealRequestBody,
-      useProxy
+      revealRequestBody
     )
 
     if (ok) {
@@ -790,8 +788,7 @@ function* tryRevealPhoneNumber(
         postToAttestationService,
         attestationsWrapper,
         attestation.attestationServiceURL,
-        revealRequestBody,
-        useProxy
+        revealRequestBody
       )
 
       if (retryOk) {
@@ -808,6 +805,17 @@ function* tryRevealPhoneNumber(
         `Reveal retry for issuer ${issuer} failed with status ${retryStatus}`
       )
     }
+
+    // Reveal is unsuccessfull, so asking the status of it from validator
+    yield put(
+      reportRevealStatus(
+        attestation.attestationServiceURL,
+        account,
+        issuer,
+        phoneHashDetails.e164Number,
+        phoneHashDetails.pepper
+      )
+    )
 
     throw new Error(
       `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${status}`
@@ -828,10 +836,9 @@ function* tryRevealPhoneNumber(
 async function postToAttestationService(
   attestationsWrapper: AttestationsWrapper,
   attestationServiceUrl: string,
-  revealRequestBody: AttesationServiceRevealRequest,
-  useProxy: boolean
+  revealRequestBody: AttesationServiceRevealRequest
 ): Promise<{ ok: boolean; status: number; body: any }> {
-  if (useProxy) {
+  if (shouldUseProxy()) {
     Logger.debug(
       `${TAG}@postToAttestationService`,
       `Posting to proxy for service url ${attestationServiceUrl}`
@@ -871,6 +878,112 @@ async function postToAttestationService(
   }
 }
 
+// Report to analytics reveal status from validator
+export function* reportRevealStatusSaga({
+  attestationServiceUrl,
+  e164Number,
+  account,
+  issuer,
+  pepper,
+}: ReportRevealStatusAction) {
+  let aggregatedResponse: undefined | { ok: boolean; status: number; body: any }
+  if (shouldUseProxy()) {
+    Logger.debug(
+      `${TAG}@reportRevealStatusSaga`,
+      `Posting to proxy for service url ${attestationServiceUrl}`
+    )
+    const fullUrl = attestationServiceUrl + '/get_attestations'
+    const body = {
+      attestationServiceUrl: fullUrl,
+      account,
+      phoneNumber: e164Number,
+      issuer,
+      pepper,
+    }
+    try {
+      const proxyReveal = functions().httpsCallable('proxyRevealStatus')
+      const response = yield call(proxyReveal, body)
+      const { status, data } = response.data
+      const ok = status >= 200 && status < 300
+      aggregatedResponse = { ok, status, body: JSON.parse(data) }
+    } catch (error) {
+      Logger.error(`${TAG}@reportAttestationRevealStatus`, 'Error calling proxyRevealStatus', error)
+      // The httpsCallable throws on any HTTP error code instead of
+      // setting response.ok like fetch does, so catching errors here
+      aggregatedResponse = { ok: false, status: 500, body: error }
+    }
+  } else {
+    const contractKit = yield call(getContractKit)
+    const attestationsWrapper: AttestationsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAttestations,
+    ])
+    Logger.debug(
+      `${TAG}@reportAttestationRevealStatus`,
+      `Start for service url ${attestationServiceUrl}`
+    )
+    try {
+      const response = yield call(
+        attestationsWrapper.getRevealStatus,
+        e164Number,
+        account,
+        issuer,
+        attestationServiceUrl,
+        pepper
+      )
+      const body = yield call(response.json.bind(response))
+      aggregatedResponse = { ok: response.ok, body, status: response.status }
+    } catch (error) {
+      Logger.error(`${TAG}@reportAttestationRevealStatus`, 'Error calling proxyRevealStatus', error)
+      aggregatedResponse = { ok: false, status: 500, body: error }
+    }
+  }
+  if (aggregatedResponse.ok) {
+    Logger.debug(
+      `${TAG}@reportAttestationRevealStatus`,
+      `Successful for service url ${attestationServiceUrl}`
+    )
+    ValoraAnalytics.track(
+      VerificationEvents.verification_reveal_attestation_status,
+      aggregatedResponse.body
+    )
+  } else {
+    Logger.debug(
+      `${TAG}@reportAttestationRevealStatus`,
+      `Failed for service url ${attestationServiceUrl} with Status: ${aggregatedResponse.status}`
+    )
+  }
+}
+
+export function* reportActionableAttestationsStatuses() {
+  const account: string = yield call(getConnectedUnlockedAccount)
+  const e164Number: string = yield select(e164NumberSelector)
+  const contractKit = yield call(getContractKit)
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+  const phoneHashDetails = yield call(getPhoneHashDetails, e164Number)
+  const actionableAttestations: ActionableAttestation[] = yield call(
+    getActionableAttestations,
+    attestationsWrapper,
+    phoneHashDetails.phoneHash,
+    account
+  )
+
+  for (const attestation of actionableAttestations) {
+    yield put(
+      reportRevealStatus(
+        attestation.attestationServiceURL,
+        account,
+        attestation.issuer,
+        phoneHashDetails.e164Number,
+        phoneHashDetails.pepper
+      )
+    )
+  }
+}
+
 // Get the code from the store if it's already there, otherwise wait for it
 function* waitForAttestationCode(issuer: string) {
   Logger.debug(TAG + '@waitForAttestationCode', `Waiting for code for issuer ${issuer}`)
@@ -885,4 +998,12 @@ function* waitForAttestationCode(issuer: string) {
       return action.code
     }
   }
+}
+
+function* getPhoneHashDetails(e164Number: string) {
+  return yield call(fetchPhoneHashPrivate, e164Number)
+}
+
+function shouldUseProxy() {
+  return DEFAULT_TESTNET === 'mainnet'
 }

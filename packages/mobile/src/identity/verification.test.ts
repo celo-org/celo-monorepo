@@ -14,6 +14,7 @@ import {
   Actions,
   cancelVerification,
   completeAttestationCode,
+  reportRevealStatus,
   setCompletedCodes,
   setVerificationStatus,
   udpateVerificationState,
@@ -34,6 +35,8 @@ import {
   fetchVerificationState,
   MAX_ACTIONABLE_ATTESTATIONS,
   NUM_ATTESTATIONS_REQUIRED,
+  reportActionableAttestationsStatuses,
+  reportRevealStatusSaga,
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
@@ -262,6 +265,7 @@ describe(startVerification, () => {
         [call(getConnectedAccount), null],
         [select(isVerificationStateExpiredSelector), false],
         [call(doVerificationFlow, false), 'This is an error message'],
+        [call(reportActionableAttestationsStatuses), null],
       ])
       .not.call.fn(fetchVerificationState)
       .run()
@@ -276,6 +280,7 @@ describe(startVerification, () => {
         [call(getConnectedAccount), null],
         [select(isVerificationStateExpiredSelector), false],
         [call(doVerificationFlow, false), sleep(1500)],
+        [call(reportActionableAttestationsStatuses), null],
         [delay(VERIFICATION_TIMEOUT), 1000],
       ])
       .run(2000)
@@ -291,6 +296,7 @@ describe(startVerification, () => {
         [call(getConnectedAccount), null],
         [select(isVerificationStateExpiredSelector), false],
         [call(doVerificationFlow, false), sleep(1500)],
+        [call(reportActionableAttestationsStatuses), null],
       ])
       .dispatch(cancelVerification())
       .run(2000)
@@ -400,7 +406,7 @@ describe(fetchVerificationState, () => {
       .run()
   })
 
-  it('catches insufficient balance for for sig retrieval', async () => {
+  it('catches insufficient balance for sig retrieval', async () => {
     const contractKit = await getContractKitAsync()
     await expectSaga(fetchVerificationState)
       .provide([
@@ -485,8 +491,35 @@ describe(doVerificationFlow, () => {
       .put(setCompletedCodes(0))
       .put(setVerificationStatus(VerificationStatus.CompletingAttestations))
       .put(completeAttestationCode(attestationCode0))
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[0].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[0].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
       .put(completeAttestationCode(attestationCode1))
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[1].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[1].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
       .put(completeAttestationCode(attestationCode2))
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[2].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[2].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
       .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
@@ -511,6 +544,15 @@ describe(doVerificationFlow, () => {
       ])
       .put(setCompletedCodes(2))
       .put(completeAttestationCode(attestationCode0))
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[0].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[0].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
       .put(setVerificationStatus(VerificationStatus.Done))
       .put(setNumberVerified(true))
       .returns(true)
@@ -591,5 +633,98 @@ describe(doVerificationFlow, () => {
       .put(setVerificationStatus(VerificationStatus.Failed))
       .returns(ErrorMessages.MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED)
       .run()
+  })
+})
+
+describe(reportActionableAttestationsStatuses, () => {
+  it('report actionable attestations', async () => {
+    const contractKit = await getContractKitAsync()
+    const mockAttestationsWrapper = {
+      ...mockAttestationsWrapperUnverified,
+      getActionableAttestations: jest.fn(() => mockActionableAttestations),
+    }
+    await expectSaga(reportActionableAttestationsStatuses)
+      .provide([
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          {
+            phoneHash: mockE164NumberHash,
+            e164Number: mockE164Number,
+            pepper: mockE164NumberPepper,
+          },
+        ],
+      ])
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[0].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[0].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[1].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[1].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
+      .put(
+        reportRevealStatus(
+          mockActionableAttestations[2].attestationServiceURL,
+          mockAccount,
+          mockActionableAttestations[2].issuer,
+          mockVerificationStateUnverified.phoneHashDetails.e164Number,
+          mockVerificationStateUnverified.phoneHashDetails.pepper
+        )
+      )
+      .run()
+  })
+})
+
+describe(reportRevealStatusSaga, () => {
+  beforeEach(() => {
+    MockedAnalytics.track.mockReset()
+  })
+  it('report actionable attestation to analytics', async () => {
+    const contractKit = await getContractKitAsync()
+    const mockAttestationsWrapper = {
+      ...mockAttestationsWrapperUnverified,
+      getRevealStatus: jest.fn(() => ({
+        ok: true,
+        json: () => body,
+      })),
+    }
+    const mockIssuer = mockActionableAttestations[0].issuer
+    const body = { issuer: mockIssuer, custom: 'payload' }
+    await expectSaga(reportRevealStatusSaga, {
+      attestationServiceUrl: 'url',
+      e164Number: mockE164Number,
+      account: mockAccount,
+      issuer: mockIssuer,
+      pepper: mockE164NumberPepper,
+    })
+      .provide([
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
+      ])
+      .run()
+    expect(MockedAnalytics.track.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(
+      VerificationEvents.verification_reveal_attestation_status
+    )
+    expect(MockedAnalytics.track.mock.calls[0][1]).toStrictEqual(body)
   })
 })
