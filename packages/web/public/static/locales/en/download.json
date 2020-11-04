@@ -1,6 +1,6 @@
 {
   "coverTitle": "Celo Developer Wallet",
-  "coverSubTitle": "A testing wallet.\nDo not send real funds.",
+  "coverSubTitle": "An Alfajores Testnet wallet.\nDo not send real funds.",
   "getStarted": "Get Started",
   "coverAction": {
     "faucet": {
