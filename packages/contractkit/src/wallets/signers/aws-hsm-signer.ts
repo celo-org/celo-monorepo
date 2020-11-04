@@ -1,4 +1,5 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { KMS } from 'aws-sdk'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
@@ -20,7 +21,7 @@ import { Signer } from './signer'
 
 const SigningAlgorithm = 'ECDSA_SHA_256'
 
-export default class AwsHsmSigner implements Signer {
+export class AwsHsmSigner implements Signer {
   private kms: KMS
   private keyId: string
   private publicKey: BigNumber
@@ -93,6 +94,17 @@ export default class AwsHsmSigner implements Signer {
     }
   }
 
+  async signTypedData(typedData: EIP712TypedData): Promise<Signature> {
+    const typedDataHashBuff = generateTypedDataHash(typedData)
+    const { v, r, s } = await this.sign(typedDataHashBuff)
+
+    return {
+      v: v + 27,
+      r,
+      s,
+    }
+  }
+
   getNativeKey(): string {
     return this.keyId
   }
@@ -101,5 +113,10 @@ export default class AwsHsmSigner implements Signer {
     throw new Error('Decryption operation is not supported on this signer')
     // To make the compiler happy
     return Promise.resolve(_ciphertext)
+  }
+
+  computeSharedSecret(_publicKey: string) {
+    throw new Error('Not implemented')
+    return Promise.resolve(Buffer.from([]))
   }
 }

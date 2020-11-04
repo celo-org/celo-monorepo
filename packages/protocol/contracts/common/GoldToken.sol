@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -7,8 +7,16 @@ import "./CalledByVm.sol";
 import "./Freezable.sol";
 import "./Initializable.sol";
 import "./interfaces/ICeloToken.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
-contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
+contract GoldToken is
+  Initializable,
+  CalledByVm,
+  Freezable,
+  IERC20,
+  ICeloToken,
+  ICeloVersionedContract
+{
   using SafeMath for uint256;
 
   // Address of the TRANSFER precompiled contract.
@@ -27,6 +35,14 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
   event TransferComment(string comment);
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -145,6 +161,7 @@ contract GoldToken is Initializable, CalledByVm, Freezable, IERC20, ICeloToken {
       return true;
     }
 
+    require(to != address(0), "mint attempted to reserved address 0x0");
     totalSupply_ = totalSupply_.add(value);
 
     bool success;

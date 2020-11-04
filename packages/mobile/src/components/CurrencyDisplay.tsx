@@ -13,6 +13,7 @@ import {
   useExchangeRate as useDollarToLocalRate,
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
   getCentAwareMoneyDisplay,
@@ -49,6 +50,8 @@ interface Props {
   formatType: FormatType
   hideFullCurrencyName: boolean
   style?: StyleProp<TextStyle>
+  currencyInfo?: CurrencyInfo
+  testID?: string
 }
 
 const BIG_SIGN_RATIO = 34 / 48
@@ -118,6 +121,17 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
   }
 }
 
+function getFullCurrencyName(currency: CURRENCY_ENUM | null) {
+  switch (currency) {
+    case CURRENCY_ENUM.DOLLAR:
+      return i18n.t('global:celoDollars')
+    case CURRENCY_ENUM.GOLD:
+      return i18n.t('global:celoGold')
+    default:
+      return null
+  }
+}
+
 export default function CurrencyDisplay({
   type,
   size,
@@ -131,9 +145,15 @@ export default function CurrencyDisplay({
   formatType,
   hideFullCurrencyName,
   style,
+  currencyInfo,
+  testID,
 }: Props) {
-  const localCurrencyCode = useLocalCurrencyCode()
-  const dollarToLocalRate = useDollarToLocalRate()
+  let localCurrencyCode = useLocalCurrencyCode()
+  let dollarToLocalRate = useDollarToLocalRate()
+  if (currencyInfo) {
+    localCurrencyCode = currencyInfo.localCurrencyCode
+    dollarToLocalRate = currencyInfo.localExchangeRate
+  }
   const goldToDollarRate = useGoldToDollarRate()
 
   const currency =
@@ -162,6 +182,7 @@ export default function CurrencyDisplay({
   const formattedValue =
     value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
   const code = displayAmount?.currencyCode
+  const fullCurrencyName = getFullCurrencyName(displayCurrency)
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
@@ -182,7 +203,7 @@ export default function CurrencyDisplay({
     const codeStyle = { fontSize: Math.round(fontSize * BIG_CODE_RATIO), lineHeight, color }
 
     return (
-      <View style={[styles.bigContainer, style]}>
+      <View style={[styles.bigContainer, style]} testID={testID}>
         {!hideSign && (
           <Text numberOfLines={1} style={[fontStyles.regular, signStyle]}>
             {sign}
@@ -206,14 +227,12 @@ export default function CurrencyDisplay({
   }
 
   return (
-    <Text numberOfLines={1} style={[style, { color }]}>
+    <Text numberOfLines={1} style={[style, { color }]} testID={testID}>
       {!hideSign && sign}
       {!hideSymbol && currencySymbol}
       {formattedValue}
       {!hideCode && !!code && ` ${code}`}
-      {!hideFullCurrencyName &&
-        code === CURRENCIES[CURRENCY_ENUM.DOLLAR].code &&
-        ` ${i18n.t('global:celoDollars')}`}
+      {!hideFullCurrencyName && !!fullCurrencyName && ` ${fullCurrencyName}`}
     </Text>
   )
 }

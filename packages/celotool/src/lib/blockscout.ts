@@ -35,8 +35,8 @@ export async function installHelmChart(
   )
 }
 
-export async function removeHelmRelease(helmReleaseName: string) {
-  await removeGenericHelmChart(helmReleaseName)
+export async function removeHelmRelease(helmReleaseName: string, celoEnv: string) {
+  await removeGenericHelmChart(helmReleaseName, celoEnv)
 }
 
 export async function upgradeHelmChart(
@@ -101,8 +101,16 @@ async function helmParameters(
     `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
     )}`,
-    `--set blockscout.metadata_crawler.schedule=${fetchEnv(
+    `--set blockscout.metadata_crawler.schedule="${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+    )}"`,
+    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+      ''
+    )}`,
+    `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
+      celoEnv
     )}`,
     )
   }
@@ -130,7 +138,7 @@ export async function createDefaultIngressIfNotExists(celoEnv: string, ingressNa
     console.info(`Creating ingress ${celoEnv}-blockscout-web-ingress`)
     const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.json`
     const ingressResource = `
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:

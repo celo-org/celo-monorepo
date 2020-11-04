@@ -1,10 +1,21 @@
 import { Address } from '@celo/utils/lib/address'
 import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { PROXY_ABI } from '../governance/proxy'
+import { CeloContract } from '../base'
+import {
+  getInitializeAbiOfImplementation,
+  PROXY_ABI,
+  PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE,
+  PROXY_SET_IMPLEMENTATION_SIGNATURE,
+} from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
-import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
+import {
+  ContractDetails,
+  getContractDetailsFromContract,
+  mapFromPairs,
+  obtainKitContractDetails,
+} from './base'
 
 export interface CallDetails {
   contract: string
@@ -32,23 +43,27 @@ export async function newBlockExplorer(kit: ContractKit) {
   return new BlockExplorer(kit, await obtainKitContractDetails(kit))
 }
 
+const getContractMappingFromDetails = (cd: ContractDetails) => ({
+  details: cd,
+  fnMapping: mapFromPairs(
+    (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
+      .filter((ad) => ad.type === 'function')
+      .map((ad) => [ad.signature, ad])
+  ),
+})
+
 export class BlockExplorer {
   private addressMapping: Map<Address, ContractMapping>
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
-      contractDetails.map((cd) => [
-        cd.address,
-        {
-          details: cd,
-          fnMapping: mapFromPairs(
-            (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
-              .filter((ad) => ad.type === 'function')
-              .map((ad) => [ad.signature, ad])
-          ),
-        },
-      ])
+      contractDetails.map((cd) => [cd.address, getContractMappingFromDetails(cd)])
     )
+  }
+
+  async updateContractDetailsMapping(name: string, address: string) {
+    const cd = await getContractDetailsFromContract(this.kit, name as CeloContract, address)
+    this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {
@@ -110,12 +125,32 @@ export class BlockExplorer {
       return null
     }
 
+    const contract =
+      matchedAbi.signature === PROXY_SET_IMPLEMENTATION_SIGNATURE ||
+      matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE
+        ? contractMapping.details.name + 'Proxy'
+        : contractMapping.details.name
+
     const { args, params } = parseDecodedParams(
       abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
+    // Transform delegate call data into a readable params map
+    if (
+      matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE &&
+      args.length === 2
+    ) {
+      const initializeAbi = getInitializeAbiOfImplementation(contract as any)
+      const encodedInitializeParameters = args[1].slice(10)
+
+      const { params: initializeParams } = parseDecodedParams(
+        abi.decodeParameters(initializeAbi.inputs!, encodedInitializeParameters)
+      )
+      params[`initialize@${abi.encodeFunctionSignature(initializeAbi)}`] = initializeParams
+    }
+
     return {
-      contract: contractMapping.details.name,
+      contract,
       function: matchedAbi.name!,
       paramMap: params,
       argList: args,

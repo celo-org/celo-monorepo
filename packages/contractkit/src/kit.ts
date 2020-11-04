@@ -1,8 +1,11 @@
+import { ensureLeading0x, Signature } from '@celo/base'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import net from 'net'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
+import { HttpProvider, Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
@@ -13,6 +16,7 @@ import { estimateGas } from './utils/web3-utils'
 import { ReadOnlyWallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
@@ -70,6 +74,7 @@ export interface NetworkConfig {
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
+  blockchainParameters: BlockchainParametersConfig
 }
 
 export interface KitOptions {
@@ -115,6 +120,11 @@ export class ContractKit {
     this.contracts = new WrapperCache(this)
   }
 
+  getWallet() {
+    assertIsCeloProvider(this.web3.currentProvider)
+    return this.web3.currentProvider.wallet
+  }
+
   async getTotalBalance(address: string): Promise<AccountBalance> {
     const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
@@ -155,6 +165,7 @@ export class ContractKit {
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
+      this.contracts.getBlockchainParameters(),
     ]
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
@@ -169,6 +180,7 @@ export class ContractKit {
       contracts[8].getConfig(),
       contracts[9].getConfig(),
       contracts[10].getConfig(),
+      contracts[11].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -182,6 +194,7 @@ export class ContractKit {
       stableToken: res[8],
       validators: res[9],
       downtimeSlasher: res[10],
+      blockchainParameters: res[11],
     }
   }
 
@@ -345,6 +358,30 @@ export class ContractKit {
         gas,
       })
     )
+  }
+
+  async signTypedData(signer: string, typedData: EIP712TypedData): Promise<Signature> {
+    const signature = await new Promise<string>((resolve, reject) => {
+      ;(this.web3.currentProvider as Pick<HttpProvider, 'send'>).send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_signTypedData',
+          params: [signer, typedData],
+        },
+        (error, resp) => {
+          if (error) {
+            reject(error)
+          } else if (resp) {
+            resolve(resp.result as string)
+          } else {
+            reject(new Error('empty-response'))
+          }
+        }
+      )
+    })
+
+    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
   private fillTxDefaults(tx?: Tx): Tx {

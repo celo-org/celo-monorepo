@@ -273,6 +273,18 @@ interface VerificationEventsProperties {
     issuer: any
     error: string
   }
+  [VerificationEvents.verification_reveal_attestation_status]: {
+    success: boolean
+    identifier: string
+    account: string
+    issuer: string
+    attempt: number
+    countryCode: string
+    status: string
+    provider: string
+    duration: number
+    errors: any
+  }
   [VerificationEvents.verification_revoke_start]: undefined
   [VerificationEvents.verification_revoke_finish]: undefined
   [VerificationEvents.verification_revoke_error]: {
@@ -627,7 +639,9 @@ interface NetworkEventsProperties {
     latestBlock: number
     latestTimestamp: number
   }
-  [NetworkEvents.network_sync_waiting]: undefined
+  [NetworkEvents.network_sync_waiting]: {
+    latestBlock?: number
+  }
   [NetworkEvents.network_sync_start]: {
     startingBlock: number
     currentBlock: number
