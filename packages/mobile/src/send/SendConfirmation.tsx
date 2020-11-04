@@ -74,7 +74,6 @@ export const sendConfirmationScreenNavOptions = () => ({
 function SendConfirmation(props: Props) {
   const [modalVisible, setModalVisible] = useState(false)
   const [encryptionDialogVisible, setEncryptionDialogVisible] = useState(false)
-  const [buttonReset, setButtonReset] = useState(false)
   const [comment, setComment] = useState('')
 
   const dispatch = useDispatch()
@@ -188,12 +187,8 @@ function SendConfirmation(props: Props) {
   }
 
   const cancelModal = () => {
-    setButtonReset(true)
     setModalVisible(false)
   }
-  useEffect(() => {
-    setButtonReset(false)
-  }, [modalVisible, buttonReset])
 
   const sendWhatsApp = () => {
     setModalVisible(false)
@@ -313,7 +308,6 @@ function SendConfirmation(props: Props) {
           FooterComponent={FeeContainer}
           LabelAboveKeyboard={EncryptionWarningLabel}
           confirmButton={primaryBtnInfo}
-          shouldReset={buttonReset}
           isSending={isSending}
         >
           <View style={styles.transferContainer}>
