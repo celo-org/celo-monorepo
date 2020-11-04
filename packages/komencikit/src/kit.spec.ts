@@ -12,12 +12,27 @@ jest.mock('./verifyWallet', () => ({
   verifyWallet: () => Promise.resolve(Ok(true)),
 }))
 
+const mockE164Number = '+14155550000'
+const expectedPhoneHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
+const expectedPepper = 'nHIvMC9B4j2+H'
+const mockCombinedSignature = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 const ODIS_PUB_KEY =
   '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
 // @ts-ignore
 contractKit.web3 = { eth: { sign: jest.fn() } }
+
+jest.mock('@celo/contractkit/lib/identity/odis/bls-blinding-client', () => {
+  // tslint:disable-next-line:no-shadowed-variable
+  class WasmBlsBlindingClient {
+    blindMessage = (m: string) => m
+    unblindAndVerifyMessage = (m: string) => m
+  }
+  return {
+    WasmBlsBlindingClient,
+  }
+})
 
 describe('KomenciKit', () => {
   beforeEach(() => {
@@ -121,14 +136,14 @@ describe('KomenciKit', () => {
         .mockResolvedValue(Err(new Unauthorised()))
 
       const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
-      await kit.getDistributedBlindedPepper('phone-number', 'client-version', blsBlindingClient)
+      await kit.getDistributedBlindedPepper(mockE164Number, 'client-version', blsBlindingClient)
 
       expect(execSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
           action: ActionTypes.DistributedBlindedPepper,
           payload: {
-            e164Number: 'phone-number',
+            blindedPhoneNumber: Buffer.from(mockE164Number).toString('base64'),
             clientVersion: 'client-version',
           },
         })
@@ -152,15 +167,15 @@ describe('KomenciKit', () => {
         const kit = kitWithOptions()
         jest
           .spyOn((kit as any).client, 'exec')
-          .mockResolvedValue(Ok({ identifier: 'pn-identifier', pepper: 'pn-pepper' }))
+          .mockResolvedValue(Ok({ combinedSignature: mockCombinedSignature }))
 
         const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
         await expect(
-          kit.getDistributedBlindedPepper('phone-number', 'client-version', blsBlindingClient)
+          kit.getDistributedBlindedPepper(mockE164Number, 'client-version', blsBlindingClient)
         ).resolves.toEqual(
           Ok({
-            identifier: 'pn-identifier',
-            pepper: 'pn-pepper',
+            identifier: expectedPhoneHash,
+            pepper: expectedPepper,
           })
         )
       })
