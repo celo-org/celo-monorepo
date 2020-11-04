@@ -87,6 +87,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
       if (!account) {
         return
       }
+      // This action is also dispatched at the end of the initializeAccount action.
       dispatch(fetchVerificationState())
     }, [account])
   )
@@ -154,11 +155,13 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   if (isLoading) {
     return (
       <View style={styles.loader}>
-        <VerificationSkipDialog
-          isVisible={showSkipDialog}
-          onPressCancel={onPressSkipCancel}
-          onPressConfirm={onPressSkipConfirm}
-        />
+        {account && (
+          <VerificationSkipDialog
+            isVisible={showSkipDialog}
+            onPressCancel={onPressSkipCancel}
+            onPressConfirm={onPressSkipConfirm}
+          />
+        )}
         <ActivityIndicator size="large" color={colors.greenBrand} />
       </View>
     )
