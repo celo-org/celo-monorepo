@@ -757,6 +757,8 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
       feelessVerificationStateSelector
     )
 
+    console.log(komenciKit)
+
     const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
       [
         komenciKit,
