@@ -1,5 +1,6 @@
 import { ASTCodeCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-code'
 import { ContractDependencies } from '@celo/protocol/lib/contract-dependencies'
+import { LibraryLinkingChange } from '@celo/protocol/lib/compatibility/change'
 
 // For each contract whose linked library dependencies have been updated, keeps
 // a list of those updated libraries.
@@ -19,7 +20,13 @@ const getChangedLinkedLibraries = (linkedLibraries: string[], codeReport: ASTCod
   return changedLinkedLibraries
 }
 
-export const reportLibraryLinkingIncompatibilities = (linkedLibraries: { [library: string]: string[] }, codeReport: ASTCodeCompatibilityReport): LibraryLinkingReport => {
+const reportToChanges = (report: LibraryLinkingReport): LibraryLinkingChange[] => {
+  return Object.keys(report).map(contract => {
+    return report[contract].map(library => new LibraryLinkingChange(contract, library))
+  }).reduce((changes, contractChanges) => changes.concat(contractChanges))
+}
+
+export const reportLibraryLinkingIncompatibilities = (linkedLibraries: { [library: string]: string[] }, codeReport: ASTCodeCompatibilityReport): LibraryLinkingChange[] => {
   const dependencies = new ContractDependencies(linkedLibraries)
 
   const changedLinkedLibraries = getChangedLinkedLibraries(Object.keys(linkedLibraries), codeReport)
@@ -46,5 +53,5 @@ export const reportLibraryLinkingIncompatibilities = (linkedLibraries: { [librar
     })
   }
 
-  return libraryLinkingReport
+  return reportToChanges(libraryLinkingReport)
 }
