@@ -184,6 +184,9 @@ After a successful release execution on a testnet, the resulting network state s
     celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
     ```
 
+### Automated environment tests
+
+Stakeholders can use the `env-tests` package in `celo-monorepo` to run an automated test suite against the network
 
 ### Performance
 
