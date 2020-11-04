@@ -4,7 +4,7 @@ import {
   AttestationsWrapper,
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { eqAddress, isValidAddress, NULL_ADDRESS } from '@celo/utils/src/address'
+import { isValidAddress, normalizeAddress, normalizeAddressWith0x } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
@@ -242,10 +242,12 @@ function* fetchWalletAddresses(e164Number: string) {
 
   const possibleUserAddresses: string[] = []
   const walletToAccountAddress: WalletToAccountAddressType = {}
-  for (const [i, walletAddress] of walletAddresses.entries()) {
-    const accountAddress = accountAddresses[i]
+  for (const [i, address] of walletAddresses.entries()) {
+    const accountAddress = normalizeAddressWith0x(accountAddresses[i])
+    const walletAddress = normalizeAddressWith0x(address)
     // `getWalletAddress` returns a null address when there isn't a wallet registered
-    if (!eqAddress(walletAddress, NULL_ADDRESS)) {
+    // TODO: Make this expression into a util function
+    if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
       walletToAccountAddress[walletAddress] = accountAddress
       possibleUserAddresses.push(walletAddress)
     } else {
