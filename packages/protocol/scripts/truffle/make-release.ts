@@ -73,13 +73,13 @@ class ContractAddresses {
 
 const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
-const isProxiedContract = async (contractName: string) => {
+const isProxiedContract = (contractName: string) => {
   if (contractName.endsWith('Proxy')) {
     return false
   }
 
   try {
-    await artifacts.require(`${contractName}Proxy`)
+    artifacts.require(`${contractName}Proxy`)
     return true
   } catch (error) {
     return false
@@ -227,7 +227,7 @@ module.exports = async (callback: (error?: any) => number) => {
       }
     }
     for (const contractName of contracts) {
-      if (isCoreContract(contractName) && (await isProxiedContract(contractName))) {
+      if (isCoreContract(contractName) && isProxiedContract(contractName)) {
         await release(contractName)
       }
     }
