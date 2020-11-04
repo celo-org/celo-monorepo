@@ -16,12 +16,13 @@ export default function AlternatingText({ style, primaryText, secondaryText }: P
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((t) => t + 1)
-      setIsPrimary(time % 2 === 0)
+      // Quick and easy way to animate the state change
+      LayoutAnimation.easeInEaseOut()
+      setIsPrimary((wasPrimary) => !wasPrimary)
     }, SHOW_TIME)
 
     return () => clearInterval(interval)
-  }, [time, isPrimary])
+  }, [])
 
   return (
     <View>
