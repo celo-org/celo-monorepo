@@ -1,8 +1,8 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
-import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
+import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'

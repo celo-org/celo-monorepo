@@ -1,3 +1,4 @@
+import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
 import {
   Change,
   DeployedBytecodeChange,
@@ -8,7 +9,6 @@ import {
   MethodVisibilityChange,
   NewContractChange,
 } from '@celo/protocol/lib/compatibility/change'
-import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
 import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
 import { assert } from 'chai'
 

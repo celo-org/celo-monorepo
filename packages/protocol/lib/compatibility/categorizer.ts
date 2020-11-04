@@ -1,9 +1,9 @@
 import {
   Change,
   ChangeVisitor,
-  ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
-  MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
-  MethodReturnChange, MethodVisibilityChange, NewContractChange, LibraryLinkingChange
+  ContractKindChange, DeployedBytecodeChange, LibraryLinkingChange,
+  MethodAddedChange, MethodMutabilityChange, MethodParametersChange,
+  MethodRemovedChange, MethodReturnChange, MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
 
 /**

@@ -3,9 +3,9 @@ import { readJsonSync } from 'fs-extra'
 import { BuildArtifacts, Contracts, getBuildArtifacts } from '@openzeppelin/upgrades'
 
 import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
-import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking'
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/compatibility/ast-layout'
 import { Categorizer } from '@celo/protocol/lib/compatibility/categorizer'
+import { reportLibraryLinkingIncompatibilities } from '@celo/protocol/lib/compatibility/library-linking'
 import { ASTDetailedVersionedReport, ASTReports } from '@celo/protocol/lib/compatibility/report'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 
@@ -35,7 +35,6 @@ export class ASTBackwardReport {
 
     logFunction("Running library linking...")
     const libraryLinking = reportLibraryLinkingIncompatibilities(linkedLibraries, code)
-    console.log(libraryLinking)
     logFunction("Done\n")
 
     const fullReports = new ASTReports(code, storage, libraryLinking).excluding(exclude)

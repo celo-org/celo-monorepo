@@ -1,12 +1,11 @@
-// tslint:disable: max-classes-per-file
 import { stripMetadata } from '@celo/protocol/lib/bytecode'
-import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   Change,
   ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
   MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/change'
+import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
   Contract as ZContract
@@ -40,8 +39,6 @@ enum StorageLocation {
 
 const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
-
-// Exported classes
 
 /**
  * A compatibility report with all the detected changes from two compiled

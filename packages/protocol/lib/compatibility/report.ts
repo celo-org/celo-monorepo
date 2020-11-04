@@ -1,8 +1,8 @@
 // tslint:disable: max-classes-per-file
 import { ASTCodeCompatibilityReport, } from '@celo/protocol/lib/compatibility/ast-code'
-import { Change } from '@celo/protocol/lib/compatibility/change'
 import { ASTStorageCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-layout'
 import { categorize, Categorizer, ChangeType } from '@celo/protocol/lib/compatibility/categorizer'
+import { Change } from '@celo/protocol/lib/compatibility/change'
 import { ContractVersionDelta, ContractVersionDeltaIndex } from '@celo/protocol/lib/compatibility/version'
 /**
  * Value object holding all uncategorized storage and code reports.

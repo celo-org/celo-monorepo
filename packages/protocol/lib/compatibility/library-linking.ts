@@ -1,6 +1,6 @@
 import { ASTCodeCompatibilityReport } from '@celo/protocol/lib/compatibility/ast-code'
-import { ContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { LibraryLinkingChange } from '@celo/protocol/lib/compatibility/change'
+import { ContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 
 // For each contract whose linked library dependencies have been updated, keeps
 // a list of those updated libraries.
@@ -35,7 +35,7 @@ export const reportLibraryLinkingIncompatibilities = (linkedLibraries: { [librar
   // To robustly handle the possibility of multiple layers of linking, we
   // iterate until `changedLinkedLibraries` stabilizes.
   let previousChangedLinkedLibrariesSize = 0
-  while (previousChangedLinkedLibrariesSize != changedLinkedLibraries.size) {
+  while (previousChangedLinkedLibrariesSize !== changedLinkedLibraries.size) {
     previousChangedLinkedLibrariesSize = changedLinkedLibraries.size
     dependencies.dependencies.forEach((libraries: string[], contract: string) => {
       const relevantChangedLibraries =
