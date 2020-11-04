@@ -1,6 +1,6 @@
 {
-  "coverTitle": "Celo Wallet",
-  "coverSubTitle": "Available for Android and iOS",
+  "coverTitle": "Celo Test Wallet",
+  "coverSubTitle": "Temporarily Not Available",
   "getStarted": "Get Started",
   "coverAction": {
     "faucet": {
@@ -14,14 +14,14 @@
         "Account start with 10 cUSD of Testnet funds. Try sending and requesting payments. Use the faucet page if you run out."
     },
     "exchange": {
-      "title": "Exchange cUSD and cGLD",
+      "title": "Exchange cUSD and CELO",
       "text":
-        "Check the exchange rate and swap between Celo’s stable coin (cUSD) and variable value token (cGLD) as you see fit."
+        "Check the exchange rate and swap between Celo’s stable coin (cUSD) and variable value token (CELO) as you see fit."
     }
   },
   "availableOnAndroid": "Available today for Android",
-  "haveAccount": "Already have an account?",
-  "useSeed": "Use your seed phrase to import your account into the Celo wallet.",
+  "haveAccount": "Already have an Alfajores testnet account?",
+  "useSeed": "Use your seed phrase to import your account into the Celo Test Wallet.",
   "learnMore": "Learn More",
   "downloadDirect": "Go straight to download\nfor your Android or Apple mobile phone"
 }

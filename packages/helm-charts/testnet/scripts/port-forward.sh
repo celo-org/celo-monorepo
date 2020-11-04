@@ -19,4 +19,4 @@ done
 [ -z "$NAMESPACE" ] && echo "Need to set the NAMESPACE_NAME via the -n flag" && exit 1;
 [ -z "$RELEASE" ] && echo "Need to set RELEASE_NAME via the -r flag" && exit 1;
 
-kubectl port-forward --namespace $NAMESPACE $(kubectl get pods --namespace $NAMESPACE -l "app=ethereum, component=gethminer1, release=$RELEASE" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}") 8545:8545 8546:8546
+kubectl port-forward --namespace $NAMESPACE $(kubectl get pods --namespace $NAMESPACE -l "app in (ethereum,testnet), component=gethminer1, release=$RELEASE" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}") 8545:8545 8546:8546

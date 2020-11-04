@@ -56,7 +56,8 @@ async function test() {
       await waitForPortOpen('localhost', 8545, 60)
     }
 
-    let testArgs = ['run', 'truffle', 'test']
+    // --reset is a hack to trick truffle into using 20M gas.
+    let testArgs = ['run', 'truffle', 'test', '--reset']
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }
@@ -71,7 +72,9 @@ async function test() {
 
     const testGlob =
       argv._.length > 0
-        ? argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
+        ? argv._.map((testName) =>
+            testName.endsWith('/') ? `test/${testName}\*\*/*.ts` : `test/\*\*/${testName}.ts`
+          ).join(' ')
         : `test/\*\*/*.ts`
     const testFiles = glob.readdirSync(testGlob)
     if (testFiles.length === 0) {

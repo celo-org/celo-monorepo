@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress } from '@celo/base/lib/address'
 import { AttestationServiceStatusResponseType, UrlType } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
@@ -57,10 +57,9 @@ export async function validateAttestationServiceUrl(
 
     const attestationKeyAddress = await accounts.getAttestationSigner(address)
 
-    // Uncomment this once we opt in by specifying an attestation key
-    // if (attestationKeyAddress === '0x0' || eqAddress(address, attestationKeyAddress)) {
-    //   return `The account has not specified a separate attestation key`
-    // }
+    if (attestationKeyAddress === '0x0' || eqAddress(address, attestationKeyAddress)) {
+      return `The account has not specified a separate attestation key`
+    }
 
     if (
       !parsedResponse.right.signature ||

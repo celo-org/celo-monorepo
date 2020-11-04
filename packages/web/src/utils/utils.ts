@@ -108,6 +108,9 @@ export function cutAddress(address: string) {
 }
 
 export function formatNumber(n: number, decimals: number = 2) {
+  if (n === Infinity) {
+    return undefined as string
+  }
   return isNaN(+n)
     ? (0).toFixed(decimals)
     : (+n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -119,4 +122,8 @@ export function copyToClipboad(text: string) {
 
 export function weiToDecimal(number: number) {
   return number / 10 ** 18
+}
+
+export function isExternalLink(link: string) {
+  return link.startsWith('http')
 }

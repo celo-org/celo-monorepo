@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,8 +6,8 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
-import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
@@ -20,6 +20,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Attestations is
   IAttestations,
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   UsingRegistry,
@@ -90,6 +91,9 @@ contract Attestations is
   // Maps a token and attestation issuer to the amount that they're owed.
   mapping(address => mapping(address => uint256)) public pendingWithdrawals;
 
+  // Attestation transfer approvals, keyed by user and keccak(identifier, from, to)
+  mapping(address => mapping(bytes32 => bool)) public transferApprovals;
+
   event AttestationsRequested(
     bytes32 indexed identifier,
     address indexed account,
@@ -115,6 +119,18 @@ contract Attestations is
   event AttestationRequestFeeSet(address indexed token, uint256 value);
   event SelectIssuersWaitBlocksSet(uint256 value);
   event MaxAttestationsSet(uint256 value);
+  event AttestationsTransferred(
+    bytes32 indexed identifier,
+    address indexed fromAccount,
+    address indexed toAccount
+  );
+  event TransferApproval(
+    address indexed approver,
+    bytes32 indexed indentifier,
+    address from,
+    address to,
+    bool approved
+  );
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -151,11 +167,23 @@ contract Attestations is
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Commit to the attestation request of a hashed identifier.
    * @param identifier The hash of the identifier to be attested.
    * @param attestationsRequested The number of requested attestations for this request.
    * @param attestationRequestFeeToken The address of the token with which the attestation fee will
    * be paid.
+   * @dev Note that if an attestation expires before it is completed, the fee is forfeited. This is
+   * to prevent folks from attacking validators by requesting attestations that they do not
+   * complete, and to increase the cost of validators attempting to manipulate the attestations
+   * protocol.
    */
   function request(
     bytes32 identifier,
@@ -291,11 +319,12 @@ contract Attestations is
    * @dev Throws if msg.sender does not have any rewards to withdraw.
    */
   function withdraw(address token) external {
-    uint256 value = pendingWithdrawals[token][msg.sender];
+    address issuer = getAccounts().attestationSignerToAccount(msg.sender);
+    uint256 value = pendingWithdrawals[token][issuer];
     require(value > 0, "value was negative/zero");
-    pendingWithdrawals[token][msg.sender] = 0;
-    require(IERC20(token).transfer(msg.sender, value), "token transfer failed");
-    emit Withdrawal(msg.sender, token, value);
+    pendingWithdrawals[token][issuer] = 0;
+    require(IERC20(token).transfer(issuer, value), "token transfer failed");
+    emit Withdrawal(issuer, token, value);
   }
 
   /**
@@ -524,6 +553,7 @@ contract Attestations is
   /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
+   * @param account Address of the account. 
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -563,6 +593,23 @@ contract Attestations is
   }
 
   /**
+   * @notice Require that a given identifier/address pair has
+   * requested a specific number of attestations.
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account.
+   * @param expected Number of expected attestations
+   * @dev It can be used when batching meta-transactions to validate
+   * attestation are requested as expected in untrusted scenarios
+   */
+  function requireNAttestationsRequested(bytes32 identifier, address account, uint32 expected)
+    external
+    view
+  {
+    uint256 requested = identifiers[identifier].attestations[account].requested;
+    require(requested == expected, "requested attestations does not match expected");
+  }
+
+  /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
@@ -581,7 +628,7 @@ contract Attestations is
     for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       uint256 count = identifiers[identifiersToLookup[i]].accounts.length;
 
-      totalAddresses = totalAddresses + count;
+      totalAddresses = totalAddresses.add(count);
       matches[i] = count;
     }
 
@@ -603,7 +650,7 @@ contract Attestations is
     IAccounts accounts = getAccounts();
     uint256 issuersLength = numberValidatorsInCurrentSet();
     uint256[] memory issuers = new uint256[](issuersLength);
-    for (uint256 i = 0; i < issuersLength; i++) issuers[i] = i;
+    for (uint256 i = 0; i < issuersLength; i = i.add(1)) issuers[i] = i;
 
     require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 
@@ -645,7 +692,65 @@ contract Attestations is
     }
   }
 
-  function isAttestationExpired(uint128 attestationRequestBlock) internal view returns (bool) {
+  /**
+   * @notice Update the approval status of allowing an attestation identifier
+   * mapping to be transfered from an address to another.  The "to" or "from"
+   * addresses must both approve.  If the other has already approved, then the transfer
+   * is executed.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
+    external
+  {
+    require(
+      msg.sender == from || msg.sender == to,
+      "Approver must be sender or recipient of transfer"
+    );
+    bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
+    address other = msg.sender == from ? to : from;
+    if (status && transferApprovals[other][key]) {
+      _transfer(identifier, index, from, to);
+      transferApprovals[other][key] = false;
+    } else {
+      transferApprovals[msg.sender][key] = status;
+      emit TransferApproval(msg.sender, identifier, from, to, status);
+    }
+  }
+
+  /**
+   * @notice Transfer an attestation identifier mapping from the sender address to a
+   * replacement address.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The address to replace the sender address in the indentifier mapping.
+   * @dev Throws if index is out of bound for account array.
+   * @dev Throws if `from` is not in the account array at the given index.
+   * @dev Throws if `to` already has attestations
+   */
+  function _transfer(bytes32 identifier, uint256 index, address from, address to) internal {
+    uint256 numAccounts = identifiers[identifier].accounts.length;
+    require(index < numAccounts, "Index is invalid");
+    require(from == identifiers[identifier].accounts[index], "Index does not match from address");
+    require(
+      identifiers[identifier].attestations[to].requested == 0,
+      "Address tranferring to has already requested attestations"
+    );
+
+    identifiers[identifier].accounts[index] = to;
+    identifiers[identifier].attestations[to] = identifiers[identifier].attestations[from];
+    identifiers[identifier].unselectedRequests[to] = identifiers[identifier]
+      .unselectedRequests[from];
+    delete identifiers[identifier].attestations[from];
+    delete identifiers[identifier].unselectedRequests[from];
+    emit AttestationsTransferred(identifier, from, to);
+  }
+
+  function isAttestationExpired(uint32 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }
 

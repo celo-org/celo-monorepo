@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import { PromiEvent, TransactionReceipt, Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { newKit } from './kit'
@@ -33,6 +34,7 @@ export function txoStub<T>(): TransactionObjectStub<T> {
     rejectHash: peStub.rejectHash,
     resolveReceipt: peStub.resolveReceipt,
     rejectReceipt: peStub.resolveReceipt,
+    _parent: jest.fn() as any,
   }
   return pe
 }
@@ -70,13 +72,29 @@ describe('kit.sendTransactionObject()', () => {
     )
   })
 
+  test('should retrieve currency gasPrice with feeCurrency', async () => {
+    const txo = txoStub()
+    const gasPrice = 100
+    const getGasPriceMin = jest.fn().mockImplementation(() => ({
+      getGasPriceMinimum() {
+        return new BigNumber(gasPrice)
+      },
+    }))
+    kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
+    const options: Tx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
+    await kit.sendTransactionObject(txo, options)
+    expect(txo.send).toBeCalledWith({
+      gasPrice: `${gasPrice * 5}`,
+      ...options,
+    })
+  })
+
   test('should forward txoptions to txo.send()', async () => {
     const txo = txoStub()
-    await kit.sendTransactionObject(txo, { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' })
+    await kit.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
     expect(txo.send).toBeCalledWith({
       gasPrice: '0',
       gas: 555,
-      feeCurrency: 'XXX',
       from: '0xAAFFF',
     })
   })

@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.43-dev",
+  "version": "0.0.61-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -31,18 +31,22 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.8-dev",
-    "@celo/utils": "0.1.11-dev",
+    "@celo/contractkit": "0.4.19-dev",
+    "@celo/utils": "0.1.23-dev",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
+    "@oclif/plugin-autocomplete": "^0.1.5",
     "@oclif/plugin-help": "^2",
+    "@types/command-exists": "^1.2.0",
+    "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "bip32": "2.0.5",
     "bip39": "3.0.2",
-    "bls12377js": "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac",
+    "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
-    "cli-ux": "^5.3.1",
+    "cli-ux": "^5.4.9",
+    "command-exists": "^1.2.9",
     "debug": "^4.1.1",
     "ethereumjs-util": "^5.2.0",
     "events": "^3.0.0",
@@ -50,23 +54,31 @@
     "fs-extra": "^8.1.0",
     "moment": "2.24.0",
     "humanize-duration": "^3.21.0",
+    "moment": "2.24.0",
     "path": "^0.12.7",
     "prompts": "^2.0.1",
+    "randombytes": "^2.0.1",
+    "save": "^2.4.0",
     "tslib": "^1",
     "web3": "1.2.4"
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
     "@celo/dev-utils": "0.0.1-dev",
+    "@celo/flake-tracker": "0.0.1-dev",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10",
+    "@types/inquirer": "^6.5.0",
+    "@types/web3": "^1.0.18",
     "@types/humanize-duration": "^3.18.0",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^10",
     "globby": "^8",
     "prettier": "1.19.1",
-    "typescript": "^3.7.3"
+    "typescript": "^3.8.3"
   },
   "files": [
     "README.md",
@@ -83,38 +95,53 @@
       "config": {
         "description": "Configure CLI options which persist across commands"
       },
+      "dkg": {
+        "description": "Publish your locally computed DKG results to the blockchain"
+      },
       "election": {
         "description": "Participate in and view the state of Validator Elections"
       },
       "exchange": {
-        "description": "Exchange Celo Dollars and Celo Gold via the stability mechanism"
+        "description": "Exchange Celo Dollars and CELO via the stability mechanism"
       },
       "governance": {
         "description": "Interact with on-chain governance proposals and hotfixes"
       },
+      "identity": {
+        "description": "Interact with ODIS and the attestations service"
+      }, 
       "lockedgold": {
-        "description": "View and manage locked Celo Gold"
+        "description": "View and manage locked CELO"
+      },
+      "network": {
+        "description": "View details about the network, like contracts and parameters"
       },
       "node": {
         "description": "Manage your Celo node"
       },
+      "releasegold": {
+        "description": "View and manage Release Gold contracts"
+      },
       "transfer": {
-        "description": "Transfer Celo Gold and Celo Dollars"
+        "description": "Transfer CELO and Celo Dollars"
       },
       "validator": {
         "description": "View and manage Validators"
       },
       "validatorgroup": {
         "description": "View and manage Validator Groups"
-      },
-      "releasegold": {
-        "description": "View and manage Release Gold contracts"
       }
     },
     "bin": "celocli",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-warn-if-update-available"
     ],
+    "warn-if-update-available": {
+      "timeoutInDays": 1,
+      "message": "<%= config.name %> update available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>."
+    },
     "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>"
   }
 }

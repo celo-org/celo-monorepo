@@ -8,7 +8,7 @@ describe('HomePage', () => {
     const tree = renderer
       .create(
         <TestProvider>
-          <HomePage isRestricted={true} />
+          <HomePage />
         </TestProvider>
       )
       .toJSON()

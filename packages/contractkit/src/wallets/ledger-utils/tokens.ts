@@ -1,5 +1,5 @@
 // Copied from '@ledgerhq/hw-app-eth/erc20' because we need to change the path of the blob and support for address+chainId
-import { Address, normalizeAddressWith0x } from '@celo/utils/lib/address'
+import { Address, normalizeAddressWith0x } from '@celo/base/lib/address'
 import blob from './data'
 
 /**
@@ -22,6 +22,23 @@ export interface TokenInfo {
   chainId: number
   signature: Buffer
   data: Buffer
+}
+
+/**
+ * @return
+ * -1: version1 < version2,
+ *  0: version1 == version2,
+ *  1: version1 > version2
+ */
+export function compareLedgerAppVersions(version1: string, version2: string): number {
+  const numberV1 = stringVersionToNumber(version1)
+  const numberV2 = stringVersionToNumber(version2)
+  return numberV1 < numberV2 ? -1 : numberV1 === numberV2 ? 0 : 1
+}
+
+function stringVersionToNumber(version: string): number {
+  const parts = version.split('.')
+  return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
 }
 
 export interface API {

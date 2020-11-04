@@ -4,13 +4,25 @@ const ProviderEngine = require('web3-provider-engine')
 const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
+const flakeTrackingConfig = require('@celo/flake-tracker/src/mocha/config.js')
+var Web3 = require('web3')
+var net = require('net')
 
-const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
+const argv = require('minimist')(process.argv.slice(2), {
+  string: ['truffle_override', 'network'],
+  boolean: ['reset'],
+})
 
-const SOLC_VERSION = '0.5.8'
-const ALFAJORES_NETWORKID = 44786
-const BAKLAVA_NETWORKID = 40120
-const BAKLAVASTAGING_NETWORKID = 31416
+const SOLC_VERSION = '0.5.13'
+const ALFAJORES_NETWORKID = 44787
+const BAKLAVA_NETWORKID = 62320
+const BAKLAVASTAGING_NETWORKID = 31420
+
+// ipcProvider returns a function to create an IPC provider when called.
+// Use by adding `provider: ipcProvider(...)` to any of the configs below.
+function ipcProvider(path) {
+  return () => new Web3.providers.IpcProvider(path, net)
+}
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -21,8 +33,10 @@ const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
 const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
+const BAKLAVA_FROM = '0x0Cc59Ed03B3e763c02d54D695FFE353055f1502D'
+const BAKLAVASTAGING_FROM = '0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285'
 
-const gasLimit = 20000000
+const gasLimit = 13000000
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -37,6 +51,12 @@ const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
 
 // Here to avoid recreating it each time
 let coverageProvider = null
+
+const fornoUrls = {
+  alfajores: 'https://alfajores-forno.celo-testnet.org',
+  baklava: 'https://baklava-forno.celo-testnet.org',
+  rc1: 'https://rc1-forno.celo-testnet.org',
+}
 
 const networks = {
   development: {
@@ -53,6 +73,14 @@ const networks = {
     from: RC0_FROM,
     network_id: 200312,
     gasPrice: 100000000000,
+  },
+  rc1: {
+    host: '127.0.0.1',
+    port: 8545,
+    from: '0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE',
+    network_id: 42220,
+    gas: gasLimit,
+    gasPrice: 10000000000,
   },
   coverage: {
     host: 'localhost',
@@ -140,10 +168,12 @@ const networks = {
   },
   baklava: {
     ...defaultConfig,
+    from: BAKLAVA_FROM,
     network_id: BAKLAVA_NETWORKID,
   },
   baklavastaging: {
     ...defaultConfig,
+    from: BAKLAVASTAGING_FROM,
     network_id: BAKLAVASTAGING_NETWORKID,
   },
 }
@@ -158,21 +188,41 @@ if (argv.truffle_override || !(argv.network in networks)) {
   }
 }
 
+if (process.argv.includes('--forno')) {
+  if (!fornoUrls[argv.network]) {
+    console.log(`Forno URL for network ${argv.network} not known!`)
+    process.exit(1)
+  }
+
+  networks[argv.network].host = undefined
+  networks[argv.network].port = undefined
+  networks[argv.network].provider = function() {
+    return new Web3.providers.HttpProvider(fornoUrls[argv.network])
+  }
+}
+
 module.exports = {
   plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],
   compilers: {
     solc: {
       version: SOLC_VERSION,
+      settings: {
+        evmVersion: 'istanbul',
+      },
     },
   },
   networks,
+  mocha: flakeTrackingConfig,
 }
 
 if (process.argv.includes('--gas')) {
   module.exports = {
     compilers: {
       solc: {
-        version: '0.5.8',
+        version: SOLC_VERSION,
+        settings: {
+          evmVersion: 'istanbul',
+        },
       },
     },
     plugins: ['truffle-security', 'truffle-plugin-blockscout-verify'],

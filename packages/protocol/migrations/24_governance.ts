@@ -73,7 +73,8 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',
       'Attestations',
-      'BlockchainParameters',
+      // BlockchainParameters ownership transitioned to governance in a follow-up script.
+      // 'BlockchainParameters',
       'DoubleSigningSlasher',
       'DowntimeSlasher',
       'Election',

@@ -1,5 +1,6 @@
-import { CeloProvider } from '@celo/contractkit/src'
-import { ParserOutput } from '@oclif/parser/lib/parse'
+import { CeloProvider } from '@celo/contractkit/lib'
+import { flags } from '@oclif/command'
+import { toChecksumAddress } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 
 export default class AccountList extends BaseCommand {
@@ -7,27 +8,39 @@ export default class AccountList extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
+    local: flags.boolean({
+      allowNo: true,
+      description:
+        'If set, only show local and hardware wallet accounts. Use no-local to only show keystore addresses.',
+    }),
   }
 
   requireSynced = false
 
   async run() {
-    this.parse(AccountList)
+    const res = this.parse(AccountList)
 
+    // Retreive accounts from the connected Celo node.
+    const allAddresses = !res.flags.local ? await this.kit.web3.eth.getAccounts() : []
+
+    // Get addresses from the local wallet.
     const celoProvider: CeloProvider = this.kit.web3.currentProvider as any
-    const addresses = await celoProvider.getAccounts()
-    const localAddresses = celoProvider.wallet.getAccounts()
-    let localName = 'Local'
-    const res: ParserOutput<any, any> = this.parse()
+    const localAddresses =
+      res.flags.local ?? true
+        ? celoProvider.wallet.getAccounts().map((value) => toChecksumAddress(value))
+        : []
 
-    if (res.flags.useLedger) {
-      localName = 'Ledger'
+    // Display the addresses.
+    const localName = res.flags.useLedger ? 'Ledger' : 'Local'
+    if (res.flags.local === undefined) {
+      console.log('All Addresses: ', allAddresses)
     }
-    console.log('All Addresses: ', addresses)
-    console.log(
-      'Keystore Addresses: ',
-      addresses.filter((address) => !localAddresses.includes(address))
-    )
-    console.log(`${localName} Addresses: `, localAddresses)
+    if (!res.flags.local) {
+      const nodeAddresses = allAddresses.filter((address) => !localAddresses.includes(address))
+      console.log('Keystore Addresses: ', nodeAddresses)
+    }
+    if (res.flags.local ?? true) {
+      console.log(`${localName} Addresses: `, localAddresses)
+    }
   }
 }

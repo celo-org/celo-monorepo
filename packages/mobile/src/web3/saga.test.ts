@@ -3,7 +3,7 @@ import { call, delay, select } from 'redux-saga/effects'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { completeWeb3Sync, updateWeb3SyncProgress } from 'src/web3/actions'
-import { getContractKit } from 'src/web3/contracts'
+import { getWeb3Async } from 'src/web3/contracts'
 import {
   checkWeb3SyncProgress,
   getOrCreateAccount,
@@ -11,6 +11,7 @@ import {
   waitForWeb3Sync,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { BLOCK_AGE_LIMIT } from 'src/web3/utils'
 import { createMockStore, sleep } from 'test/utils'
 import { mockAccount } from 'test/values'
 
@@ -77,19 +78,32 @@ describe(waitForWeb3Sync, () => {
 
 describe(checkWeb3SyncProgress, () => {
   it('reports web3 status correctly', async () => {
-    getContractKit()
+    const web3 = await getWeb3Async(false)
+    web3.eth.isSyncing
       // @ts-ignore
-      .web3.eth.isSyncing.mockReturnValueOnce({
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce({
         startingBlock: 0,
         currentBlock: 10,
         highestBlock: 100,
       })
       .mockReturnValueOnce(false)
 
+    web3.eth.getBlock
+      // @ts-ignore
+      .mockReturnValueOnce({
+        number: 100,
+        timestamp: Math.round(Date.now() / 1000) - BLOCK_AGE_LIMIT,
+      })
+      .mockReturnValueOnce({
+        number: 200,
+        timestamp: Math.round(Date.now() / 1000),
+      })
+
     // @ts-ignore
     await expectSaga(checkWeb3SyncProgress)
       .withState(state)
-      .provide([[delay(100), true]])
+      .provide([[delay(100), delay(100), true]])
       .put(updateWeb3SyncProgress({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })) // is syncing the first time
       .put(completeWeb3Sync(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)

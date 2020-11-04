@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Affirmations from 'src/alliance/Affirmations'
 import Benefits from 'src/alliance/Benefits'
 import CollectiveMission from 'src/alliance/CollectiveMission'
@@ -15,8 +14,8 @@ import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import BeautifulQuote from 'src/shared/BeautifulQuote'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
@@ -88,7 +87,6 @@ export default function Main() {
       <ArticleData title={t('mediumArticlesTitle')} tagged={'alliance'} />
       <Benefits />
       <WheelWithForm />
-      <ConnectionFooter includeDividerLine={false} />
     </View>
   )
 }

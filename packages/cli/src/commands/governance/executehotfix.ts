@@ -3,6 +3,7 @@ import {
   ProposalBuilder,
   ProposalTransactionJSON,
 } from '@celo/contractkit/lib/governance/proposals'
+import { hexToBuffer } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { readFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
@@ -27,6 +28,7 @@ export default class ExecuteHotfix extends BaseCommand {
   async run() {
     const res = this.parse(ExecuteHotfix)
     const account = res.flags.from
+    this.kit.defaultAccount = account
 
     const jsonString = readFileSync(res.flags.jsonTransactions).toString()
     const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
@@ -34,7 +36,7 @@ export default class ExecuteHotfix extends BaseCommand {
     const builder = new ProposalBuilder(this.kit)
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
     const hotfix = await builder.build()
-    const saltBuff = Buffer.from(res.flags.salt, 'hex')
+    const saltBuff = hexToBuffer(res.flags.salt)
     const hash = hotfixToHash(this.kit, hotfix, saltBuff)
 
     const governance = await this.kit.contracts.getGovernance()
@@ -43,12 +45,12 @@ export default class ExecuteHotfix extends BaseCommand {
     await newCheckBuilder(this, account)
       .hotfixIsPassing(hash)
       .hotfixNotExecuted(hash)
-      .addCheck(`Hotfix ${hash} is prepared for current epoch`, async () => {
+      .addCheck(`Hotfix 0x${hash.toString('hex')} is prepared for current epoch`, async () => {
         const validators = await this.kit.contracts.getValidators()
         const currentEpoch = await validators.getEpochNumber()
         return record.preparedEpoch.eq(currentEpoch)
       })
-      .addCheck(`Hotfix ${hash} is approved`, () => record.approved)
+      .addCheck(`Hotfix 0x${hash.toString('hex')} is approved`, () => record.approved)
       .runChecks()
 
     await displaySendTx(

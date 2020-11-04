@@ -1,8 +1,6 @@
-import {
-  hashMessageWithPrefix,
-  Signature,
-  signedMessageToPublicKey,
-} from '@celo/utils/lib/signatureUtils'
+import { findAddressIndex } from '@celo/base/lib/address'
+import { Signature } from '@celo/base/lib/signatureUtils'
+import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { ReleaseGold } from '../generated/ReleaseGold'
@@ -12,7 +10,7 @@ import {
   proxyCall,
   proxySend,
   stringIdentity,
-  stringToBytes,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -475,7 +473,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
           proofOfSigningKeyPossession.s,
-          stringToBytes(pubKey)
+          stringToSolidityBytes(pubKey)
         )
       )
     } else {
@@ -523,9 +521,9 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s,
-        stringToBytes(pubKey),
-        stringToBytes(blsPublicKey),
-        stringToBytes(blsPop)
+        stringToSolidityBytes(pubKey),
+        stringToSolidityBytes(blsPublicKey),
+        stringToSolidityBytes(blsPop)
       )
     )
   }
@@ -564,7 +562,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)
@@ -589,7 +587,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)

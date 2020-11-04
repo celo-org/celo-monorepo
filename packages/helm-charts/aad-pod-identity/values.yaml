@@ -1,0 +1,29 @@
+namespace: default
+
+nmi:
+  forceNamespaced: true
+  prometheusPort: 9090
+  image:
+    repo: mcr.microsoft.com/k8s/aad-pod-identity/nmi
+    tag: 1.6.0
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+mic:
+  syncRetryDuration: 1m
+  forceNamespaced: true
+  prometheusPort: 9090
+  image:
+    repo: mcr.microsoft.com/k8s/aad-pod-identity/mic
+    tag: 1.6.0
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi

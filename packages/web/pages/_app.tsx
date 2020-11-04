@@ -1,19 +1,18 @@
 import App from 'next/app'
 import getConfig from 'next/config'
+import Head from 'next/head'
 import * as React from 'react'
 import { View } from 'react-native'
-import config from 'react-reveal/globals'
 import scrollIntoView from 'scroll-into-view'
 import analytics, { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer'
+import pagePaths from 'src/shared/menu-items'
 import Progress from 'src/shared/Progress'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
-
-config({ ssrReveal: true })
 
 class MyApp extends App {
   async componentDidMount() {
@@ -27,6 +26,7 @@ class MyApp extends App {
       checkH1Count()
     }
     await initializeAnalytics()
+    await analytics.page()
     if (await canTrack()) {
       await initSentry()
     }
@@ -36,9 +36,13 @@ class MyApp extends App {
   }
 
   // there are a few pages we dont want the header on
-  // currently this is just the animation demo pages and brand kit
+  // currently this is just the animation demo pages and experience kits and out art project
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
+    return (
+      this.props.router.asPath.startsWith('/animation') ||
+      this.isBrand() ||
+      this.props.router.asPath.startsWith(pagePaths.FLOWERS.link)
+    )
   }
 
   isBrand = () => {
@@ -56,16 +60,21 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <ScreenSizeProvider>
-        <Progress />
-        {this.skipHeader() || <Header />}
-        <Component {...pageProps} />
-        {this.skipHeader() || (
-          <View>
-            <Footer />
-          </View>
-        )}
-      </ScreenSizeProvider>
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </Head>
+        <ScreenSizeProvider>
+          <Progress />
+          {this.skipHeader() || <Header />}
+          <Component {...pageProps} />
+          {this.skipHeader() || (
+            <View>
+              <Footer />
+            </View>
+          )}
+        </ScreenSizeProvider>
+      </>
     )
   }
 }

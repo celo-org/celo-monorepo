@@ -1,11 +1,12 @@
 import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils/lib/io'
 import express from 'express'
 import * as t from 'io-ts'
-import { kit } from '../db'
-import { getAccountAddress, getAttestationSignerAddress } from '../env'
+import { getAgeOfLatestBlock, isNodeSyncing, useKit } from '../db'
+import { fetchEnvOrDefault, getAccountAddress, getAttestationSignerAddress } from '../env'
 import { ErrorMessages, respondWithError } from '../request'
-import { blacklistRegionCodes, configuredSmsProviders } from '../sms'
+import { configuredSmsProviders } from '../sms'
 
+export const VERSION = process.env.npm_package_version as string
 export const SIGNATURE_PREFIX = 'attestation-service-status-signature:'
 export const StatusRequestType = t.type({
   messageToSign: t.union([SignatureType, t.undefined]),
@@ -18,7 +19,9 @@ function produceSignature(message: string | undefined) {
     return undefined
   }
 
-  return kit.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
+  return useKit((kit) =>
+    kit.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
+  )
 }
 
 export async function handleStatusRequest(
@@ -27,14 +30,20 @@ export async function handleStatusRequest(
   statusRequest: StatusRequest
 ) {
   try {
+    const { ageOfLatestBlock, number: latestBlock } = await getAgeOfLatestBlock()
     res
       .json(
         AttestationServiceStatusResponseType.encode({
           status: 'ok',
           smsProviders: configuredSmsProviders(),
-          blacklistedRegionCodes: blacklistRegionCodes(),
+          blacklistedRegionCodes: [], // for backwards compatibility
           accountAddress: getAccountAddress(),
           signature: await produceSignature(statusRequest.messageToSign),
+          version: VERSION,
+          latestBlock,
+          ageOfLatestBlock,
+          isNodeSyncing: await isNodeSyncing(),
+          appSignature: fetchEnvOrDefault('APP_SIGNATURE', 'unknown'),
         })
       )
       .status(200)

@@ -1,11 +1,10 @@
 import { createSelector } from 'reselect'
-import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { DAYS_TO_BACKUP, DAYS_TO_DELAY } from 'src/backup/utils'
 import { BALANCE_OUT_OF_SYNC_THRESHOLD } from 'src/config'
 import { isGethConnectedSelector } from 'src/geth/selectors'
+import { getIncomingPaymentRequests } from 'src/paymentRequest/selectors'
 import { RootState } from 'src/redux/reducers'
 import { timeDeltaInDays, timeDeltaInSeconds } from 'src/utils/time'
-import { fornoSelector } from 'src/web3/selectors'
 
 export const disabledDueToNoBackup = (
   accountCreationTime: number,
@@ -28,11 +27,9 @@ export const isBackupTooLate = (state: RootState) => {
 export const getNetworkConnected = (state: RootState) => state.networkInfo.connected
 
 export const isAppConnected = createSelector(
-  fornoSelector,
   isGethConnectedSelector,
   getNetworkConnected,
-  (fornoEnabled, gethConnected, networkConnected) =>
-    (fornoEnabled || gethConnected) && networkConnected
+  (gethConnected, networkConnected) => gethConnected && networkConnected
 )
 
 export const isAppSynced = (state: RootState) => {
@@ -49,7 +46,7 @@ export const getTabBarActiveNotification = createSelector(
   (tooLate, paymentRequests) => tooLate || Boolean(paymentRequests.length)
 )
 
-export const goldTokenLastFetch = (state: RootState) => state.goldToken.lastFetch || 0
+export const celoTokenLastFetch = (state: RootState) => state.goldToken.lastFetch || 0
 export const stableTokenLastFetch = (state: RootState) => state.stableToken.lastFetch || 0
 
 export const lastFetchTooOld = (lastFetch: number) => {
@@ -57,10 +54,16 @@ export const lastFetchTooOld = (lastFetch: number) => {
   return !!lastFetch && timeDeltaInSeconds(Date.now(), lastFetch) > BALANCE_OUT_OF_SYNC_THRESHOLD
 }
 
-export const areAllBalancesFresh = (state: RootState) =>
-  lastFetchTooOld(goldTokenLastFetch(state)) || lastFetchTooOld(stableTokenLastFetch(state))
+export const isStableTokenBalanceStale = (state: RootState) =>
+  lastFetchTooOld(stableTokenLastFetch(state))
+
+export const isCeloTokenBalanceStale = (state: RootState) =>
+  lastFetchTooOld(stableTokenLastFetch(state))
+
+export const areAllBalancesStale = (state: RootState) =>
+  isCeloTokenBalanceStale(state) || isStableTokenBalanceStale(state)
 
 // isAppConnected is used to either show the "disconnected banner" or "Refresh balance"
 // but not both at the same time
 export const shouldUpdateBalance = (state: RootState) =>
-  areAllBalancesFresh(state) && isAppConnected(state)
+  areAllBalancesStale(state) && isAppConnected(state)

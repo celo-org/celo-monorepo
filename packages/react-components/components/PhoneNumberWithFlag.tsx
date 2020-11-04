@@ -1,19 +1,20 @@
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { getCountryEmoji, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 interface Props {
   e164PhoneNumber: string
-  defaultCountryCode: string
+  defaultCountryCode?: string
 }
 
 export class PhoneNumberWithFlag extends React.PureComponent<Props> {
   render() {
     const parsedNumber = parsePhoneNumber(this.props.e164PhoneNumber, this.props.defaultCountryCode)
     return (
-      <View style={style.container}>
-        <Text style={[fontStyles.telephoneHeadline, style.countryCodeContainer]}>
+      <View style={styles.container}>
+        <Text style={[fontStyles.small, styles.countryCodeContainer]}>
           {parsedNumber
             ? getCountryEmoji(
                 this.props.e164PhoneNumber,
@@ -22,29 +23,25 @@ export class PhoneNumberWithFlag extends React.PureComponent<Props> {
               )
             : getCountryEmoji(this.props.e164PhoneNumber)}
         </Text>
-        <Text style={fontStyles.telephoneHeadline}>
-          {(parsedNumber && parsedNumber.displayNumber) || ''}
+        <Text style={[fontStyles.small, styles.phoneNumber]}>
+          {parsedNumber ? `+${parsedNumber.countryCode} ${parsedNumber.displayNumber}` : ''}
         </Text>
       </View>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   countryCodeContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 3,
-    backgroundColor: '#EEEEEE',
-    paddingLeft: 6,
-    paddingRight: 3,
-    marginRight: 5,
+    marginRight: 4,
+  },
+  phoneNumber: {
+    color: colors.gray4,
   },
 })
 

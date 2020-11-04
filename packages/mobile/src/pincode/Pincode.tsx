@@ -2,92 +2,88 @@
  * This is a VIEW. We use it everwhere we need to show PIN pad
  * with an input, e.g. get/ensure/set pincode.
  */
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
-import React, { useCallback, useMemo } from 'react'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
+import React from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import PincodeTextbox from 'src/pincode/PincodeTextbox'
+import { PIN_LENGTH } from 'src/pincode/authentication'
+import PincodeDisplay from 'src/pincode/PincodeDisplay'
 
 interface Props {
-  onPress: () => void
-  title: string
-  placeholder: string
-  buttonText: string
+  title?: string
+  errorText?: string
   maxLength?: number
-  isPinValid: (pin: string) => boolean
   pin: string
   onChangePin: (pin: string) => void
+  onCompletePin: (pin: string) => void
 }
 
-function Pincode(props: Props) {
-  const { maxLength, pin, onChangePin, onPress, title, placeholder, buttonText, isPinValid } = props
+function Pincode({
+  title,
+  errorText,
+  maxLength = PIN_LENGTH,
+  pin,
+  onChangePin,
+  onCompletePin,
+}: Props) {
+  const onDigitPress = (digit: number) => {
+    if (pin.length >= maxLength) {
+      return
+    }
 
-  const onDigitPress = useCallback(
-    (digit) => {
-      let newPin = pin + digit
-      if (maxLength) {
-        newPin = newPin.substr(0, maxLength)
-      }
-      onChangePin(newPin)
-    },
-    [pin, onChangePin, maxLength]
-  )
+    const newPin = pin + digit
+    onChangePin(newPin)
+    if (newPin.length === maxLength) {
+      // Wait for next frame so we the user can see the last digit
+      // displayed before acting on it
+      requestAnimationFrame(() => onCompletePin(newPin))
+    }
+  }
 
-  const onBackspacePress = useCallback(() => {
+  const onBackspacePress = () => {
     onChangePin(pin.substr(0, pin.length - 1))
-  }, [pin, onChangePin])
-
-  const validPin = useMemo(() => isPinValid(pin), [pin, isPinValid])
+  }
 
   return (
-    <>
-      <ScrollView contentContainerStyle={style.scrollContainer}>
-        <View>
-          <Text style={[fontStyles.h1, componentStyles.marginTop15]}>{title}</Text>
-          <View style={style.pincodeContainer}>
-            <PincodeTextbox pin={pin} placeholder={placeholder} />
-          </View>
-        </View>
-        <View>
-          <HorizontalLine />
-          <View style={style.keypadContainer}>
-            <NumberKeypad
-              showDecimal={false}
-              onDigitPress={onDigitPress}
-              onBackspacePress={onBackspacePress}
-            />
-          </View>
-        </View>
-      </ScrollView>
-      <Button
-        testID="Pincode-Submit"
-        text={buttonText}
-        standard={false}
-        type={BtnTypes.PRIMARY}
-        onPress={onPress}
-        disabled={!validPin}
-      />
-    </>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.spacer} />
+      {!errorText && <Text style={styles.title}>{title || ' '}</Text>}
+      {!!errorText && <Text style={styles.error}>{errorText}</Text>}
+      <View style={styles.pincodeContainer}>
+        <PincodeDisplay pin={pin} maxLength={maxLength} />
+      </View>
+      <View style={styles.spacer} />
+      <NumberKeypad onDigitPress={onDigitPress} onBackspacePress={onBackspacePress} />
+    </ScrollView>
   )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+  },
   scrollContainer: {
+    flexGrow: 1,
+  },
+  spacer: {
     flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: 0,
+  },
+  title: {
+    ...fontStyles.regular,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  error: {
+    ...fontStyles.regular500,
+    color: colors.warning,
+    textAlign: 'center',
+    marginBottom: 24,
   },
   pincodeContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
+    paddingHorizontal: '15%',
     alignItems: 'center',
-  },
-  keypadContainer: {
-    marginBottom: 15,
-    paddingHorizontal: 20,
   },
 })
 

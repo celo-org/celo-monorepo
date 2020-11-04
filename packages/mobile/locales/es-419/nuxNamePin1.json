@@ -1,62 +1,43 @@
 {
-  "chooseLanguage": "Elegir idioma",
   "continue": "Continuar",
-  "welcomeCelo": "Te damos la bienvenida a Celo",
+  "welcomeCelo": "Te damos la bienvenida a {{appName}}",
   "chooseCountryCode": "Código de país",
   "chooseCountry": "País",
-  "joinText": {
-    "0": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
-    "1":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
-    "2": "celo.org/terms"
+  "joinText": "{{appName}} te ayuda a enviar, recibir y guardar valor en la red de Celo.",
+  "terms": {
+    "title": "Términos y Condiciones",
+    "heading1": "Datos y Privacidad",
+    "heading2": "Activos de Celo y Cuenta {{appName}}",
+    "privacy": "Al unirte a esta red, nos das permiso para recopilar información anónima tu uso de la aplicación. Además, si verificas tu número de teléfono, se almacenará un resultado de una función hash en la Red de Celo. Más información en <0>{{tosLink}}</0>",
+    "goldDisclaimer": "Cuando creas una ‘cuenta’ con {{appName}} estas creando una app digital de la que solo tú tienes las claves. Ninguna otra persona o entidad, incluyendo cLabs, puede recuperar tus claves, cambiar o deshacer transacciones, ni recuperar fondos perdidos. Ten en cuenta que tanto cUSD como CELO son parte de una nueva clase de activos y presentan riesgos de pérdidas financieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar cualquiera de éstos. Solo puedes enviar hasta 500 cUSD por día a través de {{appName}} (“Límite Diario”). Debes contactar a support@cLabs.co y proporcionar información personal adicional para aumentar este Límite Diario. Podría haber una demora para realizar el cumplimiento requerido."
   },
-  "phoneNumber": "000 000 0000",
-  "inviteCodeText": {
-    "title": "Ingresa el Código de Invitación",
-    "body":
-      "Si tiene un código de invitación, ingréselo aquí. Puede copiar y pegar todo el mensaje.",
-    "codeHeader": "Código de Invitación",
-    "codePlaceholder": "Celo código: am9hBM3tiA+CuNb...",
-    "noCode": "¿No tienen un código? ",
-    "requestCodeNoFaucet": " Solicite una invitación de un amigo con una billetera Celo o ",
-    "requestCodeFromFaucet": "Solicite una invitación en ",
-    "faucetLink": "celo.org/app",
-    "skip": "continuar sin."
-  },
+  "phoneNumber": "Número de teléfono",
   "fullName": "Nombre completo",
+  "fullNamePlaceholder": "Nombre Apellido",
   "importIt": "Restaurar tu monedero existente",
   "cancel": "Cancelar",
   "important": "Importante",
   "createPin": {
     "title": "Crear un PIN de 6 dígitos",
-    "yourPin": "Su PIN"
+    "yourPin": "Tu PIN"
   },
   "verifyPin": {
     "title": "Repetir el PIN"
   },
   "confirmPin": {
-    "title": "Ingrese su PIN"
-  },
-  "pincodeEducation": {
-    "title": "Asegure su billetera",
-    "intro": "Para proteger su cuenta, Celo billetera requiere un PIN.",
-    "summary":
-      "Puede usar la autenticación existente de su teléfono o crear un nuevo PIN para esta aplicación.",
-    "usePhoneAuth": "Usar Autenticación de Teléfono",
-    "createNewPin": "Crear nuevo PIN"
+    "title": "Ingresa tu PIN"
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
   "initKeystoreFailureMessage": "Error al recuperar la clave",
   "pinLostForeverMessage": "Eliminaste el bloqueo de pantalla, el PIN se perdió",
   "enableScreenLockMessage":
-    "Por favor habilitá el bloqueo de pantalla para usar Celo. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de respaldo para acceder a tu cuenta",
+    "Por favor habilitá el bloqueo de pantalla para usar {{appName}}. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de cuenta para acceder a tu cuenta",
   "importContactsPermission": {
     "title": "Importar contactos",
-    "0":
-      "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
-    "1": "No se preocupe: la conexión no envía invitaciones a sus contactos.",
+    "0": "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
+    "1": "No te preocupes: la conexión no envía invitaciones a tus contactos.",
     "enable": "Habilitar acceso a contactos",
-    "loading": "Encontrar amigos usando Celo..."
+    "loading": "Encontrar amigos usando {{appName}}..."
   }
 }

@@ -1,8 +1,8 @@
 /index.js
 /index.js.map
 
-lib/*.js
-lib/*.js.map
+lib/**/*.js
+lib/**/*.js.map
 
 migrations/**/*.js
 migrations/**/*.js.map
@@ -28,3 +28,5 @@ types/contracts/*
 
 .0x-artifacts/*
 coverage/*
+
+deployedGrants.json

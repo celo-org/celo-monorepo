@@ -5,23 +5,24 @@ import express from 'express'
 import expressEnforcesSsl from 'express-enforces-ssl'
 import helmet from 'helmet'
 import next from 'next'
-import nextI18NextMiddleware from 'next-i18next/middleware'
+import path from 'path'
 import { Tables } from '../fullstack/EcoFundFields'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import Sentry, { initSentryServer } from '../server/sentry'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
-import nextI18next from '../src/i18n'
 import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
+import rateLimit from './rateLimit'
 import respondError from './respondError'
 
 const CREATED = 201
 const NO_CONTENT = 204
+const MOVED_PERMANENTLY = 301
 
 const port = parseInt(process.env.PORT, 10) || 3000
 
@@ -33,7 +34,7 @@ const handle = app.getRequestHandler()
 function wwwRedirect(req: express.Request, res: express.Response, nextAction: () => unknown) {
   if (req.headers.host.startsWith('www.')) {
     const newHost = req.headers.host.slice(4)
-    return res.redirect(301, req.protocol + '://' + newHost + req.originalUrl)
+    return res.redirect(MOVED_PERMANENTLY, req.protocol + '://' + newHost + req.originalUrl)
   }
   nextAction()
 }
@@ -53,33 +54,30 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   }
 
   // page redirects
-  ;['/careers', '/join'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/careers', '/join'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/jobs')
     })
   })
-  ;['/about-us'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/about-us'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/about')
     })
   })
-  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/arg_tos', '/arg_privacy', '/argentina'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/terms')
     })
   })
-  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/developer'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/developers')
-    })
-  })
-  ;['/build'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/validators')
-    })
-  })
-  ;['/build/validators'].forEach((path) => {
-    server.get(path, (_, res) => {
+  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/build', '/developer'].forEach(
+    (route) => {
+      server.get(route, (_, res) => {
+        res.redirect('/developers')
+      })
+    }
+  )
+  ;['/build/validators'].forEach((route) => {
+    server.get(route, (_, res) => {
       res.redirect('/validators/explore')
     })
   })
@@ -87,9 +85,9 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })
-  ;['/download', '/app', '/mobile-app', '/invite', 'build/download'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/build/wallet')
+  ;['/test-wallet', 'build/download'].forEach((route) => {
+    server.get(route, (_, res) => {
+      res.redirect('/developers/wallet')
     })
   })
 
@@ -98,17 +96,26 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   server.get('/papers/cbdc-velocity', (_, res) => {
-    res.redirect('/papers/cLabs_CBDC_Velocity_v2_04-2020.pdf')
+    res.redirect('/papers/cLabs_CBDC_Velocity_v3.pdf')
+  })
+
+  server.get('/papers/cbdc-velocity/spanish', (_, res) => {
+    res.redirect('/papers/cLabs_CBDC_Velocity_Spanish.pdf')
   })
 
   server.get('/papers/whitepaper', (_, res) => {
     res.redirect(
-      '/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+      '/papers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
     )
   })
 
-  server.get('/brand', (_, res) => {
-    res.redirect('/experience/brand')
+  server.get('/papers/whitepaper/chinese', (_, res) => {
+    res.redirect('/papers/celo-wp-simplified-chinese.pdf')
+  })
+  ;['/brand', '/grants'].forEach((slug) => {
+    server.get(slug, (_, res) => {
+      res.redirect(`/experience${slug}`)
+    })
   })
 
   server.get('/connect', (_, res) => {
@@ -123,10 +130,55 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
   })
 
-  server.use(bodyParser.json())
-  server.use(nextI18NextMiddleware(nextI18next))
+  // File serving for OpenPGP WKD https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html
+  // Content must be served on multiple paths, and cannot use a redirect.
+  ;['/.well-known/openpgpkey/hu/:userId', '/.well-known/openpgpkey/:host/hu/:userId'].forEach(
+    (route) => {
+      server.get(route, (req, res) => {
+        const host = req.params.host ?? req.hostname
+        if (!req.hostname.includes(host)) {
+          res.sendStatus(400)
+          return
+        }
+        const userId = req.params.userId ?? ''
+        if (!/\w+/.test(userId)) {
+          res.sendStatus(400)
+          return
+        }
+        res.sendFile(
+          path.join(host, 'hu', userId),
+          { root: path.join(process.cwd(), 'openpgpkey') },
+          (err) => {
+            if (err) {
+              res.sendStatus(404)
+            }
+          }
+        )
+      })
+    }
+  )
+  ;['/.well-known/openpgpkey/policy', '/.well-known/openpgpkey/:host/policy'].forEach((route) => {
+    server.get(route, (req, res) => {
+      const host = req.params.host ?? req.hostname
+      if (!req.hostname.includes(host)) {
+        res.sendStatus(400)
+        return
+      }
+      res.sendFile(
+        path.join(host, 'policy'),
+        { root: path.join(process.cwd(), 'openpgpkey') },
+        (err) => {
+          if (err) {
+            res.sendStatus(404)
+          }
+        }
+      )
+    })
+  })
 
-  server.post('/fellowship', async (req, res) => {
+  server.use(bodyParser.json())
+
+  server.post('/fellowship', rateLimit, async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
     try {
@@ -142,20 +194,20 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureException(e)
+        Sentry.captureEvent({ message: e.message, extra: e })
       })
       respondError(res, e)
     }
   })
 
-  server.post('/ecosystem/:table', async (req, res) => {
+  server.post('/ecosystem/:table', rateLimit, async (req, res) => {
     try {
-      const record = await ecoFundSubmission(req.body, req.params.table as Tables)
-      res.status(CREATED).json({ id: record.id })
+      await ecoFundSubmission(req.body, req.params.table as Tables)
+      res.sendStatus(CREATED)
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureEvent(e)
+        Sentry.captureEvent({ message: e.message, extra: e })
       })
       respondError(res, e)
     }
@@ -169,9 +221,13 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     await faucetOrInviteController(req, res, RequestType.Invite)
   })
 
-  server.post('/contacts', async (req, res) => {
-    await addToCRM(req.body)
-    res.status(NO_CONTENT).send('ok')
+  server.post('/contacts', rateLimit, async (req, res) => {
+    try {
+      await addToCRM(req.body)
+      res.status(NO_CONTENT).send('ok')
+    } catch (e) {
+      respondError(res, e)
+    }
   })
 
   server.get('/announcement', async (req, res) => {
@@ -183,7 +239,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     }
   })
 
-  server.post('/api/alliance', async (req, res) => {
+  server.post('/api/alliance', rateLimit, async (req, res) => {
     try {
       await create(req.body)
       res.sendStatus(CREATED)
@@ -192,7 +248,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     }
   })
 
-  server.post('/partnerships-email', async (req, res) => {
+  server.post('/partnerships-email', rateLimit, async (req, res) => {
     const { email } = req.body
     try {
       await mailer({

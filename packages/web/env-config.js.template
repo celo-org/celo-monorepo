@@ -11,6 +11,9 @@ const environments = {
     BLOCKSCOUT: {
       pageLength: 5,
       uri: 'http://localhost:4000/graphiql',
+      mainnet: 'http://localhost:4000/graphiql',
+      baklava: 'http://localhost:4000/graphiql',
+      baklavastaging: 'http://localhost:4000/graphiql',
     },
     V3: true,
     __SEGMENT_KEY__: 'REPLACE_ME',

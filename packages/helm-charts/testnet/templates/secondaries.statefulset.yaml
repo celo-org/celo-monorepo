@@ -1,0 +1,279 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: secondaries
+  labels:
+    component: secondaries
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    component: secondaries
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "common.fullname" . }}-secondaries
+  labels:
+{{ include "common.standard.labels" .  | indent 4 }}
+    component: secondaries
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      {{ if .Values.geth.ssd_disks }}storageClassName: ssd{{ end }}
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.geth.diskSizeGB }}Gi
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: {{ .Values.geth.secondaries }}
+  serviceName: secondaries
+  selector:
+    matchLabels:
+{{ include "common.standard.labels" .  | indent 6 }}
+      component: secondaries
+  template:
+    metadata:
+      labels:
+{{ include "common.standard.labels" .  | indent 8 }}
+        component: secondaries
+{{ if .Values.metrics | default false }}
+      annotations:
+{{ include "common.prometheus-annotations" . | indent 8 }}
+{{- end }}
+    spec:
+      initContainers:
+{{ include "common.init-genesis-container" .  | indent 6 }}
+      - name: get-account
+        image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
+        imagePullPolicy: Always
+        command:
+        - /bin/bash
+        - "-c"
+        args:
+        - |
+          [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+          RID=${BASH_REMATCH[1]}
+          echo -n "$RID" >/root/.celo/replica_id
+          echo "Generating private key for rid=$RID"
+          celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index "$RID" > /root/.celo/pkey
+          echo 'Generating address'
+          celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
+
+          # If this is a proxied validator, it will not have an external IP address
+          # and EXTERNAL_IP_ADDRESS will be empty
+          EXTERNAL_IP_ADDRESS=`echo -n "$IP_ADDRESSES" | cut -d '/' -f $((RID + 1))`
+          echo "$EXTERNAL_IP_ADDRESS" > /root/.celo/externalIpAddress
+
+          # Put the proxies per validator array into a comma separated string
+          # so we can index it at runtime
+          PROXIES_PER_VALIDATOR="{{ join "," .Values.geth.proxiesPerValidator }}"
+          PROXY_COUNT=`echo -n $PROXIES_PER_VALIDATOR | cut -d ',' -f $((RID + 1))`
+          echo -n "$PROXY_COUNT" > /root/.celo/proxyCount
+
+          if [[ -z "$EXTERNAL_IP_ADDRESS" ]]; then
+            echo "$POD_IP" > /root/.celo/ipAddress
+          else
+            cat /root/.celo/externalIpAddress > /root/.celo/ipAddress
+          fi
+          echo -n "Generating IP address for validator: "
+          cat /root/.celo/ipAddress
+
+          celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /root/.celo/bootnodeEnodeAddress
+          echo -n "Generating Bootnode enode address for the validator: "
+          cat /root/.celo/bootnodeEnodeAddress
+
+          [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
+          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo -n "Generating Bootnode enode for the validator: "
+          cat /root/.celo/bootnodeEnode
+
+          # If this validator is meant to be proxied
+          if [[ ! -z "$PROXY_COUNT" ]]; then
+            # Put the all the validator's proxy IP addresses into a comma separated string
+            # so we can access it at runtime. Validators are separated by commas,
+            # and individual IP addresses are separated by /'s. For example,
+            # if one validator has 2 proxies, and the other has 1 proxy:
+            # ALL_VALIDATOR_PROXY_IPS would have the form X.X.X.X/X.X.X.X,X.X.X.X
+            ALL_VALIDATOR_PROXY_IPS='{{ join "," .Values.geth.proxyIPAddressesPerValidatorArray }}'
+            [[ $ALL_VALIDATOR_PROXY_IPS = '<nil>' ]] && ALL_VALIDATOR_PROXY_IPS=''
+
+            PROXY_IPS=`echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1))`
+
+            # Clear the proxy enode file because it's persisted
+            rm -f /root/.celo/proxyEnodeUrlPairs
+            # Generate all proxy enode urls and put them into /root/.celo/proxyEnodeUrlPairs
+            PROXY_INDEX=0
+            while [ "$PROXY_INDEX" -lt "$PROXY_COUNT" ]; do
+              if [ "$PROXY_INDEX" -gt 0 ]; then
+                echo -n "," >> /root/.celo/proxyEnodeUrlPairs
+              fi
+
+              # gives us PROXY_ENODE_URL_PAIR
+              {{- include "celo.proxyenodeurlpair" . | indent 14 }}
+              echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
+
+              PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
+            done
+          fi
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "common.fullname" . }}-geth-account
+              key: mnemonic
+        - name: IP_ADDRESSES
+          value: {{ join "/" .Values.geth.validatorsIPAddressArray }}
+        - name: BOOTNODE_IP_ADDRESS
+          value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+{{ include "common.import-geth-account-container" .  | indent 6 }}
+      containers:
+      - name: geth
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: Always
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          set -euo pipefail
+          rm /root/.celo/pkey || true
+          ADDITIONAL_FLAGS=''
+
+          ACCOUNT_ADDRESS=$(cat /root/.celo/address)
+          RID=$(cat /root/.celo/replica_id)
+
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
+          fi
+
+          if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
+            PROXY_FLAG="--proxy.proxyenodeurlpairs"
+          else
+            PROXY_FLAG="--proxy.proxyenodeurlpair"
+          fi
+
+          PROXY_COUNT=$(cat /root/.celo/proxyCount)
+          if [ "$PROXY_COUNT" -gt 0 ]; then
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          else
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+          fi
+
+          [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
+
+          [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
+
+          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
+            BOOTNODE_FLAG="--${network_name}"
+          else
+            BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
+          fi
+
+          {{- if .metrics | default true }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+          {{- end }}
+          {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
+          {{- end }}
+          exec geth \
+            $BOOTNODE_FLAG \
+            --datadir /root/.celo \
+            --nousb \
+            --password=/root/.celo/account/accountSecret \
+            --unlock=${ACCOUNT_ADDRESS} \
+            --mine \
+            --rpc \
+            --rpcaddr 0.0.0.0 \
+            --rpcapi=eth,net,web3,debug \
+            --rpccorsdomain='*' \
+            --rpcvhosts=* \
+            --ws \
+            --wsaddr 0.0.0.0 \
+            --wsorigins=* \
+            --wsapi=eth,net,web3,debug \
+            --etherbase=${ACCOUNT_ADDRESS} \
+            --networkid=${NETWORK_ID} \
+            --syncmode=full \
+            --consoleformat=json \
+            --consoleoutput=stdout \
+            --verbosity={{ .Values.geth.verbosity }} \
+            --vmodule={{ .Values.geth.vmodule }} \
+            --istanbul.replica \
+            --istanbul.blockperiod={{ .Values.geth.blocktime }} \
+            --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
+            --maxpeers=125 \
+            --nat=extip:`cat /root/.celo/ipAddress` \
+            --allow-insecure-unlock \
+            ${ADDITIONAL_FLAGS}
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: ETHSTATS_SVC
+          value: {{ template "common.fullname" . }}-ethstats.{{ .Release.Namespace }}
+        - name: NETWORK_ID
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "common.fullname" . }}-geth-config
+              key: networkid
+        - name: FAULTY_NODES
+          value: {{ .Values.geth.faultyValidators | quote }}
+        - name: FAULTY_NODE_TYPE
+          value: {{ .Values.geth.faultyValidatorType | quote }}
+        - name: STATIC_IPS_FOR_GETH_NODES
+          value: "{{ default false .Values.geth.static_ips }}"
+        - name: PING_IP_FROM_PACKET
+          value: "{{ default false .Values.geth.ping_ip_from_packet }}"
+        - name: IN_MEMORY_DISCOVERY_TABLE
+          value: "{{ default "false" .Values.geth.in_memory_discovery_table }}"
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: rpc
+          containerPort: 8545
+        - name: ws
+          containerPort: 8546
+        {{- if .Values.geth.enable_metrics | default false }}
+        - name: metrics
+          containerPort: 6060
+        {{- end }}
+        resources:
+{{ toYaml .Values.geth.resources | indent 10 }}
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          mountPath: /root/.celo/account
+          readOnly: true
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: {{ template "common.fullname" . }}-geth-config
+      - name: account
+        secret:
+          secretName: {{ template "common.fullname" . }}-geth-account
