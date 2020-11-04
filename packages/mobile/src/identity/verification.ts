@@ -789,7 +789,7 @@ function* completeAttestation(
   yield put(completeAttestationCode(code))
 }
 
-export async function tryRevealPhoneNumber(
+export function* tryRevealPhoneNumber(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
@@ -813,7 +813,8 @@ export async function tryRevealPhoneNumber(
       smsRetrieverAppSig,
     }
 
-    const { ok, status, body } = await postToAttestationService(
+    const { ok, status, body } = yield call(
+      postToAttestationService,
       attestationsWrapper,
       attestation.attestationServiceURL,
       revealRequestBody
@@ -832,9 +833,10 @@ export async function tryRevealPhoneNumber(
       // Retry as attestation service might not yet have received the block where it was made responsible for an attestation
       Logger.debug(TAG + '@tryRevealPhoneNumber', `Retrying revealing for issuer: ${issuer}`)
 
-      await delay(REVEAL_RETRY_DELAY)
+      yield delay(REVEAL_RETRY_DELAY)
 
-      const { ok: retryOk, status: retryStatus } = await postToAttestationService(
+      const { ok: retryOk, status: retryStatus } = yield call(
+        postToAttestationService,
         attestationsWrapper,
         attestation.attestationServiceURL,
         revealRequestBody

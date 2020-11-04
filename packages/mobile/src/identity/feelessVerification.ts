@@ -33,6 +33,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
+import networkConfig from 'src/geth/networkConfig'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -45,6 +46,7 @@ import {
   StartVerificationAction,
   updateE164PhoneNumberSalts,
 } from 'src/identity/actions'
+import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
 import {
   getAddressesFromLookupResult,
   lookupAttestationIdentifiers,
@@ -759,11 +761,12 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
 
     console.log(komenciKit)
 
+    const blsBlindingClient = new ReactBlsBlindingClient(networkConfig.odisPubKey)
     const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
       [
         komenciKit,
         async (phoneNumber, version) =>
-          komenciKit.getDistributedBlindedPepper(phoneNumber, version),
+          komenciKit.getDistributedBlindedPepper(phoneNumber, version, blsBlindingClient),
       ],
       e164Number,
       DeviceInfo.getVersion()
