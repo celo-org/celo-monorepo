@@ -400,7 +400,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli --ignore @celo/env-tests run test
 
       - store_test_results:
           path: test-results
@@ -460,6 +460,24 @@ jobs:
           name: Upload to CodeCov
           command: yarn codecov -F mobile
 
+  protocol-test-release:
+    <<: *defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      - run:
+          name: Test release against v2
+          command: |
+            mkdir -p ~/.ssh
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "Comparing against first commit to contain version numbers"
+            yarn --cwd packages/protocol test:devchain-release -b celo-core-contracts-v2.pre-audit
+
   protocol-test-common:
     <<: *defaults
     resource_class: large
@@ -471,75 +489,8 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
-          name: Check contract versions
-          command: |
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            echo "Comparing against first commit to contain version numbers"
-            git fetch --all
-            RELEASE_TAG=celo-core-contracts-v1.rc1
-            yarn --cwd packages/protocol check-versions -a $RELEASE_TAG -b $CIRCLE_BRANCH
-            LIBRARIES_CHANGED=$(git diff $RELEASE_TAG --name-only packages/protocol/contracts/common/linkedlists)
-            if [[ $LIBRARIES_CHANGED ]]; then
-              echo "Changing the linked list libraries is not currently supported."
-              exit 0
-            fi
-      - run:
           name: Unit tests
           command: yarn --cwd packages/protocol test common/
-
-  protocol-verify-bytecodes:
-    <<: *defaults
-    resource_class: large
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
-      - run:
-          name: Verify bytecodes between most recent release and current branch
-          command: |
-            # TODO: remove once devchain can reproduce deployments after release 1
-            exit 0
-
-            cd packages/protocol
-
-            # deploy most recent release contracts to ganache devchain
-            # We fetch via HTTPS instead of SSH to avoid the interactive "do you
-            # trust the RSA key fingerprint" prompt.
-            git remote add origin-https https://github.com/celo-org/celo-monorepo.git
-            git fetch origin-https rc1
-            git checkout rc1
-            rm -rf build/contracts
-            yarn devchain generate-tar devchain.tar.gz --migration_override <(echo '{"downtimeSlasher": { "slashableDowntime": 60 } }')
-            # store build artifacts in build/rc1
-            mv build/contracts build/rc1
-
-            # build current contracts (artifacts in build/contracts)
-            git checkout ${CIRCLE_BRANCH}
-            rm -rf build/contracts
-            yarn build
-
-            # run ganache, wait for it to start
-            yarn devchain run-tar devchain.tar.gz &
-            GANACHE_PID=$!
-            echo "Waiting for ganache to start"
-            sleep 30
-
-            # verify bytecodes of RC1 deployment
-            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/rc1 --before_release_1
-            # generate report between RC1 and current branch
-            yarn ts-node scripts/check-backward.ts report --exclude ".*Test|Mock.*|I[A-Z].*|.*Proxy|LinkedList|SortedLinkedList|SortedLinkedListWithMedian|MultiSig.*|ReleaseGold" -o build/rc1 -n build/contracts --output_file report.json
-            # deploy new contracts and generate Governance proposal for upgrade
-            # TODO: remove --truffle_override once gas limit is increased
-            yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data example-initialize-data.json --truffle_override '{"gasLimit": 12500000, "gas": 12500000 }'
-            # verify bytecode of upgrade deployment
-            yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
-
-            # stop ganache
-            kill $GANACHE_PID
 
   protocol-test-compatibility:
     <<: *defaults
@@ -841,6 +792,24 @@ jobs:
             cd packages/celotool
             ./ci_test_governance.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
 
+  end-to-end-geth-replica-test:
+    <<: *e2e-defaults
+    resource_class: large
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            cd packages/celotool
+            ./ci_test_replicas.sh checkout ${CELO_BLOCKCHAIN_BRANCH_TO_TEST}
+
   end-to-end-geth-sync-test:
     <<: *e2e-defaults
     resource_class: large
@@ -1034,10 +1003,10 @@ workflows:
             - lint-checks
       - end-to-end-mobile-test-android
       - end-to-end-mobile-test-ios
-      - protocol-test-common:
+      - protocol-test-release:
           requires:
             - lint-checks
-      - protocol-verify-bytecodes:
+      - protocol-test-common:
           requires:
             - lint-checks
       - protocol-test-compatibility:
@@ -1083,6 +1052,10 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - end-to-end-geth-replica-test:
+          requires:
+            - lint-checks
+            - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
             - lint-checks
@@ -1110,6 +1083,7 @@ workflows:
             - end-to-end-geth-blockchain-parameters-test
             - end-to-end-geth-slashing-test
             - end-to-end-geth-governance-test
+            - end-to-end-geth-replica-test
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - phone-number-privacy-test

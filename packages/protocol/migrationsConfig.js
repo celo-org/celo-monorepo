@@ -299,6 +299,10 @@ const NetworkConfigs = {
     stableToken: {
       oracles: [network.from],
       frozen: false,
+      initialBalances: {
+        addresses: [network.from],
+        values: ['5000000000000000000000000'],
+      },
     },
   },
   testing: {

@@ -91,7 +91,7 @@ export type StackParamList = {
   }
   [Screens.FiatExchangeOptions]: {
     isAddFunds: boolean
-    amount: BigNumber
+    amount?: BigNumber
     isExplanationOpen?: boolean
   }
   [Screens.MoonPay]: {
@@ -142,6 +142,7 @@ export type StackParamList = {
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
+    onCancel: () => void
   }
   [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
@@ -181,6 +182,7 @@ export type StackParamList = {
   [Screens.Settings]:
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
     | undefined
+  [Screens.Simplex]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
