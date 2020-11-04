@@ -184,7 +184,7 @@ jobs:
             echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
 
       - restore_cache:
-          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
+          key: android=tools-v2-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
 
       - run:
           name: install android tools
@@ -198,7 +198,7 @@ jobs:
             sdkmanager --list
 
       - save_cache:
-          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
+          key: android=tools-v2-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
           paths:
             - /Users/distiller/android-tools
 
