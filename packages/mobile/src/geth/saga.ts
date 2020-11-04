@@ -12,19 +12,19 @@ import {
   setGethConnected,
   SetGethConnectedAction,
   setInitState,
-  SetInitStateAction,
+  SetInitStateAction
 } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   initGeth,
-  stopGethIfInitialized,
+  stopGethIfInitialized
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
 import {
   chainHeadSelector,
   gethInitializedSelector,
-  isGethConnectedSelector,
+  isGethConnectedSelector
 } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -33,7 +33,7 @@ import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { BLOCK_AGE_LIMIT, blockIsFresh } from 'src/web3/utils'
+import { blockIsFresh, BLOCK_AGE_LIMIT } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -44,6 +44,7 @@ const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
 const GETH_SYNC_TIMEOUT = 30000 // ms
 const GETH_POLLING_INTERVAL = 500 // ms
+const GETH_RETRY_DELAY = 3000 // ms
 
 export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -210,29 +211,35 @@ export const _waitForGethInit = waitForGethInit
 export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
+  let failureResult: GethInitOutcomes
 
-  const { result } = yield race({
-    result: call(waitForGethInit),
-    timeout: delay(INIT_GETH_TIMEOUT),
-  })
+  while (true) {
+    const { result } = yield race({
+      result: call(waitForGethInit),
+      timeout: delay(INIT_GETH_TIMEOUT),
+    })
 
-  let restartAppAutomatically: boolean = false
-  let errorContext: string
-  switch (result) {
-    case GethInitOutcomes.SUCCESS: {
+    if (result === GethInitOutcomes.SUCCESS) {
       Logger.debug(TAG, 'Geth initialized')
       ValoraAnalytics.track(GethEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
       return
-    }
-    case GethInitOutcomes.NETWORK_ERROR_FETCHING_STATIC_NODES: {
-      errorContext =
-        'Could not fetch static nodes from the network. Tell user to check data connection.'
-      Logger.error(TAG, errorContext)
+    } else if (result === GethInitOutcomes.NETWORK_ERROR_FETCHING_STATIC_NODES) {
+      // TODO(erdal): we might want to retry in other error cases as well
+      // analyze stats and decide
+      Logger.error(TAG, 'Could not fetch static nodes from the network. Tell user to check data connection.')
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
-      restartAppAutomatically = false
+      yield delay(GETH_RETRY_DELAY)
+    } else {
+      failureResult = result
       break
     }
+  }
+
+  let restartAppAutomatically: boolean = false
+  let errorContext: string
+
+  switch (failureResult) {
     case GethInitOutcomes.NETWORK_ERROR_FETCHING_GENESIS_BLOCK: {
       errorContext =
         'Could not fetch genesis block from the network. Tell user to check data connection.'
@@ -260,7 +267,7 @@ export function* initGethSaga() {
   }
 
   ValoraAnalytics.track(GethEvents.geth_init_failure, {
-    error: result,
+    error: failureResult,
     context: errorContext,
   })
 
@@ -272,7 +279,7 @@ export function* initGethSaga() {
     // Suggest switch to forno for network-related errors
     if (yield select(promptFornoIfNeededSelector)) {
       ValoraAnalytics.track(GethEvents.prompt_forno, {
-        error: result.message,
+        error: failureResult,
         context: 'Geth init error',
       })
       yield put(setPromptForno(false))
