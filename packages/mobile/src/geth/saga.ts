@@ -44,7 +44,7 @@ const NEW_BLOCK_TIMEOUT = 30000 // ms
 const GETH_MONITOR_DELAY = 5000 // ms
 const GETH_SYNC_TIMEOUT = 30000 // ms
 const GETH_POLLING_INTERVAL = 500 // ms
-const GETH_RETRY_DELAY = 3000 // ms
+export const GETH_RETRY_DELAY = 3000 // ms
 
 export enum GethInitOutcomes {
   SUCCESS = 'SUCCESS',
@@ -210,10 +210,10 @@ export const _waitForGethInit = waitForGethInit
 
 export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
-  yield put(setInitState(InitializationState.INITIALIZING))
   let failureResult: GethInitOutcomes
 
   while (true) {
+    yield put(setInitState(InitializationState.INITIALIZING))
     const { result } = yield race({
       result: call(waitForGethInit),
       timeout: delay(INIT_GETH_TIMEOUT),
@@ -223,7 +223,7 @@ export function* initGethSaga() {
       Logger.debug(TAG, 'Geth initialized')
       ValoraAnalytics.track(GethEvents.geth_init_success)
       yield put(setInitState(InitializationState.INITIALIZED))
-      return
+      return GethInitOutcomes.SUCCESS
     } else if (result === GethInitOutcomes.NETWORK_ERROR_FETCHING_STATIC_NODES) {
       // TODO(erdal): we might want to retry in other error cases as well
       // analyze stats and decide
@@ -291,6 +291,8 @@ export function* initGethSaga() {
       navigateToError('networkConnectionFailed')
     }
   }
+
+  return GethInitOutcomes.IRRECOVERABLE_FAILURE
 }
 
 // Create a channel wrapped around the native event emitter for new blocks.
