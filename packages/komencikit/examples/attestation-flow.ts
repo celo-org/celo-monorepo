@@ -4,11 +4,14 @@ import {
   requestAttestationsFromIssuers,
 } from '@celo/celotool/lib/lib/attestation'
 import { ContractKit } from '@celo/contractkit'
+import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
 import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
 const WALLET_IMPLEMENTATION_ADDRESS = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
+const ODIS_PUB_KEY =
+  '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 
 const wallet = new LocalWallet()
 const pkey = Web3.utils.randomHex(32)
@@ -55,7 +58,13 @@ const run = async () => {
   // cached:
   const phoneNumber = '+40723301264'
   // const identifier = '0x59c637d9c774d242dc36bdb0445e29fa79c69b74ef70b6d1a5c407c1db6b4110'
-  const getIdentifier = await komenciKit.getDistributedBlindedPepper(phoneNumber, 'unknown')
+
+  const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
+  const getIdentifier = await komenciKit.getDistributedBlindedPepper(
+    phoneNumber,
+    'komenci-test',
+    blsBlindingClient
+  )
   console.log('GetIdentifier: ', getIdentifier)
   if (!getIdentifier.ok) {
     return

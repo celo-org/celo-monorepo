@@ -55,6 +55,7 @@ export enum Actions {
   FEELESS_RESEND_ATTESTATIONS = 'IDENTITY/FEELESS_RESEND_ATTESTATIONS',
   SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
   FEELESS_SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/FEELESS_SET_LAST_REVEAL_ATTEMPT',
+  REPORT_REVEAL_STATUS = 'IDENTITY/REPORT_REVEAL_STATUS',
 }
 
 export interface StartVerificationAction {
@@ -269,6 +270,15 @@ export interface FeelessSetLastRevealAttempt {
   time: number
 }
 
+export interface ReportRevealStatusAction {
+  type: Actions.REPORT_REVEAL_STATUS
+  attestationServiceUrl: string
+  account: string
+  issuer: string
+  e164Number: string
+  pepper: string
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | FeelessStartVerificationAction
@@ -310,6 +320,7 @@ export type ActionTypes =
   | FeelessResendAttestations
   | SetLastRevealAttempt
   | FeelessSetLastRevealAttempt
+  | ReportRevealStatusAction
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -570,3 +581,20 @@ export const feelessSetLastRevealAttempt = (time: number): FeelessSetLastRevealA
   type: Actions.FEELESS_SET_LAST_REVEAL_ATTEMPT,
   time,
 })
+
+export const reportRevealStatus = (
+  attestationServiceUrl: string,
+  account: string,
+  issuer: string,
+  e164Number: string,
+  pepper: string
+): ReportRevealStatusAction => {
+  return {
+    type: Actions.REPORT_REVEAL_STATUS,
+    attestationServiceUrl,
+    account,
+    issuer,
+    e164Number,
+    pepper,
+  }
+}
