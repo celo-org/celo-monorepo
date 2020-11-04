@@ -9,7 +9,7 @@ import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { createSelector } from 'reselect'
 import { Actions as AccountActions, ClearStoredAccountAction } from 'src/account/actions'
-import { ATTESTATION_REVEAL_TIMEOUT_SECONDS, VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
+import { VERIFICATION_STATE_EXPIRY_SECONDS } from 'src/config'
 import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
@@ -615,20 +615,6 @@ export const isVerificationStateExpiredSelector = (state: RootState) => {
 export const isFeelessVerificationStateExpiredSelector = (state: RootState) => {
   const { lastFetch } = state.identity.feelessVerificationState
   return !lastFetch || timeDeltaInSeconds(Date.now(), lastFetch) > VERIFICATION_STATE_EXPIRY_SECONDS
-}
-
-export const isRevealAllowed = ({ identity: { lastRevealAttempt } }: RootState) => {
-  return (
-    !lastRevealAttempt ||
-    timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
-  )
-}
-
-export const feelessIsRevealAllowed = ({ identity: { feelessLastRevealAttempt } }: RootState) => {
-  return (
-    !feelessLastRevealAttempt ||
-    timeDeltaInSeconds(Date.now(), feelessLastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
-  )
 }
 
 // Use this only as part of the notification display logic

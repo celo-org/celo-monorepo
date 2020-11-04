@@ -71,6 +71,7 @@ export function* storeTimestampIfKomenciError(error: Error) {
   )
 
   let unexpectedError = false
+  console.log('KOMENCI ERROR MESSAGE: ', error.message)
 
   // QUESTION: Is this the best way to typecheck errors?
   if (error.message in TxErrorTypes) {

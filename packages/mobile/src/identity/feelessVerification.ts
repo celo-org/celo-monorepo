@@ -82,7 +82,7 @@ import {
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-import { setMtwAddress } from 'src/web3/actions'
+import { setFornoMode, setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -90,7 +90,7 @@ import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
-const KOMENCI_URL = 'https://a334b526560c.ngrok.io'
+const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
 // const KOMENCI_URL = 'http://192.168.86.33:3000'
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
@@ -192,6 +192,7 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
     })
     yield put(feelessResetVerification())
     yield call(getConnectedAccount)
+    console.log('Feeless state expired: ', yield select(isFeelessVerificationStateExpiredSelector))
     if (isRestarted || (yield select(isFeelessVerificationStateExpiredSelector))) {
       yield call(feelessFetchVerificationState)
     }
@@ -200,6 +201,7 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
       verification: call(feelessDoVerificationFlow, withoutRevealing),
       restart: take(Actions.FEELESS_RESEND_ATTESTATIONS),
     })
+    console.log('ACTION RECEIVED')
     if (restart) {
       isRestarted = true
       const { status }: FeelessVerificationState = yield select(feelessVerificationStateSelector)
@@ -234,6 +236,11 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       url: KOMENCI_URL,
       token: feelessVerificationState.komenci.sessionToken,
     })
+
+    // For now I am ensure the user is in forno-mode for feeless verification.
+    // If we leave this in, we need some logic at the end to switch users's back
+    // to their preference set under Settings
+    yield put(setFornoMode(true))
 
     // Start by checking again to make sure Komenci is ready. Throws error if not
     yield call(fetchKomenciReadiness, komenciKit)
