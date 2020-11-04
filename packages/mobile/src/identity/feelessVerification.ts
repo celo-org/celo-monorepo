@@ -763,13 +763,10 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
 
     const blsBlindingClient = new ReactBlsBlindingClient(networkConfig.odisPubKey)
     const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
-      [
-        komenciKit,
-        async (phoneNumber, version) =>
-          komenciKit.getDistributedBlindedPepper(phoneNumber, version, blsBlindingClient),
-      ],
+      [komenciKit, komenciKit.getDistributedBlindedPepper],
       e164Number,
-      DeviceInfo.getVersion()
+      DeviceInfo.getVersion(),
+      blsBlindingClient
     )
 
     if (!pepperQueryResult.ok) {
@@ -812,7 +809,7 @@ function* fetchOrDeployMtw(
     // we can't recover the MTW address or there is no quota left on the session
     try {
       const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
-        [komenciKit, async (address) => komenciKit.deployWallet(address)],
+        [komenciKit, komenciKit.deployWallet],
         CURRENT_MTW_IMPLEMENTATION_ADDRESS
       )
 
@@ -931,7 +928,7 @@ export function* feelessRequestAttestations(
     )
 
     const approveTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-      [komenciKit, async (address, num) => komenciKit.approveAttestations(address, num)],
+      [komenciKit, komenciKit.approveAttestations],
       mtwAddress,
       numAttestationsRequestsNeeded
     )
@@ -949,10 +946,7 @@ export function* feelessRequestAttestations(
     )
 
     const requestTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-      [
-        komenciKit,
-        async (address, hash, num) => komenciKit.requestAttestations(address, hash, num),
-      ],
+      [komenciKit, komenciKit.requestAttestations],
       mtwAddress,
       phoneHash,
       numAttestationsRequestsNeeded
@@ -978,7 +972,7 @@ export function* feelessRequestAttestations(
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
 
   const selectIssuersTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-    [komenciKit, async (address, hash) => komenciKit.selectIssuers(address, hash)],
+    [komenciKit, komenciKit.selectIssuers],
     mtwAddress,
     phoneHash
   )
@@ -1015,10 +1009,7 @@ export function* feelessCompleteAttestation(
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
 
   const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-    [
-      komenciKit,
-      async (address, hash, iss, cod) => komenciKit.completeAttestation(address, hash, iss, cod),
-    ],
+    [komenciKit, komenciKit.completeAttestation],
     mtwAddress,
     phoneHashDetails.phoneHash,
     code.issuer,
