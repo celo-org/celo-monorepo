@@ -631,7 +631,7 @@ export const feelessIsRevealAllowed = ({ identity: { feelessLastRevealAttempt } 
   )
 }
 
-// TODO: Use this as part of the notification display logic
+// Use this only as part of the notification display logic
 export const tryFeelessOnboardingSelector = ({
   identity: { feelessVerificationState },
 }: RootState) => {

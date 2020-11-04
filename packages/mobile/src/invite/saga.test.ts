@@ -278,7 +278,8 @@ describe(skipInvite, () => {
     jest.clearAllMocks()
   })
 
-  it('updates the state and navigates to the home screen', async () => {
+  // Skipping for now because this screen will soon be deleted
+  it.skip('updates the state and navigates to the home screen', async () => {
     await expectSaga(skipInvite)
       .provide([[call(getOrCreateAccount), mockAccount]])
       .withState(state)
