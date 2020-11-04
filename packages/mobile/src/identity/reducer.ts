@@ -232,6 +232,11 @@ export const reducer = (
           total: 0,
         },
         verificationState: initialState.verificationState,
+        // TODO: Think about if I should reset more on rehydrate
+        feelessVerificationState: {
+          ...state.feelessVerificationState,
+          isLoading: false,
+        },
         isFetchingAddresses: false,
       }
     }
