@@ -26,6 +26,7 @@ import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
@@ -78,7 +79,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
       amount: celoToTransfer.toString(),
     })
-    navigation.navigate(Screens.WithdrawCeloReviewScreen, {
+    navigate(Screens.WithdrawCeloReviewScreen, {
       amount: celoToTransfer,
       recipientAddress: accountAddress,
       feeEstimate: feeEstimate || new BigNumber(0),
