@@ -34,9 +34,7 @@ export default withNamespaces(NameSpaces.download)(
                 <H1 style={[textStyles.center, standardStyles.elementalMargin]} ariaLevel={'2'}>
                   {t('haveAccount')}
                 </H1>
-                <H4 style={[textStyles.center, standardStyles.elementalMargin, styles.seedPhrase]}>
-                  {t('useSeed')}
-                </H4>
+                <H4 style={[textStyles.center, standardStyles.elementalMargin]}>{t('useSeed')}</H4>
                 <Button
                   size={SIZE.normal}
                   kind={BTN.NAKED}
