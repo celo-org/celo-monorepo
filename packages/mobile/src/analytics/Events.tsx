@@ -94,9 +94,9 @@ export enum OnboardingEvents {
   invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
   invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
-  invite_redeem_skip_start = 'invite_redeem_skip_start',
-  invite_redeem_skip_complete = 'invite_redeem_skip_complete',
-  invite_redeem_skip_error = 'invite_redeem_skip_error',
+  initialize_account_start = 'initialize_account_start',
+  initialize_account_complete = 'initialize_account_complete',
+  initialize_account_error = 'initialize_account_error',
 
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',

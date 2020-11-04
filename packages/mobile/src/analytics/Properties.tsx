@@ -177,9 +177,9 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.invite_redeem_move_funds_start]: undefined
   [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
-  [OnboardingEvents.invite_redeem_skip_start]: undefined
-  [OnboardingEvents.invite_redeem_skip_complete]: undefined
-  [OnboardingEvents.invite_redeem_skip_error]: {
+  [OnboardingEvents.initialize_account_start]: undefined
+  [OnboardingEvents.initialize_account_complete]: undefined
+  [OnboardingEvents.initialize_account_error]: {
     error: string
   }
 

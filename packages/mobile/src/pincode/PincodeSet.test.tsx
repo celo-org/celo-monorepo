@@ -21,7 +21,7 @@ describe('Pincode', () => {
     expect(toJSON()).toMatchSnapshot()
   })
 
-  it('navigates to the EnterInviteCode screen after successfully verifying', async () => {
+  it('navigates to the VerificationEducationScreen screen after successfully verifying', async () => {
     const { getByTestId, rerender } = render(
       <Provider store={mockStore}>
         <PincodeSet {...mockScreenProps} />

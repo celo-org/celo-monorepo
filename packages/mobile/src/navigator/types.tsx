@@ -63,7 +63,6 @@ export type StackParamList = {
   }
   [Screens.Debug]: undefined
   [Screens.DrawerNavigator]: undefined
-  [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
     errorMessage?: string
   }

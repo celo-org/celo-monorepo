@@ -14,6 +14,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import Modal from 'react-native-modal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useDispatch, useSelector } from 'react-redux'
+import { initializeAccount } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
@@ -33,11 +34,13 @@ import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
+import useTypedSelector from 'src/redux/useSelector'
 import Logger from 'src/utils/Logger'
 import GoogleReCaptcha from 'src/verify/safety/GoogleReCaptcha'
 import { getSafetyNetAttestation } from 'src/verify/safety/SafetyNet'
 import VerificationLearnMoreDialog from 'src/verify/VerificationLearnMoreDialog'
 import VerificationSkipDialog from 'src/verify/VerificationSkipDialog'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.VerificationEducationScreen>
 
@@ -45,6 +48,7 @@ type Props = ScreenProps
 
 function VerificationEducationScreen({ route, navigation }: Props) {
   const showSkipDialog = route.params?.showSkipDialog || false
+  const account = useTypedSelector(currentAccountSelector)
   const [showLearnMoreDialog, setShowLearnMoreDialog] = useState(false)
   const [isCaptchaVisible, setIsCaptchaVisible] = useState(false)
   const [, setSafetyNetAttestation] = useState()
@@ -56,6 +60,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   const { isBalanceSufficient, isLoading, status, actionableAttestations } = useSelector(
     verificationStateSelector
   )
+  console.log('ZXC', isBalanceSufficient, isLoading, status, actionableAttestations)
   const { numAttestationsRemaining } = status
   const numberVerified = useSelector(numberVerifiedSelector)
   const partOfOnboarding = !route.params?.hideOnboardingStep
@@ -67,6 +72,10 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   }, [e164PhoneNumber, i18n.language])
 
   useEffect(() => {
+    dispatch(initializeAccount())
+  }, [])
+
+  useEffect(() => {
     if (status.isVerified) {
       dispatch(setNumberVerified(true))
     }
@@ -75,8 +84,11 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   useFocusEffect(
     // useCallback is needed here: https://bit.ly/2G0WKTJ
     useCallback(() => {
+      if (!account) {
+        return
+      }
       dispatch(fetchVerificationState())
-    }, [])
+    }, [account])
   )
 
   const onStartVerification = () => {

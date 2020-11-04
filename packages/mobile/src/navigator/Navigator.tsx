@@ -46,7 +46,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import DrawerNavigator from 'src/navigator/DrawerNavigator'
@@ -220,11 +219,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
       name={Screens.PincodeSet}
       component={PincodeSet}
       options={pincodeSetScreenOptions}
-    />
-    <Navigator.Screen
-      name={Screens.EnterInviteCode}
-      component={EnterInviteCode}
-      options={EnterInviteCode.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWallet}
@@ -502,7 +496,9 @@ export function MainStackScreen() {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
     } else if (!redeemComplete) {
-      initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
+      initialRoute = choseToRestoreAccount
+        ? Screens.ImportWallet
+        : Screens.OnboardingEducationScreen
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {
