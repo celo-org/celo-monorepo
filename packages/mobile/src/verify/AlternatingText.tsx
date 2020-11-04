@@ -5,7 +5,7 @@ import { Text, View } from 'react-native'
 const SHOW_TIME = 2 * 1000 // ms
 
 interface Props {
-  style: any
+  style: StyleProp<TextStyle>
   primaryText: string
   secondaryText: string
 }
