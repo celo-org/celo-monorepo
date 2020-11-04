@@ -1,24 +1,24 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: validators
+  name: secondaries
   labels:
-    component: validators
+    component: secondaries
 spec:
   ports:
   - port: 80
     name: web
   clusterIP: None
   selector:
-    component: validators
+    component: secondaries
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "common.fullname" . }}-validators
+  name: {{ template "common.fullname" . }}-secondaries
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
-    component: validators
+    component: secondaries
 spec:
   volumeClaimTemplates:
   - metadata:
@@ -32,17 +32,17 @@ spec:
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
-  replicas: {{ .Values.geth.validators }}
-  serviceName: validators
+  replicas: {{ .Values.geth.secondaries }}
+  serviceName: secondaries
   selector:
     matchLabels:
 {{ include "common.standard.labels" .  | indent 6 }}
-      component: validators
+      component: secondaries
   template:
     metadata:
       labels:
 {{ include "common.standard.labels" .  | indent 8 }}
-        component: validators
+        component: secondaries
 {{ if .Values.metrics | default false }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
@@ -216,6 +216,7 @@ spec:
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
+            --istanbul.replica \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \

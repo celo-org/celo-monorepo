@@ -183,5 +183,6 @@
   "restore": "Restaurar",
   "commentUnavailable": "Comentario no disponible",
   "accountClearFailed": "Hubo un error al borrar tu Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",
-  "withdraw": "Retirar"
+  "withdraw": "Retirar",
+  "countryNotAvailable": "{{appName}} no está disponible en tu país"
 }
