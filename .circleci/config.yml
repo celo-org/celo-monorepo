@@ -8,7 +8,11 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: '12.1.0'
+      # This is the last version that has openjdk 8
+      # On newer openjdk (11) we get the following error when running sdkmanager
+      # `Exception in thread "main" java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlSchema`
+      # See https://circleci.com/docs/2.0/testing-ios/#supported-xcode-versions
+      xcode: '11.5.0'
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
