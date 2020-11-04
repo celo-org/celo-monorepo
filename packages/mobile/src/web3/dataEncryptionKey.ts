@@ -242,14 +242,26 @@ export function* registerWalletAndDekViaKomenci(
 
   const accountName = ''
 
+  Logger.debug(
+    TAG,
+    '@registerAccountDekViaKomenci Passed params:',
+    accountAddress,
+    walletAddress,
+    publicDataKey
+  )
+
   const proofOfPossession: {
     v: number
     r: string
     s: string
-  } = yield call(accountsWrapper.generateProofOfKeyPossession, accountAddress, walletAddress)
+  } = yield call(
+    [accountsWrapper, accountsWrapper.generateProofOfKeyPossession],
+    accountAddress,
+    walletAddress
+  )
 
   const setAccountResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-    komenciKit.setAccount,
+    [komenciKit, komenciKit.setAccount],
     accountAddress,
     accountName,
     publicDataKey,
@@ -258,6 +270,15 @@ export function* registerWalletAndDekViaKomenci(
   )
 
   if (!setAccountResult.ok) {
+    Logger.debug(TAG, '@registerAccountDekViaKomenci Error:', setAccountResult.error.message)
+    Logger.debug(
+      TAG,
+      '@registerAccountDekViaKomenci Passed params:',
+      accountAddress,
+      walletAddress,
+      publicDataKey,
+      JSON.stringify(proofOfPossession)
+    )
     throw setAccountResult.error
   }
 

@@ -258,36 +258,22 @@ export const reducer = (
         },
       }
     case Actions.SET_VERIFICATION_STATUS:
-      let loading = state.feelessVerificationState.isLoading
-      if (action.status === VerificationStatus.Stopped) {
-        loading = false
-      }
       return {
         ...state,
         verificationStatus: action.status,
         verificationState: {
           ...state.verificationState,
-          isLoading: loading,
+          isLoading: action.status === VerificationStatus.GettingStatus,
         },
       }
     case Actions.FEELESS_SET_VERIFICATION_STATUS:
-      const newStatus = action.status
-      let { isActive, isLoading } = state.feelessVerificationState
-
-      if (newStatus < 1 || newStatus === VerificationStatus.Done) {
-        isActive = false
-      }
-
-      if (newStatus === VerificationStatus.Stopped) {
-        isLoading = false
-      }
       return {
         ...state,
-        feelessVerificationStatus: newStatus,
+        feelessVerificationStatus: action.status,
         feelessVerificationState: {
           ...state.feelessVerificationState,
-          isActive,
-          isLoading,
+          isActive: action.status > 0 || action.status !== VerificationStatus.Done,
+          isLoading: action.status === VerificationStatus.GettingStatus,
         },
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
@@ -646,7 +632,7 @@ export const feelessIsRevealAllowed = ({ identity: { feelessLastRevealAttempt } 
 }
 
 // TODO: Use this as part of the notification display logic
-export const userCanTryFeelessOnboarding = ({
+export const tryFeelessOnboardingSelector = ({
   identity: { feelessVerificationState },
 }: RootState) => {
   const { errorTimestamps } = feelessVerificationState.komenci
