@@ -57,7 +57,7 @@ export function* doFetchDataEncryptionKey(walletAddress: string) {
   const walletToAccountAddress: WalletToAccountAddressType = yield select(
     walletToAccountAddressSelector
   )
-  const accountAddress = walletToAccountAddress[walletAddress] || walletAddress
+  const accountAddress = walletToAccountAddress[walletAddress] ?? walletAddress
   const dek: string = yield call(accountsWrapper.getDataEncryptionKey, accountAddress)
   yield put(updateAddressDekMap(accountAddress, dek || null))
   return !dek ? null : hexToBuffer(dek)

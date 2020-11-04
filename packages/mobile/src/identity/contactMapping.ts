@@ -246,7 +246,8 @@ function* fetchWalletAddresses(e164Number: string) {
     const accountAddress = normalizeAddressWith0x(accountAddresses[i])
     const walletAddress = normalizeAddressWith0x(address)
     // `getWalletAddress` returns a null address when there isn't a wallet registered
-    // TODO: Make this expression into a util function
+    // TODO: Use the helper function `isNullAddress` I made in base/src/address
+    // once I've built from the monorepo
     if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
       walletToAccountAddress[walletAddress] = accountAddress
       possibleUserAddresses.push(walletAddress)
