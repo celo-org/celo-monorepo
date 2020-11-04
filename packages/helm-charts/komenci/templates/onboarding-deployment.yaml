@@ -56,6 +56,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+{{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding "value_name" "ruleSignatureEnable") | indent 10 }}
+{{ include "common.env-var" (dict "name" "QUOTA_DISTRIBUTED_BLINDED_PEPPER" "dict" .Values.onboarding.quota "value_name" "distributedBlindePepper") | indent 10 }}
+{{ include "common.env-var" (dict "name" "QUOTA_REQUEST_SUBSIDISED_ATTESTATION" "dict" .Values.onboarding.quota "value_name" "requestSubsidisedAttestation") | indent 10 }}
+{{ include "common.env-var" (dict "name" "QUOTA_SUBMIT_META_TRANSACTION" "dict" .Values.onboarding.quota "value_name" "submitMetaTransaction") | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db "value_name" "host" "optional" true) | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db "value_name" "port" "optional" true) | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db "value_name" "username") | indent 10 }}
@@ -63,12 +67,8 @@ spec:
 {{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.onboarding.db "value_name" "synchronize") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 10 }}
-{{ include "common.env-var" (dict "name" "FUND_ADDRESS" "dict" .Values.onboarding.onchain "value_name" "fundAddress") | indent 10 }}
-{{ include "common.env-var" (dict "name" "MTW_IMPLEMENTATION_ADDRESS" "dict" .Values.onboarding.onchain "value_name" "mtwImplementationAddress") | indent 10 }}
-{{ include "common.env-var" (dict "name" "MTW_DEPLOYER_ADDRESS" "dict" .Values.onboarding.onchain "value_name" "mtwDeployerAddress") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 10 }}
-{{ include "common.env-var" (dict "name" "NODE_PROVIDER_TYPE" "dict" .Values.onboarding.onchain "value_name" "nodeProviderType") | indent 10 }}
-{{ include "common.env-var" (dict "name" "NODE_URL" "dict" .Values.onboarding.onchain "value_name" "nodeUrl") | indent 10 }}
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

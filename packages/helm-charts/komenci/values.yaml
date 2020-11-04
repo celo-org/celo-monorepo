@@ -14,8 +14,9 @@ kubectl:
 relayer:
   image:
     repository: celotestnet.azurecr.io/komenci/relayer
-    tag: ef3a2c9dcfe59fcf5b7004bb218a83e4cb77f9aa
+    tag: d6bb173e0d0e5b93ebd50bd383766fcf0fbfb528
   replicas: 2
+  port: 3000
   identities:
   - address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
     privateKey: 0x000
@@ -36,23 +37,23 @@ relayer:
     enabled: true
     prometheusPort: 9090
   onchain:
-    fundAddress: 0xa7d74cb4fca9458757cfc8b90d9b38a126f68b47
-    mtwImplementationAddress: 0x88a2b9B8387A1823D821E406b4e951337fa1D46D
-    mtwDeployerAddress: 0x47b05993C360dEA811ACe7eC725897aCB74AaBA5
     network: alfajores
-    nodeProviderType: http
-    nodeUrl: https://alfajores-forno.celo-testnet.org
-    walletAddress: 0xa7d74cb4fca9458757cfc8b90d9b38a126f68b47
     walletType: azure-hsm
 
 onboarding:
   image: 
     repository: celotestnet.azurecr.io/komenci/onboarding
-    tag: ef3a2c9dcfe59fcf5b7004bb218a83e4cb77f9aa
+    tag: d6bb173e0d0e5b93ebd50bd383766fcf0fbfb528
   replicas: 2
+  ruleSignatureEnable: true
+  quota:
+    distributedBlindePepper: 1
+    requestSubsidisedAttestation: 10
+    submitMetaTransaction: 20
   relayer:
     host: komenci-relayer
-    port: 5050
+    port: 3000
+    rpcTimeoutMs: 5000
   db:
     host: komenci-komenci-postgresql
     port: 5432
@@ -60,9 +61,4 @@ onboarding:
     database: 'postgres'
     synchronize: true
   onchain:
-    fundAddress: 0xa7d74cb4fca9458757cfc8b90d9b38a126f68b47
-    mtwImplementationAddress: 0x88a2b9B8387A1823D821E406b4e951337fa1D46D
-    mtwDeployerAddress: 0x47b05993C360dEA811ACe7eC725897aCB74AaBA5
     network: alfajores
-    nodeProviderType: http
-    nodeUrl: https://alfajores-forno.celo-testnet.org
