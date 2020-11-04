@@ -24,5 +24,17 @@ describe('reportLibraryLinkingIncompatibilities', () => {
       codeReport
     )
     assert.equal(libraryLinksReport.length, 2)
+
+    const library2Change = libraryLinksReport.find(
+      (change) => change.getContract() === 'LinkedLibrary2'
+    )
+    assert.isDefined(library2Change)
+    assert.equal(library2Change.getDependency(), 'LinkedLibrary3')
+
+    const contractChange = libraryLinksReport.find(
+      (change) => change.getContract() === 'TestContract'
+    )
+    assert.isDefined(contractChange)
+    assert.equal(contractChange.getDependency(), 'LinkedLibrary2')
   })
 })
