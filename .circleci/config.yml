@@ -400,7 +400,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli --ignore @celo/env-tests run test
 
       - store_test_results:
           path: test-results
