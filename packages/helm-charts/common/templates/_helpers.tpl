@@ -430,3 +430,23 @@ prometheus.io/scrape: "true"
 prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
 prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}
+
+{{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
+{{- define "common.gsutil-sync-data-init-container" -}}
+- name: gsutil-sync-data
+  image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+  imagePullPolicy: Always
+  command:
+  - /bin/sh
+  - -c
+  args:
+  - |
+      # TODO(joshua): Check age of block w/ geth.
+      # If older than upload period, remove the chain data dir.
+     [ -f /root/.celo/celo ] && exit 0
+     mkdir -p /root/.celo/celo
+     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/celo/chaindata /root/.celo/celo/
+  volumeMounts:
+  - name: data
+    mountPath: /root/.celo
+{{- end -}}
