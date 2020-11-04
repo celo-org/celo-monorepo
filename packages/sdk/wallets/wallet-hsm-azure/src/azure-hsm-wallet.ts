@@ -3,23 +3,24 @@ import { Address, publicKeyToAddress } from '@celo/utils/lib/address'
 import { RemoteWallet } from '@celo/wallet-remote'
 import debugFactory from 'debug'
 import { AzureHSMSigner } from './azure-hsm-signer'
-import { AzureKeyVaultClient } from './azure-key-vault-client'
+import { AzureKeyVaultClient, AzureKeyVaultSigningAlgorithm } from './azure-key-vault-client'
 
 const debug = debugFactory('kit:wallet:aws-hsm-wallet')
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements ReadOnlyWallet {
-  private readonly vaultName: string
   private keyVaultClient: AzureKeyVaultClient | undefined
 
-  constructor(vaultName: string) {
+  constructor(
+    private readonly vaultName: string,
+    private readonly signingAlgorithm?: AzureKeyVaultSigningAlgorithm
+  ) {
     super()
-    this.vaultName = vaultName
   }
 
   protected async loadAccountSigners(): Promise<Map<Address, AzureHSMSigner>> {
     if (!this.keyVaultClient) {
-      this.keyVaultClient = this.generateNewKeyVaultClient(this.vaultName)
+      this.keyVaultClient = this.generateNewKeyVaultClient(this.vaultName, this.signingAlgorithm)
     }
     const keys = await this.keyVaultClient.getKeys()
     const addressToSigner = new Map<Address, AzureHSMSigner>()
@@ -40,8 +41,11 @@ export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements Read
   }
 
   // Extracted for testing purpose
-  private generateNewKeyVaultClient(vaultName: string) {
-    return new AzureKeyVaultClient(vaultName)
+  private generateNewKeyVaultClient(
+    vaultName: string,
+    signingAlgorithm?: AzureKeyVaultSigningAlgorithm
+  ) {
+    return new AzureKeyVaultClient(vaultName, undefined, signingAlgorithm)
   }
 
   /**

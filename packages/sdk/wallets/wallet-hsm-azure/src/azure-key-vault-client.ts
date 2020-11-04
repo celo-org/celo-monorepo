@@ -13,6 +13,13 @@ import {
 } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
 
+export enum AzureKeyVaultSigningAlgorithm {
+  ECDSA256 = 'ECDSA256',
+  ES256K = 'ES256K',
+}
+
+const DEFAULT_SIGNING_ALGORITHM = AzureKeyVaultSigningAlgorithm.ECDSA256
+
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
  */
@@ -22,14 +29,14 @@ export class AzureKeyVaultClient {
   private readonly vaultUri: string
   private readonly credential: TokenCredential
   private readonly keyClient: KeyClient
-  private readonly SIGNING_ALGORITHM: string = 'ECDSA256'
+  private readonly SIGNING_ALGORITHM: AzureKeyVaultSigningAlgorithm
   private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
     string,
     CryptographyClient
   >()
   private readonly secretClient: SecretClient
 
-  constructor(vaultName: string, credential?: TokenCredential) {
+  constructor(vaultName: string, credential?: TokenCredential, signingAlgorithm?: AzureKeyVaultSigningAlgorithm) {
     this.vaultName = vaultName
     this.vaultUri = `https://${this.vaultName}.vault.azure.net`
     // DefaultAzureCredential supports service principal or managed identity
@@ -37,6 +44,7 @@ export class AzureKeyVaultClient {
     this.credential = credential || new DefaultAzureCredential()
     this.keyClient = new KeyClient(this.vaultUri, this.credential)
     this.secretClient = new SecretClient(this.vaultUri, this.credential)
+    this.SIGNING_ALGORITHM = signingAlgorithm || DEFAULT_SIGNING_ALGORITHM
   }
 
   public async getKeys(): Promise<string[]> {
