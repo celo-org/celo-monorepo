@@ -25,9 +25,6 @@ export default function AlternatingText({ style, primaryText, secondaryText }: P
   }, [])
 
   return (
-    <View>
-      {isPrimary && <Text style={style}>{primaryText}</Text>}
-      {!isPrimary && <Text style={style}>{secondaryText}</Text>}
-    </View>
+    <Text style={style}>{isPrimary ? primaryText : secondaryText}</Text>
   )
 }
