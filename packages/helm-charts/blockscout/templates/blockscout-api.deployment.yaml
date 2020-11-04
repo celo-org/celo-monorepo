@@ -47,7 +47,8 @@ spec:
         - name: DISABLE_INDEXER
           value: "true"
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
+{{$data := dict "Values" .Values "DbSuffix" "-replica"}}
+{{ include "celo.blockscout-db-sidecar" $data  | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
