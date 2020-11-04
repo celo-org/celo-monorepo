@@ -106,7 +106,7 @@ export const NavigatorWrapper = () => {
     return () => {
       RNShake.removeEventListener('ShakeEvent')
     }
-  })
+  }, [])
 
   if (!isReady) {
     return null
