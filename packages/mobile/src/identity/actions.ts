@@ -1,3 +1,4 @@
+import { normalizeAddress } from '@celo/base'
 import { E164Number } from '@celo/utils/src/io'
 import {
   AddressToE164NumberType,
@@ -327,8 +328,8 @@ export const updateWalletToAccountAddress = (
   const walletAddresses = Object.keys(walletToAccountAddress)
 
   for (const walletAddress of walletAddresses) {
-    const newWalletAddress = walletAddress.toLowerCase()
-    const newAccountAddress = walletToAccountAddress[walletAddress].toLowerCase()
+    const newWalletAddress = normalizeAddress(walletAddress)
+    const newAccountAddress = normalizeAddress(walletToAccountAddress[walletAddress])
     newWalletToAccountAddresses[newWalletAddress] = newAccountAddress
   }
 

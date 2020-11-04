@@ -305,7 +305,7 @@ export function* getConnectedUnlockedAccount() {
 export function* getAccountAddress() {
   const walletAddress: string = yield call(getAccount)
   const mtwAddress: string | null = yield select(mtwAddressSelector)
-  return mtwAddress || walletAddress
+  return mtwAddress ?? walletAddress
 }
 
 export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {

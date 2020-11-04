@@ -242,7 +242,7 @@ function* fetchWalletAddresses(e164Number: string) {
 
   const possibleUserAddresses: string[] = []
   const walletToAccountAddress: WalletToAccountAddressType = {}
-  walletAddresses.forEach((walletAddress, i) => {
+  for (const [i, walletAddress] of walletAddresses.entries()) {
     const accountAddress = accountAddresses[i]
     // `getWalletAddress` returns a null address when there isn't a wallet registered
     if (!eqAddress(walletAddress, NULL_ADDRESS)) {
@@ -253,7 +253,7 @@ function* fetchWalletAddresses(e164Number: string) {
       walletToAccountAddress[accountAddress] = accountAddress
       possibleUserAddresses.push(accountAddress)
     }
-  })
+  }
   yield put(updateWalletToAccountAddress(walletToAccountAddress))
   return possibleUserAddresses
 }
