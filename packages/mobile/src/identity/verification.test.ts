@@ -57,6 +57,13 @@ import {
 
 const MockedAnalytics = ValoraAnalytics as any
 
+jest.mock('src/web3/saga', () => ({
+  ...jest.requireActual('src/web3/saga'),
+  unlockAccount: jest.fn(async () => true),
+}))
+
+const { unlockAccount } = require('src/web3/saga')
+
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),
   sendTransactionPromises: jest.fn(() => ({
@@ -322,9 +329,10 @@ describe(startVerification, () => {
 describe(fetchVerificationState, () => {
   it('fetches unverified', async () => {
     const contractKit = await getContractKitAsync()
+    const unlockAccountMock = jest.fn(async () => true)
+    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
-        [call(getConnectedUnlockedAccount), mockAccount],
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
         [
@@ -362,13 +370,15 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
+    expect(unlockAccountMock).toBeCalledWith(mockAccount, true)
   })
 
   it('fetches partly verified', async () => {
     const contractKit = await getContractKitAsync()
+    const unlockAccountMock = jest.fn(async () => true)
+    unlockAccount.mockImplementationOnce(unlockAccountMock)
     await expectSaga(fetchVerificationState)
       .provide([
-        [call(getConnectedUnlockedAccount), mockAccount],
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
         [
@@ -406,6 +416,7 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
+    expect(unlockAccountMock).toBeCalledWith(mockAccount, true)
   })
 
   it('catches insufficient balance for sig retrieval', async () => {
