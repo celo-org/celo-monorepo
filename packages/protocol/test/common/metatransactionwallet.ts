@@ -1,8 +1,16 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
+import {
+  MetaTransactionWalletContract,
+  MetaTransactionWalletInstance,
+  RegistryContract,
+  RegistryInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
+} from 'types'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
@@ -589,6 +597,32 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
         })
       })
+    })
+  })
+
+  describe('#transferCeloDollarsToSigner', () => {
+    const value = 100
+    let mockStableToken: MockStableTokenInstance
+    beforeEach(async () => {
+      const Registry: RegistryContract = artifacts.require('Registry')
+      const registry: RegistryInstance = await Registry.at(
+        '0x000000000000000000000000000000000000ce10'
+      )
+      // Problem is this is owned by governance...
+      console.log(await registry.owner())
+      console.log(accounts)
+      const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+      mockStableToken = await MockStableToken.new()
+      await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
+      await mockStableToken.mint(signer, value)
+      assertEqualBN(await mockStableToken.balanceOf(wallet.address), value)
+      assertEqualBN(await mockStableToken.balanceOf(signer), 0)
+    })
+
+    it('transfers all cUSD to the signer', async () => {
+      await wallet.transferCeloDollarsToSigner()
+      assertEqualBN(await mockStableToken.balanceOf(wallet.address), 0)
+      assertEqualBN(await mockStableToken.balanceOf(signer), value)
     })
   })
 })

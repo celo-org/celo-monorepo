@@ -1,10 +1,12 @@
 pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
+import "./interfaces/IRegistry.sol";
 import "./ExternalCall.sol";
 import "./Initializable.sol";
 import "./Signatures.sol";
@@ -229,7 +231,7 @@ contract MetaTransactionWallet is
    * @param data The concatenated data to be sent in each transaction.
    * @param dataLengths The length of each transaction's data.
    * @return The return values of all transactions appended as bytes and an array of the length
-   *         of each transaction output which will be 0 if a transaction had no output 
+   *         of each transaction output which will be 0 if a transaction had no output
    */
   function executeTransactions(
     address[] calldata destinations,
@@ -258,6 +260,21 @@ contract MetaTransactionWallet is
 
     require(dataPosition == data.length, "data cannot have extra bytes appended");
     return (returnValues, returnLengths);
+  }
+
+  /**
+   * @notice Transfers all cUSD to the `signer`.
+   * @dev Valora v1.2 ignores the `walletAddress` of the user, which may result in cUSD being
+   *   sent to users MetaTransactionWallets instead of their EOA. This function allows that cUSD
+   *   to be transferred to the EOA without requiring action by the user.
+   * @return Whether or not the cUSD transfer succeeded.
+   */
+  function transferCeloDollarsToSigner() external returns (bool) {
+    bytes32 STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
+    IRegistry registry = IRegistry(0x000000000000000000000000000000000000ce10);
+    IERC20 stable = IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
+    uint256 balance = stable.balanceOf(address(this));
+    return stable.transfer(signer, balance);
   }
 
   /**
