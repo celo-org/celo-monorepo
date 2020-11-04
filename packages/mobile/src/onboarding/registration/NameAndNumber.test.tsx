@@ -57,6 +57,29 @@ describe('NameAndNumberScreen', () => {
     expect(showErrorMock.mock.calls[0][0]).toBe(ErrorMessages.MISSING_FULL_NAME)
   })
 
+  it('shows banned country warning', () => {
+    const showErrorMock = jest.fn()
+    const store = createMockStore()
+    const wrapper = render(
+      <Provider store={store}>
+        <NameAndNumberClass
+          showError={showErrorMock}
+          hideAlert={jest.fn()}
+          setPromptForno={jest.fn()}
+          setPhoneNumber={jest.fn()}
+          setName={jest.fn()}
+          cachedName={''}
+          cachedNumber={'02123123'}
+          cachedCountryCallingCode={'+53'}
+          {...getMockI18nProps()}
+          {...mockScreenProps}
+        />
+      </Provider>
+    )
+    fireEvent.press(wrapper.getByTestId('NameAndNumberContinueButton'))
+    expect(showErrorMock.mock.calls[0][0]).toBe(ErrorMessages.COUNTRY_NOT_AVAILABLE)
+  })
+
   it('is disabled with no text', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
