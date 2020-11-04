@@ -14,8 +14,8 @@ export abstract class SmsProvider {
   // Should throw Error when unsuccesful, return if successful
   abstract sendSms(attestation: AttestationModel): Promise<string>
 
-  // True if this provider supports delivery status updates as POSTs to an endpoint delivery_<providername>/
-  abstract supportsDeliveryStatus(): boolean
+  // if this provider supports delivery status updates to an endpoint delivery_<providername>/, should return 'GET' or 'POST'
+  abstract deliveryStatusMethod(): string | null
 
   abstract deliveryStatusHandlers(): express.Handler[]
 
@@ -27,6 +27,7 @@ export enum SmsProviderType {
   NEXMO = 'nexmo',
   UNKNOWN = 'unknown',
   TWILIO = 'twilio',
+  MESSAGEBIRD = 'messagebird',
 }
 
 export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {

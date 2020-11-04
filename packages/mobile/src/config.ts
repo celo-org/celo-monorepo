@@ -96,6 +96,12 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
   Config.SECRETS_KEY,
   'MOONPAY_PUBLIC_KEY'
 )
+export const RECAPTCHA_SITE_KEY = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'RECAPTCHA_SITE_KEY'
+)
+export const SAFETYNET_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SAFETYNET_KEY')
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`
 
 export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
@@ -124,6 +130,8 @@ export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
     link: 'https://www.coinbase.com',
   },
 ]
+
+export const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN

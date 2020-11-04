@@ -86,7 +86,7 @@ Celo is a project with a mission of financial inclusion that consists entirely o
 Learn more about Celo:
 
 - [Overview of Celo’s architecture ](overview.md)
-- [Technical blog posts](https://medium.com/celohq/technical/home)
+- [Technical blog posts](https://medium.com/celoorg/technology/home)
 
 Browse the code, raise an issue, or contribute a PR:
 

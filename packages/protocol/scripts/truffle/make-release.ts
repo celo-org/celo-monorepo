@@ -4,6 +4,7 @@ import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/rep
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { CeloContractName } from 'lib/registry-utils'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
 
@@ -72,36 +73,21 @@ class ContractAddresses {
 
 const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
-// TODO: handle `exclude` better - probably shouldn't be a regexp, but an
-// explicit list of ignored contracts/subdirectories.
-const ensureAllContractsThatLinkLibrariesHaveChanges = (
-  dependencies: ContractDependencies,
-  report: ASTDetailedVersionedReport,
-  contracts: string[],
-  exclude: RegExp
-) => {
-  let anyContractViolates = false
-  contracts.map((contract) => {
-    const hasDependency = dependencies.get(contract).length > 0
-    const hasChanges = report.contracts[contract]
-    const isTest = contract.endsWith('Test')
+const isProxiedContract = (contractName: string) => {
+  if (contractName.endsWith('Proxy')) {
+    return false
+  }
 
-    // This check goes over all contracts, so we again have to exclude the
-    // contracts that were ignored in the version check.
-    if (hasDependency && !hasChanges && !isTest && !exclude.test(contract)) {
-      console.log(
-        `${contract} links ${dependencies.get(
-          contract
-        )} and needs to be upgraded to link proxied libraries.`
-      )
-      anyContractViolates = true
-    }
-  })
-
-  if (anyContractViolates) {
-    throw new Error('All contracts linking libraries should be upgraded in release 1')
+  try {
+    artifacts.require(`${contractName}Proxy`)
+    return true
+  } catch (error) {
+    return false
   }
 }
+
+const isCoreContract = (contractName: string) =>
+  Object.keys(CeloContractName).includes(contractName)
 
 const deployImplementation = async (
   contractName: string,
@@ -161,7 +147,6 @@ module.exports = async (callback: (error?: any) => number) => {
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
-    const exclude = new RegExp(fullReport.exclude.slice(1, fullReport.exclude.length - 1))
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
     const dependencies = new ContractDependencies(linkedLibraries)
@@ -172,13 +157,6 @@ module.exports = async (callback: (error?: any) => number) => {
     const addresses = await ContractAddresses.create(contracts, registry)
     const released: Set<string> = new Set([])
     const proposal: ProposalTx[] = []
-    // Release 1 will deploy all libraries with proxies so that they're more easily
-    // upgradable. All contracts that link libraries should be upgraded to instead link the proxied
-    // library.
-    // To ensure this actually happens, we check that all contracts that link libraries are marked
-    // as needing to be redeployed.
-    // TODO(asa): Remove this check after release 1.
-    ensureAllContractsThatLinkLibrariesHaveChanges(dependencies, report, contracts, exclude)
 
     const release = async (contractName: string) => {
       if (released.has(contractName)) {
@@ -193,15 +171,10 @@ module.exports = async (callback: (error?: any) => number) => {
         const Contract = await artifacts.require(contractName)
         await Promise.all(contractDependencies.map((d) => Contract.link(d, addresses.get(d))))
 
-        // This is a hack that will re-deploy all libraries with proxies, whether or not they have
-        // changes to them.
-        // TODO(asa): Remove `isLibrary` for future releases.
-        const isLibrary = linkedLibraries[contractName]
+        // 3. Deploy new versions of the contract, if needed.
         const shouldDeployImplementation = Object.keys(report.contracts).includes(contractName)
-        const shouldDeployProxy =
-          shouldDeployImplementation && report.contracts[contractName].changes.storage.length > 0
-        // 3. Deploy new versions of the contract and proxy, if needed.
-        if (shouldDeployImplementation || isLibrary) {
+        const isLibrary = linkedLibraries[contractName]
+        if (shouldDeployImplementation) {
           const contract = await deployImplementation(contractName, Contract, argv.dry_run)
           const setImplementationTx: ProposalTx = {
             contract: `${contractName}Proxy`,
@@ -210,11 +183,14 @@ module.exports = async (callback: (error?: any) => number) => {
             value: '0',
           }
 
-          if (shouldDeployProxy || isLibrary) {
-            // Changes need another proxy/registry repointing
+          // 4. Deploy new versions of the proxy, if needed
+          const shouldDeployProxy = report.contracts[contractName].changes.storage.length > 0
+          if (!shouldDeployProxy) {
+            proposal.push(setImplementationTx)
+          } else {
             const proxy = await deployProxy(contractName, addresses, argv.dry_run)
 
-            // 4. Update the contract's address, if needed.
+            // 5. Update the contract's address to the new proxy in the proposal
             addresses.set(contractName, proxy.address)
             proposal.push({
               contract: 'Registry',
@@ -224,7 +200,7 @@ module.exports = async (callback: (error?: any) => number) => {
               description: `Registry: ${contractName} -> ${proxy.address}`,
             })
 
-            // 5. If the implementation has an initialize function, add it to the proposal
+            // 6. If the implementation has an initialize function, add it to the proposal
             const initializeAbi = (contract as any).abi.find(
               (abi: any) => abi.type === 'function' && abi.name === 'initialize'
             )
@@ -241,16 +217,19 @@ module.exports = async (callback: (error?: any) => number) => {
             } else {
               proposal.push(setImplementationTx)
             }
-          } else {
-            proposal.push(setImplementationTx)
           }
+        } else if (isLibrary) {
+          const contract = await deployImplementation(contractName, Contract, argv.dry_run)
+          addresses.set(contractName, contract.address)
         }
-        // 5. Mark the contract as released
+        // 7. Mark the contract as released
         released.add(contractName)
       }
     }
     for (const contractName of contracts) {
-      await release(contractName)
+      if (isCoreContract(contractName) && isProxiedContract(contractName)) {
+        await release(contractName)
+      }
     }
     writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
