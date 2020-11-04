@@ -12,19 +12,19 @@ import {
   setGethConnected,
   SetGethConnectedAction,
   setInitState,
-  SetInitStateAction
+  SetInitStateAction,
 } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   initGeth,
-  stopGethIfInitialized
+  stopGethIfInitialized,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
 import {
   chainHeadSelector,
   gethInitializedSelector,
-  isGethConnectedSelector
+  isGethConnectedSelector,
 } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -33,7 +33,7 @@ import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
-import { blockIsFresh, BLOCK_AGE_LIMIT } from 'src/web3/utils'
+import { BLOCK_AGE_LIMIT, blockIsFresh } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -227,7 +227,10 @@ export function* initGethSaga() {
     } else if (result === GethInitOutcomes.NETWORK_ERROR_FETCHING_STATIC_NODES) {
       // TODO(erdal): we might want to retry in other error cases as well
       // analyze stats and decide
-      Logger.error(TAG, 'Could not fetch static nodes from the network. Tell user to check data connection.')
+      Logger.error(
+        TAG,
+        'Could not fetch static nodes from the network. Tell user to check data connection.'
+      )
       yield put(setInitState(InitializationState.DATA_CONNECTION_MISSING_ERROR))
       yield delay(GETH_RETRY_DELAY)
     } else {
