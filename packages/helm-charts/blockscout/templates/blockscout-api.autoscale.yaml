@@ -1,0 +1,22 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Name }}-api
+  labels:
+    app: blockscout
+    chart: blockscout
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: blockscout-api-autoscaler
+spec:
+  minReplicas: {{ .Values.blockscout.autoscaling.api.minReplicas }}
+  maxReplicas: {{ .Values.blockscout.autoscaling.api.maxReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Name }}-api
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 70

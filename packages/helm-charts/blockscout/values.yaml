@@ -1,5 +1,9 @@
 imagePullPolicy: IfNotPresent
 blockscout:
+  autoscaling:
+    api:
+      maxReplicas: 10
+      minReplicas: 2
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
