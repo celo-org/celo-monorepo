@@ -16,14 +16,14 @@ import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 export class ASTBackwardReport {
 
   static create = (
-    oldArtifactsFolder: string, 
-    newArtifactsFolder: string, 
-    oldArtifacts: BuildArtifacts, 
-    newArtifacts: BuildArtifacts, 
+    oldArtifactsFolder: string,
+    newArtifactsFolder: string,
+    oldArtifacts: BuildArtifacts,
+    newArtifacts: BuildArtifacts,
     exclude: RegExp,
     categorizer: Categorizer,
     logFunction: (msg: string) => void): ASTBackwardReport => {
-      
+
     // Run reports
     logFunction("Running storage report...")
     const storage = reportLayoutIncompatibilities(oldArtifacts, newArtifacts)
@@ -37,13 +37,13 @@ export class ASTBackwardReport {
     const libraryLinking = reportLibraryLinkingIncompatibilities(linkedLibraries, code)
     console.log(libraryLinking)
     logFunction("Done\n")
-  
+
     const fullReports = new ASTReports(code, storage, libraryLinking).excluding(exclude)
-    
+
     logFunction("Generating backward report...")
     const versionedReport = ASTDetailedVersionedReport.create(fullReports, categorizer)
     logFunction("Done\n")
-    
+
     return new ASTBackwardReport(
       oldArtifactsFolder,
       newArtifactsFolder,
