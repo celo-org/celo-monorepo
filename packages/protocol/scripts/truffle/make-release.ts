@@ -4,6 +4,7 @@ import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/rep
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { CeloContractName } from 'lib/registry-utils'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
 
@@ -72,7 +73,7 @@ class ContractAddresses {
 
 const REGISTRY_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
-const isCoreContract = async (contractName: string) => {
+const isProxiedContract = async (contractName: string) => {
   if (contractName.endsWith('Proxy')) {
     return false
   }
@@ -84,6 +85,9 @@ const isCoreContract = async (contractName: string) => {
     return false
   }
 }
+
+const isCoreContract = (contractName: string) =>
+  Object.keys(CeloContractName).includes(contractName)
 
 const deployImplementation = async (
   contractName: string,
@@ -223,7 +227,7 @@ module.exports = async (callback: (error?: any) => number) => {
       }
     }
     for (const contractName of contracts) {
-      if (await isCoreContract(contractName)) {
+      if (isCoreContract(contractName) && (await isProxiedContract(contractName))) {
         await release(contractName)
       }
     }
