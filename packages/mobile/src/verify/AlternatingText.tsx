@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Text, View } from 'react-native'
+import { LayoutAnimation, StyleProp, Text, TextStyle } from 'react-native'
 
 // how often to swap the text
 const SHOW_TIME = 2 * 1000 // ms
@@ -11,7 +11,6 @@ interface Props {
 }
 
 export default function AlternatingText({ style, primaryText, secondaryText }: Props) {
-  const [time, setTimer] = useState(0)
   const [isPrimary, setIsPrimary] = useState(true)
 
   useEffect(() => {
@@ -24,7 +23,5 @@ export default function AlternatingText({ style, primaryText, secondaryText }: P
     return () => clearInterval(interval)
   }, [])
 
-  return (
-    <Text style={style}>{isPrimary ? primaryText : secondaryText}</Text>
-  )
+  return <Text style={style}>{isPrimary ? primaryText : secondaryText}</Text>
 }
