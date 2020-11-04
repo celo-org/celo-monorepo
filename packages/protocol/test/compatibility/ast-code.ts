@@ -7,8 +7,8 @@ import {
   MethodReturnChange,
   MethodVisibilityChange,
   NewContractChange,
-  reportASTIncompatibilities,
-} from '@celo/protocol/lib/compatibility/ast-code'
+} from '@celo/protocol/lib/compatibility/change'
+import { reportASTIncompatibilities } from '@celo/protocol/lib/compatibility/ast-code'
 import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'
 import { assert } from 'chai'
 
