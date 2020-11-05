@@ -1,4 +1,3 @@
-import { zip } from '@celo/utils/lib/collections'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
@@ -15,25 +14,21 @@ export default class SetBitmapsCommand extends BaseCommand {
     }),
     slashableDowntimeBeforeBlock: flags.integer({
       description: 'Set all bitmaps for slashable downtime window before provided block',
-      exclusive: ['startBlocks', 'endBlocks', 'slashableDowntimeBeforeLatest'],
+      exclusive: ['intervals', 'slashableDowntimeBeforeLatest'],
     }),
     slashableDowntimeBeforeLatest: flags.boolean({
       description: 'Set all bitmaps for slashable downtime window before latest block',
-      exclusive: ['startBlocks', 'endBlocks', 'slashableDowntimeBeforeBlock'],
+      exclusive: ['intervals', 'slashableDowntimeBeforeBlock'],
     }),
-    startBlocks: Flags.intArray({
-      description: 'Array of start blocks for intervals',
-      dependsOn: ['endBlocks'],
-    }),
-    endBlocks: Flags.intArray({
-      description: 'Array of end blocks for intervals',
-      dependsOn: ['startBlocks'],
+    intervals: Flags.intRangeArray({
+      description: 'Array of intervals, ordered by min start to max end',
+      exclusive: ['beforeBlock'],
     }),
   }
 
   static examples = [
     'set-bitmaps --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --slashableDowntimeBeforeBlock 10000',
-    'set-bitmaps --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --startBlocks "[100, 150]" --endBlocks "[149, 199]"',
+    'set-bitmaps --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --intervals "[0:100], (100:200]"',
   ]
 
   async run() {
@@ -43,22 +38,16 @@ export default class SetBitmapsCommand extends BaseCommand {
 
     const intervals =
       res.flags.slashableDowntimeBeforeLatest || res.flags.slashableDowntimeBeforeBlock
-        ? await downtimeSlasher.intervalsForSlashableDowntimeWindowBeforeBlock(
+        ? await downtimeSlasher.slashableDowntimeIntervalsBefore(
             res.flags.slashableDowntimeBeforeBlock
           )
-        : zip((start, end) => ({ start, end }), res.flags.startBlocks!, res.flags.endBlocks!)
+        : res.flags.intervals!
 
-    const bitmapsSet = await Promise.all(
-      intervals.map((interval) =>
-        downtimeSlasher.isBitmapSetForInterval(interval.start, interval.end)
-      )
-    )
-
+    const bitmapsSet = await Promise.all(intervals.map(downtimeSlasher.isBitmapSetForInterval))
     const unsetIntervals = intervals.filter((_, idx) => !bitmapsSet[idx])
-    console.log(unsetIntervals)
 
     for (const interval of unsetIntervals) {
-      const tx = downtimeSlasher.setBitmapForInterval(interval.start, interval.end)
+      const tx = downtimeSlasher.setBitmapForInterval(interval)
       await displaySendTx('setBitmap', tx, undefined, 'BitmapSetForInterval')
     }
   }
