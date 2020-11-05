@@ -7,7 +7,7 @@ import {
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { ProxyInstance, RegistryInstance } from 'types'
+import { OwnableInstance, ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
 
 const ignoredContracts = [
@@ -25,6 +25,7 @@ interface VerificationContext {
   registry: RegistryInstance
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
+  Ownable: Truffle.Contract<OwnableInstance>
   web3: Web3
 }
 interface InitializationData {
@@ -104,12 +105,35 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     // tslint:disable-next-line: no-console
     console.log(`Proxy deployed at ${proxyAddress} matches ${proxyName}`)
   }
-
   // at() returns a promise despite Typescript labelling the await as extraneous
   const proxy: ProxyInstance = await context.Proxy.at(
     context.web3.utils.toChecksumAddress(proxyAddress)
   )
-  return proxy._getImplementation()
+
+  const governanceAddr = await context.registry.getAddressForString('Governance')
+  // verify proxy owner is governance
+  const proxyOwner = await proxy._getOwner()
+  if (proxyOwner !== governanceAddr) {
+    throw new Error(
+      `${proxyName}'s owner ${proxyOwner} does not match governance ${governanceAddr}`
+    )
+  } else {
+    console.log(`${proxyName}'s owner is governance`)
+  }
+
+  // verify implementation owner is governance
+  const implementationAddress = await proxy._getImplementation()
+  const ownable: OwnableInstance = await context.Ownable.at(
+    context.web3.utils.toChecksumAddress(implementationAddress)
+  )
+  const implOwner = await ownable.owner()
+  if (implOwner !== governanceAddr) {
+    throw new Error(`${contract}'s owner ${implOwner} does not match governance ${governanceAddr}`)
+  } else {
+    console.log(`${contract}'s owner is governance`)
+  }
+
+  return implementationAddress
 }
 
 const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
@@ -220,6 +244,7 @@ export const verifyBytecodes = async (
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
+  Ownable: Truffle.Contract<OwnableInstance>,
   web3: Web3,
   initializationData: InitializationData = {}
 ) => {
@@ -235,6 +260,7 @@ export const verifyBytecodes = async (
     registry,
     proposal,
     Proxy,
+    Ownable,
     web3,
   }
 
