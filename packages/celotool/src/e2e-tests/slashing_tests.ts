@@ -304,33 +304,17 @@ describe('slashing tests', function(this: any) {
       const user = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(user, '', 1000000)
 
-      const startBlock = blockNumber + safeMarginBlocks
-      const endBlock = startBlock + slashableDowntime - 1
-      const startEpoch = await kit.getEpochNumberOfBlock(startBlock)
-      const slotSize = Math.floor(slashableDowntime / 2)
+      const endBlock = blockNumber + safeMarginBlocks + slashableDowntime - 1
+      const intervals = await slasher.slashableDowntimeIntervalsBefore(endBlock)
 
-      const election = await kit.contracts.getElection()
-      const signer = await election.validatorSignerAddressFromSet(4, startBlock)
-
-      const intervalArrays = await generateValidIntervalArrays(
-        startBlock,
-        endBlock,
-        startEpoch,
-        slotSize,
-        kit
-      )
-
-      for (let i = 0; i < intervalArrays.startBlocks.length; i += 1) {
-        await slasher
-          .setBitmapForInterval(intervalArrays.startBlocks[i], intervalArrays.endBlocks[i])
-          .send({ from: user, gas: 5000000 })
+      for (const interval of intervals) {
+        await slasher.setBitmapForInterval(interval).send({ from: user, gas: 5000000 })
       }
 
-      const tx = await slasher.slashValidator(
-        signer,
-        intervalArrays.startBlocks,
-        intervalArrays.endBlocks
-      )
+      const election = await kit.contracts.getElection()
+      const signer = await election.validatorSignerAddressFromSet(4, intervals[0].start)
+
+      const tx = await slasher.slashValidator(signer, intervals)
       const txResult = await tx.send({ from: user, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)

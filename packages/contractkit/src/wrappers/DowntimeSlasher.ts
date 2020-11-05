@@ -91,22 +91,25 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
   /**
    * Calculates intervals which span `slashableDowntime` before provided block.
    * @param block Block number to build intervals before.
+   * @param maximumLength Maximum length for any interval (limited by gas limit).
    * @dev if block is undefined, latest will be used
    * @return The signature bitmap for the specified interval.
    */
-  async slashableDowntimeIntervalsBefore(block?: number): Promise<Interval[]> {
-    const MAX_BITMAP_SET_INTERVAL = 4000
+  async slashableDowntimeIntervalsBefore(
+    block?: number,
+    maximumLength = 4000
+  ): Promise<Interval[]> {
     const window = await this.getSlashableDowntimeWindow(undefined, block)
     let end = window.end
     const intervals: Interval[] = []
     while (end > window.start) {
       const epochNumber = await this.kit.getEpochNumberOfBlock(end)
       const firstBlock = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
-      const start = Math.max(window.start, end - MAX_BITMAP_SET_INTERVAL, firstBlock)
+      const start = Math.max(window.start, end - maximumLength, firstBlock)
       intervals.push({ start, end })
       end = start - 1
     }
-    return intervals
+    return intervals.reverse()
   }
 
   /**
