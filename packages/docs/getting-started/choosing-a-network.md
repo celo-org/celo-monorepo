@@ -8,6 +8,3 @@ The best place to start exploring Celo depends on your interests and objectives:
 
 * **[Mainnet](mainnet.md):** The production Celo network, Mainnet was previously known as the Release Candidate 1 network. Deployed by the Celo community starting 4/22/20, the network is currently working towards enabling the Celo stability mechansim. Much of the activity is being driven by the validator organisations that featured on the leaderboard of [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136).
 
-{% hint style="success" %}
-**Roadmap**: For more information on Celo's journey so far and next steps, see [Celo Timeline](https://celo.org/#timeline).
-{% endhint %}
