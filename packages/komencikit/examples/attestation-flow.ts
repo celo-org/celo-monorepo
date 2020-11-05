@@ -1,4 +1,4 @@
-import { base64ToHex } from '@celo/base'
+import { base64ToHex, hexToBuffer } from '@celo/base'
 import {
   printAndIgnoreRequestErrors,
   requestAttestationsFromIssuers,
@@ -6,26 +6,31 @@ import {
 import { ContractKit } from '@celo/contractkit'
 import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
 import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
+import { compressedPubKey } from '@celo/utils/src/dataEncryptionKey'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
 const WALLET_IMPLEMENTATION_ADDRESS = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
 const ODIS_PUB_KEY =
-  '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
+  'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA'
 
 const wallet = new LocalWallet()
 const pkey = Web3.utils.randomHex(32)
+const dek = Web3.utils.randomHex(32)
 // const pkey = '0xdc771e7878396744e17afcb0dea4cfc96ce6f116107c7bcc0687b812048a2bf7'
 wallet.addAccount(pkey)
 console.log('Private key: ', pkey)
+console.log('Data encryption key: ', dek)
 
 const provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
 const web3 = new Web3(provider)
 const contractKit = new ContractKit(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
+const dekPublicKey = compressedPubKey(hexToBuffer(dek))
+console.log('DEK PublicKey: ', dekPublicKey)
 const komenciKit = new KomenciKit(contractKit, account, {
-  url: 'http://localhost:3000',
+  url: 'https://komenci.celo-networks-dev.org',
 })
 
 const readline = require('readline')
@@ -76,6 +81,15 @@ const run = async () => {
   if (!checkSession2.ok) {
     return
   }
+
+  // Set Account with DEK
+  console.log('Registering DEK with setAccount')
+  const setAccount = await komenciKit.setAccount(walletAddress, '', dekPublicKey, account)
+  console.log('setAccount: ', setAccount)
+  if (!setAccount.ok) {
+    return
+  }
+
   const approveRes = await komenciKit.approveAttestations(walletAddress, 3)
   console.log(approveRes)
   if (!approveRes.ok) {
