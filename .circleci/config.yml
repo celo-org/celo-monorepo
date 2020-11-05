@@ -8,11 +8,11 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: '12.1.0'
+      xcode: '11.5.0'
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport'
+      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
       GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
@@ -274,7 +274,7 @@ jobs:
 
   end-to-end-mobile-test-ios:
     macos:
-      xcode: '12.1.0'
+      xcode: '11.3.1'
     working_directory: ~/app_osx
     steps:
       - checkout
