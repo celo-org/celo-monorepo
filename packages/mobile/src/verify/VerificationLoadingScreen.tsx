@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 // Note: we're NOT using Animated from 'react-native-reanimated'
 // because it currently has a glitch on Android and is 1 frame behind
 // when swiping quickly
-import { Animated, StyleSheet, Text, View } from 'react-native'
+import { Animated, StyleSheet, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import KeepAwake from 'react-native-keep-awake'
 import { SafeAreaView, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -34,6 +34,7 @@ import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import useBackHandler from 'src/utils/useBackHandler'
+import AlternatingText from 'src/verify/AlternatingText'
 import VerificationCountdown from 'src/verify/VerificationCountdown'
 import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 
@@ -219,7 +220,11 @@ export default function VerificationLoadingScreen({ route }: Props) {
           ]}
         >
           <Animated.View style={statusContainerStyle}>
-            <Text style={styles.statusText}>{t('loading.confirming')}</Text>
+            <AlternatingText
+              style={styles.statusText}
+              primaryText={t('loading.confirming')}
+              secondaryText={t('loading.pleaseKeepAppOpen')}
+            />
             {!route.params.withoutRevealing && (
               <VerificationCountdown startTime={countdownStartTime} onFinish={onFinishCountdown} />
             )}
