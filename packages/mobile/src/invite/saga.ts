@@ -227,10 +227,8 @@ export function* sendInvite(
 function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
-    let phoneHash: string
     const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    phoneHash = phoneHashDetails.phoneHash
-    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
+    yield put(transferEscrowedPayment(phoneHashDetails, amount, temporaryAddress, context))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {

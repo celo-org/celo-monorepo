@@ -100,7 +100,11 @@ function* sendUserFundedSetAccountTx(
       v: number
       r: string
       s: string
-    } = yield call(accountsWrapper.generateProofOfKeyPossession, accountAddress, walletAddress)
+    } = yield call(
+      [accountsWrapper, accountsWrapper.generateProofOfKeyPossession],
+      accountAddress,
+      walletAddress
+    )
 
     setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress, proofOfPossession)
 

@@ -92,7 +92,7 @@ import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
-const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
+export const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
 // const KOMENCI_URL = 'http://192.168.86.33:3000'
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']

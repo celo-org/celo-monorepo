@@ -1,3 +1,4 @@
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import BigNumber from 'bignumber.js'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
@@ -26,7 +27,7 @@ export enum Actions {
 
 export interface EscrowTransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
-  phoneHash: string
+  phoneHashDetails: PhoneNumberHashDetails
   amount: BigNumber
   tempWalletAddress: string
   context: TransactionContext
@@ -69,13 +70,13 @@ export type ActionTypes =
   | EscrowReclaimFailureAction
 
 export const transferEscrowedPayment = (
-  phoneHash: string,
+  phoneHashDetails: PhoneNumberHashDetails,
   amount: BigNumber,
   tempWalletAddress: string,
   context: TransactionContext
 ): EscrowTransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
-  phoneHash,
+  phoneHashDetails,
   amount,
   tempWalletAddress,
   context,
