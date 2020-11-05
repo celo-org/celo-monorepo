@@ -1,12 +1,11 @@
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
 import GethBridge from 'react-native-geth'
 import { expectSaga } from 'redux-saga-test-plan'
-import { InitializationState } from 'src/geth/reducer'
-import { _waitForGethInit, GethInitOutcomes, initGethSaga } from 'src/geth/saga'
-import { createMockStore } from 'test/utils'
-import { setInitState } from 'src/geth/actions'
 import { delay } from 'redux-saga/effects'
-import { GETH_RETRY_DELAY } from 'src/geth/saga'
+import { setInitState } from 'src/geth/actions'
+import { InitializationState } from 'src/geth/reducer'
+import { _waitForGethInit, GETH_RETRY_DELAY, GethInitOutcomes, initGethSaga } from 'src/geth/saga'
+import { createMockStore } from 'test/utils'
 
 describe(initGethSaga, () => {
   beforeAll(() => {
@@ -68,7 +67,7 @@ describe(initGethSaga, () => {
       .mockResolvedValueOnce(Promise.resolve('["enode://foo"]'))
 
     const state = createMockStore({}).getState()
-    return await expectSaga(initGethSaga)
+    await expectSaga(initGethSaga)
       .withState(state)
       .provide([[delay(GETH_RETRY_DELAY), true]])
       .put(setInitState(InitializationState.INITIALIZING))
