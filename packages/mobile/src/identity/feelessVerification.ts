@@ -573,25 +573,33 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     e164Number
   )
   const { phoneHash } = phonHashDetails
-
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
   const possibleMtwAddresses = getAddressesFromLookupResult(lookupResult, phoneHash)
+
   if (!possibleMtwAddresses) {
     Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
     return null
   }
 
-  const verificationResults: Array<Result<true, WalletValidationError>> = yield all(
-    possibleMtwAddresses.map((possibleMtwAddress) =>
-      call(
-        verifyWallet,
-        contractKit,
-        possibleMtwAddress,
-        ALLOWED_MTW_IMPLEMENTATIONS,
-        walletAddress
+  // TODO: Incorporate fix for the error on this and remove try/catch block
+  let verificationResults: Array<Result<true, WalletValidationError>>
+  try {
+    verificationResults = yield all(
+      possibleMtwAddresses.map((possibleMtwAddress) =>
+        call(
+          verifyWallet,
+          contractKit,
+          possibleMtwAddress,
+          ALLOWED_MTW_IMPLEMENTATIONS,
+          walletAddress
+        )
       )
     )
-  )
+  } catch (error) {
+    Logger.debug(TAG, '@fetchVerifiedMtw', 'Unable to validate existing verified accounts')
+    Logger.error(TAG, '@fetchVerifiedMtw', error)
+    return null
+  }
 
   const verifiedMtwAddresses = possibleMtwAddresses.filter(
     (address, i) => verificationResults[i].ok
@@ -847,7 +855,7 @@ function* fetchOrDeployMtw(
   )
 
   if (!validityCheckResult.ok) {
-    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to valiad MTW')
+    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to validate MTW')
     throw validityCheckResult.error
   }
 
