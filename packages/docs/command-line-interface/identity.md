@@ -13,8 +13,14 @@ USAGE
   $ celocli identity:current-attestation-services
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 ```
 
 _See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
@@ -28,11 +34,9 @@ USAGE
   $ celocli identity:identifier
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --context=context                                  mainnet (default), alfajores, or alfajoresstaging
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address from which to perform the query
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -64,10 +68,8 @@ USAGE
   $ celocli identity:test-attestation-service
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer or account address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing

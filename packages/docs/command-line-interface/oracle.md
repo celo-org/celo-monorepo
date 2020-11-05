@@ -15,10 +15,6 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the oracles for
 
-OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
 EXAMPLES
   list StableToken
   list
@@ -38,10 +34,8 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to remove expired reports for
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account removing oracle reports
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -74,10 +68,8 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to report on
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle account
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -112,8 +104,14 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the reports for
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLES
   reports StableToken

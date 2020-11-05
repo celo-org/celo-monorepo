@@ -20,6 +20,7 @@ export default class ElectionRun extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   async run() {
@@ -33,6 +34,6 @@ export default class ElectionRun extends BaseCommand {
       signers.map((addr) => validators.getValidatorFromSigner(addr))
     )
     cli.action.stop()
-    cli.table(validatorList, validatorTable, { 'no-truncate': !res.flags.truncate })
+    cli.table(validatorList, validatorTable, res.flags)
   }
 }
