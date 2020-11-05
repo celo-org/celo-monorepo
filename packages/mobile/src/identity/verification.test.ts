@@ -331,7 +331,7 @@ describe(fetchVerificationState, () => {
     const contractKit = await getContractKitAsync()
     const unlockAccountMock = jest.fn(async () => true)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
-    await expectSaga(fetchVerificationState)
+    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
       .provide([
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -370,14 +370,60 @@ describe(fetchVerificationState, () => {
         })
       )
       .run()
-    expect(unlockAccountMock).toBeCalledWith(mockAccount, true)
+    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
   })
 
   it('fetches partly verified', async () => {
     const contractKit = await getContractKitAsync()
     const unlockAccountMock = jest.fn(async () => true)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
-    await expectSaga(fetchVerificationState)
+    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
+      .provide([
+        [call(getConnectedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapperPartlyVerified,
+        ],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
+        [
+          call(fetchPhoneHashPrivate, mockE164Number),
+          {
+            phoneHash: mockE164NumberHash,
+            e164Number: mockE164Number,
+            pepper: mockE164NumberPepper,
+          },
+        ],
+        [
+          race({
+            balances: all([
+              call(waitFor, stableTokenBalanceSelector),
+              call(waitFor, celoTokenBalanceSelector),
+            ]),
+            timeout: delay(BALANCE_CHECK_TIMEOUT),
+          }),
+          { timeout: false },
+        ],
+        [select(dataEncryptionKeySelector), mockPrivateDEK],
+        [select(isBalanceSufficientForSigRetrievalSelector), true],
+      ])
+      .put(setVerificationStatus(VerificationStatus.GettingStatus))
+      .put(
+        udpateVerificationState({
+          phoneHashDetails: mockVerificationStatePartlyVerified.phoneHashDetails,
+          actionableAttestations: [mockActionableAttestations[0]],
+          status: mockVerificationStatePartlyVerified.status,
+        })
+      )
+      .run()
+    expect(unlockAccountMock).toBeCalledWith(mockAccount, false)
+  })
+
+  it('fetches with forcing unlock account', async () => {
+    const contractKit = await getContractKitAsync()
+    const unlockAccountMock = jest.fn(async () => true)
+    unlockAccount.mockImplementationOnce(unlockAccountMock)
+    await expectSaga(fetchVerificationState, { forceUnlockAccount: true })
       .provide([
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -421,7 +467,7 @@ describe(fetchVerificationState, () => {
 
   it('catches insufficient balance for sig retrieval', async () => {
     const contractKit = await getContractKitAsync()
-    await expectSaga(fetchVerificationState)
+    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -452,7 +498,7 @@ describe(fetchVerificationState, () => {
   })
   it('catches when balances are not fetched', async () => {
     const contractKit = await getContractKitAsync()
-    await expectSaga(fetchVerificationState)
+    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
