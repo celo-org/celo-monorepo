@@ -16,6 +16,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{/*
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
+*/}}
+{{- define "metric-annotations" -}}
+prometheus.io/scrape: "true"
+prometheus.io/port: "{{ .Values.oracle.metrics.prometheusPort }}"
+{{- end -}}
+
+{{/*
 Label specific to the oracle client component
 */}}
 {{- define "oracle-client-component-label" -}}

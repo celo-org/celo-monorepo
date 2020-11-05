@@ -1,24 +1,30 @@
 # Web
 
-This is the Celo website, which is deployed to https://celo.org/
+This is the Celo Foundation website, which is deployed to https://celo.org/
 
 ## Developing
 
 ### Steps to get running
 
-1. ensuring you have installed the latest dependencies:
+1. Ensure you have installed the latest dependencies:
 
-`yarn`
+    `yarn`
 
-2. decrypted the secrets files, (this requires being authenticated on gcloud)
+2. Decrypt the secrets files
 
-  * `brew cask install google-cloud-sdk` && `gcloud auth login` 
+   * Install the [gcloud SDK](https://cloud.google.com/sdk/gcloud/).
 
-  * from root of monorepo run `yarn run keys:decrypt`  
+      `brew cask install google-cloud-sdk`
 
-3. from web directory run `yarn run dev`
+   * Log in (You may need to be granted additional permissions).
 
-which will start a server accessible at [http://localhost:3000](http://localhost:3000)
+      `gcloud auth login`
+
+   * From the root of monorepo:
+
+      `yarn run keys:decrypt`  
+
+3. From the web directory, run `yarn run dev`.  The server will now be accessible at [http://localhost:3000](http://localhost:3000).
 
 ## Architecture
 
@@ -43,38 +49,11 @@ The website uses [React.js](https://reactjs.org/), [Next.js](https://nextjs.org/
 
 📸 update snapshots with `yarn test -u`
 
+
 #### Testing Strategy
 
 Each page should have a snapshot test found in `src/_page-tests`. More interactive components should have an additional tests for various states/ interactions. These test files should be coolocated with the file they are testing. 
 
 ## Deployment
 
-The website is hosted on [Google App Engine](https://cloud.google.com/appengine/). In order to deploy it, you first need the [gcloud SDK](https://cloud.google.com/sdk/gcloud/).
-
-`brew cask install google-cloud-sdk`
-
-You may need to log in and be granted additional permissions.
-
-`gcloud auth login`
-
- Make sure your dependencies are up to date. root of monorepo, run:
-
-`yarn`
-
-> Deploying will upload files on local machine to gcloud, make sure you are on the intended branch and it is up to date
-
-Now from web package directory deploy to dev.celo.org with: 
-
-`yarn run deploy:dev`
-
-to deploy to the `dev` environment, with similar commands for `staging` and `prod`
-
-
-#### dev vs staging
-
-While not enforced, the norms for using the different non-production environments are like so: 
-
-Use Staging for checking a commit works as expected before deploying to production 
-
-Use Dev for sending previews to stakeholders while developing new features. 
-
+see [release.md](release.md)

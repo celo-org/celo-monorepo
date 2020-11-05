@@ -8,7 +8,7 @@ import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Unlock extends BaseCommand {
   static description =
-    'Unlocks Celo Gold, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".'
+    'Unlocks CELO, which can be withdrawn after the unlocking period. Unlocked gold will appear as a "pending withdrawal" until the unlocking period is over, after which it can be withdrawn via "lockedgold:withdraw".'
 
   static flags = {
     ...BaseCommand.flags,
@@ -22,7 +22,7 @@ export default class Unlock extends BaseCommand {
 
   async run() {
     const res = this.parse(Unlock)
-    this.kit.defaultAccount = res.flags.from
+
     const lockedgold = await this.kit.contracts.getLockedGold()
     const value = new BigNumber(res.flags.value)
 

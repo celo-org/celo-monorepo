@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -13,10 +12,10 @@ exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
     style={
       Array [
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         },
         Object {
           "marginTop": 30,
@@ -27,14 +26,13 @@ exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
   >
     global:emptyList
   </Text>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -43,10 +41,10 @@ exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
     style={
       Array [
         Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 16,
-          "lineHeight": 24,
+          "lineHeight": 22,
         },
         Object {
           "marginTop": 30,
@@ -57,5 +55,5 @@ exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
   >
     global:emptyList
   </Text>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

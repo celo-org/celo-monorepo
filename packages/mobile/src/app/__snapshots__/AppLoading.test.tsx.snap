@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AppLoading renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "alignItems": "center",
@@ -23,5 +23,5 @@ exports[`AppLoading renders correctly 1`] = `
       }
     }
   />
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

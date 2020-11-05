@@ -1,17 +1,14 @@
-const moment = require('moment')
-
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { format } from 'date-fns'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
-import clockIcon from 'src/images/clock-icon.png'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { clockIcon } from 'src/images/Images'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { getLocalTimezone, getRemoteTime } from 'src/utils/time'
 
 export class SetClock extends React.Component<WithTranslation> {
@@ -21,8 +18,11 @@ export class SetClock extends React.Component<WithTranslation> {
     if (Platform.OS === 'android') {
       return AndroidOpenSettings.dateSettings()
     } else {
-      // TODO: Implement Date Setting on iOS
-      navigate(Screens.WalletHome)
+      navigateHome()
+      // With the following line we would be able to direct to the correct screen in
+      // settings, but it looks like this is a private API and using it risks getting
+      // the app rejected by Apple: https://stackoverflow.com/a/34024467
+      // return Linking.openURL('App-prefs:General&path=DATE_AND_TIME')
     }
   }
 
@@ -30,38 +30,32 @@ export class SetClock extends React.Component<WithTranslation> {
     const { t } = this.props
 
     return (
-      <View style={style.backgroundContainer}>
-        <View style={style.header}>
-          <Image source={clockIcon} style={style.clockImage} resizeMode="contain" />
-          <Text style={[fontStyles.h1, style.time]} testID="SetClockTitle">
-            {moment(getRemoteTime()).format('l, LT')}
+      <View style={styles.backgroundContainer}>
+        <View style={styles.header}>
+          <Image source={clockIcon} style={styles.clockImage} resizeMode="contain" />
+          <Text style={[fontStyles.h1, styles.time]} testID="SetClockTitle">
+            {format(getRemoteTime(), 'Pp')}
           </Text>
-          <Text style={fontStyles.body} testID="SetClockTitle">
+          <Text style={fontStyles.regular} testID="SetClockTitle">
             ({getLocalTimezone()})
           </Text>
         </View>
         <View>
-          <Text style={[fontStyles.h1, style.bodyText]} testID="SetClockTitle">
+          <Text style={[fontStyles.h1, styles.bodyText]} testID="SetClockTitle">
             {t('yourClockIsBroke')}
           </Text>
         </View>
         <View>
-          <Text style={[fontStyles.bodySmall, style.instructions]}>{t('adjustYourClock')}</Text>
-          <Button
-            onPress={this.goToSettings}
-            text={t('adjustDate')}
-            standard={true}
-            type={BtnTypes.PRIMARY}
-          />
+          <Text style={[fontStyles.small, styles.instructions]}>{t('adjustYourClock')}</Text>
+          <Button onPress={this.goToSettings} text={t('adjustDate')} type={BtnTypes.PRIMARY} />
         </View>
       </View>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   backgroundContainer: {
-    backgroundColor: 'white',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -80,7 +74,7 @@ const style = StyleSheet.create({
     paddingBottom: 10,
   },
   bodyText: {
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   instructions: {
     textAlign: 'center',
@@ -88,4 +82,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.global)(SetClock))
+export default withTranslation<WithTranslation>(Namespaces.global)(SetClock)

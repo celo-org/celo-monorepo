@@ -84,3 +84,8 @@ tsconfig.tsbuildinfo
 
 # git mergetool
 *.orig
+
+packages/docs/_book/
+
+*/.next/*
+.env.local

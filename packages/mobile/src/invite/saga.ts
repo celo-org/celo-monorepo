@@ -1,27 +1,42 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { trimLeading0x } from '@celo/utils/src/address'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
+import { privateKeyToAddress } from '@celo/utils/src/address'
+import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Clipboard, Linking, Platform } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  put,
+  race,
+  spawn,
+  take,
+  TakeEffect,
+  takeLeading,
+} from 'redux-saga/effects'
+import { Actions as AccountActions } from 'src/account/actions'
 import { showError, showMessage } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
+import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
-import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
+import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
   InviteBy,
+  InviteDetails,
   RedeemInviteAction,
   redeemInviteFailure,
   redeemInviteSuccess,
@@ -29,27 +44,34 @@ import {
   sendInviteFailure,
   sendInviteSuccess,
   SENTINEL_INVITE_COMMENT,
+  skipInviteFailure,
+  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigateHome } from 'src/navigator/NavigationService'
-import { getSendFee, getSendTxGas } from 'src/send/saga'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { getPasswordSaga } from 'src/pincode/authentication'
+import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
-import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
-import { getAppStoreId } from 'src/utils/appstore'
+import { newTransactionContext } from 'src/transactions/types'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, getContractKit } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { fornoSelector } from 'src/web3/selectors'
+import { getContractKitAsync, getWallet, getWeb3 } from 'src/web3/contracts'
+import { registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'invite/saga'
-export const TEMP_PW = 'ce10'
-export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.25'
+export const REDEEM_INVITE_TIMEOUT = 1.5 * 60 * 1000 // 1.5 minutes
+export const INVITE_FEE = '0.30'
+// TODO: Extract offline gas estimation into an independent library.
+// Hardcoding estimate at 1/2 cent. Fees are currently an order of magnitude smaller ($0.0003)
+const SEND_TOKEN_FEE_ESTIMATE = new BigNumber(0.005)
+// Transfer for invite flow consistently takes 191775 gas. 200k is rounded up from there.
+const SEND_TOKEN_GAS_ESTIMATE = 200000
 
 export async function getInviteTxGas(
   account: string,
@@ -57,13 +79,17 @@ export async function getInviteTxGas(
   amount: BigNumber.Value,
   comment: string
 ) {
-  const contractKit = getContractKit()
-  const escrowContract = await contractKit.contracts.getEscrow()
-  return getSendTxGas(account, currency, {
-    amount,
-    comment,
-    recipientAddress: escrowContract.address,
-  })
+  try {
+    const contractKit = await getContractKitAsync()
+    const escrowContract = await contractKit.contracts.getEscrow()
+    return getSendTxGas(account, currency, {
+      amount,
+      comment,
+      recipientAddress: escrowContract.address,
+    })
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function getInviteFee(
@@ -72,8 +98,12 @@ export async function getInviteFee(
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, currency, amount, comment)
-  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  try {
+    const gas = await getInviteTxGas(account, currency, amount, comment)
+    return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+  } catch (error) {
+    throw error
+  }
 }
 
 export function getInvitationVerificationFeeInDollars() {
@@ -81,7 +111,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(getContractKit().web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(INVITE_FEE).multipliedBy(1e18)
 }
 
 export async function generateInviteLink(inviteCode: string) {
@@ -89,23 +119,16 @@ export async function generateInviteLink(inviteCode: string) {
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
 
   // trying to fetch appStoreId needed to build a dynamic link
-  let appStoreId
-  try {
-    appStoreId = await getAppStoreId(bundleId)
-  } catch (error) {
-    Logger.error(TAG, 'Failed to load AppStore ID: ' + error.toString())
-  }
-
   const shortUrl = await generateShortInviteLink({
-    link: `https://celo.org/build/wallet?invite-code=${inviteCode}`,
-    appStoreId,
+    link: `https://valoraapp.com/?invite-code=${inviteCode}`,
+    appStoreId: APP_STORE_ID,
     bundleId,
   })
 
   return shortUrl
 }
 
-async function sendSms(toPhone: string, msg: string) {
+export async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
       if (Platform.OS === 'android') {
@@ -113,6 +136,7 @@ async function sendSms(toPhone: string, msg: string) {
         resolve()
       } else {
         // react-native-sms types are incorrect
+        // react-native-sms doesn't seem to work on Xcode emulator but works on device
         // tslint:disable-next-line: no-floating-promises
         SendSMS.send(
           {
@@ -140,13 +164,12 @@ export function* sendInvite(
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
-  yield call(getConnectedUnlockedAccount)
+  const escrowIncluded = !!amount
   try {
-    const contractKit = getContractKit()
+    ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
+    const web3 = yield call(getWeb3)
     const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
-      randomness.toString('ascii')
-    )
+    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -159,43 +182,62 @@ export function* sendInvite(
       }
     )
 
+    const inviteDetails: InviteDetails = {
+      timestamp: Date.now(),
+      e164Number,
+      tempWalletAddress: temporaryAddress.toLowerCase(),
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
+      tempWalletRedeemed: false, // no logic in place to toggle this yet
+      inviteCode,
+      inviteLink: link,
+    }
+
     // Store the Temp Address locally so we know which transactions were invites
-    yield put(storeInviteeData(temporaryAddress.toLowerCase(), inviteCode, e164Number))
+    yield put(storeInviteeData(inviteDetails))
 
-    const txId = generateStandbyTransactionId(temporaryAddress)
-
+    const context = newTransactionContext(TAG, 'Transfer to invite address')
     yield put(
       transferStableToken({
         recipientAddress: temporaryAddress,
         amount: INVITE_FEE,
         comment: SENTINEL_INVITE_COMMENT,
-        txId,
+        context,
       })
     )
 
-    yield call(waitForTransactionWithId, txId)
+    yield call(waitForTransactionWithId, context.id)
+    ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
-      try {
-        const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
-        yield call(waitForTransactionWithId, escrowTxId)
-        Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
-      } catch (e) {
-        Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-      }
+      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
 
+    const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
+    yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
+    ValoraAnalytics.track(InviteEvents.invite_tx_error, { escrowIncluded, error: e.message })
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
+  }
+}
+
+function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+  const context = newTransactionContext(TAG, 'Escrow funds')
+  try {
+    let phoneHash: string
+    const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+    phoneHash = phoneHashDetails.phoneHash
+    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
+    yield call(waitForTransactionWithId, context.id)
+    Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
+  } catch (e) {
+    Logger.error(TAG, 'Error sending payment to unverified user: ', e)
+    yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 
@@ -203,10 +245,12 @@ function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, m
   try {
     switch (inviteMode) {
       case InviteBy.SMS: {
+        ValoraAnalytics.track(InviteEvents.invite_method_sms)
         yield call(sendSms, e164Number, message)
         break
       }
       case InviteBy.WhatsApp: {
+        ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
         yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
         break
       }
@@ -219,6 +263,7 @@ function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, m
   } catch (error) {
     // Not a critical error, allow saga to proceed
     Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
+    ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
     yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
     // TODO(Rossy): We need a UI for users to review their sent invite codes and
     // redeem them in case they are unused or unsent like this case, see #2639
@@ -243,105 +288,126 @@ function* sendInviteSaga(action: SendInviteAction) {
   }
 }
 
-export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
+export function* redeemInviteSaga({ tempAccountPrivateKey }: RedeemInviteAction) {
   yield call(waitWeb3LastBlock)
   Logger.debug(TAG, 'Starting Redeem Invite')
 
-  const { result, timeout } = yield race({
-    result: call(doRedeemInvite, inviteCode),
+  const {
+    result,
+    cancel,
+    timeout,
+  }: {
+    result: { success: true; newAccount: string } | { success: false } | undefined
+    cancel: TakeEffect | undefined
+    timeout: true | undefined
+  } = yield race({
+    result: call(doRedeemInvite, tempAccountPrivateKey),
+    cancel: take(AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
-  if (result === true) {
+  if (result?.success === true) {
     Logger.debug(TAG, 'Redeem Invite completed successfully')
     yield put(redeemInviteSuccess())
-    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
-  } else if (result === false) {
+    yield put(refreshAllBalances())
+    navigate(Screens.VerificationEducationScreen)
+    // Note: We are ok with this succeeding or failing silently in the background,
+    // user will have another chance to register DEK when sending their first tx
+    yield spawn(registerAccountDek, result.newAccount)
+  } else if (result?.success === false) {
     Logger.debug(TAG, 'Redeem Invite failed')
-    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
     yield put(redeemInviteFailure())
+  } else if (cancel) {
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_cancel)
+    Logger.debug(TAG, 'Redeem Invite cancelled')
   } else if (timeout) {
     Logger.debug(TAG, 'Redeem Invite timed out')
-    CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_timeout)
     yield put(redeemInviteFailure())
     yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
 }
 
-export function* doRedeemInvite(inviteCode: string) {
+export function* doRedeemInvite(tempAccountPrivateKey: string) {
   try {
-    const contractKit = getContractKit()
-    const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_start)
+    const tempAccount = privateKeyToAddress(tempAccountPrivateKey)
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
-    const tempAccountBalanceWei: BigNumber = yield call(
-      fetchTokenBalanceInWeiWithRetry,
-      CURRENCY_ENUM.DOLLAR,
-      tempAccount
-    )
+
+    const [tempAccountBalanceWei, newAccount]: [BigNumber, string] = yield all([
+      call(fetchTokenBalanceInWeiWithRetry, CURRENCY_ENUM.DOLLAR, tempAccount),
+      call(getOrCreateAccount),
+      call(addTempAccountToWallet, tempAccountPrivateKey),
+    ])
+
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
+      ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, {
+        error: 'Empty invite',
+      })
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
-      return false
+      return { success: false }
     }
 
-    const newAccount = yield call(getOrCreateAccount)
-    yield call(addTempAccountToWallet, inviteCode)
-    yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_start)
+    yield call(
+      moveAllFundsFromAccount,
+      tempAccount,
+      tempAccountBalanceWei,
+      newAccount,
+      CURRENCY_ENUM.DOLLAR,
+      SENTINEL_INVITE_COMMENT
+    )
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_move_funds_complete)
+
     yield put(fetchDollarBalance())
-    return true
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_complete)
+    return { success: true, newAccount }
   } catch (e) {
     Logger.error(TAG + '@doRedeemInvite', 'Failed to redeem invite', e)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_error, { error: e.message })
     if (e.message in ErrorMessages) {
       yield put(showError(e.message))
     } else {
       yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     }
-    return false
+    return { success: false }
   }
 }
 
 export function* skipInvite() {
   yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken')
+  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
-    Logger.debug(TAG + '@skipInvite', 'Creating new account')
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
     yield call(getOrCreateAccount)
-    Logger.debug(TAG + '@skipInvite', 'Marking nux flows as complete')
-    // TODO(Rossy): Remove when import screen is removed
-    yield put(denyImportContacts())
+    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
+    // (`setHasSeenVerificationNux` though the user hasn't seen it),
+    // we should prefer a more atomic approach with a meaningful action type
+    yield put(refreshAllBalances())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
     navigateHome()
+    yield put(skipInviteSuccess())
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
+    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
     yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
+    yield put(skipInviteFailure())
   }
 }
 
-function* addTempAccountToWallet(inviteCode: string) {
+function* addTempAccountToWallet(tempAccountPrivateKey: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    const contractKit = getContractKit()
-    let tempAccount: string | null = null
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
-      Logger.debug(
-        TAG + '@redeemInviteCode',
-        'web3 is connected:',
-        String(yield call(contractKit.web3.eth.net.isListening))
-      )
-      addLocalAccount(inviteCode)
-    } else {
-      // Import account into the local geth node
-      tempAccount = yield call(
-        contractKit.web3.eth.personal.importRawKey,
-        trimLeading0x(inviteCode),
-        TEMP_PW
-      )
-    }
-    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
+    // Import account into the local geth node
+    const wallet: UnlockableWallet = yield call(getWallet)
+    const account = privateKeyToAddress(tempAccountPrivateKey)
+    const password: string = yield call(getPasswordSaga, account, false, true)
+    const tempAccount = yield call([wallet, wallet.addAccount], tempAccountPrivateKey, password)
+    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
-    if (e.toString().includes('account already exists')) {
+    if (e.message === ErrorMessages.GETH_ACCOUNT_ALREADY_EXISTS) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
       return
     }
@@ -350,30 +416,33 @@ function* addTempAccountToWallet(inviteCode: string) {
   }
 }
 
-export function* withdrawFundsFromTempAccount(
-  tempAccount: string,
-  tempAccountBalanceWei: BigNumber,
-  newAccount: string
+export function* moveAllFundsFromAccount(
+  account: string,
+  accountBalanceWei: BigNumber,
+  toAccount: string,
+  currency: CURRENCY_ENUM,
+  comment: string
 ) {
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const fornoMode = yield select(fornoSelector)
-  const contractKit = getContractKit()
-  if (!fornoMode) {
-    yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
-  }
+  Logger.debug(TAG + '@moveAllFundsFromAccount', 'Unlocking account')
+  const wallet: UnlockableWallet = yield call(getWallet)
+  const password: string = yield call(getPasswordSaga, account, false, true)
+  yield call([wallet, wallet.unlockAccount], account, password, UNLOCK_DURATION)
 
   Logger.debug(
-    TAG + '@withdrawFundsFromTempAccount',
-    `Temp account balance is ${tempAccountBalanceWei.toString()}. Calculating withdrawal fee`
+    TAG + '@moveAllFundsFromAccount',
+    `Temp account balance is ${accountBalanceWei.toString()}. Calculating withdrawal fee`
   )
-  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
-  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
-    recipientAddress: newAccount,
-    amount: tempAccountBalance,
-    comment: SENTINEL_INVITE_COMMENT,
-  })
-  // Inflate fee by 10% to harden against minor gas changes
-  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
+  const tempAccountBalance = divideByWei(accountBalanceWei)
+
+  // Temporarily hardcoding fee estimate to save time on gas estimation
+  const sendTokenFee = SEND_TOKEN_FEE_ESTIMATE
+  // const sendTokenFeeInWei: BigNumber = yield call(getSendFee, account, currency, {
+  //   recipientAddress: toAccount,
+  //   amount: tempAccountBalance,
+  //   comment,
+  // })
+  // // Inflate fee by 10% to harden against minor gas changes
+  // const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
 
   if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
     throw new Error('Fee is too large for amount in temp wallet')
@@ -381,22 +450,27 @@ export function* withdrawFundsFromTempAccount(
 
   const netSendAmount = tempAccountBalance.minus(sendTokenFee)
   Logger.debug(
-    TAG + '@withdrawFundsFromTempAccount',
+    TAG + '@moveAllFundsFromAccount',
     `Withdrawing net amount of ${netSendAmount.toString()}`
   )
 
-  const tx: CeloTransactionObject<boolean> = yield call(
-    createTokenTransferTransaction,
-    CURRENCY_ENUM.DOLLAR,
-    {
-      recipientAddress: newAccount,
-      amount: netSendAmount,
-      comment: SENTINEL_INVITE_COMMENT,
-    }
-  )
+  const tx: CeloTransactionObject<boolean> = yield call(createTokenTransferTransaction, currency, {
+    recipientAddress: toAccount,
+    amount: netSendAmount,
+    comment,
+  })
 
-  yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
+  const context = newTransactionContext(TAG, 'Transfer from temp wallet')
+  // Temporarily hardcoding gas estimate to save time on estimation
+  yield call(
+    sendTransaction,
+    tx.txo,
+    account,
+    context,
+    SEND_TOKEN_GAS_ESTIMATE,
+    AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT
+  )
+  Logger.debug(TAG + '@moveAllFundsFromAccount', 'Done withdrawal')
 }
 
 export function* watchSendInvite() {

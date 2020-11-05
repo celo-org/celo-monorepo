@@ -3,7 +3,6 @@ import fonts from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
 
 export interface HomeActionProps {
   title: string
@@ -21,8 +20,8 @@ export class HomeAction extends React.Component<HomeActionProps> {
       <View style={styles.container} testID={`Notification/${title}`}>
         <Image source={icon} style={styles.image} />
         <View style={styles.textContainer}>
-          <Text style={[fonts.bodySmallBold, styles.title]}>{title}</Text>
-          <Text style={[fonts.bodySmall, styles.subtitle]}>{subtitle}</Text>
+          <Text style={[fonts.small600, styles.title]}>{title}</Text>
+          <Text style={[fonts.small, styles.subtitle]}>{subtitle}</Text>
           {cta && ctaOnPress && <SmallButton solid={true} text={cta} onPress={ctaOnPress} />}
         </View>
       </View>
@@ -57,4 +56,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(HomeAction)
+export default HomeAction

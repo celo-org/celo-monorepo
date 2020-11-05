@@ -1,9 +1,9 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { EIP712TypedData, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { TransportStatusError } from '@ledgerhq/errors'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
-import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { RLPEncodedTx } from '../../utils/signing-utils'
 import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from '../ledger-utils/tokens'
 import { AddressValidation } from '../ledger-wallet'
@@ -46,9 +46,10 @@ export class LedgerSigner implements Signer {
     encodedTx: RLPEncodedTx
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
+      const validatedDerivationPath = await this.getValidatedDerivationPath()
       await this.checkForKnownToken(encodedTx)
       const signature = await this.ledger!.signTransaction(
-        await this.getValidatedDerivationPath(),
+        validatedDerivationPath,
         trimLeading0x(encodedTx.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
       // EIP155 support. check/recalc signature v value.
@@ -102,11 +103,17 @@ export class LedgerSigner implements Signer {
 
   async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
-      const dataBuff = generateTypedDataHash(typedData)
-      const trimmedData = trimLeading0x(dataBuff.toString('hex'))
-      const sig = await this.ledger!.signPersonalMessage(
+      const domainSeparator = structHash('EIP712Domain', typedData.domain, typedData.types)
+      const hashStructMessage = structHash(
+        typedData.primaryType,
+        typedData.message,
+        typedData.types
+      )
+
+      const sig = await this.ledger!.signEIP712HashedMessage(
         await this.getValidatedDerivationPath(),
-        trimmedData
+        domainSeparator,
+        hashStructMessage
       )
 
       return {
@@ -169,6 +176,26 @@ export class LedgerSigner implements Signer {
       if (tokenInfo) {
         await this.ledger!.provideERC20TokenInformation(tokenInfo)
       }
+      if (rlpEncoded.transaction.feeCurrency && rlpEncoded.transaction.feeCurrency !== '0x') {
+        const feeTokenInfo = tokenInfoByAddressAndChainId(
+          rlpEncoded.transaction.feeCurrency!,
+          rlpEncoded.transaction.chainId!
+        )
+        if (feeTokenInfo) {
+          await this.ledger!.provideERC20TokenInformation(feeTokenInfo)
+        }
+      }
     }
+  }
+
+  decrypt(_ciphertext: Buffer) {
+    throw new Error('Decryption operation is not supported on this signer')
+    // To make the compiler happy
+    return Promise.resolve(_ciphertext)
+  }
+
+  computeSharedSecret(_publicKey: string) {
+    throw new Error('Not implemented')
+    return Promise.resolve(Buffer.from([]))
   }
 }

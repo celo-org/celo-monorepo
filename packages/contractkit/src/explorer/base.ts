@@ -1,7 +1,7 @@
-import { Address } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
+import { Address } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
 import { ABIDefinition } from 'web3-eth-abi'
-import { AllContracts } from '../base'
+import { CeloContract, RegisteredContracts } from '../base'
 import { ContractKit } from '../kit'
 
 export interface ContractDetails {
@@ -10,18 +10,22 @@ export interface ContractDetails {
   jsonInterface: ABIDefinition[]
 }
 
+export const getContractDetailsFromContract = async (
+  kit: ContractKit,
+  celoContract: CeloContract,
+  address?: string
+) => {
+  const contract = await kit._web3Contracts.getContract(celoContract, address)
+  return {
+    name: celoContract,
+    address: address ?? contract.options.address,
+    jsonInterface: contract.options.jsonInterface as any, // TODO fix types
+  }
+}
+
 export async function obtainKitContractDetails(kit: ContractKit): Promise<ContractDetails[]> {
-  return concurrentMap(
-    5,
-    AllContracts.filter((name: any) => name !== 'MultiSig'),
-    async (celoContract) => {
-      const contract = await kit._web3Contracts.getContract(celoContract)
-      return {
-        name: celoContract,
-        address: contract.options.address,
-        jsonInterface: contract.options.jsonInterface as any, // TODO fix types
-      }
-    }
+  return concurrentMap(5, RegisteredContracts, (celoContract) =>
+    getContractDetailsFromContract(kit, celoContract)
   )
 }
 

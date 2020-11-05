@@ -1,3 +1,4 @@
+import { execCmd } from 'src/lib/cmd-utils'
 import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
@@ -5,8 +6,8 @@ import {
   failIfNotVmBased,
   fetchEnv,
 } from 'src/lib/env-utils'
-import { execCmd } from 'src/lib/utils'
-import { getNodeVmName, getVmSshCommand } from 'src/lib/vm-testnet-utils'
+import { getProxiesPerValidator } from 'src/lib/testnet-utils'
+import { getNodeVmName, getVmSshCommand, indexCoercer, ProxyIndex } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 
 export const command = 'vm-exec'
@@ -17,9 +18,9 @@ interface ValidatorsExecArgv extends CeloEnvArgv {
   nodeType: string
   docker: string
   cmd: string
-  only: number
-  from: number
-  to: number
+  only: number | ProxyIndex
+  from: number | ProxyIndex
+  to: number | ProxyIndex
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -40,20 +41,25 @@ export const builder = (argv: yargs.Argv) => {
       default: null,
     })
     .option('only', {
-      type: 'number',
-      description: 'Index of the only node to exec on',
+      type: 'string',
+      description:
+        'Index of the only node to exec on. If the node is a proxy, the validator and proxy indices must both be specified as `<validator index>:<proxy index>`',
       default: null,
+      coerce: indexCoercer,
     })
     .option('from', {
-      type: 'number',
-      description: 'Index of the node to start on when exec-ing over a range',
-      default: 0,
+      type: 'string',
+      description:
+        'Index of the node to start on when exec-ing over a range. If the node is a proxy, the validator and proxy indices must both be specified as `<validator index>:<proxy index>`',
+      default: '0',
+      coerce: indexCoercer,
     })
     .option('to', {
-      type: 'number',
+      type: 'string',
       description:
-        'Index of the node to end on when exec-ing over a range (not inclusive). Defaults to the max index for the nodeType',
-      default: -1,
+        'Index of the node to end on when exec-ing over a range (not inclusive). If the node is a proxy, the validator and proxy indices must both be specified as `<validator index>:<proxy index>`. Defaults to the max index for the nodeType.',
+      default: '-1',
+      coerce: indexCoercer,
     })
 }
 
@@ -80,21 +86,24 @@ export const handler = async (argv: ValidatorsExecArgv) => {
   // next instance name, which takes time, so the previous SSH command is nearly finished.
   // By doing this in two steps, we more closely make the exec across all instances
   // happen in parallel
-  const instanceNames = []
+  const instanceNames: string[] = []
   if (argv.only === null) {
-    let to: number = argv.to
+    let to: number | ProxyIndex = argv.to
 
-    if (to < 0) {
-      to = getNodeCount(argv.nodeType)
+    if (typeof to === 'number' && to < 0) {
+      to = getMaxNodeIndex(argv.nodeType)
     }
 
-    const nodeCount = getNodeCount(argv.nodeType)
-    console.info(`Node Count: ${nodeCount}`)
-    console.info(`From Index: ${argv.from}`)
-    console.info(`To Index: ${to}`)
-    for (let i = argv.from; i < to; i++) {
-      const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, i)
+    console.info('Max Node Index:', getMaxNodeIndex(argv.nodeType))
+    console.info('From Index:', argv.from)
+    console.info('To Index:', to)
+
+    const indexIterator = createIndexIterator(argv.from, to)
+    let index = indexIterator.next()
+    while (!index.done) {
+      const instanceName = await getNodeVmName(argv.celoEnv, argv.nodeType, index.value)
       instanceNames.push(instanceName)
+      index = indexIterator.next()
     }
   } else {
     console.info(`Only Index: ${argv.only}`)
@@ -119,7 +128,7 @@ async function runSshCommand(instanceName: string, cmd: string) {
   return execCmd(fullCmd, {}, false, true)
 }
 
-function getNodeCount(nodeType: string) {
+function getMaxNodeIndex(nodeType: string): number | ProxyIndex {
   switch (nodeType) {
     case 'validator':
       return parseInt(fetchEnv(envVar.VALIDATORS), 10)
@@ -130,8 +139,47 @@ function getNodeCount(nodeType: string) {
     case 'bootnode':
       return 1
     case 'proxy':
-      return parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
+      const proxiesPerValidator = getProxiesPerValidator()
+      if (!proxiesPerValidator.length) {
+        return {
+          validatorIndex: 0,
+          proxyIndex: 0,
+        }
+      }
+      return {
+        validatorIndex: proxiesPerValidator.length - 1,
+        proxyIndex: proxiesPerValidator[proxiesPerValidator.length - 1],
+      }
     default:
       throw new Error('Invalid node type')
+  }
+}
+
+function* createIndexIterator(from: number | ProxyIndex, to: number | ProxyIndex) {
+  if (typeof from !== typeof to) {
+    throw Error('From and to indices should be of the same type')
+  }
+  if (typeof from === 'number') {
+    // iterate through numeric indices
+    for (let i = from; i < to; i++) {
+      yield i
+    }
+  } else {
+    const proxyFrom = from as ProxyIndex
+    const proxyTo = to as ProxyIndex
+    // iterate through proxy indices
+    const proxiesPerValidator = getProxiesPerValidator()
+    const minValidatorIndex = Math.min(proxiesPerValidator.length, proxyTo.validatorIndex)
+    for (let valIndex = proxyFrom.validatorIndex; valIndex <= minValidatorIndex; valIndex++) {
+      const maxProxyIndex =
+        valIndex === proxyTo.validatorIndex ? proxyTo.proxyIndex : proxiesPerValidator[valIndex]
+      for (let proxyIndex = from.proxyIndex; proxyIndex < maxProxyIndex; proxyIndex++) {
+        const index: ProxyIndex = {
+          validatorIndex: valIndex,
+          proxyIndex,
+        }
+        yield index
+      }
+    }
   }
 }

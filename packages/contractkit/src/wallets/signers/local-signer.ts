@@ -1,8 +1,11 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-// @ts-ignore-next-line
+import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
+import { computeSharedSecret as computeECDHSecret } from '@celo/utils/lib/ecdh'
+import { Decrypt } from '@celo/utils/lib/ecies'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+// @ts-ignore
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
+import { decodeSig, getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 /**
@@ -25,12 +28,7 @@ export class LocalSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const signature = Account.makeSigner(addToV)(hash, this.privateKey)
-    const [v, r, s] = Account.decodeSignature(signature)
-    return {
-      v: parseInt(v, 16),
-      r: ethUtil.toBuffer(r) as Buffer,
-      s: ethUtil.toBuffer(s) as Buffer,
-    }
+    return decodeSig(signature)
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
@@ -47,5 +45,30 @@ export class LocalSigner implements Signer {
       r: Buffer.from(sig.r),
       s: Buffer.from(sig.s),
     }
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const dataBuff = generateTypedDataHash(typedData)
+    const trimmedKey = trimLeading0x(this.privateKey)
+    const pkBuffer = Buffer.from(trimmedKey, 'hex')
+
+    const sig = ethUtil.ecsign(dataBuff, pkBuffer)
+    return {
+      v: parseInt(sig.v, 10),
+      r: Buffer.from(sig.r),
+      s: Buffer.from(sig.s),
+    }
+  }
+
+  decrypt(ciphertext: Buffer) {
+    const decryptedPlaintext = Decrypt(
+      Buffer.from(trimLeading0x(this.privateKey), 'hex'),
+      ciphertext
+    )
+    return Promise.resolve(decryptedPlaintext)
+  }
+
+  computeSharedSecret(publicKey: string): Promise<Buffer> {
+    return Promise.resolve(computeECDHSecret(this.privateKey, publicKey))
   }
 }

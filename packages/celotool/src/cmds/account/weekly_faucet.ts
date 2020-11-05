@@ -1,9 +1,9 @@
 /* tslint:disable no-console */
 import { downloadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmd } from 'src/lib/cmd-utils'
 import { getBlockchainApiUrl } from 'src/lib/endpoints'
 import { portForwardAnd } from 'src/lib/port_forward'
-import { execCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 import { AccountArgv } from '../account'
 

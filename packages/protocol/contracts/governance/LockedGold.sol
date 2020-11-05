@@ -1,18 +1,27 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/ILockedGold.sol";
 
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is
+  ILockedGold,
+  ICeloVersionedContract,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
+  using Address for address payable; // prettier-ignore
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
@@ -31,7 +40,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  mapping(address => Balances) private balances;
+  mapping(address => Balances) internal balances;
 
   // Iterable map to store whitelisted identifiers.
   // Necessary to allow iterating over whitelisted IDs to check ID's address at runtime.
@@ -68,6 +77,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   );
 
   /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _unlockingPeriod The unlocking period in seconds.
@@ -93,7 +110,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function lock() external payable nonReentrant {
     require(getAccounts().isAccount(msg.sender), "not account");
-    require(msg.value > 0, "no value");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
@@ -162,6 +178,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
+    // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
   }
@@ -198,7 +215,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
-    msg.sender.transfer(value);
+    require(value <= address(this).balance, "Inconsistent balance");
+    msg.sender.sendValue(value);
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -260,6 +278,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (values, timestamps);
   }
 
+  /**
+   * @notice Returns the total amount to withdraw from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return Total amount to withdraw.
+   */
   function getTotalPendingWithdrawals(address account) external view returns (uint256) {
     uint256 pendingWithdrawalSum = 0;
     PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
@@ -360,7 +383,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
-    communityFundPayable.transfer(maxSlash.sub(reward));
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
+    communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

@@ -1,192 +1,181 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Education renders correctly 1`] = `
-<View
+<RNCSafeAreaView
+  onFinish={[MockFunction]}
   style={
-    Object {
-      "alignItems": "center",
-      "backgroundColor": "white",
-      "flex": 1,
-      "justifyContent": "center",
-    }
+    Array [
+      Object {
+        "flex": 1,
+      },
+      undefined,
+    ]
   }
 >
   <View
     style={
       Object {
         "flexDirection": "row",
-        "justifyContent": "flex-start",
-        "margin": 0,
-        "padding": 20,
+        "paddingLeft": 24,
+        "paddingVertical": 16,
         "width": "100%",
       }
     }
+    testID="Education/top"
   >
     <View
-      style={
+      accessible={true}
+      focusable={true}
+      hitSlop={
         Object {
-          "flex": 0,
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
         }
       }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        isTVSelectable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
         }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="Education-goback"
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      testID="Education/CloseIcon"
+    >
+      <svg
+        height={16}
+        style={Object {}}
+        viewBox="0 0 16 16"
+        width={16}
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-           
-          cancel
-        </Text>
-      </View>
+        <path
+          d="M13.9999 2.00146L1.99994 14.0015"
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={Object {}}
+        />
+        <path
+          d="M1.99994 2.00146L13.9999 14.0015"
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={Object {}}
+        />
+      </svg>
     </View>
   </View>
   <View
     style={
       Object {
         "alignItems": "center",
-        "flex": 8,
+        "flex": 1,
+        "justifyContent": "center",
+        "paddingBottom": 24,
       }
     }
   >
     <Swiper
       activeDotStyle={
         Object {
-          "backgroundColor": "#D1D5D8",
-          "borderRadius": 8,
+          "backgroundColor": "#2E3338",
+          "borderRadius": 5,
           "flex": 0,
-          "height": 12,
-          "width": 12,
-        }
-      }
-      containerStyle={
-        Object {
-          "alignItems": "center",
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
         }
       }
       dotStyle={
         Object {
-          "backgroundColor": "#D1D5D8",
-          "borderRadius": 8,
+          "backgroundColor": "#9CA4A9",
+          "borderRadius": 5,
           "flex": 0,
-          "height": 8,
-          "width": 8,
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
-      showsButtons={false}
-      showsPagination={true}
-      style={
-        Object {
-          "alignItems": "center",
-          "flex": 1,
-          "width": 750,
-        }
-      }
+      removeClippedSubviews={false}
     >
       <View
         style={
           Object {
             "flex": 1,
-            "justifyContent": "center",
-            "marginBottom": 60,
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source="./test.jpg"
+        <View
           style={
             Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
+              "flex": 1,
+              "justifyContent": "center",
             }
           }
-        />
-        <Text
-          style={
-            Array [
+        >
+          <Text
+            style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Light",
+                "fontFamily": "Jost-Medium",
                 "fontSize": 22,
-                "paddingBottom": 20,
+                "lineHeight": 28,
+                "marginTop": 24,
                 "textAlign": "center",
-              },
+              }
+            }
+          >
+            Step 1
+          </Text>
+          <Text
+            style={
               Object {
-                "color": "#81868B",
-                "paddingHorizontal": 20,
-                "paddingTop": 30,
-              },
-            ]
-          }
-        >
-          Step 1
-        </Text>
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingTop": 16,
+                "textAlign": "center",
+              }
+            }
+          >
+            The Journey Begins
+          </Text>
+        </View>
       </View>
     </Swiper>
-  </View>
-  <View
-    style={
-      Object {
-        "alignSelf": "stretch",
-        "flex": 2,
-        "justifyContent": "flex-end",
-      }
-    }
-  >
     <View
       style={
-        Object {
-          "flexDirection": "row",
-        }
+        Array [
+          Object {
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
+              "overflow": "hidden",
             },
             Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
-            },
-            Object {
-              "flex": 1,
-              "paddingHorizontal": 20,
-            },
-            Object {
-              "backgroundColor": "#42D689",
+              "borderRadius": 100,
             },
           ]
         }
@@ -194,7 +183,6 @@ exports[`Education renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -209,59 +197,34 @@ exports[`Education renders correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#42D689",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#1AB775",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
+              "paddingVertical": 5,
+            }
           }
+          testID="Education/progressButton"
         >
-          <View
+          <Text
             style={
               Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
               }
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              Test
-            </Text>
-          </View>
+            Done
+          </Text>
         </View>
       </View>
     </View>
   </View>
-</View>
+</RNCSafeAreaView>
 `;

@@ -16,6 +16,8 @@ export enum CeloContract {
   GoldToken = 'GoldToken',
   Governance = 'Governance',
   LockedGold = 'LockedGold',
+  MetaTransactionWallet = 'MetaTransactionWallet',
+  MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
   MultiSig = 'MultiSig',
   Random = 'Random',
   Registry = 'Registry',
@@ -26,33 +28,16 @@ export enum CeloContract {
   Validators = 'Validators',
 }
 
-export const ProxyContracts = [
-  'AccountsProxy',
-  'AttestationsProxy',
-  'BlockchainParametersProxy',
-  'DoubleSigningSlasherProxy',
-  'DowntimeSlasherProxy',
-  'ElectionProxy',
-  'EpochRewardsProxy',
-  'EscrowProxy',
-  'ExchangeProxy',
-  'FeeCurrencyWhitelistProxy',
-  'GasPriceMinimumProxy',
-  'GoldTokenProxy',
-  'GovernanceApproverMultiSigProxy',
-  'GovernanceProxy',
-  'LockedGoldProxy',
-  'ReserveProxy',
-  'ReserveSpenderMultiSigProxy',
-  'StableTokenProxy',
-  'SortedOraclesProxy',
-  'RegistryProxy',
-]
+export const ProxyContracts = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
 export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
 
-export const AllContracts = Object.keys(CeloContract).map(
-  (k) => (CeloContract as any)[k as any]
-) as CeloContract[]
+export const AllContracts = Object.keys(CeloContract) as CeloContract[]
+const AuxiliaryContracts = [
+  CeloContract.MultiSig,
+  CeloContract.MetaTransactionWalletDeployer,
+  CeloContract.MetaTransactionWallet,
+]
+export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000' as Address

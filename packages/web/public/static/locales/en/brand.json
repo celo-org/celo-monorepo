@@ -49,9 +49,9 @@
   },
   "color": {
     "title": "Color",
-    "headline": "The Celo color palette consistes of primary brand colors, accent colors, and grays.",
+    "headline": "The Celo color palette consists of primary brand colors, accent colors, and grays.",
     "primaries": "Primary Brand Colors",
-    "primariesText": "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to cGLD like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
+    "primariesText": "Primary brand colors are Celo Green, Celo Gold, Celo Dark, and Celo Light.\n\nCelo Green is used to denote value and action including communication and applications of the cUSD. Celo Gold is used more often when speaking to actions related to CELO like validation, proof of stake, and governance.\n\nCelo Dark and Celo Light are high contrast complementary colors, interchangeably switching between background and typography. Celo Dark has a tendency to represent technical content while Celo Light represents non-technical topics.",
     "accents": "Accent Colors",
     "accentsText": "Accent colors include violet, red, cyan, and blue.\n\nViolet, red, and cyan are colors that often represent alternative coins, projects, and personas in the ecosystem.\n\nBlue represents help within digital experiences like websites and mobile applications.",
     "grays": "Grays",
@@ -78,7 +78,7 @@
     "h1Example": "Main Title",
     "h2Example": "Article Title",
     "h3Example": "Section Title",
-    "h4Example": "Subtitle / larger text that is one size larger than the body, lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
+    "h4Example": "Subtitle / larger text that is one size larger than the body \n lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
     "h5Example": "Sub-section Title",
     "h6Example": "Small Title",
     "bodyExample": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec leo lorem. Donec in ligula vitae leo suscipit hendrerit. Vivamus commodo felis id nisi semper, ut pellentesque nunc sollicitudin. Nam at ligula lacus. Pellentesque lacinia justo feugiat, maximus nisi nec, venenatis neque. Aliquam tempor nec diam sed lobortis. Nam fringilla tempus posuere.",
@@ -86,20 +86,23 @@
   },
   "icons": {
     "title": "Icons",
-    "license": "You may copy and redistribute icons as long as you are abiding by the <0>Community Code of Conduct</0>. You may not remix or transform the icons. ",
-    "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
+    "license": "You may copy and redistribute icons as long as you are abiding by the <0>Community Code of Conduct</0> and <1>Brand Policy</1>. You may not remix or transform the icons.",
+    "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text cannot.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
     "searchPlaceholder": "Ex. Stable Coin",
     "searchLabel": "Explore Icons",
     "matching": "One Matching Icon",
     "matching_0": "No Matching Icons",
     "matching_plural": "{{count}} Matching Icons"
   },
+  "exchangeIcons": {
+    "license": "These assets may only be used to represent Celo assets on exchanges. The use of the Celo Exchange Icons requires following the Celo Community Code of Conduct as provided <0>here</0> and <1>Brand Policy.</1>"
+  },
   "keyImagery": {
     "title": "Key Imagery",
     "headline":
       "Used to tell a story, key images are visual tools that bring the text to life. These images help the user comprehend the material multidimensionally.\n\nImages have descriptions that act as guidelines for both accessibility and communication clarity. Most images can have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
     "license":
-      "You may copy and redistribute illustrations and abstract graphics as long as you are abiding by the <0>Community Code of Conduct</0>. You may not remix or transform them.",
+      "You may copy and redistribute illustrations and abstract graphics as long as you are abiding by the <0>Community Code of Conduct</0> and <1>Brand Policy</1>. You may not remix or transform them.",
     "illoTitle": "Illustrations",
     "illoText":
       "Illustrations show concrete ways that humans interact with an idea. They utilize current mental models to simplify a concept.",

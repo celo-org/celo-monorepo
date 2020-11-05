@@ -1,3 +1,4 @@
+import firebase from '@react-native-firebase/app'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
@@ -12,6 +13,7 @@ import { mockAccount2 } from 'test/values'
 
 const hasPermissionMock = jest.fn(() => null)
 const requestPermissionMock = jest.fn(() => null)
+const registerDeviceForRemoteMessagesMock = jest.fn(() => null)
 const getTokenMock = jest.fn(() => null)
 const onTokenRefreshMock = jest.fn(() => null)
 const onMessageMock = jest.fn(() => null)
@@ -26,6 +28,7 @@ const app: any = {
   messaging: () => ({
     hasPermission: hasPermissionMock,
     requestPermission: requestPermissionMock,
+    registerDeviceForRemoteMessages: registerDeviceForRemoteMessagesMock,
     getToken: getTokenMock,
     onTokenRefresh: onTokenRefreshMock,
     setBackgroundMessageHandler,
@@ -46,7 +49,10 @@ describe(initializeCloudMessaging, () => {
 
     await expectSaga(initializeCloudMessaging, app, address)
       .provide([
-        [call([app.messaging(), 'hasPermission']), false],
+        [
+          call([app.messaging(), 'hasPermission']),
+          firebase.messaging.AuthorizationStatus.NOT_DETERMINED,
+        ],
         [call([app.messaging(), 'requestPermission']), throwError(errorToRaise)],
         {
           spawn(effect, next) {

@@ -7,6 +7,14 @@ import Table from 'cli-table'
 import { cli } from 'cli-ux'
 import { EventLog, Tx } from 'web3-core'
 
+// TODO: How can we deploy contracts with the Celo provider w/o a CeloTransactionObject?
+export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'data'>) {
+  cli.action.start(`Sending Transaction: ${name}`)
+  const result = await txObj.send(tx)
+  console.log(result)
+  cli.action.stop()
+}
+
 export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
@@ -35,7 +43,7 @@ export async function displaySendTx<A>(
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>, color = chalk.red.bold) {
+export function printValueMap(valueMap: Record<string, any>, color = chalk.yellowBright.bold) {
   console.log(
     Object.keys(valueMap)
       .map((key) => color(`${key}: `) + valueMap[key])
@@ -60,7 +68,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
     return chalk`${v}`
   }
   return Object.keys(valueMap)
-    .map((key) => prefix + chalk`{red.bold ${key}:} ${printValue(valueMap[key])}`)
+    .map((key) => prefix + chalk.yellowBright.bold(`${key}: `) + printValue(valueMap[key]))
     .join('\n')
 }
 

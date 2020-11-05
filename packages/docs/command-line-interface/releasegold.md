@@ -13,6 +13,8 @@ USAGE
   $ celocli releasegold:authorize
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
+
   --blsKey=0x                                            The BLS public key that the validator is using for consensus,
                                                          should pass proof of possession. 96 bytes.
 
@@ -67,6 +69,7 @@ USAGE
   $ celocli releasegold:create-account
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -89,7 +92,7 @@ _See code: [packages/cli/src/commands/releasegold/create-account.ts](https://git
 
 ### Locked-gold
 
-Perform actions [lock, unlock, withdraw] on Celo Gold that has been locked via the provided ReleaseGold contract.
+Perform actions [lock, unlock, withdraw] on CELO that has been locked via the provided ReleaseGold contract.
 
 ```
 USAGE
@@ -97,6 +100,7 @@ USAGE
 
 OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on contract's gold
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -112,6 +116,8 @@ OPTIONS
   --useLedger                                            Set it to use a ledger wallet
 
   --value=10000000000000000000000                        (required) Amount of gold to perform `action` with
+
+  --yes                                                  Answer yes to prompt
 
 EXAMPLES
   locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action lock --value 10000000000000000000000
@@ -130,6 +136,7 @@ USAGE
   $ celocli releasegold:refund-and-finalize
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -150,30 +157,6 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/releasegold/refund-and-finalize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/refund-and-finalize.ts)_
 
-### Release-gold
-
-```
-USAGE
-  $ celocli releasegold:release-gold
-
-OPTIONS
-  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
-                                                         addresses for local signing
-
-  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
-                                                         from the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
-                                                         of index addresses for local signing. Example
-                                                         --ledgerCustomAddresses "[4,99]"
-
-  --useLedger                                            Set it to use a ledger wallet
-```
-
-_See code: [packages/cli/src/commands/releasegold/release-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/release-gold.ts)_
-
 ### Revoke
 
 Revoke the given contract instance. Once revoked, any Locked Gold can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.
@@ -183,6 +166,7 @@ USAGE
   $ celocli releasegold:revoke
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -214,6 +198,7 @@ USAGE
   $ celocli releasegold:revoke-votes
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group to revoke votes from
 
@@ -247,6 +232,7 @@ USAGE
   $ celocli releasegold:set-account
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   -p, --property=name|dataEncryptionKey|metaURL          (required) Property type to set
   -v, --value=value                                      (required) Property value to set
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
@@ -282,6 +268,7 @@ USAGE
   $ celocli releasegold:set-account-wallet-address
 
 OPTIONS
+  -k, --privateKey=privateKey                                 Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                           [default: 1] If --useLedger is set, this will get the
@@ -320,6 +307,7 @@ USAGE
   $ celocli releasegold:set-beneficiary
 
 OPTIONS
+  -k, --privateKey=privateKey                               Use a private key to sign local transactions with
   --beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the ReleaseGold Contract
 
@@ -356,6 +344,7 @@ USAGE
   $ celocli releasegold:set-can-expire
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -389,6 +378,7 @@ USAGE
   $ celocli releasegold:set-liquidity-provision
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -420,6 +410,7 @@ USAGE
   $ celocli releasegold:set-max-distribution
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
@@ -454,6 +445,7 @@ USAGE
   $ celocli releasegold:show
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -483,6 +475,7 @@ USAGE
   $ celocli releasegold:transfer-dollars
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -517,6 +510,7 @@ USAGE
   $ celocli releasegold:withdraw
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "./interfaces/IRandom.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -7,11 +7,19 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 /**
  * @title Provides randomness for verifier selection
  */
-contract Random is IRandom, Ownable, Initializable, UsingPrecompiles, CalledByVm {
+contract Random is
+  IRandom,
+  ICeloVersionedContract,
+  Ownable,
+  Initializable,
+  UsingPrecompiles,
+  CalledByVm
+{
   using SafeMath for uint256;
 
   /* Stores most recent commitment per address */
@@ -25,6 +33,14 @@ contract Random is IRandom, Ownable, Initializable, UsingPrecompiles, CalledByVm
   uint256 private lastEpochBlock;
 
   event RandomnessBlockRetentionWindowSet(uint256 value);
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

@@ -17,6 +17,7 @@ Contract for handling deposits needed for voting.
 ### Properties
 
 * [createAccount](_wrappers_accounts_.accountswrapper.md#createaccount)
+* [eventTypes](_wrappers_accounts_.accountswrapper.md#eventtypes)
 * [events](_wrappers_accounts_.accountswrapper.md#events)
 * [getAttestationSigner](_wrappers_accounts_.accountswrapper.md#getattestationsigner)
 * [getDataEncryptionKey](_wrappers_accounts_.accountswrapper.md#getdataencryptionkey)
@@ -27,9 +28,11 @@ Contract for handling deposits needed for voting.
 * [hasAuthorizedAttestationSigner](_wrappers_accounts_.accountswrapper.md#hasauthorizedattestationsigner)
 * [isAccount](_wrappers_accounts_.accountswrapper.md#isaccount)
 * [isSigner](_wrappers_accounts_.accountswrapper.md#issigner)
+* [methodIds](_wrappers_accounts_.accountswrapper.md#methodids)
 * [setAccountDataEncryptionKey](_wrappers_accounts_.accountswrapper.md#setaccountdataencryptionkey)
 * [setMetadataURL](_wrappers_accounts_.accountswrapper.md#setmetadataurl)
 * [setName](_wrappers_accounts_.accountswrapper.md#setname)
+* [signerToAccount](_wrappers_accounts_.accountswrapper.md#signertoaccount)
 * [validatorSignerToAccount](_wrappers_accounts_.accountswrapper.md#validatorsignertoaccount)
 * [voteSignerToAccount](_wrappers_accounts_.accountswrapper.md#votesignertoaccount)
 
@@ -46,11 +49,12 @@ Contract for handling deposits needed for voting.
 * [generateProofOfKeyPossession](_wrappers_accounts_.accountswrapper.md#generateproofofkeypossession)
 * [generateProofOfKeyPossessionLocally](_wrappers_accounts_.accountswrapper.md#generateproofofkeypossessionlocally)
 * [getAccountSummary](_wrappers_accounts_.accountswrapper.md#getaccountsummary)
+* [getCurrentSigners](_wrappers_accounts_.accountswrapper.md#getcurrentsigners)
 * [getName](_wrappers_accounts_.accountswrapper.md#getname)
+* [getPastEvents](_wrappers_accounts_.accountswrapper.md#getpastevents)
 * [parseSignatureOfAddress](_wrappers_accounts_.accountswrapper.md#parsesignatureofaddress)
 * [setAccount](_wrappers_accounts_.accountswrapper.md#setaccount)
 * [setWalletAddress](_wrappers_accounts_.accountswrapper.md#setwalletaddress)
-* [signerToAccount](_wrappers_accounts_.accountswrapper.md#signertoaccount)
 
 ## Constructors
 
@@ -60,7 +64,7 @@ Contract for handling deposits needed for voting.
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L25)*
 
 **Parameters:**
 
@@ -77,7 +81,7 @@ Name | Type |
 
 • **createAccount**: *function* = proxySend(this.kit, this.contract.methods.createAccount)
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L43)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L41)*
 
 Creates an account.
 
@@ -93,13 +97,28 @@ Name | Type |
 
 ___
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
+    (acc, key) => ({ ...acc, [key]: key }),
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *Accounts["events"]* = this.contract.events
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
 
 ___
 
@@ -109,7 +128,7 @@ ___
     this.contract.methods.getAttestationSigner
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L50)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L48)*
 
 Returns the attestation signer for the specified account.
 
@@ -131,9 +150,11 @@ ___
 
 ###  getDataEncryptionKey
 
-• **getDataEncryptionKey**: *function* = proxyCall(this.contract.methods.getDataEncryptionKey)
+• **getDataEncryptionKey**: *function* = proxyCall(this.contract.methods.getDataEncryptionKey, undefined, (res) =>
+    solidityBytesToString(res)
+  )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:300](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L300)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:304](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L304)*
 
 Returns the set data encryption key for the account
 
@@ -155,7 +176,7 @@ ___
 
 • **getMetadataURL**: *function* = proxyCall(this.contract.methods.getMetadataURL)
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:312](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L312)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:318](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L318)*
 
 Returns the metadataURL for the account
 
@@ -179,7 +200,7 @@ ___
     this.contract.methods.getValidatorSigner
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L76)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L74)*
 
 Returns the validator signer for the specified account.
 
@@ -205,7 +226,7 @@ ___
     this.contract.methods.getVoteSigner
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L68)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L66)*
 
 Returns the vote signer for the specified account.
 
@@ -229,7 +250,7 @@ ___
 
 • **getWalletAddress**: *function* = proxyCall(this.contract.methods.getWalletAddress)
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:306](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L306)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:312](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L312)*
 
 Returns the set wallet address for the account
 
@@ -253,7 +274,7 @@ ___
     this.contract.methods.hasAuthorizedAttestationSigner
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L59)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L57)*
 
 Returns if the account has authorized an attestation signer
 
@@ -277,7 +298,7 @@ ___
 
 • **isAccount**: *function* = proxyCall(this.contract.methods.isAccount)
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L115)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L111)*
 
 Check if an account already exists.
 
@@ -303,7 +324,7 @@ ___
     this.contract.methods.isAuthorizedSigner
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L122)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L118)*
 
 Check if an address is a signer address
 
@@ -323,6 +344,28 @@ Name | Type |
 
 ___
 
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+    (acc, method: Methods<T>) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+
+#### Type declaration:
+
+___
+
 ###  setAccountDataEncryptionKey
 
 • **setAccountDataEncryptionKey**: *function* = proxySend(
@@ -330,7 +373,7 @@ ___
     this.contract.methods.setAccountDataEncryptionKey
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:318](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L318)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:324](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L324)*
 
 Sets the data encryption of the account
 
@@ -352,7 +395,7 @@ ___
 
 • **setMetadataURL**: *function* = proxySend(this.kit, this.contract.methods.setMetadataURL)
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:375](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L375)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:381](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L381)*
 
 Sets the metadataURL for the account
 
@@ -374,7 +417,7 @@ ___
 
 • **setName**: *function* = proxySend(this.kit, this.contract.methods.setName)
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:369](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L369)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:375](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L375)*
 
 Sets the name for the account
 
@@ -392,13 +435,41 @@ Name | Type |
 
 ___
 
+###  signerToAccount
+
+• **signerToAccount**: *function* = proxyCall(
+    this.contract.methods.signerToAccount
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L102)*
+
+Returns the account associated with `signer`.
+
+**`param`** The address of the account or previously authorized signer.
+
+**`dev`** Fails if the `signer` is not an account or previously authorized signer.
+
+**`returns`** The associated account.
+
+#### Type declaration:
+
+▸ (`signer`: [Address](../modules/_base_.md#address)): *Promise‹[Address](../modules/_base_.md#address)›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`signer` | [Address](../modules/_base_.md#address) |
+
+___
+
 ###  validatorSignerToAccount
 
 • **validatorSignerToAccount**: *function* = proxyCall(
     this.contract.methods.validatorSignerToAccount
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L94)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:92](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L92)*
 
 Returns the account address given the signer for validating
 
@@ -424,7 +495,7 @@ ___
     this.contract.methods.voteSignerToAccount
   )
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L85)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L83)*
 
 Returns the account address given the signer for voting
 
@@ -450,7 +521,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
 
 Contract address
 
@@ -462,7 +533,7 @@ Contract address
 
 ▸ **authorizeAttestationSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:156](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L156)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:160](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L160)*
 
 Authorize an attestation signing key on behalf of this account to another address.
 
@@ -483,7 +554,7 @@ ___
 
 ▸ **authorizeValidatorSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:197](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L197)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L201)*
 
 Authorizes an address to sign consensus messages on behalf of the account.
 
@@ -504,7 +575,7 @@ ___
 
 ▸ **authorizeValidatorSignerAndBls**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature, `blsPublicKey`: string, `blsPop`: string): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L245)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:249](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L249)*
 
 Authorizes an address to sign consensus messages on behalf of the account. Also switch BLS key at the same time.
 
@@ -527,7 +598,7 @@ ___
 
 ▸ **authorizeVoteSigner**(`signer`: [Address](../modules/_base_.md#address), `proofOfSigningKeyPossession`: Signature): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L176)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:180](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L180)*
 
 Authorizes an address to sign votes on behalf of the account.
 
@@ -548,7 +619,7 @@ ___
 
 ▸ **generateProofOfKeyPossession**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:274](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L274)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:278](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L278)*
 
 **Parameters:**
 
@@ -565,7 +636,7 @@ ___
 
 ▸ **generateProofOfKeyPossessionLocally**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address), `privateKey`: string): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:282](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L282)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:286](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L286)*
 
 **Parameters:**
 
@@ -583,7 +654,7 @@ ___
 
 ▸ **getAccountSummary**(`account`: string): *Promise‹AccountSummary›*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:126](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L126)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:130](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L130)*
 
 **Parameters:**
 
@@ -595,11 +666,27 @@ Name | Type |
 
 ___
 
+###  getCurrentSigners
+
+▸ **getCurrentSigners**(`address`: string): *Promise‹string[]›*
+
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L122)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+
+**Returns:** *Promise‹string[]›*
+
+___
+
 ###  getName
 
 ▸ **getName**(`account`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹string›*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:291](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L291)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:295](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L295)*
 
 Returns the set name for the account
 
@@ -614,11 +701,32 @@ Name | Type | Description |
 
 ___
 
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: Events‹Accounts›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | Events‹Accounts› |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
+
+___
+
 ###  parseSignatureOfAddress
 
 ▸ **parseSignatureOfAddress**(`address`: [Address](../modules/_base_.md#address), `signer`: string, `signature`: string): *object*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:403](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L403)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:409](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L409)*
 
 **Parameters:**
 
@@ -642,7 +750,7 @@ ___
 
 ▸ **setAccount**(`name`: string, `dataEncryptionKey`: string, `walletAddress`: [Address](../modules/_base_.md#address), `proofOfPossession`: Signature | null): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:330](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L330)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:336](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L336)*
 
 Convenience Setter for the dataEncryptionKey and wallet address for an account
 
@@ -663,7 +771,7 @@ ___
 
 ▸ **setWalletAddress**(`walletAddress`: [Address](../modules/_base_.md#address), `proofOfPossession`: Signature | null): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
 
-*Defined in [contractkit/src/wrappers/Accounts.ts:381](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L381)*
+*Defined in [packages/contractkit/src/wrappers/Accounts.ts:387](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L387)*
 
 Sets the wallet address for the account
 
@@ -675,26 +783,3 @@ Name | Type | Default |
 `proofOfPossession` | Signature &#124; null | null |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
-
-___
-
-###  signerToAccount
-
-▸ **signerToAccount**(`signer`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹[Address](../modules/_base_.md#address)›*
-
-*Defined in [contractkit/src/wrappers/Accounts.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Accounts.ts#L105)*
-
-Returns the account associated with `signer`.
-
-**`dev`** Fails if the `signer` is not an account or previously authorized signer.
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`signer` | [Address](../modules/_base_.md#address) | The address of the account or previously authorized signer. |
-`blockNumber?` | undefined &#124; number | Height of result, defaults to tip. |
-
-**Returns:** *Promise‹[Address](../modules/_base_.md#address)›*
-
-The associated account.

@@ -1,7 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ExchangeReview renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
+  }
   style={
     Object {
       "flex": 1,
@@ -12,6 +17,7 @@ exports[`ExchangeReview renders correctly 1`] = `
   <View
     style={
       Object {
+        "flex": 1,
         "paddingHorizontal": 16,
       }
     }
@@ -39,9 +45,9 @@ exports[`ExchangeReview renders correctly 1`] = `
               style={
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 }
               }
             >
@@ -52,13 +58,13 @@ exports[`ExchangeReview renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 24,
-                    "lineHeight": 39,
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
-                    "color": "#42D689",
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -72,7 +78,7 @@ exports[`ExchangeReview renders correctly 1`] = `
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -106,9 +112,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -137,9 +143,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   undefined,
                 ]
@@ -162,241 +168,152 @@ exports[`ExchangeReview renders correctly 1`] = `
               </Text>
             </Text>
           </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "marginVertical": 5,
-                },
-                undefined,
-              ]
-            }
-          >
+          <View>
             <View
-              style={
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "marginRight": 5,
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
                 }
               }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              testID="feeDrawer/ExchangeReview"
             >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
-                    },
-                    undefined,
-                  ]
-                }
-              >
-                exchangeFee
-              </Text>
               <View
-                accessible={true}
-                focusable={true}
-                hitSlop={
-                  Object {
-                    "bottom": 10,
-                    "left": 10,
-                    "right": 10,
-                    "top": 10,
-                  }
-                }
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
-                    "alignItems": "center",
-                    "justifyContent": "flex-end",
-                    "paddingHorizontal": 5,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
                   }
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/info.png",
-                    }
-                  }
+                <View
                   style={
                     Object {
-                      "height": 12,
-                      "tintColor": "#BDBDBD",
-                      "width": 12,
+                      "alignItems": "center",
+                      "flexDirection": "row",
                     }
                   }
-                />
-              </View>
-            </View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                $
-                0.001
-              </Text>
-            </Text>
-          </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "marginVertical": 5,
-                },
-                undefined,
-              ]
-            }
-          >
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "marginRight": 5,
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
-                    },
-                    undefined,
-                  ]
-                }
-              >
-                securityFee
-              </Text>
-              <View
-                accessible={true}
-                focusable={true}
-                hitSlop={
-                  Object {
-                    "bottom": 10,
-                    "left": 10,
-                    "right": 10,
-                    "top": 10,
-                  }
-                }
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "justifyContent": "flex-end",
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/info.png",
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      }
                     }
-                  }
+                  >
+                    feeActual
+                  </Text>
+                  <View
+                    style={
+                      Object {
+                        "transform": Array [
+                          Object {
+                            "rotate": "0deg",
+                          },
+                        ],
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M3 6l5 5 5-5"
+                        stroke="#B4B9BD"
+                      />
+                    </svg>
+                  </View>
+                </View>
+                <View
                   style={
-                    Object {
-                      "height": 12,
-                      "tintColor": "#BDBDBD",
-                      "width": 12,
-                    }
+                    Array [
+                      Object {
+                        "flexDirection": "row",
+                        "justifyContent": "space-between",
+                        "marginVertical": 5,
+                      },
+                      undefined,
+                    ]
                   }
-                />
+                >
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "marginRight": 5,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#2E3338",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                          },
+                          undefined,
+                        ]
+                      }
+                    >
+                      
+                    </Text>
+                  </View>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                        },
+                        undefined,
+                      ]
+                    }
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      $
+                      0
+                    </Text>
+                  </Text>
+                </View>
               </View>
             </View>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    undefined,
-                    Object {
-                      "color": undefined,
-                    },
-                  ]
-                }
-              >
-                
-                $
-                0.001
-              </Text>
-            </Text>
           </View>
           <View
             style={
               Object {
                 "borderStyle": "solid",
-                "borderTopColor": "#EEEEEE",
+                "borderTopColor": "#F8F9F9",
                 "borderTopWidth": 1,
                 "marginBottom": 15,
                 "marginTop": 10,
@@ -430,15 +347,15 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -451,15 +368,15 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Bold",
+                    "fontFamily": "Inter-SemiBold",
                     "fontSize": 16,
-                    "lineHeight": 24,
+                    "lineHeight": 22,
                   },
                 ]
               }
@@ -509,17 +426,20 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                   ]
                 }
               >
-                Celo Dollars (@
+                Celo Dollars @
                  
                 <Text
                   numberOfLines={1}
@@ -536,7 +456,6 @@ exports[`ExchangeReview renders correctly 1`] = `
                   $
                   0.75
                 </Text>
-                )
               </Text>
             </View>
             <Text
@@ -544,12 +463,15 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
-                    "color": "#81868B",
+                    "color": "#9CA4A9",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   },
                 ]
               }
@@ -576,25 +498,24 @@ exports[`ExchangeReview renders correctly 1`] = `
   </View>
   <View
     style={
-      Object {
-        "borderTopColor": "rgba(0, 0, 0, 0.05)",
-        "borderTopWidth": 1,
-      }
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        Object {
+          "padding": 16,
+        },
+      ]
     }
   >
     <View
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "borderRadius": 3,
-            "flexDirection": "row",
+            "overflow": "hidden",
           },
-          null,
-          null,
-          undefined,
           Object {
-            "backgroundColor": "#42D689",
+            "borderRadius": 100,
           },
         ]
       }
@@ -602,7 +523,6 @@ exports[`ExchangeReview renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -617,72 +537,49 @@ exports[`ExchangeReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            },
-            Object {
-              "backgroundColor": "#42D689",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderWidth": 0,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#EEB93C",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "opacity": undefined,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
+          }
         }
+        testID="ConfirmExchange"
       >
-        <View
+        <Text
           style={
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
             }
           }
         >
+          Buy or sell 
           <Text
+            numberOfLines={1}
             style={
               Array [
+                undefined,
                 Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
+                  "color": undefined,
                 },
               ]
             }
           >
-            Buy or sell 
-            <Text
-              numberOfLines={1}
-              style={
-                Array [
-                  undefined,
-                  Object {
-                    "color": undefined,
-                  },
-                ]
-              }
-            >
-              
-              
-              10.000
-            </Text>
-             Gold
+            
+            
+            10.000
           </Text>
-        </View>
+           Gold
+        </Text>
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

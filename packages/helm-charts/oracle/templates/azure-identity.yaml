@@ -1,4 +1,5 @@
 {{- range $index, $identity := .Values.oracle.identities -}}
+{{ if (hasKey $identity "azure") }}
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentity
 metadata:
@@ -7,7 +8,8 @@ metadata:
     aadpodidentity.k8s.io/Behavior: namespaced
 spec:
   type: 0
-  ResourceID: {{ $identity.azure.id }}
-  ClientID: {{ $identity.azure.clientId }}
+  resourceID: {{ $identity.azure.id }}
+  clientID: {{ $identity.azure.clientId }}
 ---
+{{ end }}
 {{ end }}

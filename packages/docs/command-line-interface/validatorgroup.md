@@ -6,15 +6,20 @@ description: View and manage Validator Groups
 
 ### Commission
 
-Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.
+Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of. Updates must be made in a two step process where the group owner first calls uses the queue-update option, then after the required update delay, the apply option. The commission update delay, in blocks, can be viewed with the network:parameters command. A groups next commission update block can be checked with validatorgroup:show
 
 ```
 USAGE
   $ celocli validatorgroup:commission
 
 OPTIONS
-  --apply                                            Applies a previously queued update
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
+  --apply                                            Applies a previously queued update. Should be called after the
+                                                     update delay.
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group or Validator Group
+                                                     validator signer
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -26,7 +31,8 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --queue-update=queue-update                        Queues an update to the commission
+  --queue-update=queue-update                        Queues an update to the commission, which can be applied after the
+                                                     update delay.
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -39,13 +45,14 @@ _See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://gith
 
 ### Deregister
 
-Deregister a Validator Group. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator Group will become possible to unlock. Note that the Group must be empty (i.e. no members) before deregistering.
+Deregister a Validator Group. Approximately 180 days after the validator group is empty, it will be possible to deregister it start unlocking the CELO. If you wish to deregister your validator group, you must first remove all members, then wait the required 180 days before running this command.
 
 ```
 USAGE
   $ celocli validatorgroup:deregister
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or ValidatorGroup's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -74,6 +81,16 @@ List registered Validator Groups, their names (if provided), commission, and mem
 USAGE
   $ celocli validatorgroup:list
 
+OPTIONS
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
+
 EXAMPLE
   list
 ```
@@ -92,6 +109,7 @@ ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --accept                                           Accept a validator whose affiliation is already set to the group
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
 
@@ -111,6 +129,8 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
+  --yes                                              Answer yes to prompt
+
 EXAMPLES
   member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --accept 0x97f7333c51897469e8d98e7af8653aab468050a3
   member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --remove 0x97f7333c51897469e8d98e7af8653aab468050a3
@@ -128,6 +148,8 @@ USAGE
   $ celocli validatorgroup:register
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --commission=commission                            (required) The share of the epoch rewards given to elected
                                                      Validators that goes to the group.
 
@@ -165,6 +187,8 @@ ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 

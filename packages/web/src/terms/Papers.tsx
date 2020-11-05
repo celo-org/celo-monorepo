@@ -5,9 +5,9 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
+import { HelpfulLink } from './HelpfulLink'
 
 class Papers extends React.PureComponent<I18nProps> {
   static getInitialProps() {
@@ -30,43 +30,27 @@ class Papers extends React.PureComponent<I18nProps> {
             </Cell>
           </GridRow>
           <SideTitledSection span={Spans.three4th} title={t('protocol')}>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('whitepaperTitle')}
-            </Text>
+            <Text style={fonts.p}>{t('whitepaperTitle')}</Text>
             <View style={styles.links}>
-              <HelpfullLink text={t('download')} href={'/papers/whitepaper'} />
-              <HelpfullLink text={'阅读'} href={'/papers/celo-wp-simplified-chinese.pdf'} />
+              <HelpfulLink text={t('download')} href={'/papers/whitepaper'} />
+              <HelpfulLink text={'阅读'} href={'/papers/whitepaper/chinese'} />
             </View>
           </SideTitledSection>
           <SideTitledSection span={Spans.three4th} title={t('economics')}>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('stabilityTitle')}
-            </Text>
-            <HelpfullLink text={t('download')} href={'/papers/stability'} />
+            <Text style={fonts.p}>{t('stabilityTitle')}</Text>
+            <HelpfulLink text={t('download')} href={'/papers/stability'} />
           </SideTitledSection>
           <SideTitledSection span={Spans.three4th} title={''}>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('velocityTitle')}
-            </Text>
-            <HelpfullLink text={t('download')} href={'/papers/cbdc-velocity'} />
+            <Text style={fonts.p}>{t('velocityTitle')}</Text>
+            <View style={styles.links}>
+              <HelpfulLink text={t('download')} href={'/papers/cbdc-velocity'} />
+              <HelpfulLink text={'Lee el informe'} href={'/papers/cbdc-velocity/spanish'} />
+            </View>
           </SideTitledSection>
         </View>
       </>
     )
   }
-}
-
-function HelpfullLink({ text, href }) {
-  return (
-    <Button
-      kind={BTN.NAKED}
-      style={styles.link}
-      text={text}
-      href={href}
-      size={SIZE.normal}
-      target="_blank"
-    />
-  )
 }
 
 export default withNamespaces(NameSpaces.papers)(Papers)

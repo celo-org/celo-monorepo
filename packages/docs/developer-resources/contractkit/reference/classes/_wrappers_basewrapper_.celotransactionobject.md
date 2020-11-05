@@ -30,7 +30,7 @@
 
 \+ **new CeloTransactionObject**(`kit`: [ContractKit](_kit_.contractkit.md), `txo`: TransactionObject‹O›, `defaultParams?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:242](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L242)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:267](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L267)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **defaultParams**? : *[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:246](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L246)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:271](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L271)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **txo**: *TransactionObject‹O›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L245)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:270](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L270)*
 
 ## Methods
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **send**(`params?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:250](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L250)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:275](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L275)*
 
 send the transaction to the chain
 
@@ -82,7 +82,7 @@ ___
 
 ▸ **sendAndWaitForReceipt**(`params?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *Promise‹TransactionReceipt›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L255)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:280](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L280)*
 
 send the transaction and waits for the receipt
 

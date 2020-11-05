@@ -1,8 +1,10 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import CircleButton from '@celo/react-components/components/CircleButton'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import { ScrollView, StyleSheet, View, ViewProps } from 'react-native'
+import { StyleSheet, View, ViewProps } from 'react-native'
 
 interface ButtonProps {
   text: string
@@ -15,34 +17,32 @@ interface Props extends ViewProps {
   confirmButton?: ButtonProps
   modifyButton?: ButtonProps
   HeaderComponent?: React.ComponentType<any>
-  FooterComponent?: React.ComponentType<any>
-  shouldReset?: boolean
+  FooterComponent?: React.FunctionComponent
+  LabelAboveKeyboard?: React.FunctionComponent
+  isSending?: boolean
 }
 
 interface State {
-  confirmed: boolean
+  keyboardVisible: boolean
 }
 
 class ReviewFrame extends React.PureComponent<Props, State> {
-  state = {
-    confirmed: false,
+  state: State = {
+    keyboardVisible: false,
   }
 
   onConfirm = () => {
-    this.setState({ confirmed: true })
     if (this.props.confirmButton) {
       this.props.confirmButton.action()
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.shouldReset === false && this.props.shouldReset === true) {
-      this.setState({ confirmed: false })
-    }
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
   }
 
   renderButtons = () => {
-    const { navigateBack, confirmButton, modifyButton, FooterComponent } = this.props
+    const { navigateBack, confirmButton, modifyButton, FooterComponent, isSending } = this.props
 
     if (confirmButton || modifyButton) {
       return (
@@ -51,10 +51,13 @@ class ReviewFrame extends React.PureComponent<Props, State> {
             <Button
               onPress={this.onConfirm}
               text={confirmButton.text}
+              showLoading={isSending}
               accessibilityLabel={confirmButton.text}
-              standard={true}
               type={BtnTypes.PRIMARY}
-              disabled={confirmButton.disabled || this.state.confirmed}
+              size={BtnSizes.FULL}
+              style={styles.confirmButton}
+              disabled={confirmButton.disabled}
+              testID="ConfirmButton"
             />
           )}
           {modifyButton && (
@@ -62,8 +65,8 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               onPress={modifyButton.action}
               text={modifyButton.text}
               accessibilityLabel={modifyButton.text}
-              standard={false}
               type={BtnTypes.SECONDARY}
+              size={BtnSizes.FULL}
               disabled={modifyButton.disabled}
               style={styles.modifyButton}
             />
@@ -84,16 +87,25 @@ class ReviewFrame extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { HeaderComponent, FooterComponent, style, children } = this.props
+    const { HeaderComponent, FooterComponent, LabelAboveKeyboard, style, children } = this.props
 
     return (
       <View style={[styles.body, style]}>
-        <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.scrollViewContentContainer}
+          keyboardShouldPersistTaps={'handled'}
+        >
           {HeaderComponent && <HeaderComponent />}
           <View style={styles.confirmationContainer}>{children}</View>
-        </ScrollView>
-        {FooterComponent && <FooterComponent />}
-        {this.renderButtons()}
+        </KeyboardAwareScrollView>
+        {!this.state.keyboardVisible && (
+          <>
+            {FooterComponent && <FooterComponent />}
+            {this.renderButtons()}
+          </>
+        )}
+        {this.state.keyboardVisible && LabelAboveKeyboard && <LabelAboveKeyboard />}
+        <KeyboardSpacer onToggle={this.onToggleKeyboard} />
       </View>
     )
   }
@@ -102,25 +114,26 @@ class ReviewFrame extends React.PureComponent<Props, State> {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
+    backgroundColor: colors.light,
   },
   scrollViewContentContainer: {
     paddingVertical: 10,
-    justifyContent: 'flex-start',
   },
   confirmationContainer: {
-    marginVertical: 20,
     marginHorizontal: 16,
   },
   circleButtonContainer: {
     marginVertical: 20,
   },
   bottomButtonStyle: {
-    marginHorizontal: 20,
+    marginHorizontal: 16,
+    paddingVertical: 16,
   },
   modifyButton: {
     marginBottom: 10,
+  },
+  confirmButton: {
+    marginBottom: 16,
   },
 })
 

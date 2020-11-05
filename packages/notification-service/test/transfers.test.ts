@@ -50,11 +50,11 @@ jest.mock('../src/blockscout/decode', () => {
     txHash: 'txhash2',
     timestamp: 1,
   }
-  const goldTransfers = new Map<string, Transfer>()
-  const stableTransfers = new Map<string, Transfer>()
+  const goldTransfers = new Map<string, Transfer[]>()
+  const stableTransfers = new Map<string, Transfer[]>()
 
-  goldTransfers.set('txhash', TRANSFER1)
-  stableTransfers.set('txhash2', TRANSFER2)
+  goldTransfers.set('txhash', [TRANSFER1])
+  stableTransfers.set('txhash2', [TRANSFER2])
 
   decodeLogsMock = jest
     .fn()
@@ -76,8 +76,11 @@ const defaultResponse: Response<Log> = {
       topics: [''],
       timeStamp: '',
       logIndex: '',
+      gatewayFeeRecipient: '',
+      gatewayFee: '',
       gasUsed: '',
       gasPrice: '',
+      feeCurrency: '',
       data: '',
       blockNumber: '',
       address: '',
@@ -94,11 +97,11 @@ describe('Transfers', () => {
   })
 
   it('should exclude exchanges', () => {
-    const goldTransfers = new Map<string, Transfer>()
-    const stableTransfers = new Map<string, Transfer>()
+    const goldTransfers = new Map<string, Transfer[]>()
+    const stableTransfers = new Map<string, Transfer[]>()
 
-    goldTransfers.set('txhash', TRANSFER1)
-    stableTransfers.set('txhash', TRANSFER1)
+    goldTransfers.set('txhash', [TRANSFER1])
+    stableTransfers.set('txhash', [TRANSFER1])
 
     const concated = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
@@ -106,11 +109,11 @@ describe('Transfers', () => {
   })
 
   it('should include unique transactions and update the last block', () => {
-    const goldTransfers = new Map<string, Transfer>()
-    const stableTransfers = new Map<string, Transfer>()
+    const goldTransfers = new Map<string, Transfer[]>()
+    const stableTransfers = new Map<string, Transfer[]>()
 
-    goldTransfers.set('txhash', TRANSFER1)
-    stableTransfers.set('txhash2', TRANSFER2)
+    goldTransfers.set('txhash', [TRANSFER1])
+    stableTransfers.set('txhash2', [TRANSFER2])
 
     const concated = filterAndJoinTransfers(goldTransfers, stableTransfers)
 

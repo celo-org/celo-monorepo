@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
-import * as RNFS from 'react-native-fs'
 import { select } from 'redux-saga/effects'
 import { SENTRY_URL } from 'src/config'
 import Logger from 'src/utils/Logger'
@@ -15,7 +14,6 @@ export async function installSentry() {
     return
   }
   Sentry.init({ dsn: SENTRY_URL, environment: DeviceInfo.getBundleId() })
-  await uploadNdkCrashesIfAny()
   Logger.info(TAG, 'installSentry', 'Sentry installation complete')
 }
 
@@ -34,35 +32,4 @@ export function* initializeSentryUserContext() {
   Sentry.setUser({
     username: account,
   })
-}
-
-const uploadNdkCrashesIfAny = async () => {
-  // This file path should be same here and in MainApplication.java
-  const ndkCrashLogsFilePath = RNFS.CachesDirectoryPath + '/ndk_crash_logs.txt'
-  const ndkCrashLogcatLogsFilePath = RNFS.CachesDirectoryPath + '/ndk_crash_logcat_logs.txt'
-
-  if (!(await RNFS.exists(ndkCrashLogsFilePath))) {
-    Logger.debug(
-      'Sentry@uploadNdkCrashesIfAny',
-      `crash log file ${ndkCrashLogsFilePath} not found, no native crashes recorded`
-    )
-    return
-  }
-
-  const fileSize = parseInt((await RNFS.stat(ndkCrashLogsFilePath)).size, 10)
-  Logger.info(
-    'Sentry@uploadNdkCrashesIfAny',
-    `crash log file ${ndkCrashLogsFilePath} found (${fileSize} bytes), capturing it via Sentry`
-  )
-  const msg1 = (await RNFS.exists(ndkCrashLogcatLogsFilePath))
-    ? await RNFS.readFile(ndkCrashLogcatLogsFilePath)
-    : 'Logcat logs not available'
-  const msg2 = await RNFS.readFile(ndkCrashLogsFilePath)
-
-  Sentry.captureMessage(`NDK crash\n${msg1}\n${msg2}`)
-  await RNFS.unlink(ndkCrashLogsFilePath)
-
-  if (!(await RNFS.exists(ndkCrashLogcatLogsFilePath))) {
-    await RNFS.unlink(ndkCrashLogcatLogsFilePath)
-  }
 }

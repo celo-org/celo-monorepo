@@ -12,13 +12,13 @@ Base ContractWrapper
 
   ↳ [AccountsWrapper](_wrappers_accounts_.accountswrapper.md)
 
+  ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
+
   ↳ [AttestationsWrapper](_wrappers_attestations_.attestationswrapper.md)
 
   ↳ [BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
 
   ↳ [DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)
-
-  ↳ [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md)
 
   ↳ [DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)
 
@@ -28,6 +28,8 @@ Base ContractWrapper
 
   ↳ [ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)
 
+  ↳ [FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)
+
   ↳ [GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)
 
   ↳ [GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
@@ -35,6 +37,10 @@ Base ContractWrapper
   ↳ [GovernanceWrapper](_wrappers_governance_.governancewrapper.md)
 
   ↳ [LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)
+
+  ↳ [MetaTransactionWalletWrapper](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md)
+
+  ↳ [MetaTransactionWalletDeployerWrapper](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)
 
   ↳ [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)
 
@@ -54,11 +60,17 @@ Base ContractWrapper
 
 ### Properties
 
+* [eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)
 * [events](_wrappers_basewrapper_.basewrapper.md#events)
+* [methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)
 
 ### Accessors
 
 * [address](_wrappers_basewrapper_.basewrapper.md#address)
+
+### Methods
+
+* [getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)
 
 ## Constructors
 
@@ -66,7 +78,7 @@ Base ContractWrapper
 
 \+ **new BaseWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: T): *[BaseWrapper](_wrappers_basewrapper_.basewrapper.md)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L25)*
 
 **Parameters:**
 
@@ -79,11 +91,44 @@ Name | Type |
 
 ## Properties
 
+###  eventTypes
+
+• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
+    (acc, key) => ({ ...acc, [key]: key }),
+    {} as any
+  )
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L41)*
+
+#### Type declaration:
+
+___
+
 ###  events
 
-• **events**: *any* = this.contract.events
+• **events**: *T["events"]* = this.contract.events
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+
+___
+
+###  methodIds
+
+• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+    (acc, method: Methods<T>) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L46)*
+
+#### Type declaration:
 
 ## Accessors
 
@@ -91,8 +136,27 @@ Name | Type |
 
 • **get address**(): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
 
 Contract address
 
 **Returns:** *string*
+
+## Methods
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: Events‹T›, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | Events‹T› |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*

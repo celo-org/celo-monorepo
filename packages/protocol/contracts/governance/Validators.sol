@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -7,14 +7,13 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
 
-import "../identity/interfaces/IRandom.sol";
-
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -22,6 +21,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Validators is
   IValidators,
+  ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
   Initializable,
@@ -158,6 +158,14 @@ contract Validators is
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param groupRequirementValue The Locked Gold requirement amount for groups.
@@ -198,7 +206,7 @@ contract Validators is
 
   /**
    * @notice Updates the block delay for a ValidatorGroup's commission udpdate
-   * @param delay Number of block to delay the update
+   * @param delay Number of blocks to delay the update
    */
   function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
     require(delay != commissionUpdateDelay, "commission update delay not changed");
@@ -341,8 +349,14 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
     emit ValidatorRegistered(account);
@@ -492,8 +506,9 @@ contract Validators is
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      getStableToken().mint(group, groupPayment);
-      getStableToken().mint(account, validatorPayment);
+      IStableToken stableToken = getStableToken();
+      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
+      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
@@ -906,7 +921,9 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    return balance >= getAccountLockedGoldRequirement(account);
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
+    // wei rounding errors. Using 10 as an additional margin of safety.
+    return balance.add(10) >= getAccountLockedGoldRequirement(account);
   }
 
   /**

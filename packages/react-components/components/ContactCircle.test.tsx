@@ -1,7 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import { shallow } from 'enzyme'
 import * as React from 'react'
-import { Text } from 'react-native'
+import { render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 const testContact = {
@@ -18,47 +17,25 @@ describe('ContactCircle', () => {
   })
   describe('when given contact', () => {
     it('uses contact name for initial', () => {
-      const contactCircle = shallow(
-        <ContactCircle size={30} name={'Jerry'} contact={testContact} />
-      )
+      const { getByText } = render(<ContactCircle size={30} name={'Jerry'} contact={testContact} />)
 
-      expect(
-        contactCircle
-          .find(Text)
-          .children()
-          .text()
-      ).toEqual('Z')
+      expect(getByText('Z')).toBeTruthy()
     })
   })
-  describe('when "preferNameInitial"', () => {
+  describe('when not given a contact', () => {
     it('uses name for initial', () => {
-      const contactCircle = shallow(
-        <ContactCircle size={30} name={'Jerry'} contact={testContact} preferNameInitial={true} />
-      )
+      const { getByText } = render(<ContactCircle size={30} name={'Jerry'} />)
 
-      expect(
-        contactCircle
-          .find(Text)
-          .children()
-          .text()
-      ).toEqual('J')
+      expect(getByText('J')).toBeTruthy()
     })
   })
-  describe('when has image', () => {
+  describe('when has a thumbnail', () => {
     it('renders image', () => {
-      const contactWithImage = { ...testContact, hasThumbnail: true, thumbnailPath: './test.jpg' }
-      const contactCircle = shallow(
-        <ContactCircle
-          size={30}
-          name={'Jerry'}
-          contact={contactWithImage}
-          preferNameInitial={true}
-        />
+      const mockThumbnnailPath = './test.jpg'
+      const { getByName } = render(
+        <ContactCircle size={30} name={'Jerry'} thumbnailPath={mockThumbnnailPath} />
       )
-
-      expect(contactCircle.find({ resizeMode: 'cover' }).prop('source')).toEqual({
-        uri: './test.jpg',
-      })
+      expect(getByName('Image').props.source).toEqual({ uri: './test.jpg' })
     })
   })
 })

@@ -21,7 +21,7 @@
 
 • **chainId**: *number*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L22)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L22)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **contractAddress**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L19)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L19)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **data**: *Buffer*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L24)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L24)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **decimals**: *number*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L21)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L21)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **signature**: *Buffer*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L23)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L23)*
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 • **ticker**: *string*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L20)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L20)*

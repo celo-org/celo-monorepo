@@ -6,7 +6,7 @@ import profiles from 'src/community/lottie/all.json'
 export default React.memo(function CeloContributors() {
   return (
     <View style={styles.root}>
-      <LottieBase loop={false} data={profiles} />
+      <LottieBase loop={false} data={profiles} autoPlay={true} />
     </View>
   )
 })

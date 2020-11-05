@@ -1,5 +1,5 @@
-import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
-import { zip } from '@celo/utils/lib/collections'
+import { bufferToHex, ensureLeading0x } from '@celo/base/lib/address'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog, TransactionReceipt, Tx } from 'web3-core'
@@ -15,6 +15,12 @@ export interface Filter {
   [key: string]: number | string | string[] | number[]
 }
 
+type Events<T extends Contract> = keyof T['events']
+type Methods<T extends Contract> = keyof T['methods']
+type EventsEnum<T extends Contract> = {
+  [event in Events<T>]: event
+}
+
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
@@ -26,11 +32,28 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   /** Contract getPastEvents */
-  protected getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
-    return this.contract.getPastEvents(event, options)
+  public getPastEvents(event: Events<T>, options: PastEventOptions): Promise<EventLog[]> {
+    return this.contract.getPastEvents(event as string, options)
   }
 
-  events = this.contract.events
+  events: T['events'] = this.contract.events
+
+  eventTypes = Object.keys(this.events).reduce<EventsEnum<T>>(
+    (acc, key) => ({ ...acc, [key]: key }),
+    {} as any
+  )
+
+  methodIds = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+    (acc, method: Methods<T>) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
@@ -50,19 +73,21 @@ export const valueToInt = (input: BigNumber.Value) =>
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
 
-export const stringToBuffer = hexToBuffer
-
-export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
-
-type SolBytes = string | number[]
-const toBytes = (input: any): SolBytes => input
-const fromBytes = (input: SolBytes): any => input as any
-
-export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
-
-export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
-
-export const bytesToString = (input: SolBytes): string => fromBytes(input)
+// Type of bytes in solidity gets repesented as a string of number array by typechain and web3
+// Hopefull this will improve in the future, at which point we can make improvements here
+type SolidityBytes = string | number[]
+export const stringToSolidityBytes = (input: string) => ensureLeading0x(input) as SolidityBytes
+export const bufferToSolidityBytes = (input: Buffer) => stringToSolidityBytes(bufferToHex(input))
+export const solidityBytesToString = (input: SolidityBytes): string => {
+  if (input === null || input === undefined || typeof input === 'string') {
+    return input
+  } else if (Array.isArray(input)) {
+    const hexString = input.reduce((acc, num) => acc + num.toString(16).padStart(2, '0'), '')
+    return ensureLeading0x(hexString)
+  } else {
+    throw new Error('Unexpected input type for solidity bytes')
+  }
+}
 
 type Parser<A, B> = (input: A) => B
 

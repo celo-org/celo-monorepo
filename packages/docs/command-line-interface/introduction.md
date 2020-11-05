@@ -10,11 +10,11 @@ description: >-
 
 ### **Prerequisites**
 
-- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node.md) instructions for more details on running a full node.
+- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node-in-mainnet.md) instructions for more details on running a full node.
 
 ### NPM Package
 
-The Celo CLI is published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
+The Celo CLI is published as a node module on NPM. Assuming you have [npm](https://www.npmjs.com/get-npm) and [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) both installed, you can install the Celo CLI using the following command:
 
 ```bash
 npm install -g @celo/celocli
@@ -40,7 +40,23 @@ The `celocli` tool assumes that users are running a node which they have access 
 See documentation on the [config](./config.md) module for information about how set which node commands are sent to.
 
 {% hint style="info" %}
-**All balances of Celo Gold or Celo Dollars are expressed in units of 10<sup>-18</sup>**
+**All balances of CELO or Celo Dollars are expressed in units of 10<sup>-18</sup>**
 {% endhint %}
 
 {% embed url="https://www.npmjs.com/package/@celo/celocli" %}
+
+### Using a Ledger Wallet
+
+The Celo CLI supports using a [Ledger hardware wallet](../celo-holder-guide/ledger.md) to sign transactions.
+
+### Plugins
+
+Additional plugins can be installed which make the CLI experience smoother.
+
+The autocomplete plugin adds an interactive autocomplete for `bash` and `zsh` shells. To enable the autocomplete plugin, follow the instructions provided at:
+
+```text
+celocli autocomplete
+```
+
+The update warning plugin notifies the user if they are using an oudated version of the CLI. This plugin is enabled by default.

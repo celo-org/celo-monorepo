@@ -1,5 +1,5 @@
+import { execCmd } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
-import { execCmd } from './utils'
 
 async function getCurrentGcloudAccount() {
   const [output] = await execCmd('gcloud config get-value account')
