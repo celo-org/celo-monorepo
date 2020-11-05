@@ -25,6 +25,12 @@ jest.mock('src/fees/CalculateFee', () => ({
   }),
 }))
 
+jest.mock('react-native-localize', () => ({
+  getNumberFormatSettings: () => ({
+    decimalSeparator: ',',
+  }),
+}))
+
 describe('WithdrawCeloScreen', () => {
   it('renders correctly', () => {
     const tree = render(
@@ -65,7 +71,31 @@ describe('WithdrawCeloScreen', () => {
     expect(getByTestId('CeloAmount').props.value).toBe('')
     fireEvent.press(getByTestId('MaxAmount'))
     expect(parseFloat(getByTestId('CeloAmount').props.value).toFixed(5)).toBe(SAMPLE_BALANCE)
+
     expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
+  })
+
+  it('decimals with comma separators work correctly', async () => {
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <WithdrawCeloScreen {...mockScreenProps} />
+      </Provider>
+    )
+
+    fireEvent.changeText(getByTestId('AccountAddress'), SAMPLE_ADDRESS)
+    fireEvent.changeText(getByTestId('CeloAmount'), '50,1')
+    expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
+
+    fireEvent.press(getByTestId('WithdrawReviewButton'))
+
+    jest.runOnlyPendingTimers()
+
+    expect(navigate).toHaveBeenCalledWith(
+      Screens.WithdrawCeloReviewScreen,
+      expect.objectContaining({
+        amount: new BigNumber(50.1),
+      })
+    )
   })
 
   it('disables the review button if the amount is greater than the balance', async () => {

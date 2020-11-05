@@ -339,6 +339,8 @@ PODS:
     - React
   - react-native-secure-randombytes (3.0.2):
     - React
+  - react-native-shake (3.5.0):
+    - React-Core
   - react-native-simple-toast (1.1.2):
     - React
     - Toast (~> 4.0.0)
@@ -532,6 +534,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - react-native-secure-randombytes (from `../../../node_modules/react-native-secure-randombytes`)
+  - react-native-shake (from `../../../node_modules/react-native-shake`)
   - react-native-simple-toast (from `../../../node_modules/react-native-simple-toast`)
   - react-native-sms (from `../../../node_modules/react-native-sms`)
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
@@ -667,6 +670,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-secure-randombytes:
     :path: "../../../node_modules/react-native-secure-randombytes"
+  react-native-shake:
+    :path: "../../../node_modules/react-native-shake"
   react-native-simple-toast:
     :path: "../../../node_modules/react-native-simple-toast"
   react-native-sms:
@@ -807,6 +812,7 @@ SPEC CHECKSUMS:
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957
   react-native-safe-area-context: e22a8ca00f758273d2408953965cb8db67da7925
   react-native-secure-randombytes: 2d98715ff6b15bdc519cf7d4475dad9d3e96a2c0
+  react-native-shake: 41a1ea8ec541fccf3f01566edef8d3cb722b00e3
   react-native-simple-toast: 58b71ef003f01d2c0bf5dcd2fdccc75861dabade
   react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
@@ -853,6 +859,6 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: e38c669823181b25b0d68e1d32554a4d8041b562
+PODFILE CHECKSUM: bf6bcaf04d3bf278794ddd460f4ab1dfd9f3e440
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.0
