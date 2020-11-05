@@ -84,7 +84,7 @@ import {
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-import { setFornoMode, setMtwAddress } from 'src/web3/actions'
+import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { registerWalletAndDekViaKomenci } from 'src/web3/dataEncryptionKey'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -238,11 +238,6 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       url: KOMENCI_URL,
       token: feelessVerificationState.komenci.sessionToken,
     })
-
-    // For now I am ensure the user is in forno-mode for feeless verification.
-    // If we leave this in, we need some logic at the end to switch users's back
-    // to their preference set under Settings
-    yield put(setFornoMode(true))
 
     // Start by checking again to make sure Komenci is ready. Throws error if not
     yield call(fetchKomenciReadiness, komenciKit)
