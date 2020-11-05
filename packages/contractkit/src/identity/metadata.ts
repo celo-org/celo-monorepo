@@ -1,5 +1,5 @@
 import { Address, eqAddress } from '@celo/base/lib/address'
-import { retryAsyncWithBackOff } from '@celo/base/lib/async'
+import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { Signer } from '@celo/base/lib/signatureUtils'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import { guessSigner, verifySignature } from '@celo/utils/lib/signatureUtils'
@@ -39,7 +39,7 @@ export class IdentityMetadataWrapper {
   }
 
   static async fetchFromURL(kit: ContractKit, url: string) {
-    return retryAsyncWithBackOff(
+    return selectiveRetryAsyncWithBackOff(
       async () => {
         const resp = await fetch(url)
         if (!resp.ok) {
@@ -48,6 +48,7 @@ export class IdentityMetadataWrapper {
         return this.fromRawString(kit, await resp.text())
       },
       3,
+      ['Request failed with status 404'],
       []
     )
   }
