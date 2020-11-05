@@ -8,11 +8,14 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
+      # This is the last version that has openjdk 8
+      # On newer openjdk (11) we get the following error when running sdkmanager
+      # `Exception in thread "main" java.lang.NoClassDefFoundError: javax/xml/bind/annotation/XmlSchema`
+      # See https://circleci.com/docs/2.0/testing-ios/#supported-xcode-versions
       xcode: '11.5.0'
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
-      _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
       GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dorg.gradle.configureondemand=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 
 defaults: &defaults
@@ -185,7 +188,7 @@ jobs:
             echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
 
       - restore_cache:
-          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
+          key: android=tools-v2-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
 
       - run:
           name: install android tools
@@ -199,7 +202,7 @@ jobs:
             sdkmanager --list
 
       - save_cache:
-          key: android=tools-v1-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
+          key: android=tools-v2-{{ checksum "packages/mobile/scripts/install-android-tools.sh" }}-{{ arch }}
           paths:
             - /Users/distiller/android-tools
 
@@ -274,7 +277,7 @@ jobs:
 
   end-to-end-mobile-test-ios:
     macos:
-      xcode: '11.3.1'
+      xcode: '11.5.0'
     working_directory: ~/app_osx
     steps:
       - checkout
