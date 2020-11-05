@@ -57,7 +57,7 @@ volumes:
 - name: WOBSERVER_ENABLED
   value: "false"
 - name: POOL_SIZE
-  value: {{ .Values.blockscout.pool_size }}
+  value: {{ .Values.blockscout.pool_size | quote }}
 - name: HEALTHY_BLOCKS_PERIOD
   value: {{ .Values.blockscout.healthy_blocks_period | quote }}
 - name: MIX_ENV
