@@ -9,18 +9,18 @@ const KOMENCI_ERROR_WINDOW = 1000 * 60 * 60 * 3 // 3 hours
 const KOMENCI_ERROR_ALLOTMENT = 2
 
 export enum FeelessVerificationErrors {
-  KomenciQuotaExceededError = 'KomenciQuotaExceededError',
+  KomenciErrorQuotaExceeded = 'KomenciErrorQuotaExceeded',
   KomenciDisabledError = 'KomenciDisabledError',
   KomenciSessionInvalidError = 'KomenciSessionInvalidError',
   PepperNotCachedError = 'PepperNotCachedError',
 }
 
 // When Komenci has failed more than allowed within a given window
-export class KomenciQuotaExceededError extends RootError<
-  FeelessVerificationErrors.KomenciQuotaExceededError
+export class KomenciErrorQuotaExceeded extends RootError<
+  FeelessVerificationErrors.KomenciErrorQuotaExceeded
 > {
   constructor() {
-    super(FeelessVerificationErrors.KomenciQuotaExceededError)
+    super(FeelessVerificationErrors.KomenciErrorQuotaExceeded)
   }
 }
 
@@ -65,28 +65,30 @@ export const hasExceededKomenciErrorQuota = (komenciErrorTimestamps: number[]) =
 // If the error is unexpected, add it to state. If we encounter more errors than
 // allowed within a given window, we won't allow the user to attempt verifciation
 // via Komenci until a certain amount of time has passed
-export function* storeTimestampIfKomenciError(error: Error) {
+export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFlow: boolean) {
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
 
-  let unexpectedError = false
-  console.log('KOMENCI ERROR MESSAGE: ', error.message)
+  let unexpectedKomenciError = false
+  const errorString = error.toString()
 
-  // QUESTION: Is this the best way to typecheck errors?
-  if (error.message in TxErrorTypes) {
-    unexpectedError = true
-  } else if (error.message in KomenciKitErrorTypes) {
-    unexpectedError = true
-  } else if (error.message in FetchErrorTypes) {
-    unexpectedError = true
+  if (
+    Object.keys(TxErrorTypes).includes(errorString) ||
+    Object.keys(KomenciKitErrorTypes).includes(errorString) ||
+    Object.keys(FetchErrorTypes).includes(errorString) ||
+    Object.keys(FeelessVerificationErrors).includes(errorString)
+  ) {
+    unexpectedKomenciError = true
   }
 
   // These errors should not be considered fatal Komenci errors
   if (
-    !unexpectedError ||
-    error.message === FetchErrorTypes.QuotaExceededError ||
-    error.message === FeelessVerificationErrors.PepperNotCachedError
+    !unexpectedKomenciError ||
+    errorString === FetchErrorTypes.QuotaExceededError ||
+    errorString === FeelessVerificationErrors.KomenciSessionInvalidError ||
+    errorString === FeelessVerificationErrors.PepperNotCachedError ||
+    (errorString === FetchErrorTypes.Unauthorised && !errorOccuredInMainFlow)
   ) {
     return
   }

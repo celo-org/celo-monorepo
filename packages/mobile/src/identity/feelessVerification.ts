@@ -54,7 +54,7 @@ import {
 import {
   hasExceededKomenciErrorQuota,
   KomenciDisabledError,
-  KomenciQuotaExceededError,
+  KomenciErrorQuotaExceeded,
   KomenciSessionInvalidError,
   PepperNotCachedError,
   storeTimestampIfKomenciError,
@@ -149,7 +149,7 @@ export function* feelessFetchVerificationState() {
     yield put(feelessSetVerificationStatus(VerificationStatus.Stopped))
   } catch (error) {
     Logger.error(TAG, 'Error occured while fetching verification state', error)
-    yield call(storeTimestampIfKomenciError, error)
+    yield call(storeTimestampIfKomenciError, error, false)
     yield put(feelessSetVerificationStatus(VerificationStatus.Stopped))
   }
 }
@@ -402,7 +402,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
   } catch (error) {
     Logger.error(TAG, 'Error occured during feeless verification flow', error)
     yield all([
-      call(storeTimestampIfKomenciError, error),
+      call(storeTimestampIfKomenciError, error, true),
       put(feelessSetVerificationStatus(VerificationStatus.Failed)),
       put(showErrorOrFallback(error, ErrorMessages.VERIFICATION_FAILURE)),
     ])
@@ -438,7 +438,7 @@ function* fetchKomenciReadiness(komenciKit: KomenciKit) {
 
   if (hasExceededKomenciErrorQuota(komenci.errorTimestamps)) {
     Logger.debug(TAG, '@fetchKomenciReadiness', 'Too  many errors')
-    throw new KomenciQuotaExceededError()
+    throw new KomenciErrorQuotaExceeded()
   }
 
   yield put(
@@ -761,8 +761,6 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
     const feelessVerificationState: FeelessVerificationState = yield select(
       feelessVerificationStateSelector
     )
-
-    console.log(komenciKit)
 
     const blsBlindingClient = new ReactBlsBlindingClient(networkConfig.odisPubKey)
     const pepperQueryResult: Result<GetDistributedBlindedPepperResp, FetchError> = yield call(
