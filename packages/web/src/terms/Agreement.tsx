@@ -18,6 +18,7 @@ interface Props {
   title: string
   slug: string
   updatedAt: string
+  description: string
   sections: Array<{
     name: string
     contentField: Document
@@ -44,10 +45,10 @@ class Agreement extends React.PureComponent<I18nProps & Props> {
     }
   }
   render() {
-    const { t, title, sections, updatedAt, i18n } = this.props
+    const { t, title, sections, updatedAt, i18n, description } = this.props
     return (
       <>
-        <OpenGraph title={title} path={NameSpaces.terms} description={t('metaDescription')} />
+        <OpenGraph title={title} path={NameSpaces.terms} description={description} />
         <View style={styles.container}>
           <GridRow
             allStyle={standardStyles.centered}
