@@ -193,8 +193,8 @@ async function createKomenciAzureIdentityIfNotExists(
   //TODO Check how to manage the MSI type
   if (!assigneeObjectId) {
     assigneeObjectId = await getAKSManagedServiceIdentityObjectId(clusterConfig)
-    //assigneePrincipalType = 'MSI'
-    assigneePrincipalType = 'ServicePrincipal'
+    assigneePrincipalType = 'MSI'
+    // assigneePrincipalType = 'ServicePrincipal'
   }
   await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
   // Allow the komenci identity to access the correct key vault

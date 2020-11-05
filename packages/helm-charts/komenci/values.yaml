@@ -11,12 +11,11 @@ kubectl:
     repository: bitnami/kubectl
     tag: 1.17.4
 
-komenci:
-  image:
-    repository: celotestnet.azurecr.io/komenci/komenci
-    tag: 483b22e3c8712ed6b54bf410d46561b765a76fa7
 
 relayer:
+  image:
+    repository: celotestnet.azurecr.io/komenci/relayer
+    tag: dae43ddce108a73da07dce73875b980ff077c7d4
   replicas: 2
   port: 3000
   identities:
@@ -43,6 +42,9 @@ relayer:
     walletType: azure-hsm
 
 onboarding:
+  image:
+    repository: celotestnet.azurecr.io/komenci/onboarding
+    tag: dae43ddce108a73da07dce73875b980ff077c7d4
   replicas: 2
   ruleSignatureEnable: true
   quota:
