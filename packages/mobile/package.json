@@ -124,6 +124,7 @@
     "react-native-securerandom": "^1.0.0",
     "react-native-secure-randombytes": "^3.0.2",
     "react-native-send-intent": "git+https://github.com/celo-org/react-native-send-intent#a0f4b00",
+    "react-native-shake": "~3.5.0",
     "react-native-share": "^3.3.0",
     "react-native-simple-toast": "^1.1.2",
     "react-native-sms": "^1.11.0",
@@ -229,7 +230,8 @@
       },
       "ios.sim.debug": {
         "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
+        "//build": "EXCLUDED_ARCHS is needed on CircleCI until we can have tests running with Xcode 12 there",
+        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build ${CI:+EXCLUDED_ARCHS=''} | bundle exec xcpretty",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"
@@ -237,7 +239,7 @@
       },
       "ios.sim.release": {
         "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/celo.app",
-        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Release -sdk iphonesimulator -derivedDataPath ios/build | bundle exec xcpretty",
+        "build": "set -o pipefail && xcodebuild -workspace ios/celo.xcworkspace -scheme celo-test -configuration Release -sdk iphonesimulator -derivedDataPath ios/build ${CI:+EXCLUDED_ARCHS=''} | bundle exec xcpretty",
         "type": "ios.simulator",
         "device": {
           "type": "iPhone 11"

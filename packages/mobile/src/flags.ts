@@ -20,6 +20,7 @@ export const pausedFeatures = {
 // Using 2 letters alpha code. See https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 export const countryFeatures = {
   RESTRICTED_CP_DOTO: {
+    JP: true,
     PH: true,
   },
   SANCTIONED_COUNTRY: {

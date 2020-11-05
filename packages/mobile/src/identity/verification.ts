@@ -51,6 +51,7 @@ import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
@@ -58,7 +59,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -69,6 +70,14 @@ export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
 const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
+
+// Using hard-coded gas value to avoid running gas estimation.
+// Note: This is fragile and needs be updated if there are significant
+// changes to the contract implementation.
+const APPROVE_ATTESTATIONS_TX_GAS = 150000
+const REQUEST_ATTESTATIONS_TX_GAS = 215000
+const SELECT_ISSUERS_TX_GAS = 500000
+const COMPLETE_ATTESTATION_TX_GAS = 250000
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -83,13 +92,18 @@ export interface AttestationCode {
 
 export function* fetchVerificationState() {
   try {
-    const account: string = yield call(getConnectedUnlockedAccount)
+    const account: string = yield call(getConnectedAccount)
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
     ])
+
+    // Lock and ask user for a PIN because we
+    // want to reset timeout for unlocked account
+    clearPasswordCaches()
+    yield call(unlockAccount, account, true)
 
     const { timeout } = yield race({
       balances: all([
@@ -503,7 +517,8 @@ function* requestAttestations(
       sendTransaction,
       approveTx.txo,
       account,
-      newTransactionContext(TAG, 'Approve attestations')
+      newTransactionContext(TAG, 'Approve attestations'),
+      APPROVE_ATTESTATIONS_TX_GAS
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
@@ -522,7 +537,8 @@ function* requestAttestations(
       sendTransaction,
       requestTx.txo,
       account,
-      newTransactionContext(TAG, 'Request attestations')
+      newTransactionContext(TAG, 'Request attestations'),
+      REQUEST_ATTESTATIONS_TX_GAS
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   }
@@ -542,7 +558,8 @@ function* requestAttestations(
     sendTransaction,
     selectIssuersTx.txo,
     account,
-    newTransactionContext(TAG, 'Select attestation issuers')
+    newTransactionContext(TAG, 'Select attestation issuers'),
+    SELECT_ISSUERS_TX_GAS
   )
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
@@ -720,7 +737,7 @@ function* completeAttestation(
     code.code
   )
   const context = newTransactionContext(TAG, `Complete attestation from ${issuer}`)
-  yield call(sendTransaction, completeTx.txo, account, context)
+  yield call(sendTransaction, completeTx.txo, account, context, COMPLETE_ATTESTATION_TX_GAS)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
