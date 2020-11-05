@@ -51,6 +51,10 @@ export function printValueMap(valueMap: Record<string, any>, color = chalk.yello
   )
 }
 
+export function printValueMap2(valueMap: Map<any, any>, color = chalk.yellowBright.bold) {
+  valueMap.forEach((value, key) => console.log(color(`${key}: `) + value))
+}
+
 export function printValueMapRecursive(valueMap: Record<string, any>) {
   console.log(toStringValueMapRecursive(valueMap, ''))
 }
