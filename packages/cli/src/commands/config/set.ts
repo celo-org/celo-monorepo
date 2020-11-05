@@ -23,6 +23,8 @@ export default class Set extends BaseCommand {
     'set --gasCurrency CELO',
   ]
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(Set)
     const curr = readConfig(this.config.configDir)

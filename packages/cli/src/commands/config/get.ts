@@ -9,6 +9,8 @@ export default class Get extends BaseCommand {
     ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
+  requireSynced = false
+
   async run() {
     printValueMap(readConfig(this.config.configDir))
   }

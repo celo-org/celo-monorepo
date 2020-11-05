@@ -94,6 +94,8 @@ export default class NewAccount extends BaseCommand {
     throw new Error(`Invalid path: ${file}`)
   }
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(NewAccount)
     let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
