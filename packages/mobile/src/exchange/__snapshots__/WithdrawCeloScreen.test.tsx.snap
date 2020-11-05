@@ -303,19 +303,12 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
         }
         testID="WithdrawReviewButton"
       >
-        <Text
-          accessibilityLabel="continue"
-          style={
-            Object {
-              "color": "#9CA4A9",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 16,
-              "lineHeight": 22,
-            }
-          }
-        >
-          global:review
-        </Text>
+        <ActivityIndicator
+          animating={true}
+          color="#42D689"
+          hidesWhenStopped={true}
+          size="small"
+        />
       </View>
     </View>
   </View>

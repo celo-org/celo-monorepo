@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 
 export default class ValidatorDeregister extends BaseCommand {
   static description =
-    'Deregister a Validator. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator will become possible to unlock. Note that deregistering a Validator will also deaffiliate and remove the Validator from any Group it may be an affiliate or member of.'
+    "Deregister a Validator. Approximately 60 days after the validator is no longer part of any group, it will be possible to deregister the validator and start unlocking the CELO. If you wish to deregister your validator, you must first remove it from it's group, such as by deaffiliating it, then wait the required 60 days before running this command."
 
   static flags = {
     ...BaseCommand.flags,
@@ -17,7 +17,6 @@ export default class ValidatorDeregister extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorDeregister)
 
-    this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
 
     await newCheckBuilder(this, res.flags.from)

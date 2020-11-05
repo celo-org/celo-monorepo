@@ -1,4 +1,5 @@
 import { ensureLeading0x, normalizeAddressWith0x, trimLeading0x } from '@celo/base/lib/address'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -7,8 +8,7 @@ import { decodeSig } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
 const INCORRECT_PASSWORD_ERROR = 'could not decrypt key with given password'
-
-const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
+const currentTimeInSeconds = () => Math.floor(Date.now() / 1000)
 
 const toRpcHex = (val: string | number | BigNumber | BN | undefined) => {
   if (typeof val === 'number' || val instanceof BigNumber) {
@@ -26,6 +26,7 @@ enum RpcSignerEndpoint {
   UnlockAccount = 'personal_unlockAccount',
   SignTransaction = 'eth_signTransaction',
   SignBytes = 'eth_sign',
+  SignTypedData = 'eth_signTypedData',
   Decrypt = 'personal_decrypt',
 }
 
@@ -35,6 +36,7 @@ type RpcSignerEndpointInputs = {
   personal_unlockAccount: [string, string, number]
   eth_signTransaction: [any] // RpcTx doesn't match Tx because of nonce as string instead of number
   eth_sign: [string, string]
+  eth_signTypedData: [string, EIP712TypedData]
   personal_decrypt: [string, string]
 }
 
@@ -44,6 +46,7 @@ type RpcSignerEndpointResult = {
   personal_unlockAccount: boolean
   eth_signTransaction: EncodedTransaction
   eth_sign: string
+  eth_signTypedData: string
   personal_decrypt: string
 }
 
@@ -66,8 +69,8 @@ export class RpcSigner implements Signer {
     protected rpc: RpcCaller,
     protected account: string,
     protected unlockBufferSeconds = 5,
-    protected unlockTime = -1,
-    protected unlockDuration = -1
+    protected unlockTime?: number,
+    protected unlockDuration?: number
   ) {}
 
   init = (privateKey: string, passphrase: string) =>
@@ -95,6 +98,15 @@ export class RpcSigner implements Signer {
 
   async signTransaction(): Promise<{ v: number; r: Buffer; s: Buffer }> {
     throw new Error('signTransaction unimplemented; use signRawTransaction')
+  }
+
+  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const result = await this.callAndCheckResponse(RpcSignerEndpoint.SignTypedData, [
+      this.account,
+      typedData,
+    ])
+
+    return decodeSig(result)
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
@@ -130,6 +142,9 @@ export class RpcSigner implements Signer {
   }
 
   isUnlocked() {
+    if (this.unlockDuration === undefined || this.unlockTime === undefined) {
+      return false
+    }
     return this.unlockTime + this.unlockDuration - this.unlockBufferSeconds > currentTimeInSeconds()
   }
 
@@ -151,5 +166,10 @@ export class RpcSigner implements Signer {
     ])
 
     return Buffer.from(trimLeading0x(resp), 'hex')
+  }
+
+  computeSharedSecret(_publicKey: string) {
+    throw new Error('Not implemented')
+    return Promise.resolve(Buffer.from([]))
   }
 }

@@ -6,3 +6,7 @@ keywords:
 - blockchain
 - load-test
 appVersion: v1.7.3
+dependencies:
+- name: common
+  version: 0.1.0
+  repository: file://../common

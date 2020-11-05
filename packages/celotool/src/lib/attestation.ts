@@ -1,13 +1,41 @@
-import { Address, CeloTransactionParams } from '@celo/contractkit'
+import { Address, CeloTransactionParams, ContractKit, OdisUtils } from '@celo/contractkit'
+import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import {
   ActionableAttestation,
-  AttestationsWrapper,
+  AttestationsWrapper
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { sample } from 'lodash'
 import moment from 'moment'
 import { Twilio } from 'twilio'
+
+// Use the supplied salt, or if none supplied, go to ODIS and retrieve a pepper
+export async function getIdentifierAndPepper(kit : ContractKit, context : string, account : string, phoneNumber : string, salt : string | null) {
+  if (salt) {
+    return {
+      pepper: salt,
+      identifier: PhoneNumberUtils.getPhoneHash(phoneNumber, salt!),
+    }
+  } else {
+    const authSigner: AuthSigner = {
+      authenticationMethod: OdisUtils.Query.AuthenticationMethod.WALLET_KEY,
+      contractKit: kit,
+    }
+
+    const ret = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+      phoneNumber,
+      account,
+      authSigner,
+      OdisUtils.Query.getServiceContext(context)
+    )
+
+    return {
+      pepper: ret.pepper,
+      identifier: ret.phoneHash,
+    }
+  }
+}
 
 export async function requestMoreAttestations(
   attestations: AttestationsWrapper,
@@ -17,7 +45,7 @@ export async function requestMoreAttestations(
   txParams: CeloTransactionParams = {}
 ) {
   const unselectedRequest = await attestations.getUnselectedRequest(phoneNumber, account)
-  if (unselectedRequest.blockNumber === 0) {
+  if (unselectedRequest.blockNumber === 0 || (await attestations.isAttestationExpired(unselectedRequest.blockNumber))) {
     await attestations
       .approveAttestationFee(attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))
@@ -25,9 +53,9 @@ export async function requestMoreAttestations(
       .request(phoneNumber, attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))
   }
-
-  await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).sendAndWaitForReceipt(txParams)
+  
+  const selectIssuers = await attestations.selectIssuersAfterWait(phoneNumber, account)
+  await selectIssuers.sendAndWaitForReceipt(txParams)
 }
 
 type RequestAttestationError =
@@ -39,7 +67,8 @@ export async function requestAttestationsFromIssuers(
   attestationsToReveal: ActionableAttestation[],
   attestations: AttestationsWrapper,
   phoneNumber: string,
-  account: string
+  account: string,
+  pepper: string,
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
@@ -47,7 +76,8 @@ export async function requestAttestationsFromIssuers(
         phoneNumber,
         account,
         attestation.issuer,
-        attestation.attestationServiceURL
+        attestation.attestationServiceURL,
+        pepper
       )
       if (!response.ok) {
         return {
@@ -93,7 +123,7 @@ export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationEr
 export async function findValidCode(
   attestations: AttestationsWrapper,
   messages: string[],
-  phoneNumber: string,
+  identifier: string,
   attestationsToComplete: ActionableAttestation[],
   account: string
 ) {
@@ -105,7 +135,7 @@ export async function findValidCode(
       }
 
       const issuer = await attestations.findMatchingIssuer(
-        phoneNumber,
+        identifier,
         account,
         code,
         attestationsToComplete.map((_) => _.issuer)
@@ -115,7 +145,7 @@ export async function findValidCode(
         continue
       }
 
-      const isValid = await attestations.validateAttestationCode(phoneNumber, account, issuer, code)
+      const isValid = await attestations.validateAttestationCode(identifier, account, issuer, code)
 
       if (!isValid) {
         continue
@@ -134,31 +164,35 @@ export async function getPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   addressSid: string,
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string
 ) {
   const phoneNumber = await chooseFromAvailablePhoneNumbers(
     attestations,
     twilioClient,
-    maximumNumberOfAttestations
+    maximumNumberOfAttestations,
+    salt
   )
 
   if (phoneNumber !== undefined) {
     return phoneNumber
   }
 
-  return createPhoneNumber(attestations, twilioClient, addressSid, maximumNumberOfAttestations)
+  return createPhoneNumber(attestations, twilioClient, addressSid, maximumNumberOfAttestations, salt)
 }
 
 export async function chooseFromAvailablePhoneNumbers(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string,
 ) {
   const availableNumbers = await twilioClient.incomingPhoneNumbers.list()
   const usableNumber = await findSuitableNumber(
     attestations,
     availableNumbers.map((number) => number.phoneNumber),
-    maximumNumberOfAttestations
+    maximumNumberOfAttestations,
+    salt
   )
   return usableNumber
 }
@@ -166,13 +200,14 @@ export async function chooseFromAvailablePhoneNumbers(
 async function findSuitableNumber(
   attestations: AttestationsWrapper,
   numbers: string[],
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string,
 ) {
   const attestedAccountsLookup = await attestations.lookupIdentifiers(
-    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n))
+    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n, salt))
   )
   return numbers.find((number) => {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(number)
+    const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
     const allAccounts = attestedAccountsLookup[phoneHash]
 
     if (!allAccounts) {
@@ -191,9 +226,10 @@ export async function createPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   addressSid: string,
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string
 ) {
-  const countryCodes = ['GB', 'DE', 'AU']
+  const countryCodes = ['GB', 'US']
   let attempts = 0
   while (true) {
     const countryCode = sample(countryCodes)
@@ -203,7 +239,8 @@ export async function createPhoneNumber(
     const usableNumber = await findSuitableNumber(
       attestations,
       numbers.map((number) => number.phoneNumber),
-      maximumNumberOfAttestations
+      maximumNumberOfAttestations,
+      salt
     )
 
     if (!usableNumber) {

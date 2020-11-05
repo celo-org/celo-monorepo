@@ -1,8 +1,8 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
+import TextButton from '@celo/react-components/components/TextButton'
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
@@ -18,10 +18,10 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
-import CancelButton from 'src/components/CancelButton.v2'
+import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -290,7 +290,11 @@ const Word = React.memo(function _Word({ word, index, onPressWord }: WordProps) 
 
   return (
     <View key={'mnemonic-button-' + word} style={styles.mnemonicWordButtonOutterRim}>
-      <Touchable style={styles.mnemonicWordButton} onPress={onPressMnemonicWord}>
+      <Touchable
+        style={styles.mnemonicWordButton}
+        onPress={onPressMnemonicWord}
+        testID={`backupQuiz/${word}`}
+      >
         <Text style={styles.mnemonicWordButonText}>{word}</Text>
       </Touchable>
     </View>
@@ -337,11 +341,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 24,
-  },
-  successContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   scrollContainer: {
     paddingTop: 24,

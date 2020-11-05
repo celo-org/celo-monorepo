@@ -1,5 +1,5 @@
 import { isHexString, normalizeAddressWith0x } from '@celo/base/lib/address'
-import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
@@ -10,25 +10,47 @@ import {
 } from '../utils/signing-utils'
 import { Signer } from './signers/signer'
 
-export interface Wallet {
+export interface ReadOnlyWallet {
   getAccounts: () => Address[]
+  removeAccount: (address: Address) => void
   hasAccount: (address?: Address) => boolean
   signTransaction: (txParams: Tx) => Promise<EncodedTransaction>
   signTypedData: (address: Address, typedData: EIP712TypedData) => Promise<string>
   signPersonalMessage: (address: Address, data: string) => Promise<string>
   decrypt: (address: Address, ciphertext: Buffer) => Promise<Buffer>
+  computeSharedSecret: (address: Address, publicKey: string) => Promise<Buffer>
 }
 
-export abstract class WalletBase implements Wallet {
+type addInMemoryAccount = (privateKey: string) => void
+type addRemoteAccount = (privateKey: string, passphrase: string) => Promise<string>
+
+export interface Wallet extends ReadOnlyWallet {
+  addAccount: addInMemoryAccount | addRemoteAccount
+}
+
+export interface UnlockableWallet extends Wallet {
+  unlockAccount: (address: string, passphrase: string, duration: number) => Promise<boolean>
+  isAccountUnlocked: (address: string) => boolean
+}
+
+export abstract class WalletBase<TSigner extends Signer> implements ReadOnlyWallet {
   // By creating the Signers in advance we can have a common pattern across wallets
   // Each implementation is responsible for populating this map through addSigner
-  private accountSigners = new Map<Address, Signer>()
+  private accountSigners = new Map<Address, TSigner>()
 
   /**
    * Gets a list of accounts that have been registered
    */
   getAccounts(): Address[] {
     return Array.from(this.accountSigners.keys())
+  }
+
+  /**
+   * Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+   * @param address The address of the account to be removed
+   */
+  removeAccount(_address: string) {
+    throw new Error('removeAccount is not supported for this wallet')
   }
 
   /**
@@ -49,9 +71,18 @@ export abstract class WalletBase implements Wallet {
    * @param address Account address
    * @param signer Account signer
    */
-  protected addSigner(address: Address, signer: Signer) {
+  protected addSigner(address: Address, signer: TSigner) {
     const normalizedAddress = normalizeAddressWith0x(address)
     this.accountSigners.set(normalizedAddress, signer)
+  }
+
+  /**
+   * Removes the account-signer
+   * @param address Account address
+   */
+  protected removeSigner(address: Address) {
+    const normalizedAddress = normalizeAddressWith0x(address)
+    this.accountSigners.delete(normalizedAddress)
   }
 
   /**
@@ -101,16 +132,13 @@ export abstract class WalletBase implements Wallet {
       throw Error('wallet@signTypedData: TypedData Missing')
     }
 
-    const dataBuff = generateTypedDataHash(typedData)
-    const trimmedData = dataBuff.toString('hex')
-
     const signer = this.getSigner(address)
-    const sig = await signer.signPersonalMessage(trimmedData)
+    const sig = await signer.signTypedData(typedData)
 
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }
 
-  protected getSigner(address: string): Signer {
+  protected getSigner(address: string): TSigner {
     const normalizedAddress = normalizeAddressWith0x(address)
     if (!this.accountSigners.has(normalizedAddress)) {
       throw new Error(`Could not find address ${normalizedAddress}`)
@@ -121,5 +149,13 @@ export abstract class WalletBase implements Wallet {
   async decrypt(address: string, ciphertext: Buffer) {
     const signer = this.getSigner(address)
     return signer.decrypt(ciphertext)
+  }
+
+  /**
+   * Computes the shared secret (an ECDH key exchange object) between two accounts
+   */
+  computeSharedSecret(address: Address, publicKey: string): Promise<Buffer> {
+    const signer = this.getSigner(address)
+    return signer.computeSharedSecret(publicKey)
   }
 }

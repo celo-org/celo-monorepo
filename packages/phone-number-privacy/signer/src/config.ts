@@ -39,6 +39,7 @@ interface Config {
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
     minDollarBalance: BigNumber
+    minCeloBalance: BigNumber
   }
   attestations: {
     numberAttestationsRequired: number
@@ -88,7 +89,10 @@ const config: Config = {
     unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 2,
     additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
     queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
-    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 100000000000000000),
+    // Min balance is .01 cUSD
+    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    // Min balance is .005 CELO
+    minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
   },
   attestations: {
     numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,

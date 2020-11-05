@@ -45,6 +45,8 @@ exports[`SelectLocalCurrency renders correctly 1`] = `
             "UGX",
             "GHS",
             "NGN",
+            "BRL",
+            "CVE",
           ]
         }
         disableVirtualization={false}

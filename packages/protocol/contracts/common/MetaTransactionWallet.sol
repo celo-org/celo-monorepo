@@ -27,28 +27,36 @@ contract MetaTransactionWallet is
   uint256 public nonce;
   address public signer;
 
-  event SignerSet(address signer);
+  event SignerSet(address indexed signer);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
-  event TransactionExecution(address destination, uint256 value, bytes data, bytes returnData);
-  event MetaTransactionExecution(
-    address destination,
+  event Deposit(address indexed sender, uint256 value);
+  event TransactionExecution(
+    address indexed destination,
     uint256 value,
     bytes data,
-    uint256 nonce,
+    bytes returnData
+  );
+  event MetaTransactionExecution(
+    address indexed destination,
+    uint256 value,
+    bytes data,
+    uint256 indexed nonce,
     bytes returnData
   );
 
   /**
    * @dev Fallback function allows to deposit ether.
    */
-  function() external payable {}
+  function() external payable {
+    if (msg.value > 0) emit Deposit(msg.sender, msg.value);
+  }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (1, 1, 0, 1);
   }
 
   /**
@@ -56,6 +64,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function initialize(address _signer) external initializer {
+    _transferOwnership(msg.sender);
     setSigner(_signer);
     setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
@@ -70,6 +79,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function setSigner(address _signer) public onlyOwner {
+    require(_signer != address(0), "cannot assign zero address as signer");
     signer = _signer;
     emit SignerSet(signer);
   }
@@ -100,6 +110,32 @@ contract MetaTransactionWallet is
   }
 
   /**
+   * @notice Returns the struct hash of the MetaTransaction
+   * @param destination The address to which the meta-transaction is to be sent.
+   * @param value The CELO value to be sent with the meta-transaction.
+   * @param data The data to be sent with the meta-transaction.
+   * @param _nonce The nonce for this meta-transaction local to this wallet.
+   * @return The digest of the provided meta-transaction.
+   */
+  function _getMetaTransactionStructHash(
+    address destination,
+    uint256 value,
+    bytes memory data,
+    uint256 _nonce
+  ) internal view returns (bytes32) {
+    return
+      keccak256(
+        abi.encode(
+          EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
+          destination,
+          value,
+          keccak256(data),
+          _nonce
+        )
+      );
+  }
+
+  /**
    * @notice Returns the digest of the provided meta-transaction, to be signed by `sender`.
    * @param destination The address to which the meta-transaction is to be sent.
    * @param value The CELO value to be sent with the meta-transaction.
@@ -113,16 +149,8 @@ contract MetaTransactionWallet is
     bytes memory data,
     uint256 _nonce
   ) public view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(
-        EIP712_EXECUTE_META_TRANSACTION_TYPEHASH,
-        destination,
-        value,
-        keccak256(data),
-        _nonce
-      )
-    );
-    return keccak256(abi.encodePacked("\x19\x01", eip712DomainSeparator, structHash));
+    bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
+    return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
   }
 
   /**
@@ -145,8 +173,8 @@ contract MetaTransactionWallet is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    bytes32 digest = getMetaTransactionDigest(destination, value, data, _nonce);
-    return Signatures.getSignerOfMessageHash(digest, v, r, s);
+    bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
+    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
   }
 
   /**
@@ -200,22 +228,36 @@ contract MetaTransactionWallet is
    * @param values The CELO value to be sent with each transaction.
    * @param data The concatenated data to be sent in each transaction.
    * @param dataLengths The length of each transaction's data.
+   * @return The return values of all transactions appended as bytes and an array of the length
+   *         of each transaction output which will be 0 if a transaction had no output 
    */
   function executeTransactions(
     address[] calldata destinations,
     uint256[] calldata values,
     bytes calldata data,
     uint256[] calldata dataLengths
-  ) external {
+  ) external returns (bytes memory, uint256[] memory) {
     require(
       destinations.length == values.length && values.length == dataLengths.length,
       "Input arrays must be same length"
     );
+
+    bytes memory returnValues;
+    uint256[] memory returnLengths = new uint256[](destinations.length);
     uint256 dataPosition = 0;
-    for (uint256 i = 0; i < destinations.length; i++) {
-      executeTransaction(destinations[i], values[i], sliceData(data, dataPosition, dataLengths[i]));
+    for (uint256 i = 0; i < destinations.length; i = i.add(1)) {
+      bytes memory returnVal = executeTransaction(
+        destinations[i],
+        values[i],
+        sliceData(data, dataPosition, dataLengths[i])
+      );
+      returnValues = abi.encodePacked(returnValues, returnVal);
+      returnLengths[i] = returnVal.length;
       dataPosition = dataPosition.add(dataLengths[i]);
     }
+
+    require(dataPosition == data.length, "data cannot have extra bytes appended");
+    return (returnValues, returnLengths);
   }
 
   /**

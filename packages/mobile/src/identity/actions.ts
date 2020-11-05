@@ -4,6 +4,7 @@ import {
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
+  UpdatableVerificationState,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -36,10 +37,16 @@ export enum Actions {
   REQUIRE_SECURE_SEND = 'IDENTITY/REQUIRE_SECURE_SEND',
   FETCH_DATA_ENCRYPTION_KEY = 'IDENTITY/FETCH_DATA_ENCRYPTION_KEY',
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
+  FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
+  UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
+  RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
+  SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
+  REPORT_REVEAL_STATUS = 'IDENTITY/REPORT_REVEAL_STATUS',
 }
 
 export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
+  withoutRevealing: boolean
 }
 
 export interface SetVerificationStatusAction {
@@ -173,6 +180,33 @@ export interface UpdateAddressDekMapAction {
   dataEncryptionKey: string | null
 }
 
+export interface FetchVerificationState {
+  type: Actions.FETCH_VERIFICATION_STATE
+}
+
+export interface UpdateVerificationState {
+  type: Actions.UPDATE_VERIFICATION_STATE
+  state: UpdatableVerificationState
+}
+
+export interface ResendAttestations {
+  type: Actions.RESEND_ATTESTATIONS
+}
+
+export interface SetLastRevealAttempt {
+  type: Actions.SET_LAST_REVEAL_ATTEMPT
+  time: number
+}
+
+export interface ReportRevealStatusAction {
+  type: Actions.REPORT_REVEAL_STATUS
+  attestationServiceUrl: string
+  account: string
+  issuer: string
+  e164Number: string
+  pepper: string
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -198,9 +232,15 @@ export type ActionTypes =
   | EndFetchingAddressesAction
   | FetchDataEncryptionKeyAction
   | UpdateAddressDekMapAction
+  | FetchVerificationState
+  | UpdateVerificationState
+  | ResendAttestations
+  | SetLastRevealAttempt
+  | ReportRevealStatusAction
 
-export const startVerification = (): StartVerificationAction => ({
+export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
+  withoutRevealing,
 })
 
 export const cancelVerification = (): CancelVerificationAction => ({
@@ -364,3 +404,40 @@ export const updateAddressDekMap = (
   address,
   dataEncryptionKey,
 })
+
+export const fetchVerificationState = (): FetchVerificationState => ({
+  type: Actions.FETCH_VERIFICATION_STATE,
+})
+
+export const udpateVerificationState = (
+  state: UpdatableVerificationState
+): UpdateVerificationState => ({
+  type: Actions.UPDATE_VERIFICATION_STATE,
+  state,
+})
+
+export const resendAttestations = (): ResendAttestations => ({
+  type: Actions.RESEND_ATTESTATIONS,
+})
+
+export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
+  type: Actions.SET_LAST_REVEAL_ATTEMPT,
+  time,
+})
+
+export const reportRevealStatus = (
+  attestationServiceUrl: string,
+  account: string,
+  issuer: string,
+  e164Number: string,
+  pepper: string
+): ReportRevealStatusAction => {
+  return {
+    type: Actions.REPORT_REVEAL_STATUS,
+    attestationServiceUrl,
+    account,
+    issuer,
+    e164Number,
+    pepper,
+  }
+}

@@ -1,6 +1,6 @@
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
@@ -159,6 +159,22 @@ export async function encodeTransaction(
   return result
 }
 
+export function extractSignature(rawTx: string): { v: number; r: Buffer; s: Buffer } {
+  const rawValues = RLP.decode(rawTx)
+  let r = rawValues[10]
+  let s = rawValues[11]
+  // Account.recover cannot handle canonicalized signatures
+  // A canonicalized signature may have the first byte removed if its value is 0
+  r = ensureLeading0x(trimLeading0x(r).padStart(64, '0'))
+  s = ensureLeading0x(trimLeading0x(s).padStart(64, '0'))
+
+  return {
+    v: rawValues[9],
+    r,
+    s,
+  }
+}
+
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.
 export function recoverTransaction(rawTx: string): [Tx, string] {
@@ -210,8 +226,20 @@ export function verifyEIP712TypedDataSigner(
 ): boolean {
   const dataBuff = generateTypedDataHash(typedData)
   const trimmedData = dataBuff.toString('hex')
-  const valid = verifySignature(ensureLeading0x(trimmedData), signedData, expectedAddress)
-  return valid
+  return verifySignatureWithoutPrefix(ensureLeading0x(trimmedData), signedData, expectedAddress)
+}
+
+export function verifySignatureWithoutPrefix(
+  messageHash: string,
+  signature: string,
+  signer: string
+) {
+  try {
+    parseSignatureWithoutPrefix(messageHash, signature, signer)
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 export function decodeSig(sig: any) {

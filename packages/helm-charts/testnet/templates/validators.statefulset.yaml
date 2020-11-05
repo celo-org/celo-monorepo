@@ -12,7 +12,7 @@ spec:
   selector:
     component: validators
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-validators
@@ -171,11 +171,22 @@ spec:
           fi
 
           PROXY_COUNT=$(cat /root/.celo/proxyCount)
-          [ "$PROXY_COUNT" -gt 0 ] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          if [ "$PROXY_COUNT" -gt 0 ]; then
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxied ${PROXY_FLAG}=$(cat /root/.celo/proxyEnodeUrlPairs) --nodiscover --proxy.allowprivateip"
+          else
+            ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@${ETHSTATS_SVC}"
+          fi
 
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
+
+          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
+            BOOTNODE_FLAG="--${network_name}"
+          else
+            BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
+          fi
+
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
           {{- end }}
@@ -183,7 +194,8 @@ spec:
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
           exec geth \
-            --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
+            $BOOTNODE_FLAG \
+            --datadir /root/.celo \
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
@@ -200,7 +212,6 @@ spec:
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \

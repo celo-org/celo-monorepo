@@ -1,8 +1,11 @@
+import { ensureLeading0x, Signature } from '@celo/base'
+import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import net from 'net'
 import Web3 from 'web3'
-import { Tx } from 'web3-core'
+import { HttpProvider, Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
@@ -10,9 +13,10 @@ import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { estimateGas } from './utils/web3-utils'
-import { Wallet } from './wallets/wallet'
+import { ReadOnlyWallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
@@ -31,7 +35,7 @@ const debug = debugFactory('kit:kit')
  * @param url CeloBlockchain node url
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKit(url: string, wallet?: Wallet) {
+export function newKit(url: string, wallet?: ReadOnlyWallet) {
   const web3 = url.endsWith('.ipc')
     ? new Web3(new Web3.providers.IpcProvider(url, net))
     : new Web3(url)
@@ -43,7 +47,7 @@ export function newKit(url: string, wallet?: Wallet) {
  * @param web3 Web3 instance
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKitFromWeb3(web3: Web3, wallet?: Wallet) {
+export function newKitFromWeb3(web3: Web3, wallet?: ReadOnlyWallet) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
@@ -70,6 +74,7 @@ export interface NetworkConfig {
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
+  blockchainParameters: BlockchainParametersConfig
 }
 
 export interface KitOptions {
@@ -97,7 +102,7 @@ export class ContractKit {
   readonly contracts: WrapperCache
 
   private config: KitOptions
-  constructor(readonly web3: Web3, wallet?: Wallet) {
+  constructor(readonly web3: Web3, wallet?: ReadOnlyWallet) {
     this.config = {
       gasInflationFactor: 1.3,
       // gasPrice:0 means the node will compute gasPrice on its own
@@ -113,6 +118,11 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  getWallet() {
+    assertIsCeloProvider(this.web3.currentProvider)
+    return this.web3.currentProvider.wallet
   }
 
   async getTotalBalance(address: string): Promise<AccountBalance> {
@@ -155,6 +165,7 @@ export class ContractKit {
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
+      this.contracts.getBlockchainParameters(),
     ]
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
@@ -169,6 +180,7 @@ export class ContractKit {
       contracts[8].getConfig(),
       contracts[9].getConfig(),
       contracts[10].getConfig(),
+      contracts[11].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -182,6 +194,7 @@ export class ContractKit {
       stableToken: res[8],
       validators: res[9],
       downtimeSlasher: res[10],
+      blockchainParameters: res[11],
     }
   }
 
@@ -345,6 +358,30 @@ export class ContractKit {
         gas,
       })
     )
+  }
+
+  async signTypedData(signer: string, typedData: EIP712TypedData): Promise<Signature> {
+    const signature = await new Promise<string>((resolve, reject) => {
+      ;(this.web3.currentProvider as Pick<HttpProvider, 'send'>).send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_signTypedData',
+          params: [signer, typedData],
+        },
+        (error, resp) => {
+          if (error) {
+            reject(error)
+          } else if (resp) {
+            resolve(resp.result as string)
+          } else {
+            reject(new Error('empty-response'))
+          }
+        }
+      )
+    })
+
+    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+    return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
   private fillTxDefaults(tx?: Tx): Tx {

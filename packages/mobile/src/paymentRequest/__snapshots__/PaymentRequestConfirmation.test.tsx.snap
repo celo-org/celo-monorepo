@@ -160,12 +160,12 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             <TextInput
               allowFontScaling={true}
               autoFocus={false}
+              blurOnSubmit={true}
               maxLength={70}
               multiline={true}
               numberOfLines={5}
               onBlur={[Function]}
               onChangeText={[Function]}
-              onKeyPress={[Function]}
               placeholder="addDescription"
               placeholderTextColor="#1AB775"
               rejectResponderTermination={true}

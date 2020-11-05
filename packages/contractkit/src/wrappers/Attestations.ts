@@ -64,6 +64,7 @@ export interface AttesationServiceRevealRequest {
   // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
+  language?: string
 }
 
 export interface UnselectedRequest {
@@ -177,6 +178,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
       await sleep(pollDurationSeconds * 1000)
     }
+    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
@@ -463,6 +465,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(identifier))
   }
 
+  /**
+   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
+  async selectIssuersAfterWait(
+    identifier: string,
+    account: string,
+    timeoutSeconds?: number,
+    pollDurationSeconds?: number
+  ) {
+    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
+    return this.selectIssuers(identifier)
+  }
+
+  /**
+   * Reveal phone number to issuer
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   * @param smsRetrieverAppSig?: Android app's hash
+   */
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
@@ -484,6 +510,33 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+    })
+  }
+
+  /**
+   * Returns reveal status from validator's attestation service
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   */
+  getRevealStatus(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string,
+    pepper?: string
+  ) {
+    const urlParams = new URLSearchParams({
+      phoneNumber,
+      salt: pepper ?? '',
+      issuer,
+      account,
+    })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
@@ -568,7 +621,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
       attestationServiceURL = attestationServiceURLClaim.url
     } catch (error) {
-      ret.state = AttestationServiceStatusState.InvalidMetadata
+      ret.state =
+        error.type === 'system'
+          ? AttestationServiceStatusState.MetadataTimeout
+          : AttestationServiceStatusState.InvalidMetadata
       ret.error = error
       return ret
     }
@@ -586,17 +642,48 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.okStatus = true
       const statusResponseBody = await statusResponse.json()
       ret.smsProviders = statusResponseBody.smsProviders
-      ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
-      ret.state = AttestationServiceStatusState.Valid
-      ret.version = statusResponseBody.version
-      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
-      return ret
+      ret.state = ret.rightAccount
+        ? AttestationServiceStatusState.Valid
+        : AttestationServiceStatusState.WrongAccount
+
+      // Healthcheck was added in 1.0.1, same time version started being reported.
+      if (statusResponseBody.version) {
+        ret.version = statusResponseBody.version
+
+        // Try healthcheck
+        try {
+          const healthzResponse = await fetch(appendPath(attestationServiceURL, 'healthz'))
+          const healthzResponseBody = await healthzResponse.json()
+          if (!healthzResponse.ok) {
+            ret.state = AttestationServiceStatusState.Unhealthy
+            if (healthzResponseBody.error) {
+              ret.error = healthzResponseBody.error
+            }
+          }
+        } catch (error) {
+          ret.state = AttestationServiceStatusState.UnreachableHealthz
+        }
+
+        // Whether or not health check is reachable, also check full node status
+        // (overrides UnreachableHealthz status)
+        if (
+          (statusResponseBody.ageOfLatestBlock !== null &&
+            statusResponseBody.ageOfLatestBlock > 10) ||
+          statusResponseBody.isNodeSyncing === true
+        ) {
+          ret.state = AttestationServiceStatusState.Unhealthy
+        }
+      } else {
+        // No version implies 1.0.0
+        ret.version = '1.0.0'
+      }
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
       ret.error = error
-      return ret
     }
+
+    return ret
   }
 
   async revoke(identifer: string, account: Address) {
@@ -609,15 +696,19 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 }
 
-enum AttestationServiceStatusState {
+export enum AttestationServiceStatusState {
   NoAttestationSigner = 'NoAttestationSigner',
   NoMetadataURL = 'NoMetadataURL',
   InvalidMetadata = 'InvalidMetadata',
   NoAttestationServiceURL = 'NoAttestationServiceURL',
   UnreachableAttestationService = 'UnreachableAttestationService',
   Valid = 'Valid',
+  UnreachableHealthz = 'UnreachableHealthz',
+  Unhealthy = 'Unhealthy',
+  WrongAccount = 'WrongAccount',
+  MetadataTimeout = 'MetadataTimeout',
 }
-interface AttestationServiceStatusResponse {
+export interface AttestationServiceStatusResponse {
   name: string
   address: Address
   ecdsaPublicKey: string
@@ -631,7 +722,7 @@ interface AttestationServiceStatusResponse {
   okStatus: boolean
   error: null | Error
   smsProviders: string[]
-  blacklistedRegionCodes: string[]
+  blacklistedRegionCodes: string[] | null
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState

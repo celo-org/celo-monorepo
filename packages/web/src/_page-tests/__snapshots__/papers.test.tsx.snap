@@ -32,6 +32,7 @@ exports[`Papers renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -69,6 +70,7 @@ exports[`Papers renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -101,6 +103,7 @@ exports[`Papers renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -130,6 +133,7 @@ exports[`Papers renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -167,6 +171,7 @@ exports[`Papers renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -180,6 +185,7 @@ exports[`Papers renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -215,8 +221,6 @@ exports[`Papers renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -275,7 +279,7 @@ exports[`Papers renders 1`] = `
               }
               target="_blank"
             >
-              Read Paper
+              Read paper
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -314,8 +318,6 @@ exports[`Papers renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -349,7 +351,7 @@ exports[`Papers renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="/papers/celo-wp-simplified-chinese.pdf"
+              href="/papers/whitepaper/chinese"
               onClick={[Function]}
               rel=" noopener noreferrer"
               role="link"
@@ -424,6 +426,7 @@ exports[`Papers renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -453,6 +456,7 @@ exports[`Papers renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -490,6 +494,7 @@ exports[`Papers renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -503,6 +508,7 @@ exports[`Papers renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -522,8 +528,6 @@ exports[`Papers renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <div
           className="css-view-1dbjc4n"
@@ -582,7 +586,7 @@ exports[`Papers renders 1`] = `
             }
             target="_blank"
           >
-            Read Paper
+            Read paper
             <div
               className="css-view-1dbjc4n"
               style={
@@ -631,6 +635,7 @@ exports[`Papers renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -660,6 +665,7 @@ exports[`Papers renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -697,6 +703,7 @@ exports[`Papers renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -710,6 +717,7 @@ exports[`Papers renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -724,101 +732,213 @@ exports[`Papers renders 1`] = `
       </div>
       <div
         className="css-view-1dbjc4n"
-        onClick={[Function]}
-        onMouseDown={[Function]}
-        onMouseEnter={[Function]}
-        onMouseLeave={[Function]}
-        onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxLines": "multiple",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexWrap": "wrap",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "msFlexDirection": "row",
+            "msFlexWrap": "wrap",
+          }
+        }
       >
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxFlex": 0,
-              "WebkitBoxOrient": "horizontal",
-              "WebkitBoxPack": "center",
-              "WebkitFlexDirection": "row",
-              "WebkitFlexGrow": 0,
-              "WebkitJustifyContent": "center",
-              "backgroundColor": "rgba(0,0,0,0.00)",
-              "borderBottomColor": "rgba(0,0,0,0.00)",
-              "borderLeftColor": "rgba(0,0,0,0.00)",
-              "borderRightColor": "rgba(0,0,0,0.00)",
-              "borderTopColor": "rgba(0,0,0,0.00)",
-              "flexDirection": "row",
-              "flexGrow": 0,
-              "justifyContent": "center",
-              "msFlexDirection": "row",
-              "msFlexPack": "center",
-              "msFlexPositive": 0,
-              "opacity": 1,
-              "outlineColor": "transparent",
-              "width": "fit-content",
-            }
-          }
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
         >
-          <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-            data-focusable={true}
-            dir="auto"
-            href="/papers/cbdc-velocity"
-            onClick={[Function]}
-            rel=" noopener noreferrer"
-            role="link"
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
-                "WebkitAlignItems": "center",
-                "WebkitBoxAlign": "center",
-                "alignItems": "center",
-                "color": "rgba(53,208,127,1.00)",
-                "cursor": "pointer",
-                "display": "inline-flex",
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "fontWeight": "500",
-                "lineHeight": "16px",
-                "marginRight": "30px",
-                "marginTop": "10px",
-                "msFlexAlign": "center",
-                "textAlign": "center",
-                "textRendering": "geometricPrecision",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "center",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "justifyContent": "center",
+                "msFlexDirection": "row",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "width": "fit-content",
               }
             }
-            target="_blank"
           >
-            Read Paper
-            <div
-              className="css-view-1dbjc4n"
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
+              href="/papers/cbdc-velocity"
+              onClick={[Function]}
+              rel=" noopener noreferrer"
+              role="link"
               style={
                 Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "color": "rgba(53,208,127,1.00)",
+                  "cursor": "pointer",
                   "display": "inline-flex",
-                  "paddingLeft": "0.4em",
-                  "paddingTop": "0.185em",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
+                  "msFlexAlign": "center",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              <svg
-                fill="none"
-                height="0.75em"
-                style={Object {}}
-                transform="rotate(0)"
-                viewBox="0 0 8 12"
-                width="0.75em"
+              Read paper
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "paddingLeft": "0.4em",
+                    "paddingTop": "0.185em",
+                  }
+                }
               >
-                <path
-                  clipRule="evenodd"
-                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-                  fill="#35D07F"
-                  fillRule="evenodd"
-                  opacity={1}
+                <svg
+                  fill="none"
+                  height="0.75em"
                   style={Object {}}
-                />
-              </svg>
-            </div>
-          </a>
+                  transform="rotate(0)"
+                  viewBox="0 0 8 12"
+                  width="0.75em"
+                >
+                  <path
+                    clipRule="evenodd"
+                    d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                    fill="#35D07F"
+                    fillRule="evenodd"
+                    opacity={1}
+                    style={Object {}}
+                  />
+                </svg>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "center",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "justifyContent": "center",
+                "msFlexDirection": "row",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "width": "fit-content",
+              }
+            }
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
+              href="/papers/cbdc-velocity/spanish"
+              onClick={[Function]}
+              rel=" noopener noreferrer"
+              role="link"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "color": "rgba(53,208,127,1.00)",
+                  "cursor": "pointer",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
+                  "msFlexAlign": "center",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+              target="_blank"
+            >
+              Lee el informe
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "paddingLeft": "0.4em",
+                    "paddingTop": "0.185em",
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="0.75em"
+                  style={Object {}}
+                  transform="rotate(0)"
+                  viewBox="0 0 8 12"
+                  width="0.75em"
+                >
+                  <path
+                    clipRule="evenodd"
+                    d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                    fill="#35D07F"
+                    fillRule="evenodd"
+                    opacity={1}
+                    style={Object {}}
+                  />
+                </svg>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>

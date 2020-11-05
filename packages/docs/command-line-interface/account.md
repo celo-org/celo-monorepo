@@ -23,6 +23,9 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)        Use a specific gas currency for transaction fees (defaults to
+                                                       'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                    [default: 1] If --useLedger is set, this will get the first N
                                                        addresses for local signing
 
@@ -38,9 +41,6 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
-  --usdGas                                             If --usdGas is set, the transaction is paid for with a
-                                                       feeCurrency of cUSD
-
   --useLedger                                          Set it to use a ledger wallet
 
 EXAMPLES
@@ -48,7 +48,7 @@ EXAMPLES
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
-  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role validator --signer
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb --blsKey
@@ -68,7 +68,8 @@ USAGE
   $ celocli account:balance ADDRESS
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -93,6 +94,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -105,9 +109,6 @@ OPTIONS
 
   --publicKey=publicKey                              The public key of the account that others may use to send you
                                                      encrypted messages
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -130,8 +131,13 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --force                                            Ignore URL validity checks
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -143,15 +149,12 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --url=https://www.celo.org                         (required) The url you want to claim
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
+  --url=https://www.celo.org                         (required) The URL you want to claim. Should begin http://
 
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
-  claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
+  claim-attestation-service-url ~/metadata.json --url https://test.com/myurl --from
   0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
@@ -174,6 +177,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -183,9 +189,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -210,6 +213,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -219,9 +225,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -248,6 +251,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -259,9 +265,6 @@ OPTIONS
                                                      "[4,99]"
 
   --name=name                                        (required) The name you want to claim
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -286,6 +289,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -297,9 +303,6 @@ OPTIONS
                                                      "[4,99]"
 
   --url=https://www.celo.org                         (required) The URL of the storage root you want to claim
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -324,6 +327,9 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -333,9 +339,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -357,6 +360,9 @@ ARGUMENTS
   ADDRESS  Address to get metadata for
 
 OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -365,9 +371,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -386,6 +389,9 @@ USAGE
   $ celocli account:list
 
 OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -397,9 +403,6 @@ OPTIONS
 
   --[no-]local                                   If set, only show local and hardware wallet accounts. Use no-local to
                                                  only show keystore addresses.
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 ```
@@ -418,7 +421,8 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
 
 EXAMPLE
   lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -469,6 +473,80 @@ EXAMPLES
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
+### Offchain-read
+
+DEV: Reads the name from offchain storage
+
+```
+USAGE
+  $ celocli account:offchain-read
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --name=name
+
+  --root=root
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  offchain-read --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/offchain-read.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-read.ts)_
+
+### Offchain-write
+
+DEV: Writes a name to offchain storage
+
+```
+USAGE
+  $ celocli account:offchain-write
+
+OPTIONS
+  --directory=directory                              (required) To which directory data should be written
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address with which to sign
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --name=name                                        (required)
+
+  --uploadWithGit                                    If the CLI should attempt to push changes to the origin via git
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLES
+  offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  offchain-write --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
+```
+
+_See code: [packages/cli/src/commands/account/offchain-write.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/offchain-write.ts)_
+
 ### Proof-of-possession
 
 Generate proof-of-possession to be used to authorize a signer. See the "account:authorize" command for more details.
@@ -481,6 +559,9 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -492,9 +573,6 @@ OPTIONS
                                                         --ledgerCustomAddresses "[4,99]"
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 
@@ -561,6 +639,9 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -573,9 +654,6 @@ OPTIONS
 
   --name=name
 
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
-
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLES
@@ -584,6 +662,40 @@ EXAMPLES
 ```
 
 _See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
+
+### Register-data-encryption-key
+
+Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments
+
+```
+USAGE
+  $ celocli account:register-data-encryption-key
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set the data encryption key for
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --publicKey=publicKey                              (required) The public key you want to register
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  register-data-encryption-key --publicKey 0x...  --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+```
+
+_See code: [packages/cli/src/commands/account/register-data-encryption-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-data-encryption-key.ts)_
 
 ### Register-metadata
 
@@ -597,6 +709,9 @@ OPTIONS
   --force                                            Ignore metadata validity checks
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
+                                                     'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
@@ -608,9 +723,6 @@ OPTIONS
                                                      "[4,99]"
 
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -631,6 +743,9 @@ USAGE
 OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -642,9 +757,6 @@ OPTIONS
                                                         --ledgerCustomAddresses "[4,99]"
 
   --name=name                                           (required)
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 
@@ -663,6 +775,9 @@ USAGE
   $ celocli account:show ADDRESS
 
 OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -671,9 +786,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -692,6 +804,9 @@ USAGE
   $ celocli account:show-claimed-accounts ADDRESS
 
 OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -700,9 +815,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -724,6 +836,9 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -732,9 +847,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -756,9 +868,14 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until the node exits by default.
-  --password=password  Password used to unlock the account. If not specified, you will be prompted for a password.
-  --usdGas             If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --duration=duration                            Duration in seconds to leave the account unlocked. Unlocks until the
+                                                 node exits by default.
+
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
+                                                 which uses whatever feeCurrency is available)
+
+  --password=password                            Password used to unlock the account. If not specified, you will be
+                                                 prompted for a password.
 
 EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -779,6 +896,9 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
 
+  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
+                                                        'auto' which uses whatever feeCurrency is available)
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -794,9 +914,6 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to verify proof of
                                                         possession.
-
-  --usdGas                                              If --usdGas is set, the transaction is paid for with a
-                                                        feeCurrency of cUSD
 
   --useLedger                                           Set it to use a ledger wallet
 

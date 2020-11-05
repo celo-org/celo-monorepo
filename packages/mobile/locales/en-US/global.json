@@ -94,8 +94,8 @@
   "networkConnectionFailed": "Could not connect with the network, please check your data connection",
   "firebaseFailed": "Could not connect to Firebase",
   "gasPriceUpdateFailed": "Could not update fee",
-  "appHasToBeUpdated": "App has to be updated",
-  "thisVersionIsInsecure": "This version is insecure",
+  "appUpdateAvailable": "App Update Available",
+  "appIsOutdated": "Your current version is out of date, please update to the latest version",
   "update": "Update",
   "qrFailedNoAddress": "QR code read failed. Reason: wallet address not found.",
   "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid.",
@@ -122,8 +122,11 @@
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
   "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "maxActionableAttestationsExceededError": "Failed to resend messages",
+  "odisInsufficientBalance": "Your balance is too low to complete this process",
   "matchmakingQuotaExceededError": "Matchmaking can be done only once",
   "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}} cUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}} cUSD ({{currencySymbol}}{{dailyRemaining}}) remaining",
+  "requestLimitError": "Can't request more than the {{limit}} cUSD daily limit.",
   "ordinals": [
     "zeroth",
     "first",
@@ -180,5 +183,6 @@
   "restore": "Restore",
   "commentUnavailable": "Comment Unavailable",
   "accountClearFailed": "There was an error while removing your Account Key. You might have to reinstall the app to restore all functionality.",
-  "withdraw": "Withdraw"
+  "withdraw": "Withdraw",
+  "countryNotAvailable": "{{appName}} is not available in your country"
 }

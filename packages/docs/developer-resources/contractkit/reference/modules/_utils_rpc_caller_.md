@@ -21,7 +21,7 @@
 
 ▸ **getRandomId**(): *number*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L37)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L37)*
 
 **Returns:** *number*
 
@@ -31,7 +31,7 @@ ___
 
 ▸ **rpcCallHandler**(`payload`: JsonRpcPayload, `handler`: function, `callback`: Callback‹JsonRpcResponse›): *void*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L9)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L9)*
 
 **Parameters:**
 
