@@ -41,6 +41,7 @@ export enum Actions {
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
   RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
   SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
+  REPORT_REVEAL_STATUS = 'IDENTITY/REPORT_REVEAL_STATUS',
 }
 
 export interface StartVerificationAction {
@@ -197,6 +198,15 @@ export interface SetLastRevealAttempt {
   time: number
 }
 
+export interface ReportRevealStatusAction {
+  type: Actions.REPORT_REVEAL_STATUS
+  attestationServiceUrl: string
+  account: string
+  issuer: string
+  e164Number: string
+  pepper: string
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -226,6 +236,7 @@ export type ActionTypes =
   | UpdateVerificationState
   | ResendAttestations
   | SetLastRevealAttempt
+  | ReportRevealStatusAction
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -413,3 +424,20 @@ export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
   type: Actions.SET_LAST_REVEAL_ATTEMPT,
   time,
 })
+
+export const reportRevealStatus = (
+  attestationServiceUrl: string,
+  account: string,
+  issuer: string,
+  e164Number: string,
+  pepper: string
+): ReportRevealStatusAction => {
+  return {
+    type: Actions.REPORT_REVEAL_STATUS,
+    attestationServiceUrl,
+    account,
+    issuer,
+    e164Number,
+    pepper,
+  }
+}

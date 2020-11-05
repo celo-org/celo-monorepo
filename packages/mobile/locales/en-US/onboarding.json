@@ -1,11 +1,11 @@
 {
   "education": {
-    "step1": "Send and receive money instantly",
-    "step2": "Pay anyone, anywhere with very low fees",
-    "step3": "Confidently and safely use {{appName}}"
+    "step1": "{{appName}} is a new way to send and receive value worldwide",
+    "step2": "Send funds across borders",
+    "step3": "Convenient, reliable, and secure. Your phone is your wallet"
   },
   "welcome": {
-    "title": "Your value,\non your phone",
+    "title": "Share money with those you value",
     "createAccount": "Create new account",
     "restoreAccount": "I have an account"
   },
