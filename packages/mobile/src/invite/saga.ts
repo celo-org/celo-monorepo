@@ -459,5 +459,4 @@ export function* watchRedeemInvite() {
 export function* inviteSaga() {
   yield spawn(watchSendInvite)
   yield spawn(watchRedeemInvite)
-  yield spawn(skipInvite)
 }

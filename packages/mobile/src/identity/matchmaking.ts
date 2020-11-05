@@ -2,7 +2,7 @@ import { OdisUtils } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
 import DeviceInfo from 'react-native-device-info'
-import { call, put, select } from 'redux-saga/effects'
+import { call, put } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { addContactsMatches } from 'src/identity/actions'
@@ -11,16 +11,14 @@ import { ContactMatches } from 'src/identity/types'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { mtwAddressSelector } from 'src/web3/selectors'
+import { getAccountAddress, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/matchmaking'
 
 // Uses the phone number privacy service to find mutual matches between Celo users
 export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) {
   const walletAddress: string = yield call(getConnectedUnlockedAccount)
-  const mtwAddress: string | null = yield select(mtwAddressSelector)
-  const accountAddress: string = mtwAddress || walletAddress
+  const accountAddress: string = yield call(getAccountAddress)
 
   Logger.debug(TAG, 'Starting contact matchmaking')
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(

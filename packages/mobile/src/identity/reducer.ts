@@ -121,6 +121,8 @@ export interface State {
   addressToE164Number: AddressToE164NumberType
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
+  // This contains a mapping of walletAddress (EOA) to accountAddress (either MTW or EOA)
+  // and is needed to query for a user's DEK while knowing only their walletAddress
   walletToAccountAddress: WalletToAccountAddressType
   e164NumberToSalt: E164NumberToSaltType
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType

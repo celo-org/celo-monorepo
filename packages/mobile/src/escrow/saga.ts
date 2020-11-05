@@ -24,7 +24,11 @@ import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import { waitForNextBlock } from 'src/geth/saga'
 import i18n from 'src/i18n'
-import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
+import {
+  Actions as IdentityActions,
+  FeelessSetVerificationStatusAction,
+  SetVerificationStatusAction,
+} from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { VerificationStatus } from 'src/identity/types'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
@@ -115,6 +119,72 @@ function* registerStandbyTransaction(context: TransactionContext, value: string,
       comment: '',
     })
   )
+}
+
+function* withdrawFromEscrowViaKomenci() {
+  try {
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
+    Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
+
+    const contractKit = yield call(getContractKit)
+
+    const escrow: EscrowWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getEscrow,
+    ])
+
+    yield call(getConnectedUnlockedAccount)
+
+    const accountAddress = yield select(getAccountAddress)
+
+    const tmpWalletPrivateKey: string | null = yield select(
+      (state: RootState) => state.invite.redeemedTempAccountPrivateKey
+    )
+
+    if (!tmpWalletPrivateKey || !isValidPrivateKey(tmpWalletPrivateKey)) {
+      Logger.warn(TAG + '@withdrawFromEscrow', 'Invalid private key, skipping escrow withdrawal')
+      return
+    }
+
+    const tempWalletAddress = privateKeyToAddress(tmpWalletPrivateKey)
+
+    // Check if there is a payment associated with this invite code
+    const receivedPayment = yield call(getEscrowedPayment, escrow, tempWalletAddress)
+    const value = new BigNumber(receivedPayment[3])
+    if (!value.isGreaterThan(0)) {
+      Logger.warn(TAG + '@withdrawFromEscrow', 'Escrow payment is empty, skipping.')
+      return
+    }
+
+    const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
+
+    Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
+    // use the temporary key to sign a message. The message is the current account.
+    let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey))
+      .signature
+    Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
+    signature = trimLeading0x(signature)
+    const r = `0x${signature.slice(0, 64)}`
+    const s = `0x${signature.slice(64, 128)}`
+    const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
+
+    // Generate and send the withdrawal transaction.
+    const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
+    const context = newTransactionContext(TAG, 'Withdraw from escrow')
+    yield call(sendTransaction, withdrawTx.txo, account, context)
+
+    yield put(fetchDollarBalance())
+    Logger.showMessage(i18n.t('inviteFlow11:transferDollarsToAccount'))
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
+  } catch (e) {
+    Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
+    ValoraAnalytics.track(OnboardingEvents.escrow_redeem_error, { error: e.message })
+    if (e.message === ErrorMessages.INCORRECT_PIN) {
+      yield put(showError(ErrorMessages.INCORRECT_PIN))
+    } else {
+      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED))
+    }
+  }
 }
 
 function* withdrawFromEscrow() {
@@ -321,7 +391,13 @@ export function* watchFetchSentPayments() {
 export function* watchVerificationEnd() {
   while (true) {
     const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
-    if (update.status === VerificationStatus.Done) {
+    const feelessUpdate: FeelessSetVerificationStatusAction = yield take(
+      IdentityActions.FEELESS_SET_VERIFICATION_STATUS
+    )
+    if (
+      update.status === VerificationStatus.Done ||
+      feelessUpdate.status === VerificationStatus.Done
+    ) {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
