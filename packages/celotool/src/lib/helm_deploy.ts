@@ -870,7 +870,7 @@ function useStaticIPsForGethNodes() {
 }
 
 export async function checkHelmVersion() {
-  const requiredHelmVersion = 'v3.3'
+  const requiredHelmVersion = 'v3'
   const helmOK = await outputIncludes('helm version -c --short', requiredHelmVersion, `Checking local Helm version. Required ${requiredHelmVersion}`)
   if (helmOK) {
     return true
