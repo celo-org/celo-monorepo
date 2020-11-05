@@ -93,7 +93,7 @@ export function* validateRecipientAddressSaga({
 }
 
 function* watchVerification() {
-  yield takeLatest(Actions.FETCH_VERIFICATION_STATE, fetchVerificationState)
+  yield takeLeading(Actions.FETCH_VERIFICATION_STATE, fetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
   yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
