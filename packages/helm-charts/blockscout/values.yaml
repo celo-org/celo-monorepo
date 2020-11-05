@@ -4,6 +4,13 @@ blockscout:
     api:
       maxReplicas: 10
       minReplicas: 2
+      target:
+        cpu: 70
+    web:
+      maxReplicas: 5
+      minReplicas: 2
+      target:
+        cpu: 70
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo

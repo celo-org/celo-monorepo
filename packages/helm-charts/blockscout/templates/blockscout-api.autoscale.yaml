@@ -19,4 +19,4 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 70
+      targetAverageUtilization: {{ .Values.blockscout.autoscaling.api.target.cpu }}
