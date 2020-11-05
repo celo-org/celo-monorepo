@@ -29,6 +29,7 @@ import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
 
 const debug = debugFactory('kit:kit')
+const txDebug = debugFactory('kit:tx')
 
 /**
  * Creates a new instance of `ContractKit` give a nodeUrl
@@ -338,6 +339,8 @@ export class ContractKit {
     if (gas == null) {
       const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
       const getCallTx = (_tx: Tx) => {
+        // @ts-ignore missing _parent property from TransactionObject type.
+        txDebug({ ..._tx, data: txObj.encodeABI(), to: txObj._parent._address })
         // @ts-ignore missing _parent property from TransactionObject type.
         return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
       }
