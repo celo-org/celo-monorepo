@@ -194,7 +194,6 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
     })
     yield put(feelessResetVerification())
     yield call(getConnectedAccount)
-    console.log('Feeless state expired: ', yield select(isFeelessVerificationStateExpiredSelector))
     if (isRestarted || (yield select(isFeelessVerificationStateExpiredSelector))) {
       yield call(feelessFetchVerificationState)
     }
@@ -203,7 +202,7 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
       verification: call(feelessDoVerificationFlow, withoutRevealing),
       restart: take(Actions.FEELESS_RESEND_ATTESTATIONS),
     })
-    console.log('ACTION RECEIVED')
+
     if (restart) {
       isRestarted = true
       const { status }: FeelessVerificationState = yield select(feelessVerificationStateSelector)

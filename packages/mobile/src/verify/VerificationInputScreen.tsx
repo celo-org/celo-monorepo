@@ -75,15 +75,13 @@ interface State {
   isKeyboardVisible: boolean
 }
 
-const mapDispatchToProps = () => {
-  return {
-    cancelVerification,
-    receiveAttestationMessage,
-    resendAttestations,
-    feelessResendAttestations,
-    hideAlert,
-    showMessage,
-  }
+const mapDispatchToProps = {
+  cancelVerification,
+  receiveAttestationMessage,
+  resendAttestations,
+  feelessResendAttestations,
+  hideAlert,
+  showMessage,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -248,15 +246,12 @@ class VerificationInputScreen extends React.Component<Props, State> {
       timeDeltaInSeconds(Date.now(), lastRevealAttempt) > ATTESTATION_REVEAL_TIMEOUT_SECONDS
 
     if (isRevealAllowed) {
-      console.log('button pressed')
       if (feelessIsActive) {
-        console.log('feeless')
         this.props.feelessResendAttestations()
       } else {
         this.props.resendAttestations()
       }
     } else {
-      console.log('button pressed 1')
       this.props.showMessage(
         this.props.t('verificationPrematureRevealMessage'),
         ALERT_BANNER_DURATION,

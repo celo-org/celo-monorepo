@@ -565,12 +565,9 @@ export const resendAttestations = (): ResendAttestations => ({
   type: Actions.RESEND_ATTESTATIONS,
 })
 
-export const feelessResendAttestations = (): FeelessResendAttestations => {
-  console.log('feeless resend called')
-  return {
-    type: Actions.FEELESS_RESEND_ATTESTATIONS,
-  }
-}
+export const feelessResendAttestations = (): FeelessResendAttestations => ({
+  type: Actions.FEELESS_RESEND_ATTESTATIONS,
+})
 
 export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
   type: Actions.SET_LAST_REVEAL_ATTEMPT,

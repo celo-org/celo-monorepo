@@ -221,9 +221,10 @@ export const reducer = (
   switch (action.type) {
     case REHYDRATE: {
       // Ignore some persisted properties
+      const rehydratedState = getRehydratePayload(action, 'identity')
       return {
         ...state,
-        ...getRehydratePayload(action, 'identity'),
+        ...rehydratedState,
         verificationStatus: VerificationStatus.Stopped,
         feelessVerificationStatus: VerificationStatus.Stopped,
         importContactsProgress: {
@@ -232,9 +233,8 @@ export const reducer = (
           total: 0,
         },
         verificationState: initialState.verificationState,
-        // TODO: Think about if I should reset more on rehydrate
         feelessVerificationState: {
-          ...state.feelessVerificationState,
+          ...rehydratedState.feelessVerificationState,
           isLoading: false,
         },
         isFetchingAddresses: false,
