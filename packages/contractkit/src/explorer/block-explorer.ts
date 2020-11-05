@@ -140,7 +140,7 @@ export class BlockExplorer {
       matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE &&
       args.length === 2
     ) {
-      const initializeAbi = getInitializeAbiOfImplementation(contract)
+      const initializeAbi = getInitializeAbiOfImplementation(contract as any)
       const encodedInitializeParameters = args[1].slice(10)
 
       const { params: initializeParams } = parseDecodedParams(
