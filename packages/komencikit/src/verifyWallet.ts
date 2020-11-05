@@ -27,7 +27,6 @@ export const verifyWallet = async (
   expectedSigner: Address
 ): Promise<Result<true, WalletValidationError>> => {
   const code = await contractKit.web3.eth.getCode(walletAddress)
-  console.log(soliditySha3(stripBzz(code)))
 
   if (soliditySha3(stripBzz(code)) !== PROXY_BYTECODE_SHA3) {
     return Err(new InvalidBytecode(walletAddress))
