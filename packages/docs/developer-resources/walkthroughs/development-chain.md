@@ -16,9 +16,9 @@ $ git clone git@github.com:celo-org/celo-monorepo.git
 
 In the monorepo project root run `$ yarn` to install the project dependencies and `$ yarn build` to build the packages. 
 
-Once those are installed, move into the contractkit directory. `$ cd packages/contractkit`
+Once those are installed, move into the `contractkit` directory. `$ cd packages/contractkit`
 
-From the contractkit directory, run `$ yarn test:reset && yarn test:livechain`. This will start the development Celo blockchain. It will take at least a few minutes to start. The contract migrations will be printed in the terminal as they are deployed. 
+From the `contractkit` directory, run `$ yarn test:reset && yarn test:livechain`. This will start the development Celo blockchain. It will take at least a few minutes to start. The contract migrations will be printed in the terminal as they are deployed. 
 
 The process will finish and print `Ganache started`. Leave this terminal window open to leave the development chain running.
 
