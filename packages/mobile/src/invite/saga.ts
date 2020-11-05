@@ -31,7 +31,7 @@ import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
-import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
@@ -44,8 +44,6 @@ import {
   sendInviteFailure,
   sendInviteSuccess,
   SENTINEL_INVITE_COMMENT,
-  skipInviteFailure,
-  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
@@ -371,30 +369,6 @@ export function* doRedeemInvite(tempAccountPrivateKey: string) {
       yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     }
     return { success: false }
-  }
-}
-
-export function* skipInvite() {
-  yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
-  try {
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
-    yield call(getOrCreateAccount)
-    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
-    // (`setHasSeenVerificationNux` though the user hasn't seen it),
-    // we should prefer a more atomic approach with a meaningful action type
-    yield put(refreshAllBalances())
-    yield put(setHasSeenVerificationNux(true))
-    Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
-    // navigateHome()
-    navigate(Screens.VerificationEducationScreen)
-    yield put(skipInviteSuccess())
-  } catch (e) {
-    Logger.error(TAG, 'Failed to skip invite', e)
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
-    yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
-    yield put(skipInviteFailure())
   }
 }
 

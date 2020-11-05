@@ -10,7 +10,6 @@ export enum Screens {
   DappKitTxDataScreen = 'DappKitTxDataScreen',
   Debug = 'Debug',
   DrawerNavigator = 'DrawerNavigator',
-  EnterInviteCode = 'EnterInviteCode',
   ErrorScreen = 'ErrorScreen',
   EscrowedPaymentListScreen = 'EscrowedPaymentListScreen',
   ExchangeHomeScreen = 'ExchangeHomeScreen',
