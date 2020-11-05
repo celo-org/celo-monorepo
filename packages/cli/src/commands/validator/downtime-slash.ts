@@ -35,7 +35,7 @@ export default class DowntimeSlashCommand extends BaseCommand {
     'downtime-slash \
     --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 \
     --validator 0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD \
-    --intervals "[100, 149], [150, 199]"',
+    --intervals "[100:150), [150:200)"',
     'downtime-slash \
     --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 \
     --validator 0xb7ef0985bdb4f19460A29d9829aA1514B181C4CD \

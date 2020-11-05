@@ -3,7 +3,6 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
 import { cli } from 'cli-ux'
-import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
 import { ElectionResultsCache } from '../../utils/election'
@@ -16,10 +15,10 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     ...BaseCommand.flagsWithoutLocalAddresses(),
     signer: Flags.address({
       description: 'address of the signer to check for signatures',
-      exclusive: ['signersJson'],
+      exclusive: ['signers'],
     }),
-    signersJson: flags.string({
-      description: 'path to json file with list of signers to check',
+    signers: Flags.addressArray({
+      description: 'list of signer addresses to check for signatures',
       exclusive: ['signer'],
     }),
     wasDownWhileElected: flags.boolean({
@@ -35,7 +34,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       exclusive: ['slashableDowntime'],
     }),
     slashableDowntimeLookback: flags.boolean({
-      description: 'lookback of Validators.slashableDowntime',
+      description: 'lookback of slashableDowntime',
       exclusive: ['lookback'],
     }),
     width: flags.integer({
@@ -85,13 +84,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
       this.web3.eth.getBlock(latest - lookback! + i + 1)
     )
 
-    let signers: string[]
-    if (res.flags.signersJson) {
-      const signerObjectArray: any[] = JSON.parse(readFileSync(res.flags.signersJson).toString())
-      signers = signerObjectArray.map((o) => o.signer)
-    } else {
-      signers = [res.flags.signer!]
-    }
+    const signers = res.flags.signers ?? [res.flags.signer!]
 
     for (const signer of signers) {
       let wasDown: boolean

@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
@@ -43,10 +44,14 @@ export default class SetBitmapsCommand extends BaseCommand {
           )
         : res.flags.intervals!
 
-    const bitmapsSet = await Promise.all(intervals.map(downtimeSlasher.isBitmapSetForInterval))
-    const unsetIntervals = intervals.filter((_, idx) => !bitmapsSet[idx])
+    await newCheckBuilder(this)
+      .addCheck(
+        'bitmaps are not already set for intervals',
+        async () => !(await downtimeSlasher.isBitmapSetForIntervals(intervals))
+      )
+      .runChecks()
 
-    for (const interval of unsetIntervals) {
+    for (const interval of intervals) {
       const tx = downtimeSlasher.setBitmapForInterval(interval)
       await displaySendTx('setBitmap', tx, undefined, 'BitmapSetForInterval')
     }
