@@ -78,11 +78,6 @@ export default RestoreAccountOnboarding = () => {
     await sleep(5000)
   })
 
-  it('Pin', async () => {
-    // Enter pin before verification starts
-    await enterPinUi()
-  })
-
   it('VerifyEducation', async () => {
     await waitForElementId('VerificationEducationSkipHeader')
 
