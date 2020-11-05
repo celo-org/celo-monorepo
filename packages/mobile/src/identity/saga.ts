@@ -1,4 +1,5 @@
 import {
+  call,
   cancelled,
   put,
   select,
@@ -13,6 +14,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
+  FetchVerificationState,
   ValidateRecipientAddressAction,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
@@ -92,8 +94,13 @@ export function* validateRecipientAddressSaga({
   }
 }
 
+function* handleFetchVerificationState(action: FetchVerificationState) {
+  const { forceUnlockAccount } = action
+  yield call(fetchVerificationState, forceUnlockAccount)
+}
+
 function* watchVerification() {
-  yield takeLeading(Actions.FETCH_VERIFICATION_STATE, fetchVerificationState)
+  yield takeLeading(Actions.FETCH_VERIFICATION_STATE, handleFetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
   yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
