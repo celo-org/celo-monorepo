@@ -19,6 +19,8 @@ import {
   setExchangeRate,
   setTobinTax,
   WithdrawCeloAction,
+  withdrawCeloFailed,
+  withdrawCeloSuccess,
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -420,16 +422,20 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     const dollarAmount = yield call(celoToDollarAmount, amount)
     yield put(sendPaymentOrInviteSuccess(dollarAmount))
 
+    yield put(withdrawCeloSuccess())
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })
   } catch (error) {
     Logger.error(TAG, 'Error withdrawing CELO', error)
-    if (context?.id) {
-      yield put(removeStandbyTransaction(context.id))
-    }
 
-    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+    const errorToShow =
+      error.message === ErrorMessages.INCORRECT_PIN
+        ? ErrorMessages.INCORRECT_PIN
+        : ErrorMessages.TRANSACTION_FAILED
+    yield put(withdrawCeloFailed(context?.id, errorToShow))
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_error, {
       error,
     })
