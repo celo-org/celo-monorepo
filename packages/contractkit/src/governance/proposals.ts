@@ -161,7 +161,7 @@ export class ProposalBuilder {
     ) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.web3.eth.abi.encodeFunctionCall(
-        getInitializeAbiOfImplementation(tx.contract),
+        getInitializeAbiOfImplementation(tx.contract as any),
         tx.args[1]
       )
     }
