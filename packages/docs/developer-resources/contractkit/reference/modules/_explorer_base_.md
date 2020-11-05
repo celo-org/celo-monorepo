@@ -2,63 +2,39 @@
 
 ## Index
 
-### Interfaces
+### Classes
 
-* [ContractDetails](../interfaces/_explorer_base_.contractdetails.md)
+* [BaseExplorer](../classes/_explorer_base_.baseexplorer.md)
 
 ### Functions
 
-* [getContractDetailsFromContract](_explorer_base_.md#const-getcontractdetailsfromcontract)
-* [mapFromPairs](_explorer_base_.md#mapfrompairs)
-* [obtainKitContractDetails](_explorer_base_.md#obtainkitcontractdetails)
+* [getAddressMappingFromDetails](_explorer_base_.md#const-getaddressmappingfromdetails)
+* [obtainKitContractDetails](_explorer_base_.md#const-obtainkitcontractdetails)
 
 ## Functions
 
-### `Const` getContractDetailsFromContract
+### `Const` getAddressMappingFromDetails
 
-▸ **getContractDetailsFromContract**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `celoContract`: [CeloContract](../enums/_base_.celocontract.md), `address?`: undefined | string): *Promise‹object›*
+▸ **getAddressMappingFromDetails**(`contractDetails`: ContractDetails[], `abiType`: AbiType): *Map‹string, ContractMapping›*
 
-*Defined in [packages/contractkit/src/explorer/base.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L13)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`kit` | [ContractKit](../classes/_kit_.contractkit.md) |
-`celoContract` | [CeloContract](../enums/_base_.celocontract.md) |
-`address?` | undefined &#124; string |
-
-**Returns:** *Promise‹object›*
-
-___
-
-###  mapFromPairs
-
-▸ **mapFromPairs**<**A**, **B**>(`pairs`: Array‹[A, B]›): *Map‹A, B›*
-
-*Defined in [packages/contractkit/src/explorer/base.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L32)*
-
-**Type parameters:**
-
-▪ **A**
-
-▪ **B**
+*Defined in [packages/contractkit/src/explorer/base.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L52)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`pairs` | Array‹[A, B]› |
+`contractDetails` | ContractDetails[] |
+`abiType` | AbiType |
 
-**Returns:** *Map‹A, B›*
+**Returns:** *Map‹string, ContractMapping›*
 
 ___
 
-###  obtainKitContractDetails
+### `Const` obtainKitContractDetails
 
-▸ **obtainKitContractDetails**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]›*
+▸ **obtainKitContractDetails**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹ContractDetails[]›*
 
-*Defined in [packages/contractkit/src/explorer/base.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L26)*
+*Defined in [packages/contractkit/src/explorer/base.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/base.ts#L47)*
 
 **Parameters:**
 
@@ -66,4 +42,4 @@ Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 
-**Returns:** *Promise‹[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]›*
+**Returns:** *Promise‹ContractDetails[]›*

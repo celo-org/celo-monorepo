@@ -7,7 +7,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 ## Development (not published yet)
 ### **[0.0.4--dev]**
 Features
-- [one-line summary] - ( [link PR] )
+- Add mapFromPairs collections utility - [#5567](https://github.com/celo-org/celo-monorepo/pull/5567)
 
 Bug Fixes
 - [one-line summary] - ( [link PR] )

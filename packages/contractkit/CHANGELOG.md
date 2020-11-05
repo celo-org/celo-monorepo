@@ -13,7 +13,7 @@ Bug Fixes
 - [one-line summary] - ( [link PR] )
 
 Other Changes
-- [one-line summary - ( [link PR] )
+- Refactor explorer (add base, mod block/log) and simplify consumption  - [#5567](https://github.com/celo-org/celo-monorepo/pull/5567)
 
 ## Published
 
