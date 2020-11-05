@@ -73,11 +73,9 @@ Under [Your Numbers](https://dashboard.nexmo.com/your-numbers), create a US numb
 
 Under [Settings](https://dashboard.nexmo.com/settings), copy the API key into the environment variable `NEXMO_KEY`, and API secret into `NEXMO_SECRET`.
 
-If you wish to partition the numbers or settings used within this account, for example if you have validators in different environments using the same account, you may choose to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number. Copy each application's `Application Id` value into the appropriate instance's `NEXMO_APPLICATION` configuration value. Then generate a public/private keypair or upload the public key of a private key you've already generated on the target machine. The path to this private key should be supplied in the `NEXMO_APPLICATION_PRIVATE_KEY_PATH` variable.
+If you wish to partition the numbers used within this account, you may choose to create and configure a [Nexmo application](https://dashboard.nexmo.com/applications/) for each one. In each application, enable messaging (labeled as `Communicate with WhatsApp, Facebook Messenger, MMS and Viber`) and assign a number. Copy each application's `Application Id` value into the appropriate instance's `NEXMO_APPLICATION` configuration value. There is no need to generate or use a public/private keypair. By default an Attestation Service will pick a number from the global pool of numbers not linked to a specific Nexmo application. The only effect of supplying `NEXMO_APPLICATION` is to select numbers from those linked to that application.
 
-By default an Attestation Service will pick a number from the global pool of numbers not linked to a specific Nexmo application. If you wish to use separate numbers for each Nexmo application, you can link a number to each application and set the `NEXMO_APPLICATION_SPECIFIC_NUMBERS` configuration option to `1`.
-
-Note that Attestation Service from version 1.2.0 no longer requires callback URLs to be supplied in the Nexmo dashboard.
+Note that Attestation Service from version 1.2.0 no longer requires callback URLs to be supplied in the Nexmo dashboard, so supports using a single account for multiple Attestation Services.
 
 ### MessageBird
 
@@ -200,9 +198,7 @@ Nexmo configuration options:
 | --------------------------- | --------------------------------------------------------------- |
 | `NEXMO_KEY`                 | The API key to the Nexmo API                                    |
 | `NEXMO_SECRET`              | The API secret to the Nexmo API                                 |
-| `NEXMO_APPLICATION`  | Optional. If using a Nexmo application, the application ID.  |
-| `NEXMO_APPLICATION_PRIVATE_KEY_PATH`  | Optional. Required if `NEXMO_APPLICATION` is set. If using a Nexmo application, the local absolute path of the file containing the application's private key.  |
-| `NEXMO_APPLICATION_SPECIFIC_NUMBERS`  | Optional. If using a Nexmo application, if set to `1`, will use phone numbers linked to that application rather than the global pool. Default `0`. |
+| `NEXMO_APPLICATION`  | Optional. Use only numbers linked to the Nexmo application with matching ID, rather than the global pool.  |
 | `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 | `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
 
@@ -211,6 +207,7 @@ MessageBird configuration options:
 | Variable                    | Explanation                                                     |
 | --------------------------- | --------------------------------------------------------------- |
 | `MESSAGEBIRD_API_KEY`       | The API key to the MessageBird API                              |
+| `MESSAGEBIRD_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 
 ## Running the Attestation Service
 
