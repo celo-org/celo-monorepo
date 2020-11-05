@@ -44,12 +44,15 @@ const getContractMappingFromDetails = (
   ),
 })
 
-const obtainKitContractDetails = (kit: ContractKit): Promise<ContractDetails[]> =>
+export const obtainKitContractDetails = (kit: ContractKit): Promise<ContractDetails[]> =>
   concurrentMap(5, RegisteredContracts, (celoContract) =>
     getContractDetailsFromContract(kit, celoContract)
   )
 
-const getAddressMappingFromDetails = (contractDetails: ContractDetails[], abiType: AbiType) =>
+export const getAddressMappingFromDetails = (
+  contractDetails: ContractDetails[],
+  abiType: AbiType
+) =>
   mapFromPairs(
     contractDetails.map((cd) => [cd.address, getContractMappingFromDetails(cd, abiType)])
   )

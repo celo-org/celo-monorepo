@@ -24,6 +24,10 @@ export function mapFromPairs<A, B>(pairs: Array<[A, B]>): Map<A, B> {
   return new Map<A, B>(pairs)
 }
 
+export function mapFromKeysAndValues<A, B>(keys: A[], values: B[]) {
+  return mapFromPairs(zip((a, b) => [a, b], keys, values))
+}
+
 // https://stackoverflow.com/questions/43118692/typescript-filter-out-nulls-from-an-array
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
