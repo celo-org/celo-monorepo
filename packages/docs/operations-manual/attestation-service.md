@@ -87,8 +87,6 @@ Setting up an Attestation Service first requires an [Attestation Signer key](key
 
 ```bash
 # On the Attestation machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 ```
@@ -114,7 +112,7 @@ You can now run the node for the attestation service in the background. In the b
 ```bash
 # On the Attestation machine
 echo <CELO-ATTESTATION-SIGNER-PASSWORD> > .password
-docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --bootnodes $BOOTNODE_ENODES --allow-insecure-unlock
+docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --allow-insecure-unlock
 ```
 
 ### Database Configuration
