@@ -45,7 +45,8 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
   async helmParameters() {
     return [
       ...await super.helmParameters(),
-      `--set kube.cloudProvider=aws`
+      `--set kube.cloudProvider=aws`,
+      `--set oracle.awsHsm=true`
     ]
   }
 

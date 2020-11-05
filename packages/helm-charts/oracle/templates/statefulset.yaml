@@ -121,6 +121,7 @@ spec:
 {{ include "common.env-var" (dict "name" "API_REQUEST_TIMEOUT" "dict" .Values.oracle "value_name" "apiRequestTimeoutMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.oracle.azureHsm "value_name" "initTryCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
+{{ include "common.env-var" (dict "name" "AWS_HSM_WALLET" "dict" .Values.oracle "value_name" "awsHsm") | indent 8 }}
 {{ include "common.env-var" (dict "name" "BASE_CURRENCY" "dict" .Values.oracle "value_name" "baseCurrency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
 {{ include "common.env-var" (dict "name" "DATA_FETCH_FREQUENCY" "dict" .Values.oracle.aggregation.trades "value_name" "dataFetchFrequency" "optional" true) | indent 8 }}

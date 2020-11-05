@@ -18,6 +18,8 @@ kubectl:
 kube:
   cloudProvider: azure
 
+awsHsm: false
+
 oracle:
   replicas: 2
   rpcProviderUrls:
