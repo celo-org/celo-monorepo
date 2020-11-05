@@ -1,4 +1,4 @@
-import { mapFromPairs, zip } from '@celo/base/lib/collections'
+import { zip } from '@celo/base/lib/collections'
 import debugFactory from 'debug'
 import { Address, CeloContract, NULL_ADDRESS, RegisteredContracts } from './base'
 import { newRegistry, Registry } from './generated/Registry'
@@ -45,6 +45,6 @@ export class AddressRegistry {
    */
   async addressMapping() {
     const addresses = await Promise.all(RegisteredContracts.map((r) => this.addressFor(r)))
-    return mapFromPairs(zip((r, a) => [r, a], RegisteredContracts, addresses))
+    return new Map(zip((r, a) => [r, a], RegisteredContracts, addresses))
   }
 }
