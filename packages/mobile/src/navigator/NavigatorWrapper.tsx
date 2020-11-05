@@ -4,14 +4,16 @@ import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navig
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import RNShake from 'react-native-shake'
 import AlertBanner from 'src/alert/AlertBanner'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { isVersionBelowMinimum } from 'src/firebase/firebase'
-import { navigationRef } from 'src/navigator/NavigationService'
+import { navigate, navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
 import useTypedSelector from 'src/redux/useSelector'
 import BackupPrompt from 'src/shared/BackupPrompt'
@@ -96,6 +98,15 @@ export const NavigatorWrapper = () => {
       )
     }
   }, [isReady])
+
+  React.useEffect(() => {
+    RNShake.addEventListener('ShakeEvent', () => {
+      navigate(Screens.SupportContact)
+    })
+    return () => {
+      RNShake.removeEventListener('ShakeEvent')
+    }
+  }, [])
 
   if (!isReady) {
     return null
