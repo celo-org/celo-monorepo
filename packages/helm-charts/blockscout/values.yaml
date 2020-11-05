@@ -15,6 +15,7 @@ blockscout:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
   healthy_blocks_period: 60
+  pool_size: 20
   db:
     # ip: must be provided at runtime # IP address of the postgres DB
     # connection_name: must be provided at runtime # name of the cloud sql connection
