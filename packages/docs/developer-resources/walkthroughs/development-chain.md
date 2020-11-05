@@ -34,7 +34,7 @@ You can install the CLI using npm by running `npm install -g @celo/celocli`. You
 
 The CLI will connect to the node at [http://localhost:8545](http://localhost:8545) by default. You can check this by running  `$ celocli node:get`.
 
-You can see the accounts available on the Celo development chain by running`$ celocli node:accounts`. You should see something like:
+You can see the accounts available on the Celo development chain by running`$ celocli account:list`. You should see something like:
 
 ```text
 [ '0x5409ED021D9299bf6814279A6A1411A7e866A631',
