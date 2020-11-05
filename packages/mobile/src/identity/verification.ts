@@ -26,7 +26,6 @@ import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
   completeAttestationCode,
-  FetchVerificationState,
   inputAttestationCode,
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
@@ -91,14 +90,14 @@ export interface AttestationCode {
   issuer: string
 }
 
-export function* fetchVerificationState({ forceUnlockAccount }: FetchVerificationState) {
+export function* fetchVerificationState(forceUnlockAccount?: boolean) {
   try {
     const account: string = yield call(getConnectedAccount)
     if (forceUnlockAccount) {
       // we want to reset password before force unlock account
       clearPasswordCaches()
     }
-    yield call(unlockAccount, account, forceUnlockAccount)
+    yield call(unlockAccount, account, !!forceUnlockAccount)
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -207,7 +206,7 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
     yield put(resetVerification())
     yield call(getConnectedAccount)
     if (isRestarted || (yield select(isVerificationStateExpiredSelector))) {
-      yield call(fetchVerificationState, { forceUnlockAccount: true })
+      yield call(fetchVerificationState, true)
     }
 
     const { verification, restart } = yield race({

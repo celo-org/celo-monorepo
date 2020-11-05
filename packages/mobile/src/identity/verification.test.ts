@@ -318,8 +318,6 @@ describe(startVerification, () => {
         [call(getConnectedAccount), null],
         [select(isVerificationStateExpiredSelector), true],
         [call(doVerificationFlow, false), true],
-        // [call(fetchVerificationState), true],
-        // [matchers.call.fn(fetchVerificationState), fetchVerificationStateMock],
       ])
       .call.fn(fetchVerificationState)
       .run()
@@ -331,7 +329,7 @@ describe(fetchVerificationState, () => {
     const contractKit = await getContractKitAsync()
     const unlockAccountMock = jest.fn(async () => true)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
-    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
+    await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -377,7 +375,7 @@ describe(fetchVerificationState, () => {
     const contractKit = await getContractKitAsync()
     const unlockAccountMock = jest.fn(async () => true)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
-    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
+    await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -423,7 +421,7 @@ describe(fetchVerificationState, () => {
     const contractKit = await getContractKitAsync()
     const unlockAccountMock = jest.fn(async () => true)
     unlockAccount.mockImplementationOnce(unlockAccountMock)
-    await expectSaga(fetchVerificationState, { forceUnlockAccount: true })
+    await expectSaga(fetchVerificationState, true)
       .provide([
         [call(getConnectedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -467,7 +465,7 @@ describe(fetchVerificationState, () => {
 
   it('catches insufficient balance for sig retrieval', async () => {
     const contractKit = await getContractKitAsync()
-    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
+    await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
@@ -498,7 +496,7 @@ describe(fetchVerificationState, () => {
   })
   it('catches when balances are not fetched', async () => {
     const contractKit = await getContractKitAsync()
-    await expectSaga(fetchVerificationState, { forceUnlockAccount: false })
+    await expectSaga(fetchVerificationState)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number],
