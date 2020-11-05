@@ -22,6 +22,9 @@ View parameters of the network, including but not limited to configuration for t
 ```
 USAGE
   $ celocli network:parameters
+
+OPTIONS
+  --raw  Display raw numerical configuration
 ```
 
 _See code: [packages/cli/src/commands/network/parameters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/parameters.ts)_
