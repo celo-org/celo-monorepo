@@ -95,7 +95,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
       jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
 
       // Transform delegate call initialize args into a readable params map
-      const initAbi = getInitializeAbiOfImplementation(jsonTx.contract)
+      const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
 
       // 8 bytes for function sig
       const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
