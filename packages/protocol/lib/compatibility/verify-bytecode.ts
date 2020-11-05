@@ -33,7 +33,6 @@ interface InitializationData {
 
 const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
 
-
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
 const isProxyRepointTransaction = (tx: ProposalTx) =>
@@ -41,8 +40,8 @@ const isProxyRepointTransaction = (tx: ProposalTx) =>
   (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
 
 const isProxyRepointAndInitializeTransaction = (tx: ProposalTx) =>
-  tx.contract.endsWith('Proxy') &&
-    tx.function === '_setAndInitializeImplementation'
+  tx.contract.endsWith('Proxy') && tx.function === '_setAndInitializeImplementation'
+
 const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
   tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
@@ -95,6 +94,16 @@ const getImplementationAddress = async (contract: string, context: VerificationC
   const proxyAddress = isProxyChanged(contract, context)
     ? getProposedProxyAddress(contract, context)
     : await context.registry.getAddressForString(contract)
+
+  const proxyName = `${contract}Proxy`
+  const deployedProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+  const sourceProxyBytecode = getSourceBytecode(proxyName, context)
+  if (deployedProxyBytecode !== sourceProxyBytecode) {
+    throw new Error(`${proxyName}'s onchain and compiled bytecodes do not match`)
+  } else {
+    // tslint:disable-next-line: no-console
+    console.log(`Proxy deployed at ${proxyAddress} matches ${proxyName}`)
+  }
 
   // at() returns a promise despite Typescript labelling the await as extraneous
   const proxy: ProxyInstance = await context.Proxy.at(
@@ -153,7 +162,7 @@ const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
     throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
   }
 
-  console.info("Proposal contains only valid release transactions!")
+  console.info('Proposal contains only valid release transactions!')
 }
 
 const assertValidInitializationData = (
@@ -168,17 +177,22 @@ const assertValidInitializationData = (
     const contractName = ContractNameExtractorRegex.exec(proposalTx.contract)[1]
 
     if (!initializationData[contractName]) {
-      throw new Error(`Initialization Data for ${contractName} could not be found in reference file`)
+      throw new Error(
+        `Initialization Data for ${contractName} could not be found in reference file`
+      )
     }
 
     const contract = artifacts.getArtifactByName(contractName)
     const initializeAbi = contract.abi.find(
-      (abi: any) => abi.type === 'function' && abi.name === 'initialize')
+      (abi: any) => abi.type === 'function' && abi.name === 'initialize'
+    )
     const args = initializationData[contractName]
     const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
 
     if (callData !== proposalTx.args[1]) {
-      throw new Error(`Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`)
+      throw new Error(
+        `Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`
+      )
     }
 
     contractsInitialized.add(contractName)
@@ -186,7 +200,9 @@ const assertValidInitializationData = (
 
   for (const referenceContractName of Object.keys(initializationData)) {
     if (!contractsInitialized.has(referenceContractName)) {
-      throw new Error(`Reference file has initialization data for ${referenceContractName}, but proposal does not specify initialization`)
+      throw new Error(
+        `Reference file has initialization data for ${referenceContractName}, but proposal does not specify initialization`
+      )
     }
   }
 
