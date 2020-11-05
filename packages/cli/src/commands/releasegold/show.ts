@@ -1,4 +1,4 @@
-import { BalanceState, ReleaseGoldInfo } from '@celo/contractkit/lib/wrappers/ReleaseGold'
+import { BalanceState } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { printValueMapRecursive } from '../../utils/cli'
 
@@ -27,9 +27,16 @@ export default class Show extends ReleaseGoldBaseCommand {
         await this.releaseGoldWrapper.getCurrentReleasedTotalAmount()
       ).toString(),
     }
-    const releaseGoldInfo: ReleaseGoldInfo = {
+    const accounts = await this.kit.contracts.getAccounts()
+    const authorizedSigners = {
+      voter: await accounts.getVoteSigner(this.releaseGoldWrapper.address),
+      validator: await accounts.getValidatorSigner(this.releaseGoldWrapper.address),
+      attestations: await accounts.getAttestationSigner(this.releaseGoldWrapper.address),
+    }
+    const releaseGoldInfo = {
       releaseGoldWrapperAddress: this.releaseGoldWrapper.address,
       beneficiary: await this.releaseGoldWrapper.getBeneficiary(),
+      authorizedSigners,
       releaseOwner: await this.releaseGoldWrapper.getReleaseOwner(),
       refundAddress: await this.releaseGoldWrapper.getRefundAddress(),
       liquidityProvisionMet: await this.releaseGoldWrapper.getLiquidityProvisionMet(),
