@@ -13,7 +13,7 @@ Bug Fixes
 - [one-line summary] - ( [link PR] )
 
 Other Changes
-- [one-line summary - ( [link PR] )
+- Parallelize and simplify fetching of comprensive registry address map - [#5568](https://github.com/celo-org/celo-monorepo/pull/5568)
 
 ## Published
 
@@ -51,5 +51,6 @@ Other Changes
 - Add blockchain parameters to network config - [#5319](https://github.com/celo-org/celo-monorepo/pull/5319)
 - Make initialization of the proxy part of the governance proposal - [#5481](https://github.com/celo-org/celo-monorepo/pull/5481)
 
+## Published
 ### **[0.4.14]** -- 2020-09-23
 _Note: Changes before and including 0.4.14 are not documented_

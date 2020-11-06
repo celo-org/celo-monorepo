@@ -51,6 +51,10 @@ export function printValueMap(valueMap: Record<string, any>, color = chalk.yello
   )
 }
 
+export function printValueMap2(valueMap: Map<any, any>, color = chalk.yellowBright.bold) {
+  valueMap.forEach((value, key) => console.log(color(`${key}: `) + value))
+}
+
 export function printValueMapRecursive(valueMap: Record<string, any>) {
   console.log(toStringValueMapRecursive(valueMap, ''))
 }
@@ -59,8 +63,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
   const printValue = (v: any): string => {
     if (typeof v === 'object' && v != null) {
       if (BigNumber.isBigNumber(v)) {
-        const factor = new BigNumber(10).pow(18)
-        const extra = v.isGreaterThan(factor) ? `(~${v.div(factor).decimalPlaces(2)} 10^18)` : ''
+        const extra = v.isGreaterThan(new BigNumber(10).pow(3)) ? `(~${v.toExponential(3)})` : ''
         return `${v.toFixed()} ${extra}`
       }
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')

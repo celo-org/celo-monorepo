@@ -51,6 +51,7 @@ import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
@@ -58,7 +59,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -89,9 +90,14 @@ export interface AttestationCode {
   issuer: string
 }
 
-export function* fetchVerificationState() {
+export function* fetchVerificationState(forceUnlockAccount?: boolean) {
   try {
-    const account: string = yield call(getConnectedUnlockedAccount)
+    const account: string = yield call(getConnectedAccount)
+    if (forceUnlockAccount) {
+      // we want to reset password before force unlock account
+      clearPasswordCaches()
+    }
+    yield call(unlockAccount, account, !!forceUnlockAccount)
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -200,7 +206,7 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
     yield put(resetVerification())
     yield call(getConnectedAccount)
     if (isRestarted || (yield select(isVerificationStateExpiredSelector))) {
-      yield call(fetchVerificationState)
+      yield call(fetchVerificationState, true)
     }
 
     const { verification, restart } = yield race({
