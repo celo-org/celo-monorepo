@@ -25,7 +25,7 @@
 - [cUSD Owner Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
-- [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
+- [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
 
@@ -86,6 +86,7 @@
   - [Usage](developer-resources/dappkit/usage.md)
   <!-- - [Guide to Asset Custody]() -->
 - [Forno](developer-resources/forno/README.md)
+- [Local Development Chain w/ Protocol Contracts](developer-resources/walkthroughs/development-chain.md)
 - [Celo for Ethereum Developers](developer-resources/celo-for-eth-devs.md)
 - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
 - [Integrations](developer-resources/integrations/integrations.md)
@@ -136,6 +137,7 @@
     - [identity/odis/query](developer-resources/contractkit/reference/modules/_identity_odis_query_.md)
     - [AuthenticationMethod](developer-resources/contractkit/reference/enums/_identity_odis_query_.authenticationmethod.md)
     - [ErrorMessages](developer-resources/contractkit/reference/enums/_identity_odis_query_.errormessages.md)
+    - [CustomSigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.customsigner.md)
     - [EncryptionKeySigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.encryptionkeysigner.md)
     - [MatchmakingRequest](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingrequest.md)
     - [MatchmakingResponse](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingresponse.md)

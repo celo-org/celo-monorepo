@@ -41,6 +41,7 @@ export enum Actions {
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
   RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
   SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
+  REPORT_REVEAL_STATUS = 'IDENTITY/REPORT_REVEAL_STATUS',
 }
 
 export interface StartVerificationAction {
@@ -181,6 +182,7 @@ export interface UpdateAddressDekMapAction {
 
 export interface FetchVerificationState {
   type: Actions.FETCH_VERIFICATION_STATE
+  forceUnlockAccount: boolean
 }
 
 export interface UpdateVerificationState {
@@ -195,6 +197,15 @@ export interface ResendAttestations {
 export interface SetLastRevealAttempt {
   type: Actions.SET_LAST_REVEAL_ATTEMPT
   time: number
+}
+
+export interface ReportRevealStatusAction {
+  type: Actions.REPORT_REVEAL_STATUS
+  attestationServiceUrl: string
+  account: string
+  issuer: string
+  e164Number: string
+  pepper: string
 }
 
 export type ActionTypes =
@@ -226,6 +237,7 @@ export type ActionTypes =
   | UpdateVerificationState
   | ResendAttestations
   | SetLastRevealAttempt
+  | ReportRevealStatusAction
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -394,8 +406,9 @@ export const updateAddressDekMap = (
   dataEncryptionKey,
 })
 
-export const fetchVerificationState = (): FetchVerificationState => ({
+export const fetchVerificationState = (forceUnlockAccount: boolean): FetchVerificationState => ({
   type: Actions.FETCH_VERIFICATION_STATE,
+  forceUnlockAccount,
 })
 
 export const udpateVerificationState = (
@@ -413,3 +426,20 @@ export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
   type: Actions.SET_LAST_REVEAL_ATTEMPT,
   time,
 })
+
+export const reportRevealStatus = (
+  attestationServiceUrl: string,
+  account: string,
+  issuer: string,
+  e164Number: string,
+  pepper: string
+): ReportRevealStatusAction => {
+  return {
+    type: Actions.REPORT_REVEAL_STATUS,
+    attestationServiceUrl,
+    account,
+    issuer,
+    e164Number,
+    pepper,
+  }
+}
