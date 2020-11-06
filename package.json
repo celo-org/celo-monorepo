@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
-    "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
+    "lint": "yarn lerna run lint --concurrency 4 && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
