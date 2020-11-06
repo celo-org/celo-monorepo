@@ -88,9 +88,6 @@ export type StackParamList = {
     currency: CURRENCY_ENUM
   }
   [Screens.FiatExchange]: undefined
-  [Screens.FiatExchangeAmount]: {
-    isAddFunds: boolean
-  }
   [Screens.FiatExchangeOptions]: {
     isAddFunds?: boolean
     amount?: BigNumber

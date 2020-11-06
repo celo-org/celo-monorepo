@@ -34,9 +34,6 @@ import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
 import ExternalExchanges, {
   externalExchangesScreenOptions,
 } from 'src/fiatExchanges/ExternalExchanges'
-import FiatExchangeAmount, {
-  fiatExchangesAmountScreenOptions,
-} from 'src/fiatExchanges/FiatExchangeAmount'
 import FiatExchangeOptions, {
   fiatExchangesOptionsScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeOptions'
@@ -417,11 +414,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       options={headerWithBackButton}
       name={Screens.SupportContact}
       component={SupportContact}
-    />
-    <Navigator.Screen
-      options={fiatExchangesAmountScreenOptions}
-      name={Screens.FiatExchangeAmount}
-      component={FiatExchangeAmount}
     />
     <Navigator.Screen
       options={externalExchangesScreenOptions}
