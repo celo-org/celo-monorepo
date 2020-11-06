@@ -10,7 +10,7 @@ import Android from 'src/icons/Android'
 import Apple from 'src/icons/Apple'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { SIZE, BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
