@@ -48,6 +48,13 @@ interface KomenciMnemonicIdentityConfig {
   addressesFromMnemonicCount: string
 }
 
+interface KomenciDatabaseConfig {
+  host: string
+  port: string
+  username: string
+  password: string
+}
+
 /**
  * Env vars corresponding to each value for the KomenciKeyVaultIdentityConfig for a particular context
  */
@@ -60,6 +67,14 @@ const contextKomenciKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof KomenciK
  */
 const contextKomenciMnemonicIdentityConfigDynamicEnvVars: { [k in keyof KomenciMnemonicIdentityConfig]: DynamicEnvVar } = {
   addressesFromMnemonicCount: DynamicEnvVar.KOMENCI_ADDRESSES_FROM_MNEMONIC_COUNT,
+}
+
+
+const contextDatabaseConfigDynamicEnvVars: { [k in keyof KomenciDatabaseConfig]: DynamicEnvVar } = {
+  host: DynamicEnvVar.KOMENCI_DB_HOST,
+  port: DynamicEnvVar.KOMENCI_DB_PORT,
+  username: DynamicEnvVar.KOMENCI_DB_USERNAME,
+  password: DynamicEnvVar.KOMENCI_DB_PASSWORD
 }
 
 function releaseName(celoEnv: string) {
@@ -116,6 +131,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const replicas = komenciConfig.identities.length
   const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, replicas)
 
+  const databaseConfig = getContextDynamicEnvVarValues(
+    contextDatabaseConfigDynamicEnvVars,
+    context
+  )
   const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
@@ -132,6 +151,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set komenci.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set onboarding.replicas=${replicas}`,
     `--set onboarding.relayerUrls=${clusterIP}`,
+    `--set onboarding.db.host=${databaseConfig.host}`,
+    `--set onboarding.db.port=${databaseConfig.port}`,
+    `--set onboarding.db.username=${databaseConfig.username}`,
+    `--set onboarding.db.password=${databaseConfig.password}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
@@ -190,7 +213,7 @@ async function createKomenciAzureIdentityIfNotExists(
   // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
   let assigneeObjectId = await getAKSServicePrincipalObjectId(clusterConfig)
   let assigneePrincipalType = 'ServicePrincipal'
-  //TODO Check how to manage the MSI type
+  // TODO Check how to manage the MSI type
   if (!assigneeObjectId) {
     assigneeObjectId = await getAKSManagedServiceIdentityObjectId(clusterConfig)
     // assigneePrincipalType = 'MSI'
