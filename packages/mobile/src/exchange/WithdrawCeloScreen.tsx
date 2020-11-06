@@ -7,11 +7,13 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { parseInputAmount } from '@celo/utils/lib/parsing'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { isAddressFormat } from 'src/account/utils'
 import { CeloExchangeEvents } from 'src/analytics/Events'
@@ -24,6 +26,7 @@ import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
@@ -33,17 +36,18 @@ import { divideByWei } from 'src/utils/formatting'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
+const { decimalSeparator } = getNumberFormatSettings()
 const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 
 function WithdrawCeloScreen({ navigation }: Props) {
   const [accountAddress, setAccountAddress] = useState('')
   const [celoInput, setCeloToTransfer] = useState('')
+  const celoToTransfer = parseInputAmount(celoInput, decimalSeparator)
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
-  const celoToTransfer = new BigNumber(celoInput)
   const readyToReview =
     isAddressFormat(accountAddress) &&
     celoToTransfer.isGreaterThan(0) &&
@@ -75,7 +79,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
       amount: celoToTransfer.toString(),
     })
-    navigation.navigate(Screens.WithdrawCeloReviewScreen, {
+    navigate(Screens.WithdrawCeloReviewScreen, {
       amount: celoToTransfer,
       recipientAddress: accountAddress,
       feeEstimate: feeEstimate || new BigNumber(0),

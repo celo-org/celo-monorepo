@@ -4,7 +4,7 @@ metadata:
   name: {{ template "common.fullname" . }}
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
-  component: celo-fullnode
+    component: celo-fullnode
 spec:
 {{ if .Values.storage.enable }}
   volumeClaimTemplates:
