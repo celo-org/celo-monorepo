@@ -9,17 +9,17 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
 import * as fs from 'fs-extra'
-import { LocalCommand } from '../../base'
+import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 
 const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'"
 
-export default class NewAccount extends LocalCommand {
+export default class NewAccount extends BaseCommand {
   static description =
     "Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)"
 
   static flags = {
-    ...LocalCommand.flags,
+    ...BaseCommand.flags,
     passphrasePath: flags.string({
       description:
         'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet address.',
@@ -93,6 +93,8 @@ export default class NewAccount extends LocalCommand {
     }
     throw new Error(`Invalid path: ${file}`)
   }
+
+  requireSynced = false
 
   async run() {
     const res = this.parse(NewAccount)

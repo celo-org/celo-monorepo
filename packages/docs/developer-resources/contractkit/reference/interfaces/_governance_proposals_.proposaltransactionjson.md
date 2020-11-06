@@ -32,7 +32,7 @@ Example:
 
 • **args**: *any[]*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L42)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L49)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **contract**: *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L40)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L47)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **function**: *string*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L41)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L48)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **params**? : *Record‹string, any›*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L43)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L50)*
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [packages/contractkit/src/governance/proposals.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L44)*
+*Defined in [packages/contractkit/src/governance/proposals.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L51)*

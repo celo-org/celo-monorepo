@@ -6,8 +6,10 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   stringIdentity,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToInt,
   valueToString,
@@ -149,6 +151,24 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
       symbol: res[1],
       decimals: res[2],
       inflationParameters: res[3],
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the stabletoken contract
+   * @return StableTokenConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const inflationParameters = {
+      updatePeriod: secondsToDurationString(config.inflationParameters.updatePeriod),
+      factorLastUpdated: unixSecondsTimestampToDateString(
+        config.inflationParameters.factorLastUpdated
+      ),
+    }
+    return {
+      ...config,
+      inflationParameters,
     }
   }
 
