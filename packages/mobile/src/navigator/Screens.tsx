@@ -54,6 +54,7 @@ export enum Screens {
   SetClock = 'SetClock',
   Settings = 'Settings',
   Simplex = 'Simplex',
+  Spend = 'Spend',
   Support = 'Support',
   SupportContact = 'SupportContact',
   Sync = 'Sync',

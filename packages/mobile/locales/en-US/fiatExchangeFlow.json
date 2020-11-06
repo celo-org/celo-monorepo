@@ -6,6 +6,8 @@
   "cashOut": "Cash Out",
   "cashOutSubtitle": "Exchange cUSD or CELO for another currency",
   "cashOutComingSoon": "Cash Out (Coming Soon)",
+  "spend": "Spend",
+  "spendSubtitle": "Use your balance with supporting merchants",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Amount (CELO)",
   "onlyCeloDollars": "cUSD only",
@@ -27,5 +29,7 @@
     "body": "Providers allow you to add funds to or cash out from your account. They determine their own rates and restrictions depending on location, amount, and other factors. Please visit the provider website for specific help. Visit the FAQ to learn more."
   },
   "otherFundingOptions": "For more ways to add and withdraw funds, visit <0>How to fund your account</0>",
-  "youCanTransfer": "You can transfer {{currency}} to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy."
+  "youCanTransfer": "You can transfer {{currency}} to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy.",
+  "useBalanceWithMerchants": "Use your balance with supporting merchants",
+  "findMerchants": "Find local merchants near you"
 }

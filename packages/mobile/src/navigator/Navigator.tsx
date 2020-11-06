@@ -42,6 +42,7 @@ import FiatExchangeOptions, {
 } from 'src/fiatExchanges/FiatExchangeOptions'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
 import Simplex, { simplexOptions } from 'src/fiatExchanges/Simplex'
+import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
@@ -427,6 +428,7 @@ const settingsScreens = (Navigator: typeof Stack) => (
       name={Screens.ExternalExchanges}
       component={ExternalExchanges}
     />
+    <Navigator.Screen options={spendScreenOptions} name={Screens.Spend} component={Spend} />
     <Navigator.Screen
       options={fiatExchangesOptionsScreenOptions}
       name={Screens.FiatExchangeOptions}

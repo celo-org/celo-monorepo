@@ -4,6 +4,8 @@
   "buySellOnExchanges": "Comprar/Vender en Intercambios",
   "cashOut": "Retirar",
   "cashOutComingSoon": "Retirar (Muy Pronto)",
+  "spend": "Usar",
+  "spendSubtitle": "Usa tu balance con comercios asociados",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Monto (CELO)",
   "onlyCeloDollars": "Solo cUSD",
@@ -25,5 +27,7 @@
     "body": "Los proveedores le permiten agregar fondos o retirar dinero de tu cuenta. Determinan tus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visite el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
   },
   "otherFundingOptions": "Para conocer más formas de agregar y retirar fondos, visite <0>Cómo depositar fondos en mi cuenta</0>",
-  "youCanTransfer": "Puedes transferir {{currency}} desde/hacia los siguientes exchanges utilizando tu Número de Cuenta (también conocido como dirección de Celo) - toque abajo para copiar."
+  "youCanTransfer": "Puedes transferir {{currency}} desde/hacia los siguientes exchanges utilizando tu Número de Cuenta (también conocido como dirección de Celo) - toque abajo para copiar.",
+  "useBalanceWithMerchants": "Usa tu balance con comercios asociados",
+  "findMerchants": "Encuentra comercios asociados cerca de ti"
 }

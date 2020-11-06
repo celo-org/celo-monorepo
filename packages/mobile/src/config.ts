@@ -2,6 +2,7 @@ import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
 import { ExternalExchangeProvider } from 'src/fiatExchanges/ExternalExchanges'
+import { SpendMerchant } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM, GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
@@ -134,6 +135,18 @@ export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
     name: 'Coinbase (CELO as CGLD)',
     link: 'https://www.coinbase.com',
     currencies: [CURRENCY_ENUM.GOLD],
+  },
+]
+
+export const SPEND_MERCHANT_LINKS: SpendMerchant[] = [
+  {
+    name: 'Beam and Go',
+    link: 'https://valora.beamandgo.com/',
+  },
+  {
+    name: 'Merchant Map',
+    link: '',
+    subtitleKey: 'findMerchants',
   },
 ]
 

@@ -2,12 +2,14 @@ import ListItem from '@celo/react-components/components/ListItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { getRegionCodeFromCountryCode } from '@celo/utils/lib/phoneNumbers'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
+import { defaultCountryCodeSelector } from 'src/account/selectors'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { FUNDING_LINK } from 'src/config'
 import { features } from 'src/flags'
@@ -30,12 +32,19 @@ function FiatExchange() {
     navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
   }
 
+  function goToSpend() {
+    navigate(Screens.Spend)
+  }
+
   const { t } = useTranslation()
   const dollarBalance = useSelector(stableTokenBalanceSelector)
   const dollarAmount = {
     value: dollarBalance ?? '0',
     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
   }
+
+  const countryCode = useSelector(defaultCountryCodeSelector)
+  const regionCode = getRegionCodeFromCountryCode(countryCode || '')
 
   const onOpenOtherFundingOptions = () => {
     navigateToURI(FUNDING_LINK)
@@ -67,6 +76,12 @@ function FiatExchange() {
             <Text style={styles.optionTitleComingSoon}>
               {t('fiatExchangeFlow:cashOutComingSoon')}
             </Text>
+          </ListItem>
+        )}
+        {regionCode === 'PH' && (
+          <ListItem onPress={goToSpend}>
+            <Text style={styles.optionTitle}>{t('fiatExchangeFlow:spend')}</Text>
+            <Text style={styles.optionSubtitle}>{t('fiatExchangeFlow:spendSubtitle')}</Text>
           </ListItem>
         )}
       </View>
