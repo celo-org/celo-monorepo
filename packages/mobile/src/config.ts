@@ -48,7 +48,7 @@ export const DOLLAR_CASH_OUT_MIN_AMOUNT = 0.01
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 // The number of seconds before the sender can reclaim the payment.
-export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
+export const ESCROW_PAYMENT_EXPIRY_SECONDS = 3600 // 1 hour
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
 export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
