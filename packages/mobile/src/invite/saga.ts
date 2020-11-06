@@ -1,12 +1,11 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { asyncRandomBytes } from 'react-native-secure-randombytes'
+import { generateSecureRandom } from 'react-native-securerandom'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import {
@@ -31,7 +30,6 @@ import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
-import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
@@ -175,8 +173,10 @@ export function* sendInvite(
       { escrowIncluded, amount: amount?.toString() }
     )
     const web3 = yield call(getWeb3)
-    const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
+    const randomness: Uint8Array = yield call(generateSecureRandom, 64)
+    const temporaryWalletAccount = web3.eth.accounts.create(
+      Buffer.from(randomness).toString('ascii')
+    )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
     const name = yield select(nameSelector)
@@ -251,12 +251,8 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     let phoneHash: string
-    if (features.USE_PHONE_NUMBER_PRIVACY) {
-      const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-      phoneHash = phoneHashDetails.phoneHash
-    } else {
-      phoneHash = getPhoneHash(e164Number)
-    }
+    const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+    phoneHash = phoneHashDetails.phoneHash
     yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')

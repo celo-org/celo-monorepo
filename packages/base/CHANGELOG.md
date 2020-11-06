@@ -17,5 +17,10 @@ Other Changes
 
 
 ## Published
+### **[0.0.4]** -- 2020-10-30
+Features
+- JSON Parsing Utils - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
+
+## Published
 ### **[0.0.3]** -- 2020-09-23
 _Note: Changes before and including 0.0.3 are not documented_

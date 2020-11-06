@@ -4,6 +4,7 @@ import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navig
 import * as React from 'react'
 import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import RNShake from 'react-native-shake'
 import { nameSelector } from 'src/account/selectors'
 import AlertBanner from 'src/alert/AlertBanner'
 import { InviteEvents } from 'src/analytics/Events'
@@ -15,8 +16,9 @@ import { isVersionBelowMinimum } from 'src/firebase/firebase'
 import i18n from 'src/i18n'
 import InviteFriendModal from 'src/invite/InviteFriendModal'
 import { generateInviteLink } from 'src/invite/saga'
-import { navigationRef } from 'src/navigator/NavigationService'
+import { navigate, navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
 import useTypedSelector from 'src/redux/useSelector'
 import BackupPrompt from 'src/shared/BackupPrompt'
@@ -103,6 +105,15 @@ export const NavigatorWrapper = () => {
       )
     }
   }, [isReady])
+
+  React.useEffect(() => {
+    RNShake.addEventListener('ShakeEvent', () => {
+      navigate(Screens.SupportContact)
+    })
+    return () => {
+      RNShake.removeEventListener('ShakeEvent')
+    }
+  }, [])
 
   if (!isReady) {
     return null
