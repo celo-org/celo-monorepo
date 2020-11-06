@@ -29,8 +29,8 @@ export interface EscrowTransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
   phoneHashDetails: PhoneNumberHashDetails
   amount: BigNumber
-  tempWalletAddress: string
   context: TransactionContext
+  tempWalletAddress?: string
 }
 export interface EscrowReclaimPaymentAction {
   type: Actions.RECLAIM_PAYMENT
@@ -72,14 +72,14 @@ export type ActionTypes =
 export const transferEscrowedPayment = (
   phoneHashDetails: PhoneNumberHashDetails,
   amount: BigNumber,
-  tempWalletAddress: string,
-  context: TransactionContext
+  context: TransactionContext,
+  tempWalletAddress?: string
 ): EscrowTransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
   phoneHashDetails,
   amount,
-  tempWalletAddress,
   context,
+  tempWalletAddress,
 })
 
 export const reclaimEscrowPayment = (paymentID: string): EscrowReclaimPaymentAction => ({

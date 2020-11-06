@@ -26,6 +26,7 @@ import {
   storeSentEscrowPayments,
 } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
+import { features } from 'src/flags'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import { waitForNextBlock } from 'src/geth/saga'
 import i18n from 'src/i18n'
@@ -65,11 +66,24 @@ import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'escrow/saga'
 
+function* transferToEscrow(action: EscrowTransferPaymentAction) {
+  features.ESCROW_WITHOUT_CODE
+    ? yield call(transferStableTokenToEscrowWithoutCode, action)
+    : yield call(transferStableTokenToEscrow, action)
+}
+
 function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   Logger.debug(TAG + '@transferToEscrow', 'Begin transfer to escrow')
   try {
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_start)
     const { phoneHashDetails, amount, tempWalletAddress, context } = action
+
+    if (!tempWalletAddress) {
+      throw Error(
+        'No tempWalletAddress included with escrow tx. Should ESCROW_WITHOUT_CODE be enabled?'
+      )
+    }
+
     const account: string = yield call(getConnectedUnlockedAccount)
 
     const contractKit: ContractKit = yield call(getContractKit)
@@ -123,7 +137,7 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
   Logger.debug(TAG + '@transferToEscrowWithoutCode', 'Begin transfer to escrow')
   try {
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_start)
-    const { phoneHashDetails, amount } = action
+    const { phoneHashDetails, amount, context } = action
     const { phoneHash, pepper } = phoneHashDetails
     const [contractKit, walletAddress]: [
       ContractKit,
@@ -145,7 +159,10 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
     // Need to increment the derivation path of the paymentId based on
     // how many are pending to avoid collisions with existing escrow txs
     const addressIndex = escrowPaymentIds.length
-    const { publicKey } = generateDeterministicInviteCode(pepper, addressIndex)
+    const { publicKey, privateKey } = generateDeterministicInviteCode(pepper, addressIndex)
+    console.log('ESCROW DATA: ')
+    console.log(addressIndex, pepper)
+    console.log(publicKey, privateKey)
     const paymentId = publicKey
 
     // Approve a transfer of funds to the Escrow contract.
@@ -494,7 +511,7 @@ function* doFetchSentPayments() {
 }
 
 export function* watchTransferPayment() {
-  yield takeLeading(Actions.TRANSFER_PAYMENT, transferStableTokenToEscrow)
+  yield takeLeading(Actions.TRANSFER_PAYMENT, transferToEscrow)
 }
 
 export function* watchReclaimPayment() {

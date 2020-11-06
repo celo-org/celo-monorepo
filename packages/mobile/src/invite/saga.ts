@@ -28,6 +28,7 @@ import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
@@ -105,11 +106,13 @@ export async function getInviteFee(
 }
 
 export function getInvitationVerificationFeeInDollars() {
-  return new BigNumber(INVITE_FEE)
+  const inviteFee = features.ESCROW_WITHOUT_CODE ? 0 : INVITE_FEE
+  return new BigNumber(inviteFee)
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(INVITE_FEE).multipliedBy(1e18)
+  const inviteFee = features.ESCROW_WITHOUT_CODE ? 0 : INVITE_FEE
+  return new BigNumber(inviteFee).multipliedBy(1e18)
 }
 
 export async function generateInviteLink(inviteCode: string) {
@@ -163,6 +166,7 @@ export function* sendInvite(
   currency?: CURRENCY_ENUM
 ) {
   const escrowIncluded = !!amount
+
   try {
     ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
     const web3 = yield call(getWeb3)
@@ -172,6 +176,7 @@ export function* sendInvite(
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
     const link = yield call(generateInviteLink, inviteCode)
+    // TODO: Change copy for escrow txs without a code
     const message = i18n.t(
       amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS',
       {
@@ -179,6 +184,12 @@ export function* sendInvite(
         link,
       }
     )
+
+    if (features.ESCROW_WITHOUT_CODE && amount) {
+      yield call(initiateEscrowTransfer, e164Number, amount)
+      yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+      return
+    }
 
     const inviteDetails: InviteDetails = {
       timestamp: Date.now(),
@@ -209,7 +220,7 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
+      yield call(initiateEscrowTransfer, e164Number, amount, temporaryAddress)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
@@ -224,11 +235,11 @@ export function* sendInvite(
   }
 }
 
-function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+function* initiateEscrowTransfer(e164Number: string, amount: BigNumber, temporaryAddress?: string) {
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    yield put(transferEscrowedPayment(phoneHashDetails, amount, temporaryAddress, context))
+    yield put(transferEscrowedPayment(phoneHashDetails, amount, context, temporaryAddress))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {
