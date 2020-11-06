@@ -18,7 +18,7 @@ spec:
         - name: komenci-onboarding
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: {{ .Values.onboarding.image.repository }}:{{ .Values.onboarding.image.tag }}
+          image: {{ .Values.komenci.image.repository }}:{{ .Values.komenci.image.tag }}
           imagePullPolicy: Always
           ports:
             - name: http
