@@ -409,6 +409,7 @@ export const v5Schema = {
   app: {
     ...v3Schema.app,
     minVersion: null,
+    inviteModalVisible: false,
   },
 }
 

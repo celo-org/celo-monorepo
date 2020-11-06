@@ -344,7 +344,7 @@ export const reducer = (
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
-        ...completeCodeReducer(state, state.numCompleteAttestations + 1),
+        numCompleteAttestations: state.numCompleteAttestations + 1,
         acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.FEELESS_COMPLETE_ATTESTATION_CODE:

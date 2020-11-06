@@ -4,6 +4,7 @@ import { Address } from '../base'
 import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
   BaseWrapper,
+  blocksToDurationString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
@@ -59,6 +60,18 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     return {
       slashableDowntime: res[0],
       slashingIncentives: res[1],
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the downtime slasher contract
+   * @return DowntimeSlasherConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      slashableDowntime: blocksToDurationString(config.slashableDowntime),
     }
   }
 

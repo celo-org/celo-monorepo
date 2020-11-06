@@ -1,4 +1,5 @@
 import {
+  call,
   cancelled,
   put,
   select,
@@ -13,6 +14,7 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
+  FetchVerificationState,
   ValidateRecipientAddressAction,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
@@ -95,9 +97,14 @@ export function* validateRecipientAddressSaga({
     }
   }
 }
+// TODO: Replicate this for feeless
+function* handleFetchVerificationState(action: FetchVerificationState) {
+  const { forceUnlockAccount } = action
+  yield call(fetchVerificationState, forceUnlockAccount)
+}
 
 function* watchVerification() {
-  yield takeLatest(Actions.FETCH_VERIFICATION_STATE, fetchVerificationState)
+  yield takeLeading(Actions.FETCH_VERIFICATION_STATE, handleFetchVerificationState)
   yield takeLatest(Actions.FEELESS_FETCH_VERIFICATION_STATE, feelessFetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
   yield takeLatest(Actions.FEELESS_START_VERIFICATION, feelessStartVerification)

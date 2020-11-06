@@ -80,7 +80,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
   useFocusEffect(
     // useCallback is needed here: https://bit.ly/2G0WKTJ
     useCallback(() => {
-      dispatch(fetchVerificationState())
+      dispatch(fetchVerificationState(!partOfOnboarding))
       dispatch(feelessFetchVerificationState())
     }, [])
   )
