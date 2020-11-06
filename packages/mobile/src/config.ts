@@ -2,7 +2,7 @@ import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
 import { ExternalExchangeProvider } from 'src/fiatExchanges/ExternalExchanges'
-import { GethSyncMode } from 'src/geth/consts'
+import { CURRENCY_ENUM, GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
 
@@ -106,28 +106,34 @@ export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price
 
 export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
-    name: 'Bittrex (CELO)',
+    name: 'Bittrex',
     link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
-    name: 'OKCoin (CELO, CUSD)',
+    name: 'OKCoin',
     link: 'https://www.okcoin.com/en/spot/trade/cusd-usd/',
+    currencies: [CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR],
   },
   {
-    name: 'OKEx (CELO)',
+    name: 'OKEx',
     link: 'https://www.okex.com/spot/trade/CELO-USDT',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
-    name: 'CoinList Pro (CELO)',
+    name: 'CoinList Pro',
     link: 'https://coinlist.co/asset/celo',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
     name: 'Coinbase Pro (CELO as CGLD)',
     link: 'https://pro.coinbase.com/trade/CGLD-USD',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
     name: 'Coinbase (CELO as CGLD)',
     link: 'https://www.coinbase.com',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
 ]
 

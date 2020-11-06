@@ -179,7 +179,7 @@
   "review": "Revisar",
   "insufficientBalance": "Tu saldo es demasiado bajo para realizar esta transacción.",
   "amount": "Monto",
-  "currentBalance": "Tu Saldo actual",
+  "currentBalance": "Tu Saldo actual (cUSD)",
   "restore": "Restaurar",
   "commentUnavailable": "Comentario no disponible",
   "accountClearFailed": "Hubo un error al borrar tu Clave de Cuenta. Podría tener que reinstalar la app para poder usar todas las funcionalidades.",

@@ -14,6 +14,7 @@ describe(getCountryFeaturesSelector, () => {
       Object {
         "RESTRICTED_CP_DOTO": false,
         "SANCTIONED_COUNTRY": false,
+        "SIMPLEX_DISABLED": true,
       }
     `)
   })
@@ -29,6 +30,7 @@ describe(getCountryFeaturesSelector, () => {
       Object {
         "RESTRICTED_CP_DOTO": true,
         "SANCTIONED_COUNTRY": false,
+        "SIMPLEX_DISABLED": false,
       }
     `)
   })
@@ -44,6 +46,7 @@ describe(getCountryFeaturesSelector, () => {
       Object {
         "RESTRICTED_CP_DOTO": true,
         "SANCTIONED_COUNTRY": false,
+        "SIMPLEX_DISABLED": false,
       }
     `)
   })
@@ -59,6 +62,7 @@ describe(getCountryFeaturesSelector, () => {
       Object {
         "RESTRICTED_CP_DOTO": false,
         "SANCTIONED_COUNTRY": true,
+        "SIMPLEX_DISABLED": false,
       }
     `)
   })

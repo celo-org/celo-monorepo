@@ -1,21 +1,31 @@
 {
   "addFunds": "Add Funds",
+  "addFundsSubtitle": "Purchase cUSD or CELO",
   "exchanges": "Exchanges",
   "buySellOnExchanges": "Buy/Sell on Exchanges",
   "cashOut": "Cash Out",
+  "cashOutSubtitle": "Exchange cUSD or CELO for another currency",
   "cashOutComingSoon": "Cash Out (Coming Soon)",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Amount (CELO)",
   "onlyCeloDollars": "cUSD only",
   "onlyCelo": "CELO only",
+  "celoDollar": "Celo Dollar",
+  "celoDollars": "Celo Dollars",
   "tapToCopyCeloDollarsAddress": "Tap to copy your {{appName}} CUSD address",
   "disclaimerCeloDollars": "Celo dollar values are estimates.",
   "dollarsNotYetEnabledNote": "Celo Dollars are not yet available on any providers. To get Celo Dollars, purchase CELO and exchange it for Celo Dollars in the CELO tab.",
-  "pleaseSelectProvider": "Please select a provider below. These links connect to a third party service.",
+  "selectDigitalCurrency": "Select a digital currency",
+  "selectPaymentMethod": "Pay with:",
+  "payWithFiat": "Debit, credit, or bank account",
+  "payWithExchange": "Cryptocurrency exchange",
+  "selectCashOutMethod": "Receive funds in:",
+  "receiveOnAddress": "cUSD/CELO address",
+  "receiveOnPonto": "Ponto (GCash)",
   "explanationModal": {
     "title": "About Providers",
     "body": "Providers allow you to add funds to or cash out from your account. They determine their own rates and restrictions depending on location, amount, and other factors. Please visit the provider website for specific help. Visit the FAQ to learn more."
   },
   "otherFundingOptions": "For more ways to add and withdraw funds, visit <0>How to fund your account</0>",
-  "youCanTransfer": "You can transfer CELO and Celo Dollars to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy."
+  "youCanTransfer": "You can transfer {{currency}} to or from the following exchanges. You'll need your Account Number (also known as an address) - tap below to copy."
 }
