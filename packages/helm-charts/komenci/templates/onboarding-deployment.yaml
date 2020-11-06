@@ -26,6 +26,11 @@ spec:
           resources:
             {{- toYaml .Values.onboarding.resources | nindent 12 }}
           env:
+          - name: DB_PASSWORD	
+            valueFrom:	
+              secretKeyRef:	
+                key: postgresql-password	
+                name: {{ .Release.Name }}-postgresql
           - name: REPLICA_NAME
             valueFrom:
               fieldRef:
@@ -44,6 +49,14 @@ spec:
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 10 }}
+          volumeMounts:
+          - name: postgres-pass-volume
+            readOnly: true
+            mountPath: "/postgres-secret"
+        volumes:
+          - name: postgres-pass-volume
+            secret:
+              secretName: postgres-secret
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -56,3 +69,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+          volumes:
+        - name: private-key-volume
+          secret:
+            secretName: pkey-secret
