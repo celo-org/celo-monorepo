@@ -30,8 +30,7 @@ function updatePackageJson(packageName: string, property: string, value: any) {
   const packageJson = JSON.parse(readFileSync(packageJsonPath).toString())
   const updated =
     typeof value === 'object'
-      ? // todo: this won't be sorted...
-        { ...packageJson, [property]: { ...packageJson[property], ...value } }
+      ? { ...packageJson, [property]: { ...packageJson[property], ...value } }
       : { ...packageJson, [property]: value }
   writeFileSync(packageJsonPath, JSON.stringify(updated, null, 2))
 }
@@ -64,7 +63,7 @@ async function main() {
     console.warn(
       'Untracked changes in working tree, aborting. This is a destructive script and work could be lost.'
     )
-    // return: TODO: uncomment me
+    return
   }
 
   const { packageName, networks } = await prompt([
