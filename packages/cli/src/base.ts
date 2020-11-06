@@ -14,29 +14,6 @@ import Web3 from 'web3'
 import { getGasCurrency, getNodeUrl } from './utils/config'
 import { requireNodeIsSynced } from './utils/helpers'
 
-// Base for commands that do not need web3.
-export abstract class LocalCommand extends Command {
-  static flags = {
-    logLevel: flags.string({ char: 'l', hidden: true }),
-    help: flags.help({ char: 'h', hidden: true }),
-    truncate: flags.boolean({
-      default: true,
-      hidden: true,
-      allowNo: true,
-      description: 'Truncate fields to fit line',
-    }),
-  }
-
-  // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
-  log(msg: string, logLevel: string = 'info') {
-    if (logLevel === 'info') {
-      console.debug(msg)
-    } else if (logLevel === 'error') {
-      console.error(msg)
-    }
-  }
-}
-
 export enum GasOptions {
   celo = 'celo',
   CELO = 'celo',
@@ -47,15 +24,22 @@ export enum GasOptions {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-export abstract class BaseCommand extends LocalCommand {
+export abstract class BaseCommand extends Command {
   static flags = {
-    ...LocalCommand.flags,
-    privateKey: flags.string({ hidden: true }),
-    node: flags.string({ char: 'n', hidden: true }),
+    privateKey: flags.string({
+      char: 'k',
+      description: 'Use a private key to sign local transactions with',
+    }),
+    node: flags.string({
+      char: 'n',
+      description: "URL of the node to run commands against (defaults to 'http://localhost:8545')",
+      hidden: true,
+    }),
     gasCurrency: flags.enum({
       options: Object.keys(GasOptions),
       description:
         "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
+      hidden: true,
     }),
     useLedger: flags.boolean({
       default: false,
