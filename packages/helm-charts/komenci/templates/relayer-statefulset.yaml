@@ -103,13 +103,15 @@ spec:
             # Get the correct relayer account address
             ADDRESSES={{- range $index, $identity := .Values.relayer.identities -}}{{ $identity.address }},{{- end }}
             export WALLET_ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
-            
+
             exec yarn start relayer
         env:
         - name: REPLICA_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: NODE_ENV
+          value: production
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.relayer.azureHsm "value_name" "initTryCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.relayer.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
 {{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.relayer.metrics "value_name" "enabled") | indent 8 }}
@@ -117,7 +119,6 @@ spec:
 {{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.relayer "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.relayer "value_name" "privateKeyPath" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.relayer.metrics "value_name" "prometheusPort") | indent 8 }}
-
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.relayer "value_name" "port") | indent 8 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.relayer.onchain "value_name" "network") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer.onchain "value_name" "walletType") | indent 8 }}
