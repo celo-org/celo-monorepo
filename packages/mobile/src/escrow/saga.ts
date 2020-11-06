@@ -1,12 +1,12 @@
 import { Result } from '@celo/base'
-import { ContractKit } from '@celo/contractkit'
+import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { KomenciKit } from '@celo/komencikit/lib/kit'
 import { FetchError, TxError } from '@celo/komencikit/src/errors'
 import { generateDeterministicInviteCode } from '@celo/utils/lib/account'
-import { ensureLeading0x, privateKeyToAddress, trimLeading0x } from '@celo/utils/src/address'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
@@ -25,6 +25,7 @@ import {
   reclaimEscrowPaymentSuccess,
   storeSentEscrowPayments,
 } from 'src/escrow/actions'
+import { splitSignature } from 'src/escrow/utils'
 import { calculateFee } from 'src/fees/saga'
 import { features } from 'src/flags'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
@@ -216,7 +217,28 @@ function* registerStandbyTransaction(context: TransactionContext, value: string,
   )
 }
 
-function* withdrawFromEscrowViaKomenci() {
+async function formEscrowWithdrawTxWithNoCode(
+  contractKit: ContractKit,
+  escrowWrapper: EscrowWrapper,
+  paymentId: string,
+  pepper: string,
+  msgHash: string,
+  addressIndex: number
+) {
+  const { privateKey } = generateDeterministicInviteCode(pepper, addressIndex)
+  const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
+    .signature
+  Logger.debug(
+    TAG + '@withdrawFromEscrowViaKomenci',
+    `Signed message hash signature is ${signature}`
+  )
+
+  const { r, s, v } = splitSignature(contractKit, signature)
+  const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
+  return withdrawTx
+}
+
+function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
   try {
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
     Logger.debug(TAG + '@withdrawFromEscrowViaKomenci', 'Withdrawing escrowed payment')
@@ -257,44 +279,37 @@ function* withdrawFromEscrowViaKomenci() {
     )
 
     const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: walletAddress })
-
+    const context = newTransactionContext(TAG, 'Withdraw from escrow')
     // TODO: Batch the tranasctions and submit them together via `executeTransactions`
     // method on an instance of the MTW then submitting like usual
     const withdrawTxSuccess: boolean[] = []
     for (let i = 0; i < escrowPaymentIds.length; i += 1) {
-      const paymentId = escrowPaymentIds[i]
-      const { privateKey } = generateDeterministicInviteCode(pepper, i)
-      let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, privateKey))
-        .signature
-      Logger.debug(
-        TAG + '@withdrawFromEscrowViaKomenci',
-        `Signed message hash signature is ${signature}`
+      const withdrawTx: CeloTransactionObject<boolean> = yield formEscrowWithdrawTxWithNoCode(
+        contractKit,
+        escrowWrapper,
+        escrowPaymentIds[i],
+        pepper,
+        msgHash,
+        i
       )
-      // TODO: This should be a ContractKit util
-      signature = trimLeading0x(signature)
-      const r = `0x${signature.slice(0, 64)}`
-      const s = `0x${signature.slice(64, 128)}`
-      const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
-      const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
 
       try {
-        const withdrawTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-          [komenciKit, komenciKit.submitMetaTransaction],
-          mtwAddress,
-          withdrawTx
-        )
+        if (!komenciActive) {
+          yield call(sendTransaction, withdrawTx.txo, walletAddress, context)
+        } else {
+          const withdrawTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+            [komenciKit, komenciKit.submitMetaTransaction],
+            mtwAddress,
+            withdrawTx
+          )
 
-        if (!withdrawTxResult.ok) {
-          withdrawTxSuccess.push(false)
-          throw withdrawTxResult.error
+          if (!withdrawTxResult.ok) {
+            throw withdrawTxResult.error
+          }
         }
-
         withdrawTxSuccess.push(true)
-
-        if (withdrawTxSuccess.length !== escrowPaymentIds.length) {
-          yield waitForNextBlock()
-        }
       } catch (error) {
+        withdrawTxSuccess.push(false)
         Logger.debug(
           TAG + '@withdrawFromEscrowViaKomenci',
           'Unable to withdraw from escrow. Error: ',
@@ -356,13 +371,12 @@ function* withdrawFromEscrow() {
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // use the temporary key to sign a message. The message is the current account.
-    let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey))
-      .signature
+    const signature: string = (yield contractKit.web3.eth.accounts.sign(
+      msgHash,
+      tmpWalletPrivateKey
+    )).signature
     Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
-    signature = trimLeading0x(signature)
-    const r = `0x${signature.slice(0, 64)}`
-    const s = `0x${signature.slice(64, 128)}`
-    const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
+    const { r, s, v } = splitSignature(contractKit, signature)
 
     // Generate and send the withdrawal transaction.
     const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
@@ -532,10 +546,14 @@ export function* watchVerificationEnd() {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
-      yield call(withdrawFromEscrow)
+      if (features.ESCROW_WITHOUT_CODE) {
+        yield call(withdrawFromEscrowUsingPepper, false)
+      } else {
+        yield call(withdrawFromEscrow)
+      }
     } else if (feelessUpdate.status === VerificationStatus.Done) {
       yield waitForNextBlock()
-      yield call(withdrawFromEscrowViaKomenci)
+      yield call(withdrawFromEscrowUsingPepper, true)
     }
   }
 }
