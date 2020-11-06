@@ -92,7 +92,7 @@ export async function initializeSmsProviders(
         break
       case SmsProviderType.NEXMO:
         const nexmoProvider = NexmoSmsProvider.fromEnv()
-        await nexmoProvider.initialize()
+        await nexmoProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
         smsProviders.push(nexmoProvider)
         smsProvidersByType[SmsProviderType.NEXMO] = nexmoProvider
         break
