@@ -42,7 +42,6 @@ spec:
 {{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db "value_name" "host" "optional" true) | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db "value_name" "port" "optional" true) | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db "value_name" "username") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_PASSWORD" "dict" .Values.onboarding.db "value_name" "password") | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_DATABASE" "dict" .Values.onboarding.db "value_name" "database") | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.onboarding.db "value_name" "synchronize") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 10 }}
