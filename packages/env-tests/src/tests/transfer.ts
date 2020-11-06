@@ -4,9 +4,9 @@ import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
 export function runTransfercUSDTest(context: Context) {
   describe('Transfer Test', () => {
-    const logger = context.logger.child({ testGroup: 'transfer' })
+    const logger = context.logger.child({ test: 'transfer' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.TransferFrom, ONE.times(2))
+      await fundAccount(context, TestAccounts.TransferFrom, ONE.times(10))
     })
 
     test('transfer cUSD', async () => {
@@ -30,7 +30,7 @@ export function runTransfercUSDTest(context: Context) {
       logger.debug('Transferred', { receipt })
 
       const toBalanceAfter = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance After ', {
+      logger.debug('Get Balance After', {
         balance: toBalanceAfter.toString(),
         account: to.address,
       })

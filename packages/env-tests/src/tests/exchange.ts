@@ -6,9 +6,9 @@ import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
 export function runExchangeTest(context: Context) {
   describe('Exchange Test', () => {
-    const logger = context.logger.child({ testGroup: 'exchange' })
+    const logger = context.logger.child({ test: 'exchange' })
     beforeAll(async () => {
-      await fundAccount(context, TestAccounts.Exchange, ONE.times(2))
+      await fundAccount(context, TestAccounts.Exchange, ONE.times(10))
     })
 
     test('exchange cUSD for CELO', async () => {
@@ -22,12 +22,10 @@ export function runExchangeTest(context: Context) {
 
       const previousGoldBalance = await goldToken.balanceOf(from.address)
       const goldAmount = await exchange.quoteUsdSell(ONE)
-      logger.debug('exchange quote selling cUSD', { rate: goldAmount.toString() })
+      logger.debug('quote selling cUSD', { rate: goldAmount.toString() })
 
       const approveTx = await stableToken.approve(exchange.address, ONE.toString()).send()
       await approveTx.waitReceipt()
-      logger.debug('approve tx went through')
-      await sleep(5000)
       const sellTx = await exchange
         .sellDollar(
           ONE,
@@ -38,16 +36,15 @@ export function runExchangeTest(context: Context) {
             .toString()
         )
         .send()
-      const txHash = await sellTx.getHash()
-      logger.debug('sellTx', { txHash })
+      await sellTx.getHash()
       const receipt = await sellTx.waitReceipt()
 
-      logger.debug('sold cUSD', { receipt })
+      logger.debug('Sold cUSD', { receipt })
 
       // Sell more to receive at least 1 cUSD back
       const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(previousGoldBalance)
 
-      logger.debug('loss to exhange', {
+      logger.debug('Loss to exchange', {
         goldAmount: goldAmount.toString(),
         goldAmountToSell: goldAmountToSell.toString(),
       })
@@ -68,7 +65,7 @@ export function runExchangeTest(context: Context) {
         .send()
       const sellGoldReceipt = await sellGoldTx.waitReceipt()
 
-      logger.debug('sold CELO', { receipt: sellGoldReceipt })
+      logger.debug('Sold CELO', { receipt: sellGoldReceipt })
     })
   })
 }

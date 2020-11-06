@@ -4,8 +4,9 @@ import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot } from './scaffold'
 import { runExchangeTest } from './tests/exchange'
+import { runTransfercUSDTest } from './tests/transfer'
 
-jest.setTimeout(90000)
+jest.setTimeout(120000)
 function runTests() {
   const envName = loadFromEnvFile()
 
@@ -17,7 +18,7 @@ function runTests() {
 
   describe('Run tests in context of monorepo', () => {
     // TODO: Assert maximum loss after test
-    // runTransfercUSDTest({ kit, mnemonic, logger: rootLogger })
+    runTransfercUSDTest({ kit, mnemonic, logger: rootLogger })
     runExchangeTest({ kit, mnemonic, logger: rootLogger })
 
     afterAll(async () => {
