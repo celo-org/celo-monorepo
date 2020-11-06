@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.1.23-dev",
+  "version": "0.1.22",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -18,7 +18,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "0.0.5-dev",
+    "@celo/base": "file:../base",
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bigi": "^1.1.0",
     "bignumber.js": "^9.0.0",
@@ -41,7 +41,7 @@
     "web3-utils": "1.2.4"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev",
+    "@celo/flake-tracker": "file:../flake-tracker",
     "@celo/typescript": "0.0.1",
     "@types/country-data": "^0.0.0",
     "@types/elliptic": "^6.4.9",

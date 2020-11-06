@@ -1,6 +1,6 @@
 {
   "name": "@celo/komencikit",
-  "version": "0.0.1-dev",
+  "version": "0.0.0",
   "description": "Celo's KomenciKit client to interact with the Komenci meta-tx server",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -22,9 +22,9 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.19-dev",
-    "@celo/base": "0.0.5-dev",
-    "@celo/utils": "0.1.23-dev",
+    "@celo/contractkit": "file:../contractkit",
+    "@celo/base": "file:../base",
+    "@celo/utils": "file:../utils",
     "cross-fetch": "^3.0.6",
     "fp-ts": "^2.8.4",
     "io-ts": "^2.2.11"

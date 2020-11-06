@@ -120,6 +120,6 @@
     "webpack": "4.41.2"
   },
   "peerDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev"
+    "@celo/flake-tracker": "file:../flake-tracker"
   }
 }

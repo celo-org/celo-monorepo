@@ -43,7 +43,7 @@
     "firebase-functions-test": "^0.2.0"
   },
   "peerDependencies": {
-    "@celo/flake-tracker": "0.0.1-dev"
+    "@celo/flake-tracker": "file:../flake-tracker"
   },
   "engines": {
     "node": "10"

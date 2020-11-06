@@ -1,6 +1,6 @@
 {
   "name": "@celo/flake-tracker",
-  "version": "0.0.1-dev",
+  "version": "0.0.0",
   "description": "A tool for tracking and disabling flakey tests.",
   "private": true,
   "author": "Celo",

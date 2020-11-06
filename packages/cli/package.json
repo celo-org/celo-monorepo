@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.61-dev",
+  "version": "0.0.60",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -31,8 +31,8 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.19-dev",
-    "@celo/utils": "0.1.23-dev",
+    "@celo/contractkit": "file:../contractkit",
+    "@celo/utils": "file:../utils",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -52,7 +52,6 @@
     "events": "^3.0.0",
     "firebase": "^7.2.2",
     "fs-extra": "^8.1.0",
-    "moment": "2.24.0",
     "humanize-duration": "^3.21.0",
     "moment": "2.24.0",
     "path": "^0.12.7",
@@ -64,13 +63,11 @@
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
-    "@celo/dev-utils": "0.0.1-dev",
-    "@celo/flake-tracker": "0.0.1-dev",
+    "@celo/dev-utils": "file:../dev-utils",
+    "@celo/flake-tracker": "file:../flake-tracker",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^10",
     "@types/inquirer": "^6.5.0",
     "@types/web3": "^1.0.18",
     "@types/humanize-duration": "^3.18.0",
