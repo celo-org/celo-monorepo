@@ -652,6 +652,5 @@ export const tryFeelessOnboardingSelector = ({
   identity: { feelessVerificationState },
 }: RootState) => {
   const { errorTimestamps } = feelessVerificationState.komenci
-
   return !hasExceededKomenciErrorQuota(errorTimestamps) && features.KOMENCI
 }
