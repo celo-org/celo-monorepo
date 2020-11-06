@@ -38,7 +38,7 @@ export class IdentityMetadataWrapper {
     })
   }
 
-  static async fetchFromURL(kit: ContractKit, url: string) {
+  static async fetchFromURL(kit: ContractKit, url: string, tries = 3) {
     return selectiveRetryAsyncWithBackOff(
       async () => {
         const resp = await fetch(url)
@@ -47,7 +47,7 @@ export class IdentityMetadataWrapper {
         }
         return this.fromRawString(kit, await resp.text())
       },
-      3,
+      tries,
       ['Request failed with status 404'],
       []
     )
