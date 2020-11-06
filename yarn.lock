@@ -2779,8 +2779,8 @@
     "@azure/identity" "^1.1.0"
     "@azure/keyvault-keys" "^4.1.0"
     "@azure/keyvault-secrets" "^4.1.0"
-    "@celo/base" "file:../../Library/Caches/Yarn/v6/npm-@celo-contractkit-0.4.18-91ec83b2-177f-40e6-b8e0-3e3a9f92dabe-1604676404739/node_modules/@celo/base"
-    "@celo/utils" "file:../../Library/Caches/Yarn/v6/npm-@celo-contractkit-0.4.18-91ec83b2-177f-40e6-b8e0-3e3a9f92dabe-1604676404739/node_modules/@celo/utils"
+    "@celo/base" "file:../../Library/Caches/Yarn/v6/npm-@celo-contractkit-0.4.18-0cd5a9a7-aff5-425c-a2a2-58d2ee24e362-1604678704379/node_modules/@celo/base"
+    "@celo/utils" "file:../../Library/Caches/Yarn/v6/npm-@celo-contractkit-0.4.18-0cd5a9a7-aff5-425c-a2a2-58d2ee24e362-1604678704379/node_modules/@celo/utils"
     "@ledgerhq/hw-app-eth" "^5.11.0"
     "@ledgerhq/hw-transport" "^5.11.0"
     "@types/asn1js" "^0.0.2"
@@ -2967,7 +2967,7 @@
 "@celo/utils@file:packages/utils":
   version "0.1.22"
   dependencies:
-    "@celo/base" "file:../../Library/Caches/Yarn/v6/npm-@celo-utils-0.1.22-f241318f-e218-4191-b59f-53c913aa2f58-1604676404734/node_modules/@celo/base"
+    "@celo/base" "file:../../Library/Caches/Yarn/v6/npm-@celo-utils-0.1.22-9cb4375b-a310-4d48-a96e-2d2587246868-1604678704374/node_modules/@celo/base"
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^9.0.0"
