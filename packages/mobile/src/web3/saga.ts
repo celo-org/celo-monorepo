@@ -257,10 +257,10 @@ export function* getAccount() {
   }
 }
 
-export function* unlockAccount(account: string) {
+export function* unlockAccount(account: string, force: boolean = false) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   const wallet: UnlockableWallet = yield call(getWallet)
-  if (wallet.isAccountUnlocked(account)) {
+  if (!force && wallet.isAccountUnlocked(account)) {
     return true
   }
 

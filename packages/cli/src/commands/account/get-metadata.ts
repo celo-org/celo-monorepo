@@ -1,5 +1,6 @@
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { IArg } from '@oclif/parser/lib/args'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
 import { displayMetadata } from '../../utils/identity'
@@ -10,6 +11,7 @@ export default class GetMetadata extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
+    ...(cli.table.flags() as object),
   }
 
   static args: IArg[] = [Args.address('address', { description: 'Address to get metadata for' })]
@@ -17,7 +19,7 @@ export default class GetMetadata extends BaseCommand {
   static examples = ['get-metadata 0x97f7333c51897469E8D98E7af8653aAb468050a3']
 
   async run() {
-    const { args } = this.parse(GetMetadata)
+    const { args, flags } = this.parse(GetMetadata)
     const address = args.address
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(address)
@@ -30,7 +32,7 @@ export default class GetMetadata extends BaseCommand {
     try {
       const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
       console.info('Metadata contains the following claims: \n')
-      await displayMetadata(metadata, this.kit)
+      await displayMetadata(metadata, this.kit, flags)
     } catch (error) {
       console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
     }

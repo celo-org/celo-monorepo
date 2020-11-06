@@ -190,6 +190,7 @@ export interface UpdateAddressDekMapAction {
 
 export interface FetchVerificationState {
   type: Actions.FETCH_VERIFICATION_STATE
+  forceUnlockAccount: boolean
 }
 
 export interface UpdateVerificationState {
@@ -432,8 +433,9 @@ export const updateAddressDekMap = (
   dataEncryptionKey,
 })
 
-export const fetchVerificationState = (): FetchVerificationState => ({
+export const fetchVerificationState = (forceUnlockAccount: boolean): FetchVerificationState => ({
   type: Actions.FETCH_VERIFICATION_STATE,
+  forceUnlockAccount,
 })
 
 export const udpateVerificationState = (
