@@ -7,7 +7,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
-import { feelessResetVerification, resetVerification } from 'src/identity/actions'
+import { feelessRevokeVerificationState, revokeVerificationState } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import { getAttestationsStatus } from 'src/identity/verification'
 import { sendTransaction } from 'src/transactions/send'
@@ -15,7 +15,8 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
-import { currentAccountSelector, mtwAddressSelector } from 'src/web3/selectors'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { mtwAddressSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/revoke'
 
@@ -24,7 +25,7 @@ const TAG = 'identity/revoke'
 export function* revokeVerificationSaga() {
   Logger.debug(TAG + '@revokeVerification', 'Revoking previous verification')
   try {
-    const walletAddress: string | null = yield select(currentAccountSelector)
+    const walletAddress: string | null = yield call(getConnectedUnlockedAccount)
     const e164Number: string | null = yield select(e164NumberSelector)
 
     if (!walletAddress) {
@@ -71,13 +72,11 @@ export function* revokeVerificationSaga() {
       Logger.debug(TAG + '@revokeVerification', 'Account not verified, skipping actual revoke call')
     }
 
-    yield all([
-      put(resetVerification()),
-      put(feelessResetVerification()),
-      put(setNumberVerified(false)),
-      put(setMtwAddress(null)),
-    ])
+    const relevantStateRevoke = mtwAddress
+      ? () => feelessRevokeVerificationState(walletAddress)
+      : () => revokeVerificationState()
 
+    yield all([put(relevantStateRevoke()), put(setNumberVerified(false)), put(setMtwAddress(null))])
     ValoraAnalytics.track(VerificationEvents.verification_revoke_finish)
   } catch (err) {
     Logger.error(TAG + '@revokeVerification', 'Error revoking verification', err)
@@ -122,7 +121,7 @@ function* createRevokeTxForMTW(
   )
 
   const revokeTxViaMTW: CeloTransactionObject<string> = yield call(
-    mtwWrapper.signAndExecuteMetaTransaction,
+    [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
     revokeTx.txo
   )
 

@@ -25,6 +25,8 @@ export enum Actions {
   FEELESS_SET_COMPLETED_CODES = 'IDENTITY/FEELESS_SET_COMPLETED_CODES',
   SET_CAPTCHA_TOKEN = 'IDENTITY/SET_CAPTCHA_TOKEN',
   REVOKE_VERIFICATION = 'IDENTITY/REVOKE_VERIFICATION',
+  REVOKE_VERIFICATION_STATE = 'IDENTITY/REVOKE_VERIFICATION_STATE',
+  FEELESS_REVOKE_VERIFICATION_STATE = 'IDENTITY/FEELESS_REVOKE_VERIFICATION_STATE',
   RECEIVE_ATTESTATION_MESSAGE = 'IDENTITY/RECEIVE_ATTESTATION_MESSAGE',
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
   FEELESS_INPUT_ATTESTATION_CODE = 'IDENTITY/FEELESS_INPUT_ATTESTATION_CODE',
@@ -97,6 +99,15 @@ export interface FeelessResetVerificationAction {
 
 export interface RevokeVerificationAction {
   type: Actions.REVOKE_VERIFICATION
+}
+
+export interface RevokeVerificationStateAction {
+  type: Actions.REVOKE_VERIFICATION_STATE
+}
+
+export interface FeelessRevokeVerificationStateAction {
+  type: Actions.FEELESS_REVOKE_VERIFICATION_STATE
+  walletAddress: string
 }
 
 export interface ReceiveAttestationMessageAction {
@@ -320,6 +331,8 @@ export type ActionTypes =
   | SetLastRevealAttempt
   | FeelessSetLastRevealAttempt
   | ReportRevealStatusAction
+  | RevokeVerificationStateAction
+  | FeelessRevokeVerificationStateAction
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -364,6 +377,19 @@ export const setHasSeenVerificationNux = (status: boolean): SetHasSeenVerificati
 
 export const revokeVerification = (): RevokeVerificationAction => ({
   type: Actions.REVOKE_VERIFICATION,
+})
+
+// Will properly clear verification state when called
+export const revokeVerificationState = (): RevokeVerificationStateAction => ({
+  type: Actions.REVOKE_VERIFICATION_STATE,
+})
+
+// Will properly clear feeless verification state when called
+export const feelessRevokeVerificationState = (
+  walletAddress: string
+): FeelessRevokeVerificationStateAction => ({
+  type: Actions.FEELESS_REVOKE_VERIFICATION_STATE,
+  walletAddress,
 })
 
 export const receiveAttestationMessage = (

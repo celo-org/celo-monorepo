@@ -15,6 +15,7 @@ import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { hasExceededKomenciErrorQuota } from 'src/identity/feelessVerificationErrors'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
+import { removeKeyFromMapping } from 'src/identity/utils'
 import {
   AttestationCode,
   ESTIMATED_COST_PER_ATTESTATION,
@@ -232,6 +233,7 @@ export const reducer = (
         },
         verificationState: initialState.verificationState,
         feelessVerificationState: {
+          ...initialState.feelessVerificationState,
           ...rehydratedState.feelessVerificationState,
           isLoading: false,
         },
@@ -251,6 +253,30 @@ export const reducer = (
         feelessAttestationCodes: [],
         feelessNumCompleteAttestations: 0,
         feelessVerificationStatus: VerificationStatus.Stopped,
+      }
+    case Actions.REVOKE_VERIFICATION_STATE:
+      return {
+        ...state,
+        attestationCodes: [],
+        acceptedAttestationCodes: [],
+        numCompleteAttestations: 0,
+        verificationStatus: VerificationStatus.Stopped,
+        verificationState: initialState.verificationState,
+        lastRevealAttempt: null,
+      }
+    case Actions.FEELESS_REVOKE_VERIFICATION_STATE:
+      return {
+        ...state,
+        feelessAttestationCodes: [],
+        feelessAcceptedAttestationCodes: [],
+        feelessNumCompleteAttestations: 0,
+        feelessVerificationStatus: VerificationStatus.Stopped,
+        walletToAccountAddress: removeKeyFromMapping(
+          state.walletToAccountAddress,
+          action.walletAddress
+        ),
+        feelessVerificationState: initialState.feelessVerificationState,
+        feelessLastRevealAttempt: null,
       }
     case Actions.FEELESS_START_VERIFICATION:
       return {
