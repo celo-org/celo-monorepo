@@ -7,7 +7,7 @@ metadata:
 spec:
   replicas: {{ .Values.onboarding.replicaCount }}
   selector:
-    matchLabels: 
+    matchLabels:
     {{- include "komenci-onboarding-component-label" . | nindent 6 }}
   template:
     metadata:
@@ -35,6 +35,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          - name: NODE_ENV
+            value: production
 {{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding "value_name" "ruleSignatureEnable") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_DISTRIBUTED_BLINDED_PEPPER" "dict" .Values.onboarding.quota "value_name" "distributedBlindePepper") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_REQUEST_SUBSIDISED_ATTESTATION" "dict" .Values.onboarding.quota "value_name" "requestSubsidisedAttestation") | indent 10 }}
