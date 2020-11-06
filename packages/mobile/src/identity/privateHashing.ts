@@ -25,8 +25,8 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
-import { getAccount, unlockAccount } from 'src/web3/saga'
-import { currentAccountSelector, mtwAddressSelector } from 'src/web3/selectors'
+import { getAccount, getAccountAddress, unlockAccount } from 'src/web3/saga'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privateHashing'
 export const LOOKUP_GAS_FEE_ESTIMATE = 0.03
@@ -98,9 +98,8 @@ function* getPhoneHashPrivate(e164Number: string, selfPhoneHash?: string) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  const mtwAddress: string | null = yield select(mtwAddressSelector)
   const walletAddress: string = yield call(getAccount)
-  const accountAddress: string = mtwAddress || walletAddress
+  const accountAddress: string = yield call(getAccountAddress)
   const authSigner: AuthSigner = yield call(getAuthSignerForAccount, accountAddress, walletAddress)
 
   // Unlock the account if the authentication is signed by the wallet

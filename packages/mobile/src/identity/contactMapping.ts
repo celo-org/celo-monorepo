@@ -4,7 +4,7 @@ import {
   AttestationsWrapper,
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { isValidAddress } from '@celo/utils/src/address'
+import { isValidAddress, normalizeAddress, normalizeAddressWith0x } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
@@ -170,7 +170,7 @@ export function* fetchAddressesAndValidateSaga({
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const walletAddresses: string[] = yield call(getWalletAddressesAndUpdateCache, e164Number)
+    const walletAddresses: string[] = yield call(fetchWalletAddresses, e164Number)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
@@ -228,7 +228,7 @@ function* getAccountAddresses(e164Number: string) {
   return getAddressesFromLookupResult(lookupResult, phoneHash) || []
 }
 
-function* getWalletAddressesAndUpdateCache(e164Number: string) {
+function* fetchWalletAddresses(e164Number: string) {
   const contractKit = yield call(getContractKit)
   const accountsWrapper: AccountsWrapper = yield call([
     contractKit.contracts,
@@ -242,11 +242,13 @@ function* getWalletAddressesAndUpdateCache(e164Number: string) {
 
   const possibleUserAddresses: string[] = []
   const walletToAccountAddress: WalletToAccountAddressType = {}
-  walletAddresses.forEach((address, i) => {
-    const walletAddress = address.toLowerCase()
-    const accountAddress = accountAddresses[i]
-    // `getWalletAddress` returns 0x0 when there isn't a wallet registered
-    if (walletAddress !== '0x0') {
+  for (const [i, address] of walletAddresses.entries()) {
+    const accountAddress = normalizeAddressWith0x(accountAddresses[i])
+    const walletAddress = normalizeAddressWith0x(address)
+    // `getWalletAddress` returns a null address when there isn't a wallet registered
+    // TODO: Use the helper function `isNullAddress` I made in base/src/address
+    // once I've built from the monorepo
+    if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
       walletToAccountAddress[walletAddress] = accountAddress
       possibleUserAddresses.push(walletAddress)
     } else {
@@ -254,7 +256,7 @@ function* getWalletAddressesAndUpdateCache(e164Number: string) {
       walletToAccountAddress[accountAddress] = accountAddress
       possibleUserAddresses.push(accountAddress)
     }
-  })
+  }
   yield put(updateWalletToAccountAddress(walletToAccountAddress))
   return possibleUserAddresses
 }
