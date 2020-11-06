@@ -31,8 +31,8 @@ OPTIONS
                                                  which uses whatever feeCurrency is available)
 
 EXAMPLES
-  set  --node ws://localhost:2500
-  set  --node <geth-location>/geth.ipc
+  set --node ws://localhost:2500
+  set --node <geth-location>/geth.ipc
   set --gasCurrency cUSD
   set --gasCurrency CELO
 ```
