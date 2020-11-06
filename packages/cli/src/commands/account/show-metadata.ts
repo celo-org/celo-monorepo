@@ -1,5 +1,6 @@
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { IArg } from '@oclif/parser/lib/args'
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
 import { displayMetadata } from '../../utils/identity'
@@ -8,6 +9,7 @@ export default class ShowMetadata extends BaseCommand {
   static description = 'Show the data in a local metadata file'
   static flags = {
     ...BaseCommand.flags,
+    ...(cli.table.flags() as object),
   }
   static args: IArg[] = [Args.file('file', { description: 'Path of the metadata file' })]
   static examples = ['show-metadata ~/metadata.json']
@@ -17,6 +19,6 @@ export default class ShowMetadata extends BaseCommand {
     const res = this.parse(ShowMetadata)
     const metadata = await IdentityMetadataWrapper.fromFile(this.kit, res.args.file)
     console.info(`Metadata at ${res.args.file} contains the following claims: \n`)
-    await displayMetadata(metadata, this.kit)
+    await displayMetadata(metadata, this.kit, res.flags)
   }
 }

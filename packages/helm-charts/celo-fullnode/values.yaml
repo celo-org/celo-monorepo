@@ -83,9 +83,9 @@ geth:
   create_network_endpoint_group: false
   updateStrategy:
     type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
+    # rollingUpdate:
+    #   maxUnavailable: 25%
+    #   maxSurge: 25%
 
 genesis:
   networkId: 31418

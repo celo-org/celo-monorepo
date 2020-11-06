@@ -130,6 +130,12 @@ export const mockTransactionData = {
   type: TokenTransactionType.Sent,
 }
 
+export const mockInviteTransactionData = {
+  recipient: mockInvitableRecipient2,
+  amount: new BigNumber(1),
+  type: TokenTransactionType.InviteSent,
+}
+
 export const mockInvitableRecipient3: RecipientWithContact = {
   kind: RecipientKind.Contact,
   displayName: mockName2Invite,
