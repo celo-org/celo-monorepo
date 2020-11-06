@@ -125,6 +125,13 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   }
 }
 
+async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: string){
+  const [password] = await execCmdWithExitOnFailure(
+    `az keyvault secret show --name ${secretName} --vault-name ${vaultName} --query value`
+  )
+  return password
+}
+
 async function helmParameters(celoEnv: string, context: string, useForno: boolean) {
   const komenciConfig = getKomenciConfig(context)
 
@@ -136,11 +143,13 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     context
   )
   const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
+  const clusterConfig = getAKSClusterConfig(context)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
     : getFullNodeHttpRpcInternalUrl(celoEnv)
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
+  const databasePassword = await getPasswordFromKeyVaultSecret(clusterConfig.clusterName, 'DB-PASSWORD')
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
@@ -154,7 +163,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.host=${databaseConfig.host}`,
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
-    `--set onboarding.db.password=${databaseConfig.password}`,
+    `--set onboarding.db.password=${databasePassword}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
