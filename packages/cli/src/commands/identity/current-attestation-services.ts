@@ -10,6 +10,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   async run() {
@@ -66,7 +67,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
         attestationServiceURL: {},
         smsProviders: {},
       },
-      { 'no-truncate': !res.flags.truncate }
+      res.flags
     )
   }
 }

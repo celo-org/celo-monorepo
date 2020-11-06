@@ -1,4 +1,4 @@
-import { Address, normalizeAddressWith0x, serializeSignature, Signature, sleep } from '@celo/base'
+import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import { BlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
@@ -358,13 +358,17 @@ export class KomenciKit {
     metaTxWalletAddress: string,
     name: string,
     dataEncryptionKey: string,
-    walletAddress: Address,
-    proofOfPossession: Signature | null = null
+    walletAddress: Address
   ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
     const accounts = await this.contractKit.contracts.getAccounts()
+    const proofOfPossession = await accounts.generateProofOfKeyPossession(
+      metaTxWalletAddress,
+      walletAddress
+    )
+
     return this.submitMetaTransaction(
       metaTxWalletAddress,
-      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession).txo
+      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession)
     )
   }
 
