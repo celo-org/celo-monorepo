@@ -28,6 +28,8 @@ export class NexmoSmsProvider extends SmsProvider {
     phoneNumber: string
   }> = []
   balanceMetric: boolean
+  deliveryStatusURL: string | undefined
+  applicationId: string | null = null
 
   constructor(
     apiKey: string,
@@ -37,6 +39,7 @@ export class NexmoSmsProvider extends SmsProvider {
     balanceMetric: boolean
   ) {
     super()
+    this.applicationId = applicationId
     if (applicationId) {
       this.client = new Nexmo({
         apiKey,
@@ -53,7 +56,9 @@ export class NexmoSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  initialize = async () => {
+  initialize = async (deliveryStatusURL: string) => {
+    this.deliveryStatusURL = deliveryStatusURL
+
     const availableNumbers = await this.getAvailableNumbers()
 
     if (!availableNumbers) {
@@ -105,6 +110,7 @@ export class NexmoSmsProvider extends SmsProvider {
         nexmoNumber,
         attestation.phoneNumber,
         attestation.message,
+        { callback: this.deliveryStatusURL },
         (err: Error, responseData: any) => {
           if (err) {
             reject(err)
@@ -128,9 +134,14 @@ export class NexmoSmsProvider extends SmsProvider {
     })
   }
 
+  // The only effect of supplying an applicationId is to select from numbers linked to
+  // that application rather than the global pool.
   private getAvailableNumbers = async (): Promise<any> => {
     return new Promise((resolve, reject) => {
-      this.client.number.get(null, (err: Error, responseData: any) => {
+      const options = this.applicationId
+        ? { applicationId: this.applicationId, has_application: true }
+        : null
+      this.client.number.get(options, (err: Error, responseData: any) => {
         if (err) {
           reject(err)
         } else {
