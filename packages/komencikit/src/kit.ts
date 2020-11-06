@@ -359,7 +359,7 @@ export class KomenciKit {
     name: string,
     dataEncryptionKey: string,
     walletAddress: Address
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const accounts = await this.contractKit.contracts.getAccounts()
     const proofOfPossession = await accounts.generateProofOfKeyPossession(
       metaTxWalletAddress,
