@@ -85,7 +85,7 @@ function* sendUserFundedSetAccountTx(
   let setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
   const context = newTransactionContext(TAG, 'Set wallet address & DEK')
   // If MTW has been created, route the user's DEK/wallet registration through it
-  // because accountAddress is determined by msg.sender
+  // because accountAddress is determined by msg.sender. Else, do it normally
   if (mtwAddressCreated) {
     const mtwWrapper: MetaTransactionWalletWrapper = yield call(
       [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
@@ -96,19 +96,23 @@ function* sendUserFundedSetAccountTx(
       v: number
       r: string
       s: string
-    } = yield call(accountsWrapper.generateProofOfKeyPossession, accountAddress, walletAddress)
+    } = yield call(
+      [accountsWrapper, accountsWrapper.generateProofOfKeyPossession],
+      accountAddress,
+      walletAddress
+    )
 
     setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress, proofOfPossession)
 
     const setAccountTxViaMTW: CeloTransactionObject<string> = yield call(
-      mtwWrapper.signAndExecuteMetaTransaction,
+      [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
       setAccountTx.txo
     )
     yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
-    yield put(updateWalletToAccountAddress({ [walletAddress]: accountAddress }))
   } else {
     yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
   }
+  yield put(updateWalletToAccountAddress({ [walletAddress]: accountAddress }))
 }
 
 // Register the address and DEK with the Accounts contract
