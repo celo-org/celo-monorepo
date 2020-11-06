@@ -1,4 +1,4 @@
-import { logger } from '@celo/phone-number-privacy-common'
+import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import config, { DEV_MODE } from './config'
 import { initDatabase } from './database/database'
 import { initKeyProvider } from './key-management/key-provider'

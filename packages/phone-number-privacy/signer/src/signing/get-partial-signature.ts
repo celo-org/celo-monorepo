@@ -5,15 +5,16 @@ import {
   hasValidQueryPhoneNumberParam,
   hasValidTimestamp,
   isBodyReasonablySized,
-  logger,
   phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
+import { Counters, Labels } from '../common/metrics'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
@@ -26,19 +27,30 @@ export interface GetBlindedMessagePartialSigRequest {
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
   timestamp?: number
+  session?: string
 }
 
 export async function handleGetBlindedMessagePartialSig(
   request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,
   response: Response
 ) {
+  Counters.requests.labels(Labels.sigEndpoint).inc()
+
+  const logger: Logger = response.locals.logger
   logger.info('Begin handleGetBlindedMessagePartialSig request')
+
+  if (!request.body.session) {
+    Counters.signatureRequestsWithoutSessionID.inc()
+  }
+
   try {
     if (!isValidGetSignatureInput(request.body)) {
+      Counters.responses.labels(Labels.sigEndpoint, '400').inc()
       respondWithError(response, 400, WarningMessage.INVALID_INPUT)
       return
     }
-    if (!(await authenticateUser(request, getContractKit()))) {
+    if (!(await authenticateUser(request, getContractKit(), logger))) {
+      Counters.responses.labels(Labels.sigEndpoint, '401').inc()
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
@@ -53,10 +65,11 @@ export async function handleGetBlindedMessagePartialSig(
     // In the case of a DB or blockchain connection failure, don't block user
     // but set the error status accordingly
     try {
-      const queryCount = await getRemainingQueryCount(account, hashedPhoneNumber)
+      const queryCount = await getRemainingQueryCount(logger, account, hashedPhoneNumber)
       performedQueryCount = queryCount.performedQueryCount
       totalQuota = queryCount.totalQuota
     } catch (err) {
+      Counters.databaseErrors.labels(Labels.read).inc()
       logger.error('Failed to get user quota')
       logger.error({ err })
       errorMsg = ErrorMessage.DATABASE_GET_FAILURE
@@ -64,12 +77,14 @@ export async function handleGetBlindedMessagePartialSig(
     try {
       blockNumber = await getBlockNumber()
     } catch (err) {
+      Counters.blockchainErrors.labels(Labels.read).inc()
       logger.error('Failed to get latest block number')
       logger.error({ err })
       errorMsg = ErrorMessage.CONTRACT_GET_FAILURE
     }
 
     if (errorMsg !== ErrorMessage.DATABASE_GET_FAILURE && performedQueryCount >= totalQuota) {
+      Counters.responses.labels(Labels.sigEndpoint, '403')
       logger.debug('No remaining query count')
       respondWithError(
         response,
@@ -84,19 +99,20 @@ export async function handleGetBlindedMessagePartialSig(
 
     const keyProvider = getKeyProvider()
     const privateKey = keyProvider.getPrivateKey()
-    const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey)
+    const signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
 
-    if (await getRequestExists(request.body)) {
+    if (await getRequestExists(request.body, logger)) {
+      Counters.duplicateRequests.inc()
       logger.debug(
         'Signature request already exists in db. Will not store request or increment query count.'
       )
       errorMsg = WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG
     } else {
-      if (!(await storeRequest(request.body))) {
+      if (!(await storeRequest(request.body, logger))) {
         logger.debug('Did not store request.')
         errorMsg = ErrorMessage.FAILURE_TO_STORE_REQUEST
       }
-      if (!(await incrementQueryCount(account))) {
+      if (!(await incrementQueryCount(account, logger))) {
         logger.debug('Did not increment query count.')
         errorMsg = ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
       } else {
@@ -120,9 +136,11 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       signMessageResponse = signMessageResponseSuccess
     }
+    Counters.responses.labels(Labels.sigEndpoint, '200').inc()
     logger.debug('Signature retrieval success')
     response.json(signMessageResponse)
   } catch (err) {
+    Counters.responses.labels(Labels.sigEndpoint, '500').inc()
     logger.error('Failed to get signature')
     logger.error({ err })
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)

@@ -1,4 +1,4 @@
-import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, rootLogger as logger } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'

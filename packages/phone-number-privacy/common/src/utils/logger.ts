@@ -1,6 +1,7 @@
 import Logger, { createLogger, levelFromName, LogLevelString, stdSerializers } from 'bunyan'
 import bunyanDebugStream from 'bunyan-debug-stream'
 import { createStream } from 'bunyan-gke-stackdriver'
+import { NextFunction, Request, Response } from 'express'
 import { fetchEnv, fetchEnvOrDefault } from './config-utils'
 
 const logLevel = fetchEnvOrDefault('LOG_LEVEL', 'info') as LogLevelString
@@ -20,8 +21,19 @@ switch (logFormat) {
     break
 }
 
-export const logger: Logger = createLogger({
+export const rootLogger: Logger = createLogger({
   name: serviceName,
   serializers: stdSerializers,
   streams: [stream],
 })
+
+export function loggerMiddleware(req: Request, res: Response, next: NextFunction) {
+  const requestLogger = rootLogger.child({
+    endpoint: req.url,
+    session: req.body.session, // May be undefined
+  })
+
+  res.locals.logger = requestLogger
+  requestLogger.info({ req })
+  next()
+}

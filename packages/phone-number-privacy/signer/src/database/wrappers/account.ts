@@ -1,4 +1,6 @@
-import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
+import { Counters, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -9,7 +11,7 @@ function accounts() {
 /*
  * Returns how many queries the account has already performed.
  */
-export async function getPerformedQueryCount(account: string): Promise<number> {
+export async function getPerformedQueryCount(account: string, logger: Logger): Promise<number> {
   logger.debug({ account }, 'Getting performed query count')
   try {
     const queryCounts = await accounts()
@@ -18,6 +20,7 @@ export async function getPerformedQueryCount(account: string): Promise<number> {
       .first()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (err) {
+    Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error({ err })
     return 0
@@ -34,7 +37,7 @@ async function getAccountExists(account: string): Promise<boolean> {
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-export async function incrementQueryCount(account: string) {
+export async function incrementQueryCount(account: string, logger: Logger) {
   logger.debug({ account }, 'Incrementing query count')
   try {
     if (await getAccountExists(account)) {
@@ -48,6 +51,7 @@ export async function incrementQueryCount(account: string) {
       return insertRecord(newAccount)
     }
   } catch (err) {
+    Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error({ err })
     return null
@@ -57,7 +61,7 @@ export async function incrementQueryCount(account: string) {
 /*
  * Returns whether account has already performed matchmaking
  */
-export async function getDidMatchmaking(account: string): Promise<boolean> {
+export async function getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
   try {
     const didMatchmaking = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -68,6 +72,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (err) {
+    Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error({ err })
     return false
@@ -77,7 +82,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
 /*
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
-export async function setDidMatchmaking(account: string) {
+export async function setDidMatchmaking(account: string, logger: Logger) {
   logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
@@ -90,6 +95,7 @@ export async function setDidMatchmaking(account: string) {
       return insertRecord(newAccount)
     }
   } catch (err) {
+    Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error({ err })
     return null

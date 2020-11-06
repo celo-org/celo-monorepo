@@ -1,4 +1,6 @@
-import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
+import { Counters, Labels } from '../../common/metrics'
 import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
 import { getDatabase } from '../database'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
@@ -8,7 +10,8 @@ function requests() {
 }
 
 export async function getRequestExists(
-  request: GetBlindedMessagePartialSigRequest
+  request: GetBlindedMessagePartialSigRequest,
+  logger: Logger
 ): Promise<boolean> {
   if (!request.timestamp) {
     logger.debug('request does not have timestamp')
@@ -25,13 +28,14 @@ export async function getRequestExists(
       .first()
     return !!existingRequest
   } catch (err) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    Counters.databaseErrors.labels(Labels.read).inc()
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error({ err })
     return false
   }
 }
 
-export async function storeRequest(request: GetBlindedMessagePartialSigRequest) {
+export async function storeRequest(request: GetBlindedMessagePartialSigRequest, logger: Logger) {
   if (!request.timestamp) {
     logger.debug('request does not have timestamp')
     return true // TODO remove once backwards compatibility isn't necessary
@@ -43,6 +47,7 @@ export async function storeRequest(request: GetBlindedMessagePartialSigRequest) 
       .timeout(DB_TIMEOUT)
     return true
   } catch (err) {
+    Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error({ err })
     return null

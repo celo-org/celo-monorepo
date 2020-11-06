@@ -1,11 +1,12 @@
 import {
   ErrorMessage,
-  logger,
   SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Response } from 'express'
 import { getVersion } from '../config'
+
 export type ErrorType = ErrorMessage | WarningMessage
 
 export function respondWithError(
@@ -17,10 +18,12 @@ export function respondWithError(
   blockNumber: number = -1,
   signature?: string
 ) {
-  logger.info('Responding with error')
+  const logger: Logger = res.locals.logger
   if (err in WarningMessage) {
+    logger.info('Responding with warning')
     logger.warn({ err })
   } else {
+    logger.info('Responding with error')
     logger.error({ err })
   }
   const response: SignMessageResponseFailure = {
@@ -32,5 +35,6 @@ export function respondWithError(
     blockNumber,
     signature,
   }
+  logger.debug({ response })
   res.status(statusCode).json(response)
 }
