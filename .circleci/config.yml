@@ -84,7 +84,7 @@ commands:
 
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
-            yarn install || yarn install
+            yarn install || yarn install || yarn install
       - run:
           name: Fail if someone forgot to commit "yarn.lock"
           command: |

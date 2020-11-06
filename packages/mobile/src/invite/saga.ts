@@ -5,7 +5,7 @@ import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
 import { Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { asyncRandomBytes } from 'react-native-secure-randombytes'
+import { generateSecureRandom } from 'react-native-securerandom'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import {
@@ -168,8 +168,10 @@ export function* sendInvite(
   try {
     ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
     const web3 = yield call(getWeb3)
-    const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
+    const randomness: Uint8Array = yield call(generateSecureRandom, 64)
+    const temporaryWalletAccount = web3.eth.accounts.create(
+      Buffer.from(randomness).toString('ascii')
+    )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
