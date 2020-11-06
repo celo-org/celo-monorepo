@@ -20,7 +20,7 @@ As a CELO holder, you have the opportunity to impact the Celo network by voting 
 
 ### Technical
 
-- **Proven identity:** Validators and groups can supply [verifiable DNS claims](../operations-manual/validator-explorer.md). You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
+- **Proven identity:** Validators and groups can supply [verifiable DNS claims](../validator-guide/validator-explorer.md). You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
 
 - **Can receive votes**: Validator Groups can receive votes up to a certain [voting cap](../celo-codebase/protocol/proof-of-stake/validator-elections.md#group-voting-caps). You cannot vote for groups with a balance that would put it beyond its cap.
 
