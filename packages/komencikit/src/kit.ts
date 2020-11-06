@@ -131,7 +131,9 @@ export class KomenciKit {
 
     if (resp.ok) {
       this.client.setToken(resp.result.token)
-      this.client.setCallbackUrl(resp.result.callbackUrl)
+      if (resp.result.callbackUrl) {
+        this.client.setCallbackUrl(resp.result.callbackUrl)
+      }
       return Ok(resp.result)
     } else if (resp.error.errorType === FetchErrorTypes.Unauthorised) {
       return Err(new AuthenticationFailed())
