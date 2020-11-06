@@ -135,9 +135,10 @@ export function* feelessFetchVerificationState() {
       // Checks if a MTW was verified in a previous attempt and updates state.
       // This check will likely fail because the pepper hasn't been cached yet
       // but needs to happen for the edge case that a user has a cached pepper
-      // and Komenci is down
+      // and Komenci is down. If a verified MTW is found, return
       try {
         yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
+        return
       } catch (e) {
         Logger.debug(TAG, 'Unable to check if MTW is verified on first attempt')
       }
@@ -833,6 +834,7 @@ function* fetchOrDeployMtw(
       // Fetch session state now that there should be no cases where we don't have a  MTW
       yield call(fetchKomenciSessionState, komenciKit, e164Number)
       feelessVerificationState = yield select(feelessVerificationStateSelector)
+      deployedUnverifiedMtwAddress = feelessVerificationState.komenci.unverifiedMtwAddress
       komenciError = error
     }
   }

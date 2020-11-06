@@ -12,7 +12,18 @@ import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/uti
 import functions from '@react-native-firebase/functions'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
-import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  fork,
+  put,
+  race,
+  select,
+  spawn,
+  take,
+  takeEvery,
+} from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
@@ -107,7 +118,6 @@ export function* fetchVerificationState() {
     })
     if (timeout) {
       Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
-      yield put(setVerificationStatus(VerificationStatus.Stopped))
       return
     }
     const isBalanceSufficientForSigRetrieval = yield select(
@@ -115,7 +125,6 @@ export function* fetchVerificationState() {
     )
     if (!isBalanceSufficientForSigRetrieval) {
       Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
-      yield put(setVerificationStatus(VerificationStatus.Stopped))
       return
     }
 
@@ -330,8 +339,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       }
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
-      // NOTE: I think we want the DEK registration out of the race because
-      // we want that to happen no matter what
       yield race({
         actionableAttestationCompleted: call(
           completeAttestations,
@@ -346,7 +353,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
 
       // Set acccount and data encryption key in Accounts contract
       // This is done in other places too, intentionally keeping it for more coverage
-      yield call(registerAccountDek, account)
+      yield spawn(registerAccountDek, account)
 
       receiveMessageTask?.cancel()
       if (Platform.OS === 'android') {
