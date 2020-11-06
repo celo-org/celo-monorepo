@@ -15,6 +15,7 @@ import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { hasExceededKomenciErrorQuota } from 'src/identity/feelessVerificationErrors'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
+import { removeKeyFromMapping } from 'src/identity/utils'
 import {
   AttestationCode,
   ESTIMATED_COST_PER_ATTESTATION,
@@ -91,8 +92,7 @@ export type FeelessUpdatableVerificationState = {
     sessionActive: boolean
     sessionToken: string
     captchaToken: string
-    pepperQuotaRemaining: number
-    requestQuotaRemaining: number
+    pepperFetchedByKomenci: boolean
   }
 } & UpdatableVerificationState
 
@@ -208,8 +208,7 @@ const initialState: State = {
       sessionActive: false,
       sessionToken: '',
       captchaToken: '',
-      pepperQuotaRemaining: 1,
-      requestQuotaRemaining: 10,
+      pepperFetchedByKomenci: false,
     },
   },
   lastRevealAttempt: null,
@@ -236,6 +235,7 @@ export const reducer = (
         },
         verificationState: initialState.verificationState,
         feelessVerificationState: {
+          ...initialState.feelessVerificationState,
           ...rehydratedState.feelessVerificationState,
           isLoading: false,
         },
@@ -255,6 +255,30 @@ export const reducer = (
         feelessAttestationCodes: [],
         feelessNumCompleteAttestations: 0,
         feelessVerificationStatus: VerificationStatus.Stopped,
+      }
+    case Actions.REVOKE_VERIFICATION_STATE:
+      return {
+        ...state,
+        attestationCodes: [],
+        acceptedAttestationCodes: [],
+        numCompleteAttestations: 0,
+        verificationStatus: VerificationStatus.Stopped,
+        verificationState: initialState.verificationState,
+        lastRevealAttempt: null,
+      }
+    case Actions.FEELESS_REVOKE_VERIFICATION_STATE:
+      return {
+        ...state,
+        feelessAttestationCodes: [],
+        feelessAcceptedAttestationCodes: [],
+        feelessNumCompleteAttestations: 0,
+        feelessVerificationStatus: VerificationStatus.Stopped,
+        walletToAccountAddress: removeKeyFromMapping(
+          state.walletToAccountAddress,
+          action.walletAddress
+        ),
+        feelessVerificationState: initialState.feelessVerificationState,
+        feelessLastRevealAttempt: null,
       }
     case Actions.FEELESS_START_VERIFICATION:
       return {
@@ -522,8 +546,9 @@ export const reducer = (
 }
 
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
-  const { attestationCodes, acceptedAttestationCodes } = state
+  const { acceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
+  const attestationCodes = [...state.attestationCodes]
   for (let i = 0; i < numCompleteAttestations; i++) {
     attestationCodes[i] = acceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
@@ -532,13 +557,14 @@ const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
   }
   return {
     numCompleteAttestations,
-    attestationCodes: [...attestationCodes],
+    attestationCodes,
   }
 }
 
 const feelessCompleteCodeReducer = (state: State, feelessNumCompleteAttestations: number) => {
-  const { feelessAttestationCodes, feelessAcceptedAttestationCodes } = state
+  const { feelessAcceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
+  const feelessAttestationCodes = [...state.feelessAttestationCodes]
   for (let i = 0; i < feelessNumCompleteAttestations; i++) {
     feelessAttestationCodes[i] = feelessAcceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
@@ -547,7 +573,7 @@ const feelessCompleteCodeReducer = (state: State, feelessNumCompleteAttestations
   }
   return {
     feelessNumCompleteAttestations,
-    feelessAttestationCodes: [...feelessAttestationCodes],
+    feelessAttestationCodes,
   }
 }
 
@@ -624,11 +650,9 @@ export const isFeelessVerificationStateExpiredSelector = (state: RootState) => {
   return !lastFetch || timeDeltaInSeconds(Date.now(), lastFetch) > VERIFICATION_STATE_EXPIRY_SECONDS
 }
 
-// Use this only as part of the notification display logic
 export const tryFeelessOnboardingSelector = ({
   identity: { feelessVerificationState },
 }: RootState) => {
   const { errorTimestamps } = feelessVerificationState.komenci
-
   return !hasExceededKomenciErrorQuota(errorTimestamps) && features.KOMENCI
 }

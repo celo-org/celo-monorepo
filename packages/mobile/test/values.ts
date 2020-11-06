@@ -19,8 +19,6 @@ import {
   RecipientWithQrCode,
 } from 'src/recipients/recipient'
 
-export const nullAddress = '0x0'
-
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
 export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'

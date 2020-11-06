@@ -208,9 +208,7 @@ export function* registerWalletAndDekViaKomenci(
     'Setting wallet address and public data encryption key'
   )
 
-  // Don't think we need to unlock the account anymore because we do
-  // it at the start of the feeless verification flow
-  // yield call(getConnectedUnlockedAccount)
+  yield call(getConnectedUnlockedAccount)
   ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked)
 
   const privateDataKey: string | null = yield select(dataEncryptionKeySelector)

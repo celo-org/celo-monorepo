@@ -152,9 +152,9 @@ export function* fetchVerificationState() {
         status,
       })
     )
-    yield put(setVerificationStatus(VerificationStatus.Stopped))
   } catch (error) {
     Logger.error(TAG, 'Error occured during fetching verification state', error)
+  } finally {
     yield put(setVerificationStatus(VerificationStatus.Stopped))
   }
 }
@@ -333,15 +333,20 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       // NOTE: I think we want the DEK registration out of the race because
       // we want that to happen no matter what
       yield race({
-        actionableAttestationCompleted: all([
-          call(completeAttestations, attestationsWrapper, account, phoneHashDetails, attestations),
-          // Set acccount and data encryption key in Accounts contract
-          // This is done in other places too, intentionally keeping it for more coverage
-          call(registerAccountDek, account),
-        ]),
+        actionableAttestationCompleted: call(
+          completeAttestations,
+          attestationsWrapper,
+          account,
+          phoneHashDetails,
+          attestations
+        ),
         // This is needed, because we can have more actionableAttestations than NUM_ATTESTATIONS_REQUIRED
         requiredAttestationsCompleted: call(requiredAttestationsCompleted),
       })
+
+      // Set acccount and data encryption key in Accounts contract
+      // This is done in other places too, intentionally keeping it for more coverage
+      yield call(registerAccountDek, account)
 
       receiveMessageTask?.cancel()
       if (Platform.OS === 'android') {
