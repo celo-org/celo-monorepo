@@ -91,8 +91,7 @@ export type FeelessUpdatableVerificationState = {
     sessionActive: boolean
     sessionToken: string
     captchaToken: string
-    pepperQuotaRemaining: number
-    requestQuotaRemaining: number
+    pepperFetchedByKomenci: boolean
   }
 } & UpdatableVerificationState
 
@@ -206,8 +205,7 @@ const initialState: State = {
       sessionActive: false,
       sessionToken: '',
       captchaToken: '',
-      pepperQuotaRemaining: 1,
-      requestQuotaRemaining: 10,
+      pepperFetchedByKomenci: false,
     },
   },
   lastRevealAttempt: null,
@@ -520,8 +518,9 @@ export const reducer = (
 }
 
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
-  const { attestationCodes, acceptedAttestationCodes } = state
+  const { acceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
+  const attestationCodes = [...state.attestationCodes]
   for (let i = 0; i < numCompleteAttestations; i++) {
     attestationCodes[i] = acceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
@@ -530,13 +529,14 @@ const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
   }
   return {
     numCompleteAttestations,
-    attestationCodes: [...attestationCodes],
+    attestationCodes,
   }
 }
 
 const feelessCompleteCodeReducer = (state: State, feelessNumCompleteAttestations: number) => {
-  const { feelessAttestationCodes, feelessAcceptedAttestationCodes } = state
+  const { feelessAcceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
+  const feelessAttestationCodes = [...state.feelessAttestationCodes]
   for (let i = 0; i < feelessNumCompleteAttestations; i++) {
     feelessAttestationCodes[i] = feelessAcceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
@@ -545,7 +545,7 @@ const feelessCompleteCodeReducer = (state: State, feelessNumCompleteAttestations
   }
   return {
     feelessNumCompleteAttestations,
-    feelessAttestationCodes: [...feelessAttestationCodes],
+    feelessAttestationCodes,
   }
 }
 
@@ -622,7 +622,6 @@ export const isFeelessVerificationStateExpiredSelector = (state: RootState) => {
   return !lastFetch || timeDeltaInSeconds(Date.now(), lastFetch) > VERIFICATION_STATE_EXPIRY_SECONDS
 }
 
-// Use this only as part of the notification display logic
 export const tryFeelessOnboardingSelector = ({
   identity: { feelessVerificationState },
 }: RootState) => {

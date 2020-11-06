@@ -93,10 +93,18 @@ import { TransactionReceipt } from 'web3-eth'
 const TAG = 'identity/feelessVerification'
 
 const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
-// const KOMENCI_URL = 'http://192.168.86.33:3000'
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
 const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
+
+// NOTE: This will need to change if we begin to use the `total`
+// property as a consideration for verification status
+const VERIFIED_ATTESTATION_STATUS = {
+  isVerified: true,
+  numAttestationsRemaining: 0,
+  total: NUM_ATTESTATIONS_REQUIRED,
+  completed: NUM_ATTESTATIONS_REQUIRED,
+}
 
 export function* feelessFetchVerificationState() {
   Logger.debug(TAG, '@feelessFetchVerificationState', 'Starting fetch')
@@ -121,22 +129,26 @@ export function* feelessFetchVerificationState() {
     })
 
     try {
+      // Throws error if Komenci is not ready for user, otherwise it updates state
+      yield call(fetchKomenciReadiness, komenciKit)
+    } catch (error) {
       // Checks if a MTW was verified in a previous attempt and updates state.
       // This check will likely fail because the pepper hasn't been cached yet
       // but needs to happen for the edge case that a user has a cached pepper
       // and Komenci is down
-      yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
-    } catch (error) {
-      Logger.debug(TAG, 'Unable to check it MTW is verified on first attempt')
+      try {
+        yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
+      } catch (e) {
+        Logger.debug(TAG, 'Unable to check if MTW is verified on first attempt')
+      }
+      throw error
     }
-    // Throws error if Komenci is not ready for user, otherwise it updates state
-    yield call(fetchKomenciReadiness, komenciKit)
 
     // Throws error if unable to retreive phone hash, otherwise it updates state
     yield call(fetchPhoneHashDetailsFromCache, e164Number)
 
     // Updates state with sessionStatus and the mtwAddress associated with the session
-    yield call(fetchSessionState, komenciKit, e164Number)
+    yield call(fetchKomenciSessionState, komenciKit, e164Number)
 
     // Checks if a MTW was verified in a previous attempt and updates state
     yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
@@ -146,10 +158,10 @@ export function* feelessFetchVerificationState() {
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
     })
-    yield put(feelessSetVerificationStatus(VerificationStatus.Stopped))
   } catch (error) {
     Logger.error(TAG, 'Error occured while fetching verification state', error)
     yield call(storeTimestampIfKomenciError, error, false)
+  } finally {
     yield put(feelessSetVerificationStatus(VerificationStatus.Stopped))
   }
 }
@@ -238,26 +250,23 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       token: feelessVerificationState.komenci.sessionToken,
     })
 
-    // Start by checking again to make sure Komenci is ready. Throws error if not
-    yield call(fetchKomenciReadiness, komenciKit)
-
     // There should be no instances where the first param is truethy but the second isn't.
     // Mainly including the second param to satisfy typescript
     if (
       !feelessVerificationState.status.isVerified ||
       !feelessVerificationState.komenci.unverifiedMtwAddress
     ) {
-      // Start or resume a Komenci session and update state. Throws error if unable to do so
+      // Start a new Komenci session if one doesn't exist or we've run out of quota and update state.
+      // Throws error if unable to do so
       yield call(startOrResumeKomenciSession, komenciKit, e164Number)
 
       // Adds phoneHash into verification state, will ping Komenci for it only if needed.
       // Throws an error if unable to get phoneHash
       yield call(fetchPhoneHashDetails, komenciKit, e164Number)
 
-      const startingPepperQuota = feelessVerificationState.komenci.pepperQuotaRemaining
       // Now that we are guarnateed to have the phoneHash, check again to see if the
       // user already has a verified MTW
-      yield call(reFetchVerifiedMtw, contractKit, walletAddress, e164Number, startingPepperQuota)
+      yield call(reFetchVerifiedMtw, contractKit, walletAddress, e164Number)
 
       const mtwIsVerified = yield call(isMtwVerified)
 
@@ -281,7 +290,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       const { unverifiedMtwAddress } = komenci
 
       if (!unverifiedMtwAddress) {
-        throw Error('MTW not yet deploy. Should never happen')
+        throw Error('MTW not yet deployed. Should never happen')
       }
 
       const attestationsWrapper: AttestationsWrapper = yield call([
@@ -420,35 +429,48 @@ function* fetchKomenciReadiness(komenciKit: KomenciKit) {
     feelessVerificationStateSelector
   )
 
-  const { komenci } = feelessVerificationState
+  try {
+    const { komenci } = feelessVerificationState
 
-  if (!features.KOMENCI) {
-    throw new KomenciDisabledError()
+    if (!features.KOMENCI) {
+      throw new KomenciDisabledError()
+    }
+
+    const serviceStatusResult: Result<true, KomenciDown> = yield call([
+      komenciKit,
+      komenciKit.checkService,
+    ])
+    if (!serviceStatusResult.ok) {
+      Logger.debug(TAG, '@fetchKomenciReadiness', 'Service down')
+      throw serviceStatusResult.error
+    }
+
+    if (hasExceededKomenciErrorQuota(komenci.errorTimestamps)) {
+      Logger.debug(TAG, '@fetchKomenciReadiness', 'Too  many errors')
+      throw new KomenciErrorQuotaExceeded()
+    }
+
+    yield put(
+      feelessUpdateVerificationState({
+        ...feelessVerificationState,
+        komenci: {
+          ...feelessVerificationState.komenci,
+          serviceAvailable: true,
+        },
+      })
+    )
+  } catch (error) {
+    yield put(
+      feelessUpdateVerificationState({
+        ...feelessVerificationState,
+        komenci: {
+          ...feelessVerificationState.komenci,
+          serviceAvailable: false,
+        },
+      })
+    )
+    throw error
   }
-
-  const serviceStatusResult: Result<true, KomenciDown> = yield call([
-    komenciKit,
-    komenciKit.checkService,
-  ])
-  if (!serviceStatusResult.ok) {
-    Logger.debug(TAG, '@fetchKomenciReadiness', 'Service down')
-    throw serviceStatusResult.error
-  }
-
-  if (hasExceededKomenciErrorQuota(komenci.errorTimestamps)) {
-    Logger.debug(TAG, '@fetchKomenciReadiness', 'Too  many errors')
-    throw new KomenciErrorQuotaExceeded()
-  }
-
-  yield put(
-    feelessUpdateVerificationState({
-      ...feelessVerificationState,
-      komenci: {
-        ...feelessVerificationState.komenci,
-        serviceAvailable: true,
-      },
-    })
-  )
 }
 
 function* fetchPhoneHashDetailsFromCache(e164Number: string) {
@@ -486,8 +508,8 @@ function* fetchPhoneHashDetailsFromCache(e164Number: string) {
   return phoneHashDetails
 }
 
-function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
-  Logger.debug(TAG, '@fetchSessionState', 'Starting fetch')
+function* fetchKomenciSessionState(komenciKit: KomenciKit, e164Number: string) {
+  Logger.debug(TAG, '@fetchKomenciSessionState', 'Starting fetch')
   const [feelessVerificationState, pepperCache, sessionStatusResult]: [
     FeelessVerificationState,
     E164NumberToSaltType,
@@ -499,18 +521,14 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
   ])
 
   let sessionActive = true
-  let {
-    requestQuotaRemaining,
-    pepperQuotaRemaining,
-    unverifiedMtwAddress,
-  } = feelessVerificationState.komenci
+  let { unverifiedMtwAddress } = feelessVerificationState.komenci
 
   // An inactive session is not fatal, it just means we will need to start one
   if (!sessionStatusResult.ok) {
-    Logger.debug(TAG, '@fetchSessionState', 'No active sessions')
+    Logger.debug(TAG, '@fetchKomenciSessionState', 'No active sessions')
     sessionActive = false
   } else {
-    Logger.debug(TAG, '@fetchSessionState', 'Active session found')
+    Logger.debug(TAG, '@fetchKomenciSessionState', 'Active session found')
     const {
       quotaLeft: { distributedBlindedPepper, requestSubsidisedAttestation, submitMetaTransaction },
       metaTxWalletAddress,
@@ -519,16 +537,13 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
 
     Logger.debug(
       TAG,
-      '@fetchSessionState Session status:',
+      '@fetchKomenciSessionState Session status:',
       JSON.stringify(sessionStatusResult.result)
     )
 
-    sessionActive = true
-    // Somtimes `metaTxWalletAddress` is returned as undefined for an active session.
+    // Sometimes `metaTxWalletAddress` is returned as undefined for an active session.
     // In that case, use the `unverifiedMtwAddress` we have stored locally
     unverifiedMtwAddress = metaTxWalletAddress ?? unverifiedMtwAddress
-    pepperQuotaRemaining = distributedBlindedPepper
-    requestQuotaRemaining = requestSubsidisedAttestation
 
     // No pepper quota remaining is only bad if it's not already cached. Given Komenci will fetch
     // a pepper for you once, a session could be invalid due to the pepper condition if a user
@@ -538,6 +553,11 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
       !requestSubsidisedAttestation ||
       !submitMetaTransaction
     ) {
+      Logger.debug(
+        TAG,
+        '@fetchKomenciSessionState',
+        'Komenci session has run out of quota. Will attempt to start a new one'
+      )
       sessionActive = false
     }
   }
@@ -549,8 +569,6 @@ function* fetchSessionState(komenciKit: KomenciKit, e164Number: string) {
         ...feelessVerificationState.komenci,
         unverifiedMtwAddress,
         sessionActive,
-        requestQuotaRemaining,
-        pepperQuotaRemaining,
       },
     })
   )
@@ -562,11 +580,11 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     feelessVerificationStateSelector
   )
 
-  const phonHashDetails: PhoneNumberHashDetails = yield call(
+  const phoneHashDetails: PhoneNumberHashDetails = yield call(
     fetchPhoneHashDetailsFromCache,
     e164Number
   )
-  const { phoneHash } = phonHashDetails
+  const { phoneHash } = phoneHashDetails
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
   const possibleMtwAddresses = getAddressesFromLookupResult(lookupResult, phoneHash)
 
@@ -599,7 +617,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     (address, i) => verificationResults[i].ok
   )
 
-  if (verifiedMtwAddresses.length > 2) {
+  if (verifiedMtwAddresses.length > 1) {
     throw Error(
       'More than one verified MTW with walletAddress as signer found. Should never happen'
     )
@@ -615,12 +633,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
   yield put(
     feelessUpdateVerificationState({
       ...feelessVerificationState,
-      status: {
-        isVerified: true,
-        numAttestationsRemaining: 0,
-        total: NUM_ATTESTATIONS_REQUIRED,
-        completed: NUM_ATTESTATIONS_REQUIRED,
-      },
+      status: VERIFIED_ATTESTATION_STATUS,
       komenci: {
         ...feelessVerificationState.komenci,
         unverifiedMtwAddress: verifiedMtwAddress,
@@ -631,22 +644,17 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
   return verifiedMtwAddress
 }
 
-function* reFetchVerifiedMtw(
-  contractKit: ContractKit,
-  walletAddress: string,
-  e164Number: string,
-  startingPepperQuota: number
-) {
+function* reFetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164Number: string) {
   Logger.debug(TAG, '@reFetchVerifiedMtw', 'Starting fetch')
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
 
-  const { pepperQuotaRemaining } = feelessVerificationState.komenci
+  const { pepperFetchedByKomenci } = feelessVerificationState.komenci
   // If Komenci was used to fetch their pepper, check if the they have a verified
   // account. If user already had their pepper, then check would have happened
   // in `feelessFetchVerificationState`
-  if (startingPepperQuota > pepperQuotaRemaining) {
+  if (pepperFetchedByKomenci) {
     yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
   }
 }
@@ -708,7 +716,7 @@ function* fetchAttestationStatus(contractKit: ContractKit) {
 function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string) {
   Logger.debug(TAG, '@startOrResumeKomenciSession', 'Starting session')
   // Fetch session state to make sure we have the most up-to-date session info
-  yield call(fetchSessionState, komenciKit, e164Number)
+  yield call(fetchKomenciSessionState, komenciKit, e164Number)
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
@@ -721,8 +729,9 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
   if (!sessionActive || !sessionToken.length) {
     // Should never get here without a captcha token
     if (!captchaToken.length) {
-      Logger.debug(TAG, '@startOrResumeKomenciSession', 'No captcha found')
-      throw new KomenciSessionInvalidError()
+      const error = new KomenciSessionInvalidError()
+      Logger.error(TAG, '@startOrResumeKomenciSession', error)
+      throw error
     }
 
     const komenciSessionResult: Result<
@@ -746,7 +755,7 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
     )
 
     // Fetch session state now that we are sure to have a token
-    yield call(fetchSessionState, komenciKit, e164Number)
+    yield call(fetchKomenciSessionState, komenciKit, e164Number)
   }
 }
 
@@ -774,13 +783,12 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
       throw pepperQueryResult.error
     }
 
-    const pepperQuotaRemaining = feelessVerificationState.komenci.pepperQuotaRemaining - 1
     yield put(
       feelessUpdateVerificationState({
         ...feelessVerificationState,
         komenci: {
           ...feelessVerificationState.komenci,
-          pepperQuotaRemaining,
+          pepperFetchedByKomenci: true,
         },
       })
     )
@@ -800,11 +808,13 @@ function* fetchOrDeployMtw(
   let feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
-  let { unverifiedMtwAddress } = feelessVerificationState.komenci
+  const storedUnverifiedMtwAddress = feelessVerificationState.komenci.unverifiedMtwAddress
+  let deployedUnverifiedMtwAddress: string | null = null
+  let komenciError: FetchError | TxError | InvalidWallet | undefined
 
-  // If there isn't a MTW for this session, ask Komenci to deploy one
-  if (!unverifiedMtwAddress) {
-    // This try/catch block is a workaround because Komenci will throw and error
+  // If there isn't a MTW stored for this session, ask Komenci to deploy one
+  if (!storedUnverifiedMtwAddress) {
+    // This try/catch block is a workaround because Komenci will throw an error
     // if a wallet was already deployed in a session. This is only fatal if
     // we can't recover the MTW address or there is no quota left on the session
     try {
@@ -818,26 +828,29 @@ function* fetchOrDeployMtw(
         throw deployWalletResult.error
       }
 
-      unverifiedMtwAddress = deployWalletResult.result
+      deployedUnverifiedMtwAddress = deployWalletResult.result
     } catch (error) {
-      // Fetch session state now that we are sure to have a MTW
-      yield call(fetchSessionState, komenciKit, e164Number)
+      // Fetch session state now that there should be no cases where we don't have a  MTW
+      yield call(fetchKomenciSessionState, komenciKit, e164Number)
       feelessVerificationState = yield select(feelessVerificationStateSelector)
-      // If we can't recover the MTW address or already used up all our quota,
-      // then propogate the Komenci error
-      unverifiedMtwAddress = feelessVerificationState.komenci.unverifiedMtwAddress
-      if (!unverifiedMtwAddress || !feelessVerificationState.komenci.sessionActive) {
-        Logger.debug(
-          TAG,
-          '@fetchOrDeployMtw',
-          'Checked status again and but still no MTW address found'
-        )
-        throw error
-      }
+      komenciError = error
     }
   }
 
-  // Check if MTW we have is a valid implementation
+  const unverifiedMtwAddress = deployedUnverifiedMtwAddress ?? storedUnverifiedMtwAddress
+
+  // If we couldn't recover or deploy a new the MTW address, then propogate the Komenci error
+  // we recevied from the failed `deployWallet` call. We also need to check if the session
+  // is still active because it's possible the current session ran out of quota
+  if (!unverifiedMtwAddress || !feelessVerificationState.komenci.sessionActive) {
+    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to deploy or recover a MTW')
+    // The new error on the RHS is mostly to placate the linting rules.
+    // There should be no instances where Komenci is unable to deploy
+    // a MTW yet doesn't return an error
+    throw komenciError ?? new Error('Unable to deploy or recover a MTW')
+  }
+
+  // Check if the MTW we have is a valid implementation
   const validityCheckResult: Result<true, WalletValidationError> = yield call(
     verifyWallet,
     contractKit,
@@ -847,13 +860,27 @@ function* fetchOrDeployMtw(
   )
 
   if (!validityCheckResult.ok) {
-    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to validate MTW')
+    Logger.debug(TAG, '@fetchOrDeployMtw', 'Unable to validate MTW implementation')
     throw validityCheckResult.error
+  }
+
+  // If a new MTW was deployed, then make sure to reset all attestation
+  // progress associated with the old MTW
+  let { status } = feelessVerificationState
+  if (deployedUnverifiedMtwAddress) {
+    yield put(feelessResetVerification())
+    status = {
+      isVerified: false,
+      numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+      total: 0,
+      completed: 0,
+    }
   }
 
   yield put(
     feelessUpdateVerificationState({
       ...feelessVerificationState,
+      status,
       komenci: {
         ...feelessVerificationState.komenci,
         unverifiedMtwAddress,
@@ -985,7 +1012,7 @@ export function* feelessRequestAttestations(
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
 
-function* feelessGetCodeForIssuer(issuer: string) {
+export function* feelessGetCodeForIssuer(issuer: string) {
   const existingCodes: AttestationCode[] = yield select(feelessAttestationCodesSelector)
   return existingCodes.find((c) => c.issuer === issuer)
 }

@@ -62,9 +62,11 @@ export const hasExceededKomenciErrorQuota = (komenciErrorTimestamps: number[]) =
   return recentErrors.length > KOMENCI_ERROR_ALLOTMENT
 }
 
-// If the error is unexpected, add it to state. If we encounter more errors than
-// allowed within a given window, we won't allow the user to attempt verifciation
-// via Komenci until a certain amount of time has passed
+// If an error occurs during the feeless verification flow that is `unexpected` and likely
+// due to a Komenci service failure, add the timestamp of it's occurrence to `feelessVerificationState`.
+// If the user encounters more errors than we feel comfortable with during a given window,
+// we won't allow them to attempt feeless verifciation until a certain amount of time has passed
+// in order to give cLabs time to remediate the issue
 export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFlow: boolean) {
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
@@ -73,6 +75,8 @@ export function* storeTimestampIfKomenciError(error: Error, errorOccuredInMainFl
   let unexpectedKomenciError = false
   const errorString = error.toString()
 
+  // Any errors that of these types are unexpected Komenci errors and
+  // are likely indicative of a service failure that needs remediation
   if (
     Object.keys(TxErrorTypes).includes(errorString) ||
     Object.keys(KomenciKitErrorTypes).includes(errorString) ||

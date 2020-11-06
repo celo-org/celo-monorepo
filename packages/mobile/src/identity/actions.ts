@@ -73,7 +73,6 @@ export interface SetVerificationStatusAction {
   status: VerificationStatus
 }
 
-// TODO: delete this if we dont end up using it
 export interface FeelessSetVerificationStatusAction {
   type: Actions.FEELESS_SET_VERIFICATION_STATUS
   status: VerificationStatus
@@ -351,7 +350,6 @@ export const setVerificationStatus = (status: VerificationStatus): SetVerificati
   status,
 })
 
-// TODO: delete this if we dont end up using it
 export const feelessSetVerificationStatus = (
   status: VerificationStatus
 ): FeelessSetVerificationStatusAction => ({
