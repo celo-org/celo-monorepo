@@ -220,9 +220,10 @@ async function formEscrowWithdrawTxWithNoCode(
   escrowWrapper: EscrowWrapper,
   paymentId: string,
   pepper: string,
-  msgHash: string,
+  walletAddress: string,
   addressIndex: number
 ) {
+  const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: walletAddress })
   const { privateKey } = generateDeterministicInviteCode(pepper, addressIndex)
   const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
     .signature
@@ -239,7 +240,7 @@ async function formEscrowWithdrawTxWithNoCode(
 function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
   try {
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
-    Logger.debug(TAG + '@withdrawFromEscrowViaKomenci', 'Withdrawing escrowed payment')
+    Logger.debug(TAG + '@withdrawFromEscrowUsingPepper', 'Withdrawing escrowed payment')
     const phoneHashDetails: PhoneNumberHashDetails | undefined = yield call(
       getUserSelfPhoneHashDetails
     )
@@ -276,7 +277,6 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       phoneHash
     )
 
-    const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: walletAddress })
     const context = newTransactionContext(TAG, 'Withdraw from escrow')
     // TODO: Batch the tranasctions and submit them together via `executeTransactions`
     // method on an instance of the MTW then submitting like usual
@@ -287,7 +287,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         escrowWrapper,
         escrowPaymentIds[i],
         pepper,
-        msgHash,
+        walletAddress,
         i
       )
 

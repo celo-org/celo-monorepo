@@ -1,5 +1,6 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
+import { generateDeterministicInviteCode } from '@celo/utils/lib/account'
 
 export const splitSignature = (contractKit: ContractKit, signature: string) => {
   const sig = trimLeading0x(signature)
@@ -9,25 +10,11 @@ export const splitSignature = (contractKit: ContractKit, signature: string) => {
   return { r, s, v }
 }
 
-function* formEscrowWithdrawTx(
-  contractKit: ContractKit,
-  escrowWrapper: EscrowWrapper,
-  paymentId: string,
-  pepper: string,
-  msgHash: string,
-  addressIndex: number
-) {
-  if (features.ESCROW_WITHOUT_CODE) {
-    const { privateKey } = generateDeterministicInviteCode(pepper, i)
-    const signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, privateKey))
-      .signature
-    Logger.debug(
-      TAG + '@withdrawFromEscrowViaKomenci',
-      `Signed message hash signature is ${signature}`
-    )
-
-    const { r, s, v } = splitSignature(contractKit, signature)
-    const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
-    return withdrawTx
-  }
+export const generateEscrowPaymentId = (
+  recipientPepper: string,
+  addressIndex: number = 0,
+  changeIndex: number = 0,
+  derivationPath: string = CELO_DERIVATION_PATH_BASE
+) => {
+  generateDeterministicInviteCode(pepper, addressIndex)
 }
