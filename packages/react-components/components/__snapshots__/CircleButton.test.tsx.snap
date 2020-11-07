@@ -24,7 +24,6 @@ exports[`CircleButton renders correctly with minimum props 1`] = `
         "top": 10,
       }
     }
-    isTVSelectable={true}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -94,7 +93,6 @@ exports[`CircleButton when given optional props renders correctly 1`] = `
         "top": 10,
       }
     }
-    isTVSelectable={true}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}

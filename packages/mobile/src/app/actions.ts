@@ -1,10 +1,5 @@
-import { NavigationParams } from 'react-navigation'
 import i18n from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-const numeral = require('numeral')
-require('numeral/locales/es')
 
 const TAG = 'app/actions'
 
@@ -27,9 +22,12 @@ export enum Actions {
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
-  NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
+  SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
+  MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+  TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
 }
 
 export interface SetAppState {
@@ -74,15 +72,14 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-interface SetLockWithPinEnabled {
+interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
 }
 
-export interface NavigatePinProtected {
-  type: Actions.NAVIGATE_PIN_PROTECTED
-  routeName: string
-  params?: NavigationParams
+interface InviteModalAction {
+  type: Actions.TOGGLE_INVITE_MODAL
+  inviteModalVisible: boolean
 }
 
 export interface Lock {
@@ -91,6 +88,21 @@ export interface Lock {
 
 export interface Unlock {
   type: Actions.UNLOCK
+}
+
+export interface SetSessionId {
+  type: Actions.SET_SESSION_ID
+  sessionId: string
+}
+
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+}
+
+interface MinAppVersionDeterminedAction {
+  type: Actions.MIN_APP_VERSION_DETERMINED
+  minVersion: string | null
 }
 
 export type ActionTypes =
@@ -103,10 +115,13 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | SetLockWithPinEnabled
-  | NavigatePinProtected
+  | SetRequirePinOnAppOpen
   | Lock
   | Unlock
+  | SetSessionId
+  | OpenUrlAction
+  | MinAppVersionDeterminedAction
+  | InviteModalAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -123,22 +138,18 @@ export const setNumberVerified = (numberVerified: boolean) => ({
   numberVerified,
 })
 
-export const setLanguage = (language: string, nextScreen?: Screens) => {
-  numeral.locale(language.substring(0, 2))
+export const setLanguage = (language: string) => {
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 
-  if (nextScreen) {
-    navigate(nextScreen)
-  }
   return {
     type: Actions.SET_LANGUAGE,
     language,
   }
 }
 
-export const openDeepLink = (deepLink: string) => {
+export const openDeepLink = (deepLink: string): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
@@ -162,24 +173,37 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })
 
-export const navigatePinProtected = (
-  routeName: string,
-  params?: NavigationParams
-): NavigatePinProtected => ({
-  type: Actions.NAVIGATE_PIN_PROTECTED,
-  routeName,
-  params,
-})
-
-export const lock = (): Lock => ({
+export const appLock = (): Lock => ({
   type: Actions.LOCK,
 })
 
-export const unlock = (): Unlock => ({
+export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
+})
+
+export const setSessionId = (sessionId: string) => ({
+  type: Actions.SET_SESSION_ID,
+  sessionId,
+})
+
+export const openUrl = (url: string): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
+})
+
+export const minAppVersionDetermined = (
+  minVersion: string | null
+): MinAppVersionDeterminedAction => ({
+  type: Actions.MIN_APP_VERSION_DETERMINED,
+  minVersion,
+})
+
+export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
+  type: Actions.TOGGLE_INVITE_MODAL,
+  inviteModalVisible,
 })

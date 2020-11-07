@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { GasPriceMinimum } from '../generated/GasPriceMinimum'
-import { BaseWrapper, proxyCall, valueToBigNumber } from './BaseWrapper'
+import { BaseWrapper, fixidityValueToBigNumber, proxyCall, valueToBigNumber } from './BaseWrapper'
 
 export interface GasPriceMinimumConfig {
   gasPriceMinimum: BigNumber
@@ -13,8 +13,8 @@ export interface GasPriceMinimumConfig {
  */
 export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
   /**
-   * Query current gas price minimum in gGLD.
-   * @returns current gas price minimum in cGLD
+   * Query current gas price minimum in CELO.
+   * @returns current gas price minimum in CELO
    */
   gasPriceMinimum = proxyCall(this.contract.methods.gasPriceMinimum, undefined, valueToBigNumber)
 
@@ -32,12 +32,20 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
    * Query target density parameter.
    * @returns the current block density targeted by the gas price minimum algorithm.
    */
-  targetDensity = proxyCall(this.contract.methods.targetDensity, undefined, valueToBigNumber)
+  targetDensity = proxyCall(
+    this.contract.methods.targetDensity,
+    undefined,
+    fixidityValueToBigNumber
+  )
   /**
    * Query adjustment speed parameter
    * @returns multiplier that impacts how quickly gas price minimum is adjusted.
    */
-  adjustmentSpeed = proxyCall(this.contract.methods.adjustmentSpeed, undefined, valueToBigNumber)
+  adjustmentSpeed = proxyCall(
+    this.contract.methods.adjustmentSpeed,
+    undefined,
+    fixidityValueToBigNumber
+  )
   /**
    * Returns current configuration parameters.
    */

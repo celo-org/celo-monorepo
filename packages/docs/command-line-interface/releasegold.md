@@ -13,6 +13,8 @@ USAGE
   $ celocli releasegold:authorize
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
+
   --blsKey=0x                                            The BLS public key that the validator is using for consensus,
                                                          should pass proof of possession. 96 bytes.
 
@@ -21,13 +23,25 @@ OPTIONS
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
   --role=vote|validator|attestation                      (required)
 
-  --signature=signature                                  (required) Signature (a.k.a. proof-of-possession) of the signer
+  --signature=0x                                         (required) Signature (a.k.a. proof-of-possession) of the signer
                                                          key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The signer key that is to be used for voting through
                                                          the ReleaseGold instance
+
+  --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLES
   authorize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
@@ -55,7 +69,20 @@ USAGE
   $ celocli releasegold:create-account
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLE
   create-account --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
@@ -65,7 +92,7 @@ _See code: [packages/cli/src/commands/releasegold/create-account.ts](https://git
 
 ### Locked-gold
 
-Perform actions [lock, unlock, withdraw] on Celo Gold that has been locked via the provided ReleaseGold contract.
+Perform actions [lock, unlock, withdraw] on CELO that has been locked via the provided ReleaseGold contract.
 
 ```
 USAGE
@@ -73,8 +100,24 @@ USAGE
 
 OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on contract's gold
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
   --value=10000000000000000000000                        (required) Amount of gold to perform `action` with
+
+  --yes                                                  Answer yes to prompt
 
 EXAMPLES
   locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action lock --value 10000000000000000000000
@@ -93,25 +136,26 @@ USAGE
   $ celocli releasegold:refund-and-finalize
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLE
   refund-and-finalize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
 _See code: [packages/cli/src/commands/releasegold/refund-and-finalize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/refund-and-finalize.ts)_
-
-### Release-gold
-
-```
-USAGE
-  $ celocli releasegold:release-gold
-
-OPTIONS
-  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-```
-
-_See code: [packages/cli/src/commands/releasegold/release-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/release-gold.ts)_
 
 ### Revoke
 
@@ -122,7 +166,21 @@ USAGE
   $ celocli releasegold:revoke
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
   --yesreally                                            Override prompt to set liquidity (be careful!)
 
 EXAMPLE
@@ -140,8 +198,22 @@ USAGE
   $ celocli releasegold:revoke-votes
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group to revoke votes from
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
   --votes=votes                                          (required) The number of votes to revoke
 
 EXAMPLE
@@ -160,9 +232,22 @@ USAGE
   $ celocli releasegold:set-account
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   -p, --property=name|dataEncryptionKey|metaURL          (required) Property type to set
   -v, --value=value                                      (required) Property value to set
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLES
   set-account --contract 0x5719118266779B58D0f9519383A4A27aA7b829E5 --property name --value mywallet
@@ -183,8 +268,22 @@ USAGE
   $ celocli releasegold:set-account-wallet-address
 
 OPTIONS
+  -k, --privateKey=privateKey                                 Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                           [default: 1] If --useLedger is set, this will get the
+                                                              first N addresses for local signing
+
+  --ledgerConfirmAddress                                      Set it to ask confirmation for the address of the
+                                                              transaction from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses               [default: [0]] If --useLedger is set, this will get the
+                                                              array of index addresses for local signing. Example
+                                                              --ledgerCustomAddresses "[4,99]"
+
   --pop=pop                                                   ECDSA PoP for signer over contract's account
+
+  --useLedger                                                 Set it to use a ledger wallet
 
   --walletAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of wallet to set for contract's account
                                                               and signer of PoP. 0x0 if owner wants payers to contact
@@ -201,22 +300,74 @@ _See code: [packages/cli/src/commands/releasegold/set-account-wallet-address.ts]
 
 ### Set-beneficiary
 
-Set the beneficiary of the ReleaseGold contract
+Set the beneficiary of the ReleaseGold contract. This command is gated via a multi-sig, so this is expected to be called twice: once by the contract's beneficiary and once by the contract's releaseOwner. Once both addresses call this command with the same parameters, the tx will execute.
 
 ```
 USAGE
   $ celocli releasegold:set-beneficiary
 
 OPTIONS
-  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address of the ReleaseGold Contract
-  --new_beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
+  -k, --privateKey=privateKey                               Use a private key to sign local transactions with
+  --beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
+  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the ReleaseGold Contract
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address to submit multisig transaction from (one
+                                                            of the owners)
+
+  --ledgerAddresses=ledgerAddresses                         [default: 1] If --useLedger is set, this will get the first
+                                                            N addresses for local signing
+
+  --ledgerConfirmAddress                                    Set it to ask confirmation for the address of the
+                                                            transaction from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses             [default: [0]] If --useLedger is set, this will get the
+                                                            array of index addresses for local signing. Example
+                                                            --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                               Set it to use a ledger wallet
+
+  --yesreally                                               Override prompt to set new beneficiary (be careful!)
 
 EXAMPLE
-  set-beneficiary --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --new-beneficiary
-  0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
+  set-beneficiary --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --from
+  0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84 --beneficiary 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
 ```
 
 _See code: [packages/cli/src/commands/releasegold/set-beneficiary.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-beneficiary.ts)_
+
+### Set-can-expire
+
+Set the canExpire flag for the given ReleaseGold contract
+
+```
+USAGE
+  $ celocli releasegold:set-can-expire
+
+OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
+  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
+  --value=(true|false|True|False)                        (required) canExpire value
+
+  --yesreally                                            Override prompt to set expiration flag (be careful!)
+
+EXAMPLE
+  set-can-expire --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --value true
+```
+
+_See code: [packages/cli/src/commands/releasegold/set-can-expire.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-can-expire.ts)_
 
 ### Set-liquidity-provision
 
@@ -227,7 +378,21 @@ USAGE
   $ celocli releasegold:set-liquidity-provision
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
   --yesreally                                            Override prompt to set liquidity (be careful!)
 
 EXAMPLE
@@ -245,12 +410,25 @@ USAGE
   $ celocli releasegold:set-max-distribution
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
                                                          indicating % of total balance available for distribution.
 
-  --yesreally                                            Override prompt to set liquidity (be careful!)
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
+  --yesreally                                            Override prompt to set new maximum distribution (be careful!)
 
 EXAMPLE
   set-max-distribution --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --distributionRatio 1000
@@ -267,7 +445,20 @@ USAGE
   $ celocli releasegold:show
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
 
 EXAMPLE
   show --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
@@ -284,13 +475,28 @@ USAGE
   $ celocli releasegold:transfer-dollars
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        (required) Address of the recipient of Celo Dollars transfer
+
+  --useLedger                                            Set it to use a ledger wallet
+
   --value=10000000000000000000000                        (required) Value (in Wei) of Celo Dollars to transfer
 
 EXAMPLE
-  transfer --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --value
-  10000000000000000000000
+  transfer-dollars --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
+  --value 10000000000000000000000
 ```
 
 _See code: [packages/cli/src/commands/releasegold/transfer-dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/transfer-dollars.ts)_
@@ -304,7 +510,21 @@ USAGE
   $ celocli releasegold:withdraw
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
+                                                         addresses for local signing
+
+  --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
+                                                         from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
+                                                         of index addresses for local signing. Example
+                                                         --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                            Set it to use a ledger wallet
+
   --value=10000000000000000000000                        (required) Amount of released gold (in wei) to withdraw
 
 EXAMPLE

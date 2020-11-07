@@ -4,6 +4,7 @@ import LazyFade from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Ally from 'src/alliance/AllianceMember'
 import { Category as CategoryEnum } from 'src/alliance/CategoryEnum'
+import gatherAllies from 'src/alliance/gatherAllies'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, Trans, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -12,14 +13,6 @@ import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
 import Outbound, { externalizeURL } from 'src/shared/Outbound'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-
-async function gatherAllies(persistFunc: (data: []) => void, signal: { aborted: boolean }) {
-  const response = await fetch('api/alliance')
-  const alliesByCategory = await response.json()
-  if (!signal.aborted) {
-    persistFunc(alliesByCategory)
-  }
-}
 
 function buildDropDownProps(t: TFunction, currentFilter: string): ListItem[] {
   return Object.keys(CategoryEnum).map((key) => {
@@ -157,14 +150,19 @@ const Member = React.memo(function _Member({ logo, name, url }: Ally) {
       {(onLoad: () => void) => (
         <View style={styles.member}>
           <a target={'_blank'} href={href}>
-            <Image
-              resizeMode="contain"
-              resizeMethod="resize"
-              onLoad={onLoad}
-              source={{ uri: logo.uri }}
-              accessibilityLabel={name}
-              style={[styles.logo, { width: logo.width / divisor }]}
-            />
+            <View style={styles.memberName}>
+              <Image
+                resizeMode="contain"
+                resizeMethod="resize"
+                onLoad={onLoad}
+                source={{ uri: logo.uri }}
+                accessibilityLabel={name}
+                style={[styles.logo, { width: logo.width / divisor }]}
+              />
+              <Text style={[fonts.mini, textStyles.italic, textStyles.center, textStyles.caption]}>
+                {name}
+              </Text>
+            </View>
           </a>
           {href && <Outbound url={href} />}
         </View>
@@ -194,6 +192,7 @@ const styles = StyleSheet.create({
   selectionArea: { maxWidth: 220 },
   membersArea: { minHeight: 650 },
   memberTitle: { marginBottom: 5 },
+  memberName: { flexDirection: 'column' },
   grayLine: {
     marginTop: 2,
     borderBottomColor: colors.gray,

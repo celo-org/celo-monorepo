@@ -1,4 +1,8 @@
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+apiVersion: networking.k8s.io/v1beta1
+{{ else }}
 apiVersion: extensions/v1beta1
+{{ end -}}
 kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-celostats-frontend
@@ -14,10 +18,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Namespace }}-celostats-frontend.{{ .Values.domain.name }}.org
+    - {{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org
     secretName: {{ .Release.Namespace }}-celostats-frontend-tls
   rules:
-  - host: {{ .Release.Namespace }}-celostats-frontend.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org
     http:
       paths:
       - path: /

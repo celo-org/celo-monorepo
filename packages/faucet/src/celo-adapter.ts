@@ -1,5 +1,5 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { getAddress } from './tx'
+import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/lib/address'
 
 export class CeloAdapter {
   public readonly defaultAddress: string
@@ -12,9 +12,10 @@ export class CeloAdapter {
     // injectDebugProvider(this.kit.web3)
 
     this.kit = newKit(nodeUrl)
-    console.log(`New kit from url: ${nodeUrl}`)
-    this.privateKey = this.kit.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
-    this.defaultAddress = getAddress(this.kit.web3, this.privateKey)
+    console.info(`New kit from url: ${nodeUrl}`)
+    this.privateKey = ensureLeading0x(pk)
+    this.defaultAddress = privateKeyToAddress(this.privateKey)
+    console.info(`Using address ${this.defaultAddress} to send transactions`)
     this.kit.addAccount(this.privateKey)
     this.kit.defaultAccount = this.defaultAddress
   }
@@ -33,7 +34,7 @@ export class CeloAdapter {
     phoneHash: string,
     tempWallet: string,
     amount: string,
-    expirarySeconds: number,
+    expirySeconds: number,
     minAttestations: number
   ) {
     const escrow = await this.kit.contracts.getEscrow()
@@ -44,7 +45,7 @@ export class CeloAdapter {
       phoneHash,
       stableToken.address,
       amount,
-      expirarySeconds,
+      expirySeconds,
       tempWallet,
       minAttestations
     )
@@ -58,5 +59,9 @@ export class CeloAdapter {
   async getGoldBalance(accountAddress: string = this.defaultAddress) {
     const goldToken = await this.kit.contracts.getStableToken()
     return goldToken.balanceOf(accountAddress)
+  }
+
+  stop() {
+    this.kit.stop()
   }
 }

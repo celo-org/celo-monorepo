@@ -3,7 +3,7 @@ const environments = {
     BASE_URL: 'https://dev.celo.org',
     FAUCET: true,
     FIREBASE_CONFIG: {
-      apiKey: 'AIzaSyC90HNy5ChMhQhcgBpFaDC_eJ10BRtAGNI',
+      apiKey: 'REPLACE_ME',
       authDomain: 'celo-faucet.firebaseapp.com',
       databaseURL: 'https://celo-faucet.firebaseio.com',
       projectId: 'celo-faucet',
@@ -11,6 +11,9 @@ const environments = {
     BLOCKSCOUT: {
       pageLength: 5,
       uri: 'http://localhost:4000/graphiql',
+      mainnet: 'http://localhost:4000/graphiql',
+      baklava: 'http://localhost:4000/graphiql',
+      baklavastaging: 'http://localhost:4000/graphiql',
     },
     V3: true,
     __SEGMENT_KEY__: 'REPLACE_ME',

@@ -1,3 +1,3 @@
-## Phone Number Privacy
+# Contents
 
-This package hosts a firebase function that is used to generate unique salts for phone numbers.
+Home for the Oblivious Decentralized Identifier Service (ODIS), formerly PGPNP (Pretty Good Phone Number Privacy).

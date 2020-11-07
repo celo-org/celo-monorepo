@@ -1,10 +1,12 @@
 /* tslint:disable max-classes-per-file */
+import { PhoneNumberUtils } from '@celo/utils'
+import { retryAsync, sleep } from '@celo/utils/lib/async'
 import { database } from 'firebase-admin'
 import { DataSnapshot } from 'firebase-functions/lib/providers/database'
 import { CeloAdapter } from './celo-adapter'
 import { NetworkConfig } from './config'
 import { ExecutionResult, logExecutionResult } from './metrics'
-import { generateInviteCode, getPhoneHash, isE164Number, wait } from './utils'
+import { generateInviteCode } from './utils'
 
 export type Address = string
 export interface AccountRecord {
@@ -86,9 +88,10 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
 
 function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: NetworkConfig) {
   return async (account: AccountRecord) => {
-    const celo = new CeloAdapter({ nodeUrl: config.nodeUrl, pk: account.pk })
-    await sendGold(celo, request.beneficiary, config.faucetGoldAmount, snap)
-    await sendDollars(celo, request.beneficiary, config.faucetDollarAmount, snap)
+    const { nodeUrl, faucetDollarAmount, faucetGoldAmount } = config
+    const celo = new CeloAdapter({ nodeUrl, pk: account.pk })
+    await retryAsync(sendGold, 3, [celo, request.beneficiary, faucetGoldAmount, snap], 500)
+    await retryAsync(sendDollars, 3, [celo, request.beneficiary, faucetDollarAmount, snap], 500)
   }
 }
 
@@ -97,28 +100,34 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     if (!config.twilioClient) {
       throw new Error('Cannot send an invite without a valid twilio client')
     }
-    if (!isE164Number(request.beneficiary)) {
+    if (!PhoneNumberUtils.isE164Number(request.beneficiary)) {
       throw new Error('Must send to valid E164 Number.')
     }
+    console.info(`req(${snap.key}): Creating Celo Adapter`)
     const celo = new CeloAdapter({ nodeUrl: config.nodeUrl, pk: account.pk })
+    console.info(`req(${snap.key}): New kit created`)
     const { address: tempAddress, inviteCode } = generateInviteCode()
+    console.info(`req(${snap.key}): Invite code generated`)
 
-    await sendGold(celo, tempAddress, config.inviteGoldAmount, snap)
-    await sendDollars(celo, tempAddress, config.inviteDollarAmount, snap)
+    await retryAsync(sendGold, 3, [celo, tempAddress, config.inviteGoldAmount, snap], 500)
+    await retryAsync(sendDollars, 3, [celo, tempAddress, config.inviteDollarAmount, snap], 500)
 
-    const phoneHash = getPhoneHash(request.beneficiary)
+    const phoneHash = PhoneNumberUtils.getPhoneHash(request.beneficiary)
     console.info(`req(${snap.key}): Sending escrow payment for phone hash ${phoneHash}`)
     const escrowTx = await celo.escrowDollars(
       phoneHash,
       tempAddress,
       config.escrowDollarAmount,
-      config.expirarySeconds,
+      config.expirySeconds,
       config.minAttestations
     )
     const escrowReceipt = await escrowTx.sendAndWaitForReceipt()
     const escrowTxHash = escrowReceipt.transactionHash
     console.info(`req(${snap.key}): Escrow Dollar Transaction Sent. txhash:${escrowTxHash}`)
     await snap.ref.update({ escrowTxHash })
+
+    console.info(`req(${snap.key}): Txs done, stopping kit`)
+    celo.stop()
 
     await config.twilioClient.messages.create({
       body: messageText(inviteCode, request),
@@ -134,6 +143,7 @@ async function sendDollars(
   amount: string,
   snap: DataSnapshot
 ) {
+  console.info(`req(${snap.key}): Sending ${amount} dollars`)
   const dollarTx = await celo.transferDollars(address, amount)
   const dollarTxReceipt = await dollarTx.sendAndWaitForReceipt()
   const dollarTxHash = dollarTxReceipt.transactionHash
@@ -143,6 +153,7 @@ async function sendDollars(
 }
 
 async function sendGold(celo: CeloAdapter, address: Address, amount: string, snap: DataSnapshot) {
+  console.info(`req(${snap.key}): Sending ${amount} gold`)
   const goldTx = await celo.transferGold(address, amount)
   const goldTxReceipt = await goldTx.sendAndWaitForReceipt()
   const goldTxHash = goldTxReceipt.transactionHash
@@ -266,7 +277,7 @@ export class AccountPool {
         if (acc != null) {
           return acc
         } else {
-          await wait(this.options.retryWaitMS)
+          await sleep(this.options.retryWaitMS)
           retries++
         }
       }

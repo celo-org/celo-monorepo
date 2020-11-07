@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -7,14 +7,13 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
 
-import "../identity/interfaces/IRandom.sol";
-
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/UsingRegistry.sol";
 import "../common/UsingPrecompiles.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -22,6 +21,7 @@ import "../common/libraries/ReentrancyGuard.sol";
  */
 contract Validators is
   IValidators,
+  ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
   Initializable,
@@ -127,7 +127,7 @@ contract Validators is
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
-  event ValidatorRegistered(address indexed validator, bytes ecdsaPublicKey, bytes blsPublicKey);
+  event ValidatorRegistered(address indexed validator);
   event ValidatorDeregistered(address indexed validator);
   event ValidatorAffiliated(address indexed validator, address indexed group);
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
@@ -155,6 +155,14 @@ contract Validators is
   modifier onlySlasher() {
     require(getLockedGold().isSlasher(msg.sender), "Only registered slasher can call");
     _;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -198,7 +206,7 @@ contract Validators is
 
   /**
    * @notice Updates the block delay for a ValidatorGroup's commission udpdate
-   * @param delay Number of block to delay the update
+   * @param delay Number of blocks to delay the update
    */
   function setCommissionUpdateDelay(uint256 delay) public onlyOwner {
     require(delay != commissionUpdateDelay, "commission update delay not changed");
@@ -341,11 +349,17 @@ contract Validators is
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
     Validator storage validator = validators[account];
     address signer = getAccounts().getValidatorSigner(account);
-    _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
+    require(
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
+      "Error updating ECDSA public key"
+    );
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     registeredValidators.push(account);
     updateMembershipHistory(account, address(0));
-    emit ValidatorRegistered(account, ecdsaPublicKey, blsPublicKey);
+    emit ValidatorRegistered(account);
     return true;
   }
 
@@ -486,13 +500,15 @@ contract Validators is
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
     if (meetsAccountLockedGoldRequirements(account) && meetsAccountLockedGoldRequirements(group)) {
-      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(maxPayment).multiply(
-        validators[account].score
-      );
+      FixidityLib.Fraction memory totalPayment = FixidityLib
+        .newFixed(maxPayment)
+        .multiply(validators[account].score)
+        .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
       uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-      getStableToken().mint(group, groupPayment);
-      getStableToken().mint(account, validatorPayment);
+      IStableToken stableToken = getStableToken();
+      require(stableToken.mint(group, groupPayment), "mint failed to validator group");
+      require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
@@ -582,8 +598,10 @@ contract Validators is
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
+    require(
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
+    );
     return true;
   }
 
@@ -607,6 +625,7 @@ contract Validators is
     require(blsPop.length == 48, "Wrong BLS PoP length");
     require(checkProofOfPossession(account, blsPublicKey, blsPop), "Invalid BLS PoP");
     validator.publicKeys.bls = blsPublicKey;
+    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
     return true;
   }
 
@@ -625,9 +644,32 @@ contract Validators is
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
-      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
+    return true;
+  }
+
+  /**
+   * @notice Updates a validator's ECDSA key.
+   * @param validator The validator whose ECDSA public key should be updated.
+   * @param signer The address with which the validator is signing consensus messages.
+   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
+   *   match `signer`. 64 bytes.
+   * @return True upon success.
+   */
+  function _updateEcdsaPublicKey(
+    Validator storage validator,
+    address account,
+    address signer,
+    bytes memory ecdsaPublicKey
+  ) private returns (bool) {
+    require(ecdsaPublicKey.length == 64, "Wrong ECDSA public key length");
+    require(
+      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
+      "ECDSA key does not match signer"
+    );
+    validator.publicKeys.ecdsa = ecdsaPublicKey;
     emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
     return true;
   }
@@ -653,34 +695,13 @@ contract Validators is
     require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     require(
-      _updateEcdsaPublicKey(validator, signer, ecdsaPublicKey),
+      _updateEcdsaPublicKey(validator, account, signer, ecdsaPublicKey),
       "Error updating ECDSA public key"
     );
-    emit ValidatorEcdsaPublicKeyUpdated(account, ecdsaPublicKey);
-    _updateBlsPublicKey(validator, account, blsPublicKey, blsPop);
-    emit ValidatorBlsPublicKeyUpdated(account, blsPublicKey);
-    return true;
-  }
-
-  /**
-   * @notice Updates a validator's ECDSA key.
-   * @param validator The validator whose ECDSA public key should be updated.
-   * @param signer The address with which the validator is signing consensus messages.
-   * @param ecdsaPublicKey The ECDSA public key that the validator is using for consensus. Should
-   *   match `signer`. 64 bytes.
-   * @return True upon success.
-   */
-  function _updateEcdsaPublicKey(
-    Validator storage validator,
-    address signer,
-    bytes memory ecdsaPublicKey
-  ) private returns (bool) {
-    require(ecdsaPublicKey.length == 64, "Wrong ECDSA public key length");
     require(
-      address(uint160(uint256(keccak256(ecdsaPublicKey)))) == signer,
-      "ECDSA key does not match signer"
+      _updateBlsPublicKey(validator, account, blsPublicKey, blsPop),
+      "Error updating BLS public key"
     );
-    validator.publicKeys.ecdsa = ecdsaPublicKey;
     return true;
   }
 
@@ -837,10 +858,11 @@ contract Validators is
 
   /**
    * @notice Queues an update to a validator group's commission.
+   * If there was a previously scheduled update, that is overwritten.
    * @param commission Fixidity representation of the commission this group receives on epoch
    *   payments made to its members. Must be in the range [0, 1.0].
    */
-  function queueCommissionUpdate(uint256 commission) external {
+  function setNextCommissionUpdate(uint256 commission) external {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
@@ -899,7 +921,9 @@ contract Validators is
    */
   function meetsAccountLockedGoldRequirements(address account) public view returns (bool) {
     uint256 balance = getLockedGold().getAccountTotalLockedGold(account);
-    return balance >= getAccountLockedGoldRequirement(account);
+    // Add a bit of "wiggle room" to accommodate the fact that vote activation can result in ~1
+    // wei rounding errors. Using 10 as an additional margin of safety.
+    return balance.add(10) >= getAccountLockedGoldRequirement(account);
   }
 
   /**

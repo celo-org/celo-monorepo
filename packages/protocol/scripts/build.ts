@@ -25,12 +25,13 @@ export const ProxyContracts = [
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
   'LockedGoldProxy',
+  'MetaTransactionWalletProxy',
+  'MetaTransactionWalletDeployerProxy',
+  'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
-  'RegistryProxy',
-  'BlockchainParametersProxy',
 ]
 export const CoreContracts = [
   // common
@@ -38,9 +39,12 @@ export const CoreContracts = [
   'GasPriceMinimum',
   'FeeCurrencyWhitelist',
   'GoldToken',
+  'MetaTransactionWallet',
+  'MetaTransactionWalletDeployer',
   'MultiSig',
   'Registry',
   'Freezer',
+  'MetaTransactionWallet',
   'TransferWhitelist',
 
   // governance
@@ -124,7 +128,9 @@ async function generateFilesForContractKit() {
   exec(`rm -rf ${CONTRACTKIT_GEN_DIR}`)
   const relativePath = path.relative(ROOT_DIR, CONTRACTKIT_GEN_DIR)
 
-  const globPattern = `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
+  const contractKitContracts = CoreContracts.concat('Proxy')
+
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 

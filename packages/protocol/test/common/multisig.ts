@@ -1,4 +1,9 @@
-import { assertEqualBN, assertRevert, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertLogMatches2,
+  assertRevert,
+  NULL_ADDRESS,
+} from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
 import * as _ from 'lodash'
 import { MultiSigContract, MultiSigInstance } from 'types'
@@ -37,6 +42,31 @@ contract('MultiSig', (accounts: any) => {
       await assertRevert(
         multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
       )
+    })
+  })
+
+  describe('fallback function', () => {
+    describe('when receiving celo', () => {
+      it('emits Deposit event with correct parameters', async () => {
+        const value = 100
+        // @ts-ignore
+        const res = await multiSig.send(value)
+        assertLogMatches2(res.logs[0], {
+          event: 'Deposit',
+          args: {
+            sender: accounts[0],
+            value,
+          },
+        })
+      })
+    })
+
+    describe('when receiving 0 value', () => {
+      it('does not emit an event', async () => {
+        // @ts-ignore
+        const res = await multiSig.send(0)
+        assert.equal(res.logs, 0)
+      })
     })
   })
 
@@ -166,6 +196,7 @@ contract('MultiSig', (accounts: any) => {
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
+      assert.sameMembers([accounts[0], accounts[1], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to add an owner', async () => {
@@ -210,6 +241,7 @@ contract('MultiSig', (accounts: any) => {
       assert.isFalse(await multiSig.isOwner(accounts[1]))
       assertEqualBN(await multiSig.required(), 1)
       assertEqualBN(await multiSig.internalRequired(), 1)
+      assert.sameMembers([accounts[0]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to remove an owner', async () => {
@@ -235,6 +267,7 @@ contract('MultiSig', (accounts: any) => {
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
       assert.isFalse(await multiSig.isOwner(accounts[1]))
+      assert.sameMembers([accounts[0], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to replace an owner', async () => {

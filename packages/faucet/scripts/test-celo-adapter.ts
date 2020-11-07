@@ -1,6 +1,6 @@
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 import { CeloAdapter } from '../src/celo-adapter'
-import { getAddress } from '../src/tx'
 
 // Obtained from `yarn cli config:get --net alfajores`
 const Config = {
@@ -13,8 +13,6 @@ const Config = {
 const FAUCET_ADDR = '0x22579CA45eE22E2E16dDF72D955D6cf4c767B0eF'
 
 async function main() {
-  const web3 = new Web3(Config.node_url)
-
   if (process.argv.length !== 4) {
     console.log(`Call with: <privateKey> <recipientAddress>`)
     process.exit(1)
@@ -23,9 +21,9 @@ async function main() {
   const pk = process.argv[2]
   const to = process.argv[3]
 
-  if (getAddress(web3, pk).toLowerCase() !== FAUCET_ADDR.toLowerCase()) {
+  if (privateKeyToAddress(pk).toLowerCase() !== FAUCET_ADDR.toLowerCase()) {
     console.log(
-      `PrivateKey for invalid address. Expected: ${FAUCET_ADDR}, GOT: ${getAddress(web3, pk)}`
+      `PrivateKey for invalid address. Expected: ${FAUCET_ADDR}, GOT: ${privateKeyToAddress(pk)}`
     )
     process.exit(1)
   }

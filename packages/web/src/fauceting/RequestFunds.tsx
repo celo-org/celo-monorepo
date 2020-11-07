@@ -11,7 +11,7 @@ import {
   validateBeneficary,
 } from 'src/fauceting/utils'
 import { postForm } from 'src/forms/Form'
-import { TextInput } from 'src/forms/FormComponents'
+import { TextInput } from 'src/forms/TextInput'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Android from 'src/icons/Android'
 import Apple from 'src/icons/Apple'

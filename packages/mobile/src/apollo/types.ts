@@ -158,6 +158,7 @@ export enum TokenTransactionType {
   InviteSent = 'INVITE_SENT',
   InviteReceived = 'INVITE_RECEIVED',
   PayRequest = 'PAY_REQUEST',
+  PayPrefill = 'PAY_PREFILL',
   NetworkFee = 'NETWORK_FEE',
 }
 
@@ -297,7 +298,7 @@ export interface IntrospectionResultData {
     }>
   }
 }
-const result: IntrospectionResultData = {
+export const introspectionQueryResultData: IntrospectionResultData = {
   __schema: {
     types: [
       {
@@ -327,4 +328,3 @@ const result: IntrospectionResultData = {
     ],
   },
 }
-export default result

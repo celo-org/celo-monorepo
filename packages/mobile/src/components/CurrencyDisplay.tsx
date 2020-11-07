@@ -6,12 +6,14 @@ import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
 import { useExchangeRate as useGoldToDollarRate } from 'src/exchange/hooks'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import i18n from 'src/i18n'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import {
   useExchangeRate as useDollarToLocalRate,
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
   getCentAwareMoneyDisplay,
@@ -46,7 +48,10 @@ interface Props {
   showLocalAmount?: boolean
   showExplicitPositiveSign: boolean // shows '+' for a positive amount when true (default is false)
   formatType: FormatType
+  hideFullCurrencyName: boolean
   style?: StyleProp<TextStyle>
+  currencyInfo?: CurrencyInfo
+  testID?: string
 }
 
 const BIG_SIGN_RATIO = 34 / 48
@@ -100,18 +105,30 @@ function getFormatFunction(formatType: FormatType): FormatFunction {
     case FormatType.Default:
       return getMoneyDisplayValue
     case FormatType.CentAware:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getCentAwareMoneyDisplay(amount)
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
+        getCentAwareMoneyDisplay(amount)
     case FormatType.Fee:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) => getFeeDisplayValue(amount)
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) => getFeeDisplayValue(amount)
     case FormatType.NetworkFee:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
         getNetworkFeeDisplayValue(amount)
     case FormatType.NetworkFeePrecise:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
         getNetworkFeeDisplayValue(amount, true)
     case FormatType.ExchangeRate:
-      return (amount: BigNumber.Value, currency?: CURRENCY_ENUM) =>
+      return (amount: BigNumber.Value, _currency?: CURRENCY_ENUM) =>
         getExchangeRateDisplayValue(amount)
+  }
+}
+
+function getFullCurrencyName(currency: CURRENCY_ENUM | null) {
+  switch (currency) {
+    case CURRENCY_ENUM.DOLLAR:
+      return i18n.t('global:celoDollars')
+    case CURRENCY_ENUM.GOLD:
+      return i18n.t('global:celoGold')
+    default:
+      return null
   }
 }
 
@@ -126,10 +143,17 @@ export default function CurrencyDisplay({
   showExplicitPositiveSign,
   amount,
   formatType,
+  hideFullCurrencyName,
   style,
+  currencyInfo,
+  testID,
 }: Props) {
-  const localCurrencyCode = useLocalCurrencyCode()
-  const dollarToLocalRate = useDollarToLocalRate()
+  let localCurrencyCode = useLocalCurrencyCode()
+  let dollarToLocalRate = useDollarToLocalRate()
+  if (currencyInfo) {
+    localCurrencyCode = currencyInfo.localCurrencyCode
+    dollarToLocalRate = currencyInfo.localExchangeRate
+  }
   const goldToDollarRate = useGoldToDollarRate()
 
   const currency =
@@ -158,11 +182,12 @@ export default function CurrencyDisplay({
   const formattedValue =
     value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
   const code = displayAmount?.currencyCode
+  const fullCurrencyName = getFullCurrencyName(displayCurrency)
 
   const color = useColors
     ? currency === CURRENCY_ENUM.GOLD
-      ? colors.celoGold
-      : colors.celoGreen
+      ? colors.goldBrand
+      : colors.greenBrand
     : StyleSheet.flatten(style)?.color
 
   if (type === DisplayType.Big) {
@@ -178,7 +203,7 @@ export default function CurrencyDisplay({
     const codeStyle = { fontSize: Math.round(fontSize * BIG_CODE_RATIO), lineHeight, color }
 
     return (
-      <View style={[styles.bigContainer, style]}>
+      <View style={[styles.bigContainer, style]} testID={testID}>
         {!hideSign && (
           <Text numberOfLines={1} style={[fontStyles.regular, signStyle]}>
             {sign}
@@ -202,11 +227,12 @@ export default function CurrencyDisplay({
   }
 
   return (
-    <Text numberOfLines={1} style={[style, { color }]}>
+    <Text numberOfLines={1} style={[style, { color }]} testID={testID}>
       {!hideSign && sign}
       {!hideSymbol && currencySymbol}
       {formattedValue}
       {!hideCode && !!code && ` ${code}`}
+      {!hideFullCurrencyName && !!fullCurrencyName && ` ${fullCurrencyName}`}
     </Text>
   )
 }
@@ -220,6 +246,7 @@ CurrencyDisplay.defaultProps = {
   hideCode: true,
   showExplicitPositiveSign: false,
   formatType: FormatType.Default,
+  hideFullCurrencyName: true,
 }
 
 const styles = StyleSheet.create({

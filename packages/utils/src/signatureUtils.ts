@@ -1,6 +1,17 @@
+import { NativeSigner, serializeSignature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
+import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export {
+  NativeSigner,
+  POP_SIZE,
+  serializeSignature,
+  Signature,
+  Signer,
+} from '@celo/base/lib/signatureUtils'
 const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
@@ -21,15 +32,11 @@ export function hashMessage(message: string): string {
   return Web3Utils.soliditySha3({ type: 'string', value: message })
 }
 
-export interface Signer {
-  sign: (message: string) => Promise<string>
-}
-
 export async function addressToPublicKey(
   signer: string,
   signFn: (message: string, signer: string) => Promise<string>
 ) {
-  const msg = new Buffer('dummy_msg_data')
+  const msg = Buffer.from('dummy_msg_data')
   const data = '0x' + msg.toString('hex')
   // Note: Eth.sign typing displays incorrect parameter order
   const sig = await signFn(data, signer)
@@ -51,17 +58,6 @@ export async function addressToPublicKey(
   return '0x' + pubKey.toString('hex')
 }
 
-// Uses a native function to sign (as signFn), most commonly `web.eth.sign`
-export function NativeSigner(
-  signFn: (message: string, signer: string) => Promise<string>,
-  signer: string
-): Signer {
-  return {
-    sign: async (message: string) => {
-      return signFn(message, signer)
-    },
-  }
-}
 export function LocalSigner(privateKey: string): Signer {
   return {
     sign: async (message: string) =>
@@ -103,19 +99,6 @@ export function signMessageWithoutPrefix(messageHash: string, privateKey: string
   return { v, r: ethjsutil.bufferToHex(r), s: ethjsutil.bufferToHex(s) }
 }
 
-export interface Signature {
-  v: number
-  r: string
-  s: string
-}
-
-export function serializeSignature(signature: Signature) {
-  const serializedV = signature.v.toString(16)
-  const serializedR = signature.r.slice(2)
-  const serializedS = signature.s.slice(2)
-  return '0x' + serializedV + serializedR + serializedS
-}
-
 export function verifySignature(message: string, signature: string, signer: string) {
   try {
     parseSignature(message, signature, signer)
@@ -144,7 +127,34 @@ export function parseSignatureWithoutPrefix(
     return { v, r, s }
   }
 
-  throw new Error('Unable to parse signature')
+  throw new Error(`Unable to parse signature (expected signer ${signer})`)
+}
+
+export function recoverEIP712TypedDataSigner(
+  typedData: EIP712TypedData,
+  signature: string
+): string {
+  const dataBuff = generateTypedDataHash(typedData)
+  const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
+  const publicKey = ethjsutil.ecrecover(
+    ethjsutil.toBuffer(dataBuff),
+    v,
+    ethjsutil.toBuffer(r),
+    ethjsutil.toBuffer(s)
+  )
+  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+}
+
+export function guessSigner(message: string, signature: string): string {
+  const messageHash = hashMessageWithPrefix(message)
+  const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
+  const publicKey = ethjsutil.ecrecover(
+    ethjsutil.toBuffer(messageHash),
+    v,
+    ethjsutil.toBuffer(r),
+    ethjsutil.toBuffer(s)
+  )
+  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
 }
 
 function parseSignatureAsVrs(signature: string) {

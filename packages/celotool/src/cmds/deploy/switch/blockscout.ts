@@ -1,7 +1,6 @@
 import { SwitchArgv } from 'src/cmds/deploy/switch'
-import { switchIngressService } from 'src/lib/blockscout'
+import { getReleaseName, switchIngressService } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import yargs from 'yargs'
 
 export const command = 'blockscout'
@@ -13,9 +12,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: SwitchArgv) => {
   await switchToClusterFromEnv()
-  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
-    'BLOCKSCOUT_DB_SUFFIX',
-    ''
-  )}`
+
+  const helmReleaseName = getReleaseName(argv.celoEnv)
   await switchIngressService(argv.celoEnv, helmReleaseName)
 }

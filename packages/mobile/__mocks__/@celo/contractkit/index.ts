@@ -1,25 +1,68 @@
 import BigNumber from 'bignumber.js'
+import crypto from 'crypto'
+import Web3 from 'web3'
 
-export const newKitFromWeb3 = () => ({
+const txo = (response?: any) => ({
+  call: jest.fn(() => response),
+  send: jest.fn(() => response),
+  sendAndWaitForReceipt: jest.fn(() => response),
+})
+
+const GasPriceMinimum = {
+  getGasPriceMinimum: jest.fn(async (address: string) => new BigNumber(10000)),
+}
+
+const StableToken = {
+  balanceOf: jest.fn(async () => {
+    return new BigNumber(1e18)
+  }),
+  decimals: jest.fn(async () => '10'),
+  transferWithComment: jest.fn(async () => ({ txo: txo() })),
+}
+
+const GoldToken = {
+  balanceOf: jest.fn(async () => new BigNumber(1e18)),
+  decimals: jest.fn(async () => '10'),
+  transferWithComment: jest.fn(async () => ({ txo: txo() })),
+  approve: jest.fn(() => ({ txo: txo() })),
+}
+
+const Attestations = {
+  getAttestationStat: jest.fn(),
+}
+
+const Accounts = {}
+
+const TOBIN_TAX = { '0': '5000000000000000000000', '1': '1000000000000000000000000' } // Contract returns tuple representing fraction
+
+const Reserve = {
+  getOrComputeTobinTax: jest.fn(() => ({ txo: txo(TOBIN_TAX) })),
+}
+
+const Exchange = {
+  getExchangeRate: jest.fn(() => new BigNumber(2)),
+  exchange: jest.fn(),
+}
+
+const web3 = new Web3()
+
+const kit = {
   contracts: {
-    getGasPriceMinimum: async () => ({
-      getGasPriceMinimum: jest.fn(async (address: string) => new BigNumber(10000)),
-    }),
-    getStableToken: async () => ({
-      balanceOf: jest.fn(async () => new BigNumber(10000000000)),
-      decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => null),
-    }),
-    getGoldToken: async () => ({
-      balanceOf: jest.fn(async () => new BigNumber(10000000000)),
-      decimals: jest.fn(async () => '10'),
-      transferWithComment: jest.fn(async () => null),
-    }),
+    getGasPriceMinimum: jest.fn(async () => GasPriceMinimum),
+    getStableToken: jest.fn(async () => StableToken),
+    getGoldToken: jest.fn(async () => GoldToken),
+    getAttestations: jest.fn(async () => Attestations),
+    getAccounts: jest.fn(async () => Accounts),
+    getReserve: jest.fn(async () => Reserve),
+    getExchange: jest.fn(async () => Exchange),
   },
   registry: {
     addressFor: async (address: string) => 1000,
   },
-})
+  web3,
+}
+
+export const newKitFromWeb3 = () => kit
 
 export enum CeloContract {
   Accounts = 'Accounts',
@@ -42,4 +85,54 @@ export enum CeloContract {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
+}
+
+const SALT = '__celo__'
+export function obfuscateNumberForMatchmaking(e164Number: string) {
+  return crypto
+    .createHash('sha256')
+    .update(e164Number + SALT)
+    .digest('base64')
+}
+
+const PEPPER_CHAR_LENGTH = 13
+export function getPepperFromThresholdSignature(sigBuf: Buffer) {
+  // Currently uses 13 chars for a 78 bit pepper
+  return crypto
+    .createHash('sha256')
+    .update(sigBuf)
+    .digest('base64')
+    .slice(0, PEPPER_CHAR_LENGTH)
+}
+
+enum AuthenticationMethod {
+  WALLET_KEY = 'wallet_key',
+  ENCRYPTION_KEY = 'encryption_key',
+}
+
+export const GenesisBlockUtils = jest.fn()
+GenesisBlockUtils.getGenesisBlockAsync = jest.fn()
+GenesisBlockUtils.getChainIdFromGenesis = jest.fn()
+
+export const StaticNodeUtils = jest.fn().mockImplementation()
+StaticNodeUtils.getStaticNodesAsync = jest.fn()
+StaticNodeUtils.getStaticNodeRegion = jest.fn()
+StaticNodeUtils.getRegionalStaticNodesAsync = jest.fn()
+StaticNodeUtils.getStaticNodesGoogleStorageBucketName = jest.fn()
+
+export const OdisUtils = {
+  Query: {
+    ODIS_ALFAJORESSTAGING_CONTEXT: {
+      odisUrl: 'alfajoresstaging',
+      odisPubKey: 'alfajoresstaging',
+    },
+    ODIS_ALFAJORES_CONTEXT: {
+      odisUrl: 'alfajores',
+      odisPubKey: 'alfajores',
+    },
+    ODIS_MAINNET_CONTEXT: {
+      odisUrl: 'mainnet',
+      odisPubKey: 'mainnet',
+    },
+  },
 }

@@ -25,8 +25,8 @@ interface Speeds {
 export async function getNetworkDownloadSpeed() {
   try {
     const testNetworkSpeed = new NetworkSpeed()
-    const byteSize = 2000
-    const baseUrl = `https://eu.httpbin.org/stream-byteSize/${byteSize}`
+    const byteSize = 300
+    const baseUrl = `/api/bytes`
 
     const speed: Speeds = await testNetworkSpeed.checkDownloadSpeed(baseUrl, byteSize)
     return speed
@@ -47,13 +47,13 @@ async function isFast(speed: number | EffectiveTypes) {
   return false
 }
 
-function getEffectiveConnection(navigator): EffectiveTypes {
+export function getEffectiveConnection(navigator): EffectiveTypes {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
   return (connection && connection.effectiveType) || 'unknown'
 }
 
 // from http://wicg.github.io/netinfo/#dom-effectiveconnectiontype-slow-2g
-enum EffectiveTypes {
+export enum EffectiveTypes {
   '2g' = '2g',
   '3g' = '3g',
   '4g' = '4g',
@@ -71,19 +71,14 @@ export async function hasGoodConnection() {
 }
 
 async function multiPartCheck() {
-  const multiPart = await Promise.all([
-    getNetworkDownloadSpeed(),
-    getNetworkDownloadSpeed(),
-    getNetworkDownloadSpeed(),
-  ])
+  const multiPart = await Promise.all([getNetworkDownloadSpeed(), getNetworkDownloadSpeed()])
 
   const averageSpeed =
     multiPart
       .map((speeds) => speeds.mbps)
       .reduce((previous, current) => {
         return Number(previous) + Number(current)
-      }, 0) / 3
-
+      }, 0) / multiPart.length
   return isFast(averageSpeed)
 }
 
@@ -113,6 +108,9 @@ export function cutAddress(address: string) {
 }
 
 export function formatNumber(n: number, decimals: number = 2) {
+  if (n === Infinity) {
+    return undefined as string
+  }
   return isNaN(+n)
     ? (0).toFixed(decimals)
     : (+n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -124,4 +122,8 @@ export function copyToClipboad(text: string) {
 
 export function weiToDecimal(number: number) {
   return number / 10 ** 18
+}
+
+export function isExternalLink(link: string) {
+  return link.startsWith('http')
 }

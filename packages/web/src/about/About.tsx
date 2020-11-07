@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import * as React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import shuffleSeed from 'shuffle-seed'
@@ -11,7 +10,7 @@ import Team from 'src/about/Team'
 import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
 import analytics from 'src/analytics/analytics'
-import { H1 } from 'src/fonts/Fonts'
+import { H1, H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
@@ -72,8 +71,12 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('MissionTitle')}>
             <H1>{t('MissionText')}</H1>
           </BookLayout>
+          <BookLayout label={<Text style={styles.foundation}>{t('celoFoundation')}</Text>}>
+            <H2 style={standardStyles.elementalMarginBottom}>{t('celoFoundationBelieves')}</H2>
+            <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('celoFoundationText')}</Text>
+          </BookLayout>
           <BookLayout label={t('MeaningTile')} endBlock={true}>
-            <H1 style={standardStyles.elementalMarginBottom}>
+            <H1 ariaLevel="2" style={standardStyles.elementalMarginBottom}>
               <Trans
                 ns={NameSpaces.about}
                 t={t}
@@ -156,6 +159,9 @@ function Strong({ children }) {
 const styles = StyleSheet.create({
   teamImage: { width: '100%', height: 650 },
   logoArea: { justifyContent: 'flex-end' },
+  foundation: {
+    lineHeight: 42,
+  },
 })
 
 export default withNamespaces('about')(About)

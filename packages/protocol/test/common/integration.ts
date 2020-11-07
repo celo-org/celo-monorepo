@@ -1,7 +1,7 @@
 import { constitution } from '@celo/protocol/governanceConstitution'
 import {
+  addressMinedLatestBlock,
   assertEqualBN,
-  isSameAddress,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -383,8 +383,6 @@ contract('Integration: Governance', (accounts: string[]) => {
 })
 
 contract('Integration: Exchange', (accounts: string[]) => {
-  const sellAmount = new BigNumber('1000000000000000000')
-  const minBuyAmount = 1
   const transferAmount = 10
   let exchange: ExchangeInstance
   let multiSig: ReserveSpenderMultiSigInstance
@@ -394,6 +392,9 @@ contract('Integration: Exchange', (accounts: string[]) => {
   let originalStable
   let originalGold
   let originalReserve
+  let finalStable: BigNumber
+  let finalGold: BigNumber
+  let finalReserve: BigNumber
 
   const decimals = 18
 
@@ -405,69 +406,127 @@ contract('Integration: Exchange', (accounts: string[]) => {
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
   })
 
-  describe('When selling gold', () => {
-    beforeEach(async () => {
-      await goldToken.approve(exchange.address, sellAmount)
-      originalStable = await stableToken.balanceOf(accounts[0])
-      originalGold = await goldToken.balanceOf(accounts[0])
-      originalReserve = await goldToken.balanceOf(reserve.address)
+  describe('Selling', () => {
+    const sellAmount = new BigNumber('1000000000000000000')
+    const minBuyAmount = 1
+
+    describe('When selling gold', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await goldToken.approve(exchange.address, sellAmount)
+        await exchange.sell(sellAmount, minBuyAmount, true)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
+
+      it(`should increase user's stable`, async () => {
+        assert.isTrue(finalStable.gt(originalStable))
+      })
+
+      it(`should reduce user's gold`, async () => {
+        if (await addressMinedLatestBlock(accounts[0])) {
+          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+        } else {
+          assert.isTrue(finalGold.lt(originalGold))
+        }
+      })
+
+      it(`should increase Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.gt(originalReserve))
+      })
     })
 
-    it(`should increase user's stable`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalStable = await stableToken.balanceOf(accounts[0])
+    // Note that this test relies on having purchased cUSD in the previous test.
+    describe('When selling stable token', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await stableToken.approve(exchange.address, sellAmount)
+        // Cannot sell more than was purchased in the previous test.
+        await exchange.sell(sellAmount.div(20), minBuyAmount, false)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
 
-      assert.isTrue(finalStable.gt(originalStable))
-    })
+      it(`should reduce user's stable`, async () => {
+        assert.isTrue(finalStable.lt(originalStable))
+      })
 
-    it(`should reduce user's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalGold = await goldToken.balanceOf(accounts[0])
+      it(`should increase user's gold`, async () => {
+        assert.isTrue(finalGold.gt(originalGold))
+      })
 
-      const block = await web3.eth.getBlock('latest')
-      if (isSameAddress(block.miner, accounts[0])) {
-        const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
-        assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
-      } else {
-        assert.isTrue(finalGold.lt(originalGold))
-      }
-    })
-
-    it(`should increase Reserve's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalReserve = await goldToken.balanceOf(reserve.address)
-
-      assert.isTrue(finalReserve.gt(originalReserve))
+      it(`should reduce Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.lt(originalReserve))
+      })
     })
   })
 
-  describe('When selling stable token', () => {
-    beforeEach(async () => {
-      originalStable = await stableToken.balanceOf(accounts[0])
-      originalGold = await goldToken.balanceOf(accounts[0])
-      originalReserve = await goldToken.balanceOf(reserve.address)
-      await stableToken.approve(exchange.address, sellAmount)
+  describe('Buying', () => {
+    const buyAmount = new BigNumber(1)
+    const maxSellAmount = new BigNumber('1000000000000000000')
+
+    describe('When buying stable token', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await goldToken.approve(exchange.address, maxSellAmount)
+        await exchange.buy(buyAmount, maxSellAmount, false)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
+
+      it(`should increase user's stable`, async () => {
+        assert.isTrue(finalStable.gt(originalStable))
+      })
+
+      it(`should reduce user's gold`, async () => {
+        if (await addressMinedLatestBlock(accounts[0])) {
+          const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+          assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+        } else {
+          assert.isTrue(finalGold.lt(originalGold))
+        }
+      })
+
+      it(`should increase Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.gt(originalReserve))
+      })
     })
 
-    it(`should reduce user's stable`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalStable = await stableToken.balanceOf(accounts[0])
+    // Note that this test relies on having purchased cUSD in a previous test
+    describe('When buying gold', () => {
+      before(async () => {
+        originalStable = await stableToken.balanceOf(accounts[0])
+        originalGold = await goldToken.balanceOf(accounts[0])
+        originalReserve = await goldToken.balanceOf(reserve.address)
+        await stableToken.approve(exchange.address, maxSellAmount)
+        // Cannot sell more than was purchased in the previous test.
+        await exchange.buy(buyAmount, maxSellAmount, true)
+        finalStable = await stableToken.balanceOf(accounts[0])
+        finalGold = await goldToken.balanceOf(accounts[0])
+        finalReserve = await goldToken.balanceOf(reserve.address)
+      })
 
-      assert.isTrue(finalStable.lt(originalStable))
-    })
+      it(`should reduce user's stable`, async () => {
+        assert.isTrue(finalStable.lt(originalStable))
+      })
 
-    it(`should increase user's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalGold = await goldToken.balanceOf(accounts[0])
+      it(`should increase user's gold`, async () => {
+        assert.isTrue(finalGold.gt(originalGold))
+      })
 
-      assert.isTrue(finalGold.gt(originalGold))
-    })
-
-    it(`should reduce Reserve's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalReserve = await goldToken.balanceOf(reserve.address)
-
-      assert.isTrue(finalReserve.lt(originalReserve))
+      it(`should reduce Reserve's gold`, async () => {
+        assert.isTrue(finalReserve.lt(originalReserve))
+      })
     })
   })
 

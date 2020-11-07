@@ -1,11 +1,9 @@
-pragma solidity ^0.5.3;
-
-import "../interfaces/IElection.sol";
+pragma solidity ^0.5.13;
 
 /**
  * @title Holds a list of addresses of validators
  */
-contract MockElection is IElection {
+contract MockElection {
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
   address[] public electedValidators;
@@ -53,6 +51,10 @@ contract MockElection is IElection {
   }
 
   function activate(address) external returns (bool) {
+    return true;
+  }
+
+  function revokeAllActive(address, address, address, uint256) external returns (bool) {
     return true;
   }
 

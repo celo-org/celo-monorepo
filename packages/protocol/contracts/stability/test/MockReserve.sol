@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 // solhint-disable no-unused-vars
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -34,10 +34,6 @@ contract MockReserve {
   }
 
   function burnToken(address) external pure returns (bool) {
-    return true;
-  }
-
-  function mintToken(address, address, uint256) external pure returns (bool) {
     return true;
   }
 

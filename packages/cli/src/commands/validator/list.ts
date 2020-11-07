@@ -17,7 +17,8 @@ export default class ValidatorList extends BaseCommand {
     'List registered Validators, their name (if provided), affiliation, uptime score, and public keys used for validating.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   static examples = ['list']
@@ -30,6 +31,6 @@ export default class ValidatorList extends BaseCommand {
     const validatorList = await validators.getRegisteredValidators()
 
     cli.action.stop()
-    cli.table(validatorList, validatorTable, { 'no-truncate': !res.flags.truncate })
+    cli.table(validatorList, validatorTable, res.flags)
   }
 }

@@ -8,6 +8,7 @@ import { NameSpaces } from 'src/i18n'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
+
 export default class MobileApp extends React.PureComponent {
   static getInitialProps() {
     return {
@@ -19,7 +20,7 @@ export default class MobileApp extends React.PureComponent {
       <>
         <View style={styles.cover}>
           <OpenGraph
-            title={'Celo | Download Mobile App'}
+            title={'Celo Test Wallet'}
             path={CeloLinks.walletApp}
             description={''}
             image={require('src/download/ogimage-wallet.png')}
@@ -28,7 +29,6 @@ export default class MobileApp extends React.PureComponent {
           <CoverActions />
         </View>
         <AppStores />
-        {/* TODO add <ConnectiveFooter/> once its in master  */}
       </>
     )
   }

@@ -7,25 +7,21 @@ import {
   Text,
   View,
 } from 'react-native'
-import Fade from 'react-reveal/Fade'
-import { H2, H3, H4 } from 'src/fonts/Fonts'
+import { H3, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { fonts, standardStyles } from 'src/styles'
 
 export default React.memo(function _Engage() {
-  const { t } = useTranslation(NameSpaces.dev)
   return (
     <>
-      <EngageAsDeveloper action={t('engage.developers.verb')} noun={t('engage.developers.noun')}>
-        <H2 style={standardStyles.elementalMarginBottom}>{t('engage.topTitle')}</H2>
-      </EngageAsDeveloper>
       <EngageAsValidator />
-      <Contribute />
+      <Meet />
     </>
   )
 })
@@ -46,7 +42,7 @@ const Content = React.memo(function _Content(props: ContentProps) {
       {props.h3Text && <H3 style={standardStyles.elementalMarginBottom}>{props.h3Text}</H3>}
       {props.h4Text && <H4 style={standardStyles.elementalMarginBottom}>{props.h4Text}</H4>}
       <Text style={fonts.h6}>{props.network}</Text>
-      <Fade fraction={0.5} bottom={true} distance={'10px'}>
+      <Fade fraction={0.5} distance={'10px'}>
         <AspectRatio style={styles.graphicContainer} ratio={290 / 225}>
           <Image style={styles.graphic} source={props.image} resizeMode="contain" />
         </AspectRatio>
@@ -93,7 +89,7 @@ const Aside = React.memo(function _Aside({
       ]}
     >
       <View style={styles.asideFrame}>
-        <Fade fraction={0.5} bottom={true} distance={'10px'}>
+        <Fade fraction={0.5} distance={'10px'}>
           <AspectRatio style={styles.asideGraphic} ratio={1}>
             <Image source={image} style={styles.graphic} />
           </AspectRatio>
@@ -125,6 +121,33 @@ export function Contribute() {
           kind={BTN.PRIMARY}
           href={CeloLinks.fundingRequest}
         />
+      </Cell>
+      <Cell span={Spans.half} style={standardStyles.centered}>
+        <AspectRatio ratio={309 / 360} style={[styles.feastImage, standardStyles.image]}>
+          <Image
+            source={require('src/dev/Feast.png')}
+            style={styles.graphic}
+            resizeMode="contain"
+          />
+        </AspectRatio>
+      </Cell>
+    </GridRow>
+  )
+}
+
+export function Meet() {
+  const { t } = useTranslation(NameSpaces.dev)
+  return (
+    <GridRow
+      allStyle={[styles.contributeContainer, standardStyles.elementalMarginBottom]}
+      desktopStyle={standardStyles.blockMarginTop}
+      tabletStyle={standardStyles.blockMarginTopTablet}
+      mobileStyle={standardStyles.blockMarginTopMobile}
+    >
+      <Cell span={Spans.half} style={styles.contributeContent}>
+        <H3>{t('engage.meetTitle')}</H3>
+        <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('engage.meetText')}</Text>
+        <Button text={t('engage.meetBtn')} kind={BTN.PRIMARY} href="https://discord.gg/jYRrHDQ" />
       </Cell>
       <Cell span={Spans.half} style={standardStyles.centered}>
         <AspectRatio ratio={309 / 360} style={[styles.feastImage, standardStyles.image]}>
@@ -212,7 +235,7 @@ export function EngageAsValidator() {
           caption={t('engage.validators.caption')}
           primaryAction={{
             text: t('engage.validators.primaryAction'),
-            href: 'https://medium.com/celoOrg/announcing-the-great-celo-stake-off-12eb15dd5eb0',
+            href: 'https://docs.celo.org/getting-started/choosing-a-network',
           }}
         />
       </Cell>
@@ -221,7 +244,7 @@ export function EngageAsValidator() {
           screen={screen}
           text={t('engage.tutorial.copy')}
           title={t('engage.tutorial.title')}
-          href="https://docs.celo.org/getting-started/running-a-validator"
+          href="https://docs.celo.org/getting-started/running-a-validator-in-mainnet"
           btnText={t('engage.tutorial.btnText')}
           image={require('src/icons/download-dark.png')}
         />

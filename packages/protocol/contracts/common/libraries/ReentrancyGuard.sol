@@ -1,4 +1,4 @@
-pragma solidity ^0.5.2;
+pragma solidity ^0.5.13;
 
 /**
  * @title Helps contracts guard against reentrancy attacks.
@@ -27,6 +27,6 @@ contract ReentrancyGuard {
     _guardCounter += 1;
     uint256 localCounter = _guardCounter;
     _;
-    require(localCounter == _guardCounter);
+    require(localCounter == _guardCounter, "reentrant call");
   }
 }

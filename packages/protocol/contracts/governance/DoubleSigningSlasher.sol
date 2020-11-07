@@ -1,16 +1,26 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
 
-contract DoubleSigningSlasher is SlasherUtil {
+contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+  event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
+
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -140,6 +150,6 @@ contract DoubleSigningSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
+    emit DoubleSigningSlashPerformed(validator, blockNumber);
   }
-
 }

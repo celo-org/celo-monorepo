@@ -47,18 +47,12 @@
     "text": "Shared norms and behaviors are the foundation of a beautiful community. Please read and support the effort.",
     "button": "Read Code"
   },
-  "communityTenets": "Celo Community Tenets",
   "communityGuidelines": "Community Guidelines",
-  "writingAbout": "What We're Writing About",
-  "recentNews": "Recent news from the core Celo team.",
-  "whereToSayHello": "Where to Say Hello",
-  "hearFromCelo": "Hear from the Celo team at these upcoming events",
   "comeMeetUsAt": "Come meet us at these upcoming events.",
   "readMoreOn": "Read More On",
   "contactUs": "Questions? Email us",
   "readMore": "Read More",
   "learnMore": "Learn More",
-  "interested": "Interested in what we are building?",
   "interestedText": {
     "0": "Stay up-to-date by signing up for our newsletter.  If you'd like to share, we'd love to learn more about you so that we can collectively build the Celo community. Our",
     "1": "Privacy Policy",
@@ -67,7 +61,7 @@
   "celoFellow": {
     "title": "Celo Fellowships: Decentralized and Connected",
     "heading": "Let’s collaborate",
-    "text": "Let’s chat about building a new monetary system that creates the conditions for prosperity for all. We are open to working with bright and innovative people all over the world for short, fixed-term projects.",
+    "text": "Let’s chat about building a new financial system that creates the conditions for prosperity for all. We are open to working with bright and innovative people all over the world for short, fixed-term projects.",
     "callForProp": "Read More in our Call for Proposals"
   },
   "contribute": {
@@ -108,14 +102,14 @@
       "topic": "Interest",
       "partnership": "Partnership opportunities",
       "community": "Developer community",
-      "jobs": "Jobs at Celo",
+      "jobs": "Jobs working on Celo",
       "other": "Other"
     }
   },
   "ecoFund": {
     "title": "Celo Ecosystem Venture Fund",
     "poweredBy": "By Polychain",
-    "description": "The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible monetary system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.",
+    "description": "The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible financial system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.",
     "generalPartner": "General Partner",
     "limitedPartners": "Limited Partners",
     "link": "Learn about building on Celo",
@@ -124,6 +118,7 @@
   },
   "apply": "Apply",
   "recommend": "Recommend",
+  "recommendationSubmitted": "Recommendation Submitted",
   "website": "WEBSITE",
   "recap": "RECAP"
 }

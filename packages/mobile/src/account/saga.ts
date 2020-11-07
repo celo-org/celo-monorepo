@@ -1,103 +1,77 @@
-import { randomBytes } from 'react-native-randombytes'
-import { call, put, select, takeLeading } from 'redux-saga/effects'
+import firebase from '@react-native-firebase/app'
+import { call, put, spawn, take, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
+  ClearStoredAccountAction,
   SetPincodeAction,
   setPincodeFailure,
   setPincodeSuccess,
 } from 'src/account/actions'
-import { PincodeType } from 'src/account/reducer'
-import { pincodeTypeSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import { getCachedPincode, setCachedPincode } from 'src/pincode/PincodeCache'
-import { getPinFromKeystore, setPinInKeystore } from 'src/pincode/PincodeUtils'
+import { clearStoredMnemonic } from 'src/backup/utils'
+import { FIREBASE_ENABLED } from 'src/config'
+import { firebaseSignOut } from 'src/firebase/firebase'
+import { deleteNodeData } from 'src/geth/geth'
+import { removeAccountLocally } from 'src/pincode/authentication'
+import { persistor } from 'src/redux/store'
+import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'account/saga'
 
-export function* setPincode({ pincodeType, pin }: SetPincodeAction) {
-  try {
-    if (pincodeType === PincodeType.PhoneAuth) {
-      Logger.debug(TAG + '@setPincode', 'Setting pincode with using system auth')
-      pin = randomBytes(10).toString('hex') as string
-      yield call(setPinInKeystore, pin)
-    } else if (pincodeType === PincodeType.CustomPin && pin) {
-      Logger.debug(TAG + '@setPincode', 'Pincode set using user provided pin')
-      setCachedPincode(pin)
-    } else {
-      throw new Error('Pincode type must be phone auth or must provide pin')
-    }
+export const SENTINEL_MIGRATE_COMMENT = '__CELO_MIGRATE_TX__'
 
+export function* setPincode({ pincodeType }: SetPincodeAction) {
+  try {
+    // TODO hooks into biometrics will likely go here
+    // But for now this saga does not to much, most cut during the auth refactor
     yield put(setPincodeSuccess(pincodeType))
     Logger.info(TAG + '@setPincode', 'Pincode set successfully')
   } catch (error) {
     Logger.error(TAG + '@setPincode', 'Failed to set pincode', error)
+    ValoraAnalytics.track(OnboardingEvents.pin_failed_to_set, { error: error.message, pincodeType })
     yield put(showError(ErrorMessages.SET_PIN_FAILED))
     yield put(setPincodeFailure())
   }
 }
 
-export function* getPincode(useCache = true, onValidCustomPin?: () => void) {
-  const pincodeType = yield select(pincodeTypeSelector)
+function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
+  try {
+    yield call(removeAccountLocally, account)
+    yield call(clearStoredMnemonic)
+    yield call(ValoraAnalytics.reset)
+    yield call(deleteNodeData)
 
-  if (pincodeType === PincodeType.Unset) {
-    Logger.error(TAG + '@getPincode', 'Pin has never been set')
-    throw Error('Pin has never been set')
-  }
-
-  if (pincodeType === PincodeType.PhoneAuth) {
-    Logger.debug(TAG + '@getPincode', 'Getting pin from keystore')
-    const pin = yield call(getPinFromKeystore)
-    if (!pin) {
-      throw new Error('Keystore returned empty pin')
-    }
-    if (onValidCustomPin) {
-      onValidCustomPin()
-    }
-    return pin
-  }
-
-  if (pincodeType === PincodeType.CustomPin) {
-    Logger.debug(TAG + '@getPincode', 'Getting custom pin')
-    if (useCache) {
-      const cachedPin = getCachedPincode()
-      if (cachedPin) {
-        if (onValidCustomPin) {
-          onValidCustomPin()
-        }
-        return cachedPin
+    // Ignore error if it was caused by Firebase.
+    try {
+      yield call(firebaseSignOut, firebase.app())
+    } catch (error) {
+      if (FIREBASE_ENABLED) {
+        Logger.error(TAG + '@clearStoredAccount', 'Failed to sign out from Firebase', error)
       }
     }
 
-    const pincodeEntered = new Promise((resolve) => {
-      navigate(Screens.PincodeConfirmation, {
-        onValidPin: (code: string) => {
-          if (onValidCustomPin) {
-            onValidCustomPin()
-          } else {
-            navigateBack()
-          }
-          resolve(code)
-        },
-      })
-    })
-    const pin = yield pincodeEntered
-    if (!pin) {
-      throw new Error('Pincode confirmation returned empty pin')
-    }
-    if (useCache) {
-      setCachedPincode(pin)
-    }
-    if (onValidCustomPin) {
-      onValidCustomPin()
-    }
-    return pin
+    yield call(persistor.flush)
+    yield call(restartApp)
+  } catch (error) {
+    Logger.error(TAG + '@clearStoredAccount', 'Error while removing account', error)
+    yield put(showError(ErrorMessages.ACCOUNT_CLEAR_FAILED))
   }
 }
 
-export function* accountSaga() {
+export function* watchSetPincode() {
   yield takeLeading(Actions.SET_PINCODE, setPincode)
+}
+
+export function* watchClearStoredAccount() {
+  const action = yield take(Actions.CLEAR_STORED_ACCOUNT)
+  yield call(clearStoredAccountSaga, action)
+}
+
+export function* accountSaga() {
+  yield spawn(watchSetPincode)
+  yield spawn(watchClearStoredAccount)
 }

@@ -1,17 +1,16 @@
-import { StaticNodeUtils } from '@celo/walletkit'
-import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/genesis-block-utils'
+import { StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlocksGoogleStorageBucketName } from '@celo/contractkit/lib/network-utils/genesis-block-utils'
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
 import * as path from 'path'
-import sleep from 'sleep-promise'
+import { retryCmd } from '../lib/utils'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
-import { getEnvFile } from './env-utils'
+import { envVar, fetchEnvOrFallback, getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
-import { execCmdWithExitOnFailure } from './utils'
-
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()
 // Someone has taken env_files and I don't even has permission to modify it :/
@@ -27,7 +26,7 @@ export async function uploadTestnetInfoToGoogleStorage(
   if (uploadGenesis) {
     await uploadGenesisBlockToGoogleStorage(networkName)
   }
-  await uploadStaticNodesToGoogleStorage(networkName)
+  await uploadTestnetStaticNodesToGoogleStorage(networkName)
   await uploadBootnodeToGoogleStorage(networkName)
   await uploadEnvFileToGoogleStorage(networkName)
 }
@@ -50,8 +49,9 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
   return JSON.stringify(await resp.json())
 }
 
-// This will throw an error if it fails to upload
-export async function uploadStaticNodesToGoogleStorage(networkName: string) {
+// This will throw an error if it fails to upload.
+// Intended to be used for deploying testnets, not forno full nodes.
+export async function uploadTestnetStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
   const nodesData: string[] | null = await retryCmd(() =>
@@ -60,12 +60,16 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  const nodesJson = JSON.stringify(nodesData)
-  console.debug('Static nodes are ' + nodesJson + '\n')
+  return uploadStaticNodesToGoogleStorage(networkName, nodesData)
+}
+
+export async function uploadStaticNodesToGoogleStorage(fileName: string, enodes: string[]) {
+  const json = JSON.stringify(enodes)
+  console.debug(`${fileName} static nodes are ${json}\n`)
   await uploadDataToGoogleStorage(
-    nodesJson,
+    json,
     staticNodesBucketName,
-    networkName,
+    fileName,
     true,
     'application/json'
   )
@@ -112,29 +116,6 @@ export async function uploadEnvFileToGoogleStorage(networkName: string) {
     false /* keep file private */,
     'text/plain'
   )
-}
-
-async function retryCmd(
-  cmd: () => Promise<any>,
-  numAttempts: number = 100,
-  maxTimeoutMs: number = 15000
-) {
-  for (let i = 1; i <= numAttempts; i++) {
-    try {
-      const result = await cmd()
-      return result
-    } catch (error) {
-      const sleepTimeBasisInMs = 1000
-      const sleepTimeInMs = Math.min(sleepTimeBasisInMs * Math.pow(2, i), maxTimeoutMs)
-      console.warn(
-        `${new Date().toLocaleTimeString()} Retry attempt: ${i}/${numAttempts}, ` +
-          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
-        error
-      )
-      await sleep(sleepTimeInMs)
-    }
-  }
-  return null
 }
 
 async function getGoogleCloudUserInfo(): Promise<string> {
@@ -214,4 +195,29 @@ export async function uploadFileToGoogleStorage(
         role: storage.acl.READER_ROLE,
       })
   }
+}
+
+// Reads the envVar VALIDATOR_PROXY_COUNTS, which indicates how many validators
+// have a certain number of proxies in the format:
+// <# of validators>:<proxy count>;<# of validators>:<proxy count>;...
+// For example, VALIDATOR_PROXY_COUNTS='2:1,3:2' will give [1,1,2,2,2]
+// The resulting array does not necessarily have the same length as the total
+// number of validators because non-proxied validators are not represented in the array
+export function getProxiesPerValidator() {
+  const arr = []
+  const valProxyCountsStr = fetchEnvOrFallback(envVar.VALIDATOR_PROXY_COUNTS, '')
+  const splitValProxyCountStrs = valProxyCountsStr.split(',').filter((counts) => counts)
+  for (const valProxyCount of splitValProxyCountStrs) {
+    const [valCountStr, proxyCountStr] = valProxyCount.split(':')
+    const valCount = parseInt(valCountStr, 10)
+    const proxyCount = parseInt(proxyCountStr, 10)
+    for (let i = 0; i < valCount; i++) {
+      arr.push(proxyCount)
+    }
+  }
+  return arr
+}
+
+export function getProxyName(celoEnv: string, validatorIndex: number, proxyIndex: number) {
+  return `${celoEnv}-validators-${validatorIndex}-proxy-${proxyIndex}`
 }

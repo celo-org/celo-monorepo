@@ -4,6 +4,7 @@ export enum LocalCurrencyCode {
   CAD = 'CAD',
   EUR = 'EUR',
   MXN = 'MXN',
+  COP = 'COP',
   PHP = 'PHP',
   LRD = 'LRD',
   SLL = 'SLL',
@@ -11,6 +12,8 @@ export enum LocalCurrencyCode {
   UGX = 'UGX',
   GHS = 'GHS',
   NGN = 'NGN',
+  BRL = 'BRL',
+  CVE = 'CVE',
 }
 
 export enum LocalCurrencySymbol {
@@ -18,6 +21,7 @@ export enum LocalCurrencySymbol {
   CAD = '$',
   EUR = '€',
   MXN = '$',
+  COP = '$',
   PHP = '₱',
   LRD = 'L$',
   SLL = 'Le',
@@ -25,6 +29,8 @@ export enum LocalCurrencySymbol {
   UGX = 'USh',
   GHS = 'GH₵',
   NGN = '₦',
+  BRL = 'R$',
+  CVE = '$',
 }
 
 export const LOCAL_CURRENCY_CODES = Object.values(LocalCurrencyCode)

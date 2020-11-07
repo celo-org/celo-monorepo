@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,11 +6,19 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IAccounts.sol";
 
 import "../common/Initializable.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
-contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRegistry {
+contract Accounts is
+  IAccounts,
+  ICeloVersionedContract,
+  Ownable,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
 
   struct Signers {
@@ -44,7 +52,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     string metadataURL;
   }
 
-  mapping(address => Account) private accounts;
+  mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
 
@@ -59,6 +67,14 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -562,7 +578,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     require(isAccount(msg.sender), "Unknown account");
     require(
       isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
-      "delegate or account exists"
+      "Cannot re-authorize address or locked gold account."
     );
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);

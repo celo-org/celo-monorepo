@@ -19,4 +19,7 @@ test('stringToBigNum()', () => {
   expect(parseInputAmount('1.')).toStrictEqual(new BigNumber('1'))
   expect(parseInputAmount('0')).toStrictEqual(new BigNumber('0'))
   expect(parseInputAmount('')).toStrictEqual(new BigNumber('0'))
+  expect(parseInputAmount('1.23')).toStrictEqual(new BigNumber('1.23'))
+  expect(parseInputAmount('1,23')).toStrictEqual(new BigNumber(NaN))
+  expect(parseInputAmount('1,23', ',')).toStrictEqual(new BigNumber('1.23'))
 })

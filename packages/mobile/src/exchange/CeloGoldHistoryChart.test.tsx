@@ -9,6 +9,7 @@ import { createMockStore, getMockI18nProps } from 'test/utils'
 
 const SAMPLE_BALANCE = '55.00001'
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
+const endDate = new Date('01/01/2020').getTime()
 
 it('renders without history', () => {
   const tree = renderer.create(
@@ -25,7 +26,6 @@ it('renders without history', () => {
 })
 
 it('renders while update is in progress', () => {
-  const now = Date.now()
   const tree = renderer.create(
     <Provider
       store={createMockStore({
@@ -35,9 +35,17 @@ it('renders while update is in progress', () => {
             celoGoldExchangeRates: [
               {
                 exchangeRate: '0.123',
-                timestamp: now,
+                timestamp: endDate,
               },
             ],
+            aggregatedExchangeRates: [
+              {
+                exchangeRate: '0.123',
+                timestamp: endDate,
+              },
+            ],
+            granularity: 60,
+            range: 30 * 24 * 60 * 60 * 1000, // 30 days
             lastTimeUpdated: 0,
           },
         },
@@ -51,18 +59,21 @@ it('renders while update is in progress', () => {
 })
 
 it('renders properly', () => {
-  const now = Date.now()
+  const celoGoldExchangeRates = _.range(60).map((i) => ({
+    exchangeRate: (i / 60).toString(),
+    timestamp: endDate - i * 24 * 3600 * 1000,
+  }))
   const tree = renderer.create(
     <Provider
       store={createMockStore({
         exchange: {
           exchangeRatePair,
           history: {
-            celoGoldExchangeRates: _.range(60).map((i) => ({
-              exchangeRate: (i / 60).toString(),
-              timestamp: now - i * 24 * 3600 * 1000,
-            })),
-            lastTimeUpdated: now,
+            celoGoldExchangeRates,
+            aggregatedExchangeRates: celoGoldExchangeRates,
+            lastTimeUpdated: endDate,
+            granularity: 60,
+            range: 30 * 24 * 60 * 60 * 1000, // 30 days
           },
         },
         goldToken: { balance: SAMPLE_BALANCE },

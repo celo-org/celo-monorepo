@@ -1,7 +1,7 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { installGenericHelmChart, removeGenericHelmChart, setHelmArray } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-service'
@@ -16,7 +16,7 @@ export async function installHelmChart(celoEnv: string) {
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
@@ -47,11 +47,12 @@ async function helmParameters(celoEnv: string) {
       envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_REPOSITORY
     )}`,
     `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
+    `--set attestation_service.twilio.accountSid="${fetchEnv(envVar.TWILIO_ACCOUNT_SID)}"`,
+    `--set attestation_service.twilio.authToken="${fetchEnv(envVar.TWILIO_ACCOUNT_AUTH_TOKEN)}"`,
+    `--set attestation_service.twilio.addressSid="${fetchEnv(envVar.TWILIO_ADDRESS_SID)}"`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
-    `--set attestation_service.sms_retriever_hash_code="${fetchEnv(
-      envVar.SMS_RETRIEVER_HASH_CODE
-    )}"`,
+    ...setHelmArray('attestation_service.nexmo.applications', fetchEnv(envVar.NEXMO_APPLICATIONS).split(',')),
     `--set geth.validators="${fetchEnv(envVar.VALIDATORS)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set global.postgresql.postgresqlDatabase=AttestationService`,

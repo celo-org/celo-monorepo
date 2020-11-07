@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 interface IAccounts {
   function isAccount(address) external view returns (bool);
@@ -6,8 +6,9 @@ interface IAccounts {
   function validatorSignerToAccount(address) external view returns (address);
   function attestationSignerToAccount(address) external view returns (address);
   function signerToAccount(address) external view returns (address);
-  function getValidatorSigner(address) external view returns (address);
   function getAttestationSigner(address) external view returns (address);
+  function getValidatorSigner(address) external view returns (address);
+  function getVoteSigner(address) external view returns (address);
   function hasAuthorizedVoteSigner(address) external view returns (bool);
   function hasAuthorizedValidatorSigner(address) external view returns (bool);
   function hasAuthorizedAttestationSigner(address) external view returns (bool);

@@ -1,43 +1,52 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import NumberKeypad from '@celo/react-components/components/NumberKeypad'
+/**
+ * This is a reactnavigation SCREEN, which we use to set a PIN.
+ */
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import PincodeTextbox from 'src/pincode/PincodeTextbox'
+import { StackParamList } from 'src/navigator/types'
+import { DEFAULT_CACHE_ACCOUNT, isPinValid } from 'src/pincode/authentication'
+import { setCachedPin } from 'src/pincode/PasswordCache'
+import Pincode from 'src/pincode/Pincode'
+import { RootState } from 'src/redux/reducers'
+
+interface StateProps {
+  choseToRestoreAccount: boolean | undefined
+}
 
 interface DispatchProps {
-  showError: typeof showError
   setPincode: typeof setPincode
 }
 
 interface State {
-  isPin1Inputted: boolean
   pin1: string
   pin2: string
+  errorText: string | undefined
 }
 
-type Props = DispatchProps & WithTranslation
+type ScreenProps = StackScreenProps<StackParamList, Screens.PincodeSet>
+
+type Props = ScreenProps & StateProps & DispatchProps & WithTranslation
+
+function mapStateToProps(state: RootState): StateProps {
+  return {
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
+  }
+}
 
 const mapDispatchToProps = {
-  showError,
   setPincode,
 }
 
@@ -45,118 +54,89 @@ export class PincodeSet extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   state = {
-    isPin1Inputted: false,
     pin1: '',
     pin2: '',
+    errorText: undefined,
+  }
+
+  getNextScreen = () => {
+    if (this.props.choseToRestoreAccount) {
+      return Screens.ImportWallet
+    }
+
+    return Screens.EnterInviteCode
   }
 
   onChangePin1 = (pin1: string) => {
-    this.setState({ pin1 })
+    this.setState({ pin1, errorText: undefined })
   }
 
   onChangePin2 = (pin2: string) => {
     this.setState({ pin2 })
   }
 
-  isPin1Valid = () => {
-    return this.state.pin1.length === 6
+  isPin1Valid = (pin: string) => {
+    return isPinValid(pin)
   }
 
-  isPin2Valid = () => {
-    return this.state.pin1 === this.state.pin2
+  isPin2Valid = (pin: string) => {
+    return this.state.pin1 === pin
   }
 
-  onPressPin1Continue = () => {
-    CeloAnalytics.track(CustomEventNames.pin_value)
-    this.setState({
-      isPin1Inputted: true,
-    })
-  }
-
-  onPressPin2Continue = () => {
-    CeloAnalytics.track(CustomEventNames.pin_create_button)
-    if (this.isPin1Valid() && this.isPin2Valid()) {
-      this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
-      navigate(Screens.EnterInviteCode)
+  onCompletePin1 = () => {
+    if (this.isPin1Valid(this.state.pin1)) {
+      this.props.navigation.setParams({ isVerifying: true })
     } else {
-      this.props.showError(ErrorMessages.INCORRECT_PIN)
-    }
-  }
-
-  onDigitPress = (digit: number) => {
-    const { pin1, pin2, isPin1Inputted } = this.state
-    if (!isPin1Inputted) {
+      ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pin is invalid' })
       this.setState({
-        pin1: (pin1 + digit).substr(0, 6),
-      })
-    } else {
-      this.setState({
-        pin2: (pin2 + digit).substr(0, 6),
+        pin1: '',
+        pin2: '',
+        errorText: this.props.t('pincodeSet.invalidPin'),
       })
     }
   }
 
-  onBackspacePress = () => {
-    const { pin1, pin2, isPin1Inputted } = this.state
-    if (!isPin1Inputted) {
-      this.setState({
-        pin1: pin1.substr(0, pin1.length - 1),
-      })
+  onCompletePin2 = async (pin2: string) => {
+    const { pin1 } = this.state
+    if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
+      setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
+      this.props.setPincode(PincodeType.CustomPin)
+      ValoraAnalytics.track(OnboardingEvents.pin_set)
+      this.props.navigation.navigate(this.getNextScreen())
     } else {
+      this.props.navigation.setParams({ isVerifying: false })
+      ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pins do not match' })
       this.setState({
-        pin2: pin2.substr(0, pin2.length - 1),
+        pin1: '',
+        pin2: '',
+        errorText: this.props.t('pincodeSet.pinsDontMatch'),
       })
     }
   }
 
   render() {
-    const { t } = this.props
-    const { isPin1Inputted, pin1, pin2 } = this.state
+    const { route } = this.props
+    const isVerifying = route.params?.isVerifying
+    const { pin1, pin2, errorText } = this.state
 
     return (
-      <SafeAreaView style={style.container}>
-        <DevSkipButton nextScreen={Screens.EnterInviteCode} />
-        <ScrollView contentContainerStyle={style.scrollContainer}>
-          <View>
-            <Text style={[fontStyles.h1, componentStyles.marginTop15]}>
-              {isPin1Inputted ? t('verifyPin.title') : t('createPin.title')}
-            </Text>
-            <View style={style.pincodeContainer}>
-              <PincodeTextbox
-                pin={isPin1Inputted ? pin2 : pin1}
-                placeholder={t('createPin.yourPin')}
-              />
-            </View>
-          </View>
-          <View>
-            <HorizontalLine />
-            <View style={style.keypadContainer}>
-              <NumberKeypad
-                showDecimal={false}
-                onDigitPress={this.onDigitPress}
-                onBackspacePress={this.onBackspacePress}
-              />
-            </View>
-          </View>
-        </ScrollView>
-        {!isPin1Inputted && (
-          <Button
-            testID="Pincode-Enter"
-            text={t('global:continue')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            onPress={this.onPressPin1Continue}
-            disabled={!this.isPin1Valid()}
+      <SafeAreaView style={styles.container}>
+        <DevSkipButton nextScreen={this.getNextScreen()} />
+        {isVerifying ? (
+          // Verify
+          <Pincode
+            errorText={errorText}
+            pin={pin2}
+            onChangePin={this.onChangePin2}
+            onCompletePin={this.onCompletePin2}
           />
-        )}
-        {isPin1Inputted && (
-          <Button
-            testID="Pincode-ReEnter"
-            text={t('global:save')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            onPress={this.onPressPin2Continue}
-            disabled={!this.isPin2Valid()}
+        ) : (
+          // Create
+          <Pincode
+            errorText={errorText}
+            pin={pin1}
+            onChangePin={this.onChangePin1}
+            onCompletePin={this.onCompletePin1}
           />
         )}
       </SafeAreaView>
@@ -164,31 +144,15 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.onboardingBackground,
     justifyContent: 'space-between',
-  },
-  scrollContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: 0,
-  },
-  pincodeContainer: {
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  keypadContainer: {
-    marginVertical: 15,
-    paddingHorizontal: 20,
   },
 })
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxNamePin1)(PincodeSet))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation<Props>(Namespaces.onboarding)(PincodeSet))

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { Status } from 'src/home/roadmap/milestones'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import CoinHalfFull from 'src/shared/CoinHalfFull'
 import HollowCoin from 'src/shared/HollowOval'
 import OvalCoin from 'src/shared/OvalCoin'
@@ -26,13 +26,7 @@ export default React.memo(function GoldStone({ date, title, text, isLast, index,
   const isComplete = status === Status.complete
   const delay = DELAY_BASE * index * status
   return (
-    <View
-      style={[
-        styles.container,
-        isMobile && styles.containerMobile,
-        isComplete && !isLast && styles.fillSpace,
-      ]}
-    >
+    <View style={[styles.container, isMobile && styles.containerMobile]}>
       <View
         style={
           isComplete

@@ -21,7 +21,6 @@ export type ExtractProps<
  * Usage: array.filter(isPresent)
  * See https://github.com/microsoft/TypeScript/issues/16069#issuecomment-565658443
  */
-
 export function isPresent<T>(t: T | undefined | null | void): t is T {
   return t !== undefined && t !== null
 }
@@ -30,3 +29,10 @@ export function isPresent<T>(t: T | undefined | null | void): t is T {
 export function assertNever(x: never): never {
   throw new Error('Unexpected object: ' + x)
 }
+
+/**
+ * Unwrap type of promise.
+ * This can be removed once we switch to TypeScript 3.9 which directly supports the `awaited` keyword
+ * See https://github.com/microsoft/TypeScript/pull/35998
+ */
+export type Awaited<T> = T extends Promise<infer U> ? U : never

@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ErrorScreen with errorMessage renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "alignItems": "center",
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
@@ -17,16 +16,21 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
   }
 >
   <View
-    style={Object {}}
+    style={
+      Object {
+        "alignItems": "center",
+        "height": 120,
+        "justifyContent": "space-between",
+      }
+    }
   >
     <Text
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "paddingBottom": 20,
-          "textAlign": "center",
+          "fontFamily": "Jost-Book",
+          "fontSize": 26,
+          "lineHeight": 32,
         }
       }
     >
@@ -36,9 +40,9 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 18,
-          "textAlign": "center",
+          "fontFamily": "Jost-Medium",
+          "fontSize": 22,
+          "lineHeight": 28,
         }
       }
     >
@@ -53,8 +57,10 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
         Object {
           "backgroundColor": "rgba(238, 238, 238, 0.75)",
           "borderRadius": 25,
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 12,
+          "lineHeight": 22,
           "padding": 15,
         }
       }
@@ -73,87 +79,62 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "borderRadius": 3,
             "flexDirection": "row",
           },
-          Object {
-            "marginVertical": 10,
-          },
-          Object {
-            "marginBottom": 10,
-          },
           undefined,
-          Object {
-            "backgroundColor": "#42D689",
-          },
         ]
       }
     >
       <View
-        accessible={true}
-        focusable={true}
-        isTVSelectable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
+              "overflow": "hidden",
             },
             Object {
-              "backgroundColor": "#42D689",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderColor": "#42D689",
-              "borderRadius": 3,
-              "borderWidth": 2,
+              "borderRadius": 100,
             },
           ]
         }
-        testID="ErrorContinueButton"
       >
         <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "backgroundColor": "#1AB775",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
+              "paddingVertical": 5,
             }
           }
+          testID="ErrorContinueButton"
         >
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
+              Object {
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
             }
           >
             restartApp
@@ -162,14 +143,13 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ErrorScreen without errorMessage renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "alignItems": "center",
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "height": 1292,
@@ -182,16 +162,21 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
   }
 >
   <View
-    style={Object {}}
+    style={
+      Object {
+        "alignItems": "center",
+        "height": 120,
+        "justifyContent": "space-between",
+      }
+    }
   >
     <Text
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "paddingBottom": 20,
-          "textAlign": "center",
+          "fontFamily": "Jost-Book",
+          "fontSize": 26,
+          "lineHeight": 32,
         }
       }
     >
@@ -201,9 +186,9 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 18,
-          "textAlign": "center",
+          "fontFamily": "Jost-Medium",
+          "fontSize": 22,
+          "lineHeight": 28,
         }
       }
     >
@@ -218,8 +203,10 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
         Object {
           "backgroundColor": "rgba(238, 238, 238, 0.75)",
           "borderRadius": 25,
-          "fontFamily": "Hind-Regular",
+          "color": "#2E3338",
+          "fontFamily": "Inter-Regular",
           "fontSize": 12,
+          "lineHeight": 22,
           "padding": 15,
         }
       }
@@ -238,87 +225,62 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "borderRadius": 3,
             "flexDirection": "row",
           },
-          Object {
-            "marginVertical": 10,
-          },
-          Object {
-            "marginBottom": 10,
-          },
           undefined,
-          Object {
-            "backgroundColor": "#42D689",
-          },
         ]
       }
     >
       <View
-        accessible={true}
-        focusable={true}
-        isTVSelectable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
+              "overflow": "hidden",
             },
             Object {
-              "backgroundColor": "#42D689",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderColor": "#42D689",
-              "borderRadius": 3,
-              "borderWidth": 2,
+              "borderRadius": 100,
             },
           ]
         }
-        testID="ErrorContinueButton"
       >
         <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "backgroundColor": "#1AB775",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
+              "paddingVertical": 5,
             }
           }
+          testID="ErrorContinueButton"
         >
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
+              Object {
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
             }
           >
             restartApp
@@ -327,5 +289,5 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

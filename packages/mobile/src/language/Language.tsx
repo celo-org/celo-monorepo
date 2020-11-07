@@ -1,73 +1,99 @@
-import { RootState } from '@celo/mobile/src/redux/reducers'
-import LanguageSelectUI from '@celo/react-components/components/LanguageSelectUI'
-import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { NavigationInjectedProps } from 'react-navigation'
-import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import SelectionOption from '@celo/react-components/components/SelectionOption'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps, TransitionPresets } from '@react-navigation/stack'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { FlatList, ListRenderItemInfo, ScrollView, StyleSheet, Text } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useDispatch } from 'react-redux'
+import { SettingsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import logo from 'src/images/celo-logo.png'
+import { Namespaces } from 'src/i18n'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 
-interface State {
-  selectedAnswer: string | null
+type ScreenProps = StackScreenProps<StackParamList, Screens.Language | Screens.LanguageModal>
+type Props = ScreenProps
+
+interface Language {
+  code: string
+  name: string
 }
 
-interface DispatchProps {
-  setLanguage: typeof setLanguage
+function keyExtractor(item: Language) {
+  return item.code
 }
 
-interface NavigationProps {
-  nextScreen: Screens
-}
+function LanguageScreen({ route }: Props) {
+  const dispatch = useDispatch()
+  const { t, i18n } = useTranslation(Namespaces.accountScreen10)
+  const nextScreen = route.params?.nextScreen
 
-type Props = DispatchProps & NavigationInjectedProps<NavigationProps> & WithTranslation
-
-export class Language extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-
-  state = {
-    selectedAnswer: i18n.language || '',
-  }
-
-  onSelectAnswer = (language: string, code: string) => {
-    CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
-    this.props.setLanguage(code)
-    this.setState({ selectedAnswer: code })
-  }
-
-  onSubmit = () => {
-    const nextScreen = this.props.navigation.getParam('nextScreen', Screens.JoinCelo)
-    CeloAnalytics.track(CustomEventNames.nux_continue, {
-      nextScreen,
-      selectedAnswer: this.state.selectedAnswer,
+  const onSelect = (language: string, code: string) => {
+    dispatch(setLanguage(code))
+    // Wait for next frame before navigating
+    // so the user can see the changed selection briefly
+    requestAnimationFrame(() => {
+      navigate(nextScreen || Screens.OnboardingEducationScreen)
     })
 
-    this.props.setLanguage(this.state.selectedAnswer, nextScreen)
+    ValoraAnalytics.track(SettingsEvents.language_select, { language: code })
   }
 
-  render() {
-    const { t } = this.props
+  const renderItem = ({ item: language }: ListRenderItemInfo<Language>) => {
     return (
-      <LanguageSelectUI
-        logo={logo}
-        onLanguageSelected={this.onSelectAnswer}
-        onSubmit={this.onSubmit}
-        isSubmitDisabled={!this.state.selectedAnswer}
-        currentSelected={this.state.selectedAnswer}
-        languages={AVAILABLE_LANGUAGES}
-        t={t}
+      <SelectionOption
+        // nextScreen is not set when the language screen is the first seen in the app
+        // for when the best language couldn't be determined
+        hideCheckboxes={!nextScreen}
+        text={language.name}
+        key={language.code}
+        onSelect={onSelect}
+        isSelected={language.code === i18n.language}
+        data={language.code}
+        testID={`ChooseLanguage/${language.code}`}
       />
     )
   }
+
+  return (
+    <ScrollView style={styles.container}>
+      <SafeAreaView edges={['bottom']}>
+        <Text style={styles.title} testID={'ChooseLanguageTitle'}>
+          {t('selectLanguage')}
+        </Text>
+        <FlatList
+          data={AVAILABLE_LANGUAGES}
+          extraData={i18n.language}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+        />
+      </SafeAreaView>
+    </ScrollView>
+  )
 }
 
-export default componentWithAnalytics(
-  connect<any, DispatchProps, {}, RootState>(null, { setLanguage })(
-    withTranslation(Namespaces.accountScreen10)(Language)
-  )
-)
+LanguageScreen.navigationOptions = (withAnimation: boolean) => ({ navigation }: ScreenProps) => {
+  return navigation.canGoBack()
+    ? {
+        ...headerWithBackButton,
+        ...(withAnimation ? TransitionPresets.ModalTransition : {}),
+      }
+    : emptyHeader
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  title: {
+    ...fontStyles.h2,
+    margin: 16,
+  },
+})
+
+export default LanguageScreen

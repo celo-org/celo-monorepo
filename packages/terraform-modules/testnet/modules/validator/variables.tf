@@ -38,14 +38,9 @@ variable genesis_content_base64 {
   description = "Content of the genesis file encoded in base64"
 }
 
-variable geth_exporter_docker_image_repository {
+variable geth_metrics {
   type        = string
-  description = "Repository of the geth exporter docker image"
-}
-
-variable geth_exporter_docker_image_tag {
-  type        = string
-  description = "Tag of the geth exporter docker image"
+  description = "Enable Geth metrics (prometheus format) on port 6060"
 }
 
 variable geth_node_docker_image_repository {
@@ -83,14 +78,14 @@ variable network_name {
   description = "Name of the GCP network the validator VM is in"
 }
 
-variable proxied_validator_count {
+variable node_disk_size_gb {
   type        = number
-  description = "Number of validator_count validators that are hidden behind proxies"
+  description = "The size in GB for each node's disk"
 }
 
-variable tx_node_count {
-  type        = number
-  description = "Number of tx-nodes that are created"
+variable proxies_per_validator {
+  type        = list(number)
+  description = "Number of proxies for each validator that is proxied. Does not include validators that aren't proxied. indices correspond to validator indices."
 }
 
 variable validator_count {
