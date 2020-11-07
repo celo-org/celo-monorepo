@@ -1867,10 +1867,10 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.3.tgz#355199fe45d1f9e667ee66836a34e93828b3b5a5"
   integrity sha512-3GeGcUHCzMxCpkBHywEuoXZp1VV+yN6uEHPowxGgH2VP++qO01HMw8G5J4wlP7jN5HFt3WsZaHWfIhor/irGKg==
 
-"@celo/client@0.0.317":
-  version "0.0.317"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.317.tgz#d306f99d90f725165102ddb745824023bd872a65"
-  integrity sha512-+M9DJqEj2HIZTwq3JRr7kk1AB3iHBjC7dgdnKhFn8EVgnqnkHcRW04LhQ54CAi37szKwShg8kVpzDOs3fxuTRA==
+"@celo/client@0.0.319":
+  version "0.0.319"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.319.tgz#d8ec1f265fed3b73ec72ba2a34e043c6d400c7c4"
+  integrity sha512-5pjqAOju4NCFzYvnkPIiQnfVxqggB/8Ol8Js4ysdqHa6o/fg3u4noCkDqGc31kZzZniQvfal6a0wn9OXXSMWow==
 
 "@celo/contractkit@0.3.1":
   version "0.3.1"
