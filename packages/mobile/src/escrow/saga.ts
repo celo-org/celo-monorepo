@@ -281,6 +281,12 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       phoneHash
     )
 
+    if (escrowPaymentIds.length === 0) {
+      Logger.debug(TAG + '@withdrawFromEscrow', 'No pending payments in escrow')
+      ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
+      return
+    }
+
     const paymentIdSet: Set<string> = new Set()
     for (const paymentId of escrowPaymentIds) {
       paymentIdSet.add(paymentId)
