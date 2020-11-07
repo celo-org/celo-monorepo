@@ -104,6 +104,8 @@
     "elliptic": "^6.5.3",
     "dot-prop": "^5.2.0",
     "bl": "^4.0.3",
-    "node-libs-react-native": "^1.2.0"
+    "node-libs-react-native": "^1.2.0",
+    "object-path": "^0.11.5",
+    "node-forge": "^0.10.0"
   }
 }
