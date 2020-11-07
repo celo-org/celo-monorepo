@@ -1,13 +1,14 @@
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   AttestationsWrapper,
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { isValidAddress } from '@celo/utils/src/address'
+import { isValidAddress, normalizeAddress, normalizeAddressWith0x } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
-import { call, delay, put, race, select, take } from 'redux-saga/effects'
+import { all, call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showErrorOrFallback } from 'src/alert/actions'
@@ -23,6 +24,7 @@ import {
   requireSecureSend,
   updateE164PhoneNumberAddresses,
   updateImportContactsProgress,
+  updateWalletToAccountAddress,
 } from 'src/identity/actions'
 import { fetchContactMatches } from 'src/identity/matchmaking'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
@@ -34,6 +36,7 @@ import {
   matchedContactsSelector,
   SecureSendPhoneNumberMapping,
   secureSendPhoneNumberMappingSelector,
+  WalletToAccountAddressType,
 } from 'src/identity/reducer'
 import { checkIfValidationRequired } from 'src/identity/secureSend'
 import { ImportContactsStatus } from 'src/identity/types'
@@ -167,31 +170,33 @@ export function* fetchAddressesAndValidateSaga({
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const addresses: string[] = yield call(getAddresses, e164Number)
+    const walletAddresses: string[] = yield call(fetchWalletAddresses, e164Number)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
-    if (!addresses.length) {
+    if (!walletAddresses.length) {
       Logger.debug(TAG + '@fetchAddressesAndValidate', `No addresses for number`)
       // Save invalid/0 addresses to avoid checking again
       // null means a contact is unverified, whereas undefined means we haven't checked yet
       e164NumberToAddressUpdates[e164Number] = null
     } else {
-      e164NumberToAddressUpdates[e164Number] = addresses
-      addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
+      e164NumberToAddressUpdates[e164Number] = walletAddresses
+      walletAddresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
     }
 
     const userAddress = yield select(currentAccountSelector)
+    const secureSendPossibleAddresses = [...walletAddresses]
     const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
     // If fetch is being done as part of a payment request from an unverified address,
     // the unverified address should be considered in the Secure Send check
-    if (requesterAddress && !addresses.includes(requesterAddress)) {
-      addresses.push(requesterAddress)
+    if (requesterAddress && !secureSendPossibleAddresses.includes(requesterAddress)) {
+      secureSendPossibleAddresses.push(requesterAddress)
     }
+
     const addressValidationType = checkIfValidationRequired(
       oldAddresses,
-      addresses,
+      secureSendPossibleAddresses,
       userAddress,
       secureSendPhoneNumberMapping,
       e164Number
@@ -216,13 +221,44 @@ export function* fetchAddressesAndValidateSaga({
   }
 }
 
-function* getAddresses(e164Number: string) {
-  let phoneHash: string
+function* getAccountAddresses(e164Number: string) {
   const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-  phoneHash = phoneHashDetails.phoneHash
-
+  const phoneHash = phoneHashDetails.phoneHash
   const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
   return getAddressesFromLookupResult(lookupResult, phoneHash) || []
+}
+
+function* fetchWalletAddresses(e164Number: string) {
+  const contractKit = yield call(getContractKit)
+  const accountsWrapper: AccountsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAccounts,
+  ])
+
+  const accountAddresses: string[] = yield call(getAccountAddresses, e164Number)
+  const walletAddresses: string[] = yield all(
+    accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
+  )
+
+  const possibleUserAddresses: string[] = []
+  const walletToAccountAddress: WalletToAccountAddressType = {}
+  for (const [i, address] of walletAddresses.entries()) {
+    const accountAddress = normalizeAddressWith0x(accountAddresses[i])
+    const walletAddress = normalizeAddressWith0x(address)
+    // `getWalletAddress` returns a null address when there isn't a wallet registered
+    // TODO: Use the helper function `isNullAddress` I made in base/src/address
+    // once I've built from the monorepo
+    if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
+      walletToAccountAddress[walletAddress] = accountAddress
+      possibleUserAddresses.push(walletAddress)
+    } else {
+      // NOTE: Only need this else block if we are not confident all wallets are registered
+      walletToAccountAddress[accountAddress] = accountAddress
+      possibleUserAddresses.push(accountAddress)
+    }
+  }
+  yield put(updateWalletToAccountAddress(walletToAccountAddress))
+  return possibleUserAddresses
 }
 
 // Returns IdentifierLookupResult
