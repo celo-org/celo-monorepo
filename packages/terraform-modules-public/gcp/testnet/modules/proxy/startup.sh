@@ -347,8 +347,8 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 # Load configuration to files
 mkdir -p $DATA_DIR/account
-echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
+#echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
+#echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${proxy_private_key}' > $DATA_DIR/pkey
@@ -365,7 +365,7 @@ docker run \
   -v $DATA_DIR:$DATA_DIR \
   --entrypoint /bin/sh \
   -i $GETH_NODE_DOCKER_IMAGE \
-  -c "geth init $DATA_DIR/genesis.json && geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
+  -c "geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey | true"
 
 cat <<EOF >/etc/systemd/system/geth.service
 [Unit]
@@ -388,7 +388,6 @@ ExecStart=/usr/bin/docker run \\
       --password $DATA_DIR/account/accountSecret \\
       --allow-insecure-unlock \\
       --nousb \\
-      --bootnodes $(cat $DATA_DIR/bootnodes) \\
       --rpc \\
       --rpcaddr 0.0.0.0 \\
       --rpcapi=eth,net,web3 \\
