@@ -39,7 +39,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "0.0.317",
+    "@celo/client": "0.0.319",
     "@celo/contractkit": "0.4.19-dev",
     "@celo/komencikit": "0.0.1-dev",
     "@celo/react-components": "1.0.0",
