@@ -1,16 +1,16 @@
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import {
+  ExchangeInstance,
+  GoldTokenInstance,
   MetaTransactionWalletContract,
   MetaTransactionWalletInstance,
-  RegistryContract,
-  RegistryInstance,
-  MockStableTokenContract,
-  MockStableTokenInstance,
+  StableTokenInstance,
 } from 'types'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import BigNumber from 'bignumber.js'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
@@ -601,28 +601,26 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
   })
 
   describe('#transferCeloDollarsToSigner', () => {
-    const value = 100
-    let mockStableToken: MockStableTokenInstance
+    let value: BigNumber
+    let stableToken: StableTokenInstance
     beforeEach(async () => {
-      const Registry: RegistryContract = artifacts.require('Registry')
-      const registry: RegistryInstance = await Registry.at(
-        '0x000000000000000000000000000000000000ce10'
-      )
-      // Problem is this is owned by governance...
-      console.log(await registry.owner())
-      console.log(accounts)
-      const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-      mockStableToken = await MockStableToken.new()
-      await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
-      await mockStableToken.mint(signer, value)
-      assertEqualBN(await mockStableToken.balanceOf(wallet.address), value)
-      assertEqualBN(await mockStableToken.balanceOf(signer), 0)
+      const sellAmount = 1000
+      const exchange: ExchangeInstance = await getDeployedProxiedContract('Exchange', artifacts)
+      const goldToken: GoldTokenInstance = await getDeployedProxiedContract('GoldToken', artifacts)
+      stableToken = await getDeployedProxiedContract('StableToken', artifacts)
+      await goldToken.approve(exchange.address, sellAmount)
+      await exchange.sell(sellAmount, 0, true)
+      value = await stableToken.balanceOf(accounts[0])
+      assert.isTrue(value.isGreaterThan(0))
+      await stableToken.transfer(wallet.address, value)
+      assertEqualBN(await stableToken.balanceOf(wallet.address), value)
+      assertEqualBN(await stableToken.balanceOf(signer), 0)
     })
 
     it('transfers all cUSD to the signer', async () => {
       await wallet.transferCeloDollarsToSigner()
-      assertEqualBN(await mockStableToken.balanceOf(wallet.address), 0)
-      assertEqualBN(await mockStableToken.balanceOf(signer), value)
+      assertEqualBN(await stableToken.balanceOf(wallet.address), 0)
+      assertEqualBN(await stableToken.balanceOf(signer), value)
     })
   })
 })
