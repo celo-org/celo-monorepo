@@ -27,7 +27,8 @@ export function getFirebaseAdminCreds(admin: any) {
 export const VERSION = process.env.GAE_VERSION
 export const ENVIRONMENT = process.env.ENVIRONMENT
 export const PORT = Number(process.env.PORT) || 8080
-export const FIREBASE_DB = process.env.FIREBASE_DB
+export const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID
+export const FIREBASE_DB = `https://${FIREBASE_PROJECT_ID}.firebaseio.com`
 const ENFORCE_NOTIFICATIONS = process.env.ENFORCE_LOCAL_NOTIFICATIONS === 'true'
 export const NOTIFICATIONS_DISABLED = !ENFORCE_NOTIFICATIONS && ENVIRONMENT === 'local'
 export const BLOCKSCOUT_API = process.env.BLOCKSCOUT_API

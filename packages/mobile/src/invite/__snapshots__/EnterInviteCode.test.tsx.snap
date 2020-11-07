@@ -4,21 +4,19 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#F9F5ED",
+      "backgroundColor": "#F9F6F0",
       "flex": 1,
     }
   }
 >
-  <SafeAreaView
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -36,7 +34,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     >
          
     </Text>
-  </SafeAreaView>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Array [
@@ -46,9 +44,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
           "paddingHorizontal": 20,
           "paddingTop": 34,
         },
-        Object {
-          "marginBottom": 0,
-        },
+        null,
       ]
     }
     keyboardShouldPersistTaps="always"
@@ -88,9 +84,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                 "shadowOpacity": 1,
                 "shadowRadius": 8,
               },
-              Object {
-                "padding": 0,
-              },
+              Array [
+                Object {
+                  "padding": 0,
+                },
+                undefined,
+              ],
             ]
           }
         >
@@ -166,6 +165,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                         undefined,
                       ]
                     }
+                    testID="inviteCodeInput"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -206,46 +206,24 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             }
           />
         </Text>
-        <View
-          accessible={true}
-          focusable={false}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackgroundBorderless",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          testID="RestoreExistingWallet"
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#1AB775",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                },
-                Object {
-                  "color": "#A49B80",
-                  "padding": 16,
-                  "textAlign": "center",
-                },
-              ]
-            }
-          >
-            nuxNamePin1:importIt
-          </Text>
-        </View>
       </View>
     </View>
   </RCTScrollView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;

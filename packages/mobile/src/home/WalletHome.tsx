@@ -1,6 +1,5 @@
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
-import variables from '@celo/react-components/styles/variables'
 import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -14,9 +13,10 @@ import {
   StyleSheet,
 } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -25,7 +25,7 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
-import Logo from 'src/icons/Logo.v2'
+import Logo from 'src/icons/Logo'
 import { importContacts } from 'src/identity/actions'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -36,8 +36,6 @@ import { initializeSentryUserContext } from 'src/sentry/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
   loading: boolean
@@ -81,7 +79,11 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-export class WalletHome extends React.Component<Props> {
+interface State {
+  isMigrating: boolean
+}
+
+export class WalletHome extends React.Component<Props, State> {
   scrollPosition: Animated.Value<number>
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
@@ -90,6 +92,7 @@ export class WalletHome extends React.Component<Props> {
 
     this.scrollPosition = new Animated.Value(0)
     this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
+    this.state = { isMigrating: false }
   }
 
   onRefresh = async () => {
@@ -102,6 +105,8 @@ export class WalletHome extends React.Component<Props> {
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()
     }
+
+    ValoraAnalytics.setUserAddress(this.props.address)
 
     // Waiting 1/2 sec before triggering to allow
     // rest of feed to load unencumbered
@@ -127,7 +132,7 @@ export class WalletHome extends React.Component<Props> {
     if (!title) {
       return null
     }
-    return <SectionHeadNew text={title} />
+    return <SectionHead text={title} />
   }
 
   keyExtractor = (_item: any, index: number) => {
@@ -140,18 +145,19 @@ export class WalletHome extends React.Component<Props> {
       t('testnetAlert.1', { testnet: _.startCase(DEFAULT_TESTNET) }),
       ALERT_BANNER_DURATION,
       null,
+      null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
   }
 
   render() {
-    const { t, activeNotificationCount, callToActNotification } = this.props
+    const { activeNotificationCount, callToActNotification } = this.props
 
     const refresh: React.ReactElement<RefreshControlProps> = (
       <RefreshControl
         refreshing={this.props.loading}
         onRefresh={this.onRefresh}
-        colors={[colors.celoGreen]}
+        colors={[colors.greenUI]}
       />
     ) as React.ReactElement<RefreshControlProps>
 
@@ -165,7 +171,6 @@ export class WalletHome extends React.Component<Props> {
     }
 
     sections.push({
-      title: t('activity'),
       data: [{}],
       renderItem: () => (
         <TransactionsList key={'TransactionList'} currency={CURRENCY_ENUM.DOLLAR} />
@@ -196,31 +201,7 @@ export class WalletHome extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     position: 'relative',
-  },
-  banner: { paddingVertical: 15, marginTop: 50 },
-  containerFeed: {
-    paddingBottom: 40,
-  },
-  header: {
-    backgroundColor: colors.background,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  headerRight: {
-    position: 'absolute',
-    top: 0,
-    right: variables.contentPadding - HEADER_BUTTON_MARGIN,
-    bottom: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerButton: {
-    justifyContent: 'flex-end',
-    margin: HEADER_BUTTON_MARGIN,
   },
 })
 

@@ -18,7 +18,7 @@ const mockProvider: provider = {
       callback(new Error(payload.method))
       return
     } else if (payload.method === 'mock_response_error_method') {
-      response.error = {
+      ;(response.error as any) = {
         code: -32000,
         message: 'foobar',
       }

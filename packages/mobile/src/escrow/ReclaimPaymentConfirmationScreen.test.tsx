@@ -41,7 +41,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   it('renders correctly', async () => {
     mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
 
-    const { queryByText, toJSON } = render(
+    const { queryByText, queryAllByText, toJSON } = render(
       <Provider store={store}>
         <ReclaimPaymentConfirmationScreen {...mockScreenProps} />
       </Provider>
@@ -49,7 +49,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
 
     // Initial render
     expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('securityFee')).not.toBeNull()
+    expect(queryAllByText('securityFee')).toHaveLength(2)
     expect(queryByText('$0.001')).toBeNull()
 
     // Wait for fee to be calculated and displayed
@@ -73,7 +73,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
 
     // Initial render
     expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('securityFee')).not.toBeNull()
+    expect(queryAllByText('securityFee')).toHaveLength(2)
     expect(queryByText('$0.001')).toBeNull()
     expect(queryAllByText('10.00')).toHaveLength(1)
 

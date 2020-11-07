@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import ExchangeCELO from 'src/icons/ExchangeIconCGLD'
+import ExchangeCELO from 'src/icons/ExchangeIconCELO'
 import ExchangeCUSD from 'src/icons/ExchangeIconCUSD'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
@@ -51,6 +51,12 @@ export function TwoAssets() {
           />
         </AssetToken>
         <AssetToken ticker="CELO" info={t('CELOinfo')} icon={<ExchangeCELO size={ICON_SIZE} />}>
+          <Button
+            kind={BTN.NAKED}
+            text={t('viewReserve')}
+            href={'https://celoreserve.org'}
+            size={SIZE.normal}
+          />
           <Button
             kind={BTN.NAKED}
             text={t('learnGovernance')}
@@ -103,7 +109,7 @@ function AssetToken({ ticker, info, icon, children }: Props) {
             {info}
           </Text>
         </View>
-        {children}
+        <View style={styles.governanceLinks}>{children}</View>
       </View>
     </Cell>
   )
@@ -112,6 +118,10 @@ function AssetToken({ ticker, info, icon, children }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+  },
+  governanceLinks: {
+    minHeight: 50,
+    justifyContent: 'space-between',
   },
   root: {
     maxWidth: 330,

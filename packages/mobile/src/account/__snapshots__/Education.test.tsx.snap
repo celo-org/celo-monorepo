@@ -1,11 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Education renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
+  onFinish={[MockFunction]}
   style={
-    Object {
-      "flex": 1,
-    }
+    Array [
+      Object {
+        "flex": 1,
+      },
+      undefined,
+    ]
   }
 >
   <View
@@ -75,7 +79,6 @@ exports[`Education renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
         "flex": 1,
         "justifyContent": "center",
         "paddingBottom": 24,
@@ -86,79 +89,73 @@ exports[`Education renders correctly 1`] = `
       activeDotStyle={
         Object {
           "backgroundColor": "#2E3338",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 8,
-          "marginHorizontal": 5,
-          "width": 8,
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
         }
       }
       dotStyle={
         Object {
           "backgroundColor": "#9CA4A9",
-          "borderRadius": 8,
+          "borderRadius": 5,
           "flex": 0,
-          "height": 6,
-          "marginHorizontal": 5,
-          "width": 6,
+          "height": 5,
+          "marginHorizontal": 3,
+          "width": 5,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
+      removeClippedSubviews={false}
     >
       <View
         style={
           Object {
             "flex": 1,
-            "justifyContent": "center",
             "marginBottom": 24,
             "paddingHorizontal": 24,
           }
         }
       >
-        <Image
-          resizeMode="contain"
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/placeholder.png",
-            }
-          }
+        <View
           style={
             Object {
-              "alignSelf": "center",
-              "height": 200,
-              "width": 200,
-            }
-          }
-        />
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Jost-Medium",
-              "fontSize": 22,
-              "lineHeight": 28,
-              "marginTop": 24,
-              "textAlign": "center",
+              "flex": 1,
+              "justifyContent": "center",
             }
           }
         >
-          Step 1
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingTop": 16,
-              "textAlign": "center",
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
+                "marginTop": 24,
+                "textAlign": "center",
+              }
             }
-          }
-        >
-          The Journey Begins
-        </Text>
+          >
+            Step 1
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingTop": 16,
+                "textAlign": "center",
+              }
+            }
+          >
+            The Journey Begins
+          </Text>
+        </View>
       </View>
     </Swiper>
     <View
@@ -202,12 +199,12 @@ exports[`Education renders correctly 1`] = `
           style={
             Object {
               "alignItems": "center",
-              "backgroundColor": "#F1F0EB",
+              "backgroundColor": "#1AB775",
               "height": 48,
               "justifyContent": "center",
               "minWidth": 120,
               "opacity": undefined,
-              "paddingHorizontal": 16,
+              "paddingHorizontal": 24,
               "paddingVertical": 5,
             }
           }
@@ -216,7 +213,7 @@ exports[`Education renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#2E3338",
+                "color": "#FFFFFF",
                 "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
                 "lineHeight": 22,
@@ -229,5 +226,5 @@ exports[`Education renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

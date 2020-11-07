@@ -2,22 +2,29 @@
 import { StackNavigationProp } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
-import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { TokenTransactionType } from 'src/apollo/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { StackParamList } from 'src/navigator/types'
+import { NotificationTypes } from 'src/notifications/types'
+import { PaymentRequest, PaymentRequestStatus } from 'src/paymentRequest/types'
+import { UriData } from 'src/qrcode/schema'
 import {
   RecipientKind,
   RecipientWithContact,
   RecipientWithMobileNumber,
+  RecipientWithQrCode,
 } from 'src/recipients/recipient'
+
+export const nullAddress = '0x0'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
 export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
+export const mockAccount3 = '0x1230000000000000000000000000000000007E57'
 
 export const mockMnemonic =
   'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
@@ -37,8 +44,8 @@ export const mockE164Number = '+14155550000'
 export const mockDisplayNumber = '(415) 555-0000'
 export const mockE164NumberHash =
   '0xefbc804cdddcb76544e1dd2c25e9624edae290d175ccd20538e5cae06c7dbe9e'
-export const mockE164NumberSalt = 'piWqRHHYWtfg9'
-export const mockE164NumberHashWithSalt =
+export const mockE164NumberPepper = 'piWqRHHYWtfg9'
+export const mockE164NumberHashWithPepper =
   '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
 
 export const mockE164Number2 = '+12095559790'
@@ -46,14 +53,18 @@ export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
 export const mockCountryCode = '+1'
 
-export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
+export const mockQrCodeData = {
+  address: mockAccount,
+  e164PhoneNumber: mockE164Number,
+  displayName: mockName,
+}
 
 export const mockNameInvite = 'Jane Doe'
 export const mockName2Invite = 'George Bogart'
 export const mockE164NumberInvite = '+13105550000'
 export const mockDisplayNumberInvite = '13105550000'
-export const mockE164Number2Invite = '+21255550000'
-export const mockDisplayNumber2Invite = '21255550000'
+export const mockE164Number2Invite = '+442012341234'
+export const mockDisplayNumber2Invite = '442012341234'
 export const mockAccountInvite = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
 export const mockAccountInvitePrivKey =
   '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
@@ -61,7 +72,11 @@ export const mockAccount2Invite = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
 export const mockAccountInvite2PrivKey =
   '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
 
-export const mockQrCodeData2 = `{"address":"${mockAccount2Invite}","e164PhoneNumber":"${mockE164Number2Invite}","displayName":"${mockName2Invite}"}`
+export const mockQrCodeData2 = {
+  address: mockAccount2Invite,
+  e164PhoneNumber: mockE164Number2Invite,
+  displayName: mockName2Invite,
+}
 
 export const mockInviteDetails = {
   timestamp: 1588200517518,
@@ -116,6 +131,12 @@ export const mockTransactionData = {
   recipient: mockInvitableRecipient2,
   amount: new BigNumber(1),
   type: TokenTransactionType.Sent,
+}
+
+export const mockInviteTransactionData = {
+  recipient: mockInvitableRecipient2,
+  amount: new BigNumber(1),
+  type: TokenTransactionType.InviteSent,
 }
 
 export const mockInvitableRecipient3: RecipientWithContact = {
@@ -240,9 +261,9 @@ export const mockPaymentRequests: PaymentRequest[] = [
     uid: 'FAKE_ID_1',
     timestamp: date,
     comment: 'Dinner for me and the gals, PIZZAA!',
-    requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
     requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
     status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
@@ -253,9 +274,9 @@ export const mockPaymentRequests: PaymentRequest[] = [
     amount: '180.89',
     uid: 'FAKE_ID_2',
     comment: 'My Birthday Present. :) Am I not the best? Celebration. Bam!',
-    requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
     requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
     status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
@@ -266,12 +287,80 @@ export const mockPaymentRequests: PaymentRequest[] = [
     amount: '180.89',
     uid: 'FAKE_ID_3',
     comment: 'My Birthday Present. :) Am I not the best? Celebration. Bam!',
-    requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
     requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
     status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
 ]
+
+export const mockUriData: UriData[] = [
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'CELO',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: undefined,
+    amount: undefined,
+    comment: undefined,
+    token: 'CELO',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'BTC',
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: undefined,
+    comment: undefined,
+    token: undefined,
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: undefined,
+  },
+  {
+    address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+    displayName: undefined,
+    e164PhoneNumber: undefined,
+    currencyCode: 'USD' as LocalCurrencyCode,
+    amount: '1',
+    comment: undefined,
+    token: 'cUSD',
+  },
+]
+
+export const mockQRCodeRecipient: RecipientWithQrCode = {
+  kind: RecipientKind.QrCode,
+  address: mockUriData[3].address.toLowerCase(),
+  displayId: mockUriData[3].e164PhoneNumber,
+  displayName: mockUriData[3].displayName || 'anonymous',
+  e164PhoneNumber: mockUriData[3].e164PhoneNumber,
+  phoneNumberLabel: undefined,
+  thumbnailPath: undefined,
+  contactId: undefined,
+}

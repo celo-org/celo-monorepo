@@ -1,15 +1,26 @@
 {
+  "education": {
+    "step1": "{{appName}} is a new way to send and receive value worldwide",
+    "step2": "Send funds across borders",
+    "step3": "Convenient, reliable, and secure. Your phone is your wallet"
+  },
+  "welcome": {
+    "title": "Share money with those you value",
+    "createAccount": "Create new account",
+    "restoreAccount": "I have an account"
+  },
   "contacts": {
     "header": "Connect Contacts",
     "body": "Adding your contacts makes it easy to send and request payments with your friends. Connecting does not send invites to your contacts.",
     "findSwitch": "Allow contacts to find you",
     "syncing": {
-      "loadingHeader": "Syncing contacts...",
-      "loadingStatus0": "Importing",
+      "loadingHeader": "Syncing...",
+      "loadingStatus0": "Importing contacts",
       "loadingStatus1": "Processing {{total}} contacts",
-      "loadingStatus2": "Finding matches",
-      "successHeader": "You have {{matches}} friends on Celo",
-      "successStatus": "You're all synced"
+      "loadingStatus2": "Finding friends",
+      "successHeader": "Completed",
+      "successWithMatches": "{{matches}} friends on {{appName}}",
+      "successWithoutMatches": "Syncing complete"
     }
   },
   "accountInfo": "Account Info",
@@ -18,22 +29,30 @@
   "pincodeSet": {
     "create": "Create a PIN",
     "verify": "Enter PIN again",
-    "pinsDontMatch": "The PINs didn't match"
+    "pinsDontMatch": "The PINs didn't match",
+    "invalidPin": "Please use a stronger PIN"
   },
   "inviteCode": {
     "title": "Invite Code",
-    "body": "If you were invited or received a payment, please copy and paste the invite code below.",
+    "body": "Did you receive a payment or invite? If so, please copy and paste the Invite Code below.",
     "label": "Invite Code",
     "codePlaceholder": "Enter invite code",
     "noCode": "Don’t have an Invite Code",
-    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/app</0> or <1>continue without</1>"
+    "nodeCodeInviteLink": "Don’t have an invite code? Request one at <0>celo.org/developers/wallet</0> or <1>continue without</1>",
+    "loadingHeader": "Creating account...",
+    "loadingBody": "This can take up to 90 seconds"
   },
   "verificationEducation": {
-    "title": "Confirm",
-    "header": "Confirm phone number",
-    "body": "To make sure your number is really yours, we’re going to send you three messages.\n\nConfirming your number takes about three minutes.",
+    "title": "Phone Number",
+    "header": "Connect your phone number",
+    "body": "To make sure your number is really yours, we’re going to send you three messages that will cost about 0.05 cUSD each.\n\nConfirming your number takes about three minutes.",
+    "feelessBody": "Connecting takes about three minutes. To confirm your number, you’ll receive three messages.",
     "start": "Start",
-    "learnMore": "Learn more"
+    "resume": "Resume",
+    "doINeedToConfirm": "Do I need to confirm?",
+    "skipForNow": "Skip for now",
+    "bodyInsufficientBalance": "Your current balance is not high enough to complete the verification process.\n\nPlease try again when you have added funds to your wallet.",
+    "bodyAlreadyVerified": "Your number is already confirmed!"
   },
   "verificationSkipDialog": {
     "title": "Are you sure?",
@@ -41,9 +60,58 @@
     "cancel": "Go Back",
     "confirm": "Skip for now"
   },
+  "verificationPrematureRevealMessage": "Please wait one minute before resending",
   "verificationLearnMoreDialog": {
-    "title": "Phone Number Confirmation",
-    "body": "Phone number confirmation works by associating your account with your phone number.\n\n<0>Do I need to complete this?</0>\n\nConfirmation is not required, however, unconfirmed accounts can only send payments using Celo addresses or QR codes.\n\n<1>Security and Privacy</1>\n\nTo protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain.",
+    "title": "Phone Numbers and {{appName}}",
+    "body": "Confirming makes it easy to connect with your friends by allowing you to send and receive funds to your phone number.\n\n<0>Can I do this later?</0>\n\nYes, but unconfirmed accounts can only send payments with QR codes or account numbers (addresses).\n\n<1>Secure and Private</1>\n\nValora uses state of the art cryptography to keep your phone number private.",
     "dismiss": "Dismiss"
+  },
+  "importExistingKey": {
+    "explanation": "Your Account Key is a 24-word phrase that you wrote down and saved when you set up your account. Please enter it here to restore your account.\n\nNote that your language preference must match the language used when you created your account.",
+    "keyPlaceholder": "horse leopard dog monkey ..."
+  },
+  "verificationInput": {
+    "title": "Confirm",
+    "body": "We sent you three messages (SMS). Please copy and paste them below.",
+    "body_ios": "We sent you three messages (SMS). Please tap the link in each message to fill the codes below or copy and paste them manually.",
+    "codeLabel1": "First Code",
+    "codeLabel2": "Second Code",
+    "codeLabel3": "Third Code",
+    "codePlaceholder1": "Copy the first message",
+    "codePlaceholder1_ios": "Tap or copy the first message",
+    "codePlaceholder2": "Copy the second message",
+    "codePlaceholder2_ios": "Tap or copy the second message",
+    "codePlaceholder3": "Copy the third message",
+    "codePlaceholder3_ios": "Tap or copy the third message",
+    "codePlaceholderWithCodeInClipboard": "Great! Paste it here",
+    "typingTip": "Typing? Try copying and pasting",
+    "resendMessages": "Resend last message",
+    "resendMessages_plural": "Resend {{count}} messages",
+    "resendMessages_all": "Resend all messages"
+  },
+  "verificationInputHelpDialog": {
+    "title": "Help",
+    "bodySection1": {
+      "title": "Received all three messages?",
+      "content": "If your messages contain a link, simply tap the links to confirm.\n\nIf there are no links, please copy and paste the messages into the fields. You’re welcome to paste the entire message."
+    },
+    "bodySection2": {
+      "title": "Missing some or all messages?",
+      "defaultContent": "If you’re having trouble receiving messages, you can skip this step for now and try again later. Sometimes it can take a few minutes for messages to arrive.",
+      "content": "$t(verificationInputHelpDialog.bodySection2.defaultContent)",
+      "content_countdown": "$t(verificationInputHelpDialog.bodySection2.defaultContent) The skip option below will be available in {{count}} second.",
+      "content_countdown_plural": "$t(verificationInputHelpDialog.bodySection2.defaultContent) The skip option below will be available in {{count}} seconds."
+    },
+    "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
+    "skip": "Skip for now",
+    "back": "Go Back"
+  },
+  "emptyAccount": {
+    "description": "This account doesn’t have any funds. Would you still like to use it?",
+    "useAccount": "Use Account",
+    "title": "Balance <0></0>"
+  },
+  "success": {
+    "message": "You're all set!"
   }
 }

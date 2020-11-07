@@ -1,4 +1,5 @@
 import {
+  call,
   cancelled,
   put,
   select,
@@ -8,21 +9,28 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { showErrorInline } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
+  FetchVerificationState,
   ValidateRecipientAddressAction,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
+import { revokeVerificationSaga } from 'src/identity/revoke'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
-import { revokeVerification, startVerification } from 'src/identity/verification'
+import {
+  fetchVerificationState,
+  reportRevealStatusSaga,
+  startVerification,
+} from 'src/identity/verification'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { fetchDataEncryptionKeyWrapper } from 'src/web3/dataEncryptionKey'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/saga'
@@ -31,6 +39,7 @@ export function* validateRecipientAddressSaga({
   userInputOfFullAddressOrLastFourDigits,
   addressValidationType,
   recipient,
+  requesterAddress,
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
   try {
@@ -43,9 +52,17 @@ export function* validateRecipientAddressSaga({
     const { e164PhoneNumber } = recipient
     const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
 
-    // Should never happen since secure send is initiated due to there being several possible addresses
+    // Should never happen - Secure Send is initiated to deal with
+    // there being several possible addresses
     if (!possibleRecievingAddresses) {
       throw Error('There are no possible recipient addresses to validate against')
+    }
+
+    // E164NumberToAddress in redux store only holds verified addresses
+    // Need to add the requester address to the option set in the event
+    // a request is coming from an unverified account
+    if (requesterAddress && !possibleRecievingAddresses.includes(requesterAddress)) {
+      possibleRecievingAddresses.push(requesterAddress)
     }
 
     const validatedAddress = validateAndReturnMatch(
@@ -55,17 +72,17 @@ export function* validateRecipientAddressSaga({
       addressValidationType
     )
 
-    CeloAnalytics.track(CustomEventNames.send_secure_success, {
-      method: 'manual',
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+    ValoraAnalytics.track(SendEvents.send_secure_complete, {
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
     })
 
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
-    CeloAnalytics.track(CustomEventNames.send_secure_incorrect, {
-      method: 'manual',
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
-      error,
+    ValoraAnalytics.track(SendEvents.send_secure_incorrect, {
+      confirmByScan: false,
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      error: error.message,
     })
 
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
@@ -76,9 +93,16 @@ export function* validateRecipientAddressSaga({
     }
   }
 }
+
+function* handleFetchVerificationState(action: FetchVerificationState) {
+  const { forceUnlockAccount } = action
+  yield call(fetchVerificationState, forceUnlockAccount)
+}
+
 function* watchVerification() {
+  yield takeLeading(Actions.FETCH_VERIFICATION_STATE, handleFetchVerificationState)
   yield takeLatest(Actions.START_VERIFICATION, startVerification)
-  yield takeEvery(Actions.REVOKE_VERIFICATION, revokeVerification)
+  yield takeLeading(Actions.REVOKE_VERIFICATION, revokeVerificationSaga)
 }
 
 function* watchContactMapping() {
@@ -94,6 +118,14 @@ function* watchNewFeedTransactions() {
   yield takeEvery(TransactionActions.NEW_TRANSACTIONS_IN_FEED, checkTxsForIdentityMetadata)
 }
 
+function* watchFetchDataEncryptionKey() {
+  yield takeLeading(Actions.FETCH_DATA_ENCRYPTION_KEY, fetchDataEncryptionKeyWrapper)
+}
+
+function* watchReportRevealStatus() {
+  yield takeEvery(Actions.REPORT_REVEAL_STATUS, reportRevealStatusSaga)
+}
+
 export function* identitySaga() {
   Logger.debug(TAG, 'Initializing identity sagas')
   try {
@@ -101,6 +133,8 @@ export function* identitySaga() {
     yield spawn(watchContactMapping)
     yield spawn(watchValidateRecipientAddress)
     yield spawn(watchNewFeedTransactions)
+    yield spawn(watchFetchDataEncryptionKey)
+    yield spawn(watchReportRevealStatus)
   } catch (error) {
     Logger.error(TAG, 'Error initializing identity sagas', error)
   } finally {

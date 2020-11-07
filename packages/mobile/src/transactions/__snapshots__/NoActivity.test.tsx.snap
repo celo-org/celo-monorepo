@@ -5,40 +5,21 @@ exports[`renders exchange 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "paddingHorizontal": 20,
-      "paddingVertical": 20,
+      "flex": 1,
+      "justifyContent": "center",
+      "marginTop": 32,
+      "paddingHorizontal": 16,
     }
   }
 >
-  <Image
-    resizeMode="contain"
-    source={
-      Object {
-        "testUri": "../../../packages/mobile/src/images/exchange.png",
-      }
-    }
-    style={
-      Object {
-        "height": 108,
-        "marginVertical": 20,
-        "width": 108,
-      }
-    }
-  />
   <Text
     style={
-      Array [
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-        Object {
-          "marginBottom": 10,
-          "textAlign": "center",
-        },
-      ]
+      Object {
+        "color": "#B4B9BD",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 18,
+        "lineHeight": 24,
+      }
     }
   >
     noExchangeActivity
@@ -52,112 +33,26 @@ exports[`renders home 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "paddingHorizontal": 20,
-      "paddingVertical": 20,
+      "flex": 1,
+      "justifyContent": "center",
+      "marginTop": 32,
+      "paddingHorizontal": 16,
     }
   }
 >
-  <Image
-    resizeMode="contain"
-    source={
-      Object {
-        "testUri": "../../../packages/mobile/src/images/shiny-dollar.png",
-      }
-    }
-    style={
-      Object {
-        "height": 108,
-        "marginVertical": 20,
-        "width": 108,
-      }
-    }
-  />
   <Text
     style={
-      Array [
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-        Object {
-          "marginBottom": 10,
-          "textAlign": "center",
-        },
-      ]
+      Object {
+        "color": "#B4B9BD",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 18,
+        "lineHeight": 24,
+      }
     }
   >
     noTransactionActivity
      
   </Text>
-  <View
-    accessible={true}
-    focusable={true}
-    hitSlop={
-      Object {
-        "bottom": 7,
-        "left": 7,
-        "right": 7,
-        "top": 7,
-      }
-    }
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "alignSelf": "flex-start",
-          "borderRadius": 2,
-          "flexDirection": "row",
-          "paddingHorizontal": 16,
-          "paddingVertical": 6,
-        },
-        Object {
-          "backgroundColor": "#42D689",
-          "paddingHorizontal": 18,
-          "paddingVertical": 8,
-        },
-        Object {
-          "alignSelf": "center",
-          "marginTop": 20,
-        },
-      ]
-    }
-  >
-    <Text
-      style={
-        Array [
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 13,
-            "lineHeight": 20,
-            "textAlign": "center",
-          },
-          Object {
-            "color": "#FFFFFF",
-          },
-          null,
-          undefined,
-        ]
-      }
-    >
-      global:sendCeloDollars
-    </Text>
-  </View>
 </View>
 `;
 
@@ -166,8 +61,10 @@ exports[`renders loading 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "paddingHorizontal": 20,
-      "paddingVertical": 20,
+      "flex": 1,
+      "justifyContent": "center",
+      "marginTop": 32,
+      "paddingHorizontal": 16,
     }
   }
 >
@@ -186,21 +83,16 @@ exports[`renders loading 1`] = `
   />
   <Text
     style={
-      Array [
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-        Object {
-          "marginBottom": 10,
-          "textAlign": "center",
-        },
-      ]
+      Object {
+        "color": "#B4B9BD",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 18,
+        "lineHeight": 24,
+      }
     }
   >
-    loadingActivity
+    noTransactionActivity
+     
   </Text>
 </View>
 `;

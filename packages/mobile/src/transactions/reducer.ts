@@ -1,3 +1,7 @@
+import {
+  Actions as ExchangeActions,
+  ActionTypes as ExchangeActionTypes,
+} from 'src/exchange/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -33,7 +37,7 @@ const initialState = {
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | RehydrateAction | ExchangeActionTypes
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -50,10 +54,11 @@ export const reducer = (
         standbyTransactions: [action.transaction, ...(state.standbyTransactions || [])],
       }
     case Actions.REMOVE_STANDBY_TRANSACTION:
+    case ExchangeActions.WITHDRAW_CELO_FAILED:
       return {
         ...state,
         standbyTransactions: state.standbyTransactions.filter(
-          (tx: StandbyTransaction) => tx.id !== action.idx
+          (tx: StandbyTransaction) => tx.context.id !== action.idx
         ),
       }
     case Actions.RESET_STANDBY_TRANSACTIONS:
@@ -65,7 +70,7 @@ export const reducer = (
       return {
         ...state,
         standbyTransactions: state.standbyTransactions.map((tx) => {
-          if (tx.id !== action.idx) {
+          if (tx.context.id !== action.idx) {
             return tx
           }
           return {

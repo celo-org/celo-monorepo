@@ -1,3 +1,5 @@
+export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
+
 export enum CeloContractName {
   Accounts = 'Accounts',
   Attestations = 'Attestations',

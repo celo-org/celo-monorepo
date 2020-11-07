@@ -9,24 +9,28 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
 import * as fs from 'fs-extra'
-import { LocalCommand } from '../../base'
+import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 
-const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'/0"
+const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'"
 
-export default class NewAccount extends LocalCommand {
+export default class NewAccount extends BaseCommand {
   static description =
-    "Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)"
+    "Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/changeIndex/addressIndex) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)"
 
   static flags = {
-    ...LocalCommand.flags,
+    ...BaseCommand.flags,
     passphrasePath: flags.string({
       description:
-        'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet address.',
+        'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet address.',
     }),
-    indexAddress: flags.integer({
+    changeIndex: flags.integer({
       default: 0,
-      description: 'Choose the index address of the derivation path',
+      description: 'Choose the change index for the derivation path',
+    }),
+    addressIndex: flags.integer({
+      default: 0,
+      description: 'Choose the address index for the derivation path',
     }),
     language: flags.string({
       options: [
@@ -57,8 +61,8 @@ export default class NewAccount extends LocalCommand {
     'new',
     'new --passphrasePath myFolder/my_passphrase_file',
     'new --language spanish',
-    'new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5',
-    'new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5',
+    'new --passphrasePath some_folder/my_passphrase_file --language japanese --addressIndex 5',
+    'new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --addressIndex 5',
   ]
 
   static languageOptions(language: string): MnemonicLanguages | undefined {
@@ -90,6 +94,8 @@ export default class NewAccount extends LocalCommand {
     throw new Error(`Invalid path: ${file}`)
   }
 
+  requireSynced = false
+
   async run() {
     const res = this.parse(NewAccount)
     let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
@@ -108,7 +114,8 @@ export default class NewAccount extends LocalCommand {
     const keys = await generateKeys(
       mnemonic,
       passphrase,
-      res.flags.indexAddress,
+      res.flags.addressIndex,
+      res.flags.changeIndex,
       undefined,
       derivationPath
     )

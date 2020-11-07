@@ -1,6 +1,7 @@
-import { eqAddress } from '@celo/utils/lib/address'
+import { Address, eqAddress } from '@celo/base/lib/address'
+import { Signer } from '@celo/base/lib/signatureUtils'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
-import { guessSigner, Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
+import { guessSigner, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
@@ -26,7 +27,7 @@ export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
 export class IdentityMetadataWrapper {
   data: IdentityMetadata
 
-  static fromEmpty(address: string) {
+  static fromEmpty(address: Address) {
     return new IdentityMetadataWrapper({
       claims: [],
       meta: {
@@ -56,7 +57,7 @@ export class IdentityMetadataWrapper {
     kit: ContractKit,
     hash: any,
     signature: any,
-    address: string
+    address: Address
   ) {
     // First try to verify on account's address
     if (!verifySignature(hash, signature, address)) {

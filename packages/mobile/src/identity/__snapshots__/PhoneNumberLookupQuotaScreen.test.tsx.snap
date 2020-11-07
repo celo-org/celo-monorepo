@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -136,11 +135,10 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
+            "lineHeight": 32,
             "marginTop": 20,
-            "paddingBottom": 20,
-            "textAlign": "center",
           }
         }
       >
@@ -150,9 +148,9 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 17,
-            "lineHeight": 26,
+            "fontFamily": "Inter-Regular",
+            "fontSize": 18,
+            "lineHeight": 24,
             "marginBottom": 20,
             "textAlign": "center",
           }
@@ -164,9 +162,9 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 17,
-            "lineHeight": 26,
+            "fontFamily": "Inter-Regular",
+            "fontSize": 18,
+            "lineHeight": 24,
             "marginBottom": 20,
             "textAlign": "center",
           }
@@ -217,80 +215,62 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "borderRadius": 3,
             "flexDirection": "row",
           },
-          null,
-          null,
           undefined,
-          Object {
-            "backgroundColor": "#A3EBC6",
-          },
         ]
       }
     >
       <View
-        accessible={true}
-        focusable={false}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
+              "overflow": "hidden",
             },
             Object {
-              "backgroundColor": "#A3EBC6",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderWidth": 0,
+              "borderRadius": 100,
             },
           ]
         }
-        testID="QuotaBuyButton"
       >
         <View
+          accessible={true}
+          focusable={false}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "backgroundColor": "#97DFC1",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
+              "paddingVertical": 5,
             }
           }
+          testID="QuotaBuyButton"
         >
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
+              Object {
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
             }
           >
             quotaLookup.cta
@@ -302,80 +282,62 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "borderRadius": 3,
             "flexDirection": "row",
           },
-          null,
-          null,
           undefined,
-          Object {
-            "backgroundColor": "transparent",
-          },
         ]
       }
     >
       <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
+              "overflow": "hidden",
             },
             Object {
-              "backgroundColor": "transparent",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderWidth": 0,
+              "borderRadius": 100,
             },
           ]
         }
-        testID="QuotaSkipButton"
       >
         <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "backgroundColor": "#F1F0EB",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 120,
+              "opacity": undefined,
+              "paddingHorizontal": 24,
+              "paddingVertical": 5,
             }
           }
+          testID="QuotaSkipButton"
         >
           <Text
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
             }
           >
             global:skip
@@ -384,5 +346,21 @@ exports[`PhoneNumberLookupQuotaScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;

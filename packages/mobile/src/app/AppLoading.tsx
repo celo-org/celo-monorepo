@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
@@ -48,7 +48,6 @@ export class AppLoading extends React.Component<Props, State> {
             <Button
               onPress={deleteChainDataAndRestartApp}
               text={t(RESTART_APP_I18N_KEY)}
-              standard={false}
               type={BtnTypes.PRIMARY}
               testID="RestartButton"
             />
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     width: '100%',
-    backgroundColor: colors.celoGreen,
+    backgroundColor: colors.greenBrand,
   },
 
   button: {

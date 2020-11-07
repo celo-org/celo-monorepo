@@ -1,8 +1,11 @@
+import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
-import { ErrorMessages } from '../common/error-utils'
-import logger from '../common/logger'
 import config from '../config'
 import { KeyProviderBase } from './key-provider-base'
+
+interface SecretStringResult {
+  [key: string]: string
+}
 
 export class AWSKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore() {
@@ -11,24 +14,49 @@ export class AWSKeyProvider extends KeyProviderBase {
       const { region, secretName, secretKey } = config.keystore.aws
 
       const client = new SecretsManager({ region })
-
       client.config.update({ region })
 
-      const privateKeyResponse = await client
+      const response = await client
         .getSecretValue({
           SecretId: secretName,
         })
         .promise()
 
-      const privateKey = JSON.parse(privateKeyResponse.SecretString || '{}')[secretKey]
+      let privateKey
+      if (response.SecretString) {
+        privateKey = this.tryParseSecretString(response.SecretString, secretKey)
+      } else if (response.SecretBinary) {
+        // @ts-ignore AWS sdk typings not quite correct
+        const buff = new Buffer(response.SecretBinary, 'base64')
+        privateKey = buff.toString('ascii')
+      } else {
+        throw new Error('Response has neither string nor binary')
+      }
 
       if (!privateKey) {
-        throw new Error('Key is empty or undefined')
+        throw new Error('Secret is empty or undefined')
       }
       this.setPrivateKey(privateKey)
-    } catch (error) {
-      logger.error('Error retrieving key', error)
-      throw new Error(ErrorMessages.KEY_FETCH_ERROR)
+    } catch (err) {
+      logger.info('Error retrieving key')
+      logger.error({ err })
+      throw new Error(ErrorMessage.KEY_FETCH_ERROR)
+    }
+  }
+
+  private tryParseSecretString(secretString: string, key: string) {
+    if (!secretString) {
+      throw new Error('Cannot parse empty string')
+    }
+    if (!key) {
+      throw new Error('Cannot parse secret without key')
+    }
+
+    try {
+      const secret = JSON.parse(secretString) as SecretStringResult
+      return secret[key]
+    } catch (e) {
+      throw new Error('Expecting JSON, secret string is not valid JSON')
     }
   }
 }

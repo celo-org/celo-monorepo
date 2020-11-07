@@ -17,7 +17,7 @@
 
 • **slashableDowntime**: *number*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L16)*
+*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L19)*
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **slashingIncentives**: *object*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L17)*
+*Defined in [packages/contractkit/src/wrappers/DowntimeSlasher.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L20)*
 
 #### Type declaration:
 

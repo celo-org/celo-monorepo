@@ -1,6 +1,6 @@
+import { zip } from '@celo/base/lib/collections'
 import debugFactory from 'debug'
-import Web3 from 'web3'
-import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
+import { Address, CeloContract, NULL_ADDRESS, RegisteredContracts } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 import { ContractKit } from './kit'
 
@@ -28,10 +28,9 @@ export class AddressRegistry {
     if (!this.cache.has(contract)) {
       const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const hash = Web3.utils.soliditySha3({ type: 'string', value: proxyStrippedContract })
-      const address = await this.registry.methods.getAddressFor(hash).call()
+      const address = await this.registry.methods.getAddressForString(proxyStrippedContract).call()
 
-      debug('Fetched address:  %s = %s', address)
+      debug('Fetched address %s', address)
       if (!address || address === NULL_ADDRESS) {
         throw new Error(`Failed to get address for ${contract} from the Registry`)
       }
@@ -42,14 +41,10 @@ export class AddressRegistry {
   }
 
   /**
-   * Get the address for all possible `CeloContract`
+   * Get the address mapping for known registered contracts
    */
-
-  async allAddresses(): Promise<Record<CeloContract, Address>> {
-    const res: Partial<Record<CeloContract, Address>> = {}
-    for (const contract of AllContracts) {
-      res[contract] = await this.addressFor(contract)
-    }
-    return res as Record<CeloContract, Address>
+  async addressMapping() {
+    const addresses = await Promise.all(RegisteredContracts.map((r) => this.addressFor(r)))
+    return new Map(zip((r, a) => [r, a], RegisteredContracts, addresses))
   }
 }

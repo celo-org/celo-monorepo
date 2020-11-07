@@ -4,24 +4,27 @@ import {
   hexToBuffer,
   NULL_ADDRESS,
   trimLeading0x,
-} from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+} from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'
 import { Address } from '../base'
 import { Governance } from '../generated/Governance'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   bufferToSolidityBytes,
   identity,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   solidityBytesToString,
   stringIdentity,
   toTransactionObject,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToInt,
   valueToString,
@@ -249,6 +252,31 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * @dev Returns human readable configuration of the governance contract
+   * @return GovernanceConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const stageDurations = {
+      [ProposalStage.Approval]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Approval]
+      ),
+      [ProposalStage.Referendum]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Referendum]
+      ),
+      [ProposalStage.Execution]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Execution]
+      ),
+    }
+    return {
+      ...config,
+      dequeueFrequency: secondsToDurationString(config.dequeueFrequency),
+      queueExpiry: secondsToDurationString(config.queueExpiry),
+      stageDurations,
+    }
+  }
+
+  /**
    * Returns the metadata associated with a given proposal.
    * @param proposalID Governance proposal UUID
    */
@@ -263,6 +291,18 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       descriptionURL: res[4],
     })
   )
+
+  /**
+   * Returns the human readable metadata associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
+  async getHumanReadableProposalMetadata(proposalID: BigNumber.Value) {
+    const meta = await this.getProposalMetadata(proposalID)
+    return {
+      ...meta,
+      timestamp: unixSecondsTimestampToDateString(meta.timestamp),
+    }
+  }
 
   /**
    * Returns the transaction at the given index associated with a given proposal.
@@ -330,13 +370,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return { referendum, execution, expiration }
   }
 
+  async humanReadableTimeUntilStages(propoaslID: BigNumber.Value) {
+    const time = await this.timeUntilStages(propoaslID)
+    return {
+      referendum: secondsToDurationString(time.referendum),
+      execution: secondsToDurationString(time.execution),
+      expiration: secondsToDurationString(time.expiration),
+    }
+  }
+
   /**
    * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID
    */
   async getProposal(proposalID: BigNumber.Value): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
-    const txIndices = Array.from(Array(metadata.transactionCount).keys())
+    const txIndices = zeroRange(metadata.transactionCount)
     return concurrentMap(4, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 

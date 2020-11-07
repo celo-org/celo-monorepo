@@ -12,10 +12,13 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 1`] = `
         "borderRadius": 8,
       },
       undefined,
-      Object {
-        "backgroundColor": "rgba(103, 99, 86, 0.1)",
-        "padding": 0,
-      },
+      Array [
+        Object {
+          "backgroundColor": "rgba(103, 99, 86, 0.1)",
+          "padding": 0,
+        },
+        undefined,
+      ],
     ]
   }
 >
@@ -99,9 +102,12 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 2`] = `
         "shadowOpacity": 1,
         "shadowRadius": 8,
       },
-      Object {
-        "padding": 0,
-      },
+      Array [
+        Object {
+          "padding": 0,
+        },
+        undefined,
+      ],
     ]
   }
 >
@@ -199,10 +205,13 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 3`] = `
         "borderRadius": 8,
       },
       undefined,
-      Object {
-        "backgroundColor": "rgba(103, 99, 86, 0.1)",
-        "padding": 0,
-      },
+      Array [
+        Object {
+          "backgroundColor": "rgba(103, 99, 86, 0.1)",
+          "padding": 0,
+        },
+        undefined,
+      ],
     ]
   }
 >
@@ -292,10 +301,13 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 4`] = `
         "borderRadius": 8,
       },
       undefined,
-      Object {
-        "backgroundColor": "rgba(103, 99, 86, 0.1)",
-        "padding": 0,
-      },
+      Array [
+        Object {
+          "backgroundColor": "rgba(103, 99, 86, 0.1)",
+          "padding": 0,
+        },
+        undefined,
+      ],
     ]
   }
 >
@@ -385,10 +397,13 @@ exports[`CodeInput renders correctly for all CodeInputStatus states 5`] = `
         "borderRadius": 8,
       },
       undefined,
-      Object {
-        "backgroundColor": "rgba(103, 99, 86, 0.1)",
-        "padding": 0,
-      },
+      Array [
+        Object {
+          "backgroundColor": "rgba(103, 99, 86, 0.1)",
+          "padding": 0,
+        },
+        undefined,
+      ],
     ]
   }
 >

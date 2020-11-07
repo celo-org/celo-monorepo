@@ -3,6 +3,11 @@
 exports[`DevelopersPage renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "scrollPadding": "20px",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
@@ -180,6 +185,7 @@ exports[`DevelopersPage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -217,6 +223,7 @@ exports[`DevelopersPage renders 1`] = `
           aria-level="1"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -238,6 +245,7 @@ exports[`DevelopersPage renders 1`] = `
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -256,12 +264,7 @@ exports[`DevelopersPage renders 1`] = `
       </div>
     </div>
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": 0,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -288,6 +291,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -392,6 +396,7 @@ exports[`DevelopersPage renders 1`] = `
                   aria-level="3"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -411,6 +416,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -432,8 +438,6 @@ exports[`DevelopersPage renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -469,7 +473,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -590,6 +593,7 @@ exports[`DevelopersPage renders 1`] = `
                   aria-level="3"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -609,6 +613,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -630,8 +635,6 @@ exports[`DevelopersPage renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -667,7 +670,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/start"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -788,6 +790,7 @@ exports[`DevelopersPage renders 1`] = `
                   aria-level="3"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -807,6 +810,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -828,8 +832,6 @@ exports[`DevelopersPage renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -865,7 +867,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://github.com/celo-org"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -949,6 +950,7 @@ exports[`DevelopersPage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexWrap": "wrap",
+          "msGridRowAlign": "center",
           "overflowX": "hidden",
           "overflowY": "hidden",
           "paddingLeft": "10px",
@@ -992,6 +994,7 @@ exports[`DevelopersPage renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1010,6 +1013,7 @@ exports[`DevelopersPage renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1029,6 +1033,7 @@ exports[`DevelopersPage renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1120,10 +1125,8 @@ exports[`DevelopersPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1136,13 +1139,13 @@ exports[`DevelopersPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Applications
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1170,6 +1173,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1189,6 +1193,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1208,6 +1213,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1222,11 +1228,12 @@ exports[`DevelopersPage renders 1`] = `
                   }
                 }
               >
-                Exchange between cUSD and cGLD
+                Exchange between cUSD and CELO
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1246,6 +1253,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1281,8 +1289,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1290,7 +1296,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1358,8 +1363,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -1395,7 +1398,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1493,10 +1495,8 @@ exports[`DevelopersPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1509,13 +1509,13 @@ exports[`DevelopersPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Core Contracts
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1543,6 +1543,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1562,6 +1563,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1581,6 +1583,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1616,8 +1619,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1625,7 +1626,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1693,8 +1693,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -1730,7 +1728,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1828,10 +1825,8 @@ exports[`DevelopersPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1844,13 +1839,13 @@ exports[`DevelopersPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Blockchain
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1878,6 +1873,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1897,6 +1893,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1916,6 +1913,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1951,8 +1949,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1960,7 +1956,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2028,8 +2023,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -2065,7 +2058,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2132,6 +2124,7 @@ exports[`DevelopersPage renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -2150,6 +2143,7 @@ exports[`DevelopersPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(255,255,255,1.00)",
@@ -2172,8 +2166,6 @@ exports[`DevelopersPage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2181,7 +2173,6 @@ exports[`DevelopersPage renders 1`] = `
               dir="auto"
               href="https://github.com/celo-org"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -2275,12 +2266,7 @@ exports[`DevelopersPage renders 1`] = `
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -2300,6 +2286,7 @@ exports[`DevelopersPage renders 1`] = `
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -2329,6 +2316,7 @@ exports[`DevelopersPage renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2363,6 +2351,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",
               "msFlexWrap": "wrap",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -2472,6 +2461,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2490,6 +2480,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2608,6 +2599,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2626,6 +2618,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2744,6 +2737,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2762,6 +2756,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2880,6 +2875,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2898,6 +2894,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3016,6 +3013,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3034,6 +3032,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3152,6 +3151,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3170,6 +3170,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3288,6 +3289,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3306,6 +3308,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3424,6 +3427,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3442,6 +3446,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3479,6 +3484,7 @@ exports[`DevelopersPage renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "justify",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3508,6 +3514,7 @@ exports[`DevelopersPage renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -3527,6 +3534,7 @@ exports[`DevelopersPage renders 1`] = `
         aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -3553,6 +3561,7 @@ exports[`DevelopersPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -3567,12 +3576,7 @@ exports[`DevelopersPage renders 1`] = `
           Alfajores Testnet
         </div>
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -3648,6 +3652,7 @@ exports[`DevelopersPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -3694,8 +3699,6 @@ Build dApps for the Celo platform.
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3703,7 +3706,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3807,12 +3809,7 @@ Build dApps for the Celo platform.
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -3911,6 +3908,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3927,6 +3925,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3947,8 +3946,6 @@ Build dApps for the Celo platform.
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -3984,7 +3981,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="/developers/faucet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4064,12 +4060,7 @@ Build dApps for the Celo platform.
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -4168,6 +4159,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -4184,6 +4176,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -4204,8 +4197,6 @@ Build dApps for the Celo platform.
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -4241,7 +4232,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="https://docs.celo.org/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4316,6 +4306,7 @@ Build dApps for the Celo platform.
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "justify",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -4349,6 +4340,7 @@ Build dApps for the Celo platform.
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -4366,6 +4358,7 @@ Build dApps for the Celo platform.
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -4387,8 +4380,6 @@ Build dApps for the Celo platform.
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <a
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -4396,7 +4387,6 @@ Build dApps for the Celo platform.
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {

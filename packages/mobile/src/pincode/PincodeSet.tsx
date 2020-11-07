@@ -1,25 +1,30 @@
 /**
  * This is a reactnavigation SCREEN, which we use to set a PIN.
  */
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { DEFAULT_CACHE_ACCOUNT, isPinValid } from 'src/pincode/authentication'
+import { setCachedPin } from 'src/pincode/PasswordCache'
 import Pincode from 'src/pincode/Pincode'
-import { isPinValid } from 'src/pincode/utils'
+import { RootState } from 'src/redux/reducers'
+
+interface StateProps {
+  choseToRestoreAccount: boolean | undefined
+}
 
 interface DispatchProps {
   setPincode: typeof setPincode
@@ -33,7 +38,13 @@ interface State {
 
 type ScreenProps = StackScreenProps<StackParamList, Screens.PincodeSet>
 
-type Props = ScreenProps & DispatchProps & WithTranslation
+type Props = ScreenProps & StateProps & DispatchProps & WithTranslation
+
+function mapStateToProps(state: RootState): StateProps {
+  return {
+    choseToRestoreAccount: state.account.choseToRestoreAccount,
+  }
+}
 
 const mapDispatchToProps = {
   setPincode,
@@ -46,6 +57,14 @@ export class PincodeSet extends React.Component<Props, State> {
     pin1: '',
     pin2: '',
     errorText: undefined,
+  }
+
+  getNextScreen = () => {
+    if (this.props.choseToRestoreAccount) {
+      return Screens.ImportWallet
+    }
+
+    return Screens.EnterInviteCode
   }
 
   onChangePin1 = (pin1: string) => {
@@ -65,18 +84,28 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 
   onCompletePin1 = () => {
-    CeloAnalytics.track(CustomEventNames.pin_value)
-    this.props.navigation.setParams({ isVerifying: true })
+    if (this.isPin1Valid(this.state.pin1)) {
+      this.props.navigation.setParams({ isVerifying: true })
+    } else {
+      ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pin is invalid' })
+      this.setState({
+        pin1: '',
+        pin2: '',
+        errorText: this.props.t('pincodeSet.invalidPin'),
+      })
+    }
   }
 
-  onCompletePin2 = (pin2: string) => {
-    CeloAnalytics.track(CustomEventNames.pin_create_button)
+  onCompletePin2 = async (pin2: string) => {
     const { pin1 } = this.state
     if (this.isPin1Valid(pin1) && this.isPin2Valid(pin2)) {
-      this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
-      navigate(Screens.EnterInviteCode)
+      setCachedPin(DEFAULT_CACHE_ACCOUNT, pin1)
+      this.props.setPincode(PincodeType.CustomPin)
+      ValoraAnalytics.track(OnboardingEvents.pin_set)
+      this.props.navigation.navigate(this.getNextScreen())
     } else {
       this.props.navigation.setParams({ isVerifying: false })
+      ValoraAnalytics.track(OnboardingEvents.pin_invalid, { error: 'Pins do not match' })
       this.setState({
         pin1: '',
         pin2: '',
@@ -91,8 +120,8 @@ export class PincodeSet extends React.Component<Props, State> {
     const { pin1, pin2, errorText } = this.state
 
     return (
-      <SafeAreaView style={style.container}>
-        <DevSkipButton nextScreen={Screens.EnterInviteCode} />
+      <SafeAreaView style={styles.container}>
+        <DevSkipButton nextScreen={this.getNextScreen()} />
         {isVerifying ? (
           // Verify
           <Pincode
@@ -115,7 +144,7 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.onboardingBackground,
@@ -123,7 +152,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps>(
-  null,
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
   mapDispatchToProps
 )(withTranslation<Props>(Namespaces.onboarding)(PincodeSet))

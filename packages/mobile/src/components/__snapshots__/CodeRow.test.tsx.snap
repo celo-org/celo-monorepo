@@ -5,7 +5,7 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 1`] = `
   style={
     Object {
       "backgroundColor": "#F0F0F0",
-      "borderColor": "#D1D5D8",
+      "borderColor": "#EDEEEF",
       "borderRadius": 3,
       "borderWidth": 1,
       "height": 50,
@@ -19,9 +19,9 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 1`] = `
     style={
       Object {
         "color": "#81868B",
-        "fontFamily": "Hind-Regular",
+        "fontFamily": "Inter-Regular",
         "fontSize": 15,
-        "lineHeight": 24,
+        "lineHeight": 22,
       }
     }
   >
@@ -42,7 +42,7 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 2`] = `
       },
       Object {
         "backgroundColor": "#FFF",
-        "borderColor": "#D1D5D8",
+        "borderColor": "#EDEEEF",
         "borderRadius": 3,
         "borderWidth": 1,
         "flex": 0,
@@ -61,14 +61,19 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 2`] = `
     rejectResponderTermination={true}
     shouldShowClipboard={[MockFunction]}
     style={
-      Object {
-        "backgroundColor": "#FFFFFF",
-        "borderColor": "#D1D5D8",
-        "borderRadius": 3,
-        "flex": 1,
-        "fontFamily": "Hind-Regular",
-        "padding": 8,
-      }
+      Array [
+        Object {
+          "color": "#2E3338",
+          "flex": 1,
+          "fontFamily": "Inter-Regular",
+          "fontSize": 16,
+          "lineHeight": 22,
+          "paddingHorizontal": 0,
+          "paddingVertical": 12,
+        },
+        undefined,
+        undefined,
+      ]
     }
     underlineColorAndroid="transparent"
     value="test"
@@ -81,7 +86,7 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 3`] = `
   style={
     Object {
       "backgroundColor": "#FFF",
-      "borderColor": "#D1D5D8",
+      "borderColor": "#EDEEEF",
       "borderRadius": 3,
       "borderWidth": 1,
       "height": 50,
@@ -96,9 +101,9 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 3`] = `
     style={
       Object {
         "color": "#81868B",
-        "fontFamily": "Hind-Regular",
+        "fontFamily": "Inter-Regular",
         "fontSize": 15,
-        "lineHeight": 24,
+        "lineHeight": 22,
       }
     }
   >
@@ -126,7 +131,7 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 4`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#EEEEEE",
+      "backgroundColor": "#F8F9F9",
       "borderRadius": 3,
       "height": 50,
       "justifyContent": "center",
@@ -141,9 +146,9 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 4`] = `
     style={
       Object {
         "color": "#81868B",
-        "fontFamily": "Hind-Regular",
+        "fontFamily": "Inter-Regular",
         "fontSize": 15,
-        "lineHeight": 24,
+        "lineHeight": 22,
       }
     }
   >
@@ -156,7 +161,7 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 5`] = `
 <View
   style={
     Object {
-      "backgroundColor": "#EEEEEE",
+      "backgroundColor": "#F8F9F9",
       "borderRadius": 3,
       "height": 50,
       "justifyContent": "center",
@@ -171,9 +176,9 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 5`] = `
     style={
       Object {
         "color": "#81868B",
-        "fontFamily": "Hind-Regular",
+        "fontFamily": "Inter-Regular",
         "fontSize": 15,
-        "lineHeight": 24,
+        "lineHeight": 22,
       }
     }
   >
@@ -182,7 +187,7 @@ exports[`CodeRow renders correctly for all CodeRowStatus states 5`] = `
   <View
     style={
       Object {
-        "backgroundColor": "#EEEEEE",
+        "backgroundColor": "#F8F9F9",
         "padding": 10,
         "position": "absolute",
         "right": 3,

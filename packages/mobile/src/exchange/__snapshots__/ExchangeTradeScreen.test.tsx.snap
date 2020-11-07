@@ -1,12 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ExchangeTradeScreen renders correctly 1`] = `
-<SafeAreaView
-  forceInset={
-    Object {
-      "bottom": "always",
-      "top": "never",
-    }
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+    ]
   }
   style={
     Object {
@@ -132,9 +131,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
@@ -169,9 +168,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
@@ -244,12 +243,12 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#E3C376",
+            "backgroundColor": "#F1F0EB",
             "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
             "opacity": undefined,
-            "paddingHorizontal": 16,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }
@@ -259,7 +258,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           accessibilityLabel="continue"
           style={
             Object {
-              "color": "#FFFFFF",
+              "color": "#9CA4A9",
               "fontFamily": "Inter-SemiBold",
               "fontSize": 16,
               "lineHeight": 22,
@@ -271,5 +270,21 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
+</RNCSafeAreaView>
 `;

@@ -1,47 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BackupComplete renders correctly when social backup is complete 1`] = `
-<SafeAreaView
+exports[`BackupComplete renders correctly 1`] = `
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
-      "flex": 1,
-    }
-  }
->
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flex": 1,
-        "justifyContent": "center",
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "marginTop": 20,
-          "paddingBottom": 20,
-          "paddingHorizontal": 40,
-          "textAlign": "center",
-        }
-      }
-    >
-      backupComplete.2
-    </Text>
-  </View>
-</SafeAreaView>
-`;
-
-exports[`BackupComplete renders correctly when social backup is not complete 1`] = `
-<SafeAreaView
-  style={
-    Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -68,6 +30,20 @@ exports[`BackupComplete renders correctly when social backup is not complete 1`]
         style={Object {}}
       />
     </svg>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Jost-Book",
+          "fontSize": 26,
+          "lineHeight": 32,
+          "marginTop": 20,
+          "paddingHorizontal": 40,
+        }
+      }
+    >
+      backupComplete.2
+    </Text>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

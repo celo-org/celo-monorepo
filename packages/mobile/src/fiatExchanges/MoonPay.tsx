@@ -1,4 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
@@ -7,15 +8,14 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import config from 'src/geth/networkConfig'
 import i18n from 'src/i18n'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
-
-import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
+import { StackParamList } from 'src/navigator/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const celoCurrencyCode = 'CUSD'
+const celoCurrencyCode = 'celo'
 
 export const moonPayOptions = () => {
   const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
@@ -27,10 +27,14 @@ export const moonPayOptions = () => {
   }
 }
 
-function FiatExchangeWeb() {
+type RouteProps = StackScreenProps<StackParamList, Screens.MoonPay>
+type Props = RouteProps
+
+function FiatExchangeWeb({ route }: Props) {
   const [uri, setUri] = React.useState('')
+  const { localAmount, currencyCode } = route.params
   const account = useSelector(currentAccountSelector)
-  const localCurrencyCode = useSelector(getLocalCurrencyCode)
+
   React.useEffect(() => {
     const getSignedUrl = async () => {
       const response = await fetch(config.signMoonpayUrl, {
@@ -39,11 +43,11 @@ function FiatExchangeWeb() {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        // TODO: Add amount here
         body: JSON.stringify({
           currency: celoCurrencyCode,
           address: account,
-          fiatCurrency: localCurrencyCode,
+          fiatCurrency: currencyCode,
+          fiatAmount: localAmount?.toString(),
         }),
       })
       const json = await response.json()
@@ -58,7 +62,7 @@ function FiatExchangeWeb() {
   return (
     <View style={styles.container}>
       {uri === '' ? (
-        <ActivityIndicator size="large" color={colors.celoGreen} />
+        <ActivityIndicator size="large" color={colors.greenBrand} />
       ) : (
         <WebView style={styles.exchangeWebView} source={{ uri }} />
       )}

@@ -24,6 +24,10 @@ export enum Actions {
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
+  SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
+  MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+  TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
 }
 
 export interface SetAppState {
@@ -68,9 +72,14 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-interface SetLockWithPinEnabled {
+interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
+}
+
+interface InviteModalAction {
+  type: Actions.TOGGLE_INVITE_MODAL
+  inviteModalVisible: boolean
 }
 
 export interface Lock {
@@ -79,6 +88,21 @@ export interface Lock {
 
 export interface Unlock {
   type: Actions.UNLOCK
+}
+
+export interface SetSessionId {
+  type: Actions.SET_SESSION_ID
+  sessionId: string
+}
+
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+}
+
+interface MinAppVersionDeterminedAction {
+  type: Actions.MIN_APP_VERSION_DETERMINED
+  minVersion: string | null
 }
 
 export type ActionTypes =
@@ -91,9 +115,13 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | SetLockWithPinEnabled
+  | SetRequirePinOnAppOpen
   | Lock
   | Unlock
+  | SetSessionId
+  | OpenUrlAction
+  | MinAppVersionDeterminedAction
+  | InviteModalAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -121,7 +149,7 @@ export const setLanguage = (language: string) => {
   }
 }
 
-export const openDeepLink = (deepLink: string) => {
+export const openDeepLink = (deepLink: string): OpenDeepLink => {
   return {
     type: Actions.OPEN_DEEP_LINK,
     deepLink,
@@ -145,7 +173,7 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+export const setRequirePinOnAppOpen = (enabled: boolean): SetRequirePinOnAppOpen => ({
   type: Actions.SET_LOCK_WITH_PIN_ENABLED,
   enabled,
 })
@@ -156,4 +184,26 @@ export const appLock = (): Lock => ({
 
 export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
+})
+
+export const setSessionId = (sessionId: string) => ({
+  type: Actions.SET_SESSION_ID,
+  sessionId,
+})
+
+export const openUrl = (url: string): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
+})
+
+export const minAppVersionDetermined = (
+  minVersion: string | null
+): MinAppVersionDeterminedAction => ({
+  type: Actions.MIN_APP_VERSION_DETERMINED,
+  minVersion,
+})
+
+export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
+  type: Actions.TOGGLE_INVITE_MODAL,
+  inviteModalVisible,
 })

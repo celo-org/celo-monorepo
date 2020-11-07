@@ -5,13 +5,14 @@ export enum RecipientVerificationStatus {
 }
 
 export enum VerificationStatus {
+  SaltQuotaExceeded = -3,
+  InsufficientBalance = -2,
   Failed = -1,
   Stopped = 0,
   Prepping = 1,
   GettingStatus = 2,
   RequestingAttestations = 3,
-  RevealingNumber = 4,
-  RevealAttemptFailed = 5,
+  CompletingAttestations = 4,
   Done = 6,
 }
 

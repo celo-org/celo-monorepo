@@ -86,20 +86,13 @@ export class TxParamsNormalizer {
     return this.gatewayFeeRecipient
   }
 
-  private getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
-    // Gold Token
-    if (!feeCurrency) {
-      return this.getGasPriceInCeloGold()
-    }
-    throw new Error(
-      `missing-tx-params-populator@getGasPrice: gas price for currency ${feeCurrency} cannot be computed pass it explicitly`
-    )
-  }
+  private async getGasPrice(feeCurrency: string | undefined): Promise<string | undefined> {
+    // Required otherwise is not backward compatible
+    const parameter = feeCurrency ? [feeCurrency] : []
 
-  private async getGasPriceInCeloGold(): Promise<string> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice
-    const result = await this.rpcCaller.call('eth_gasPrice', [])
-    const gasPriceInHex = result.result.toString()
+    const response = await this.rpcCaller.call('eth_gasPrice', parameter)
+    const gasPriceInHex = response.result.toString()
     return gasPriceInHex
   }
 }

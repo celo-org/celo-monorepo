@@ -1,17 +1,18 @@
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
+import { showMessage } from 'src/alert/actions'
+import { TokenTransactionType } from 'src/apollo/types'
+import { openUrl } from 'src/app/actions'
+import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
 import {
   NotificationReceiveState,
   NotificationTypes,
-  PaymentRequest,
   TransferNotificationData,
-} from 'src/account/types'
-import { showMessage } from 'src/alert/actions'
-import { TokenTransactionType } from 'src/apollo/types'
-import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
-import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+} from 'src/notifications/types'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
@@ -36,8 +37,13 @@ function* handlePaymentRequested(
     return
   }
 
+  const addressToE164Number = yield select(addressToE164NumberSelector)
   const recipientCache = yield select(recipientCacheSelector)
-  const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
+  const targetRecipient = getRequesterFromPaymentRequest(
+    paymentRequest,
+    addressToE164Number,
+    recipientCache
+  )
 
   navigateToRequestedPaymentReview({
     firebasePendingRequestUid: paymentRequest.uid,
@@ -79,12 +85,31 @@ export function* handleNotification(
   message: FirebaseMessagingTypes.RemoteMessage,
   notificationState: NotificationReceiveState
 ) {
+  // See if this is a notification with an open url action (`ou` prop in the data)
+  const urlToOpen = message.data?.ou
+
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    const title = message.notification?.title
+    const { title, body } = message.notification ?? {}
     if (title) {
-      yield put(showMessage(title))
+      yield put(
+        showMessage(
+          body || title,
+          undefined,
+          null,
+          urlToOpen ? openUrl(urlToOpen) : null,
+          body ? title : null
+        )
+      )
+    }
+  } else {
+    // Notification was received while app wasn't already open (i.e. tapped to act on it)
+    // So directly handle the action if any
+    if (urlToOpen) {
+      yield put(openUrl(urlToOpen))
+      return
     }
   }
+
   switch (message.data?.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
       yield call(

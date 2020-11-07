@@ -1,13 +1,15 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SearchInput from '@celo/react-components/components/SearchInput'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { LocalizedCountry } from '@celo/utils/src/countries'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList, StyleSheet, View } from 'react-native'
-import { useSafeArea } from 'react-native-safe-area-view'
-import { Namespaces } from 'src/i18n'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import i18n, { Namespaces } from 'src/i18n'
+import { headerWithCloseButton } from 'src/navigator/Headers'
+import { modalScreenOptions } from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import SelectCountryItem from 'src/onboarding/registration/SelectCountryItem'
@@ -27,7 +29,10 @@ export default function SelectCountry({ navigation, route }: Props) {
   ])
 
   function onSelect(country: LocalizedCountry) {
-    navigation.navigate(Screens.JoinCelo, { selectedCountryCodeAlpha2: country.alpha2 })
+    navigation.navigate(Screens.NameAndNumber, {
+      selectedCountryCodeAlpha2: country.alpha2,
+      country: country.displayNameNoDiacritics,
+    })
   }
 
   const renderItem = useCallback(
@@ -42,7 +47,7 @@ export default function SelectCountry({ navigation, route }: Props) {
     [selectedCountryCodeAlpha2]
   )
 
-  const inset = useSafeArea()
+  const inset = useSafeAreaInsets()
 
   return (
     <View style={styles.container}>
@@ -66,6 +71,13 @@ export default function SelectCountry({ navigation, route }: Props) {
     </View>
   )
 }
+
+SelectCountry.navigationOptions = (navOptions: Props) => ({
+  ...modalScreenOptions(navOptions),
+  ...headerWithCloseButton,
+  headerTitle: i18n.t('onboarding:selectCountryCode'),
+  headerTransparent: false,
+})
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

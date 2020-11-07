@@ -1,26 +1,30 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import Switch from '@celo/react-components/components/Switch.v2'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import Switch from '@celo/react-components/components/Switch'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
 import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import CancelButton from 'src/components/CancelButton'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, pushToStack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'backup/BackupPhrase'
 
@@ -30,6 +34,7 @@ interface State {
 }
 
 interface StateProps {
+  account: string | null
   backupCompleted: boolean
 }
 
@@ -38,18 +43,32 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.BackupPhrase>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    account: currentAccountSelector(state),
     backupCompleted: state.account.backupCompleted,
   }
 }
 
-export const navOptionsForBackupPhrase = {
-  headerLeft: () => <CancelConfirm screen={TAG} />,
-  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
-  headerRight: () => <HeaderRight />,
+export const navOptionsForBackupPhrase = ({
+  route,
+}: StackScreenProps<StackParamList, Screens.BackupPhrase>) => {
+  const navigatedFromSettings = route.params?.navigatedFromSettings
+  return {
+    headerLeft: () => {
+      return navigatedFromSettings ? (
+        <CancelButton style={styles.cancelButton} />
+      ) : (
+        <CancelConfirm screen={TAG} />
+      )
+    },
+    headerRight: () => <HeaderRight />,
+  }
 }
 
 class BackupPhrase extends React.Component<Props, State> {
@@ -70,7 +89,7 @@ class BackupPhrase extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
-    const mnemonic = await getStoredMnemonic()
+    const mnemonic = await getStoredMnemonic(this.props.account)
 
     if (mnemonic) {
       this.setState({ mnemonic })
@@ -83,12 +102,6 @@ class BackupPhrase extends React.Component<Props, State> {
     this.setState({
       isConfirmChecked: value,
     })
-
-    CeloAnalytics.track(
-      value
-        ? CustomEventNames.backup_setup_toggle_enable
-        : CustomEventNames.backup_setup_toggle_disable
-    )
   }
 
   onPressConfirmArea = () => {
@@ -96,13 +109,18 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz)
+    ValoraAnalytics.track(OnboardingEvents.backup_continue)
+    navigate(Screens.BackupQuiz, { navigatedFromSettings: this.navigatedFromSettings() })
+  }
+
+  navigatedFromSettings = () => {
+    return this.props.route.params?.navigatedFromSettings ?? false
   }
 
   render() {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
+    const navigatedFromSettings = this.navigatedFromSettings()
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -113,10 +131,14 @@ class BackupPhrase extends React.Component<Props, State> {
           />
           <Text style={styles.body}>{t('backupKeySummary')}</Text>
         </ScrollView>
-        {!backupCompleted && (
+        {(!backupCompleted || navigatedFromSettings) && (
           <>
             <View style={styles.confirmationSwitchContainer}>
-              <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
+              <Switch
+                value={isConfirmChecked}
+                onValueChange={this.onPressConfirmSwitch}
+                testID="backupKeySavedSwitch"
+              />
               <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
                 {t('savedConfirmation')}
               </Text>
@@ -127,6 +149,7 @@ class BackupPhrase extends React.Component<Props, State> {
               text={t('global:continue')}
               size={BtnSizes.FULL}
               type={BtnTypes.SECONDARY}
+              testID="backupKeyContinue"
             />
           </>
         )}
@@ -138,7 +161,7 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    CeloAnalytics.track(CustomEventNames.backup_setup_info)
+    ValoraAnalytics.track(OnboardingEvents.backup_more_info)
     pushToStack(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
@@ -147,7 +170,6 @@ function HeaderRight() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     justifyContent: 'space-between',
     padding: 16,
   },
@@ -168,6 +190,9 @@ const styles = StyleSheet.create({
     flex: 1,
     ...fontStyles.regular,
     paddingLeft: 8,
+  },
+  cancelButton: {
+    color: colors.gray4,
   },
 })
 

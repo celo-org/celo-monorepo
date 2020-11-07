@@ -10,9 +10,9 @@ The first set of active validators are determined in the genesis block. Thereaft
 
 ![](https://storage.googleapis.com/celo-website/docs/concepts.jpg)
 
-In Celo's [Validator Elections](validator-elections.md), holders of the native asset, Celo Gold, may participate and earn rewards for doing so. Accounts do not make votes for validators directly, but instead vote for [validator groups](validator-groups.md).
+In Celo's [Validator Elections](validator-elections.md), holders of the native asset, CELO, may participate and earn rewards for doing so. Accounts do not make votes for validators directly, but instead vote for [validator groups](validator-groups.md).
 
-Before they can vote, holders of Celo Gold move balances into the [Locked Gold](locked-gold.md) smart contract. Locked Gold can be used concurrently for: placing votes in Validator Elections, maintaining a stake to satisfy the requirements of registering as a validator or validator group, and also voting in on-chain [Governance](../governance.md) proposals. This means that validators and groups can vote and earn rewards with their stake.
+Before they can vote, holders of CELO move balances into the [Locked Gold](locked-gold.md) smart contract. Locked Gold can be used concurrently for: placing votes in Validator Elections, maintaining a stake to satisfy the requirements of registering as a validator or validator group, and also voting in on-chain [Governance](../governance.md) proposals. This means that validators and groups can vote and earn rewards with their stake.
 
 Unlike in other proof-of-stake systems, holding Locked Gold or voting for a group does not put that amount 'at risk' from slashing due to the behavior of validators or validator groups. Only the stake put up by a validator or group may be slashed.
 

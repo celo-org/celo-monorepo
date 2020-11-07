@@ -3,6 +3,11 @@
 exports[`BuildPage renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "scrollPadding": "20px",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
@@ -360,6 +365,7 @@ exports[`BuildPage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -397,6 +403,7 @@ exports[`BuildPage renders 1`] = `
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -413,20 +420,75 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-vsf5x1"
           >
-            Operate Celo
+            <span
+              className="css-q7lffx"
+            >
+              O
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              C
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              l
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
           </div>
         </h2>
         <h4
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -442,14 +504,333 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-vsf5x1"
           >
-            Participate in Celo's proof-of-stake consensus and produce blocks
+            <span
+              className="css-q7lffx"
+            >
+              P
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              i
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              i
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              i
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              C
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              l
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              '
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              f
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              -
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              f
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              -
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              t
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              k
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              u
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              a
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              n
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              d
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              p
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              r
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              d
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              u
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              e
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+               
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              b
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              l
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              o
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              c
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              k
+            </span>
+            <span
+              className="css-q7lffx"
+            >
+              s
+            </span>
           </div>
         </h4>
       </div>
@@ -481,6 +862,7 @@ exports[`BuildPage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexWrap": "wrap",
+          "msGridRowAlign": "center",
           "overflowX": "hidden",
           "overflowY": "hidden",
           "paddingLeft": "10px",
@@ -524,6 +906,7 @@ exports[`BuildPage renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -542,6 +925,7 @@ exports[`BuildPage renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -561,6 +945,7 @@ exports[`BuildPage renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -652,10 +1037,8 @@ exports[`BuildPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -668,13 +1051,13 @@ exports[`BuildPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Applications
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -702,6 +1085,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -721,6 +1105,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -740,6 +1125,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -754,11 +1140,12 @@ exports[`BuildPage renders 1`] = `
                   }
                 }
               >
-                Exchange between cUSD and cGLD
+                Exchange between cUSD and CELO
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -778,6 +1165,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -813,8 +1201,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -822,7 +1208,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -890,8 +1275,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -927,7 +1310,6 @@ exports[`BuildPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1025,10 +1407,8 @@ exports[`BuildPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1041,13 +1421,13 @@ exports[`BuildPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Core Contracts
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1075,6 +1455,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1094,6 +1475,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1113,6 +1495,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1148,8 +1531,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1157,7 +1538,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1225,8 +1605,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -1262,7 +1640,6 @@ exports[`BuildPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1360,10 +1737,8 @@ exports[`BuildPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1376,13 +1751,13 @@ exports[`BuildPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Blockchain
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -1410,6 +1785,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1429,6 +1805,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1448,6 +1825,7 @@ exports[`BuildPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -1483,8 +1861,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1492,7 +1868,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1560,8 +1935,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -1597,7 +1970,6 @@ exports[`BuildPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1664,6 +2036,7 @@ exports[`BuildPage renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -1682,6 +2055,7 @@ exports[`BuildPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(255,255,255,1.00)",
@@ -1704,8 +2078,6 @@ exports[`BuildPage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1713,7 +2085,6 @@ exports[`BuildPage renders 1`] = `
               dir="auto"
               href="https://github.com/celo-org"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -1807,12 +2178,7 @@ exports[`BuildPage renders 1`] = `
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -1832,6 +2198,7 @@ exports[`BuildPage renders 1`] = `
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -1861,6 +2228,7 @@ exports[`BuildPage renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1895,6 +2263,7 @@ exports[`BuildPage renders 1`] = `
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",
               "msFlexWrap": "wrap",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -2004,6 +2373,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2022,6 +2392,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2140,6 +2511,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2158,6 +2530,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2276,6 +2649,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2294,6 +2668,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2412,6 +2787,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2430,6 +2806,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2548,6 +2925,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2566,6 +2944,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2684,6 +3063,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2702,6 +3082,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2820,6 +3201,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2838,6 +3220,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -2956,6 +3339,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2974,6 +3358,7 @@ exports[`BuildPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3011,6 +3396,7 @@ exports[`BuildPage renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "justify",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3048,6 +3434,7 @@ exports[`BuildPage renders 1`] = `
           aria-level="3"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -3067,6 +3454,7 @@ exports[`BuildPage renders 1`] = `
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -3085,6 +3473,7 @@ exports[`BuildPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -3099,12 +3488,7 @@ exports[`BuildPage renders 1`] = `
           
         </div>
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -3180,6 +3564,7 @@ exports[`BuildPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -3225,8 +3610,6 @@ exports[`BuildPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3234,7 +3617,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/getting-started/choosing-a-network"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3338,12 +3720,7 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -3442,6 +3819,7 @@ exports[`BuildPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3458,6 +3836,7 @@ exports[`BuildPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3478,8 +3857,6 @@ exports[`BuildPage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -3515,7 +3892,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/getting-started/running-a-validator-in-mainnet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3595,12 +3971,7 @@ exports[`BuildPage renders 1`] = `
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -3699,6 +4070,7 @@ exports[`BuildPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3715,6 +4087,7 @@ exports[`BuildPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3735,8 +4108,6 @@ exports[`BuildPage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -3772,7 +4143,6 @@ exports[`BuildPage renders 1`] = `
                 dir="auto"
                 href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3847,6 +4217,7 @@ exports[`BuildPage renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "justify",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3880,6 +4251,7 @@ exports[`BuildPage renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -3897,6 +4269,7 @@ exports[`BuildPage renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3918,8 +4291,6 @@ exports[`BuildPage renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <a
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3927,7 +4298,6 @@ exports[`BuildPage renders 1`] = `
           dir="auto"
           href="https://discord.gg/jYRrHDQ"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {

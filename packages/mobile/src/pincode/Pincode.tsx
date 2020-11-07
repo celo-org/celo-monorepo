@@ -3,12 +3,12 @@
  * with an input, e.g. get/ensure/set pincode.
  */
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { PIN_LENGTH } from 'src/pincode/authentication'
 import PincodeDisplay from 'src/pincode/PincodeDisplay'
-import { PIN_LENGTH } from 'src/pincode/utils'
 
 interface Props {
   title?: string
@@ -27,7 +27,7 @@ function Pincode({
   onChangePin,
   onCompletePin,
 }: Props) {
-  function onDigitPress(digit: number) {
+  const onDigitPress = (digit: number) => {
     if (pin.length >= maxLength) {
       return
     }
@@ -41,7 +41,7 @@ function Pincode({
     }
   }
 
-  function onBackspacePress() {
+  const onBackspacePress = () => {
     onChangePin(pin.substr(0, pin.length - 1))
   }
 

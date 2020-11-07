@@ -1,6 +1,6 @@
-import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import TextButton from '@celo/react-components/components/TextButton'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
   title: {
     ...fontStyles.h2,
     marginBottom: 8,
-    color: colors.white,
+    color: colors.light,
   },
   description: {
     ...fontStyles.regular,
-    color: colors.white,
+    color: colors.light,
     textAlign: 'center',
     marginBottom: 16,
   },

@@ -13,6 +13,7 @@ USAGE
   $ celocli dkg:deploy
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -43,6 +44,7 @@ USAGE
   $ celocli dkg:get
 
 OPTIONS
+  -k, --privateKey=privateKey                                          Use a private key to sign local transactions with
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d                 (required) DKG Contract Address
 
   --ledgerAddresses=ledgerAddresses                                    [default: 1] If --useLedger is set, this will get
@@ -71,6 +73,7 @@ USAGE
   $ celocli dkg:publish
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --data=data                                           (required) Path to the data being published
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
@@ -99,6 +102,7 @@ USAGE
   $ celocli dkg:register
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --blsKey=blsKey                                       (required)
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
@@ -127,6 +131,7 @@ USAGE
   $ celocli dkg:start
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 
@@ -154,6 +159,7 @@ USAGE
   $ celocli dkg:whitelist
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
   --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
 

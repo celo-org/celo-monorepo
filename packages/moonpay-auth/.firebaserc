@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "celo-org-mobile"
+    "default": "celo-org-mobile",
+    "prod": "celo-mobile-mainnet"
   }
 }

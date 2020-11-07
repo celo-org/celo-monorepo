@@ -82,12 +82,12 @@ export const sendInviteFailure = (error: ErrorMessages): SendInviteFailureAction
 
 export interface RedeemInviteAction {
   type: Actions.REDEEM_INVITE
-  inviteCode: string
+  tempAccountPrivateKey: string
 }
 
-export const redeemInvite = (inviteCode: string): RedeemInviteAction => ({
+export const redeemInvite = (tempAccountPrivateKey: string): RedeemInviteAction => ({
   type: Actions.REDEEM_INVITE,
-  inviteCode,
+  tempAccountPrivateKey,
 })
 
 export interface RedeemInviteSuccessAction {

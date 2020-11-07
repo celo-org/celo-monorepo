@@ -4,20 +4,17 @@ import { Provider } from 'react-redux'
 import BackupQuiz, { BackupQuiz as BackupQuizRaw } from 'src/backup/BackupQuiz'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
-import { mockMnemonic } from 'test/values'
+import { mockAccount, mockMnemonic } from 'test/values'
 
 jest.mock('lodash', () => ({
   ...jest.requireActual('lodash'),
   shuffle: jest.fn((array) => array),
 }))
 
-jest.mock('react-native-secure-key-store', () => {
-  return {
-    get: async () => {
-      return mockMnemonic
-    },
-  }
-})
+jest.mock('src/backup/utils', () => ({
+  ...jest.requireActual('src/backup/utils'),
+  getStoredMnemonic: jest.fn(() => mockMnemonic),
+}))
 
 const mockScreenProps = getMockStackScreenProps(Screens.BackupQuiz)
 
@@ -48,6 +45,7 @@ describe('BackupQuiz', () => {
             {...getMockStackScreenProps(Screens.BackupQuiz)}
             setBackupCompleted={mockSetBackupCompleted}
             showError={jest.fn()}
+            account={mockAccount}
             {...getMockI18nProps()}
           />
         </Provider>
@@ -87,6 +85,7 @@ describe('BackupQuiz', () => {
           {...mockScreenProps}
           setBackupCompleted={mockSetBackupCompleted}
           showError={jest.fn()}
+          account={mockAccount}
           {...getMockI18nProps()}
         />
       </Provider>

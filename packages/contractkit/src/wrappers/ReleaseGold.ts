@@ -1,9 +1,6 @@
-import { findAddressIndex } from '@celo/utils/lib/address'
-import {
-  hashMessageWithPrefix,
-  Signature,
-  signedMessageToPublicKey,
-} from '@celo/utils/lib/signatureUtils'
+import { findAddressIndex } from '@celo/base/lib/address'
+import { Signature } from '@celo/base/lib/signatureUtils'
+import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { ReleaseGold } from '../generated/ReleaseGold'
@@ -12,10 +9,12 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   stringIdentity,
   stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToInt,
   valueToString,
@@ -78,6 +77,21 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       numReleasePeriods: valueToInt(releaseSchedule.numReleasePeriods),
       releasePeriod: valueToInt(releaseSchedule.releasePeriod),
       amountReleasedPerPeriod: valueToBigNumber(releaseSchedule.amountReleasedPerPeriod),
+    }
+  }
+
+  /**
+   * Returns the underlying Release schedule of the ReleaseGold contract
+   * @return A ReleaseSchedule.
+   */
+  async getHumanReadableReleaseSchedule() {
+    const releaseSchedule = await this.getReleaseSchedule()
+
+    return {
+      ...releaseSchedule,
+      releaseCliff: unixSecondsTimestampToDateString(releaseSchedule.releaseCliff),
+      releaseStartTime: unixSecondsTimestampToDateString(releaseSchedule.releaseStartTime),
+      releasePeriod: secondsToDurationString(releaseSchedule.releasePeriod),
     }
   }
 

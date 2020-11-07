@@ -27,7 +27,7 @@ function last4DigitsAreUnique(addressArr: string[]) {
   return last4DigitArr.length === last4DigitSet.size
 }
 
-// Check if there are multiple addresses but somehow a preferred addresses hasn't been set yet
+// Check if there are multiple addresses but somehow a preferred address hasn't been set yet
 // Should never happen in production but makes the change backwards compatible for testing env
 function accidentallyBypassedValidation(
   newAddresses: string[] | null,
@@ -41,24 +41,23 @@ function accidentallyBypassedValidation(
 
 export function checkIfValidationRequired(
   oldAddresses: string[],
-  newAddresses: string[] | null,
+  possibleAddresses: string[],
   userAddress: string,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping,
   e164Number: string
 ) {
-  // if there are no addresses or only one address available,
-  // there is no validation needed
-  if (!newAddresses || newAddresses.length < 2) {
+  // No validation needed if there is only 1 possible address
+  if (possibleAddresses.length < 2) {
     return AddressValidationType.NONE
   }
 
   if (
-    newAddressesAdded(oldAddresses, newAddresses) ||
-    accidentallyBypassedValidation(newAddresses, e164Number, secureSendPhoneNumberMapping)
+    newAddressesAdded(oldAddresses, possibleAddresses) ||
+    accidentallyBypassedValidation(possibleAddresses, e164Number, secureSendPhoneNumberMapping)
   ) {
     Logger.debug(TAG, 'Address needs to be validated by user')
     // Adding user's address so they don't mistakenly verify with last 4 digits of their own address
-    if (last4DigitsAreUnique([userAddress, ...newAddresses])) {
+    if (last4DigitsAreUnique([userAddress, ...possibleAddresses])) {
       return AddressValidationType.PARTIAL
     }
     return AddressValidationType.FULL

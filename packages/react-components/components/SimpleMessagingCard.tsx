@@ -1,6 +1,6 @@
 import CallToActionsBar, { CallToAction } from '@celo/react-components/components/CallToActionsBar'
 import MessagingCard from '@celo/react-components/components/MessagingCard'
-import fonts from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 
@@ -21,7 +21,7 @@ export default function SimpleMessagingCard({
     iconProp
   ) : (
     // @ts-ignore isValidElement check above ensures image is an image source type
-    <Image source={iconProp} style={styles.image} resizeMode="contain" />
+    <Image source={iconProp} resizeMode="contain" />
   )
 
   return (
@@ -50,16 +50,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   text: {
-    ...fonts.large,
+    ...fontStyles.large,
     marginRight: 12,
   },
   iconContainer: {
     width: 80,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  image: {
-    width: 30,
-    height: 30,
   },
 })

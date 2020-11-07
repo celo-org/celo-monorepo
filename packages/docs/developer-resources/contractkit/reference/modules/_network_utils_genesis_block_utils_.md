@@ -16,4 +16,4 @@
 
 • **GenesisBlocksGoogleStorageBucketName**: *"genesis_blocks"* = "genesis_blocks"
 
-*Defined in [contractkit/src/network-utils/genesis-block-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/genesis-block-utils.ts#L5)*
+*Defined in [packages/contractkit/src/network-utils/genesis-block-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/genesis-block-utils.ts#L5)*

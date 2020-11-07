@@ -2,14 +2,14 @@ import interpolateColors from '@celo/react-components/components/interpolateColo
 import SegmentedControl from '@celo/react-components/components/SegmentedControl'
 import Share from '@celo/react-components/icons/Share'
 import Times from '@celo/react-components/icons/Times'
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React, { useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
 import Animated from 'react-native-reanimated'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
-import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { shareQRCode, SVG } from 'src/send/actions'
 
 type Props = MaterialTopTabBarProps & {
@@ -36,7 +36,7 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
 
   const color = interpolateColors(position, {
     inputRange: [0.9, 1],
-    outputColorRange: [colors.dark, colors.white],
+    outputColorRange: [colors.dark, colors.light],
   })
 
   const onPressClose = () => {
@@ -63,30 +63,32 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
   }
 
   return (
-    <SafeAreaView style={StyleSheet.absoluteFill}>
-      <View style={styles.container}>
-        <View style={styles.leftContainer}>
-          <TopBarIconButton icon={<Times color={color} />} onPress={onPressClose} />
-        </View>
-        <SegmentedControl
-          values={values}
-          selectedIndex={state.index}
-          position={position}
-          onChange={onChange}
-        />
-        <Animated.View
-          style={[styles.rightContainer, { opacity: shareOpacity }]}
-          pointerEvents={state.index > 0 ? 'none' : undefined}
-        >
-          <TopBarIconButton icon={<Share />} onPress={onPressShare} />
-        </Animated.View>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.leftContainer}>
+        <TopBarIconButton icon={<Times color={color} />} onPress={onPressClose} />
       </View>
+      <SegmentedControl
+        values={values}
+        selectedIndex={state.index}
+        position={position}
+        onChange={onChange}
+      />
+      <Animated.View
+        style={[styles.rightContainer, { opacity: shareOpacity }]}
+        pointerEvents={state.index > 0 ? 'none' : undefined}
+      >
+        <TopBarIconButton icon={<Share />} onPress={onPressShare} />
+      </Animated.View>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,

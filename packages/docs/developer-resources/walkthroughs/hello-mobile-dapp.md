@@ -52,7 +52,7 @@ Compiling your contracts...
 Starting migrations...
 ======================
 > Network name:    'alfajores'
-> Network id:      44786
+> Network id:      44787
 > Block gas limit: 0x1312d00
 
 
