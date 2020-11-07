@@ -2,20 +2,18 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { Switch as RNSwitch, SwitchProps } from 'react-native'
 
-function Switch(props: SwitchProps) {
+export default function Switch(props: SwitchProps) {
   return (
     <RNSwitch
-      trackColor={switchTrackColors}
-      thumbColor={colors.light}
-      ios_backgroundColor={colors.gray4}
+      trackColor={SWITCH_TRACK}
+      thumbColor={colors.gray2}
+      ios_backgroundColor={colors.gray3}
       {...props}
     />
   )
 }
 
-const switchTrackColors = {
-  false: colors.gray4,
-  true: colors.greenBrand,
+const SWITCH_TRACK = {
+  false: colors.gray3,
+  true: colors.greenUI,
 }
-
-export default Switch

@@ -34,6 +34,7 @@ export function txoStub<T>(): TransactionObjectStub<T> {
     rejectHash: peStub.rejectHash,
     resolveReceipt: peStub.resolveReceipt,
     rejectReceipt: peStub.resolveReceipt,
+    _parent: jest.fn() as any,
   }
   return pe
 }

@@ -25,6 +25,7 @@
 * [recoverTransaction](_utils_signing_utils_.md#recovertransaction)
 * [rlpEncodedTx](_utils_signing_utils_.md#rlpencodedtx)
 * [verifyEIP712TypedDataSigner](_utils_signing_utils_.md#verifyeip712typeddatasigner)
+* [verifySignatureWithoutPrefix](_utils_signing_utils_.md#verifysignaturewithoutprefix)
 
 ## Variables
 
@@ -72,7 +73,7 @@ ___
 
 ▸ **decodeSig**(`sig`: any): *object*
 
-*Defined in [packages/contractkit/src/utils/signing-utils.ts:233](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L233)*
+*Defined in [packages/contractkit/src/utils/signing-utils.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L245)*
 
 **Parameters:**
 
@@ -138,7 +139,7 @@ ___
 
 ▸ **getAddressFromPublicKey**(`publicKey`: BigNumber): *[Address](_base_.md#address)*
 
-*Defined in [packages/contractkit/src/utils/signing-utils.ts:266](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L266)*
+*Defined in [packages/contractkit/src/utils/signing-utils.ts:278](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L278)*
 
 **Parameters:**
 
@@ -170,7 +171,7 @@ ___
 
 ▸ **recoverKeyIndex**(`signature`: Uint8Array, `publicKey`: BigNumber, `hash`: Uint8Array): *number*
 
-*Defined in [packages/contractkit/src/utils/signing-utils.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L245)*
+*Defined in [packages/contractkit/src/utils/signing-utils.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L257)*
 
 Attempts each recovery key to find a match
 
@@ -248,5 +249,23 @@ Name | Type |
 `typedData` | EIP712TypedData |
 `signedData` | string |
 `expectedAddress` | string |
+
+**Returns:** *boolean*
+
+___
+
+###  verifySignatureWithoutPrefix
+
+▸ **verifySignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *boolean*
+
+*Defined in [packages/contractkit/src/utils/signing-utils.ts:232](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L232)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`messageHash` | string |
+`signature` | string |
+`signer` | string |
 
 **Returns:** *boolean*

@@ -142,6 +142,24 @@ function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
         }
         throw new Error('Invalid Path')
       },
+      signEIP712HashedMessage: async (
+        derivationPath: string,
+        domainSeparator: Buffer,
+        structHash: Buffer
+      ) => {
+        const messageHash = ethUtil.sha3(
+          Buffer.concat([Buffer.from('1901', 'hex'), domainSeparator, structHash])
+        ) as Buffer
+
+        const trimmedKey = trimLeading0x(ledgerAddresses[derivationPath].privateKey)
+        const pkBuffer = Buffer.from(trimmedKey, 'hex')
+        const signature = ethUtil.ecsign(messageHash, pkBuffer)
+        return {
+          v: signature.v,
+          r: signature.r.toString('hex'),
+          s: signature.s.toString('hex'),
+        }
+      },
       getAppConfiguration: async () => {
         return { arbitraryDataEnabled: 1, version: '0.0.0' }
       },

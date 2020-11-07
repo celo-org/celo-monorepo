@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import getConfig from 'next/config'
 import cache from './cache'
 

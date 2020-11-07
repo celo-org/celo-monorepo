@@ -1,7 +1,7 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
@@ -14,9 +14,7 @@ interface Props {
 
 class RecipientItem extends React.PureComponent<Props> {
   onPress = () => {
-    const recipient = this.props.recipient
-    recipient.address = recipient.address?.toLowerCase()
-    this.props.onSelectRecipient(recipient)
+    this.props.onSelectRecipient(this.props.recipient)
   }
 
   render() {
@@ -59,24 +57,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
-  nameContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingRight: 5,
-  },
   name: { ...fontStyles.regular500, color: colors.dark },
-  invite: {
-    color: colors.greenBrand,
-    lineHeight: 41,
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-  },
-  image: {
-    height: 40,
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   phone: {
     ...fontStyles.small,
     color: colors.gray4,

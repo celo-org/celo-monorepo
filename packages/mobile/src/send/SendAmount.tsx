@@ -1,6 +1,6 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { parseInputAmount } from '@celo/utils/src/parsing'
@@ -9,7 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
@@ -18,7 +18,7 @@ import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import {
   ALERT_BANNER_DURATION,
   DAILY_PAYMENT_LIMIT_CUSD,
@@ -45,7 +45,7 @@ import {
   getLocalCurrencyExchangeRate,
   getLocalCurrencySymbol,
 } from 'src/localCurrency/selectors'
-import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
+import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -314,13 +314,9 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={
-          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN &&
-          reviewButtonPressed ? (
-            <ActivityIndicator testID={'loading/SendAmount'} />
-          ) : (
-            t('global:review')
-          )
+        text={t('global:review')}
+        showLoading={
+          recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN && reviewButtonPressed
         }
         type={BtnTypes.SECONDARY}
         onPress={onReviewButtonPressed}

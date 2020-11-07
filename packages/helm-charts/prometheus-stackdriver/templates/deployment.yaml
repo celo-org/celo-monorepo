@@ -12,7 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
@@ -25,6 +25,9 @@ metadata:
     component: prometheus-stackdriver
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-server
   template:
     metadata:
       labels:
@@ -53,6 +56,10 @@ spec:
             - --stackdriver.kubernetes.cluster-name={{ .Values.cluster }}
 {{ if .Values.includeFilter }}
 {{ indent 12 (printf "- --include=%s" .Values.includeFilter) }}
+{{ end }}
+{{/* This used to be enabled, but now is not. Enable this for oracle clusters only. */}}
+{{ if (and false .Values.stackdriver_metrics_prefix) }}
+            - --stackdriver.metrics-prefix={{ .Values.stackdriver_metrics_prefix }}
 {{ end }}
           ports:
             - name: sidecar

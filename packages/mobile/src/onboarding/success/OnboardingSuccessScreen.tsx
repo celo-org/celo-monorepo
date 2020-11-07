@@ -1,13 +1,13 @@
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import React, { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
-import Logo, { LogoTypes } from 'src/icons/Logo.v2'
+import Logo, { LogoTypes } from 'src/icons/Logo'
 import { background } from 'src/images/Images'
-import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
+import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigateHome } from 'src/navigator/NavigationService'
 
 function OnboardingSuccessScreen() {

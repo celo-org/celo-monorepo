@@ -25,6 +25,9 @@ export enum Actions {
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
   SET_SESSION_ID = 'SET_SESSION_ID',
+  OPEN_URL = 'APP/OPEN_URL',
+  MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+  TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
 }
 
 export interface SetAppState {
@@ -74,6 +77,11 @@ interface SetRequirePinOnAppOpen {
   enabled: boolean
 }
 
+interface InviteModalAction {
+  type: Actions.TOGGLE_INVITE_MODAL
+  inviteModalVisible: boolean
+}
+
 export interface Lock {
   type: Actions.LOCK
 }
@@ -85,6 +93,16 @@ export interface Unlock {
 export interface SetSessionId {
   type: Actions.SET_SESSION_ID
   sessionId: string
+}
+
+export interface OpenUrlAction {
+  type: Actions.OPEN_URL
+  url: string
+}
+
+interface MinAppVersionDeterminedAction {
+  type: Actions.MIN_APP_VERSION_DETERMINED
+  minVersion: string | null
 }
 
 export type ActionTypes =
@@ -101,6 +119,9 @@ export type ActionTypes =
   | Lock
   | Unlock
   | SetSessionId
+  | OpenUrlAction
+  | MinAppVersionDeterminedAction
+  | InviteModalAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -168,4 +189,21 @@ export const appUnlock = (): Unlock => ({
 export const setSessionId = (sessionId: string) => ({
   type: Actions.SET_SESSION_ID,
   sessionId,
+})
+
+export const openUrl = (url: string): OpenUrlAction => ({
+  type: Actions.OPEN_URL,
+  url,
+})
+
+export const minAppVersionDetermined = (
+  minVersion: string | null
+): MinAppVersionDeterminedAction => ({
+  type: Actions.MIN_APP_VERSION_DETERMINED,
+  minVersion,
+})
+
+export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
+  type: Actions.TOGGLE_INVITE_MODAL,
+  inviteModalVisible,
 })

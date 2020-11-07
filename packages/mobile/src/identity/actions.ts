@@ -1,10 +1,12 @@
+import { normalizeAddressWith0x } from '@celo/base'
 import { E164Number } from '@celo/utils/src/io'
 import {
   AddressToE164NumberType,
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
-  VerificationState,
+  UpdatableVerificationState,
+  WalletToAccountAddressType,
 } from 'src/identity/reducer'
 import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
 import { AttestationCode, CodeInputType } from 'src/identity/verification'
@@ -22,6 +24,7 @@ export enum Actions {
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
   COMPLETE_ATTESTATION_CODE = 'IDENTITY/COMPLETE_ATTESTATION_CODE',
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
+  UPDATE_WALLET_TO_ACCOUNT_ADDRESS = 'UPDATE_WALLET_TO_ACCOUNT_ADDRESS',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
   END_FETCHING_ADDRESSES = 'IDENTITY/END_FETCHING_ADDRESSES',
@@ -39,6 +42,9 @@ export enum Actions {
   UPDATE_ADDRESS_DEK_MAP = 'IDENTITY/UPDATE_ADDRESS_DEK_MAP',
   FETCH_VERIFICATION_STATE = 'IDENTITY/FETCH_VERIFICATION_STATE',
   UPDATE_VERIFICATION_STATE = 'IDENTITY/UPDATE_VERIFICATION_STATE',
+  RESEND_ATTESTATIONS = 'IDENTITY/RESEND_ATTESTATIONS',
+  SET_LAST_REVEAL_ATTEMPT = 'IDENTITY/SET_LAST_REVEAL_ATTEMPT',
+  REPORT_REVEAL_STATUS = 'IDENTITY/REPORT_REVEAL_STATUS',
 }
 
 export interface StartVerificationAction {
@@ -93,6 +99,11 @@ export interface UpdateE164PhoneNumberAddressesAction {
   type: Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES
   e164NumberToAddress: E164NumberToAddressType
   addressToE164Number: AddressToE164NumberType
+}
+
+export interface UpdateWalletToAccountAddressAction {
+  type: Actions.UPDATE_WALLET_TO_ACCOUNT_ADDRESS
+  walletToAccountAddress: WalletToAccountAddressType
 }
 
 export interface UpdateE164PhoneNumberSaltAction {
@@ -179,11 +190,30 @@ export interface UpdateAddressDekMapAction {
 
 export interface FetchVerificationState {
   type: Actions.FETCH_VERIFICATION_STATE
+  forceUnlockAccount: boolean
 }
 
 export interface UpdateVerificationState {
   type: Actions.UPDATE_VERIFICATION_STATE
-  state: VerificationState
+  state: UpdatableVerificationState
+}
+
+export interface ResendAttestations {
+  type: Actions.RESEND_ATTESTATIONS
+}
+
+export interface SetLastRevealAttempt {
+  type: Actions.SET_LAST_REVEAL_ATTEMPT
+  time: number
+}
+
+export interface ReportRevealStatusAction {
+  type: Actions.REPORT_REVEAL_STATUS
+  attestationServiceUrl: string
+  account: string
+  issuer: string
+  e164Number: string
+  pepper: string
 }
 
 export type ActionTypes =
@@ -197,6 +227,7 @@ export type ActionTypes =
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
+  | UpdateWalletToAccountAddressAction
   | UpdateE164PhoneNumberSaltAction
   | ImportContactsAction
   | UpdateImportContactProgress
@@ -213,6 +244,9 @@ export type ActionTypes =
   | UpdateAddressDekMapAction
   | FetchVerificationState
   | UpdateVerificationState
+  | ResendAttestations
+  | SetLastRevealAttempt
+  | ReportRevealStatusAction
 
 export const startVerification = (withoutRevealing: boolean = false): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -287,6 +321,24 @@ export const updateE164PhoneNumberAddresses = (
   e164NumberToAddress,
   addressToE164Number,
 })
+
+export const updateWalletToAccountAddress = (
+  walletToAccountAddress: WalletToAccountAddressType
+): UpdateWalletToAccountAddressAction => {
+  const newWalletToAccountAddresses: WalletToAccountAddressType = {}
+  const walletAddresses = Object.keys(walletToAccountAddress)
+
+  for (const walletAddress of walletAddresses) {
+    const newWalletAddress = normalizeAddressWith0x(walletAddress)
+    const newAccountAddress = normalizeAddressWith0x(walletToAccountAddress[walletAddress])
+    newWalletToAccountAddresses[newWalletAddress] = newAccountAddress
+  }
+
+  return {
+    type: Actions.UPDATE_WALLET_TO_ACCOUNT_ADDRESS,
+    walletToAccountAddress: newWalletToAccountAddresses,
+  }
+}
 
 export const updateE164PhoneNumberSalts = (
   e164NumberToSalt: E164NumberToSaltType
@@ -381,11 +433,40 @@ export const updateAddressDekMap = (
   dataEncryptionKey,
 })
 
-export const fetchVerificationState = (): FetchVerificationState => ({
+export const fetchVerificationState = (forceUnlockAccount: boolean): FetchVerificationState => ({
   type: Actions.FETCH_VERIFICATION_STATE,
+  forceUnlockAccount,
 })
 
-export const udpateVerificationState = (state: VerificationState): UpdateVerificationState => ({
+export const udpateVerificationState = (
+  state: UpdatableVerificationState
+): UpdateVerificationState => ({
   type: Actions.UPDATE_VERIFICATION_STATE,
   state,
 })
+
+export const resendAttestations = (): ResendAttestations => ({
+  type: Actions.RESEND_ATTESTATIONS,
+})
+
+export const setLastRevealAttempt = (time: number): SetLastRevealAttempt => ({
+  type: Actions.SET_LAST_REVEAL_ATTEMPT,
+  time,
+})
+
+export const reportRevealStatus = (
+  attestationServiceUrl: string,
+  account: string,
+  issuer: string,
+  e164Number: string,
+  pepper: string
+): ReportRevealStatusAction => {
+  return {
+    type: Actions.REPORT_REVEAL_STATUS,
+    attestationServiceUrl,
+    account,
+    issuer,
+    e164Number,
+    pepper,
+  }
+}

@@ -12,6 +12,8 @@ export enum LocalCurrencyCode {
   UGX = 'UGX',
   GHS = 'GHS',
   NGN = 'NGN',
+  BRL = 'BRL',
+  CVE = 'CVE',
 }
 
 export enum LocalCurrencySymbol {
@@ -27,6 +29,8 @@ export enum LocalCurrencySymbol {
   UGX = 'USh',
   GHS = 'GH₵',
   NGN = '₦',
+  BRL = 'R$',
+  CVE = '$',
 }
 
 export const LOCAL_CURRENCY_CODES = Object.values(LocalCurrencyCode)

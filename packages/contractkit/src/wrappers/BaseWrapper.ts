@@ -2,6 +2,7 @@ import { bufferToHex, ensureLeading0x } from '@celo/base/lib/address'
 import { zip } from '@celo/base/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import moment from 'moment'
 import { EventLog, TransactionReceipt, Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 import { Contract, PastEventOptions } from 'web3-eth-contract'
@@ -15,6 +16,12 @@ export interface Filter {
   [key: string]: number | string | string[] | number[]
 }
 
+type Events<T extends Contract> = keyof T['events']
+type Methods<T extends Contract> = keyof T['methods']
+type EventsEnum<T extends Contract> = {
+  [event in Events<T>]: event
+}
+
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
@@ -26,11 +33,28 @@ export abstract class BaseWrapper<T extends Contract> {
   }
 
   /** Contract getPastEvents */
-  public getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
-    return this.contract.getPastEvents(event, options)
+  public getPastEvents(event: Events<T>, options: PastEventOptions): Promise<EventLog[]> {
+    return this.contract.getPastEvents(event as string, options)
   }
 
-  events = this.contract.events
+  events: T['events'] = this.contract.events
+
+  eventTypes = Object.keys(this.events).reduce<EventsEnum<T>>(
+    (acc, key) => ({ ...acc, [key]: key }),
+    {} as any
+  )
+
+  methodIds = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+    (acc, method: Methods<T>) => {
+      const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
+
+      acc[method] =
+        methodABI === undefined ? '0x' : this.kit.web3.eth.abi.encodeFunctionSignature(methodABI)
+
+      return acc
+    },
+    {} as any
+  )
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
@@ -49,6 +73,59 @@ export const valueToInt = (input: BigNumber.Value) =>
 
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
+
+enum TimeDurations {
+  millennium = 31536000000000,
+  century = 3153600000000,
+  decade = 315360000000,
+  year = 31536000000,
+  quarter = 7776000000,
+  month = 2592000000,
+  week = 604800000,
+  day = 86400000,
+  hour = 3600000,
+  minute = 60000,
+  second = 1000,
+  millisecond = 1,
+}
+
+type TimeUnit = keyof typeof TimeDurations
+
+// taken mostly from https://gist.github.com/RienNeVaPlus/024de3431ae95546d60f2acce128a7e2
+export function secondsToDurationString(
+  durationSeconds: BigNumber.Value,
+  outputUnits: TimeUnit[] = ['year', 'month', 'week', 'day', 'hour', 'minute', 'second']
+) {
+  let durationMilliseconds = valueToBigNumber(durationSeconds)
+    .times(TimeDurations.second)
+    .toNumber()
+
+  if (durationMilliseconds <= 0) {
+    return 'past'
+  }
+
+  const durations = outputUnits.reduce((res: Map<TimeUnit, number>, key) => {
+    const unitDuration = TimeDurations[key]
+    const value = Math.floor(durationMilliseconds / unitDuration)
+    durationMilliseconds -= value * unitDuration
+    return res.set(key, value)
+  }, new Map())
+
+  let s = ''
+  durations.forEach((value, unit) => {
+    if (value > 0) {
+      s += s !== '' ? ', ' : ''
+      s += `${value} ${unit}${value > 1 ? 's' : ''}`
+    }
+  })
+  return s
+}
+
+export const blocksToDurationString = (input: BigNumber.Value) =>
+  secondsToDurationString(valueToBigNumber(input).times(5)) // TODO: fetch blocktime
+
+export const unixSecondsTimestampToDateString = (input: BigNumber.Value) =>
+  moment.unix(valueToInt(input)).toString()
 
 // Type of bytes in solidity gets repesented as a string of number array by typechain and web3
 // Hopefull this will improve in the future, at which point we can make improvements here

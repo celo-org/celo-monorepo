@@ -386,6 +386,7 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
                 "paddingVertical": 5,
               }
             }
+            testID="SetUpAccountKey"
           >
             <Text
               style={

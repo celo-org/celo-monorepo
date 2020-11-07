@@ -16,10 +16,8 @@ ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -50,10 +48,8 @@ USAGE
   $ celocli validator:deaffiliate
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -75,17 +71,15 @@ _See code: [packages/cli/src/commands/validator/deaffiliate.ts](https://github.c
 
 ### Deregister
 
-Deregister a Validator. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator will become possible to unlock. Note that deregistering a Validator will also deaffiliate and remove the Validator from any Group it may be an affiliate or member of.
+Deregister a Validator. Approximately 60 days after the validator is no longer part of any group, it will be possible to deregister the validator and start unlocking the CELO. If you wish to deregister your validator, you must first remove it from it's group, such as by deaffiliating it, then wait the required 60 days before running this command.
 
 ```
 USAGE
   $ celocli validator:deregister
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -114,10 +108,8 @@ USAGE
   $ celocli validator:force-deaffiliate
 
 OPTIONS
+  -k, --privateKey=privateKey                             Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
-                                                          'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                       [default: 1] If --useLedger is set, this will get the first N
                                                           addresses for local signing
@@ -149,8 +141,14 @@ USAGE
   $ celocli validator:list
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLE
   list
@@ -167,13 +165,11 @@ USAGE
   $ celocli validator:register
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --blsKey=0x                                        (required) BLS Public Key
   --blsSignature=0x                                  (required) BLS Proof-of-Possession
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -208,10 +204,6 @@ List the Locked Gold requirements for registering a Validator. This consists of 
 USAGE
   $ celocli validator:requirements
 
-OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
 EXAMPLE
   requirements
 ```
@@ -229,10 +221,6 @@ USAGE
 ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
-OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
@@ -249,14 +237,8 @@ USAGE
 
 OPTIONS
   --at-block=at-block                                  latest block to examine for signer activity
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)        Use a specific gas currency for transaction fees (defaults to
-                                                       'auto' which uses whatever feeCurrency is available)
-
   --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
-
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
-
   --width=width                                        [default: 40] line width for printing marks
 
 EXAMPLES
@@ -278,15 +260,25 @@ USAGE
   $ celocli validator:status
 
 OPTIONS
+  -x, --extended                                          show extra columns
   --all                                                   get the status of all registered validators
+  --columns=columns                                       only show provided columns (comma-separated)
+  --csv                                                   output is csv format [alias: --output=csv]
 
   --end=end                                               [default: -1] what block to end at when looking at signer
                                                           activity. defaults to the latest block
 
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)           Use a specific gas currency for transaction fees (defaults to
-                                                          'auto' which uses whatever feeCurrency is available)
+  --filter=filter                                         filter property by partial string matching, ex: name=foo
+
+  --no-header                                             hide table header from output
+
+  --no-truncate                                           do not truncate output to fit screen
+
+  --output=csv|json|yaml                                  output in a more machine friendly format
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     address of the signer to check if elected and validating
+
+  --sort=sort                                             property to sort by (prepend '-' for descending)
 
   --start=start                                           [default: -1] what block to start at when looking at signer
                                                           activity. defaults to the last 100 blocks
@@ -310,12 +302,10 @@ USAGE
   $ celocli validator:update-bls-public-key
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing

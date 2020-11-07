@@ -1,12 +1,12 @@
+import { logger } from '@celo/phone-number-privacy-common'
 import knex from 'knex'
 import Knex from 'knex/types'
-import logger from '../common/logger'
 import config, { DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
-  logger.info('Initializing database connection')
+  logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl } = config.db
 
   let dbConfig: any

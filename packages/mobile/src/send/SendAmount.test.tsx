@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import { ActivityIndicator } from 'react-native'
 import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render, RenderAPI } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
@@ -44,7 +45,7 @@ const mockE164NumberToAddress: E164NumberToAddressType = {
 const mockTransactionData2 = {
   type: mockTransactionData.type,
   recipient: mockTransactionData.recipient,
-  amount: new BigNumber('3.70676691729323309'),
+  amount: new BigNumber('3.706766917293233083'),
   reason: '',
 }
 
@@ -119,6 +120,7 @@ describe('SendAmount', () => {
       fireEvent.press(reviewButton)
       expect(store.getActions()).toEqual([
         {
+          action: null,
           alertType: 'error',
           buttonMessage: null,
           dismissAfter: 5000,
@@ -147,6 +149,7 @@ describe('SendAmount', () => {
       fireEvent.press(sendButton)
       expect(store.getActions()).toEqual([
         {
+          action: null,
           alertType: 'error',
           buttonMessage: null,
           dismissAfter: 5000,
@@ -190,7 +193,7 @@ describe('SendAmount', () => {
       enterAmount(tree, AMOUNT_VALID)
       fireEvent.press(tree.getByTestId('Review'))
 
-      expect(tree.getByTestId('loading/SendAmount')).toBeTruthy()
+      expect(tree.getByType(ActivityIndicator)).toBeTruthy()
 
       store = createMockStore({
         identity: {

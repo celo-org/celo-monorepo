@@ -1,7 +1,7 @@
 import Expandable from '@celo/react-components/components/Expandable'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
@@ -9,8 +9,9 @@ import { useTranslation } from 'react-i18next'
 import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { EncryptionFeeIcon, ExchangeFeeIcon, SecurityFeeIcon } from 'src/components/FeeIcon'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import LineItemRow from 'src/components/LineItemRow'
 import { Namespaces } from 'src/i18n'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 
 interface Props {
   isEstimate?: boolean
@@ -26,6 +27,7 @@ interface Props {
   feeHasError?: boolean
   totalFee?: BigNumber
   testID?: string
+  currencyInfo?: CurrencyInfo
 }
 
 export default function FeeDrawer({
@@ -42,6 +44,7 @@ export default function FeeDrawer({
   feeHasError,
   totalFee,
   testID,
+  currencyInfo,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const [expanded, setExpanded] = useState(false)
@@ -90,7 +93,11 @@ export default function FeeDrawer({
             title={''}
             amount={
               totalFeeAmount && (
-                <CurrencyDisplay amount={totalFeeAmount} formatType={FormatType.Fee} />
+                <CurrencyDisplay
+                  amount={totalFeeAmount}
+                  formatType={FormatType.Fee}
+                  currencyInfo={currencyInfo}
+                />
               )
             }
             isLoading={feeLoading}
@@ -103,7 +110,7 @@ export default function FeeDrawer({
           {isInvite && inviteFeeAmount && (
             <LineItemRow
               title={t('inviteFee')}
-              amount={<CurrencyDisplay amount={inviteFeeAmount} />}
+              amount={<CurrencyDisplay amount={inviteFeeAmount} currencyInfo={currencyInfo} />}
               textStyle={styles.dropDownText}
             />
           )}
@@ -113,7 +120,11 @@ export default function FeeDrawer({
               titleIcon={<ExchangeFeeIcon />}
               amount={
                 exchangeAmount && (
-                  <CurrencyDisplay amount={exchangeAmount} formatType={FormatType.Fee} />
+                  <CurrencyDisplay
+                    amount={exchangeAmount}
+                    formatType={FormatType.Fee}
+                    currencyInfo={currencyInfo}
+                  />
                 )
               }
               textStyle={styles.dropDownText}
@@ -123,7 +134,13 @@ export default function FeeDrawer({
             <LineItemRow
               title={t('encryption.feeLabel')}
               titleIcon={<EncryptionFeeIcon />}
-              amount={<CurrencyDisplay amount={dekFeeAmount} formatType={FormatType.Fee} />}
+              amount={
+                <CurrencyDisplay
+                  amount={dekFeeAmount}
+                  formatType={FormatType.Fee}
+                  currencyInfo={currencyInfo}
+                />
+              }
               textStyle={styles.dropDownText}
             />
           )}
@@ -133,7 +150,11 @@ export default function FeeDrawer({
             titleIcon={<SecurityFeeIcon />}
             amount={
               securityAmount && (
-                <CurrencyDisplay amount={securityAmount} formatType={FormatType.Fee} />
+                <CurrencyDisplay
+                  amount={securityAmount}
+                  formatType={FormatType.Fee}
+                  currencyInfo={currencyInfo}
+                />
               )
             }
             isLoading={feeLoading}

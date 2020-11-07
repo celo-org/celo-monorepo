@@ -1,7 +1,9 @@
 import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
+import chalk from 'chalk'
 import { toBuffer } from 'ethereumjs-util'
+import { writeFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap, printValueMapRecursive } from '../../utils/cli'
@@ -12,6 +14,10 @@ export default class Show extends BaseCommand {
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
     raw: flags.boolean({ required: false, description: 'Display proposal in raw bytes format' }),
+    jsonTransactions: flags.string({
+      required: false,
+      description: 'Output proposal JSON to provided file',
+    }),
     proposalID: flags.string({
       exclusive: ['account', 'hotfix'],
       description: 'UUID of proposal to view',
@@ -64,6 +70,13 @@ export default class Show extends BaseCommand {
         try {
           const jsonproposal = await proposalToJSON(this.kit, record.proposal)
           record.proposal = jsonproposal as any
+
+          if (res.flags.jsonTransactions) {
+            console.log(
+              chalk.yellowBright(`Outputting proposal JSON to ${res.flags.jsonTransactions}`)
+            )
+            writeFileSync(res.flags.jsonTransactions, JSON.stringify(jsonproposal, null, 2))
+          }
         } catch (error) {
           console.warn(`Could not decode proposal, displaying raw data: ${error}`)
         }
@@ -84,7 +97,7 @@ export default class Show extends BaseCommand {
         },
         isApproved: await governance.isApproved(id),
         isProposalPassing: await governance.isProposalPassing(id),
-        secondsUntilStages: await governance.timeUntilStages(id),
+        timeUntilStages: await governance.humanReadableTimeUntilStages(id),
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer
