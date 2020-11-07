@@ -1,5 +1,4 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base'
-import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
 import { ContractKit } from '@celo/contractkit'
 import { generateDeterministicInviteCode } from '@celo/utils/lib/account'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
@@ -15,16 +14,12 @@ export const splitSignature = (contractKit: ContractKit, signature: string) => {
 export const generateEscrowPaymentIdAndPk = (
   recipientPhoneHash: string,
   recipientPepper: string,
-  addressIndex: number = 0,
-  changeIndex: number = 0,
-  derivationPath: string = CELO_DERIVATION_PATH_BASE
+  addressIndex: number = 0
 ) => {
   const { publicKey, privateKey } = generateDeterministicInviteCode(
     recipientPhoneHash,
     recipientPepper,
-    addressIndex,
-    changeIndex,
-    derivationPath
+    addressIndex
   )
   const paymentId = publicKeyToAddress(publicKey)
   return { paymentId, privateKey }

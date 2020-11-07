@@ -3373,7 +3373,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
           }
         }
       >
-        verificationEducation.feelessBody
+        verificationEducation.bodyInsufficientBalance
       </Text>
       <View
         style={
@@ -3598,7 +3598,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                 "paddingVertical": 5,
               }
             }
-            testID="VerificationEducationContinue"
+            testID="VerificationEducationSkip"
           >
             <Text
               style={
@@ -3610,7 +3610,7 @@ exports[`VerificationEducationScreen with KOMENCI enabled shows the \`continue\`
                 }
               }
             >
-              verificationEducation.start
+              verificationEducation.skipForNow
             </Text>
           </View>
         </View>

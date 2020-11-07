@@ -164,6 +164,8 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
       pepper
     )
 
+    console.log('Payment ID: ', paymentId)
+
     if (!paymentId) {
       throw Error('Could not generate a unique paymentId for escrow. Should never happen')
     }
