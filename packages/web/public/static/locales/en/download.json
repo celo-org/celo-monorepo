@@ -1,11 +1,11 @@
 {
-  "coverTitle": "Celo Test Wallet",
-  "coverSubTitle": "Temporarily Not Available",
+  "coverTitle": "Celo Developer Wallet",
+  "coverSubTitle": "An Alfajores Testnet wallet.\nDo not send real funds.",
   "getStarted": "Get Started",
   "coverAction": {
     "faucet": {
-      "title": "Testnet Faucet",
-      "text": "If you already have an account, faucet yourself to get more Celo Dollars.",
+      "title": "Afajores Testnet Faucet",
+      "text": "If you already have a testnet account, faucet yourself to get more Test Celo Dollars",
       "link": "Get Testnet cUSD"
     },
     "payments": {
@@ -21,7 +21,7 @@
   },
   "availableOnAndroid": "Available today for Android",
   "haveAccount": "Already have an Alfajores testnet account?",
-  "useSeed": "Use your seed phrase to import your account into the Celo Test Wallet.",
+  "useSeed": "Use your seed phrase to import your account into the Celo Developer Wallet.",
   "learnMore": "Learn More",
-  "downloadDirect": "Go straight to download\nfor your Android or Apple mobile phone"
+  "downloadDirect": "Get the Celo Developer Wallet"
 }
