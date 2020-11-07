@@ -52,14 +52,14 @@ interface KomenciDatabaseConfig {
   host: string
   port: string
   username: string
-  password: string
+  passwordVaultName: string
 }
 
 /**
  * Env vars corresponding to each value for the KomenciKeyVaultIdentityConfig for a particular context
  */
 const contextKomenciKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof KomenciKeyVaultIdentityConfig]: DynamicEnvVar } = {
-  addressAzureKeyVaults: DynamicEnvVar.KOMENCI_ADDRESS_AZURE_KEY_VAULTS,
+addressAzureKeyVaults: DynamicEnvVar.KOMENCI_ADDRESS_AZURE_KEY_VAULTS,
 }
 
 /**
@@ -74,7 +74,7 @@ const contextDatabaseConfigDynamicEnvVars: { [k in keyof KomenciDatabaseConfig]:
   host: DynamicEnvVar.KOMENCI_DB_HOST,
   port: DynamicEnvVar.KOMENCI_DB_PORT,
   username: DynamicEnvVar.KOMENCI_DB_USERNAME,
-  password: DynamicEnvVar.KOMENCI_DB_PASSWORD
+  passwordVaultName: DynamicEnvVar.KOMENCI_DB_PASSWORD_VAULT_NAME
 }
 
 function releaseName(celoEnv: string) {
@@ -143,13 +143,12 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     context
   )
   const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
-  const clusterConfig = getAKSClusterConfig(context)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
     : getFullNodeHttpRpcInternalUrl(celoEnv)
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
-  const databasePassword = await getPasswordFromKeyVaultSecret(clusterConfig.clusterName, 'DB-PASSWORD')
+  const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
@@ -295,7 +294,7 @@ function getKomenciConfig(context: string): KomenciConfig {
  */
 function getKomenciIdentities(context: string): KomenciIdentity[] {
   const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
-    contextKomenciKeyVaultIdentityConfigDynamicEnvVars,
+  contextKomenciKeyVaultIdentityConfigDynamicEnvVars,
     context,
     {
       addressAzureKeyVaults: '',

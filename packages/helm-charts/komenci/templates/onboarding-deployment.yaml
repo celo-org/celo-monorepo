@@ -15,49 +15,52 @@ spec:
 {{- include "komenci-onboarding-component-label" . | nindent 8 }}
     spec:
       containers:
-        - name: komenci-onboarding
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: {{ .Values.komenci.image.repository }}:{{ .Values.komenci.image.tag }}
-          imagePullPolicy: Always
-          ports:
-            - name: http
-              containerPort: 3000
-          resources:
-            {{- toYaml .Values.onboarding.resources | nindent 12 }}
-          env:
-          - name: DB_PASSWORD	
-            valueFrom:	
-              secretKeyRef:	
-                key: postgresql-password	
-                name: {{ .Release.Name }}-postgresql
-          - name: REPLICA_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: NODE_ENV
-            value: production
-{{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding "value_name" "ruleSignatureEnable") | indent 10 }}
-{{ include "common.env-var" (dict "name" "QUOTA_DISTRIBUTED_BLINDED_PEPPER" "dict" .Values.onboarding.quota "value_name" "distributedBlindePepper") | indent 10 }}
-{{ include "common.env-var" (dict "name" "QUOTA_REQUEST_SUBSIDISED_ATTESTATION" "dict" .Values.onboarding.quota "value_name" "requestSubsidisedAttestation") | indent 10 }}
-{{ include "common.env-var" (dict "name" "QUOTA_SUBMIT_META_TRANSACTION" "dict" .Values.onboarding.quota "value_name" "submitMetaTransaction") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db "value_name" "host" "optional" true) | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db "value_name" "port" "optional" true) | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db "value_name" "username") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_DATABASE" "dict" .Values.onboarding.db "value_name" "database") | indent 10 }}
-{{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.onboarding.db "value_name" "synchronize") | indent 10 }}
-{{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 10 }}
-{{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 10 }}
-{{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
-{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 10 }}
-          volumeMounts:
-          - name: postgres-pass-volume
-            readOnly: true
-            mountPath: "/postgres-secret"
-        volumes:
-          - name: postgres-pass-volume
-            secret:
-              secretName: postgres-secret
+      - name: komenci-onboarding
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: {{ .Values.komenci.image.repository }}:{{ .Values.komenci.image.tag }}
+        imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 3000
+        resources:
+          {{- toYaml .Values.onboarding.resources | nindent 12 }}
+        env:
+        - name: DB_PASSWORD	
+          valueFrom:	
+            secretKeyRef:	
+              key: postgresql-password	
+              name: {{ .Release.Name }}-postgresql
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_ENV
+          value: production
+{{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding "value_name" "ruleSignatureEnable") | indent 8 }}
+{{ include "common.env-var" (dict "name" "QUOTA_DISTRIBUTED_BLINDED_PEPPER" "dict" .Values.onboarding.quota "value_name" "distributedBlindePepper") | indent 8 }}
+{{ include "common.env-var" (dict "name" "QUOTA_REQUEST_SUBSIDISED_ATTESTATION" "dict" .Values.onboarding.quota "value_name" "requestSubsidisedAttestation") | indent 8 }}
+{{ include "common.env-var" (dict "name" "QUOTA_SUBMIT_META_TRANSACTION" "dict" .Values.onboarding.quota "value_name" "submitMetaTransaction") | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.onboarding.db "value_name" "host" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.onboarding.db "value_name" "port" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.onboarding.db "value_name" "username") | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_DATABASE" "dict" .Values.onboarding.db "value_name" "database") | indent 8 }}
+{{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.onboarding.db "value_name" "synchronize") | indent 8 }}
+{{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 8 }}
+{{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 8 }}
+{{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 8 }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 8 }}
+        volumeMounts:
+        - name: postgres-pass-volume
+          readOnly: true
+          mountPath: "/postgres-secret"
+      volumes:
+        - name: postgres-pass-volume
+          secret:
+            secretName: postgres-secret
+        - name: private-key-volume
+          secret:
+            secretName: pkey-secret
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -70,7 +73,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-          volumes:
-        - name: private-key-volume
-          secret:
-            secretName: pkey-secret
