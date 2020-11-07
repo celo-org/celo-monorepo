@@ -24,6 +24,10 @@ export function getFornoUrl(celoEnv: string) {
   return `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
 }
 
-export function getFullNodeRpcInternalUrl(celoEnv: string) {
+export function getFullNodeHttpRpcInternalUrl(celoEnv: string) {
   return `http://${celoEnv}-fullnodes-rpc.${celoEnv}.svc.cluster.local:8545`
+}
+
+export function getFullNodeWebSocketRpcInternalUrl(celoEnv: string) {
+  return `ws://${celoEnv}-fullnodes-rpc.${celoEnv}.svc.cluster.local:8546`
 }

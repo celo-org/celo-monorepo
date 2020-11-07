@@ -1,35 +1,37 @@
-import * as Web3Utils from 'web3-utils'
+import {
+  base64ToHex,
+  extractAttestationCodeFromMessage,
+  getIdentifierPrefix,
+  hashIdentifier as baseHashIdentifier,
+  IdentifierType,
+  isAccountConsideredVerified,
+  messageContainsAttestationCode,
+  sanitizeMessageBase64,
+} from '@celo/base/lib/attestations'
+import { soliditySha3 } from 'web3-utils'
 import { privateKeyToAddress } from './address'
-import { PhoneNumberUtils } from './phoneNumbers'
 import { Signature, SignatureUtils } from './signatureUtils'
 
-// Supported identifer types for attestations
-export enum IdentifierType {
-  PHONE_NUMBER = 0,
-  // In the future, other types like usernames or emails could go here
-}
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export {
+  AttestationsStatus,
+  base64ToHex,
+  extractAttestationCodeFromMessage,
+  getIdentifierPrefix,
+  IdentifierType,
+  isAccountConsideredVerified,
+  messageContainsAttestationCode,
+  sanitizeMessageBase64,
+} from '@celo/base/lib/attestations'
 
-// Each identifer type has a unique prefix to prevent unlikely but possible collisions
-export function getIdentifierPrefix(type: IdentifierType) {
-  switch (type) {
-    case IdentifierType.PHONE_NUMBER:
-      return 'tel://'
-    default:
-      throw new Error('Unsupported Identifier Type')
-  }
-}
-
+const sha3 = (v: string): string | null => soliditySha3({ type: 'string', value: v })
 export function hashIdentifier(identifier: string, type: IdentifierType, salt?: string) {
-  switch (type) {
-    case IdentifierType.PHONE_NUMBER:
-      return PhoneNumberUtils.getPhoneHash(identifier, salt)
-    default:
-      throw new Error('Unsupported Identifier Type')
-  }
+  return baseHashIdentifier(sha3, identifier, type, salt)
 }
 
 export function getAttestationMessageToSignFromIdentifier(identifier: string, account: string) {
-  const messageHash: string = Web3Utils.soliditySha3(
+  const messageHash: string = soliditySha3(
     { type: 'bytes32', value: identifier },
     { type: 'address', value: account }
   )
@@ -47,10 +49,6 @@ export function getAttestationMessageToSignFromPhoneNumber(
   )
 }
 
-export function base64ToHex(base64String: string) {
-  return '0x' + Buffer.from(base64String, 'base64').toString('hex')
-}
-
 export function attestToIdentifier(
   identifier: string,
   account: string,
@@ -65,33 +63,6 @@ export function attestToIdentifier(
   return { v, r, s }
 }
 
-export function sanitizeMessageBase64(base64String: string) {
-  // Replace occurrences of ¿ with _. Unsure why that is happening right now
-  return base64String.replace(/(¿|§)/gi, '_')
-}
-
-const attestationCodeRegex = new RegExp(
-  /(.* |^)(?:celo:\/\/wallet\/v\/)?([a-zA-Z0-9=\+\/_-]{87,88})($| .*)/
-)
-
-export function messageContainsAttestationCode(message: string) {
-  return attestationCodeRegex.test(message)
-}
-
-export function extractAttestationCodeFromMessage(message: string) {
-  const sanitizedMessage = sanitizeMessageBase64(message)
-
-  if (!messageContainsAttestationCode(sanitizedMessage)) {
-    return null
-  }
-
-  const matches = sanitizedMessage.match(attestationCodeRegex)
-  if (!matches || matches.length < 3) {
-    return null
-  }
-  return base64ToHex(matches[2])
-}
-
 export const AttestationUtils = {
   IdentifierType,
   getIdentifierPrefix,
@@ -103,4 +74,5 @@ export const AttestationUtils = {
   sanitizeMessageBase64,
   messageContainsAttestationCode,
   extractAttestationCodeFromMessage,
+  isAccountConsideredVerified,
 }

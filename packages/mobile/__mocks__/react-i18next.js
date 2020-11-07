@@ -8,6 +8,9 @@ const getChildren = (node) =>
   node && node.children ? node.children : node.props && node.props.children
 
 const renderNodes = (reactNodes) => {
+  if (reactNodes === undefined) {
+    return null
+  }
   if (typeof reactNodes === 'string' || React.isValidElement(reactNodes)) {
     return reactNodes
   }
@@ -31,17 +34,28 @@ const renderNodes = (reactNodes) => {
   })
 }
 
-const useMock = [(k) => k, {}]
-useMock.t = (k) => k
+// This is useful to test that correct params were sent to i18n.
+// For example, in the TransferFeedItem tests we are checking that the title of the item matches a cached value.
+// Without this it's impossible to check if the used value is the cached one since it only prints the i18n key.
+const printParamInsteadOfKey = {
+  feedItemSentTitle: 'nameOrNumber',
+}
+const translationFunction = (key, params) => {
+  const paramToPrint = printParamInsteadOfKey[key]
+  return paramToPrint ? params[paramToPrint] || key : key
+}
+
+const useMock = [translationFunction, {}]
+useMock.t = translationFunction
 useMock.i18n = { language: 'en' }
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop
   withTranslation: () => (Component) => (props) => (
-    <Component t={(k) => k} i18n={{ language: 'en' }} {...props} />
+    <Component t={translationFunction} i18n={{ language: 'en' }} {...props} />
   ),
   Trans: ({ children }) => renderNodes(children),
-  Translation: ({ children }) => children((k) => k, { i18n: {} }),
+  Translation: ({ children }) => children(translationFunction, { i18n: {} }),
   useTranslation: () => useMock,
 
   // mock if needed

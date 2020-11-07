@@ -47,6 +47,10 @@ export function getTakerAmount(makerAmount: numberT, exchangeRate: numberT, deci
     return new BigNumber(0)
   }
 
+  if (rateBN.isZero()) {
+    Logger.warn(TAG, 'Exchange rate is 0')
+    return new BigNumber(0)
+  }
   let converted = amountBN.dividedBy(rateBN)
   if (decimals !== undefined) {
     converted = converted.decimalPlaces(decimals, BigNumber.ROUND_DOWN)

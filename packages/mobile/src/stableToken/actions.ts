@@ -44,13 +44,13 @@ export const transferStableToken = ({
   recipientAddress,
   amount,
   comment,
-  txId,
+  context,
 }: TokenTransfer): TransferAction => ({
   type: Actions.TRANSFER,
   recipientAddress,
   amount,
   comment,
-  txId,
+  context,
 })
 
 export const setEducationCompleted = (): SetEducationCompletedAction => ({

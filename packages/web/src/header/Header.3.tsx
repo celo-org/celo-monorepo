@@ -15,7 +15,7 @@ import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
 import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
-import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
+import menu, { CeloLinks, MAIN_MENU, MenuLink, pagePaths } from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
@@ -26,18 +26,13 @@ const CookieConsent = dynamic(
 )
 
 const menuItems = MAIN_MENU
-const DARK_PAGES = new Set([
-  menu.HOME.link,
-  menu.BUILD.link,
-  menu.ALLIANCE_COLLECTIVE.link,
-  menu.DEVELOPERS.link,
-  menu.VALIDATORS_LIST.link,
-  menu.VALIDATORS_LIST__BAKLAVA.link,
-  menu.VALIDATORS_LIST_BAKLAVASTAGING.link,
-  CeloLinks.walletApp,
-])
+const mobileMenu = [menu.HOME, ...MAIN_MENU]
 
-const TRANSLUCENT_PAGES = new Set([menu.ABOUT_US.link, menu.ALLIANCE_COLLECTIVE.link])
+const PATH_TO_ATTRIBUTES: Record<string, MenuLink> = Object.keys(pagePaths).reduce((last, key) => {
+  last[pagePaths[key].link] = pagePaths[key]
+
+  return last
+}, {})
 
 interface OwnProps {
   router: Router
@@ -58,10 +53,6 @@ function scrollOffset() {
   return window.scrollY || document.documentElement.scrollTop
 }
 
-function menuHidePoint() {
-  return Dimensions.get('window').height - HEADER_HEIGHT - 1
-}
-
 export class Header extends React.PureComponent<Props, State> {
   lastScrollOffset: number
 
@@ -77,7 +68,7 @@ export class Header extends React.PureComponent<Props, State> {
 
   handleScroll = throttle(() => {
     const goingUp = this.lastScrollOffset > scrollOffset()
-    const belowFold = scrollOffset() > menuHidePoint()
+    const belowFold = scrollOffset() > this.menuHidePoint()
 
     if (goingUp && belowFold) {
       this.setState({ belowFoldUpScroll: true })
@@ -104,6 +95,14 @@ export class Header extends React.PureComponent<Props, State> {
     }
   }, 200)
 
+  menuHidePoint() {
+    const attributes = this.getAttributes()
+    if (this.props.screen === ScreenSizes.MOBILE && attributes.menuHidePointMobile) {
+      return attributes.menuHidePointMobile
+    }
+    return attributes.menuHidePoint || Dimensions.get('window').height - HEADER_HEIGHT - 1
+  }
+
   componentDidMount() {
     this.lastScrollOffset = scrollOffset()
     window.addEventListener('scroll', this.handleScroll)
@@ -119,15 +118,23 @@ export class Header extends React.PureComponent<Props, State> {
     this.setState({ mobileMenuActive: false })
   }
 
-  isDarkMode = () => {
+  getAttributes = () => {
     return (
-      DARK_PAGES.has(this.props.router.pathname) ||
-      (this.props.router.pathname === menu.ABOUT_US.link && !this.state.belowFoldUpScroll)
+      PATH_TO_ATTRIBUTES[this.props.router.pathname] || {
+        isDark: false,
+        translucent: null,
+        menuHidePoint: null,
+        menuHidePointMobile: null,
+      }
     )
   }
 
+  isDarkMode = () => {
+    return this.getAttributes().isDark || (this.isTranslucent() && !this.state.belowFoldUpScroll)
+  }
+
   isTranslucent = () => {
-    return TRANSLUCENT_PAGES.has(this.props.router.pathname)
+    return this.getAttributes().translucent
   }
 
   getForegroundColor = () => {
@@ -136,7 +143,9 @@ export class Header extends React.PureComponent<Props, State> {
 
   getBackgroundColor = () => {
     if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
-      return this.state.isHovering ? colors.darkTransparent : 'transparent'
+      return this.state.isHovering
+        ? this.getAttributes().translucent.backgroundHover
+        : 'transparent'
     }
     return this.isDarkMode() ? colors.dark : colors.white
   }
@@ -280,7 +289,7 @@ export class Header extends React.PureComponent<Props, State> {
         {this.state.mobileMenuActive && (
           <View style={styles.menuActive}>
             <View style={styles.mobileOpenContainer}>
-              <MobileMenu currentPage={this.props.router.pathname} />
+              <MobileMenu currentPage={this.props.router.pathname} menu={mobileMenu} />
             </View>
           </View>
         )}

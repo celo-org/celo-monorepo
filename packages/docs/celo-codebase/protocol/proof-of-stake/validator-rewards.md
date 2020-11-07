@@ -1,6 +1,6 @@
 # Rewards to Validators and Validator Groups
 
-The protocol aims to incentivize validator uptime performance and penalize past poor behavior in future rewards, while ensuring that payments are economically reasonable in size independent of fluctuations of the price of Celo Gold.
+The protocol aims to incentivize validator uptime performance and penalize past poor behavior in future rewards, while ensuring that payments are economically reasonable in size independent of fluctuations of the price of CELO.
 
 Five factors affect validator and group rewards:
 
@@ -10,7 +10,7 @@ Five factors affect validator and group rewards:
 - The current value of the slashing penalty for the group of which it was a member at the last election
 - The group share for the group of which it was a member at the last election
 
-Epoch rewards to validators and validator groups are denominated in Celo Dollars, since it is anticipated that most of their expenses will be incurred in fiat currencies, allowing organizations to understand their likely return regardless of volatility in the price of Celo Gold. To enable this, the protocol mints new Celo Dollars that correspond to the epoch reward equivalent of Celo Gold which are maintained on chain to preserve the collateralization ratio. Of course, the effect on the target schedule depends on the prevailing exchange rate.
+Epoch rewards to validators and validator groups are denominated in Celo Dollars, since it is anticipated that most of their expenses will be incurred in fiat currencies, allowing organizations to understand their likely return regardless of volatility in the price of CELO. To enable this, the protocol mints new Celo Dollars that correspond to the epoch reward equivalent of CELO which are maintained on chain to preserve the collateralization ratio. Of course, the effect on the target schedule depends on the prevailing exchange rate.
 
 ![](https://storage.googleapis.com/celo-website/docs/validator-rewards.jpg)
 

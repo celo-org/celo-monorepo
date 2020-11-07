@@ -4,8 +4,6 @@ exports[`SendCallToAction renders correctly 1`] = `
 <View
   style={
     Object {
-      "borderBottomColor": "rgba(134, 138, 141, 0.15)",
-      "borderBottomWidth": 1,
       "flexDirection": "row",
       "paddingHorizontal": 20,
       "paddingVertical": 15,
@@ -60,7 +58,7 @@ exports[`SendCallToAction renders correctly 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-SemiBold",
+          "fontFamily": "Inter-Medium",
           "fontSize": 14,
           "lineHeight": 18,
         }
@@ -72,7 +70,7 @@ exports[`SendCallToAction renders correctly 1`] = `
       style={
         Object {
           "color": "#2E3338",
-          "fontFamily": "Hind-Regular",
+          "fontFamily": "Inter-Regular",
           "fontSize": 14,
           "lineHeight": 18,
           "marginVertical": 10,
@@ -100,15 +98,12 @@ exports[`SendCallToAction renders correctly 1`] = `
     >
       <Text
         style={
-          Array [
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            undefined,
-          ]
+          Object {
+            "color": "#1AB775",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 22,
+          }
         }
       >
         cta

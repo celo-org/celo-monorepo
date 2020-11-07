@@ -1,5 +1,67 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`AlertBanner when an action is provided it dispatches the action when pressed 1`] = `
+<View
+  style={
+    Object {
+      "overflow": "hidden",
+    }
+  }
+  testID="infoBanner"
+>
+  <View
+    accessible={true}
+    focusable={true}
+    forwardedRef={[Function]}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#0768AE",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "paddingBottom": 10,
+        "paddingHorizontal": 25,
+        "paddingTop": 10,
+        "transform": Array [
+          Object {
+            "translateY": -500,
+          },
+        ],
+      }
+    }
+    testID="SmartTopAlertTouchable"
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          false,
+          Object {
+            "color": "white",
+            "lineHeight": undefined,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      My message
+    </Text>
+  </View>
+</View>
+`;
+
 exports[`AlertBanner when error message passed in renders error message 1`] = `
 <View
   style={
@@ -23,7 +85,7 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#FD785B",
+        "backgroundColor": "#EA6042",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -36,6 +98,7 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
         ],
       }
     }
+    testID="SmartTopAlertTouchable"
   >
     <View
       style={
@@ -75,7 +138,13 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Medium",
             "fontSize": 14,
             "lineHeight": 18,
           },
@@ -83,9 +152,6 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
             "color": "white",
             "lineHeight": undefined,
             "textAlign": "center",
-          },
-          Object {
-            "fontFamily": "Hind-SemiBold",
           },
         ]
       }
@@ -119,7 +185,7 @@ exports[`AlertBanner when message and title passed in renders title with message
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -132,22 +198,23 @@ exports[`AlertBanner when message and title passed in renders title with message
         ],
       }
     }
+    testID="SmartTopAlertTouchable"
   >
     <Text
       style={
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },
+          false,
           Object {
             "color": "white",
             "lineHeight": undefined,
             "textAlign": "center",
           },
-          false,
         ]
       }
     >
@@ -155,12 +222,15 @@ exports[`AlertBanner when message and title passed in renders title with message
         style={
           Array [
             Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
               "color": "white",
               "lineHeight": undefined,
               "textAlign": "center",
-            },
-            Object {
-              "fontFamily": "Hind-SemiBold",
             },
           ]
         }
@@ -198,7 +268,7 @@ exports[`AlertBanner when message passed in renders message 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -211,22 +281,23 @@ exports[`AlertBanner when message passed in renders message 1`] = `
         ],
       }
     }
+    testID="SmartTopAlertTouchable"
   >
     <Text
       style={
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },
+          false,
           Object {
             "color": "white",
             "lineHeight": undefined,
             "textAlign": "center",
           },
-          false,
         ]
       }
     >

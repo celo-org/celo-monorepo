@@ -4,7 +4,7 @@ const serverEnvConfig = require('./server-env-config')
 
 module.exports = withImages({
   experimental: {
-    granularChunks: true,
+    modern: false,
   },
   publicRuntimeConfig: envConfig,
   serverRuntimeConfig: serverEnvConfig,
@@ -22,6 +22,18 @@ module.exports = withImages({
     if (!isServer) {
       config.resolve.alias['@sentry/node'] = '@sentry/browser'
     }
+
+    config.module.rules.push({
+      test: /\.md$/,
+      use: [
+        {
+          loader: 'raw-loader',
+          options: {
+            esModule: false,
+          },
+        },
+      ],
+    })
 
     config.module.rules.push({
       loader: 'ignore-loader',

@@ -1,69 +1,54 @@
-import SummaryNotification from '@celo/react-components/components/SummaryNotification'
-import fontStyles from '@celo/react-components/styles/fonts'
+import AggregatedRequestsMessagingCard from '@celo/react-components/components/AggregatedRequestsMessagingCard'
 import * as React from 'react'
-import i18n from 'src/i18n'
+import { Trans, useTranslation } from 'react-i18next'
+import { Namespaces } from 'src/i18n'
 
-import { StyleSheet, Text, View } from 'react-native'
-
-interface OwnProps<T> {
+interface Props<T> {
   title: string
-  icon: JSX.Element
+  detailsI18nKey: string
+  icon: React.ReactNode
   onReview: () => void
-  itemRenderer: (item: T, key: number) => JSX.Element
+  itemRenderer: (item: T, key: number) => React.ReactNode
   items: T[]
 }
 
-type Props<T> = OwnProps<T>
-
+// If changing this, you probably also need to update the translation files
+// which use it via detailsI18nKey
 const PREVIEW_SIZE = 2
 
-function getAdditionalItemsCount<T>(items: T[]) {
-  const total = items.length
-  if (total - PREVIEW_SIZE > 0) {
-    return (
-      <View>
-        <Text style={styles.moreWithCountText}>
-          {i18n.t('global:moreWithCount', { count: total - PREVIEW_SIZE + 1 })}
-        </Text>
-      </View>
-    )
+function getContext(count: number) {
+  if (count === 2) {
+    return 'exactly2Items'
   }
+  if (count === 3) {
+    return 'exactly3Items'
+  }
+
+  return 'moreThan3Items'
 }
 
-// Payment Request notification for the notification center on home screen
-function PaymentsSummaryNotification<T>(props: Props<T>) {
-  const { items, title, icon, onReview, itemRenderer } = props
+// Summary notification for the notification center on home screen
+export default function SummaryNotification<T>(props: Props<T>) {
+  const { t } = useTranslation(Namespaces.walletFlow5)
+  const { items, title, detailsI18nKey, icon, onReview, itemRenderer } = props
 
   return (
-    <SummaryNotification
+    <AggregatedRequestsMessagingCard
       title={title}
+      details={
+        <Trans
+          i18nKey={detailsI18nKey}
+          tOptions={{ context: getContext(items.length) }}
+          components={items.slice(0, PREVIEW_SIZE).map(itemRenderer)}
+        />
+      }
       icon={icon}
-      reviewCTA={{
-        text: i18n.t('walletFlow5:review'),
-        onPress: onReview,
-      }}
-    >
-      <View style={styles.body}>
-        <View style={styles.items}>
-          {items
-            .slice(0, props.items.length > PREVIEW_SIZE ? PREVIEW_SIZE - 1 : PREVIEW_SIZE)
-            .map(itemRenderer)}
-          {getAdditionalItemsCount(items)}
-        </View>
-      </View>
-    </SummaryNotification>
+      callToActions={[
+        {
+          text: t('viewAll'),
+          onPress: onReview,
+        },
+      ]}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  body: {
-    marginTop: 5,
-    flexDirection: 'row',
-  },
-  items: {
-    flex: 1,
-  },
-  moreWithCountText: fontStyles.subSmall,
-})
-
-export default PaymentsSummaryNotification

@@ -3,6 +3,11 @@ declare module '*.json' {
   export default value
 }
 
+declare module '*.md' {
+  const value: string
+  export default value
+}
+
 declare module '*.png' {
   const value: any
   export default value
@@ -14,6 +19,11 @@ declare module '*.jpg' {
 }
 
 declare module '*.gif' {
+  const value: any
+  export default value
+}
+
+declare module '*.webp' {
   const value: any
   export default value
 }

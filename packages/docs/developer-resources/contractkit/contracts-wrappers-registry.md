@@ -1,8 +1,8 @@
 # Examples
 
-## Interacting with cGLD & cUSD
+## Interacting with CELO & cUSD
 
-celo-blockchain has two initial coins: cGLD and cUSD (stableToken).
+celo-blockchain has two initial coins: CELO and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts

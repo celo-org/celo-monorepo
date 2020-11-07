@@ -1,32 +1,47 @@
-import { fireEvent, render, waitForDomChange } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import * as React from 'react'
 import SignupForm from 'src/alliance/SignupForm'
+
+import { TestProvider } from 'src/_page-tests/test-utils'
+
 describe('When Submitting', () => {
   describe('when not filled out', () => {
     it('shows errors', async () => {
-      const { getByText } = render(<SignupForm />)
+      const { getByText } = render(
+        <TestProvider>
+          <SignupForm />
+        </TestProvider>
+      )
 
-      fireEvent.click(getByText('form.btn'))
-      expect(getByText('common:applicationSubmitted')).not.toBeVisible()
-      expect(getByText('common:validationErrors.email')).toBeVisible()
-      expect(getByText('common:validationErrors.generic')).toBeVisible()
+      fireEvent.click(getByText('Apply'))
+      expect(getByText('Application Submitted')).not.toBeVisible()
+      expect(getByText('Please enter a valid email')).toBeVisible()
+      expect(getByText('Oops I’m blank!')).toBeVisible()
     })
     it('does not show any unknown Errors', () => {
-      const { queryByText } = render(<SignupForm />)
-      expect(queryByText('common:validationErrors.unknownError')).not.toBeInTheDocument()
+      const { queryByText } = render(
+        <TestProvider>
+          <SignupForm />
+        </TestProvider>
+      )
+      expect(queryByText('Something went wrong')).not.toBeInTheDocument()
     })
   })
   describe('when filled out', () => {
     it('displays success message', async () => {
-      const { getByLabelText, getByText } = render(<SignupForm />)
+      const { getByLabelText, getByText } = render(
+        <TestProvider>
+          <SignupForm />
+        </TestProvider>
+      )
 
-      fireEvent.change(getByLabelText('form.email'), { target: { value: 'hello@example.com' } })
-      fireEvent.change(getByLabelText('form.name'), { target: { value: 'Human' } })
-      fireEvent.click(getByText('form.btn'))
-      await waitForDomChange()
-      expect(getByText('common:applicationSubmitted')).toBeVisible()
-      expect(getByText('common:validationErrors.email')).not.toBeVisible()
-      expect(getByText('common:validationErrors.generic')).not.toBeVisible()
+      fireEvent.change(getByLabelText('Email'), { target: { value: 'hello@example.com' } })
+      fireEvent.change(getByLabelText('Name'), { target: { value: 'Human' } })
+      fireEvent.click(getByText('Apply'))
+      await waitFor(() => true)
+      expect(getByText('Application Submitted')).toBeVisible()
+      expect(getByText('Please enter a valid email')).not.toBeVisible()
+      expect(getByText('Oops I’m blank!')).not.toBeVisible()
     })
   })
 })

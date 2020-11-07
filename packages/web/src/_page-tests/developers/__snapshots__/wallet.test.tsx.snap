@@ -43,6 +43,7 @@ Array [
             "msFlexDirection": "column",
             "msFlexItemAlign": "center",
             "msFlexPack": "center",
+            "msGridRowAlign": "center",
             "paddingLeft": "10px",
             "paddingRight": "10px",
             "width": "100%",
@@ -148,6 +149,7 @@ Array [
               aria-level="1"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -161,12 +163,13 @@ Array [
                 }
               }
             >
-              Celo Test Wallet
+              Celo Developer Wallet
             </h1>
             <h4
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -179,427 +182,278 @@ Array [
                 }
               }
             >
-              Available for Android and iOS.
-Units in this wallet have no real value.
+              An Alfajores Testnet wallet.
+Do not send real funds.
             </h4>
             <div
               className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "marginBottom": "20px",
-                  "marginTop": "20px",
-                }
-              }
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
             >
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(221,221,221,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "14px",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                
-              </div>
-              <div
-                className="css-text-901oao"
-                dir="auto"
-                style={
-                  Object {
-                    "color": "rgba(255,255,255,1.00)",
-                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "16px",
-                    "fontWeight": "500",
-                    "lineHeight": "18px",
-                    "marginTop": "20px",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-              >
-                Choose Mobile OS
-              </div>
               <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {
                     "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
                     "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
                     "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
                     "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
                     "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
                   }
                 }
               >
-                <div
-                  className="css-view-1dbjc4n"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
-                  onKeyDown={[Function]}
-                  onKeyUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderMove={[Function]}
-                  onResponderRelease={[Function]}
-                  onResponderTerminate={[Function]}
-                  onResponderTerminationRequest={[Function]}
-                  onStartShouldSetResponder={[Function]}
+                  dir="auto"
+                  href="https://play.google.com/apps/testing/org.celo.mobile.alfajores"
+                  onClick={[Function]}
+                  role="link"
                   style={
                     Object {
-                      "MozTransitionProperty": "opacity",
-                      "MozUserSelect": "none",
-                      "WebkitTransitionDuration": "0.15s",
-                      "WebkitTransitionProperty": "opacity",
-                      "WebkitUserSelect": "none",
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
                       "cursor": "pointer",
-                      "msTouchAction": "manipulation",
-                      "msUserSelect": "none",
-                      "touchAction": "manipulation",
-                      "transitionDuration": "0.15s",
-                      "transitionProperty": "opacity",
-                      "userSelect": "none",
+                      "display": "inline-flex",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "20px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "marginTop": "30px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
-                  tabIndex="0"
                 >
                   <div
                     className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "WebkitAlignContent": "center",
-                        "WebkitAlignItems": "center",
-                        "WebkitBoxAlign": "center",
-                        "WebkitBoxDirection": "normal",
-                        "WebkitBoxOrient": "horizontal",
-                        "WebkitFlexDirection": "row",
-                        "alignContent": "center",
-                        "alignItems": "center",
-                        "flexDirection": "row",
-                        "marginBottom": "10px",
-                        "marginTop": "10px",
-                        "msFlexAlign": "center",
-                        "msFlexDirection": "row",
-                        "msFlexLinePack": "center",
+                        "display": "inline-flex",
+                        "paddingRight": "8px",
                       }
                     }
                   >
                     <svg
                       fill="none"
-                      height="24"
+                      height={18}
                       style={Object {}}
-                      viewBox="0 0 24 24"
-                      width="24"
+                      viewBox="0 0 19 22"
+                      width={18}
                     >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="11.5"
-                        stroke="#DDDDDD"
+                      <g
+                        clipPath="url(#clip0)"
+                        style={Object {}}
+                      >
+                        <path
+                          d="M1.75602 7.33545C1.03284 7.33545 0.457397 7.91089 0.457397 8.63406V14.0433C0.457397 14.7665 1.03284 15.3419 1.75602 15.3419C2.47919 15.3419 3.05463 14.7665 3.05463 14.0433V8.63406C3.05463 7.91089 2.47919 7.33545 1.75602 7.33545ZM16.9019 7.33545C16.1787 7.33545 15.6033 7.91089 15.6033 8.63406V14.0433C15.6033 14.7665 16.1787 15.3419 16.9019 15.3419C17.6251 15.3419 18.2005 14.7665 18.2005 14.0433V8.63406C18.2005 7.91089 17.6251 7.33545 16.9019 7.33545Z"
+                          fill="#35D07F"
+                          style={Object {}}
+                        />
+                        <path
+                          d="M7.16532 13.5083C6.44214 13.5083 5.8667 14.0837 5.8667 14.8069V20.2162C5.8667 20.9393 6.44214 21.5148 7.16532 21.5148C7.88849 21.5148 8.46393 20.9393 8.46393 20.2162V14.8069C8.46393 14.0837 7.88849 13.5083 7.16532 13.5083ZM11.4927 13.5083C10.7695 13.5083 10.1941 14.0837 10.1941 14.8069V20.2162C10.1941 20.9393 10.7695 21.5148 11.4927 21.5148C12.2159 21.5148 12.7913 20.9393 12.7913 20.2162V14.8069C12.7913 14.0837 12.2159 13.5083 11.4927 13.5083Z"
+                          fill="#35D07F"
+                          style={Object {}}
+                        />
+                        <path
+                          clipRule="evenodd"
+                          d="M5.64586 0.543893C5.67406 0.528263 5.70266 0.520342 5.73336 0.520029C5.79908 0.519398 5.86137 0.55223 5.89643 0.615486L6.82317 2.28599C7.58127 1.94972 8.4316 1.76098 9.32892 1.76098C10.2262 1.76098 11.0766 1.94972 11.8347 2.28599L12.7614 0.615486C12.7965 0.55223 12.8588 0.519394 12.9245 0.520029C12.9552 0.520321 12.9838 0.528263 13.012 0.543893C13.1046 0.595223 13.135 0.701633 13.0836 0.794469L12.1688 2.44707C13.9288 3.36287 15.1176 5.10324 15.12 7.10062H3.53784C3.54022 5.10324 4.72903 3.36287 6.48906 2.44707L5.57427 0.794469C5.52281 0.701633 5.55326 0.595223 5.64586 0.543893ZM3.53784 15.9523V7.55802H15.12V15.9523C15.12 16.7279 14.4956 17.3523 13.72 17.3523H4.93788C4.16226 17.3523 3.53784 16.7279 3.53784 15.9523ZM6.17285 4.49743C6.17285 4.23303 6.3917 4.01417 6.6561 4.01417C6.9205 4.01417 7.13935 4.23303 7.13935 4.49743C7.13935 4.76183 6.9205 4.98069 6.6561 4.98069C6.3917 4.98069 6.17285 4.76183 6.17285 4.49743ZM11.5185 4.49743C11.5185 4.23303 11.7373 4.01417 12.0017 4.01417C12.2661 4.01417 12.485 4.23303 12.485 4.49743C12.485 4.76183 12.2661 4.98069 12.0017 4.98069C11.7373 4.98069 11.5185 4.76183 11.5185 4.49743Z"
+                          fill="#35D07F"
+                          fillRule="evenodd"
+                          style={Object {}}
+                        />
+                      </g>
+                      <defs
+                        style={Object {}}
+                      >
+                        <clipPath
+                          id="clip0"
+                          style={Object {}}
+                        >
+                          <rect
+                            fill="white"
+                            height="22"
+                            style={Object {}}
+                            width="18.711"
+                          />
+                        </clipPath>
+                      </defs>
+                    </svg>
+                  </div>
+                  Android
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height="0.75em"
+                      style={Object {}}
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
                         style={Object {}}
                       />
                     </svg>
-                    <div
-                      className="css-view-1dbjc4n"
-                      style={
-                        Object {
-                          "WebkitBoxPack": "center",
-                          "WebkitJustifyContent": "center",
-                          "justifyContent": "center",
-                          "msFlexPack": "center",
-                          "paddingLeft": "10px",
-                          "paddingRight": "10px",
-                        }
-                      }
-                    >
-                      <svg
-                        fill="none"
-                        height={18}
-                        style={Object {}}
-                        viewBox="0 0 19 22"
-                        width={18}
-                      >
-                        <g
-                          clipPath="url(#clip0)"
-                          style={Object {}}
-                        >
-                          <path
-                            d="M1.75602 7.33545C1.03284 7.33545 0.457397 7.91089 0.457397 8.63406V14.0433C0.457397 14.7665 1.03284 15.3419 1.75602 15.3419C2.47919 15.3419 3.05463 14.7665 3.05463 14.0433V8.63406C3.05463 7.91089 2.47919 7.33545 1.75602 7.33545ZM16.9019 7.33545C16.1787 7.33545 15.6033 7.91089 15.6033 8.63406V14.0433C15.6033 14.7665 16.1787 15.3419 16.9019 15.3419C17.6251 15.3419 18.2005 14.7665 18.2005 14.0433V8.63406C18.2005 7.91089 17.6251 7.33545 16.9019 7.33545Z"
-                            fill="#838486"
-                            style={Object {}}
-                          />
-                          <path
-                            d="M7.16532 13.5083C6.44214 13.5083 5.8667 14.0837 5.8667 14.8069V20.2162C5.8667 20.9393 6.44214 21.5148 7.16532 21.5148C7.88849 21.5148 8.46393 20.9393 8.46393 20.2162V14.8069C8.46393 14.0837 7.88849 13.5083 7.16532 13.5083ZM11.4927 13.5083C10.7695 13.5083 10.1941 14.0837 10.1941 14.8069V20.2162C10.1941 20.9393 10.7695 21.5148 11.4927 21.5148C12.2159 21.5148 12.7913 20.9393 12.7913 20.2162V14.8069C12.7913 14.0837 12.2159 13.5083 11.4927 13.5083Z"
-                            fill="#838486"
-                            style={Object {}}
-                          />
-                          <path
-                            clipRule="evenodd"
-                            d="M5.64586 0.543893C5.67406 0.528263 5.70266 0.520342 5.73336 0.520029C5.79908 0.519398 5.86137 0.55223 5.89643 0.615486L6.82317 2.28599C7.58127 1.94972 8.4316 1.76098 9.32892 1.76098C10.2262 1.76098 11.0766 1.94972 11.8347 2.28599L12.7614 0.615486C12.7965 0.55223 12.8588 0.519394 12.9245 0.520029C12.9552 0.520321 12.9838 0.528263 13.012 0.543893C13.1046 0.595223 13.135 0.701633 13.0836 0.794469L12.1688 2.44707C13.9288 3.36287 15.1176 5.10324 15.12 7.10062H3.53784C3.54022 5.10324 4.72903 3.36287 6.48906 2.44707L5.57427 0.794469C5.52281 0.701633 5.55326 0.595223 5.64586 0.543893ZM3.53784 15.9523V7.55802H15.12V15.9523C15.12 16.7279 14.4956 17.3523 13.72 17.3523H4.93788C4.16226 17.3523 3.53784 16.7279 3.53784 15.9523ZM6.17285 4.49743C6.17285 4.23303 6.3917 4.01417 6.6561 4.01417C6.9205 4.01417 7.13935 4.23303 7.13935 4.49743C7.13935 4.76183 6.9205 4.98069 6.6561 4.98069C6.3917 4.98069 6.17285 4.76183 6.17285 4.49743ZM11.5185 4.49743C11.5185 4.23303 11.7373 4.01417 12.0017 4.01417C12.2661 4.01417 12.485 4.23303 12.485 4.49743C12.485 4.76183 12.2661 4.98069 12.0017 4.98069C11.7373 4.98069 11.5185 4.76183 11.5185 4.49743Z"
-                            fill="#838486"
-                            fillRule="evenodd"
-                            style={Object {}}
-                          />
-                        </g>
-                        <defs
-                          style={Object {}}
-                        >
-                          <clipPath
-                            id="clip0"
-                            style={Object {}}
-                          >
-                            <rect
-                              fill="white"
-                              height="22"
-                              style={Object {}}
-                              width="18.711"
-                            />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                    </div>
-                    <label
-                      className="css-text-901oao"
-                      dir="auto"
-                      style={
-                        Object {
-                          "color": "rgba(131,132,134,1.00)",
-                          "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                          "fontSize": "20px",
-                          "lineHeight": "28px",
-                          "textRendering": "geometricPrecision",
-                        }
-                      }
-                    >
-                      Android
-                    </label>
                   </div>
-                </div>
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "marginLeft": "20px",
-                    }
-                  }
-                >
-                  <div
-                    className="css-view-1dbjc4n"
-                    data-focusable={true}
-                    onKeyDown={[Function]}
-                    onKeyUp={[Function]}
-                    onResponderGrant={[Function]}
-                    onResponderMove={[Function]}
-                    onResponderRelease={[Function]}
-                    onResponderTerminate={[Function]}
-                    onResponderTerminationRequest={[Function]}
-                    onStartShouldSetResponder={[Function]}
-                    style={
-                      Object {
-                        "MozTransitionProperty": "opacity",
-                        "MozUserSelect": "none",
-                        "WebkitTransitionDuration": "0.15s",
-                        "WebkitTransitionProperty": "opacity",
-                        "WebkitUserSelect": "none",
-                        "cursor": "pointer",
-                        "msTouchAction": "manipulation",
-                        "msUserSelect": "none",
-                        "touchAction": "manipulation",
-                        "transitionDuration": "0.15s",
-                        "transitionProperty": "opacity",
-                        "userSelect": "none",
-                      }
-                    }
-                    tabIndex="0"
-                  >
-                    <div
-                      className="css-view-1dbjc4n"
-                      style={
-                        Object {
-                          "WebkitAlignContent": "center",
-                          "WebkitAlignItems": "center",
-                          "WebkitBoxAlign": "center",
-                          "WebkitBoxDirection": "normal",
-                          "WebkitBoxOrient": "horizontal",
-                          "WebkitFlexDirection": "row",
-                          "alignContent": "center",
-                          "alignItems": "center",
-                          "flexDirection": "row",
-                          "marginBottom": "10px",
-                          "marginTop": "10px",
-                          "msFlexAlign": "center",
-                          "msFlexDirection": "row",
-                          "msFlexLinePack": "center",
-                        }
-                      }
-                    >
-                      <svg
-                        fill="none"
-                        height="24"
-                        style={Object {}}
-                        viewBox="0 0 24 24"
-                        width="24"
-                      >
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="11.5"
-                          stroke="#DDDDDD"
-                          style={Object {}}
-                        />
-                      </svg>
-                      <div
-                        className="css-view-1dbjc4n"
-                        style={
-                          Object {
-                            "WebkitBoxPack": "center",
-                            "WebkitJustifyContent": "center",
-                            "justifyContent": "center",
-                            "msFlexPack": "center",
-                            "paddingLeft": "10px",
-                            "paddingRight": "10px",
-                          }
-                        }
-                      >
-                        <svg
-                          fill="none"
-                          height={18}
-                          style={Object {}}
-                          viewBox="0 0 17 20"
-                          width={18}
-                        >
-                          <path
-                            d="M13.7637 10.6399C13.7368 8.11249 15.8572 6.88412 15.9556 6.82226C14.7567 5.09018 12.8958 4.86041 12.2427 4.84274C10.6771 4.68367 9.16508 5.7618 8.36882 5.7618C7.55468 5.7618 6.32898 4.85158 5.01382 4.87809C3.31395 4.9046 1.72145 5.87669 0.853619 7.38784C-0.944662 10.4632 0.397339 14.9878 2.12405 17.471C2.98293 18.6906 3.9939 20.0515 5.30906 19.9985C6.59738 19.9454 7.0805 19.1854 8.63722 19.1854C10.1761 19.1854 10.6323 19.9985 11.9743 19.972C13.3611 19.9454 14.2289 18.7524 15.0609 17.5152C16.054 16.119 16.4566 14.7404 16.4745 14.6697C16.4477 14.6697 13.7905 13.6711 13.7637 10.6399Z"
-                            fill="#838486"
-                            style={Object {}}
-                          />
-                          <path
-                            d="M11.2229 3.20789C11.9207 2.35068 12.3949 1.18418 12.2607 0C11.2587 0.0441858 9.9972 0.689299 9.27252 1.52883C8.62836 2.27115 8.06472 3.48184 8.20787 4.62184C9.33515 4.69253 10.4982 4.04742 11.2229 3.20789Z"
-                            fill="#838486"
-                            style={Object {}}
-                          />
-                        </svg>
-                      </div>
-                      <label
-                        className="css-text-901oao"
-                        dir="auto"
-                        style={
-                          Object {
-                            "color": "rgba(131,132,134,1.00)",
-                            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                            "fontSize": "20px",
-                            "lineHeight": "28px",
-                            "textRendering": "geometricPrecision",
-                          }
-                        }
-                      >
-                        iOS
-                      </label>
-                    </div>
-                  </div>
-                </div>
+                </a>
               </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+            >
               <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "height": "80px",
-                    "marginBottom": "20px",
-                    "marginTop": "20px",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "backgroundColor": "rgba(0,0,0,0.00)",
+                    "borderBottomColor": "rgba(0,0,0,0.00)",
+                    "borderLeftColor": "rgba(0,0,0,0.00)",
+                    "borderRightColor": "rgba(0,0,0,0.00)",
+                    "borderTopColor": "rgba(0,0,0,0.00)",
+                    "flexDirection": "row",
+                    "flexGrow": 0,
+                    "justifyContent": "center",
+                    "msFlexDirection": "row",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "outlineColor": "transparent",
+                    "width": "fit-content",
                   }
                 }
               >
-                <div />
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-              >
-                <div
-                  className="css-view-1dbjc4n"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="https://testflight.apple.com/join/s212x3Rp"
                   onClick={[Function]}
-                  onMouseDown={[Function]}
-                  onMouseEnter={[Function]}
-                  onMouseLeave={[Function]}
-                  onMouseUp={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderRelease={[Function]}
+                  role="link"
                   style={
                     Object {
-                      "WebkitAlignItems": "flex-start",
-                      "WebkitBoxAlign": "start",
-                      "alignItems": "flex-start",
-                      "msFlexAlign": "start",
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "alignItems": "center",
+                      "color": "rgba(53,208,127,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "20px",
+                      "fontWeight": "500",
+                      "lineHeight": "16px",
+                      "marginTop": "30px",
+                      "msFlexAlign": "center",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
                     }
                   }
-                >
-                  <a
-                    className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                    data-focusable={true}
-                    dir="auto"
-                    role="link"
-                    style={
-                      Object {
-                        "WebkitAlignItems": "center",
-                        "WebkitBoxAlign": "center",
-                        "WebkitBoxFlex": 0,
-                        "WebkitBoxPack": "center",
-                        "WebkitFlexGrow": 0,
-                        "WebkitJustifyContent": "center",
-                        "alignItems": "center",
-                        "backgroundColor": "rgba(69,214,138,0.70)",
-                        "borderBottomColor": "rgba(69,214,138,0.70)",
-                        "borderBottomLeftRadius": "3px",
-                        "borderBottomRightRadius": "3px",
-                        "borderBottomWidth": "1px",
-                        "borderLeftColor": "rgba(69,214,138,0.70)",
-                        "borderLeftWidth": "1px",
-                        "borderRightColor": "rgba(69,214,138,0.70)",
-                        "borderRightWidth": "1px",
-                        "borderTopColor": "rgba(69,214,138,0.70)",
-                        "borderTopLeftRadius": "3px",
-                        "borderTopRightRadius": "3px",
-                        "borderTopWidth": "1px",
-                        "color": "rgba(46,51,56,1.00)",
-                        "cursor": "not-allowed",
-                        "display": "inline-flex",
-                        "flexGrow": 0,
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "20px",
-                        "fontWeight": "500",
-                        "justifyContent": "center",
-                        "lineHeight": "16px",
-                        "minWidth": "200px",
-                        "msFlexAlign": "center",
-                        "msFlexPack": "center",
-                        "msFlexPositive": 0,
-                        "opacity": 1,
-                        "paddingBottom": "20px",
-                        "paddingLeft": "30px",
-                        "paddingRight": "30px",
-                        "paddingTop": "20px",
-                        "textAlign": "center",
-                        "textRendering": "geometricPrecision",
-                        "width": "fit-content",
-                      }
-                    }
-                  >
-                    Get Started
-                  </a>
-                </div>
-                <div
-                  className="css-view-1dbjc4n"
                 >
                   <div
                     className="css-view-1dbjc4n"
                     style={
                       Object {
-                        "marginTop": "10px",
-                        "position": "absolute",
-                        "width": "100%",
+                        "display": "inline-flex",
+                        "paddingRight": "8px",
                       }
                     }
-                  />
-                </div>
+                  >
+                    <svg
+                      fill="none"
+                      height={18}
+                      style={Object {}}
+                      viewBox="0 0 17 20"
+                      width={18}
+                    >
+                      <path
+                        d="M13.7637 10.6399C13.7368 8.11249 15.8572 6.88412 15.9556 6.82226C14.7567 5.09018 12.8958 4.86041 12.2427 4.84274C10.6771 4.68367 9.16508 5.7618 8.36882 5.7618C7.55468 5.7618 6.32898 4.85158 5.01382 4.87809C3.31395 4.9046 1.72145 5.87669 0.853619 7.38784C-0.944662 10.4632 0.397339 14.9878 2.12405 17.471C2.98293 18.6906 3.9939 20.0515 5.30906 19.9985C6.59738 19.9454 7.0805 19.1854 8.63722 19.1854C10.1761 19.1854 10.6323 19.9985 11.9743 19.972C13.3611 19.9454 14.2289 18.7524 15.0609 17.5152C16.054 16.119 16.4566 14.7404 16.4745 14.6697C16.4477 14.6697 13.7905 13.6711 13.7637 10.6399Z"
+                        fill="#35D07F"
+                        style={Object {}}
+                      />
+                      <path
+                        d="M11.2229 3.20789C11.9207 2.35068 12.3949 1.18418 12.2607 0C11.2587 0.0441858 9.9972 0.689299 9.27252 1.52883C8.62836 2.27115 8.06472 3.48184 8.20787 4.62184C9.33515 4.69253 10.4982 4.04742 11.2229 3.20789Z"
+                        fill="#35D07F"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                  iOS
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "display": "inline-flex",
+                        "paddingLeft": "0.4em",
+                        "paddingTop": "0.185em",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height="0.75em"
+                      style={Object {}}
+                      transform="rotate(0)"
+                      viewBox="0 0 8 12"
+                      width="0.75em"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                        fill="#35D07F"
+                        fillRule="evenodd"
+                        opacity={1}
+                        style={Object {}}
+                      />
+                    </svg>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
@@ -805,6 +659,7 @@ Units in this wallet have no real value.
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -916,6 +771,7 @@ Units in this wallet have no real value.
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -930,11 +786,12 @@ Units in this wallet have no real value.
                 }
               }
             >
-              Testnet Faucet
+              Afajores Testnet Faucet
             </h3>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(221,221,221,1.00)",
@@ -946,7 +803,7 @@ Units in this wallet have no real value.
                 }
               }
             >
-              If you already have an account, faucet yourself to get more Celo Dollars.
+              If you already have a testnet account, faucet yourself to get more Test Celo Dollars
             </div>
           </div>
           <div
@@ -956,8 +813,6 @@ Units in this wallet have no real value.
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -993,7 +848,6 @@ Units in this wallet have no real value.
                 dir="auto"
                 href="/developers/faucet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1114,6 +968,7 @@ Units in this wallet have no real value.
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1133,6 +988,7 @@ Units in this wallet have no real value.
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(221,221,221,1.00)",
@@ -1216,6 +1072,7 @@ Units in this wallet have no real value.
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1230,11 +1087,12 @@ Units in this wallet have no real value.
                 }
               }
             >
-              Exchange cUSD and cGLD
+              Exchange cUSD and CELO
             </h3>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(221,221,221,1.00)",
@@ -1246,7 +1104,7 @@ Units in this wallet have no real value.
                 }
               }
             >
-              Check the exchange rate and swap between Celo’s stable coin (cUSD) and variable value token (cGLD) as you see fit.
+              Check the exchange rate and swap between Celo’s stable coin (cUSD) and variable value token (CELO) as you see fit.
             </div>
           </div>
         </div>
@@ -1271,6 +1129,7 @@ Units in this wallet have no real value.
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1297,12 +1156,7 @@ Units in this wallet have no real value.
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -1311,6 +1165,7 @@ Units in this wallet have no real value.
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1324,8 +1179,7 @@ Units in this wallet have no real value.
                 }
               }
             >
-              Go straight to download
-for your Android or Apple mobile phone
+              Get the Celo Developer Wallet
             </h2>
           </div>
         </div>
@@ -1344,6 +1198,7 @@ for your Android or Apple mobile phone
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1388,26 +1243,21 @@ for your Android or Apple mobile phone
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -1415,7 +1265,7 @@ for your Android or Apple mobile phone
           tabIndex="0"
         >
           <a
-            href="https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores"
+            href="https://play.google.com/apps/testing/org.celo.mobile.alfajores"
           >
             <div
               className="css-view-1dbjc4n"
@@ -1467,26 +1317,21 @@ for your Android or Apple mobile phone
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -1494,7 +1339,7 @@ for your Android or Apple mobile phone
           tabIndex="0"
         >
           <a
-            href="https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446"
+            href="https://testflight.apple.com/join/s212x3Rp"
           >
             <div
               className="css-view-1dbjc4n"
@@ -1558,6 +1403,7 @@ for your Android or Apple mobile phone
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1584,24 +1430,22 @@ for your Android or Apple mobile phone
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
             style={
               Object {
+                "WebkitAlignContent": "center",
                 "WebkitAlignItems": "center",
                 "WebkitBoxAlign": "center",
                 "WebkitBoxPack": "center",
                 "WebkitJustifyContent": "center",
+                "alignContent": "center",
                 "alignItems": "center",
                 "justifyContent": "center",
                 "msFlexAlign": "center",
+                "msFlexLinePack": "center",
                 "msFlexPack": "center",
               }
             }
@@ -1610,6 +1454,7 @@ for your Android or Apple mobile phone
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1631,6 +1476,7 @@ for your Android or Apple mobile phone
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1640,14 +1486,13 @@ for your Android or Apple mobile phone
                   "lineHeight": "32px",
                   "marginBottom": "20px",
                   "marginTop": "20px",
-                  "maxWidth": "450px",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                   "textTransform": "none",
                 }
               }
             >
-              Use your seed phrase to import your account into the Celo Test Wallet.
+              Use your seed phrase to import your account into the Celo Developer Wallet.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1656,8 +1501,14 @@ for your Android or Apple mobile phone
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "msFlexAlign": "center",
+                }
+              }
             >
               <div
                 className="css-view-1dbjc4n"
@@ -1693,7 +1544,6 @@ for your Android or Apple mobile phone
                   dir="auto"
                   href="https://docs.celo.org/getting-started/alfajores-testnet"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {

@@ -1,221 +1,254 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Touchable from '@celo/react-components/components/Touchable'
+import BackChevron from '@celo/react-components/icons/BackChevron'
+import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import progressDots from '@celo/react-components/styles/progressDots'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  ImageSourcePropType,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native'
+import { NativeSafeAreaViewProps, SafeAreaView } from 'react-native-safe-area-context'
 import Swiper from 'react-native-swiper'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { placeholder } from 'src/images/Images'
+import { OnboardingEvents } from 'src/analytics/Events'
+import { ScrollDirection } from 'src/analytics/types'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
 
-const PROGRESS_CIRCLE_PASSIVE_SIZE = 8
-const PROGRESS_CIRCLE_ACTIVE_SIZE = 12
+export enum EmbeddedNavBar {
+  Close = 'Close',
+  Drawer = 'Drawer',
+}
 
-export const CTA_CIRCLE_SIZE = 5
+export enum EducationTopic {
+  onboarding = 'onboarding',
+  backup = 'backup',
+  celo = 'celo',
+}
+
+interface EducationStep {
+  image: ImageSourcePropType | null
+  topic: EducationTopic
+  title: string
+  // If set to true, title is displayed at the top
+  isTopTitle?: boolean
+  text?: string
+}
+
+export type Props = NativeSafeAreaViewProps & {
+  embeddedNavBar: EmbeddedNavBar | null
+  stepInfo: EducationStep[]
+  buttonType: BtnTypes
+  buttonText: string
+  finalButtonType: BtnTypes
+  finalButtonText: string
+  dotStyle: StyleProp<ViewStyle>
+  activeDotStyle: StyleProp<ViewStyle>
+  onFinish: () => void
+}
 
 interface State {
   step: number
 }
 
-interface EducationStep {
-  image: any
-  text: string
-  cancelEvent: CustomEventNames
-  screenName: string
-}
+export default class Education extends React.Component<Props, State> {
+  static defaultProps = {
+    buttonType: BtnTypes.SECONDARY,
+    finalButtonType: BtnTypes.PRIMARY,
+    dotStyle: progressDots.circlePassive,
+    activeDotStyle: progressDots.circleActive,
+  }
 
-interface CustomizedProps {
-  stepInfo: EducationStep[]
-  buttonText: string
-  linkText?: string
-  onFinish: () => void
-  onFinishAlternate?: () => void
-}
-
-type Props = WithTranslation & CustomizedProps
-
-class Education extends React.Component<Props, State> {
   state = {
     step: 0,
   }
 
+  swiper = React.createRef<Swiper>()
+
   goBack = () => {
-    const currentStepInfo = this.props.stepInfo[this.state.step]
-    if (currentStepInfo.cancelEvent && currentStepInfo.screenName) {
-      CeloAnalytics.track(currentStepInfo.cancelEvent, {
-        screen: currentStepInfo.screenName,
-      })
+    const { step } = this.state
+    const { topic } = this.props.stepInfo[this.state.step]
+    if (step === 0) {
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_cancel)
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_cancel)
+      }
+      navigateBack()
+    } else {
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      } else if (topic === EducationTopic.onboarding) {
+        ValoraAnalytics.track(OnboardingEvents.onboarding_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.previous,
+        })
+      }
+      this.swiper?.current?.scrollBy(-1, true)
     }
-    navigateBack()
   }
 
   setStep = (step: number) => {
     this.setState({ step })
   }
 
-  renderHeader() {
-    const { t } = this.props
-    return (
-      <View style={style.header}>
-        <View style={style.goBack}>
-          <Touchable testID="Education-goback" borderless={true} onPress={this.goBack}>
-            <Text style={fontStyles.headerButton}> {t('cancel')}</Text>
-          </Touchable>
-        </View>
-      </View>
-    )
-  }
+  nextStep = () => {
+    const { step } = this.state
+    const { topic } = this.props.stepInfo[this.state.step]
+    const isLastStep = step === this.props.stepInfo.length - 1
 
-  renderBody() {
-    const { t, stepInfo } = this.props
-    const children = stepInfo.map((v: any, i: any) => {
-      const imgSrc = v.image ? v.image : placeholder
-      return (
-        <View style={style.swipedContent} key={i}>
-          <Image source={imgSrc} style={style.bodyImage} resizeMode="contain" />
-          <Text style={[fontStyles.h1, style.bodyText]}>{t(v.text)}</Text>
-        </View>
-      )
-    })
-
-    return (
-      <View style={style.body}>
-        {/* 
-        // @ts-ignore */}
-        <Swiper
-          onIndexChanged={this.setStep}
-          loop={false}
-          showsButtons={false}
-          showsPagination={true}
-          style={style.swiper}
-          dotStyle={style.circlePassive}
-          activeDotStyle={style.circleActive}
-          containerStyle={style.swiperContainer}
-        >
-          {children}
-        </Swiper>
-      </View>
-    )
-  }
-
-  renderFooter() {
-    const { t, stepInfo, onFinish, onFinishAlternate, buttonText, linkText } = this.props
-    if (this.state.step !== stepInfo.length - 1) {
-      return <View style={style.footer} />
+    if (isLastStep) {
+      this.props.onFinish()
+    } else {
+      if (topic === EducationTopic.backup) {
+        ValoraAnalytics.track(OnboardingEvents.backup_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      } else if (topic === EducationTopic.celo) {
+        ValoraAnalytics.track(OnboardingEvents.celo_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      } else if (topic === EducationTopic.onboarding) {
+        ValoraAnalytics.track(OnboardingEvents.onboarding_education_scroll, {
+          currentStep: step,
+          direction: ScrollDirection.next,
+        })
+      }
+      this.swiper?.current?.scrollBy(1, true)
     }
-    return (
-      <View style={style.footer}>
-        <View style={style.buttonContainer}>
-          <Button
-            text={t(buttonText)}
-            onPress={onFinish}
-            style={style.button}
-            standard={true}
-            type={BtnTypes.PRIMARY}
-          />
-        </View>
-        {onFinishAlternate ? (
-          <Button
-            text={t(linkText ? linkText : 'backToWallet')}
-            onPress={onFinishAlternate}
-            style={style.button}
-            standard={true}
-            type={BtnTypes.TERTIARY}
-          />
-        ) : null}
-      </View>
-    )
+  }
+
+  renderEmbeddedNavBar() {
+    switch (this.props.embeddedNavBar) {
+      case EmbeddedNavBar.Close:
+        return (
+          <View style={styles.top} testID="Education/top">
+            <TopBarIconButton
+              testID="Education/CloseIcon"
+              onPress={this.goBack}
+              icon={this.state.step === 0 ? <Times /> : <BackChevron color={colors.dark} />}
+            />
+          </View>
+        )
+      case EmbeddedNavBar.Drawer:
+        return <DrawerTopBar testID="DrawerTopBar" />
+      default:
+        return null
+    }
   }
 
   render() {
+    const {
+      style,
+      embeddedNavBar,
+      stepInfo,
+      buttonType,
+      buttonText,
+      finalButtonType,
+      finalButtonText,
+      dotStyle,
+      activeDotStyle,
+      ...passThroughProps
+    } = this.props
+    const isLastStep = this.state.step === stepInfo.length - 1
+
     return (
-      <View style={style.container}>
-        {this.renderHeader()}
-        {this.renderBody()}
-        {this.renderFooter()}
-      </View>
+      <SafeAreaView style={[styles.root, style]} {...passThroughProps}>
+        {this.renderEmbeddedNavBar()}
+        <View style={styles.container}>
+          <Swiper
+            ref={this.swiper}
+            onIndexChanged={this.setStep}
+            loop={false}
+            dotStyle={dotStyle}
+            activeDotStyle={activeDotStyle}
+            removeClippedSubviews={false}
+          >
+            {stepInfo.map((step: EducationStep, i: number) => {
+              return (
+                <View style={styles.swipedContent} key={i}>
+                  {step.isTopTitle && <Text style={styles.headingTop}>{step.title}</Text>}
+                  <View style={styles.swipedContentInner}>
+                    {step.image && (
+                      <Image source={step.image} style={styles.bodyImage} resizeMode="contain" />
+                    )}
+                    {!step.isTopTitle && <Text style={styles.heading}>{step.title}</Text>}
+                    {!!step.text && <Text style={styles.bodyText}>{step.text}</Text>}
+                  </View>
+                </View>
+              )
+            })}
+          </Swiper>
+          <Button
+            testID="Education/progressButton"
+            onPress={this.nextStep}
+            text={isLastStep ? finalButtonText : buttonText}
+            type={isLastStep ? finalButtonType : buttonType}
+          />
+        </View>
+      </SafeAreaView>
     )
   }
 }
 
-const circle = {
-  flex: 0,
-  backgroundColor: colors.inactive,
-  borderRadius: 8,
-}
-
-const { width } = Dimensions.get('window')
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
+    paddingBottom: 24,
   },
-  header: {
-    padding: 20,
-    margin: 0,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    width: '100%',
+  heading: {
+    marginTop: 24,
+    ...fontStyles.h2,
+    textAlign: 'center',
   },
-  goBack: {
-    flex: 0,
-  },
-  body: {
-    flex: 8,
-    alignItems: 'center',
+  headingTop: {
+    ...fontStyles.h1,
+    marginTop: 26,
   },
   bodyText: {
-    color: colors.darkSecondary,
-    paddingTop: 30,
-    paddingHorizontal: 20,
+    ...fontStyles.regular,
+    textAlign: 'center',
+    paddingTop: 16,
   },
   bodyImage: {
     alignSelf: 'center',
-    width: 200,
-    height: 200,
-  },
-  footer: {
-    justifyContent: 'flex-end',
-    alignSelf: 'stretch',
-    flex: 2,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-  },
-  button: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  circle,
-  circlePassive: {
-    ...circle,
-    height: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    width: PROGRESS_CIRCLE_PASSIVE_SIZE,
-  },
-  circleActive: {
-    ...circle,
-    height: PROGRESS_CIRCLE_ACTIVE_SIZE,
-    width: PROGRESS_CIRCLE_ACTIVE_SIZE,
-  },
-  swiper: {
-    alignItems: 'center',
-    flex: 1,
-    width,
-  },
-  swiperContainer: {
-    alignItems: 'center',
   },
   swipedContent: {
     flex: 1,
+    marginBottom: 24,
+    paddingHorizontal: 24,
+  },
+  swipedContentInner: {
+    flex: 1,
     justifyContent: 'center',
-    marginBottom: 60,
+  },
+  top: {
+    paddingLeft: 24,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    width: '100%',
   },
 })
-
-export default withTranslation(Namespaces.nuxCurrencyPhoto4)(Education)

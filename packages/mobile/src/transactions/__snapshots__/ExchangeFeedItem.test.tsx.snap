@@ -41,7 +41,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/exchangeGreenGold.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-exchange.png",
           }
         }
         style={
@@ -112,6 +112,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
+            "paddingTop": 2,
           }
         }
       >

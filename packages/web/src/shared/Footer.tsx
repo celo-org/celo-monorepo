@@ -24,14 +24,20 @@ const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [
   { name: 'Docs', link: CeloLinks.docs },
   { name: 'Security Audits', link: CeloLinks.audits },
+  { name: 'Reserve', link: CeloLinks.reserve },
   menu.PAPERS,
 ]
 const eventsLink = `${menu.COMMUNITY.link}#${hashNav.connect.events}`
 const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
+  menu.BRAND_POLICY,
+  menu.PRESS,
   { name: 'Events', link: eventsLink },
+  menu.EVENTS_KIT,
   menu.BRAND,
+  menu.MERCHANTS,
+  menu.GRANT_KIT,
   { name: 'Ecosystem Fund', link: ecoFundLink },
 ]
 
@@ -40,7 +46,7 @@ const SOCIAL_MENU = [
   {
     name: 'Blog',
     link: CeloLinks.mediumPublication,
-    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} />,
+    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} wrapWithLink={false} />,
   },
   {
     name: 'GitHub',
@@ -70,38 +76,48 @@ const SOCIAL_MENU = [
   { name: 'Instagram', link: CeloLinks.instagram, icon: <Instagram size={ICON_SIZE} /> },
 ]
 
-export default function Footer() {
+interface Props {
+  hideForm?: boolean
+}
+
+export default function Footer({ hideForm }: Props) {
   const { t } = useTranslation(NameSpaces.common)
   const { isMobile, isTablet } = useScreenSize()
   const year = new Date().getFullYear()
   return (
     <>
-      <GridRow
-        allStyle={standardStyles.centered}
-        desktopStyle={standardStyles.blockMargin}
-        tabletStyle={standardStyles.blockMarginTablet}
-        mobileStyle={standardStyles.blockMarginMobile}
-      >
-        <Cell
-          span={Spans.half}
-          tabletSpan={Spans.twoThird}
-          style={[standardStyles.centered, styles.form]}
+      {!hideForm && (
+        <GridRow
+          allStyle={standardStyles.centered}
+          desktopStyle={standardStyles.blockMarginTop}
+          tabletStyle={standardStyles.blockMarginTopTablet}
+          mobileStyle={standardStyles.blockMarginTopMobile}
         >
-          <Image resizeMode="contain" source={{ uri: sendCoinIcon }} style={styles.emailLogo} />
-          <Text
-            style={[
-              fonts.p,
-              textStyles.center,
-              standardStyles.halfElement,
-              standardStyles.elementalMarginTop,
-            ]}
+          <Cell
+            span={Spans.half}
+            tabletSpan={Spans.twoThird}
+            style={[standardStyles.centered, styles.form]}
           >
-            {t('receiveUpdates')}
-          </Text>
-          <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
-        </Cell>
-      </GridRow>
-      <GridRow tabletStyle={styles.column}>
+            <Image resizeMode="contain" source={{ uri: sendCoinIcon }} style={styles.emailLogo} />
+            <Text
+              style={[
+                fonts.p,
+                textStyles.center,
+                standardStyles.halfElement,
+                standardStyles.elementalMarginTop,
+              ]}
+            >
+              {t('receiveUpdates')}
+            </Text>
+            <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
+          </Cell>
+        </GridRow>
+      )}
+      <GridRow
+        desktopStyle={standardStyles.blockMarginTop}
+        tabletStyle={[standardStyles.blockMarginTopTablet, styles.column]}
+        mobileStyle={standardStyles.blockMarginTopMobile}
+      >
         <Cell span={Spans.third} tabletSpan={Spans.twoThird}>
           <View style={isMobile ? [standardStyles.centered, styles.ringsMobile] : styles.rings}>
             <RingsGlyph />
@@ -131,8 +147,7 @@ export default function Footer() {
         mobileStyle={standardStyles.blockMarginMobile}
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
-          <Lazy once={true}>
-            {' '}
+          <Lazy unmountIfInvisible={true}>
             <ChangeStory />
           </Lazy>
           <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>

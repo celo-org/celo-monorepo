@@ -1,16 +1,16 @@
-import BaseNotification from '@celo/react-components/components/BaseNotification'
-import fontStyles from '@celo/react-components/styles/fonts'
+import ContactCircle from '@celo/react-components/components/ContactCircle'
+import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import * as React from 'react'
-import { Trans, WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { WithTranslation } from 'react-i18next'
+import { StyleSheet, View } from 'react-native'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { NotificationBannerCTATypes, NotificationBannerTypes } from 'src/home/NotificationBox'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { inviteFriendsIcon } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
 import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
@@ -33,7 +33,10 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onRemind = async () => {
     const { payment, t, invitees } = this.props
     const recipientPhoneNumber = payment.recipientPhone
-    CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.escrow_tx_pending,
+      selectedAction: NotificationBannerCTATypes.remind,
+    })
 
     try {
       const inviteDetails = invitees.find(
@@ -61,7 +64,10 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onReclaimPayment = () => {
     const { payment } = this.props
     const reclaimPaymentInput = payment
-    CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
+    ValoraAnalytics.track(HomeEvents.notification_select, {
+      notificationType: NotificationBannerTypes.escrow_tx_pending,
+      selectedAction: NotificationBannerCTATypes.reclaim,
+    })
     navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
   }
   getCTA = () => {
@@ -89,32 +95,26 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   render() {
     const { t, payment } = this.props
     const mobile = this.getDisplayName() || t('global:unknown').toLowerCase()
+    const amount = {
+      value: divideByWei(payment.amount),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
 
     return (
       <View style={styles.container}>
-        <BaseNotification
-          title={
-            <Trans
-              i18nKey="escrowPaymentNotificationTitl"
-              ns={Namespaces.inviteFlow11}
-              values={{ mobile }}
-            >
-              Invited and paid {{ mobile }} (
-              <CurrencyDisplay
-                amount={{
-                  value: divideByWei(payment.amount),
-                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                }}
-              />
-              )
-            </Trans>
+        <RequestMessagingCard
+          title={t('escrowPaymentNotificationTitle', { mobile })}
+          amount={<CurrencyDisplay amount={amount} />}
+          details={payment.message}
+          icon={
+            <ContactCircle
+              name={mobile}
+              // TODO: Add thumbnailPath={}
+            />
           }
-          icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
-          ctas={this.getCTA()}
+          callToActions={this.getCTA()}
           testID={testID}
-        >
-          <Text style={fontStyles.bodySmall}>{payment.message || t('defaultComment')}</Text>
-        </BaseNotification>
+        />
       </View>
     )
   }
@@ -124,17 +124,6 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
-  body: {
-    marginTop: 5,
-    flexDirection: 'row',
-  },
-  image: {
-    width: 30,
-    height: 30,
-  },
-  payment: {
-    flex: 1,
-  },
 })
 
-export default withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
+export default withTranslation<Props>(Namespaces.inviteFlow11)(EscrowedPaymentListItem)

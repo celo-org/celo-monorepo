@@ -1,14 +1,14 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 
@@ -30,7 +30,7 @@ export default function DelayButton() {
 
   const onPressDelay = React.useCallback(() => {
     dispatch(setBackupDelayed())
-    CeloAnalytics.track(CustomEventNames.delay_backup)
+    ValoraAnalytics.track(OnboardingEvents.backup_delay)
     navigateBack()
   }, [dispatch])
 

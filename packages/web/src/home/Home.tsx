@@ -4,46 +4,31 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import celoHero from 'src/home/celo-hero.png'
 import HomeBackers from 'src/home/HomeBackers'
-import HomeCarousel from 'src/home/HomeCarousel'
-import HomeSystems from 'src/home/HomeSystems'
-import Timeline, { MileStone } from 'src/home/roadmap/Timeline'
+import HomeBenefits from 'src/home/HomeBenefits'
+import ImagePanes from 'src/home/ImagePanes'
+import Involvement from 'src/home/Involvement'
+import { TwoAssets } from 'src/home/TwoAssets'
 import HomeCover from 'src/home/version3/HomeCover'
-import HomeHero from 'src/home/version3/HomeHero'
-import HomeWork from 'src/home/version3/HomeWork'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
+import FlowerArea from './FlowerArea'
 
 interface State {
   mobile: boolean
 }
 
-interface Props {
-  milestones: MileStone[]
-}
-
 const DESCRIPTION =
-  'Celo is building a monetary system that creates the conditions for prosperity for all. Our stablecoin uses phone numbers as identity and is built on a secure and proven platform.'
+  'Celo is an open platform that makes financial tools accessible to anyone with a mobile phone'
 
-export class Home extends React.Component<I18nProps & Props, State> {
-  static async getInitialProps({ req }) {
-    let milestones = []
-    try {
-      if (req) {
-        const getMilestones = await import('src/../server/fetchMilestones')
-        milestones = await getMilestones.default()
-      } else {
-        milestones = await fetch(`/api/milestones`).then((result) => result.json())
-      }
-      return { milestones }
-    } catch {
-      return { milestones }
-    }
+export class Home extends React.Component<I18nProps, State> {
+  static getInitialProps() {
+    return { namespacesRequired: [NameSpaces.home, NameSpaces.common] }
   }
 
   state: State
 
   render() {
-    const { t, milestones } = this.props
+    const { t } = this.props
     const { publicRuntimeConfig } = getConfig()
     const BASE_URL = publicRuntimeConfig.BASE_URL
     const metaImage = BASE_URL + celoHero
@@ -66,12 +51,12 @@ export class Home extends React.Component<I18nProps & Props, State> {
           <meta name="twitter:card" content="summary_large_image" />
         </Head>
         <HomeCover />
-        <HomeHero />
+        <ImagePanes />
+        <HomeBenefits />
+        <FlowerArea />
+        <TwoAssets />
         <Press />
-        <HomeSystems />
-        <Timeline milestones={milestones} />
-        <HomeWork />
-        <HomeCarousel />
+        <Involvement />
         <HomeBackers />
       </View>
     )
@@ -88,4 +73,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('home')(Home)
+export default withNamespaces(NameSpaces.home)(Home)

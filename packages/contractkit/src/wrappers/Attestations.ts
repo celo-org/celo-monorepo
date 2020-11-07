@@ -1,7 +1,9 @@
-import { AttestationUtils, SignatureUtils } from '@celo/utils'
-import { concurrentMap, sleep } from '@celo/utils/lib/async'
-import { notEmpty, zip3 } from '@celo/utils/lib/collections'
-import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
+import { eqAddress } from '@celo/base/lib/address'
+import { concurrentMap, sleep } from '@celo/base/lib/async'
+import { notEmpty, zip3 } from '@celo/base/lib/collections'
+import { parseSolidityStringArray } from '@celo/base/lib/parsing'
+import { appendPath } from '@celo/base/lib/string'
+import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -9,11 +11,13 @@ import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
+  blocksToDurationString,
   proxyCall,
   toTransactionObject,
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator } from './Validators'
 
 export interface AttestationStat {
   completed: number
@@ -54,12 +58,14 @@ type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
 
-interface AttesationServiceRevealRequest {
+export interface AttesationServiceRevealRequest {
   account: Address
   phoneNumber: string
   issuer: string
+  // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
+  language?: string
 }
 
 export interface UnselectedRequest {
@@ -136,6 +142,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * @notice Checks if attestation request is expired.
+   * @param attestationRequestBlockNumber Attestation Request Block Number to be checked
+   */
+  isAttestationExpired = async (attestationRequestBlockNumber: number) => {
+    // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
+    const attestationExpiryBlocks = await this.attestationExpiryBlocks()
+    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
+  }
+
+  /**
    * @notice Waits for appropriate block numbers for before issuer can be selected
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
@@ -162,6 +179,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
       await sleep(pollDurationSeconds * 1000)
     }
+    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
@@ -187,7 +205,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the attestation stats of a phone number/account pair
+   * Returns the attestation stats of a identifer/account pair
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
    */
@@ -199,6 +217,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     undefined,
     (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
   )
+
+  /**
+   * Returns the verified status of an identifier/account pair indicating whether the attestation
+   * stats for a given pair are completed beyond a certain threshold of confidence (aka "verified")
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   * @param numAttestationsRequired Optional number of attestations required.  Will default to
+   *  hardcoded value if absent.
+   * @param attestationThreshold Optional threshold for fraction attestations completed. Will
+   *  default to hardcoded value if absent.
+   */
+  async getVerifiedStatus(
+    identifier: string,
+    account: Address,
+    numAttestationsRequired?: number,
+    attestationThreshold?: number
+  ) {
+    const attestationStats = await this.getAttestationStat(identifier, account)
+    return AttestationUtils.isAccountConsideredVerified(
+      attestationStats,
+      numAttestationsRequired,
+      attestationThreshold
+    )
+  }
 
   /**
    * Calculates the amount of StableToken required to request Attestations
@@ -349,6 +391,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees.
+   * @return AttestationsConfig object
    */
   async getConfig(tokens: string[]): Promise<AttestationsConfig> {
     const fees = await Promise.all(
@@ -360,6 +403,18 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return {
       attestationExpiryBlocks: await this.attestationExpiryBlocks(),
       attestationRequestFees: fees,
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the attestations contract
+   * @return AttestationsConfig object
+   */
+  async getHumanReadableConfig(tokens: string[]) {
+    const config = await this.getConfig(tokens)
+    return {
+      attestationRequestFees: config.attestationRequestFees,
+      attestationExpiry: blocksToDurationString(config.attestationExpiryBlocks),
     }
   }
 
@@ -424,27 +479,78 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(identifier))
   }
 
+  /**
+   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
+  async selectIssuersAfterWait(
+    identifier: string,
+    account: string,
+    timeoutSeconds?: number,
+    pollDurationSeconds?: number
+  ) {
+    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
+    return this.selectIssuers(identifier)
+  }
+
+  /**
+   * Reveal phone number to issuer
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   * @param smsRetrieverAppSig?: Android app's hash
+   */
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
     issuer: Address,
     serviceURL: string,
-    salt?: string,
+    pepper?: string,
     smsRetrieverAppSig?: string
   ) {
     const body: AttesationServiceRevealRequest = {
       account,
       phoneNumber,
       issuer,
-      salt,
+      salt: pepper,
       smsRetrieverAppSig,
     }
-    return fetch(serviceURL + '/attestations', {
+    return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+    })
+  }
+
+  /**
+   * Returns reveal status from validator's attestation service
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   */
+  getRevealStatus(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string,
+    pepper?: string
+  ) {
+    const urlParams = new URLSearchParams({
+      phoneNumber,
+      salt: pepper ?? '',
+      issuer,
+      account,
+    })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
@@ -477,4 +583,163 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       .call()
     return result.toLowerCase() !== NULL_ADDRESS
   }
+
+  /**
+   * Gets the relevant attestation service status for a validator
+   * @param validator Validator to get the attestation service status for
+   */
+  async getAttestationServiceStatus(
+    validator: Validator
+  ): Promise<AttestationServiceStatusResponse> {
+    const accounts = await this.kit.contracts.getAccounts()
+    const hasAttestationSigner = await accounts.hasAuthorizedAttestationSigner(validator.address)
+    const attestationSigner = await accounts.getAttestationSigner(validator.address)
+
+    let attestationServiceURL: string
+
+    const ret: AttestationServiceStatusResponse = {
+      ...validator,
+      hasAttestationSigner,
+      attestationSigner,
+      attestationServiceURL: null,
+      okStatus: false,
+      error: null,
+      smsProviders: [],
+      blacklistedRegionCodes: [],
+      rightAccount: false,
+      metadataURL: null,
+      state: AttestationServiceStatusState.NoAttestationSigner,
+      version: null,
+      ageOfLatestBlock: null,
+    }
+
+    if (!hasAttestationSigner) {
+      return ret
+    }
+
+    const metadataURL = await accounts.getMetadataURL(validator.address)
+    ret.metadataURL = metadataURL
+
+    if (!metadataURL) {
+      ret.state = AttestationServiceStatusState.NoMetadataURL
+    }
+
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+
+      if (!attestationServiceURLClaim) {
+        ret.state = AttestationServiceStatusState.NoAttestationServiceURL
+        return ret
+      }
+
+      attestationServiceURL = attestationServiceURLClaim.url
+    } catch (error) {
+      ret.state =
+        error.type === 'system'
+          ? AttestationServiceStatusState.MetadataTimeout
+          : AttestationServiceStatusState.InvalidMetadata
+      ret.error = error
+      return ret
+    }
+
+    ret.attestationServiceURL = attestationServiceURL
+
+    try {
+      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
+
+      if (!statusResponse.ok) {
+        ret.state = AttestationServiceStatusState.UnreachableAttestationService
+        return ret
+      }
+
+      ret.okStatus = true
+      const statusResponseBody = await statusResponse.json()
+      ret.smsProviders = statusResponseBody.smsProviders
+      ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
+      ret.state = ret.rightAccount
+        ? AttestationServiceStatusState.Valid
+        : AttestationServiceStatusState.WrongAccount
+
+      // Healthcheck was added in 1.0.1, same time version started being reported.
+      if (statusResponseBody.version) {
+        ret.version = statusResponseBody.version
+
+        // Try healthcheck
+        try {
+          const healthzResponse = await fetch(appendPath(attestationServiceURL, 'healthz'))
+          const healthzResponseBody = await healthzResponse.json()
+          if (!healthzResponse.ok) {
+            ret.state = AttestationServiceStatusState.Unhealthy
+            if (healthzResponseBody.error) {
+              ret.error = healthzResponseBody.error
+            }
+          }
+        } catch (error) {
+          ret.state = AttestationServiceStatusState.UnreachableHealthz
+        }
+
+        // Whether or not health check is reachable, also check full node status
+        // (overrides UnreachableHealthz status)
+        if (
+          (statusResponseBody.ageOfLatestBlock !== null &&
+            statusResponseBody.ageOfLatestBlock > 10) ||
+          statusResponseBody.isNodeSyncing === true
+        ) {
+          ret.state = AttestationServiceStatusState.Unhealthy
+        }
+      } else {
+        // No version implies 1.0.0
+        ret.version = '1.0.0'
+      }
+    } catch (error) {
+      ret.state = AttestationServiceStatusState.UnreachableAttestationService
+      ret.error = error
+    }
+
+    return ret
+  }
+
+  async revoke(identifer: string, account: Address) {
+    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const idx = accounts.findIndex((acc) => eqAddress(acc, account))
+    if (idx < 0) {
+      throw new Error("Account not found in identifier's accounts")
+    }
+    return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
+  }
+}
+
+export enum AttestationServiceStatusState {
+  NoAttestationSigner = 'NoAttestationSigner',
+  NoMetadataURL = 'NoMetadataURL',
+  InvalidMetadata = 'InvalidMetadata',
+  NoAttestationServiceURL = 'NoAttestationServiceURL',
+  UnreachableAttestationService = 'UnreachableAttestationService',
+  Valid = 'Valid',
+  UnreachableHealthz = 'UnreachableHealthz',
+  Unhealthy = 'Unhealthy',
+  WrongAccount = 'WrongAccount',
+  MetadataTimeout = 'MetadataTimeout',
+}
+export interface AttestationServiceStatusResponse {
+  name: string
+  address: Address
+  ecdsaPublicKey: string
+  blsPublicKey: string
+  affiliation: string | null
+  score: BigNumber
+  hasAttestationSigner: boolean
+  attestationSigner: string
+  attestationServiceURL: string | null
+  metadataURL: string | null
+  okStatus: boolean
+  error: null | Error
+  smsProviders: string[]
+  blacklistedRegionCodes: string[] | null
+  rightAccount: boolean
+  signer: string
+  state: AttestationServiceStatusState
+  version: string | null
+  ageOfLatestBlock: number | null
 }

@@ -1,14 +1,22 @@
-import { Client } from 'pg'
+import { Address, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import {
-  verifyDomainRecord,
   verifyAccountClaim,
+  verifyDomainRecord,
 } from '@celo/contractkit/lib/identity/claims/verify'
-import { normalizeAddress } from '@celo/utils/lib/address'
-import { ClaimPayload, serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
-import { newKit } from '@celo/contractkit'
-import { logger } from './logger'
-import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
+import {
+  AttestationServiceStatusState,
+  AttestationsWrapper,
+} from '@celo/contractkit/lib/wrappers/Attestations'
+import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
+import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
+import { concurrentMap } from '@celo/utils/lib/async'
+import Logger from 'bunyan'
+import fetch from 'cross-fetch'
+import { Client } from 'pg'
+import { dataLogger, logger, operationalLogger } from './logger'
+
+const CONCURRENCY = 10
 
 const PGUSER = process.env['PGUSER'] || 'postgres'
 const PGPASSWORD = process.env['PGPASSWORD'] || ''
@@ -27,6 +35,11 @@ const client = new Client({
 
 const kit = newKit(PROVIDER_URL)
 
+const discordWebhook = process.env['DISCORD_WEBHOOK_URL']
+const clusterName = process.env['CLUSTER_NAME']
+  ? process.env['CLUSTER_NAME'][0].toUpperCase() + process.env['CLUSTER_NAME'].substring(1)
+  : undefined
+
 async function jsonQuery(query: string) {
   let res = await client.query(`SELECT json_agg(t) FROM (${query}) t`)
   return res.rows[0].json_agg
@@ -36,110 +49,241 @@ async function createVerificationClaims(
   address: string,
   domain: string,
   verified: boolean,
-  accounts: Array<AccountClaim>
+  accounts: Array<Address>
 ) {
   await addDatabaseVerificationClaims(address, domain, verified)
-  await Promise.all(
-    accounts.map(async (account) => {
-      await addDatabaseVerificationClaims(account.address.replace('0x', ''), domain, verified)
-    })
+  await concurrentMap(CONCURRENCY, accounts, (account) =>
+    addDatabaseVerificationClaims(account, domain, verified)
   )
 }
 
 async function addDatabaseVerificationClaims(address: string, domain: string, verified: boolean) {
   try {
-    const query = `INSERT INTO celo_claims (address, type, element, verified, timestamp, inserted_at, updated_at) VALUES 
-        (decode($1, 'hex'), 'domain', $2, $3, now(), now(), now()) 
-        ON CONFLICT (address, type, element) DO 
+    const query = `INSERT INTO celo_claims (address, type, element, verified, timestamp, inserted_at, updated_at) VALUES
+        (decode($1, 'hex'), 'domain', $2, $3, now(), now(), now())
+        ON CONFLICT (address, type, element) DO
         UPDATE SET verified=$3, timestamp=now(), updated_at=now() `
-    const values = [address, domain, verified]
+    // Trim 0x to match Blockscout convention
+    const values = [trimLeading0x(address), domain, verified]
 
     await client
       .query(query, values)
-      .catch((error) => logger.error('Database error %s, query: %s', error, query))
-      .then(() =>
-        logger.info('Verification flag added to domain %s and address %s', domain, address)
-      )
+      .catch((err) => logger.error({ err, query }, 'addDataBaseVerificationClaims error'))
+      .then(() => dataLogger.info({ domain, address }, 'VERIFIED_DOMAIN_CLAIM'))
   } catch (err) {
-    logger.error('Error updating the database', err)
+    logger.error({ err }, 'addDataBaseVerificationClaims error')
   }
 }
 
-async function handleItem(item: { url: string; address: string }) {
-  try {
-    let metadata = await IdentityMetadataWrapper.fetchFromURL(kit, item.url)
-    let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
-    const unverifiedAccounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
-    const accountVerification = await Promise.all(
-      unverifiedAccounts.map(async (claim) => ({
+async function getVerifiedAccounts(metadata: IdentityMetadataWrapper, address: Address) {
+  const unverifiedAccounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
+  const accountVerification = await Promise.all(
+    unverifiedAccounts.map(async (claim) => ({
+      claim,
+      verified: await verifyAccountClaim(kit, claim, address),
+    }))
+  )
+  const accounts = accountVerification
+    .filter(({ verified }) => verified === undefined)
+    .map((a) => a.claim.address)
+
+  return accounts
+}
+
+async function getVerifiedDomains(
+  metadata: IdentityMetadataWrapper,
+  address: Address,
+  logger: Logger
+) {
+  const unverifiedDomains = metadata.filterClaims(ClaimTypes.DOMAIN)
+
+  const domainVerification = await concurrentMap(CONCURRENCY, unverifiedDomains, async (claim) => {
+    try {
+      const verificationStatus = await verifyDomainRecord(kit, claim, address)
+      logger.debug({ claim, verificationStatus }, `verified_domain`)
+      return {
         claim,
-        verified: await verifyAccountClaim(kit, claim, item.address),
-      }))
-    )
-    const accounts = accountVerification
-      .filter(({ verified }) => verified === undefined)
-      .map((a) => a.claim)
-
-    await Promise.all(
-      claims.map(async (claim: ClaimPayload<ClaimTypes.DOMAIN>) => {
-        const addressWith0x = '0x' + item.address
-        logger.debug('Claim: %s', serializeClaim(claim))
-        logger.debug('Accounts: %s', JSON.stringify(accounts))
-        logger.debug('Verifying %s for address %s', claim.domain, addressWith0x)
-
-        const verificationStatus = await verifyDomainRecord(
-          kit,
-          claim,
-          addressWith0x
-        ).catch((error: any) => logger.error('Error in verifyDomainClaim %s', error))
-        if (verificationStatus === undefined)
-          // If undefined means the claim was verified successfully
-          await createVerificationClaims(item.address, claim.domain, true, accounts)
-        else logger.debug(verificationStatus)
-      })
-    )
-  } catch (err) {
-    logger.error('Cannot read metadata %s', err)
-  }
-}
-
-async function main() {
-  logger.info('Connecting DB: %s', PGHOST)
-  await client.connect()
-
-  client.on('error', (error) => {
-    logger.debug('Reconnecting after %s', error)
-    client.connect()
+        verified: verificationStatus === undefined,
+      }
+    } catch (err) {
+      logger.error({ err, claim })
+      return {
+        claim,
+        verified: false,
+      }
+    }
   })
 
+  const domains = domainVerification.filter(({ verified }) => verified).map((_) => _.claim.domain)
+
+  return domains
+}
+
+async function processDomainClaimForValidator(item: { url: string; address: string }) {
+  const itemLogger = operationalLogger.child({ url: item.url, address: item.address })
+  try {
+    itemLogger.debug('fetch_metadata')
+    const metadata = await IdentityMetadataWrapper.fetchFromURL(kit, item.url)
+    const verifiedAccounts = await getVerifiedAccounts(metadata, item.address)
+    const verifiedDomains = await getVerifiedDomains(metadata, item.address, itemLogger)
+
+    await concurrentMap(CONCURRENCY, verifiedDomains, (domain) =>
+      createVerificationClaims(item.address, domain, true, verifiedAccounts)
+    )
+
+    itemLogger.debug(
+      {
+        verfiedAccountClaims: verifiedAccounts.length,
+        verifiedDomainClaims: verifiedDomains.length,
+      },
+      'processDomainClaimForValidator done'
+    )
+  } catch (err) {
+    itemLogger.error({ err }, 'processDomainClaimForValidator error')
+  }
+}
+
+async function processDomainClaims() {
   let items: { address: string; url: string }[] = await jsonQuery(
     `SELECT address, url FROM celo_account WHERE url is NOT NULL `
   )
 
+  operationalLogger.debug({ length: items.length }, 'fetching all accounts')
+
   items = items || []
   items = items.map((a) => ({
     ...a,
-    address: normalizeAddress(a.address.substr(2)),
+    // Addresses are stored by blockscout as just the bytes prepended with \x
+    address: normalizeAddressWith0x(a.address.substr(2)),
   }))
 
-  await Promise.all(
-    items.map(async (item) => {
-      await handleItem(item)
-    })
-  )
+  return concurrentMap(CONCURRENCY, items, (item) => processDomainClaimForValidator(item))
     .then(() => {
-      logger.info('Closing DB connecting and finishing')
-      client.end()
-      process.exit(0)
+      operationalLogger.info('Closing DB connecting and finishing')
     })
-    .catch((error) => {
-      logger.error('Error: %s', error)
+    .catch((err) => {
+      operationalLogger.error({ err }, 'processDomainClaimForValidator error')
       client.end()
       process.exit(1)
     })
 }
 
+async function processAttestationServiceStatusForValidator(
+  electedValidators: Set<Address>,
+  attestationsWrapper: AttestationsWrapper,
+  validator: Validator
+) {
+  const status = await attestationsWrapper.getAttestationServiceStatus(validator)
+  const {
+    name,
+    smsProviders,
+    address,
+    affiliation,
+    attestationServiceURL,
+    metadataURL,
+    attestationSigner,
+    blacklistedRegionCodes,
+    rightAccount,
+    error,
+    state,
+    version,
+    ageOfLatestBlock,
+  } = status
+  const isElected = electedValidators.has(validator.address)
+  dataLogger.info(
+    {
+      name,
+      isElected,
+      smsProviders,
+      address,
+      group: affiliation,
+      attestationServiceURL,
+      metadataURL,
+      attestationSigner,
+      blacklistedRegionCodes,
+      rightAccount,
+      err: error,
+      state,
+      version,
+      ageOfLatestBlock,
+    },
+    'checked_attestation_service_status'
+  )
+
+  // Consider pushing a state change to Discord for elected validators.
+  if (discordWebhook && isElected) {
+    const currentValid =
+      status.state === AttestationServiceStatusState.NoAttestationSigner ||
+      status.state === AttestationServiceStatusState.UnreachableHealthz ||
+      status.state === AttestationServiceStatusState.Valid
+
+    if (!currentValid) {
+      const content =
+        `:no_mobile_phones: **Problem with Attestation Service!** ${status.name} \n` +
+        `For validator \`${validator.address}\` in group \`${validator.affiliation}\`\n` +
+        `\`${status.state}\` ${status.attestationServiceURL ?? ''}${
+          status.error ? '\n`' + (status.error.message ?? status.error) + '`' : ''
+        }`
+      await postToDiscord(content)
+    }
+  }
+}
+
+async function postToDiscord(content: string) {
+  if (discordWebhook) {
+    try {
+      await fetch(discordWebhook, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: `${clusterName} Metadata Crawler`, content }),
+      })
+    } catch {}
+  }
+}
+
+async function processAttestationServices() {
+  operationalLogger.debug('processAttestationServices start')
+  const validatorsWrapper = await kit.contracts.getValidators()
+  const electionsWrapper = await kit.contracts.getElection()
+  const attestationsWrapper = await kit.contracts.getAttestations()
+  const validators = await validatorsWrapper.getRegisteredValidators()
+
+  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.web3.eth.getBlockNumber())
+  const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
+  const electedValidatorsSet: Set<Address> = new Set()
+  electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))
+
+  await concurrentMap(CONCURRENCY, validators, (validator) =>
+    processAttestationServiceStatusForValidator(
+      electedValidatorsSet,
+      attestationsWrapper,
+      validator
+    )
+  )
+  operationalLogger.debug('processAttestationServices finish')
+  return
+}
+
+async function main() {
+  operationalLogger.info({ host: PGHOST }, 'Connecting DB')
+  await client.connect()
+
+  client.on('error', (err) => {
+    operationalLogger.error({ err }, 'Reconnecting after error')
+    client.connect()
+  })
+
+  await processDomainClaims()
+  await processAttestationServices()
+
+  client.end()
+  process.exit(0)
+}
+
 main().catch((err) => {
-  logger.error({ err })
+  operationalLogger.error({ err })
   process.exit(1)
 })

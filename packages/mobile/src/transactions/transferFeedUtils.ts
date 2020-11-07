@@ -1,39 +1,97 @@
-import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
-import { TokenTransactionType } from 'src/apollo/types'
+import {
+  ExchangeItemFragment,
+  TokenTransactionType,
+  TransferItemFragment,
+  UserTransactionsQuery,
+} from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
-import { features } from 'src/flags'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { decryptComment } from 'src/identity/commentEncryption'
+import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
+import { KnownFeedTransactionsType } from 'src/transactions/reducer'
+import { isPresent } from 'src/utils/typescript'
 
-export function decryptComment(
-  comment: string | null | undefined,
-  commentKey: Buffer | null,
+export function getDecryptedTransferFeedComment(
+  comment: string | null,
+  commentKey: string | null,
   type: TokenTransactionType
 ) {
-  return comment && commentKey && features.USE_COMMENT_ENCRYPTION
-    ? decryptCommentRaw(
-        comment,
-        commentKey,
-        type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
-      ).comment
-    : comment
+  const { comment: decryptedComment } = decryptComment(comment, commentKey, isTokenTxTypeSent(type))
+  return decryptedComment
+}
+
+// Hacky way to get escrow recipients until blockchain API
+// returns correct address (currently returns Escrow SC address)
+function getEscrowSentRecipientPhoneNumber(invitees: InviteDetails[], txTimestamp: number) {
+  const possiblePhoneNumbers = new Set()
+  invitees.forEach((inviteDetails) => {
+    const inviteTimestamp = inviteDetails.timestamp
+    // Invites are logged before invite tx is confirmed so considering a match
+    // to be when escrow tx timestamp is within 30 secs of invite timestamp
+    if (Math.abs(txTimestamp - inviteTimestamp) < 1000 * 30) {
+      possiblePhoneNumbers.add(inviteDetails.e164Number)
+    }
+  })
+
+  // Set to null if there isn't a conclusive match
+  if (possiblePhoneNumbers.size !== 1) {
+    return null
+  }
+
+  return possiblePhoneNumbers.values().next().value
+}
+
+function getRecipient(
+  type: TokenTransactionType,
+  e164PhoneNumber: string | null,
+  recipientCache: NumberToRecipient,
+  recentTxRecipientsCache: NumberToRecipient,
+  txTimestamp: number,
+  invitees: InviteDetails[]
+) {
+  let phoneNumber = e164PhoneNumber
+
+  if (type === TokenTransactionType.EscrowSent) {
+    phoneNumber = getEscrowSentRecipientPhoneNumber(invitees, txTimestamp)
+  }
+
+  if (!phoneNumber) {
+    return undefined
+  }
+
+  // Use the recentTxRecipientCache until the full cache is populated
+  return Object.keys(recipientCache).length
+    ? recipientCache[phoneNumber]
+    : recentTxRecipientsCache[phoneNumber]
 }
 
 export function getTransferFeedParams(
   type: TokenTransactionType,
   t: TFunction,
   recipientCache: NumberToRecipient,
+  recentTxRecipientsCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
+  addressToDisplayName: AddressToDisplayNameType,
   rawComment: string | null,
-  commentKey: Buffer | null
+  commentKey: string | null,
+  timestamp: number,
+  invitees: InviteDetails[]
 ) {
   const e164PhoneNumber = addressToE164Number[address]
-  const recipient = e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
-  const nameOrNumber = recipient ? recipient.displayName : e164PhoneNumber
-  const comment = decryptComment(rawComment, commentKey, type)
+  const recipient = getRecipient(
+    type,
+    e164PhoneNumber,
+    recipientCache,
+    recentTxRecipientsCache,
+    timestamp,
+    invitees
+  )
+  const nameOrNumber = recipient?.displayName || addressToDisplayName[address] || e164PhoneNumber
+  const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info
 
@@ -117,4 +175,26 @@ export function getTransferFeedParams(
     }
   }
   return { title, info, recipient }
+}
+
+export function getTxsFromUserTxQuery(data: UserTransactionsQuery | undefined) {
+  return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
+}
+
+export function getNewTxsFromUserTxQuery(
+  data: UserTransactionsQuery | undefined,
+  knownFeedTxs: KnownFeedTransactionsType
+) {
+  const txFragments = getTxsFromUserTxQuery(data)
+  return txFragments.filter((tx) => !knownFeedTxs[tx.hash])
+}
+
+export function isTokenTxTypeSent(type: TokenTransactionType) {
+  return type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
+}
+
+export function isTransferTransaction(
+  tx: TransferItemFragment | ExchangeItemFragment
+): tx is TransferItemFragment {
+  return (tx as TransferItemFragment).address !== undefined
 }

@@ -339,6 +339,14 @@ export const standardStyles = StyleSheet.create({
   darkBackground: {
     backgroundColor: colors.dark,
   },
+  fadeInitial: {
+    transitionDuration: '1s',
+    transitionProperty: 'opacity',
+    opacity: 0,
+  },
+  fadeIn: {
+    opacity: 1,
+  },
 })
 
 // These dont seem to be applied when set thru stylesheet

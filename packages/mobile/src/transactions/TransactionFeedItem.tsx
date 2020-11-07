@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -9,7 +9,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
-import { TransactionStatus } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/types'
 
 interface Props {
   type: TokenTransactionType
@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
   subtitle: {
     ...fontStyles.small,
     color: colors.gray4,
+    paddingTop: 2,
   },
   amount: {
     ...fontStyles.regular500,

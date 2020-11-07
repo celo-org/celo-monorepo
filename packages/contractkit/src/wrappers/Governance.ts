@@ -1,23 +1,30 @@
-import { ensureLeading0x, NULL_ADDRESS, trimLeading0x } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import {
+  bufferToHex,
+  ensureLeading0x,
+  hexToBuffer,
+  NULL_ADDRESS,
+  trimLeading0x,
+} from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'
 import { Address } from '../base'
 import { Governance } from '../generated/Governance'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
-  bufferToBytes,
-  bufferToString,
-  bytesToString,
+  bufferToSolidityBytes,
   identity,
   proxyCall,
   proxySend,
+  secondsToDurationString,
+  solidityBytesToString,
   stringIdentity,
-  stringToBuffer,
   toTransactionObject,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToInt,
   valueToString,
@@ -67,11 +74,11 @@ export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
 export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {
-  const data = proposal.map((tx) => stringToBuffer(tx.input))
+  const data = proposal.map((tx) => hexToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to!),
-    bufferToBytes(Buffer.concat(data)),
+    bufferToSolidityBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
     descriptionURL,
   ]
@@ -107,7 +114,7 @@ export interface Votes {
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
 export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
   const p = proposalToParams(proposal, '') // no description URL for hotfixes
-  return [p[0], p[1], p[2], p[3], bufferToString(salt)]
+  return [p[0], p[1], p[2], p[3], bufferToHex(salt)]
 }
 
 export interface HotfixRecord {
@@ -245,6 +252,31 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * @dev Returns human readable configuration of the governance contract
+   * @return GovernanceConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const stageDurations = {
+      [ProposalStage.Approval]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Approval]
+      ),
+      [ProposalStage.Referendum]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Referendum]
+      ),
+      [ProposalStage.Execution]: secondsToDurationString(
+        config.stageDurations[ProposalStage.Execution]
+      ),
+    }
+    return {
+      ...config,
+      dequeueFrequency: secondsToDurationString(config.dequeueFrequency),
+      queueExpiry: secondsToDurationString(config.queueExpiry),
+      stageDurations,
+    }
+  }
+
+  /**
    * Returns the metadata associated with a given proposal.
    * @param proposalID Governance proposal UUID
    */
@@ -261,6 +293,18 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
+   * Returns the human readable metadata associated with a given proposal.
+   * @param proposalID Governance proposal UUID
+   */
+  async getHumanReadableProposalMetadata(proposalID: BigNumber.Value) {
+    const meta = await this.getProposalMetadata(proposalID)
+    return {
+      ...meta,
+      timestamp: unixSecondsTimestampToDateString(meta.timestamp),
+    }
+  }
+
+  /**
    * Returns the transaction at the given index associated with a given proposal.
    * @param proposalID Governance proposal UUID
    * @param txIndex Transaction index
@@ -274,7 +318,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => ({
       value: res[0],
       to: res[1],
-      input: bytesToString(res[2]),
+      input: solidityBytesToString(res[2]),
     })
   )
 
@@ -326,13 +370,22 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     return { referendum, execution, expiration }
   }
 
+  async humanReadableTimeUntilStages(propoaslID: BigNumber.Value) {
+    const time = await this.timeUntilStages(propoaslID)
+    return {
+      referendum: secondsToDurationString(time.referendum),
+      execution: secondsToDurationString(time.execution),
+      expiration: secondsToDurationString(time.expiration),
+    }
+  }
+
   /**
    * Returns the proposal associated with a given id.
    * @param proposalID Governance proposal UUID
    */
   async getProposal(proposalID: BigNumber.Value): Promise<Proposal> {
     const metadata = await this.getProposalMetadata(proposalID)
-    const txIndices = Array.from(Array(metadata.transactionCount).keys())
+    const txIndices = zeroRange(metadata.transactionCount)
     return concurrentMap(4, txIndices, (idx) => this.getProposalTransaction(proposalID, idx))
   }
 
@@ -689,7 +742,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   async getHotfixRecord(hash: Buffer): Promise<HotfixRecord> {
-    const res = await this.contract.methods.getHotfixRecord(bufferToString(hash)).call()
+    const res = await this.contract.methods.getHotfixRecord(bufferToHex(hash)).call()
     return {
       approved: res[0],
       executed: res[1],
@@ -704,14 +757,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isHotfixWhitelistedBy = proxyCall(
     this.contract.methods.isHotfixWhitelistedBy,
-    tupleParser(bufferToString, (s: Address) => identity<Address>(s))
+    tupleParser(bufferToHex, (s: Address) => identity<Address>(s))
   )
 
   /**
    * Returns whether a given hotfix can be passed.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
+  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToHex))
 
   /**
    * Returns the number of validators required to reach a Byzantine quorum
@@ -728,7 +781,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   hotfixWhitelistValidatorTally = proxyCall(
     this.contract.methods.hotfixWhitelistValidatorTally,
-    tupleParser(bufferToString)
+    tupleParser(bufferToHex)
   )
 
   /**
@@ -738,7 +791,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   whitelistHotfix = proxySend(
     this.kit,
     this.contract.methods.whitelistHotfix,
-    tupleParser(bufferToString)
+    tupleParser(bufferToHex)
   )
 
   /**
@@ -746,21 +799,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  approveHotfix = proxySend(
-    this.kit,
-    this.contract.methods.approveHotfix,
-    tupleParser(bufferToString)
-  )
+  approveHotfix = proxySend(this.kit, this.contract.methods.approveHotfix, tupleParser(bufferToHex))
 
   /**
    * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  prepareHotfix = proxySend(
-    this.kit,
-    this.contract.methods.prepareHotfix,
-    tupleParser(bufferToString)
-  )
+  prepareHotfix = proxySend(this.kit, this.contract.methods.prepareHotfix, tupleParser(bufferToHex))
 
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.

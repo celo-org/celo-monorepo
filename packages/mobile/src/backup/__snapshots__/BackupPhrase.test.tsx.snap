@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly with backup completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "padding": 16,
@@ -30,27 +29,48 @@ exports[`renders correctly with backup completed 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Inter-Medium",
-                "fontSize": 16,
-                "lineHeight": 22,
+                "flexDirection": "column",
               }
             }
           >
-            backupKey
-          </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                  "marginBottom": 16,
+                }
+              }
+            >
+              writeDownKey
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                }
+              }
+            >
+              yourAccountKey
+            </Text>
+          </View>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "borderRadius": 4,
               "justifyContent": "center",
-              "marginTop": 16,
+              "marginTop": 8,
               "padding": 16,
             }
           }
@@ -71,14 +91,13 @@ exports[`renders correctly with backup completed 1`] = `
       </Text>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`renders correctly with backup not completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "padding": 16,
@@ -104,27 +123,48 @@ exports[`renders correctly with backup not completed 1`] = `
             }
           }
         >
-          <Text
+          <View
             style={
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Inter-Medium",
-                "fontSize": 16,
-                "lineHeight": 22,
+                "flexDirection": "column",
               }
             }
           >
-            backupKey
-          </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                  "marginBottom": 16,
+                }
+              }
+            >
+              writeDownKey
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                }
+              }
+            >
+              yourAccountKey
+            </Text>
+          </View>
         </View>
         <View
           style={
             Object {
               "alignContent": "center",
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "borderRadius": 4,
               "justifyContent": "center",
-              "marginTop": 16,
+              "marginTop": 8,
               "padding": 16,
             }
           }
@@ -161,6 +201,7 @@ exports[`renders correctly with backup not completed 1`] = `
       onChange={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="backupKeySavedSwitch"
       thumbTintColor="#EDEEEF"
       trackColorForFalse="#B4B9BD"
       trackColorForTrue="#1AB775"
@@ -184,17 +225,24 @@ exports[`renders correctly with backup not completed 1`] = `
   </View>
   <View
     style={
-      Object {
-        "flexDirection": "row",
-      }
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        undefined,
+      ]
     }
   >
     <View
       style={
-        Object {
-          "borderRadius": 100,
-          "overflow": "hidden",
-        }
+        Array [
+          Object {
+            "overflow": "hidden",
+          },
+          Object {
+            "borderRadius": 100,
+          },
+        ]
       }
     >
       <View
@@ -216,14 +264,16 @@ exports[`renders correctly with backup not completed 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "#F5F4F0",
-            "flex": 1,
+            "backgroundColor": "#F1F0EB",
+            "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
-            "paddingHorizontal": 16,
+            "opacity": undefined,
+            "paddingHorizontal": 24,
             "paddingVertical": 5,
           }
         }
+        testID="backupKeyContinue"
       >
         <Text
           style={
@@ -240,5 +290,99 @@ exports[`renders correctly with backup not completed 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
+`;
+
+exports[`still renders when mnemonic doesnt show up 1`] = `
+<RNCSafeAreaView
+  style={
+    Object {
+      "flex": 1,
+      "justifyContent": "space-between",
+      "padding": 16,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flexGrow": 1,
+        "paddingBottom": 16,
+      }
+    }
+  >
+    <View>
+      <View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 2,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                  "marginBottom": 16,
+                }
+              }
+            >
+              writeDownKey
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 13,
+                  "lineHeight": 16,
+                }
+              }
+            >
+              yourAccountKey
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "alignContent": "center",
+              "backgroundColor": "#F1F0EB",
+              "borderRadius": 4,
+              "justifyContent": "center",
+              "marginTop": 8,
+              "padding": 16,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginTop": 16,
+          }
+        }
+      >
+        backupKeySummary
+      </Text>
+    </View>
+  </RCTScrollView>
+</RNCSafeAreaView>
 `;

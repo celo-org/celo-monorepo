@@ -2,9 +2,6 @@ import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
-import { getOutgoingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequest } from 'src/account/types'
-import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   AddressToE164NumberType,
@@ -15,8 +12,11 @@ import {
   NotificationList,
   titleWithBalanceNavigationOptions,
 } from 'src/notifications/NotificationList'
+import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/paymentRequest/actions'
 import OutgoingPaymentRequestListItem from 'src/paymentRequest/OutgoingPaymentRequestListItem'
-import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
+import { getOutgoingPaymentRequests } from 'src/paymentRequest/selectors'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesteeFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -50,7 +50,7 @@ export const listItemRenderer = (params: {
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const requestee = getSenderFromPaymentRequest(
+  const requestee = getRequesteeFromPaymentRequest(
     request,
     params.addressToE164Number,
     params.recipientCache
@@ -86,4 +86,4 @@ OutgoingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   cancelPaymentRequest,
   updatePaymentRequestNotified,
-})(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))
+})(withTranslation<Props>(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BackupIntroduction renders correctly when backup completed 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -9,6 +9,85 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
     }
   }
 >
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": 0,
+        "borderBottomWidth": 1,
+        "flexDirection": "row",
+        "height": 56,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "left": 0,
+          "marginBottom": 0,
+          "marginLeft": 16,
+          "opacity": 1,
+          "padding": 0,
+          "position": "absolute",
+        }
+      }
+      testID="Hamburguer"
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+  </View>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -23,9 +102,9 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
             }
           }
         >
@@ -34,7 +113,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "#FFF9EE",
+              "backgroundColor": "#F1F0EB",
               "marginTop": 16,
               "padding": 16,
             }
@@ -106,11 +185,11 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -118,6 +197,85 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
     }
   }
 >
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderBottomColor": 0,
+        "borderBottomWidth": 1,
+        "flexDirection": "row",
+        "height": 56,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      hitSlop={
+        Object {
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "left": 0,
+          "marginBottom": 0,
+          "marginLeft": 16,
+          "opacity": 1,
+          "padding": 0,
+          "position": "absolute",
+        }
+      }
+      testID="Hamburguer"
+    >
+      <svg
+        fill="none"
+        height="32"
+        viewBox="0 0 32 32"
+        width="32"
+      >
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="9.75"
+          y2="9.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="15.75"
+          y2="15.75"
+        />
+        <line
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeWidth="2.5"
+          x1="7.25"
+          x2="24.75"
+          y1="21.75"
+          y2="21.75"
+        />
+      </svg>
+    </View>
+  </View>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -155,8 +313,8 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 24,
+            "fontFamily": "Jost-Book",
+            "fontSize": 26,
             "lineHeight": 32,
             "paddingBottom": 16,
             "paddingTop": 16,
@@ -180,17 +338,24 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
       </Text>
       <View
         style={
-          Object {
-            "flexDirection": "row",
-          }
+          Array [
+            Object {
+              "flexDirection": "row",
+            },
+            undefined,
+          ]
         }
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -215,11 +380,13 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
                 "backgroundColor": "#1AB775",
                 "height": 48,
                 "justifyContent": "center",
-                "minWidth": 98,
-                "paddingHorizontal": 16,
+                "minWidth": 120,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
+            testID="SetUpAccountKey"
           >
             <Text
               style={
@@ -238,5 +405,5 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

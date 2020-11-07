@@ -1,0 +1,4 @@
+## Unique Gifts
+In the spirit of decentralization and supporting one another, we strongly suggest teaming up with a co-organizer (or 2!) to help with your event. This allows you to focus on your unique gifts in event leadership while allowing others to share theirs. Many hands make for light work and more magic. 
+
+Similarly, don’t be shy to invite participants to contribute in some way to the event. Whether it’s taking photos, sharing a talk, or setting up the space beautifully look for ways to engage your community members into the event. In encouraging contribution, you are encouraging the Celo in your members to shine. 

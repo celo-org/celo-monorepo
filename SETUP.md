@@ -35,7 +35,7 @@ Follow these steps to get everything that you need installed to build the celo-m
 
 We need Go for [celo-blockchain], the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client).
 
-Note: We currently use Go 1.11. Brew installs Go 1.12 by default, which is not entirely compatible with our repositories. [Install Go 1.11 manually](https://golang.org/dl/), then run
+Note: We currently use Go 1.13. [Install Go 1.13 manually](https://golang.org/dl/), then run
 
 ```
 go get golang.org/x/mobile/cmd/gobind
@@ -104,7 +104,8 @@ sudo apt-get update && sudo apt-get install yarn
 
 #### Install Rust
 
-We use Rust to build the [celo-blockchain] and [bls-zexe] repos. You will need to install Rust if you'd like to run the Celo blockchain locally. This is not required if you only want use the monorepo and mobile wallet.
+We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust) This is not 
+required if you only want use the blockchain, monorepo, and mobile wallet.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -124,14 +125,22 @@ rustup install 1.42.0
 rustup default 1.42.0
 ```
 
-If you're building Geth for Android, you need a NDK that has a cross-compilation toolchain. You can get it by appropriately defining the relevant environment variables, e.g.:
+If you're building Geth for Android, you need a NDK that has a cross-compilation toolchain. We need version 19.
+
+On Mac (darwin):
+```bash
+brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/a39a95824122da8448dbeb0b0ca1dde78e5a793c/Casks/android-ndk.rb
+
+export ANDROID_NDK=/usr/local/share/android-ndk
+```
+
+In `celo-blockchain`, define the relevant environment variables, e.g.:
 
 ```bash
 export NDK_VERSION=android-ndk-r19c
-export ANDROID_NDK=ndk_bundle/android-ndk-r19c
 ```
 
-and running `make ndk_bundle`. This will download the NDK for your platform.
+and run `make ndk_bundle`. This will download the NDK for your platform.
 
 
 ## Building celo-monorepo
@@ -152,7 +161,7 @@ npm install lerna
 # install dependencies and run post-install script
 yarn
 # build all packages
-yarn build
+yarn build --ignore docs
 ```
 
 > Note that if you do your checkouts with a different method, Yarn will fail if
@@ -164,6 +173,9 @@ yarn build
 > you aren't left with freshly unpackaged modules. This is because we use `patch-package`
 > and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
 
+> The docs package relies on gitbook which has problems off of a fresh install. Running
+> `yarn build --ignore docs` is a known workaround. 
+
 
 ## Running the mobile wallet
 
@@ -172,6 +184,6 @@ To build and run the mobile wallet on your iOS or Android devices see the guide 
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
-[bls-zexe]: https://github.com/celo-org/bls-zexe
+[celo-bls]: https://github.com/celo-org/celo-bls-go
 [Homebrew]: https://brew.sh
 [https://github.com/nvm-sh/nvm]: https://github.com/nvm-sh/nvm

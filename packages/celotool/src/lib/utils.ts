@@ -1,4 +1,4 @@
-// import prompts from 'prompts'
+import sleep from 'sleep-promise'
 import yargs from 'yargs'
 import { switchToClusterFromEnv } from './cluster'
 import { execCmdWithExitOnFailure } from './cmd-utils'
@@ -38,7 +38,7 @@ export async function getVerificationPoolConfig(celoEnv: string) {
   }
 }
 
-export async function switchToProject(projectName: string) {
+export async function switchToGCPProject(projectName: string) {
   const [currentProject] = await execCmdWithExitOnFailure('gcloud config get-value project')
 
   if (currentProject !== projectName) {
@@ -48,7 +48,7 @@ export async function switchToProject(projectName: string) {
 
 export async function switchToProjectFromEnv() {
   const expectedProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  await switchToProject(expectedProject)
+  await switchToGCPProject(expectedProject)
 }
 
 export function addCeloGethMiddleware(argv: yargs.Argv) {
@@ -73,3 +73,26 @@ export const validateAccountAddress = (address: string) => {
 
 export const ensure0x = (hexstr: string) => (hexstr.startsWith('0x') ? hexstr : '0x' + hexstr)
 export const strip0x = (hexstr: string) => (hexstr.startsWith('0x') ? hexstr.slice(2) : hexstr)
+
+export async function retryCmd(
+  cmd: () => Promise<any>,
+  numAttempts: number = 100,
+  maxTimeoutMs: number = 15000
+) {
+  for (let i = 1; i <= numAttempts; i++) {
+    try {
+      const result = await cmd()
+      return result
+    } catch (error) {
+      const sleepTimeBasisInMs = 1000
+      const sleepTimeInMs = Math.min(sleepTimeBasisInMs * Math.pow(2, i), maxTimeoutMs)
+      console.warn(
+        `${new Date().toLocaleTimeString()} Retry attempt: ${i}/${numAttempts}, ` +
+          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
+        error
+      )
+      await sleep(sleepTimeInMs)
+    }
+  }
+  throw Error(`Retried ${numAttempts} without any successes`)
+}

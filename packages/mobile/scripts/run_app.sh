@@ -7,23 +7,18 @@ set -euo pipefail
 
 # Flags:
 # -p: Platform (android or ios)
-# -n (Optional): Name of the network to run on 
-# -f (Optional): Fast (skip steps not required unless network or depedencies changes)
-# -r (Optional): Hot Reload (Restore nav state on reload, useful for UI dev-ing)
-# -b (Optional): Just configure and build sdk, skip running 
+# -e (Optional): Name of the env to run
+# -r (Optional): Use release build (by default uses debug). Note: on Android the release keystore needs to be present and the password in the env variable for this to work.
 
-NETWORK=""
 PLATFORM=""
-FAST=false
-HOT_RELOAD=false
-BUILD_ONLY=false
-while getopts 'p:n:frb' flag; do
+ENV_NAME="alfajoresdev"
+RELEASE=false
+
+while getopts 'p:e:r' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
-    n) NETWORK="$OPTARG" ;;
-    f) FAST=true ;;
-    r) HOT_RELOAD=true ;;
-    b) BUILD_ONLY=true ;;
+    e) ENV_NAME="$OPTARG" ;;
+    r) RELEASE=true ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -31,86 +26,89 @@ done
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 
 # Get machine type (needed later)
-unameOut="$(uname -s)"
-case "${unameOut}" in
+if [ -z "${MACHINE-}" ]; then
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
     Linux*)     MACHINE=Linux;;
     Darwin*)    MACHINE=Mac;;
     CYGWIN*)    MACHINE=Cygwin;;
     MINGW*)     MACHINE=MinGw;;
     *)          MACHINE="UNKNOWN:${unameOut}"
-esac
-echo "Machine type: $MACHINE"
-echo "Current directory: `pwd`"
-
-# Read values from the .env file and put them in env vars
-ENV_FILENAME="${ENVFILE:-.env}"
-# From https://stackoverflow.com/a/56229034/158525
-# Supports vars with spaces and single or double quotes
-eval $(grep -v -e '^#' $ENV_FILENAME | xargs -I {} echo export \'{}\')
-
-if [ -z "$NETWORK" ]; then
-  echo "No network set, using $DEFAULT_TESTNET network set in $ENV_FILENAME file."
-  NETWORK=$DEFAULT_TESTNET
+  esac
 fi
 
-# Set DEFAULT_TESTNET in .env file
-sed -i.bak "s/DEFAULT_TESTNET=.*/DEFAULT_TESTNET=$NETWORK/g" $ENV_FILENAME
+# Read values from the .env file and put them in env vars
+ENV_FILENAME=".env.${ENV_NAME}"
+# From https://stackoverflow.com/a/56229034/158525
+# Supports vars with spaces and single or double quotes
+eval "$(grep -v -e '^#' "$ENV_FILENAME" | xargs -I {} echo export \'{}\')"
 
-# Set Hot Reload (saved nav state) in .env file
-sed -i.bak "s/DEV_RESTORE_NAV_STATE_ON_RELOAD=.*/DEV_RESTORE_NAV_STATE_ON_RELOAD=$HOT_RELOAD/g" $ENV_FILENAME
+echo "**************************"
+echo "Current directory: $(pwd)"
+echo "Machine type: $MACHINE"
+echo "Environment: $ENV_FILENAME"
+echo "Network: $DEFAULT_TESTNET"
+echo "Platform: $PLATFORM"
+echo "**************************"
 
-# Set Firebase settings in google service config files
-ANDROID_GSERVICES_PATH="./android/app/src/debug/google-services.json"
-IOS_GSERVICES_PATH="./ios/$IOS_GOOGLE_SERVICE_PLIST"
-sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $ANDROID_GSERVICES_PATH || true
-sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $IOS_GSERVICES_PATH || true
+startPackager() {
+  export RCT_METRO_PORT="${RCT_METRO_PORT:=8081}"
+  if [ -z "${RCT_NO_LAUNCH_PACKAGER+xxx}" ] ; then
+    if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then
+      if ! curl -s "http://localhost:${RCT_METRO_PORT}/status" | grep -q "packager-status:running" ; then
+        echo "Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly"
+        exit 2
+      fi
+      echo "Packager server already running"
+    else
+      terminal="${RCT_TERMINAL-${REACT_TERMINAL-$TERM_PROGRAM}}"
+      echo "Starting packager in new terminal..."
 
-# Cleanup artifacts from in-place sed replacement on BSD based systems (macOS)
-rm -f $ENV_FILENAME.bak
-rm -f $ANDROID_GSERVICES_PATH.bak
-rm -f $IOS_GSERVICES_PATH.bak
+      if [ "$MACHINE" = "Mac" ]; then
+        open -a "$terminal" ./scripts/launch_packager.command || open ./scripts/launch_packager.command || open_failed=1
+      elif [ "$MACHINE" = "Linux" ]; then
+        "$terminal" -e "sh ./scripts/launch_packager.command" || open_failed=1
+      else 
+        echo "Unsupported machine for running in new terminal"
+        open_failed=1
+      fi
+
+      if [ "${open_failed-}" = 1 ]; then
+        echo "Could not open terminal '${terminal}'. Falling back to running the packager inline."
+        yarn react-native start &
+      fi
+    fi
+  fi
+}
 
 # Build the app and run it
-if [ $PLATFORM = "android" ]; then
-  echo "Using platform android"
+if [ "$PLATFORM" = "android" ]; then
 
-  if [ "$BUILD_ONLY" = true ]; then
-    echo "Build only enabled, stopping here."
-    exit 0
-  fi
-
-  NUM_DEVICES=`adb devices -l | wc -l`
-  if [ $NUM_DEVICES -lt 3 ]; then 
+  NUM_DEVICES=$(adb devices -l | wc -l)
+  if [ "$NUM_DEVICES" -lt 3 ]; then 
     echo "No android devices found"
     exit 1
   fi
 
-  if [ $MACHINE = "Mac" ]; then
-    echo "Starting packager in new terminal"
-    RN_START_CMD="cd `pwd` && (yarn react-native start || yarn react-native start)"
-    OSASCRIPT_CMD="tell application \"Terminal\" to do script \"$RN_START_CMD\""
-    echo "FULLCMD: $OSASCRIPT_CMD"
-    osascript -e "$OSASCRIPT_CMD"
-    # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appIdSuffix "debug" --no-packager
-  else 
-    # Run android without packager because RN cli doesn't work with yarn workspaces
-    yarn react-native run-android --appIdSuffix "debug" --no-packager
-    yarn react-native start 
-  fi
+  case "$RELEASE" in
+    true) BUILD_TYPE="Release" ;;
+    *) BUILD_TYPE="Debug" ;;
+  esac
 
-elif [ $PLATFORM = "ios" ]; then
-  echo "Using platform ios"
-  # TODO have iOS build and start from command line
-  echo -e "\nFor now ios must be build and run from xcode\nStarting RN bundler\n"
+  # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
+  startPackager
+  yarn react-native run-android --variant "${ENV_NAME}${BUILD_TYPE}" --appId "$APP_BUNDLE_ID" --no-packager
 
+elif [ "$PLATFORM" = "ios" ]; then
 
-  if [ "$BUILD_ONLY" = true ]; then
-    echo "Build only enabled, stopping here."
-    exit 0
-  fi
+  case "$RELEASE" in
+    true) CONFIGURATION="Release" ;;
+    *) CONFIGURATION="Debug" ;;
+  esac
 
-  yarn react-native start 
+  # Launch our packager directly as RN launchPackager doesn't work correctly with monorepos
+  startPackager
+  yarn react-native run-ios --scheme "celo-${ENV_NAME}" --configuration "$CONFIGURATION" --no-packager
 
 else
   echo "Invalid value for platform, must be 'android' or 'ios'"

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IStableToken.sol";
 import "../common/interfaces/ICeloToken.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
@@ -18,6 +19,7 @@ import "../common/UsingPrecompiles.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is
+  ICeloVersionedContract,
   Ownable,
   Initializable,
   UsingRegistry,
@@ -66,7 +68,7 @@ contract StableToken is
   InflationState inflationState;
 
   /**
-   * @notice recomputes and updates inflation factor if more than `updatePeriod`
+   * @notice Recomputes and updates inflation factor if more than `updatePeriod`
    * has passed since last update.
    */
   modifier updateInflationFactor() {
@@ -84,12 +86,22 @@ contract StableToken is
   }
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
    * @param _name The name of the stable token (English)
    * @param _symbol A short symbol identifying the token (e.g. "cUSD")
    * @param _decimals Tokens are divisible to this many decimal places.
    * @param registryAddress Address of the Registry contract.
-   * @param inflationRate weekly inflation rate.
-   * @param inflationFactorUpdatePeriod how often the inflation factor is updated.
+   * @param inflationRate Weekly inflation rate.
+   * @param inflationFactorUpdatePeriod How often the inflation factor is updated.
+   * @param initialBalanceAddresses Array of addresses with an initial balance.
+   * @param initialBalanceValues Array of balance values corresponding to initialBalanceAddresses.
    */
   function initialize(
     string calldata _name,
@@ -126,8 +138,8 @@ contract StableToken is
 
   /**
    * @notice Updates Inflation Parameters.
-   * @param rate new rate.
-   * @param updatePeriod how often inflationFactor is updated.
+   * @param rate New rate.
+   * @param updatePeriod How often inflationFactor is updated.
    */
   function setInflationParameters(uint256 rate, uint256 updatePeriod)
     external
@@ -392,9 +404,10 @@ contract StableToken is
 
   /**
    * @notice Returns the units for a given value given the current inflation factor.
+   * @param inflationFactor The current inflation factor.
    * @param value The value to convert to units.
    * @return The units corresponding to `value` given the current inflation factor.
-   * @dev we assume any function calling this will have updated the inflation factor.
+   * @dev We assume any function calling this will have updated the inflation factor.
    */
   function _valueToUnits(FixidityLib.Fraction memory inflationFactor, uint256 value)
     private
@@ -406,8 +419,8 @@ contract StableToken is
 
   /**
    * @notice Computes the up-to-date inflation factor.
-   * @return current inflation factor.
-   * @return lastUpdated time when the returned inflation factor went into effect.
+   * @return Current inflation factor.
+   * @return Last time when the returned inflation factor was updated.
    */
   function getUpdatedInflationFactor() private view returns (FixidityLib.Fraction memory, uint256) {
     /* solhint-disable not-rely-on-time */

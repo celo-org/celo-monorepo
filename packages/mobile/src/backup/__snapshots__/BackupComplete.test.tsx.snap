@@ -1,47 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BackupComplete renders correctly when social backup is complete 1`] = `
-<SafeAreaView
+exports[`BackupComplete renders correctly 1`] = `
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
-      "flex": 1,
-    }
-  }
->
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flex": 1,
-        "justifyContent": "center",
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Light",
-          "fontSize": 22,
-          "marginTop": 20,
-          "paddingBottom": 20,
-          "paddingHorizontal": 40,
-          "textAlign": "center",
-        }
-      }
-    >
-      backupComplete.2
-    </Text>
-  </View>
-</SafeAreaView>
-`;
-
-exports[`BackupComplete renders correctly when social backup is not complete 1`] = `
-<SafeAreaView
-  style={
-    Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
     }
   }
@@ -59,31 +21,29 @@ exports[`BackupComplete renders correctly when social backup is not complete 1`]
       fill="none"
       height={32}
       style={Object {}}
-      viewBox="0 0 18 18"
-      width={47}
-      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      width={32}
     >
-      <rect
-        fill="#45CD86"
-        height="2"
-        rx="1"
+      <path
+        d="M8.414 15.086a2 2 0 10-2.828 2.828l2.828-2.828zM12.5 22l-1.414 1.414a2 2 0 002.8.029L12.5 22zm13.885-10.557a2 2 0 00-2.77-2.886l2.77 2.886zm-20.8 6.471l5.5 5.5 2.83-2.828-5.5-5.5-2.83 2.828zm8.3 5.529l12.5-12-2.77-2.886-12.5 12 2.77 2.886z"
+        fill="#42D689"
         style={Object {}}
-        transform="rotate(-135 6.89185 17.0205)"
-        width="8.33324"
-        x="6.89185"
-        y="17.0205"
-      />
-      <rect
-        fill="#45CD86"
-        height="2"
-        rx="1"
-        style={Object {}}
-        transform="rotate(-45 5.47778 15.6064)"
-        width="14.9998"
-        x="5.47778"
-        y="15.6064"
       />
     </svg>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Jost-Book",
+          "fontSize": 26,
+          "lineHeight": 32,
+          "marginTop": 20,
+          "paddingHorizontal": 40,
+        }
+      }
+    >
+      backupComplete.2
+    </Text>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

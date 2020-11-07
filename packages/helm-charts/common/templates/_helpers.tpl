@@ -100,13 +100,19 @@ release: {{ .Release.Name }}
       NAT_IP=$(cat /root/.celo/ipAddress)
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
+
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
-    [[ -f /root/.celo/pkey ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey"
+    if [[ -f /root/.celo/pkey ]]; then
+      NODE_KEY=$(cat /root/.celo/pkey)
+      if [[ ! -z ${NODE_KEY} ]]; then
+        ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --nodekey=/root/.celo/pkey"
+      fi
+    fi
     {{ if .proxy | default false }}
     VALIDATOR_HEX_ADDRESS=$(cat /root/.celo/validator_address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
     {{- end }}
-  
+
     {{ if .proxied | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
     {{ end }}
@@ -129,10 +135,31 @@ release: {{ .Release.Name }}
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    {{- if .proxy | default false }}
+    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- else }}
+    {{- if not (.proxied | default false) }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if .metrics | default true }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+    {{- end }}
+    {{- if .pprof | default false }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
+    {{- end }}
+    PORT=30303
+    {{- if .ports }}
+    PORTS_PER_RID={{ join "," .ports }}
+    PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
     {{- end }}
 
-    geth \
+{{ .extra_setup }}
+
+    exec geth \
+      --port $PORT  \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
@@ -146,7 +173,7 @@ release: {{ .Release.Name }}
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
       --vmodule={{ .Values.geth.vmodule }} \
-      --metrics \
+      --istanbul.blockperiod={{ .Values.geth.blocktime | default 5 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -159,17 +186,49 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
+{{- if .Values.aws }}
+  - name: HOST_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.hostIP
+{{- end }}
+{{/* TODO: make this use IPC */}}
+{{- if .expose }}
+  readinessProbe:
+    exec:
+      command:
+      - /bin/sh
+      - "-c"
+      - |
+{{ include "common.node-health-check" . | indent 8 }}
+    initialDelaySeconds: 20
+    periodSeconds: 10
+{{- end }}
   ports:
+{{- if .ports }}
+{{- range $index, $port := .ports }}
+  - name: discovery-{{ $port }}
+    containerPort: {{ $port }}
+    protocol: UDP
+  - name: ethereum-{{ $port }}
+    containerPort: {{ $port }}
+{{- end }}
+{{- else }}
   - name: discovery
     containerPort: 30303
     protocol: UDP
   - name: ethereum
     containerPort: 30303
+{{- end }}
 {{- if .expose }}
   - name: rpc
     containerPort: 8545
   - name: ws
     containerPort: 8546
+{{ end }}
+{{- if .pprof }}
+  - name: pprof
+    containerPort: {{ .pprof_port }}
 {{ end }}
   resources:
 {{ toYaml .Values.geth.resources | indent 4 }}
@@ -205,14 +264,22 @@ data:
     - |
       [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
       RID=${BASH_REMATCH[1]}
-      echo "Generating private key for rid=$RID"
-      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $RID > /root/.celo/pkey
+      {{ if .proxy }}
+      # To allow proxies to scale up easily without conflicting with keys of
+      # proxies associated with other validators
+      KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
+      {{ else }}
+      KEY_INDEX=$RID
+      {{ end }}
+      echo "Generating private key with KEY_INDEX=$KEY_INDEX"
+      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $KEY_INDEX > /root/.celo/pkey
+      echo "Private key $(cat /root/.celo/pkey)"
       echo 'Generating address'
       celotooljs.sh generate account-address --private-key $(cat /root/.celo/pkey) > /root/.celo/address
       {{ if .proxy }}
       # Generating the account address of the validator
-      echo "Generating the account address of the validator $RID"
-      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/validator_pkey
+      echo "Generating the account address of the validator {{ .validator_index }}"
+      celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index {{ .validator_index }} > /root/.celo/validator_pkey
       celotooljs.sh generate account-address --private-key `cat /root/.celo/validator_pkey` > /root/.celo/validator_address
       rm -f /root/.celo/validator_pkey
       {{ end }}
@@ -232,7 +299,7 @@ data:
         fi
       else
         echo 'Using $IP_ADDRESSES'
-        echo $IP_ADDRESSES | cut -d ',' -f $((RID + 1)) > /root/.celo/ipAddress
+        echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
       fi
       echo "/root/.celo/ipAddress"
       cat /root/.celo/ipAddress
@@ -253,7 +320,7 @@ data:
         apiVersion: v1
         fieldPath: status.podIP
   - name: BOOTNODE_IP_ADDRESS
-    value: {{ default "none" .Values.geth.bootnodeIpAddress  }}
+    value: {{ default "none" .Values.geth.bootnodeIpAddress }}
   - name: REPLICA_NAME
     valueFrom:
       fieldRef:
@@ -264,10 +331,37 @@ data:
         name: {{ template "common.fullname" . }}-geth-account
         key: mnemonic
   - name: IP_ADDRESSES
-    value:  "{{ join "," .ip_addresses }}"
+    value: {{ .ip_addresses }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+{{- end -}}
+
+{{- define "common.node-health-check" -}}
+# fail if any wgets fail
+set -euo pipefail
+RPC_URL=http://localhost:8545
+# first check if it's syncing
+SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
+NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
+if [ ! $NOT_SYNCING ]; then
+  echo "Node is syncing: $SYNCING"
+  exit 1
+fi
+
+# then make sure that the latest block is new
+MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
+LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
+BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
+BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
+CURRENT_TIMESTAMP=$(date +%s)
+BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
+# if the most recent block is too old, then indicate the node is not ready
+if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
+  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
+  exit 1
+fi
+exit 0
 {{- end -}}
 
 {{- define "common.geth-exporter-container" -}}
@@ -314,4 +408,25 @@ spec:
 {{- if .load_balancer_ip }}
   loadBalancerIP: {{ .load_balancer_ip }}
 {{- end }}
+{{- end -}}
+
+{{/*
+* Specifies an env var given a dictionary, the name of the desired value, and
+* if it's optional. If optional, the env var is only given if the desired value exists in the dict.
+*/}}
+{{- define "common.env-var" -}}
+{{- if or (not .optional) (hasKey .dict .value_name) }}
+- name: {{ .name }}
+  value: "{{ (index .dict .value_name) }}"
+{{- end }}
+{{- end -}}
+
+{{/*
+Annotations to indicate to the prometheus server that this node should be scraped for metrics
+*/}}
+{{- define "common.prometheus-annotations" -}}
+{{- $pprof := .Values.pprof | default dict -}}
+prometheus.io/scrape: "true"
+prometheus.io/path:  "{{ $pprof.path | default "/debug/metrics/prometheus" }}"
+prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- end -}}

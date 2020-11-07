@@ -7,8 +7,7 @@ import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -18,16 +17,12 @@ const store = createMockStore({
   },
 })
 
-const mockRoute = {
-  name: Screens.ExchangeTradeScreen as Screens.ExchangeTradeScreen,
-  key: '1',
-  params: {
-    makerTokenDisplay: {
-      makerToken: CURRENCY_ENUM.GOLD,
-      makerTokenBalance: '20',
-    },
+const mockScreenProps = getMockStackScreenProps(Screens.ExchangeTradeScreen, {
+  makerTokenDisplay: {
+    makerToken: CURRENCY_ENUM.GOLD,
+    makerTokenBalance: '20',
   },
-}
+})
 
 describe(ExchangeTradeScreen, () => {
   beforeEach(() => {
@@ -38,8 +33,7 @@ describe(ExchangeTradeScreen, () => {
     const { toJSON } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={mockNavigation}
-          route={mockRoute}
+          {...mockScreenProps}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}
@@ -61,8 +55,7 @@ describe(ExchangeTradeScreen, () => {
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={mockNavigation}
-          route={mockRoute}
+          {...mockScreenProps}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={mockShowError}
@@ -97,16 +90,12 @@ describe(ExchangeTradeScreen, () => {
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={mockNavigation}
-          route={{
-            ...mockRoute,
-            params: {
-              makerTokenDisplay: {
-                makerToken: CURRENCY_ENUM.DOLLAR,
-                makerTokenBalance: '20.02', // equals 400.4 MXN
-              },
+          {...getMockStackScreenProps(Screens.ExchangeTradeScreen, {
+            makerTokenDisplay: {
+              makerToken: CURRENCY_ENUM.DOLLAR,
+              makerTokenBalance: '20.02', // equals 400.4 MXN
             },
-          }}
+          })}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={mockShowError}
@@ -138,8 +127,7 @@ describe(ExchangeTradeScreen, () => {
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={mockNavigation}
-          route={mockRoute}
+          {...mockScreenProps}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}
@@ -169,16 +157,12 @@ describe(ExchangeTradeScreen, () => {
     const { getByTestId } = render(
       <Provider store={store}>
         <ExchangeTradeScreen
-          navigation={mockNavigation}
-          route={{
-            ...mockRoute,
-            params: {
-              makerTokenDisplay: {
-                makerToken: CURRENCY_ENUM.DOLLAR,
-                makerTokenBalance: '200',
-              },
+          {...getMockStackScreenProps(Screens.ExchangeTradeScreen, {
+            makerTokenDisplay: {
+              makerToken: CURRENCY_ENUM.DOLLAR,
+              makerTokenBalance: '200',
             },
-          }}
+          })}
           error={null}
           fetchExchangeRate={jest.fn()}
           showError={jest.fn()}

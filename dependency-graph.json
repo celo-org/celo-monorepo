@@ -1,83 +1,204 @@
 {
-  "attestation-service": [
-    "contractkit",
-    "protocol",
-    "utils"
-  ],
-  "azure": [],
-  "blockchain-api": [
-    "contractkit",
-    "utils"
-  ],
-  "celotool": [
-    "contractkit",
-    "protocol",
-    "utils",
-    "verification-pool-api"
-  ],
-  "cli": [
-    "contractkit",
-    "dev-utils",
-    "utils"
-  ],
-  "contractkit": [
-    "dev-utils",
-    "protocol",
-    "utils"
-  ],
-  "dappkit": [
-    "contractkit",
-    "utils"
-  ],
-  "dev-utils": [],
-  "docs": [],
-  "faucet": [
-    "contractkit",
-    "utils"
-  ],
-  "leaderboard": [
-    "contractkit"
-  ],
-  "metadata-crawler": [
-    "contractkit",
-    "utils"
-  ],
-  "mobile": [
-    "contractkit",
-    "react-components",
-    "typescript",
-    "utils"
-  ],
-  "moonpay-auth": [],
-  "notification-service": [
-    "contractkit",
-    "utils"
-  ],
-  "phone-number-privacy": [
-    "contractkit",
-    "utils"
-  ],
-  "protocol": [
-    "typescript",
-    "utils"
-  ],
-  "react-components": [
-    "typescript",
-    "utils"
-  ],
-  "transaction-metrics-exporter": [
-    "contractkit",
-    "utils"
-  ],
-  "typescript": [],
-  "utils": [
-    "typescript"
-  ],
-  "verification-pool-api": [
-    "contractkit",
-    "utils"
-  ],
-  "web": [
-    "utils"
-  ]
+  "@celo/attestation-proxy": {
+    "location": "packages/attestation-proxy",
+    "dependencies": []
+  },
+  "@celo/attestation-service": {
+    "location": "packages/attestation-service",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "celo-azure-build": {
+    "location": "packages/azure",
+    "dependencies": []
+  },
+  "@celo/base": {
+    "location": "packages/base",
+    "dependencies": [
+      "@celo/flake-tracker",
+      "@celo/typescript"
+    ]
+  },
+  "@celo/blockchain-api": {
+    "location": "packages/blockchain-api",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/flake-tracker",
+      "@celo/utils"
+    ]
+  },
+  "@celo/celotool": {
+    "location": "packages/celotool",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/dev-utils",
+      "@celo/flake-tracker",
+      "@celo/protocol",
+      "@celo/utils"
+    ]
+  },
+  "@celo/celocli": {
+    "location": "packages/cli",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/dev-utils",
+      "@celo/flake-tracker",
+      "@celo/utils"
+    ]
+  },
+  "@celo/contractkit": {
+    "location": "packages/contractkit",
+    "dependencies": [
+      "@celo/base",
+      "@celo/dev-utils",
+      "@celo/flake-tracker",
+      "@celo/protocol",
+      "@celo/utils"
+    ]
+  },
+  "@celo/dappkit": {
+    "location": "packages/dappkit",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/dev-utils": {
+    "location": "packages/dev-utils",
+    "dependencies": []
+  },
+  "docs": {
+    "location": "packages/docs",
+    "dependencies": []
+  },
+  "@celo/env-tests": {
+    "location": "packages/env-tests",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/faucet-app": {
+    "location": "packages/faucet",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/flake-tracker": {
+    "location": "packages/flake-tracker",
+    "dependencies": []
+  },
+  "@celo/komencikit": {
+    "location": "packages/komencikit",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/metadata-crawler": {
+    "location": "packages/metadata-crawler",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/mobile": {
+    "location": "packages/mobile",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/flake-tracker",
+      "@celo/react-components",
+      "@celo/typescript",
+      "@celo/utils"
+    ]
+  },
+  "@celo/moonpay-auth": {
+    "location": "packages/moonpay-auth",
+    "dependencies": []
+  },
+  "@celo/notification-service": {
+    "location": "packages/notification-service",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/flake-tracker",
+      "@celo/utils"
+    ]
+  },
+  "@celo/protocol": {
+    "location": "packages/protocol",
+    "dependencies": [
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
+    ]
+  },
+  "@celo/react-components": {
+    "location": "packages/react-components",
+    "dependencies": [
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
+    ]
+  },
+  "@celo/reserve-web": {
+    "location": "packages/reserve-site",
+    "dependencies": []
+  },
+  "@celo/typescript": {
+    "location": "packages/typescript",
+    "dependencies": []
+  },
+  "@celo/utils": {
+    "location": "packages/utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript"
+    ]
+  },
+  "@celo/web": {
+    "location": "packages/web",
+    "dependencies": [
+      "@celo/flake-tracker",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-combiner": {
+    "location": "packages/phone-number-privacy/combiner",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/flake-tracker",
+      "@celo/phone-number-privacy-common",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-common": {
+    "location": "packages/phone-number-privacy/common",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-monitor": {
+    "location": "packages/phone-number-privacy/monitor",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/phone-number-privacy-common",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-signer": {
+    "location": "packages/phone-number-privacy/signer",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/flake-tracker",
+      "@celo/phone-number-privacy-common",
+      "@celo/utils"
+    ]
+  }
 }

@@ -43,12 +43,16 @@ export async function displaySendTx<A>(
   }
 }
 
-export function printValueMap(valueMap: Record<string, any>, color = chalk.red.bold) {
+export function printValueMap(valueMap: Record<string, any>, color = chalk.yellowBright.bold) {
   console.log(
     Object.keys(valueMap)
       .map((key) => color(`${key}: `) + valueMap[key])
       .join('\n')
   )
+}
+
+export function printValueMap2(valueMap: Map<any, any>, color = chalk.yellowBright.bold) {
+  valueMap.forEach((value, key) => console.log(color(`${key}: `) + value))
 }
 
 export function printValueMapRecursive(valueMap: Record<string, any>) {
@@ -59,8 +63,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
   const printValue = (v: any): string => {
     if (typeof v === 'object' && v != null) {
       if (BigNumber.isBigNumber(v)) {
-        const factor = new BigNumber(10).pow(18)
-        const extra = v.isGreaterThan(factor) ? `(~${v.div(factor).decimalPlaces(2)} 10^18)` : ''
+        const extra = v.isGreaterThan(new BigNumber(10).pow(3)) ? `(~${v.toExponential(3)})` : ''
         return `${v.toFixed()} ${extra}`
       }
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
@@ -68,7 +71,7 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
     return chalk`${v}`
   }
   return Object.keys(valueMap)
-    .map((key) => prefix + chalk`{red.bold ${key}:} ${printValue(valueMap[key])}`)
+    .map((key) => prefix + chalk.yellowBright.bold(`${key}: `) + printValue(valueMap[key]))
     .join('\n')
 }
 

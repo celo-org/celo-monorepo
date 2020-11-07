@@ -1,11 +1,11 @@
 import Carousel from 'nuka-carousel'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import PagingDots from 'src/carousel/PagingDots'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import { hashNav } from 'src/shared/menu-items'
 import ResponsiveImage from 'src/shared/ResponsiveImage'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -53,7 +53,7 @@ class Tenets extends React.PureComponent<Props> {
           desktopStyle={standardStyles.sectionMargin}
         >
           <Cell span={Spans.three4th}>
-            <Fade bottom={true} distance={'20px'}>
+            <Fade distance={'20px'}>
               <View style={standardStyles.centered}>
                 <H2 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
                   {t('tenetTitle')}
@@ -63,7 +63,7 @@ class Tenets extends React.PureComponent<Props> {
             </Fade>
           </Cell>
         </GridRow>
-        <Fade bottom={true} distance={'20px'}>
+        <Fade distance={'20px'}>
           <Carousel
             heightMode={'current'}
             autoplay={false}

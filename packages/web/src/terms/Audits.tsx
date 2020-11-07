@@ -7,7 +7,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { HelpfullLink } from './HelpfullLink'
+import { HelpfulLink } from './HelpfulLink'
 
 interface Audit {
   auditor: string
@@ -25,7 +25,12 @@ const DATA: Audit[] = [
   },
   { auditor: 'Teserakt', title: 'Crypto Library Audit', type: 'security' },
   { auditor: 'Trailofbits', title: 'Security Audit', type: 'security' },
-  { auditor: 'Certora', title: 'Formal Verification of Smart Contracts', type: 'contracts' },
+  {
+    auditor: 'Certora',
+    title: 'Formal Verification of Celo Governance Protocols',
+    type: 'contracts',
+    link: 'https://www.certora.com/pubs/CeloMay2020.pdf',
+  },
   { auditor: 'Gauntlet', title: 'Stability Protocol Analysis', type: 'economics' },
   { auditor: 'Prysm Group', title: 'Economic Analysis', type: 'economics' },
   { auditor: 'NCC', title: 'Reserve Audit', type: 'economics' },
@@ -70,7 +75,7 @@ class Audits extends React.PureComponent<I18nProps> {
                     <Text style={fonts.p}>
                       {audit.title} by <Text style={textStyles.italic}>{audit.auditor}</Text>
                     </Text>
-                    {audit.link && <HelpfullLink text={t('download')} href={audit.link} />}
+                    {audit.link && <HelpfulLink text={t('download')} href={audit.link} />}
                   </View>
                 ))}
               </SideTitledSection>

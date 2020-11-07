@@ -1,15 +1,14 @@
-import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
+import { Dimensions, Linking, StatusBar, YellowBox } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import { SafeAreaProvider } from 'react-native-safe-area-view'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { AppEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { apolloClient } from 'src/apollo/index'
 import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
@@ -38,21 +37,49 @@ BigNumber.config({
   },
 })
 
-export class App extends React.Component {
+interface Props {
+  appStartedMillis: number
+}
+
+// Enables LayoutAnimation on Android. It makes transitions between states smoother.
+// https://reactnative.dev/docs/layoutanimation
+// Disabling it for now as it seems to cause blank white screens on certain android devices
+// if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+//   UIManager.setLayoutAnimationEnabledExperimental(true)
+// }
+
+export class App extends React.Component<Props> {
+  reactLoadTime: number = Date.now()
+
   async componentDidMount() {
-    CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
-    const appLoadedAt: Date = new Date()
-    const appStartListener = DeviceEventEmitter.addListener(
-      'AppStartedLoading',
-      (appInitializedAtString: string) => {
-        const appInitializedAt = new Date(appInitializedAtString)
-        const tti = appLoadedAt.getTime() - appInitializedAt.getTime()
-        CeloAnalytics.track(DefaultEventNames.appLoadTTIInMilliseconds, { tti }, true)
-        appStartListener.remove()
-      }
-    )
+    await ValoraAnalytics.init()
 
     Linking.addEventListener('url', this.handleOpenURL)
+
+    const url = await Linking.getInitialURL()
+    if (url) {
+      this.handleOpenURL({ url })
+    }
+
+    this.logAppLoadTime()
+  }
+
+  logAppLoadTime() {
+    const { appStartedMillis } = this.props
+    const reactLoadDuration = (this.reactLoadTime - appStartedMillis) / 1000
+    const appLoadDuration = (Date.now() - appStartedMillis) / 1000
+    Logger.debug(
+      'App/logAppLoadTime',
+      `reactLoad: ${reactLoadDuration} appLoad: ${appLoadDuration}`
+    )
+    const { width, height } = Dimensions.get('window')
+
+    ValoraAnalytics.startSession(AppEvents.app_launched, {
+      deviceHeight: height,
+      deviceWidth: width,
+      reactLoadDuration,
+      appLoadDuration,
+    })
   }
 
   componentWillUnmount() {
@@ -69,7 +96,7 @@ export class App extends React.Component {
         <ApolloProvider client={apolloClient}>
           <Provider store={store}>
             <PersistGate loading={<AppLoading />} persistor={persistor}>
-              <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+              <StatusBar backgroundColor="transparent" barStyle="dark-content" />
               <ErrorBoundary>
                 <NavigatorWrapper />
               </ErrorBoundary>

@@ -4,6 +4,12 @@ exports[`renders selected correctly 1`] = `
 <View
   accessible={true}
   focusable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackground",
+      "type": "ThemeAttrAndroid",
+    }
+  }
   onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
@@ -11,30 +17,23 @@ exports[`renders selected correctly 1`] = `
   onResponderTerminate={[Function]}
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
-  style={
-    Object {
-      "opacity": 1,
-    }
-  }
 >
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "height": 60,
-        },
-        Object {
-          "backgroundColor": "#F8F8F8",
-        },
-      ]
+      Object {
+        "alignItems": "center",
+        "borderBottomWidth": 1,
+        "borderColor": "#EDEEEF",
+        "flexDirection": "row",
+        "marginLeft": 16,
+        "paddingVertical": 14,
+      }
     }
   >
     <View
       style={
         Object {
-          "marginHorizontal": 12,
+          "marginRight": 16,
         }
       }
     >
@@ -48,7 +47,7 @@ exports[`renders selected correctly 1`] = `
         <circle
           cx="12"
           cy="12"
-          fill="#42D689"
+          fill="#1AB775"
           r="12"
           style={Object {}}
         />
@@ -61,28 +60,21 @@ exports[`renders selected correctly 1`] = `
         />
       </svg>
     </View>
-    <View
+    <Text
+      numberOfLines={1}
       style={
         Object {
-          "borderBottomWidth": 1,
-          "borderColor": "#EEEEEE",
-          "height": 60,
-          "justifyContent": "center",
-          "width": 702,
+          "color": "#2E3338",
+          "flex": 1,
+          "fontFamily": "Inter-Regular",
+          "fontSize": 16,
+          "lineHeight": 22,
+          "marginRight": 16,
         }
       }
     >
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontSize": 16,
-          }
-        }
-      >
-        Example
-      </Text>
-    </View>
+      Example
+    </Text>
   </View>
 </View>
 `;
@@ -91,6 +83,12 @@ exports[`renders unselected correctly 1`] = `
 <View
   accessible={true}
   focusable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackground",
+      "type": "ThemeAttrAndroid",
+    }
+  }
   onClick={[Function]}
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
@@ -98,35 +96,30 @@ exports[`renders unselected correctly 1`] = `
   onResponderTerminate={[Function]}
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
-  style={
-    Object {
-      "opacity": 1,
-    }
-  }
 >
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "flexDirection": "row",
-          "height": 60,
-        },
-        false,
-      ]
+      Object {
+        "alignItems": "center",
+        "borderBottomWidth": 1,
+        "borderColor": "#EDEEEF",
+        "flexDirection": "row",
+        "marginLeft": 16,
+        "paddingVertical": 14,
+      }
     }
   >
     <View
       style={
         Object {
-          "marginHorizontal": 12,
+          "marginRight": 16,
         }
       }
     >
       <View
         style={
           Object {
-            "borderColor": "#D1D5D8",
+            "borderColor": "#9CA4A9",
             "borderRadius": 12,
             "borderWidth": 2,
             "height": 24,
@@ -136,28 +129,21 @@ exports[`renders unselected correctly 1`] = `
         }
       />
     </View>
-    <View
+    <Text
+      numberOfLines={1}
       style={
         Object {
-          "borderBottomWidth": 1,
-          "borderColor": "#EEEEEE",
-          "height": 60,
-          "justifyContent": "center",
-          "width": 702,
+          "color": "#2E3338",
+          "flex": 1,
+          "fontFamily": "Inter-Regular",
+          "fontSize": 16,
+          "lineHeight": 22,
+          "marginRight": 16,
         }
       }
     >
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontSize": 16,
-          }
-        }
-      >
-        Example
-      </Text>
-    </View>
+      Example
+    </Text>
   </View>
 </View>
 `;

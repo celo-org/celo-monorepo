@@ -1,22 +1,20 @@
+import { NativeSigner, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import {
   hashMessageWithPrefix,
   LocalSigner,
-  NativeSigner,
   parseSignature,
-  Signature,
   signedMessageToPublicKey,
-  Signer,
 } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { Address } from '../base'
 import { Accounts } from '../generated/Accounts'
 import {
   BaseWrapper,
-  bytesToString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  stringToBytes,
+  solidityBytesToString,
+  stringToSolidityBytes,
   toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
@@ -149,7 +147,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       },
       metadataURL: ret[4],
       wallet: ret[5],
-      dataEncryptionKey: bytesToString(ret[6]),
+      dataEncryptionKey: ret[6],
     }
   }
 
@@ -222,7 +220,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
           proofOfSigningKeyPossession.s,
-          stringToBytes(pubKey)
+          stringToSolidityBytes(pubKey)
         )
       )
     } else {
@@ -270,9 +268,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s,
-        stringToBytes(pubKey),
-        stringToBytes(blsPublicKey),
-        stringToBytes(blsPop)
+        stringToSolidityBytes(pubKey),
+        stringToSolidityBytes(blsPublicKey),
+        stringToSolidityBytes(blsPop)
       )
     )
   }
@@ -303,7 +301,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * Returns the set data encryption key for the account
    * @param account Account
    */
-  getDataEncryptionKey = proxyCall(this.contract.methods.getDataEncryptionKey)
+  getDataEncryptionKey = proxyCall(this.contract.methods.getDataEncryptionKey, undefined, (res) =>
+    solidityBytesToString(res)
+  )
 
   /**
    * Returns the set wallet address for the account

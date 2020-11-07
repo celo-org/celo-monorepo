@@ -35,8 +35,8 @@ export async function installHelmChart(
   )
 }
 
-export async function removeHelmRelease(helmReleaseName: string) {
-  await removeGenericHelmChart(helmReleaseName)
+export async function removeHelmRelease(helmReleaseName: string, celoEnv: string) {
+  await removeGenericHelmChart(helmReleaseName, celoEnv)
 }
 
 export async function upgradeHelmChart(
@@ -73,6 +73,10 @@ async function helmParameters(
   blockscoutDBConnectionName: string
 ) {
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  const useMetadataCrawler = fetchEnvOrFallback(
+    envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY,
+    'false',
+  )
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
@@ -86,18 +90,30 @@ async function helmParameters(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
+    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
+    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
+  ]
+  if (useMetadataCrawler !== 'false') {
+    params.push(
     `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
     )}`,
     `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
     )}`,
-    `--set blockscout.metadata_crawler.schedule=${fetchEnv(
+    `--set blockscout.metadata_crawler.schedule="${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+    )}"`,
+    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+      ''
     )}`,
-    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
-    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
-  ]
+    `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
+      celoEnv
+    )}`,
+    )
+  }
   if (isVmBased()) {
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)

@@ -11,9 +11,10 @@ export const command = 'all'
 
 export const describe = 'upgrades a typical deploy'
 
-type TestnetArgv = UpgradeArgv & {
+type AllArgv = UpgradeArgv & {
   reset: boolean
   useExistingGenesis: boolean
+  skipFaucetting: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -28,9 +29,14 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Instead of generating a new genesis, use an existing genesis in GCS',
       default: false,
     })
+    .option('skipFaucetting', {
+      describe: 'skips allocation of cUSD to any oracle or bot accounts',
+      default: false,
+      type: 'boolean',
+    })
 }
 
-export const handler = async (argv: TestnetArgv) => {
+export const handler = async (argv: AllArgv) => {
   console.info('Deploy the testnet')
   await testnetHandler(argv)
   console.info('Deploy celostats')

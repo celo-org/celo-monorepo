@@ -17,7 +17,7 @@ it('renders correctly', () => {
   }
   const tree = renderer.create(
     <Provider store={store}>
-      <PaymentRequestNotificationInner amount="24" requesterRecipient={requesterRecipient} />
+      <PaymentRequestNotificationInner amount="24" recipient={requesterRecipient} />
     </Provider>
   )
 

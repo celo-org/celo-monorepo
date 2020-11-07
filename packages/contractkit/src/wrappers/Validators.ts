@@ -1,17 +1,20 @@
-import { eqAddress, findAddressIndex } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import { eqAddress, findAddressIndex } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/Validators'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
+  blocksToDurationString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  stringToBytes,
+  secondsToDurationString,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -173,6 +176,29 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
+   * @dev Returns human readable configuration of the validators contract
+   * @return ValidatorsConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const validatorLockedGoldRequirements = {
+      ...config.validatorLockedGoldRequirements,
+      duration: secondsToDurationString(config.validatorLockedGoldRequirements.duration),
+    }
+    const groupLockedGoldRequirements = {
+      ...config.groupLockedGoldRequirements,
+      duration: secondsToDurationString(config.groupLockedGoldRequirements.duration),
+    }
+    return {
+      ...config,
+      slashingMultiplierResetPeriod: secondsToDurationString(config.slashingMultiplierResetPeriod),
+      commissionUpdateDelay: blocksToDurationString(config.commissionUpdateDelay),
+      validatorLockedGoldRequirements,
+      groupLockedGoldRequirements,
+    }
+  }
+
+  /**
    * Returns the account associated with `signer`.
    * @param signer The address of an account or currently authorized validator signer.
    * @dev Fails if the `signer` is not an account or currently authorized validator.
@@ -208,7 +234,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -399,7 +425,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(stringToBytes, stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -573,7 +599,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentSignerSet(): Promise<Address[]> {
     const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
-    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+    return concurrentMap(5, zeroRange(n), (idx) =>
       this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
     )
   }

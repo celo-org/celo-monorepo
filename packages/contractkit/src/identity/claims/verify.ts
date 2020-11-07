@@ -1,5 +1,5 @@
-import { eqAddress } from '@celo/utils/lib/address'
-import { isValidUrl } from '@celo/utils/lib/io'
+import { eqAddress } from '@celo/base/lib/address'
+import { isValidUrl } from '@celo/base/lib/io'
 import { resolveTxt } from 'dns'
 import { promisify } from 'util'
 import { ContractKit } from '../..'
@@ -37,7 +37,6 @@ export const verifyAccountClaim = async (
 ) => {
   const metadataURL = await (await kit.contracts.getAccounts()).getMetadataURL(claim.address)
 
-  console.info('metadataURL ' + JSON.stringify(metadataURL))
   if (!isValidUrl(metadataURL)) {
     return `Metadata URL of ${claim.address} could not be retrieved`
   }
@@ -81,7 +80,6 @@ export const verifyDomainRecord = async (
     for (const record of domainRecords) {
       for (const entry of record) {
         if (entry.startsWith(DOMAIN_TXT_HEADER)) {
-          console.debug(`TXT Record celo-site-verification found`)
           const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
           const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
           if (
@@ -92,16 +90,13 @@ export const verifyDomainRecord = async (
               address
             )
           ) {
-            console.debug(`Signature verified successfully`)
             return
           }
         }
       }
     }
-    console.debug(`Domain not validated correctly`)
     return `Unable to verify domain claim with address ${address}`
   } catch (error) {
-    console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
     return `Unable to fetch domain TXT records: ${error.toString()}`
   }
 }

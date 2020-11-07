@@ -1,11 +1,11 @@
-import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/address'
-import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/base/lib/address'
+import { concurrentMap, concurrentValuesMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import BigNumber from 'bignumber.js'
-import { range } from 'lodash'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
 import { Election } from '../generated/Election'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -151,7 +151,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getValidatorSigners(blockNumber: number): Promise<Address[]> {
     const numValidators = await this.numberValidatorsInSet(blockNumber)
-    return concurrentMap(10, range(0, numValidators, 1), (i: number) =>
+    return concurrentMap(10, zeroRange(numValidators), (i: number) =>
       this.validatorSignerAddressFromSet(i, blockNumber)
     )
   }
@@ -318,7 +318,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
   }
 
-  _activate = proxySend(this.kit, this.contract.methods.activate)
+  private _activate = proxySend(this.kit, this.contract.methods.activate)
 
   /**
    * Activates any activatable pending votes.
@@ -450,7 +450,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve the elected validator set at.
    */
   async getElectedValidators(epochNumber: number): Promise<Validator[]> {
-    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
+    const blockNumber = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
     const signers = await this.getValidatorSigners(blockNumber)
     const validators = await this.kit.contracts.getValidators()
     return concurrentMap(10, signers, (addr) => validators.getValidatorFromSigner(addr))

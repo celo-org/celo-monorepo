@@ -5,7 +5,6 @@ import DeveloperPhoneCover from 'src/dev/DeveloperPhoneCover'
 import { Contribute, EngageAsDeveloper } from 'src/dev/Engage'
 import Features from 'src/dev/Features'
 import FullStack from 'src/dev/FullStack'
-import Sandbox from 'src/dev/Sandbox'
 import { H2, H3 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
@@ -25,7 +24,6 @@ class Developers extends React.PureComponent<I18nProps> {
           }
         />
         <DeveloperPhoneCover />
-        <Sandbox />
         <FullStack />
         <Features />
         <EngageAsDeveloper>

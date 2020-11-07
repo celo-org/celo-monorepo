@@ -6,13 +6,17 @@ import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
+import { requestPincodeInput } from 'src/pincode/authentication'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
+
+type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
 
@@ -27,7 +31,8 @@ async function ensureNavigator() {
   }
 }
 
-export function replace(routeName: string, params?: object) {
+export const replace: SafeNavigate = (...args) => {
+  const [routeName, params] = args
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
@@ -43,7 +48,30 @@ export function replace(routeName: string, params?: object) {
     })
 }
 
-export function navigate(routeName: string, params?: object) {
+// for when a screen should be pushed onto stack even if it already exists in it.
+export const pushToStack: SafeNavigate = (...args) => {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@pushToStack`, `Dispatch ${routeName}`)
+      navigationRef.current?.dispatch(
+        StackActions.push({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@pushToStack`, `Navigation failure: ${reason}`)
+    })
+}
+
+export function navigate<RouteName extends keyof StackParamList>(
+  ...args: undefined extends StackParamList[RouteName]
+    ? [RouteName] | [RouteName, StackParamList[RouteName]]
+    : [RouteName, StackParamList[RouteName]]
+) {
+  const [routeName, params] = args
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
@@ -60,47 +88,35 @@ export function navigate(routeName: string, params?: object) {
     })
 }
 
-async function ensurePincode(): Promise<boolean> {
+export async function ensurePincode(): Promise<boolean> {
   const pincodeType = pincodeTypeSelector(store.getState())
 
   if (pincodeType === PincodeType.Unset) {
     Logger.error(TAG + '@ensurePincode', 'Pin has never been set')
+    ValoraAnalytics.track(OnboardingEvents.pin_never_set)
     return false
   }
 
-  if (pincodeType === PincodeType.CustomPin) {
-    Logger.debug(TAG + '@ensurePincode', 'Getting custom pin')
-    let pin
-    try {
-      pin = await new Promise((resolve) => {
-        navigate(Screens.PincodeEnter, {
-          onSuccess: resolve,
-          withVerification: true,
-        })
-      })
-    } catch (error) {
-      Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error)
-      return false
-    }
-
-    if (!pin) {
-      Logger.error(`${TAG}@ensurePincode`, `Empty PIN`)
-      return false
-    }
+  if (pincodeType !== PincodeType.CustomPin) {
+    Logger.error(TAG + '@ensurePincode', `Unsupported Pincode Type ${pincodeType}`)
+    return false
   }
-  return true
+
+  try {
+    await requestPincodeInput(true, false)
+    return true
+  } catch (error) {
+    Logger.error(`${TAG}@ensurePincode`, `PIN entering error`, error, true)
+    return false
+  }
 }
 
-export function navigateProtected(routeName: string, params?: object) {
-  ensurePincode()
-    .then((ensured) => {
-      if (ensured) {
-        navigate(routeName, params)
-      }
-    })
-    .catch((error) => {
-      Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
-    })
+export function navigateToExchangeHome() {
+  if (store.getState().goldToken.educationCompleted) {
+    navigate(Screens.ExchangeHomeScreen)
+  } else {
+    navigate(Screens.GoldEducation)
+  }
 }
 
 export function navigateBack(params?: object) {
@@ -115,15 +131,24 @@ export function navigateBack(params?: object) {
     })
 }
 
-export function navigateHome(params?: object) {
+interface NavigateHomeOptions {
+  onAfterNavigate?: () => void
+  params?: StackParamList[Screens.DrawerNavigator]
+}
+
+export function navigateHome(options?: NavigateHomeOptions) {
+  const { onAfterNavigate, params } = options ?? {}
   navigationRef.current?.reset({
     index: 0,
-    routes: [{ name: Screens.TabNavigator, params }],
+    routes: [{ name: Screens.DrawerNavigator, params }],
   })
+
+  if (onAfterNavigate) {
+    requestAnimationFrame(onAfterNavigate)
+  }
 }
 
 export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
-  CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
-  navigate(Screens.ErrorScreen, { errorMessage, error })
+  navigate(Screens.ErrorScreen, { errorMessage })
 }

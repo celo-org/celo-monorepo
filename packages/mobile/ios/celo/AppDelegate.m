@@ -65,9 +65,15 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
     [FIRApp configure];
   }
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+
+  NSDate *now = [NSDate date];
+  NSTimeInterval nowEpochSeconds = [now timeIntervalSince1970];
+  long long nowEpochMs = (long long)(nowEpochSeconds * 1000);
+  NSDictionary *props = @{@"appStartedMillis" : @(nowEpochMs)};
+
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"celo"
-                                            initialProperties:nil];
+                                            initialProperties:props];
   
   [RNSplashScreen showSplash:@"LaunchScreen" inRootView:rootView];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
@@ -77,6 +83,7 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
   return YES;
 }
 

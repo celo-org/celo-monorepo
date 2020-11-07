@@ -1,22 +1,31 @@
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { HomeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import { Namespaces } from 'src/i18n'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { addressToDisplayNameSelector, AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
-import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
+import {
+  getDecryptedTransferFeedComment,
+  getTransferFeedParams,
+} from 'src/transactions/transferFeedUtils'
+import { TransactionStatus } from 'src/transactions/types'
 
 type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  commentKey: Buffer | null
+  recentTxRecipientsCache: NumberToRecipient
+  invitees: InviteDetails[]
+  commentKey: string | null
 }
 
 function navigateToTransactionReview({
@@ -35,13 +44,15 @@ function navigateToTransactionReview({
   }
 
   const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+  const e164PhoneNumber = addressToE164Number[address] || undefined
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
-    comment: decryptComment(comment, commentKey, type),
+    comment: getDecryptedTransferFeedComment(comment, commentKey, type),
     amount,
     recipient,
     type,
+    e164PhoneNumber,
     // fee TODO: add fee here.
   })
 }
@@ -51,6 +62,7 @@ export function TransferFeedItem(props: Props) {
 
   const onPress = () => {
     navigateToTransactionReview(props)
+    ValoraAnalytics.track(HomeEvents.transaction_feed_item_select)
   }
 
   const {
@@ -63,16 +75,24 @@ export function TransferFeedItem(props: Props) {
     status,
     addressToE164Number,
     recipientCache,
+    recentTxRecipientsCache,
+    invitees,
   } = props
+
+  const addressToDisplayName = useSelector(addressToDisplayNameSelector)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
     recipientCache,
+    recentTxRecipientsCache,
     address,
     addressToE164Number,
+    addressToDisplayName,
     comment,
-    commentKey
+    commentKey,
+    timestamp,
+    invitees
   )
 
   return (

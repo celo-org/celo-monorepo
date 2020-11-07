@@ -17,7 +17,7 @@
 
 • **byContractKey**: *function*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L45)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L45)*
 
 #### Type declaration:
 
@@ -35,7 +35,7 @@ ___
 
 • **list**: *function*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L46)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L46)*
 
 #### Type declaration:
 

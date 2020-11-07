@@ -1,69 +1,83 @@
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import dotProp from 'dot-prop-immutable'
-import { padStart } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { EmitterSubscription, StyleSheet, Text, View } from 'react-native'
-import Modal from 'react-native-modal'
-import SafeAreaView from 'react-native-safe-area-view'
-import { connect } from 'react-redux'
-import { hideAlert } from 'src/alert/actions'
+import { LayoutAnimation, Platform, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { connect, useDispatch } from 'react-redux'
+import { hideAlert, showMessage } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton'
+import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces, withTranslation } from 'src/i18n'
-import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import { ALERT_BANNER_DURATION } from 'src/config'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import {
+  cancelVerification,
+  receiveAttestationMessage,
+  resendAttestations,
+} from 'src/identity/actions'
+import { isRevealAllowed } from 'src/identity/reducer'
+import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   CodeInputType,
   NUM_ATTESTATIONS_REQUIRED,
-  VerificationStatus,
 } from 'src/identity/verification'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import VerificationCodeRow from 'src/verify/VerificationCodeRow'
+import VerificationCodeInput from 'src/verify/VerificationCodeInput'
+import VerificationInputHelpDialog from 'src/verify/VerificationInputHelpDialog'
 
 const TAG = 'VerificationInputScreen'
 
+type ScreenProps = StackScreenProps<StackParamList, Screens.VerificationInputScreen>
+
 interface StateProps {
-  e164Number: string
+  e164Number: string | null
   attestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
   underlyingError: ErrorMessages | null | undefined
+  isRevealAllowed: boolean
 }
 
 interface DispatchProps {
   cancelVerification: typeof cancelVerification
   receiveAttestationMessage: typeof receiveAttestationMessage
+  resendAttestations: typeof resendAttestations
   hideAlert: typeof hideAlert
+  showMessage: typeof showMessage
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps & DispatchProps & WithTranslation & ScreenProps
 
 interface State {
   timer: number
   codeInputValues: string[]
   codeSubmittingStatuses: boolean[]
-  isModalVisible: boolean
   isTipVisible: boolean
-  didFinish: boolean
+  isKeyboardVisible: boolean
 }
 
 const mapDispatchToProps = {
   cancelVerification,
   receiveAttestationMessage,
+  resendAttestations,
   hideAlert,
+  showMessage,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -73,23 +87,53 @@ const mapStateToProps = (state: RootState): StateProps => {
     numCompleteAttestations: state.identity.numCompleteAttestations,
     verificationStatus: state.identity.verificationStatus,
     underlyingError: errorSelector(state),
+    isRevealAllowed: isRevealAllowed(state),
   }
 }
 
-class VerificationInputScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+function HeaderLeftButton() {
+  const dispatch = useDispatch()
+  const onCancel = () => {
+    Logger.debug(TAG + '@onCancel', 'Cancelled, going back to education screen')
+    dispatch(cancelVerification())
+    navigate(Screens.VerificationEducationScreen)
+  }
 
+  return <BackButton onPress={onCancel} />
+}
+
+class VerificationInputScreen extends React.Component<Props, State> {
+  static navigationOptions = ({ navigation }: ScreenProps) => ({
+    ...nuxNavigationOptions,
+    gestureEnabled: false,
+    headerLeft: () => {
+      return <HeaderLeftButton />
+    },
+    headerTitle: () => (
+      <HeaderTitleWithSubtitle
+        title={i18n.t('onboarding:verificationInput.title')}
+        subTitle={i18n.t('onboarding:step', { step: '4' })}
+      />
+    ),
+    headerRight: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:help')}
+        testID="VerificationInputHelp"
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigation.setParams({ showHelpDialog: true })}
+      />
+    ),
+  })
+
+  tipHideTimer?: number
   interval?: number
-  keyboardDidShowListener?: EmitterSubscription
-  keyboardDidHideListener?: EmitterSubscription
 
   state: State = {
     timer: 60,
-    codeInputValues: [],
-    codeSubmittingStatuses: [],
-    isModalVisible: false,
+    codeInputValues: ['', '', ''],
+    codeSubmittingStatuses: [false, false, false],
     isTipVisible: false,
-    didFinish: false,
+    isKeyboardVisible: false,
   }
 
   componentDidMount() {
@@ -102,8 +146,8 @@ class VerificationInputScreen extends React.Component<Props, State> {
     }, 1000)
   }
 
-  componentDidUpdate() {
-    if (this.isVerificationComplete()) {
+  componentDidUpdate(prevProps: Props) {
+    if (this.isVerificationComplete(prevProps)) {
       return this.finishVerification()
     }
     if (this.isCodeRejected() && this.isAnyCodeSubmitting()) {
@@ -113,10 +157,14 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   componentWillUnmount() {
     clearInterval(this.interval)
+    clearTimeout(this.tipHideTimer)
   }
 
-  isVerificationComplete = () => {
-    return this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED && !this.state.didFinish
+  isVerificationComplete = (prevProps: Props) => {
+    return (
+      prevProps.numCompleteAttestations < NUM_ATTESTATIONS_REQUIRED &&
+      this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED
+    )
   }
 
   isCodeRejected = () => {
@@ -132,38 +180,38 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   finishVerification = () => {
     Logger.debug(TAG + '@finishVerification', 'Verification finished, navigating to next screen.')
-    this.setState({ didFinish: true })
     this.props.hideAlert()
-    navigate(Screens.VerificationSuccessScreen)
-  }
-
-  onCancel = () => {
-    Logger.debug(TAG + '@onCancel', 'Cancelled, going back to education screen')
-    this.props.cancelVerification()
-    navigate(Screens.VerificationEducationScreen)
+    navigate(Screens.ImportContacts)
   }
 
   onChangeInputCode = (index: number) => {
     return (value: string) => {
       // TODO(Rossy) Add test this of typing codes gradually
-      this.setState(dotProp.set(this.state, `codeInputValues.${index}`, value))
+      this.setState((state) => dotProp.set(state, `codeInputValues.${index}`, value))
       if (extractAttestationCodeFromMessage(value)) {
-        this.setState(dotProp.set(this.state, `codeSubmittingStatuses.${index}`, true))
+        this.setState((state) => dotProp.set(state, `codeSubmittingStatuses.${index}`, true))
         this.props.receiveAttestationMessage(value, CodeInputType.MANUAL)
       }
     }
   }
 
   onKeyboardToggle = (visible: boolean) => {
-    this.setState({ isTipVisible: visible })
+    clearTimeout(this.tipHideTimer)
+    this.setState({ isKeyboardVisible: visible, isTipVisible: visible })
+    if (visible) {
+      this.tipHideTimer = window.setTimeout(() => {
+        LayoutAnimation.easeInEaseOut()
+        this.setState({ isTipVisible: false })
+      }, 3000)
+    }
   }
 
   onPressCodesNotReceived = () => {
-    this.setState({ isModalVisible: true })
+    this.props.navigation.setParams({ showHelpDialog: true })
   }
 
   onPressWaitForCodes = () => {
-    this.setState({ isModalVisible: false })
+    this.props.navigation.setParams({ showHelpDialog: false })
   }
 
   onPressSkip = () => {
@@ -171,88 +219,98 @@ class VerificationInputScreen extends React.Component<Props, State> {
     navigateHome()
   }
 
+  onPressResend = () => {
+    if (this.props.isRevealAllowed) {
+      this.props.resendAttestations()
+    } else {
+      this.props.showMessage(
+        this.props.t('verificationPrematureRevealMessage'),
+        ALERT_BANNER_DURATION,
+        null
+      )
+    }
+  }
+
   render() {
     const {
       codeInputValues,
       codeSubmittingStatuses,
-      isModalVisible,
       isTipVisible,
+      isKeyboardVisible,
       timer,
     } = this.state
-    const { t, attestationCodes, numCompleteAttestations } = this.props
+    const { t, attestationCodes, numCompleteAttestations, route } = this.props
+    const showHelpDialog = route.params?.showHelpDialog || false
+    const translationPlatformContext = Platform.select({ ios: 'ios' })
 
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.buttonCancelContainer}>
-          <CancelButton onCancel={this.onCancel} />
-        </View>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps={'always'}
-        >
-          <DevSkipButton nextScreen={Screens.WalletHome} />
-          <View style={styles.timerContainer}>
-            <LoadingSpinner />
-            {timer > 0 ? (
-              <Text style={styles.timerText}>{'0:' + padStart(`${timer}`, 2, '0')}</Text>
-            ) : (
-              <Text style={styles.timerText}>{t('input.sendingCodes')}</Text>
+      <HeaderHeightContext.Consumer>
+        {(headerHeight) => (
+          <SafeAreaInsetsContext.Consumer>
+            {(insets) => (
+              <View style={styles.container}>
+                <View style={styles.innerContainer}>
+                  <KeyboardAwareScrollView
+                    style={headerHeight ? { marginTop: headerHeight } : undefined}
+                    contentContainerStyle={[
+                      styles.scrollContainer,
+                      !isKeyboardVisible && insets && { marginBottom: insets.bottom },
+                    ]}
+                    keyboardShouldPersistTaps={'always'}
+                  >
+                    <DevSkipButton nextScreen={Screens.WalletHome} />
+                    <Text style={styles.body}>
+                      {t('verificationInput.body', { context: translationPlatformContext })}
+                    </Text>
+                    {[0, 1, 2].map((i) => (
+                      <View key={'verificationCodeRow' + i}>
+                        <VerificationCodeInput
+                          label={t('verificationInput.codeLabel' + (i + 1))}
+                          index={i}
+                          inputValue={codeInputValues[i]}
+                          inputPlaceholder={t('verificationInput.codePlaceholder' + (i + 1), {
+                            context: translationPlatformContext,
+                          })}
+                          inputPlaceholderWithClipboardContent={t(
+                            'verificationInput.codePlaceholderWithCodeInClipboard'
+                          )}
+                          isCodeSubmitting={codeSubmittingStatuses[i]}
+                          onInputChange={this.onChangeInputCode(i)}
+                          attestationCodes={attestationCodes}
+                          numCompleteAttestations={numCompleteAttestations}
+                          style={styles.codeInput}
+                        />
+                      </View>
+                    ))}
+                    <View style={styles.spacer} />
+                    <TextButton style={styles.resendButton} onPress={this.onPressResend}>
+                      {t(
+                        `verificationInput.resendMessages${numCompleteAttestations ? '' : '_all'}`,
+                        { count: NUM_ATTESTATIONS_REQUIRED - numCompleteAttestations }
+                      )}
+                    </TextButton>
+                  </KeyboardAwareScrollView>
+                  <View style={styles.tipContainer} pointerEvents="none">
+                    <View
+                      key={isTipVisible ? 'tip' : undefined}
+                      style={[styles.tip, isTipVisible && { opacity: 1.0 }]}
+                    >
+                      <Text style={styles.tipText}>{t('verificationInput.typingTip')}</Text>
+                    </View>
+                  </View>
+                </View>
+                <VerificationInputHelpDialog
+                  isVisible={showHelpDialog}
+                  secondsLeft={timer}
+                  onPressBack={this.onPressWaitForCodes}
+                  onPressSkip={this.onPressSkip}
+                />
+                <KeyboardSpacer onToggle={this.onKeyboardToggle} />
+              </View>
             )}
-          </View>
-          <Text style={fontStyles.h1} testID="VerificationInputHeader">
-            {t('input.header')}
-          </Text>
-          <Text style={fontStyles.body}>
-            <Text style={fontStyles.bold}>{t('input.body1')}</Text>
-            {t('input.body2')}
-          </Text>
-          {[0, 1, 2].map((i) => (
-            <View key={'verificationCodeRow' + i}>
-              <Text style={styles.codeHeader}>{t('input.codeHeader' + (i + 1))}</Text>
-              <VerificationCodeRow
-                index={i}
-                inputValue={codeInputValues[i]}
-                isCodeSubmitting={codeSubmittingStatuses[i]}
-                onInputChange={this.onChangeInputCode(i)}
-                attestationCodes={attestationCodes}
-                numCompleteAttestations={numCompleteAttestations}
-              />
-            </View>
-          ))}
-          <Link style={styles.missingCodesLink} onPress={this.onPressCodesNotReceived}>
-            {t('input.codesMissing')}
-          </Link>
-        </KeyboardAwareScrollView>
-        {isTipVisible && (
-          <View style={styles.tipContainer}>
-            <Text style={fontStyles.bodySmall}>
-              <Text style={fontStyles.bodySmallSemiBold} testID="noTypeTip">
-                {t('global:Tip') + ': '}
-              </Text>
-              {t('input.tip')}
-            </Text>
-          </View>
+          </SafeAreaInsetsContext.Consumer>
         )}
-        <Modal isVisible={isModalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('missingCodesModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('missingCodesModal.body')}</Text>
-            <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.onPressWaitForCodes} style={styles.modalCancelText}>
-                {t('missingCodesModal.wait')}
-              </TextButton>
-              <TextButton
-                onPress={this.onPressSkip}
-                style={[styles.modalSkipText, timer > 0 && styles.modalSkipTextDisabled]}
-                disabled={timer > 0}
-              >
-                {t('missingCodesModal.skip')}
-              </TextButton>
-            </View>
-          </View>
-        </Modal>
-        <KeyboardSpacer onToggle={this.onKeyboardToggle} />
-      </SafeAreaView>
+      </HeaderHeightContext.Consumer>
     )
   }
 }
@@ -261,75 +319,55 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    backgroundColor: colors.backgroundDarker,
+    backgroundColor: colors.onboardingBackground,
+  },
+  innerContainer: {
+    flex: 1,
   },
   scrollContainer: {
-    padding: 30,
-    paddingTop: 0,
+    flexGrow: 1,
+    paddingHorizontal: Spacing.Regular16,
+    paddingTop: 32,
   },
-  buttonCancelContainer: {
-    left: 5,
+  body: {
+    ...fontStyles.regular,
+    marginBottom: Spacing.Thick24,
   },
-  timerContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  timerText: {
-    ...fontStyles.body,
-    marginTop: 5,
-  },
-  bodyBold: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-  },
-  codeHeader: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    marginTop: 20,
-  },
-  missingCodesLink: {
-    fontSize: 16,
-    textAlign: 'center',
-    paddingVertical: 10,
-    marginVertical: 20,
+  codeInput: {
+    marginBottom: Spacing.Thick24,
   },
   tipContainer: {
-    backgroundColor: colors.backgroundDarker,
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-  },
-  modalContainer: {
-    backgroundColor: colors.background,
-    padding: 20,
-    marginHorizontal: 10,
-    borderRadius: 4,
-  },
-  modalHeader: {
-    ...fontStyles.h2,
-    ...fontStyles.bold,
-    marginVertical: 15,
-  },
-  modalButtonsContainer: {
-    marginTop: 25,
-    flexDirection: 'row',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
   },
-  modalCancelText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    paddingRight: 20,
+  tip: {
+    opacity: 0,
+    backgroundColor: colors.onboardingBlue,
+    borderRadius: 4,
+    marginHorizontal: Spacing.Regular16,
+    marginVertical: Spacing.Regular16,
   },
-  modalSkipText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    color: colors.celoGreen,
-    paddingLeft: 20,
+  tipText: {
+    ...fontStyles.small500,
+    textAlign: 'center',
+    color: colors.light,
+    paddingVertical: Spacing.Smallest8,
+    paddingHorizontal: Spacing.Regular16,
   },
-  modalSkipTextDisabled: { color: colors.celoGreenInactive },
+  resendButton: {
+    textAlign: 'center',
+    color: colors.onboardingBrownLight,
+    padding: Spacing.Regular16,
+  },
+  spacer: {
+    flex: 1,
+  },
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
+)(withTranslation<Props>(Namespaces.onboarding)(VerificationInputScreen))

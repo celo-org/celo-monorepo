@@ -3,7 +3,6 @@ import withTextInputPasteAware from '@celo/react-components/components/WithTextI
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
@@ -63,7 +62,7 @@ function CodeRow({
     return (
       <View style={styles.codeProcessingContainer}>
         <Text style={styles.codeValue}>{shortenedInput || t('processing')}</Text>
-        <ActivityIndicator size="small" color={colors.celoGreen} style={styles.codeInputSpinner} />
+        <ActivityIndicator size="small" color={colors.greenBrand} style={styles.codeInputSpinner} />
       </View>
     )
   }
@@ -96,10 +95,11 @@ function CodeRow({
 
 const styles = StyleSheet.create({
   codeInput: {
-    ...componentStyles.roundedBorder,
     flex: 0,
     backgroundColor: '#FFF',
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
+    borderRadius: 3,
+    borderWidth: 1,
     height: 50,
     marginVertical: 5,
   },
@@ -107,25 +107,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: colors.darkLightest,
+    backgroundColor: colors.gray1,
     borderRadius: 3,
     height: 50,
   },
   checkmarkContainer: {
-    backgroundColor: colors.darkLightest,
+    backgroundColor: colors.gray1,
     position: 'absolute',
     top: 3,
     right: 3,
     padding: 10,
   },
   codeProcessingContainer: {
-    ...componentStyles.roundedBorder,
     backgroundColor: '#FFF',
     position: 'relative',
     justifyContent: 'center',
     marginVertical: 5,
     paddingHorizontal: 10,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
+    borderRadius: 3,
+    borderWidth: 1,
     height: 50,
   },
   codeInputSpinner: {
@@ -139,17 +140,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 10,
     marginVertical: 5,
-    borderColor: colors.inputBorder,
+    borderColor: colors.gray2,
     borderRadius: 3,
     borderWidth: 1,
     height: 50,
     backgroundColor: '#F0F0F0',
   },
   codeValue: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     fontSize: 15,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })
 
-export default withTranslation(Namespaces.global)(CodeRow)
+export default withTranslation<Props>(Namespaces.global)(CodeRow)

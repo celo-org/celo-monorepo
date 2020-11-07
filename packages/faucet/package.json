@@ -18,10 +18,10 @@
     "build:rules": "firebase-bolt database-rules.bolt"
   },
   "dependencies": {
-    "@firebase/app": "^0.5.3",
-    "@google-cloud/logging": "^7.1.0",
     "@celo/contractkit": "0.3.6",
     "@celo/utils": "0.1.9",
+    "@firebase/app": "^0.5.3",
+    "@google-cloud/logging": "^7.1.0",
     "debug": "^4.1.1",
     "firebase": "^7.8.0",
     "firebase-admin": "^8.10.0",
@@ -36,7 +36,7 @@
     "@types/yargs": "^13.0.2",
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
-    "firebase-tools": "^8.0.0",
+    "firebase-tools": "^8.4.2",
     "rimraf": "2.6.3",
     "yargs": "14.0.0"
   },
