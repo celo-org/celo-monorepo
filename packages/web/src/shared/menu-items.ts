@@ -96,6 +96,11 @@ export const pagePaths = {
     link: '/developers/faucet',
     isDark: false,
   },
+  GRANT_KIT: {
+    name: 'GrantKit',
+    link: '/experience/grants',
+    isDark: false,
+  },
   JOBS: {
     name: 'Join',
     link: '/jobs',
@@ -191,8 +196,8 @@ export enum CeloLinks {
   linkedIn = 'https://www.linkedin.com/company/celoOrg/',
   monorepo = 'https://github.com/celo-org/celo-monorepo',
   blockChainRepo = 'https://github.com/celo-org/celo-blockchain',
-  playStoreWallet = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores',
-  appStoreWallet = 'https://apps.apple.com/us/app/celo-alfajores-wallet/id1482389446',
+  playStoreDevWallet = 'https://play.google.com/apps/testing/org.celo.mobile.alfajores',
+  appStoreDevWallet = 'https://testflight.apple.com/join/s212x3Rp',
   privacyDocs = 'https://docs.celo.org/celo-codebase/protocol/identity/phone-number-privacy',
   tutorial = 'https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client',
   buildWalletDocs = 'https://docs.celo.org/celo-codebase/wallet/intro',

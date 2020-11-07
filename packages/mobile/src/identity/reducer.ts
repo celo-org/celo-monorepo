@@ -20,6 +20,7 @@ import {
 } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { Actions as SendActions, StoreLatestInRecentsAction } from 'src/send/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { timeDeltaInSeconds } from 'src/utils/time'
 
@@ -40,6 +41,14 @@ export interface E164NumberToSaltType {
 
 export interface AddressToDataEncryptionKeyType {
   [address: string]: string | null // null means no DEK registered
+}
+
+export interface AddressToDisplayNameType {
+  [address: string]: string | undefined
+}
+
+export interface WalletToAccountAddressType {
+  [address: string]: string
 }
 
 export interface ImportContactProgress {
@@ -87,8 +96,14 @@ export interface State {
   addressToE164Number: AddressToE164NumberType
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
+  // This contains a mapping of walletAddress (EOA) to accountAddress (either MTW or EOA)
+  // and is needed to query for a user's DEK while knowing only their walletAddress
+  walletToAccountAddress: WalletToAccountAddressType
   e164NumberToSalt: E164NumberToSaltType
   addressToDataEncryptionKey: AddressToDataEncryptionKeyType
+  // Doesn't contain all known addresses, use only as a fallback.
+  // TODO: Remove if unused after CIP-8 implementation.
+  addressToDisplayName: AddressToDisplayNameType
   // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
@@ -111,8 +126,10 @@ const initialState: State = {
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
+  walletToAccountAddress: {},
   e164NumberToSalt: {},
   addressToDataEncryptionKey: {},
+  addressToDisplayName: {},
   askedContactsPermission: false,
   importContactsProgress: {
     status: ImportContactsStatus.Stopped,
@@ -142,7 +159,7 @@ const initialState: State = {
 
 export const reducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction | ClearStoredAccountAction
+  action: ActionTypes | RehydrateAction | ClearStoredAccountAction | StoreLatestInRecentsAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -191,7 +208,7 @@ export const reducer = (
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
-        ...completeCodeReducer(state, state.numCompleteAttestations + 1),
+        numCompleteAttestations: state.numCompleteAttestations + 1,
         acceptedAttestationCodes: [...state.acceptedAttestationCodes, action.code],
       }
     case Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES:
@@ -203,10 +220,29 @@ export const reducer = (
           ...action.e164NumberToAddress,
         },
       }
+    case Actions.UPDATE_WALLET_TO_ACCOUNT_ADDRESS:
+      return {
+        ...state,
+        walletToAccountAddress: {
+          ...state.walletToAccountAddress,
+          ...action.walletToAccountAddress,
+        },
+      }
     case Actions.UPDATE_E164_PHONE_NUMBER_SALT:
       return {
         ...state,
         e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
+      }
+    case SendActions.STORE_LATEST_IN_RECENTS:
+      if (!action.recipient.address) {
+        return state
+      }
+      return {
+        ...state,
+        addressToDisplayName: {
+          ...state.addressToDisplayName,
+          [action.recipient.address]: action.recipient.displayName,
+        },
       }
     case Actions.IMPORT_CONTACTS:
       return {
@@ -344,10 +380,10 @@ export const reducer = (
 }
 
 const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
-  const { attestationCodes } = state
+  const { attestationCodes, acceptedAttestationCodes } = state
   // Ensure numCompleteAttestations many codes are filled
   for (let i = 0; i < numCompleteAttestations; i++) {
-    attestationCodes[i] = attestationCodes[i] || {
+    attestationCodes[i] = acceptedAttestationCodes[i] || {
       code: ATTESTATION_CODE_PLACEHOLDER,
       issuer: ATTESTATION_ISSUER_PLACEHOLDER,
     }
@@ -363,12 +399,18 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
+export const walletToAccountAddressSelector = (state: RootState) =>
+  state.identity.walletToAccountAddress
+export const addressToDataEncryptionKeySelector = (state: RootState) =>
+  state.identity.addressToDataEncryptionKey
 export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
   state.identity.secureSendPhoneNumberMapping
 export const importContactsProgressSelector = (state: RootState) =>
   state.identity.importContactsProgress
 export const matchedContactsSelector = (state: RootState) => state.identity.matchedContacts
+export const addressToDisplayNameSelector = (state: RootState) =>
+  state.identity.addressToDisplayName
 
 export const isBalanceSufficientForSigRetrievalSelector = (state: RootState) => {
   const dollarBalance = stableTokenBalanceSelector(state) || 0

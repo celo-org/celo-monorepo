@@ -14,6 +14,7 @@ import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
@@ -51,10 +52,6 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
-  [Screens.BackupSocial]: undefined
-  [Screens.BackupSocialIntro]: {
-    incomingFromBackupFlow: boolean
-  }
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -94,7 +91,7 @@ export type StackParamList = {
   }
   [Screens.FiatExchangeOptions]: {
     isAddFunds: boolean
-    amount: BigNumber
+    amount?: BigNumber
     isExplanationOpen?: boolean
   }
   [Screens.MoonPay]: {
@@ -108,7 +105,7 @@ export type StackParamList = {
         showZeroBalanceModal?: boolean
       }
     | undefined
-  [Screens.ImportWalletSocial]: undefined
+
   [Screens.ImportContacts]:
     | undefined
     | {
@@ -116,10 +113,6 @@ export type StackParamList = {
         importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.Invite]: undefined
-  [Screens.InviteReview]: {
-    recipient: Recipient
-  }
   [Screens.NameAndNumber]:
     | {
         selectedCountryCodeAlpha2: string
@@ -149,6 +142,7 @@ export type StackParamList = {
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
+    onCancel: () => void
   }
   [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
@@ -182,11 +176,13 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
     isFromScan?: boolean
+    currencyInfo?: CurrencyInfo
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]:
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
     | undefined
+  [Screens.Simplex]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
@@ -222,6 +218,7 @@ export type StackParamList = {
   [Screens.WithdrawCeloReviewScreen]: {
     amount: BigNumber
     recipientAddress: string
+    feeEstimate: BigNumber
   }
   [Screens.WithdrawCeloScreen]: undefined
 }

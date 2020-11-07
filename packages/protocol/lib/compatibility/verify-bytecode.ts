@@ -26,35 +26,46 @@ interface VerificationContext {
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
-
-  // TODO: remove this after first smart contracts release
-  isBeforeRelease1: boolean
 }
+interface InitializationData {
+  [contractName: string]: any[]
+}
+
+const ContractNameExtractorRegex = new RegExp(/(.*)Proxy/)
+
 
 // Checks if the given transaction is a repointing of the Proxy for the given
 // contract.
-const isProxyRepointTransaction = (tx: ProposalTx, contract: string) =>
-  tx.contract === `${contract}Proxy` && tx.function === '_setImplementation'
+const isProxyRepointTransaction = (tx: ProposalTx) =>
+  tx.contract.endsWith('Proxy') &&
+  (tx.function === '_setImplementation' || tx.function === '_setAndInitializeImplementation')
+
+const isProxyRepointAndInitializeTransaction = (tx: ProposalTx) =>
+  tx.contract.endsWith('Proxy') &&
+    tx.function === '_setAndInitializeImplementation'
+const isProxyRepointForIdTransaction = (tx: ProposalTx, contract: string) =>
+  tx.contract === `${contract}Proxy` && isProxyRepointTransaction(tx)
 
 const isImplementationChanged = (contract: string, context: VerificationContext): boolean =>
-  context.proposal.some((tx: ProposalTx) => isProxyRepointTransaction(tx, contract))
+  context.proposal.some((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract))
 
 const getProposedImplementationAddress = (contract: string, context: VerificationContext) =>
-  context.proposal.find((tx: ProposalTx) => isProxyRepointTransaction(tx, contract)).args[0]
+  context.proposal.find((tx: ProposalTx) => isProxyRepointForIdTransaction(tx, contract)).args[0]
 
 // Checks if the given transaction is a repointing of the Registry entry for the
 // given registryId.
-const isRegistryRepointTransaction = (tx: ProposalTx, registryId: string) =>
-  tx.contract === `Registry` && tx.function === 'setAddressFor' && tx.args[0] === registryId
+const isRegistryRepointTransaction = (tx: ProposalTx) =>
+  tx.contract === `Registry` && tx.function === 'setAddressFor'
+
+const isRegistryRepointForIdTransaction = (tx: ProposalTx, registryId: string) =>
+  isRegistryRepointTransaction(tx) && tx.args[0] === registryId
 
 const isProxyChanged = (contract: string, context: VerificationContext): boolean => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  return context.proposal.some((tx) => isRegistryRepointTransaction(tx, registryId))
+  return context.proposal.some((tx) => isRegistryRepointForIdTransaction(tx, contract))
 }
 
 const getProposedProxyAddress = (contract: string, context: VerificationContext): string => {
-  const registryId = context.web3.utils.soliditySha3({ type: 'string', value: contract })
-  const relevantTx = context.proposal.find((tx) => isRegistryRepointTransaction(tx, registryId))
+  const relevantTx = context.proposal.find((tx) => isRegistryRepointForIdTransaction(tx, contract))
   return relevantTx.args[1]
 }
 
@@ -76,19 +87,14 @@ const getImplementationAddress = async (contract: string, context: VerificationC
     return getProposedImplementationAddress(contract, context)
   }
 
-  let proxyAddress: string
   if (isLibrary(contract, context)) {
-    proxyAddress = context.libraryAddresses.addresses[contract]
-    // Before the first contracts upgrade libraries are not proxied.
-    if (context.isBeforeRelease1) {
-      return proxyAddress
-    }
-  } else {
-    // contract is registered but we need to check if the proxy is affected by the proposal
-    proxyAddress = isProxyChanged(contract, context)
-      ? getProposedProxyAddress(contract, context)
-      : await context.registry.getAddressForString(contract)
+    return `0x${context.libraryAddresses.addresses[contract]}`
   }
+
+  // contract is registered but we need to check if the proxy is affected by the proposal
+  const proxyAddress = isProxyChanged(contract, context)
+    ? getProposedProxyAddress(contract, context)
+    : await context.registry.getAddressForString(contract)
 
   // at() returns a promise despite Typescript labelling the await as extraneous
   const proxy: ProxyInstance = await context.Proxy.at(
@@ -124,12 +130,67 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
+  } else {
+    // tslint:disable-next-line: no-console
+    console.log(
+      `${
+        isLibrary(contract, context) ? 'Library' : 'Contract'
+      } deployed at ${implementationAddress} matches ${contract}`
+    )
   }
 
   // push unvisited libraries to DFS queue
   queue.push(
     ...Object.keys(sourceLibraryPositions.positions).filter((library) => !visited.has(library))
   )
+}
+
+const assertValidProposalTransactions = (proposal: ProposalTx[]) => {
+  const invalidTransactions = proposal.filter(
+    (tx) => !isProxyRepointTransaction(tx) && !isRegistryRepointTransaction(tx)
+  )
+  if (invalidTransactions.length > 0) {
+    throw new Error(`Proposal contains invalid release transactions ${invalidTransactions}`)
+  }
+
+  console.info("Proposal contains only valid release transactions!")
+}
+
+const assertValidInitializationData = (
+  artifacts: BuildArtifacts,
+  proposal: ProposalTx[],
+  web3: Web3,
+  initializationData: InitializationData
+) => {
+  const initializingProposals = proposal.filter(isProxyRepointAndInitializeTransaction)
+  const contractsInitialized = new Set()
+  for (const proposalTx of initializingProposals) {
+    const contractName = ContractNameExtractorRegex.exec(proposalTx.contract)[1]
+
+    if (!initializationData[contractName]) {
+      throw new Error(`Initialization Data for ${contractName} could not be found in reference file`)
+    }
+
+    const contract = artifacts.getArtifactByName(contractName)
+    const initializeAbi = contract.abi.find(
+      (abi: any) => abi.type === 'function' && abi.name === 'initialize')
+    const args = initializationData[contractName]
+    const callData = web3.eth.abi.encodeFunctionCall(initializeAbi, args)
+
+    if (callData !== proposalTx.args[1]) {
+      throw new Error(`Intialization Data for ${contractName} in proposal does not match reference file ${initializationData[contractName]}`)
+    }
+
+    contractsInitialized.add(contractName)
+  }
+
+  for (const referenceContractName of Object.keys(initializationData)) {
+    if (!contractsInitialized.has(referenceContractName)) {
+      throw new Error(`Reference file has initialization data for ${referenceContractName}, but proposal does not specify initialization`)
+    }
+  }
+
+  console.info('Initialization Data was verified!')
 }
 
 /*
@@ -144,8 +205,11 @@ export const verifyBytecodes = async (
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
   web3: Web3,
-  isBeforeRelease1: boolean = false
+  initializationData: InitializationData = {}
 ) => {
+  assertValidProposalTransactions(proposal)
+  assertValidInitializationData(artifacts, proposal, web3, initializationData)
+
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
 
@@ -156,7 +220,6 @@ export const verifyBytecodes = async (
     proposal,
     Proxy,
     web3,
-    isBeforeRelease1,
   }
 
   while (queue.length > 0) {

@@ -15,10 +15,12 @@
 ### Properties
 
 * [addAccount](_wallets_wallet_.unlockablewallet.md#addaccount)
+* [computeSharedSecret](_wallets_wallet_.unlockablewallet.md#computesharedsecret)
 * [decrypt](_wallets_wallet_.unlockablewallet.md#decrypt)
 * [getAccounts](_wallets_wallet_.unlockablewallet.md#getaccounts)
 * [hasAccount](_wallets_wallet_.unlockablewallet.md#hasaccount)
 * [isAccountUnlocked](_wallets_wallet_.unlockablewallet.md#isaccountunlocked)
+* [removeAccount](_wallets_wallet_.unlockablewallet.md#removeaccount)
 * [signPersonalMessage](_wallets_wallet_.unlockablewallet.md#signpersonalmessage)
 * [signTransaction](_wallets_wallet_.unlockablewallet.md#signtransaction)
 * [signTypedData](_wallets_wallet_.unlockablewallet.md#signtypeddata)
@@ -32,7 +34,28 @@
 
 *Inherited from [Wallet](_wallets_wallet_.wallet.md).[addAccount](_wallets_wallet_.wallet.md#addaccount)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L26)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L28)*
+
+___
+
+###  computeSharedSecret
+
+• **computeSharedSecret**: *function*
+
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[computeSharedSecret](_wallets_wallet_.readonlywallet.md#computesharedsecret)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L21)*
+
+#### Type declaration:
+
+▸ (`address`: [Address](../modules/_base_.md#address), `publicKey`: string): *Promise‹Buffer›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+`publicKey` | string |
 
 ___
 
@@ -42,7 +65,7 @@ ___
 
 *Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[decrypt](_wallets_wallet_.readonlywallet.md#decrypt)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L19)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L20)*
 
 #### Type declaration:
 
@@ -77,7 +100,7 @@ ___
 
 *Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[hasAccount](_wallets_wallet_.readonlywallet.md#hasaccount)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L15)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L16)*
 
 #### Type declaration:
 
@@ -95,7 +118,7 @@ ___
 
 • **isAccountUnlocked**: *function*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L31)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L33)*
 
 #### Type declaration:
 
@@ -109,13 +132,33 @@ Name | Type |
 
 ___
 
+###  removeAccount
+
+• **removeAccount**: *function*
+
+*Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[removeAccount](_wallets_wallet_.readonlywallet.md#removeaccount)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L15)*
+
+#### Type declaration:
+
+▸ (`address`: [Address](../modules/_base_.md#address)): *void*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+
+___
+
 ###  signPersonalMessage
 
 • **signPersonalMessage**: *function*
 
 *Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[signPersonalMessage](_wallets_wallet_.readonlywallet.md#signpersonalmessage)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L18)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L19)*
 
 #### Type declaration:
 
@@ -136,7 +179,7 @@ ___
 
 *Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[signTransaction](_wallets_wallet_.readonlywallet.md#signtransaction)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L16)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L17)*
 
 #### Type declaration:
 
@@ -156,7 +199,7 @@ ___
 
 *Inherited from [ReadOnlyWallet](_wallets_wallet_.readonlywallet.md).[signTypedData](_wallets_wallet_.readonlywallet.md#signtypeddata)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L17)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L18)*
 
 #### Type declaration:
 
@@ -175,7 +218,7 @@ ___
 
 • **unlockAccount**: *function*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L30)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L32)*
 
 #### Type declaration:
 

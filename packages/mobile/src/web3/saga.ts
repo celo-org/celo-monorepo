@@ -34,7 +34,7 @@ import {
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { currentAccountSelector, fornoSelector, mtwAddressSelector } from 'src/web3/selectors'
 import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
@@ -63,7 +63,7 @@ export function* checkWeb3SyncProgress() {
       let syncProgress: boolean | Web3SyncProgress
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      const web3 = yield call(getWeb3)
+      const web3 = yield call(getWeb3, false)
       syncProgress = yield call(web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
@@ -81,7 +81,9 @@ export function* checkWeb3SyncProgress() {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
           if (status !== SyncStatus.WAITING) {
             status = SyncStatus.WAITING
-            ValoraAnalytics.track(NetworkEvents.network_sync_waiting)
+            ValoraAnalytics.track(NetworkEvents.network_sync_waiting, {
+              latestBlock: latestBlock?.number,
+            })
           }
         }
       } else if (typeof syncProgress === 'object') {
@@ -255,10 +257,10 @@ export function* getAccount() {
   }
 }
 
-export function* unlockAccount(account: string) {
+export function* unlockAccount(account: string, force: boolean = false) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   const wallet: UnlockableWallet = yield call(getWallet)
-  if (wallet.isAccountUnlocked(account)) {
+  if (!force && wallet.isAccountUnlocked(account)) {
     return true
   }
 
@@ -294,6 +296,16 @@ export function* getConnectedUnlockedAccount() {
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
   }
+}
+
+// This will return MTW if there is one and the EOA if
+// there isn't. Eventually need to change naming convention
+// used elsewhere that errouneously refers to the EOA
+// as `account`
+export function* getAccountAddress() {
+  const walletAddress: string = yield call(getAccount)
+  const mtwAddress: string | null = yield select(mtwAddressSelector)
+  return mtwAddress ?? walletAddress
 }
 
 export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {

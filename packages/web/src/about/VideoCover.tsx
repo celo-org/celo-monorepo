@@ -93,6 +93,7 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
                   ]}
                 >
                   <H1
+                    ariaLevel={'2'}
                     style={[
                       textStyles.invert,
                       styles.title,
