@@ -1,0 +1,371 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "proxyName": {
+      "type": "string",
+      "metadata": {
+        "description": "The proxy name for ethstats"
+      }
+    },
+    "validatorName": {
+      "type": "string",
+      "metadata": {
+        "description": "The validator name for ethstats"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username for SSH access"
+      }
+    },
+    "adminPublicKey": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Admin public key for SSH access"
+      }
+    },
+    "attesterPostgreSQLUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username for Attester PostgreSQL server"
+      }
+    },
+    "attesterPostgreSQLPassword": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Admin password for Attester PostgreSQL server"
+      }
+    },
+    "validatorAccountAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Authorized validator signer etherbase account address"
+      }
+    },
+    "proxyPublicKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Proxy enode public key"
+      }
+    },
+    "proxyPrivateKey": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Proxy etherbase account private key"
+      }
+    },
+    "validatorPrivateKey": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Authorized validator signer etherbase account private key"
+      }
+    },
+    "attesterAccountAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Attester account address"
+      }
+    },
+    "attesterPrivateKey": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Attester account private key"
+      }
+    },
+    "attesterTwilioAccountSID": {
+      "type": "string",
+      "metadata": {
+        "description": "Attester Twilio account SID"
+      }
+    },
+    "attesterTwilioAuthToken": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Attester Twilio authentication token"
+      }
+    },
+    "attesterTwilioMessageServiceSID": {
+      "type": "string",
+      "metadata": {
+        "description": "Attester Twilio message service SID"
+      }
+    },
+    "bootnodes": {
+      "type": "string",
+      "defaultValue": "enode://5aaf10664b12431c250597e980aacd7d5373cae00f128be5b00364344bb96bce7555b50973664bddebd1cb7a6d3fb927bec81527f80e22a26fa373c375fcdefc@34.82.45.71:30301",
+      "metadata": {
+        "description": "geth --bootnodes argument"
+      }
+    },
+    "gethVerbosity": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "geth --verbosity argument"
+      }
+    },
+    "celoEnv": {
+      "type": "string",
+      "defaultValue": "baklava",
+      "metadata": {
+        "description": "Celo network environment name"
+      }
+    },
+    "networkId": {
+      "type": "string",
+      "defaultValue": "200110",
+      "metadata": {
+        "description": "Numeric Celo network ID"
+      }
+    },
+    "gethNodeDockerImageRepository": {
+      "type": "string",
+      "defaultValue": "us.gcr.io/celo-testnet/celo-node",
+      "metadata": {
+        "description": "Celo geth Docker image repository"
+      }
+    },
+    "gethNodeDockerImageTag": {
+      "type": "string",
+      "defaultValue": "[parameters('celoEnv')]",
+      "metadata": {
+        "description": "Celo geth Docker image tag"
+      }
+    },
+    "gethExporterDockerImageRepository": {
+      "type": "string",
+      "defaultValue": "gcr.io/celo-testnet-production/geth-exporter",
+      "metadata": {
+        "description": "Celo geth-exporter Docker image repository"
+      }
+    },
+    "gethExporterDockerImageTag": {
+      "type": "string",
+      "defaultValue": "ed7d21bd50592709173368cd697ef73c1774a261",
+      "metadata": {
+        "description": "Celo geth-exporter Docker image tag"
+      }
+    },
+    "attestationServiceDockerImageRepository": {
+      "type": "string",
+      "defaultValue": "us.gcr.io/celo-testnet/celo-monorepo",
+      "metadata": {
+        "description": "Celo attestation service Docker image repository"
+      }
+    },
+    "attestationServiceDockerImageTag": {
+      "type": "string",
+      "defaultValue": "[concat('attestation-service-', parameters('celoEnv'))]",
+      "metadata": {
+        "description": "Celo attestation service Docker image tag"
+      }
+    },
+    "blockTime": {
+      "type": "int",
+      "defaultValue": 5,
+      "metadata": {
+        "description": "The ethereum network block time"
+      }
+    },
+    "istanbulRequestTimeoutMs": {
+      "type": "int",
+      "defaultValue": 10000,
+      "metadata": {
+        "description": "The ethereum request timeout"
+      }
+    },
+    "proxyMaxPeers": {
+      "type": "int",
+      "defaultValue": 120,
+      "metadata": {
+        "description": "Max number of peers to connect with"
+      }
+    },
+    "ethstatsHost": {
+      "type": "string",
+      "defaultValue": "[concat(parameters('celoEnv'), '-ethstats.celo-testnet.org')]",
+      "metadata": {
+        "description": "Ethstats host to report data"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "virtualNetworkAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "Virtual Network Address prefix"
+      }
+    },
+    "defaultNetworkAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "Default Virtual Network Address prefix"
+      }
+    },
+    "bastionNetworkAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24",
+      "metadata": {
+        "description": "Bastion Virtual Network Address prefix"
+      }
+    },
+    "validatorDiskSize": {
+      "type": "int",
+      "defaultValue": 1024,
+      "metadata": {
+        "description": "Validator data disk size in gigabytes"
+      }
+    },
+    "validatorVirtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "Validator Virtual Machine size"
+      }
+    },
+    "proxyPublicIpAddressType": {
+      "type": "string",
+      "defaultValue": "Static",
+      "metadata": {
+        "description": "Public IP Address type"
+      }
+    },
+    "proxyPublicIpAddressSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "metadata": {
+        "description": "Public IP Address SKU"
+      }
+    },
+    "proxyDiskSize": {
+      "type": "int",
+      "defaultValue": 1024,
+      "metadata": {
+        "description": "Validator data disk size in gigabytes"
+      }
+    },
+    "proxyVirtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "Proxy Virtual Machine size"
+      }
+    },
+    "attesterPublicIpAddressType": {
+      "type": "string",
+      "defaultValue": "Static",
+      "metadata": {
+        "description": "Public IP Address type"
+      }
+    },
+    "attesterPublicIpAddressSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "metadata": {
+        "description": "Public IP Address SKU"
+      }
+    },
+    "attesterVirtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "Attester Virtual Machine size"
+      }
+    },
+    "attesterDiskSize": {
+      "type": "int",
+      "defaultValue": 1024,
+      "metadata": {
+        "description": "Attester data disk size in gigabytes"
+      }
+    },
+    "osDiskType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "OS Disk Type for every Virtual Machine"
+      }
+    }
+  },
+  "variables": {
+    "virtualNetworkName": "[concat(deployment().name, '-', 'virtualNetwork')]",
+    "virtualNetworkId":
+      "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetId": "[concat(variables('virtualNetworkId'), '/subnets/default')]",
+    "validatorKeyVaultName": "[concat('validator-', celo.globalName('keyvault'))]",
+    "validatorPrivateKeyName": "validatorPrivateKey",
+    "validatorDataDiskName": "validatorDataDisk",
+    "validatorVirtualMachineName": "validatorVirtualMachine",
+    "validatorNetworkInterfaceName": "validatorNetworkInterface",
+    "validatorNetworkSecurityGroupName": "validatorNetworkSecurityGroup",
+    "validatorUserAssignedIdentityName":
+      "[concat(deployment().name, '-validatorUserAssignedIdentity')]",
+    "proxyKeyVaultName": "[concat('proxy-', celo.globalName('keyvault'))]",
+    "proxyPrivateKeyName": "proxyPrivateKey",
+    "proxyPublicIpAddressName": "proxyPublicIpAddress",
+    "proxyNetworkSecurityGroupName": "proxyNetworkSecurityGroup",
+    "proxyDataDiskName": "proxyDataDisk",
+    "proxyVirtualMachineName": "proxyVirtualMachine",
+    "proxyNetworkInterfaceName": "proxyNetworkInterface",
+    "proxyUserAssignedIdentityName": "[concat(deployment().name, '-proxyUserAssignedIdentity')]",
+    "attesterKeyVaultName": "[concat('attester-', celo.globalName('keyvault'))]",
+    "attesterPrivateKeyName": "attesterPrivateKey",
+    "attesterTwilioAuthTokenName": "attesterTwilioAuthToken",
+    "attesterPublicIpAddressName": "attesterPublicIpAddress",
+    "attesterNetworkSecurityGroupName": "attesterNetworkSecurityGroup",
+    "attesterVirtualMachineName": "attesterVirtualMachine",
+    "attesterNetworkInterfaceName": "attesterNetworkInterface",
+    "attesterUserAssignedIdentityName":
+      "[concat(deployment().name, '-attesterUserAssignedIdentity')]",
+    "attesterDataDiskName": "attesterDataDisk",
+    "attesterDBName": "[concat('attester-', celo.globalName('postgresql'))]",
+    "attesterPostgreSQLVersion": "9.6",
+    "attesterPostgreSQLStorageProfile": {
+      "storageMB": 51200,
+      "backupRetentionDays": 7,
+      "geoRedundantBackup": "Disabled",
+      "storageAutoGrow": "Enabled"
+    },
+    "attesterPostgreSQLSku": {
+      "name": "GP_Gen5_4",
+      "tier": "GeneralPurpose",
+      "capacity": 4,
+      "size": 51200,
+      "family": "Gen5"
+    },
+    "imageReference": {
+      "publisher": "credativ",
+      "offer": "Debian",
+      "sku": "9-backports",
+      "version": "latest"
+    }
+  },
+  "functions": [
+    {
+      "namespace": "celo",
+      "members": {
+        "globalName": {
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string"
+            }
+          ],
+          "output": {
+            "type": "string",
+            "value": "[uniqueString(subscription().subscriptionId, resourceGroup().name, parameters('name'))]"
+          }
+        }
+      }
+    }
+  ]
+}

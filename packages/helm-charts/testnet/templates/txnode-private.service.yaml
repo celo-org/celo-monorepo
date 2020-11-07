@@ -1,0 +1,19 @@
+{{ if .Values.geth.static_ips }}
+{{ range $index, $e := until (.Values.geth.private_tx_nodes | int) }}
+
+{{ $loadBalancerIP := default "" (index $.Values.geth (print "private_tx_nodes_" $index "IpAddress")) }}
+
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "svc_name" "tx-nodes-private" "node_name" "tx-nodes-private" "component_label" "tx_nodes_private" "load_balancer_ip" $loadBalancerIP ) }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: UDP
+---
+{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "svc_name" "tx-nodes-private" "node_name" "tx-nodes-private" "svc_name_suffix" "-tcp" "component_label" "tx_nodes_private" "load_balancer_ip" $loadBalancerIP ) }}
+  ports:
+  - name: celo
+    port: 30303
+    protocol: TCP
+---
+{{ end }}
+{{ end }}

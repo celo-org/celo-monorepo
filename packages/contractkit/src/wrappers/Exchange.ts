@@ -1,12 +1,15 @@
 import BigNumber from 'bignumber.js'
-import { Exchange } from '../generated/types/Exchange'
+import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToFrac,
   valueToString,
@@ -17,6 +20,7 @@ export interface ExchangeConfig {
   reserveFraction: BigNumber
   updateFrequency: BigNumber
   minimumReports: BigNumber
+  lastBucketUpdate: BigNumber
 }
 
 /**
@@ -28,12 +32,16 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * Query spread parameter
    * @returns Current spread charged on exchanges
    */
-  spread = proxyCall(this.contract.methods.spread, undefined, valueToBigNumber)
+  spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
   /**
    * Query reserve fraction parameter
    * @returns Current fraction to commit to the gold bucket
    */
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, valueToBigNumber)
+  reserveFraction = proxyCall(
+    this.contract.methods.reserveFraction,
+    undefined,
+    fixidityValueToBigNumber
+  )
   /**
    * Query update frequency parameter
    * @returns The time period that needs to elapse between bucket
@@ -47,6 +55,11 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * commit to the gold bucket
    */
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, valueToBigNumber)
+  /**
+   * Query last bucket update
+   * @returns The timestamp of the last time exchange buckets were updated.
+   */
+  lastBucketUpdate = proxyCall(this.contract.methods.lastBucketUpdate, undefined, valueToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -54,14 +67,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  getBuyTokenAmount: (
-    sellAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getBuyTokenAmount,
-    tupleParser(valueToString, identity),
-    valueToBigNumber
-  )
+  async getBuyTokenAmount(sellAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const sell = valueToString(sellAmount)
+    if (new BigNumber(sell).eq(0)) {
+      return new BigNumber(0)
+    }
+    const res = await this.contract.methods.getBuyTokenAmount(sell, sellGold).call()
+    return valueToBigNumber(res)
+  }
 
   /**
    * Returns the amount of sellToken a user would need to exchange to receive buyAmount of
@@ -70,14 +83,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
    */
-  getSellTokenAmount: (
-    buyAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getSellTokenAmount,
-    tupleParser(valueToString, identity),
-    valueToBigNumber
-  )
+  async getSellTokenAmount(buyAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const buy = valueToString(buyAmount)
+    if (new BigNumber(buy).eq(0)) {
+      return new BigNumber(0)
+    }
+    const res = await this.contract.methods.getSellTokenAmount(buy, sellGold).call()
+    return valueToBigNumber(res)
+  }
 
   /**
    * Returns the buy token and sell token bucket sizes, in order. The ratio of
@@ -112,9 +125,9 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   )
 
   /**
-   * Exchanges amount of cGold in exchange for at least minUsdAmount of cUsd
+   * Exchanges amount of CELO in exchange for at least minUsdAmount of cUsd
    * Requires the amount to have been approved to the exchange
-   * @param amount The amount of cGold the user is selling to the exchange
+   * @param amount The amount of CELO the user is selling to the exchange
    * @param minUsdAmount The minimum amount of cUsd the user has to receive for this
    * transaction to succeed
    */
@@ -122,41 +135,41 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     this.exchange(amount, minUSDAmount, true)
 
   /**
-   * Exchanges amount of cUsd in exchange for at least minGoldAmount of cGold
+   * Exchanges amount of cUsd in exchange for at least minGoldAmount of CELO
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of cUsd the user is selling to the exchange
-   * @param minGoldAmount The minimum amount of cGold the user has to receive for this
+   * @param minGoldAmount The minimum amount of CELO the user has to receive for this
    * transaction to succeed
    */
   sellDollar = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
     this.exchange(amount, minGoldAmount, false)
 
   /**
-   * Returns the amount of cGold a user would get for sellAmount of cUsd
+   * Returns the amount of CELO a user would get for sellAmount of cUsd
    * @param sellAmount The amount of cUsd the user is selling to the exchange
-   * @return The corresponding cGold amount.
+   * @return The corresponding CELO amount.
    */
   quoteUsdSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, false)
 
   /**
-   * Returns the amount of cUsd a user would get for sellAmount of cGold
-   * @param sellAmount The amount of cGold the user is selling to the exchange
+   * Returns the amount of cUsd a user would get for sellAmount of CELO
+   * @param sellAmount The amount of CELO the user is selling to the exchange
    * @return The corresponding cUsd amount.
    */
   quoteGoldSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, true)
 
   /**
-   * Returns the amount of cGold a user would need to exchange to receive buyAmount of
+   * Returns the amount of CELO a user would need to exchange to receive buyAmount of
    * cUsd.
    * @param buyAmount The amount of cUsd the user would like to purchase.
-   * @return The corresponding cGold amount.
+   * @return The corresponding CELO amount.
    */
   quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
 
   /**
    * Returns the amount of cUsd a user would need to exchange to receive buyAmount of
-   * cGold.
-   * @param buyAmount The amount of cGold the user would like to purchase.
+   * CELO.
+   * @param buyAmount The amount of CELO the user would like to purchase.
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
@@ -171,14 +184,30 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       this.reserveFraction(),
       this.updateFrequency(),
       this.minimumReports(),
+      this.lastBucketUpdate(),
     ])
     return {
       spread: res[0],
       reserveFraction: res[1],
       updateFrequency: res[2],
       minimumReports: res[3],
+      lastBucketUpdate: res[4],
     }
   }
+
+  /**
+   * @dev Returns human readable configuration of the exchange contract
+   * @return ExchangeConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      updateFrequency: secondsToDurationString(config.updateFrequency),
+      lastBucketUpdate: unixSecondsTimestampToDateString(config.lastBucketUpdate),
+    }
+  }
+
   /**
    * Returns the exchange rate estimated at buyAmount.
    * @param buyAmount The amount of buyToken in wei to estimate the exchange rate at
@@ -193,14 +222,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   /**
    * Returns the exchange rate for cUsd estimated at the buyAmount
    * @param buyAmount The amount of cUsd in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cGold received for one cUsd)
+   * @return The exchange rate (number of CELO received for one cUsd)
    */
   getUsdExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, false)
 
   /**
-   * Returns the exchange rate for cGold estimated at the buyAmount
-   * @param buyAmount The amount of cGold in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cUsd received for one cGold)
+   * Returns the exchange rate for CELO estimated at the buyAmount
+   * @param buyAmount The amount of CELO in wei to estimate the exchange rate at
+   * @return The exchange rate (number of cUsd received for one CELO)
    */
   getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }

@@ -7,7 +7,7 @@ ContractKit supports the following functionality:
 - Connect to a node
 - Access web3 object to interact with node's Json RPC API
 - Send Transaction with celo's extra fields: (feeCurrency)
-- Simple interface to interact with cGold and cDollar
+- Simple interface to interact with CELO and cUSD
 - Simple interface to interact with Celo Core contracts
 - Utilities
 
@@ -18,9 +18,9 @@ ContractKit supports the following functionality:
 To install:
 
 ```bash
-npm install @celo/contractkit
+npm install @celo/contractkit@baklava
 // or
-yarn add @celo/contractkit
+yarn add @celo/contractkit@baklava
 ```
 
 You will need node version `8.13.0` or higher.
@@ -57,9 +57,9 @@ async function getKit(myAddress: string) {
 }
 ```
 
-### Interacting with cGold & cDollar
+### Interacting with CELO & cUSD
 
-celo-blockchain has two initial coins: cGold and cDollar (stableToken).
+celo-blockchain has two initial coins: CELO and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
@@ -80,10 +80,27 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-To interact with cDollar, is the same but with a different contract:
+To interact with cUSD, is the same but with a different contract:
 
 ```ts
 const stabletoken = await kit.contracts.getStableToken()
+```
+
+If you would like to pay fees in cUSD, set the gas price manually:
+
+```ts
+const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+const gasPriceMinimumContract = await kit.contracts.getGasPriceMinimum()
+const gasPriceMinimum = await gasPriceMinimumContract.getGasPriceMinimum(stableTokenAddress)
+const gasPrice = Math.ceil(gasPriceMinimum * 1.3) // Wiggle room if gas price minimum changes before tx is sent
+contractKit.setFeeCurrency(CeloContract.StableToken) // Default to paying fees in cUSD
+
+const stableTokenContract = kit.contracts.getStableToken()
+const tx = await stableTokenContract
+  .transfer(recipient, weiTransferAmount)
+  .send({ from: myAddress, gasPrice })
+const hash = await tx.getHash()
+const receipt = await tx.waitReceipt()
 ```
 
 ### Interacting with Other Contracts

@@ -1,20 +1,30 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "./SlasherUtil.sol";
 
-contract DoubleSigningSlasher is SlasherUtil {
+contract DoubleSigningSlasher is ICeloVersionedContract, SlasherUtil {
   using SafeMath for uint256;
 
   // For each signer address, check if a block header has already been slashed
   mapping(address => mapping(bytes32 => bool)) isSlashed;
 
   event SlashingIncentivesSet(uint256 penalty, uint256 reward);
+  event DoubleSigningSlashPerformed(address indexed validator, uint256 indexed blockNumber);
 
   /**
-   * @notice Initializer
-   * @param registryAddress Sets the registry address. Useful for testing.
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    */
@@ -35,18 +45,11 @@ contract DoubleSigningSlasher is SlasherUtil {
   function countSetBits(uint256 v) internal pure returns (uint256) {
     uint256 res = 0;
     uint256 acc = v;
-    for (uint256 i = 0; i < 256; i++) {
-      if (acc & 1 == 1) res++;
+    for (uint256 i = 0; i < 256; i = i.add(1)) {
+      if (acc & 1 == 1) res = res.add(1);
       acc = acc >> 1;
     }
     return res;
-  }
-
-  /**
-   * @notice Returns the minimum number of required signers for a given block number.
-   */
-  function minQuorumSize(uint256 blockNumber) internal view returns (uint256) {
-    return (2 * numberValidatorsInSet(blockNumber) + 2) / 3;
   }
 
   /**
@@ -147,6 +150,6 @@ contract DoubleSigningSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
+    emit DoubleSigningSlashPerformed(validator, blockNumber);
   }
-
 }

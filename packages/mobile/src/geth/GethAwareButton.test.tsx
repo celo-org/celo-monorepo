@@ -10,7 +10,6 @@ it('renders correctly when disconnected', () => {
       onPress={jest.fn()}
       connected={false}
       text={'Celo Button'}
-      standard={false}
       type={BtnTypes.TERTIARY}
     />
   )
@@ -23,7 +22,6 @@ it('renders correctly when connected', () => {
       onPress={jest.fn()}
       connected={true}
       text={'Celo Button'}
-      standard={false}
       type={BtnTypes.TERTIARY}
     />
   )

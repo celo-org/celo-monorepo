@@ -1,18 +1,13 @@
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { DefaultEventNames } from 'src/analytics/constants'
-import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
-
-const TAG = 'web3/actions'
-
 export enum Actions {
   SET_ACCOUNT = 'WEB3/SET_ACCOUNT',
   SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
-  SET_COMMENT_KEY = 'WEB3/SET_COMMENT_KEY',
+  SET_MTW_ADDRESS = 'WEB3/SET_MTW_ADDRESS',
+  SET_DATA_ENCRYPTION_KEY = 'WEB3/SET_DATA_ENCRYPTION_KEY',
+  REGISTER_DATA_ENCRYPTION_KEY = 'WEB3/REGISTER_DATA_ENCRYPTION_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
   SET_IS_READY = 'WEB3/SET_IS_READY',
-  SET_IS_ZERO_SYNC = 'WEB3/SET_IS_ZERO_SYNC',
-  TOGGLE_IS_ZERO_SYNC = 'WEB3/TOGGLE_IS_ZERO_SYNC',
+  SET_IS_FORNO = 'WEB3/SET_IS_FORNO',
+  TOGGLE_IS_FORNO = 'WEB3/TOGGLE_IS_FORNO',
   COMPLETE_WEB3_SYNC = 'WEB3/COMPLETE_WEB3_SYNC',
   REQUEST_SYNC_PROGRESS = 'WEB3/REQUEST_SYNC_PROGRESS',
   UPDATE_WEB3_SYNC_PROGRESS = 'WEB3/UPDATE_WEB3_SYNC_PROGRESS',
@@ -23,24 +18,33 @@ export interface SetAccountAction {
   address: string
 }
 
+export interface SetMtwAddressAction {
+  type: Actions.SET_MTW_ADDRESS
+  address: string
+}
+
 export interface SetAccountInWeb3KeystoreAction {
   type: Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE
   address: string
 }
 
-export interface SetIsZeroSyncAction {
-  type: Actions.SET_IS_ZERO_SYNC
-  zeroSyncMode: boolean
+export interface SetIsFornoAction {
+  type: Actions.SET_IS_FORNO
+  fornoMode: boolean
 }
 
-export interface ToggleIsZeroSyncAction {
-  type: Actions.TOGGLE_IS_ZERO_SYNC
-  zeroSyncMode: boolean
+export interface ToggleIsFornoAction {
+  type: Actions.TOGGLE_IS_FORNO
+  fornoMode: boolean
 }
 
-export interface SetCommentKeyAction {
-  type: Actions.SET_COMMENT_KEY
-  commentKey: string
+export interface SetDataEncryptionKeyAction {
+  type: Actions.SET_DATA_ENCRYPTION_KEY
+  key: string
+}
+
+export interface RegisterDataEncryptionKeyAction {
+  type: Actions.REGISTER_DATA_ENCRYPTION_KEY
 }
 
 export interface CompleteWeb3SyncAction {
@@ -59,17 +63,25 @@ export interface UpdateWeb3SyncProgressAction {
 
 export type ActionTypes =
   | SetAccountAction
+  | SetMtwAddressAction
   | SetAccountInWeb3KeystoreAction
-  | SetIsZeroSyncAction
-  | ToggleIsZeroSyncAction
-  | SetCommentKeyAction
+  | SetIsFornoAction
+  | ToggleIsFornoAction
+  | SetDataEncryptionKeyAction
+  | RegisterDataEncryptionKeyAction
   | CompleteWeb3SyncAction
   | UpdateWeb3SyncProgressAction
 
 export const setAccount = (address: string): SetAccountAction => {
-  CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
+    address: address.toLowerCase(),
+  }
+}
+
+export const setMtwAddress = (address: string): SetMtwAddressAction => {
+  return {
+    type: Actions.SET_MTW_ADDRESS,
     address: address.toLowerCase(),
   }
 }
@@ -81,24 +93,30 @@ export const setAccountInWeb3Keystore = (address: string): SetAccountInWeb3Keyst
   }
 }
 
-export const toggleZeroSyncMode = (zeroSyncMode: boolean): ToggleIsZeroSyncAction => {
+export const toggleFornoMode = (fornoMode: boolean): ToggleIsFornoAction => {
   return {
-    type: Actions.TOGGLE_IS_ZERO_SYNC,
-    zeroSyncMode,
+    type: Actions.TOGGLE_IS_FORNO,
+    fornoMode,
   }
 }
 
-export const setZeroSyncMode = (zeroSyncMode: boolean): SetIsZeroSyncAction => {
+export const setFornoMode = (fornoMode: boolean): SetIsFornoAction => {
   return {
-    type: Actions.SET_IS_ZERO_SYNC,
-    zeroSyncMode,
+    type: Actions.SET_IS_FORNO,
+    fornoMode,
   }
 }
 
-export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction => {
+export const setDataEncryptionKey = (key: string): SetDataEncryptionKeyAction => {
   return {
-    type: Actions.SET_COMMENT_KEY,
-    commentKey,
+    type: Actions.SET_DATA_ENCRYPTION_KEY,
+    key,
+  }
+}
+
+export const registerDataEncryptionKey = (): RegisterDataEncryptionKeyAction => {
+  return {
+    type: Actions.REGISTER_DATA_ENCRYPTION_KEY,
   }
 }
 
@@ -119,17 +137,3 @@ export const updateWeb3SyncProgress = (
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS,
   payload,
 })
-
-export const checkSyncProgress = () => ({ type: Actions.REQUEST_SYNC_PROGRESS })
-
-// Note: This returns Promise<Block>
-export function getLatestBlock() {
-  Logger.debug(TAG, 'Getting latest block')
-  return web3.eth.getBlock('latest')
-}
-
-// Note: This returns Promise<Block>
-export function getBlock(blockNumber: number) {
-  Logger.debug(TAG, 'Getting block ' + blockNumber)
-  return web3.eth.getBlock(blockNumber)
-}

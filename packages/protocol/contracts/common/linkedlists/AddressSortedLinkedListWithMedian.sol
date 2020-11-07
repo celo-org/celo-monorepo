@@ -1,14 +1,23 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./AddressLinkedList.sol";
+
 import "./SortedLinkedListWithMedian.sol";
 
 /**
  * @title Maintains a sorted list of unsigned ints keyed by address.
  */
 library AddressSortedLinkedListWithMedian {
+  using SafeMath for uint256;
   using SortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
 
   function toBytes(address a) public pure returns (bytes32) {
     return bytes32(uint256(a) << 96);
@@ -20,6 +29,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -37,6 +47,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(SortedLinkedListWithMedian.List storage list, address key) public {
@@ -45,6 +56,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -63,6 +75,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -76,6 +89,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
@@ -89,6 +103,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns the median value of the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @return The median value.
    */
   function getMedianValue(SortedLinkedListWithMedian.List storage list)
@@ -101,6 +116,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns the key of the first element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the first element in the list.
    */
   function getHead(SortedLinkedListWithMedian.List storage list) external view returns (address) {
@@ -109,6 +125,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns the key of the median element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the median element in the list.
    */
   function getMedian(SortedLinkedListWithMedian.List storage list) external view returns (address) {
@@ -117,6 +134,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns the key of the last element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the last element in the list.
    */
   function getTail(SortedLinkedListWithMedian.List storage list) external view returns (address) {
@@ -125,6 +143,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Returns the number of elements in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The number of elements in the list.
    */
   function getNumElements(SortedLinkedListWithMedian.List storage list)
@@ -137,6 +156,7 @@ library AddressSortedLinkedListWithMedian {
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getElements(SortedLinkedListWithMedian.List storage list)
@@ -150,7 +170,7 @@ library AddressSortedLinkedListWithMedian {
     // prettier-ignore
     SortedLinkedListWithMedian.MedianRelation[] memory relations =
       new SortedLinkedListWithMedian.MedianRelation[](keys.length);
-    for (uint256 i = 0; i < byteKeys.length; i++) {
+    for (uint256 i = 0; i < byteKeys.length; i = i.add(1)) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.getValue(byteKeys[i]);
       relations[i] = list.relation[byteKeys[i]];

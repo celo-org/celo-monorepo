@@ -6,7 +6,8 @@ export default class ValidatorGroupList extends BaseCommand {
     'List registered Validator Groups, their names (if provided), commission, and members.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   static examples = ['list']
@@ -27,7 +28,7 @@ export default class ValidatorGroupList extends BaseCommand {
         commission: { get: (r) => r.commission.toFixed() },
         members: { get: (r) => r.members.length },
       },
-      { 'no-truncate': !res.flags.truncate }
+      res.flags
     )
   }
 }

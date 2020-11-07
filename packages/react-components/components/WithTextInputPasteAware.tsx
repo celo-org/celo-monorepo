@@ -1,76 +1,29 @@
 // HOC to add a paste button to a text input
 
 import TouchableDefault from '@celo/react-components/components/Touchable'
+import {
+  PasteAwareWrappedElementProps,
+  withPasteAware,
+} from '@celo/react-components/components/WithPasteAware'
 import Paste from '@celo/react-components/icons/Paste'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { AppState, Clipboard, StyleSheet, TextInputProps, View, ViewStyle } from 'react-native'
-
-interface PasteAwareProps {
-  value: string
-  shouldShowClipboard: (value: string) => boolean
-  onChangeText: (text: string) => void
-}
+import { StyleSheet, TextInputProps, View, ViewStyle } from 'react-native'
 
 export default function withTextInputPasteAware<P extends TextInputProps>(
   WrappedTextInput: React.ComponentType<P>,
   pasteIconContainerStyle?: ViewStyle
 ) {
-  return class WithTextInputLabeling extends React.Component<P & PasteAwareProps> {
-    state = {
-      isPasteIconVisible: false,
-    }
-
-    _isMounted = false
-
-    async componentDidMount() {
-      this._isMounted = true
-      AppState.addEventListener('change', this.checkClipboardContents)
-      await this.checkClipboardContents()
-    }
-
-    componentWillUnmount() {
-      this._isMounted = false
-      AppState.removeEventListener('change', this.checkClipboardContents)
-    }
-
-    checkClipboardContents = async () => {
-      try {
-        const clipboardContent = await Clipboard.getString()
-        if (!this._isMounted) {
-          return
-        }
-
-        if (
-          clipboardContent &&
-          clipboardContent !== this.props.value &&
-          this.props.shouldShowClipboard(clipboardContent)
-        ) {
-          this.setState({ isPasteIconVisible: true })
-        } else {
-          this.setState({ isPasteIconVisible: false })
-        }
-      } catch (error) {
-        console.error('Error checking clipboard contents', error)
-      }
-    }
-
-    onPressPate = async () => {
-      const clipboardContents = await Clipboard.getString()
-      this.setState({ isPasteIconVisible: false })
-      this.props.onChangeText(clipboardContents)
-    }
-
+  class Wrapper extends React.Component<P & PasteAwareWrappedElementProps> {
     render() {
-      const { isPasteIconVisible } = this.state
-
+      const { isPasteIconVisible, onPressPaste } = this.props
       return (
-        <View style={style.container}>
+        <View style={styles.container}>
           <WrappedTextInput {...this.props} showClearButton={!isPasteIconVisible} />
           {isPasteIconVisible && (
             <TouchableDefault
-              style={[style.pasteIconContainer, pasteIconContainerStyle]}
-              onPress={this.onPressPate}
+              style={[styles.pasteIconContainer, pasteIconContainerStyle]}
+              onPress={onPressPaste}
               hitSlop={iconHitslop}
             >
               <Paste />
@@ -80,9 +33,10 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
       )
     }
   }
+  return withPasteAware(Wrapper)
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     position: 'relative',
   },

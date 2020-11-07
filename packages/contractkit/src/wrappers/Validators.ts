@@ -1,20 +1,24 @@
-import { eqAddress } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import { eqAddress, findAddressIndex } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Validators } from '../generated/types/Validators'
+import { Validators } from '../generated/Validators'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
+  blocksToDurationString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  stringToBytes,
+  secondsToDurationString,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
+  valueToFixidityString,
   valueToInt,
 } from './BaseWrapper'
 
@@ -35,6 +39,10 @@ export interface ValidatorGroup {
   membersUpdated: number
   affiliates: Address[]
   commission: BigNumber
+  nextCommission: BigNumber
+  nextCommissionBlock: BigNumber
+  lastSlashed: BigNumber
+  slashingMultiplier: BigNumber
 }
 
 export interface ValidatorReward {
@@ -54,6 +62,9 @@ export interface ValidatorsConfig {
   groupLockedGoldRequirements: LockedGoldRequirements
   validatorLockedGoldRequirements: LockedGoldRequirements
   maxGroupSize: BigNumber
+  membershipHistoryLength: BigNumber
+  slashingMultiplierResetPeriod: BigNumber
+  commissionUpdateDelay: BigNumber
 }
 
 export interface GroupMembership {
@@ -71,12 +82,25 @@ export interface MembershipHistoryExtraData {
  */
 // TODO(asa): Support validator signers
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
-  async updateCommission(commission: BigNumber): Promise<CeloTransactionObject<boolean>> {
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.updateCommission(toFixed(commission).toFixed())
-    )
-  }
+  /**
+   * Queues an update to a validator group's commission.
+   * @param commission Fixidity representation of the commission this group receives on epoch
+   *   payments made to its members. Must be in the range [0, 1.0].
+   */
+  setNextCommissionUpdate: (commission: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.setNextCommissionUpdate,
+    tupleParser(valueToFixidityString)
+  )
+
+  /**
+   * Updates a validator group's commission based on the previously queued update
+   */
+  updateCommission: () => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.updateCommission
+  )
+
   /**
    * Returns the Locked Gold requirements for validators.
    * @returns The Locked Gold requirements for validators.
@@ -112,6 +136,24 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /**
+   * Returns the reset period, in seconds, for slashing multiplier.
+   */
+  getSlashingMultiplierResetPeriod = proxyCall(
+    this.contract.methods.slashingMultiplierResetPeriod,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
+   * Returns the update delay, in blocks, for the group commission.
+   */
+  getCommissionUpdateDelay = proxyCall(
+    this.contract.methods.commissionUpdateDelay,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ValidatorsConfig> {
@@ -119,11 +161,40 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.getValidatorLockedGoldRequirements(),
       this.getGroupLockedGoldRequirements(),
       this.contract.methods.maxGroupSize().call(),
+      this.contract.methods.membershipHistoryLength().call(),
+      this.getSlashingMultiplierResetPeriod(),
+      this.getCommissionUpdateDelay(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
       groupLockedGoldRequirements: res[1],
       maxGroupSize: valueToBigNumber(res[2]),
+      membershipHistoryLength: valueToBigNumber(res[3]),
+      slashingMultiplierResetPeriod: res[4],
+      commissionUpdateDelay: res[5],
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the validators contract
+   * @return ValidatorsConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const validatorLockedGoldRequirements = {
+      ...config.validatorLockedGoldRequirements,
+      duration: secondsToDurationString(config.validatorLockedGoldRequirements.duration),
+    }
+    const groupLockedGoldRequirements = {
+      ...config.groupLockedGoldRequirements,
+      duration: secondsToDurationString(config.groupLockedGoldRequirements.duration),
+    }
+    return {
+      ...config,
+      slashingMultiplierResetPeriod: secondsToDurationString(config.slashingMultiplierResetPeriod),
+      commissionUpdateDelay: blocksToDurationString(config.commissionUpdateDelay),
+      validatorLockedGoldRequirements,
+      groupLockedGoldRequirements,
     }
   }
 
@@ -144,9 +215,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  async signerToAccount(signerAddress: Address, blockNumber?: number) {
+  async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.signerToAccount(signerAddress, blockNumber)
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -163,7 +234,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -224,8 +295,20 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
-    const account = await this.signerToAccount(address, blockNumber)
-    return this.getValidator(account, blockNumber)
+    const account = await this.signerToAccount(address)
+    if (eqAddress(account, NULL_ADDRESS) || !(await this.isValidator(account))) {
+      return {
+        name: 'Unregistered validator',
+        address,
+        ecdsaPublicKey: '',
+        blsPublicKey: '',
+        affiliation: '',
+        score: new BigNumber(0),
+        signer: address,
+      }
+    } else {
+      return this.getValidator(account, blockNumber)
+    }
   }
 
   /** Get ValidatorGroup information */
@@ -242,19 +325,23 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     if (getAffiliates) {
       const validators = await this.getRegisteredValidators(blockNumber)
       affiliates = validators
-        .filter((v) => v.affiliation === address)
+        .filter((v) => v.affiliation && eqAddress(v.affiliation, address))
         .filter((v) => !res[0].includes(v.address))
     }
     return {
       name,
       address,
       members: res[0],
-      membersUpdated: res[2].reduce(
+      commission: fromFixed(new BigNumber(res[1])),
+      nextCommission: fromFixed(new BigNumber(res[2])),
+      nextCommissionBlock: new BigNumber(res[3]),
+      membersUpdated: res[4].reduce(
         (a: number, b: BigNumber.Value) => Math.max(a, new BigNumber(b).toNumber()),
         0
       ),
-      commission: fromFixed(new BigNumber(res[1])),
       affiliates: affiliates.map((v) => v.address),
+      slashingMultiplier: fromFixed(new BigNumber(res[5])),
+      lastSlashed: valueToBigNumber(res[6]),
     }
   }
 
@@ -338,7 +425,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(stringToBytes, stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -347,7 +434,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async deregisterValidator(validatorAddress: Address) {
     const allValidators = await this.getRegisteredValidatorsAddresses()
-    const idx = allValidators.findIndex((addr) => eqAddress(validatorAddress, addr))
+    const idx = findAddressIndex(validatorAddress, allValidators)
 
     if (idx < 0) {
       throw new Error(`${validatorAddress} is not a registered validator`)
@@ -375,7 +462,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async deregisterValidatorGroup(validatorGroupAddress: Address) {
     const allGroups = await this.getRegisteredValidatorGroupsAddresses()
-    const idx = allGroups.findIndex((addr) => eqAddress(validatorGroupAddress, addr))
+    const idx = findAddressIndex(validatorGroupAddress, allGroups)
 
     if (idx < 0) {
       throw new Error(`${validatorGroupAddress} is not a registered validator`)
@@ -400,10 +487,20 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
 
+  /**
+   * Removes a validator from the group for which it is a member.
+   * @param validatorAccount The validator to deaffiliate from their affiliated validator group.
+   */
   forceDeaffiliateIfValidator = proxySend(
     this.kit,
     this.contract.methods.forceDeaffiliateIfValidator
   )
+
+  /**
+   * Resets a group's slashing multiplier if it has been >= the reset period since
+   * the last time the group was slashed.
+   */
+  resetSlashingMultiplier = proxySend(this.kit, this.contract.methods.resetSlashingMultiplier)
 
   /**
    * Adds a member to the end of a validator group's list of members.
@@ -448,7 +545,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    const currentIdx = group.members.indexOf(validator)
+    const currentIdx = findAddressIndex(validator, group.members)
     if (currentIdx < 0) {
       throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
@@ -481,10 +578,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       toBlock: blockNumber,
     })
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidator(e.returnValues.validator, blockNumber)
+      this.getValidator(e.returnValues.validator)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
@@ -502,7 +599,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentSignerSet(): Promise<Address[]> {
     const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
-    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+    return concurrentMap(5, zeroRange(n), (idx) =>
       this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
     )
   }
@@ -512,7 +609,43 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentValidatorAccountsSet() {
     const signerAddresses = await this.currentSignerSet()
-    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    const accountAddresses = await concurrentMap(5, signerAddresses, (signer) =>
+      this.validatorSignerToAccount(signer)
+    )
     return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
+  }
+
+  /**
+   * Returns the group membership for `validator`.
+   * @param validator Address of validator to retrieve group membership for.
+   * @param blockNumber Block number to retrieve group membership at.
+   * @return Group and membership history index for `validator`.
+   */
+  async getValidatorMembershipHistoryIndex(
+    validator: Validator,
+    blockNumber?: number
+  ): Promise<{ group: Address; historyIndex: number }> {
+    const blockEpoch = await this.kit.getEpochNumberOfBlock(
+      blockNumber || (await this.kit.web3.eth.getBlockNumber())
+    )
+    const account = await this.validatorSignerToAccount(validator.signer)
+    const membershipHistory = await this.getValidatorMembershipHistory(account)
+    const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
+    const group = membershipHistory[historyIndex].group
+    return { group, historyIndex }
+  }
+
+  /**
+   * Returns the index into `history` for `epoch`.
+   * @param epoch The needle.
+   * @param history The haystack.
+   * @return Index for epoch or -1.
+   */
+  findValidatorMembershipHistoryIndex(epoch: number, history: GroupMembership[]): number {
+    const revIndex = history
+      .slice()
+      .reverse()
+      .findIndex((x) => x.epoch <= epoch)
+    return revIndex < 0 ? -1 : history.length - revIndex - 1
   }
 }

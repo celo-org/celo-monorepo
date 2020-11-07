@@ -1,37 +1,14 @@
+import { BaseProps, validateDecimal, validateInteger } from '@celo/base/lib/inputValidation'
 import { getDisplayPhoneNumber } from './phoneNumbers'
 
-export enum ValidatorKind {
-  Custom = 'custom',
-  Decimal = 'decimal',
-  Integer = 'integer',
-  Phone = 'phone',
-}
-
-export interface BaseProps {
-  validator?: ValidatorKind
-  customValidator?: (input: string) => string
-  countryCallingCode?: string
-  lng?: string
-}
-
-export function validateInteger(input: string): string {
-  return input.replace(/[^0-9]/g, '')
-}
-
-export function validateDecimal(input: string, lng?: string): string {
-  // Comma decimal points -- only supports es right now
-  const decimalChar = lng && lng.startsWith('es') ? ',' : '.'
-  const regex = decimalChar === ',' ? /[^0-9,]/g : /[^0-9.]/g
-
-  const cleanedArray = input.replace(regex, '').split(decimalChar)
-
-  if (cleanedArray.length <= 1) {
-    // Empty string or no decimals
-    return cleanedArray.join('')
-  } else {
-    return cleanedArray.shift() + decimalChar + cleanedArray.join('')
-  }
-}
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export {
+  BaseProps,
+  validateDecimal,
+  validateInteger,
+  ValidatorKind,
+} from '@celo/base/lib/inputValidation'
 
 export function validatePhone(input: string, countryCallingCode?: string): string {
   input = input.replace(/[^0-9()\- ]/g, '')
@@ -56,7 +33,7 @@ export function validateInput(input: string, props: BaseProps): string {
 
   switch (props.validator) {
     case 'decimal':
-      return validateDecimal(input, props.lng)
+      return validateDecimal(input, props.decimalSeparator)
     case 'integer':
       return validateInteger(input)
     case 'phone':

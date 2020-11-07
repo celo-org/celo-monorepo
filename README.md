@@ -22,13 +22,13 @@ and other packages. The source code for the Celo Blockchain which operates a nod
 <!-- row 2 - links & profiles -->
 
 [![Website celo.org](https://img.shields.io/website-up-down-green-red/https/celo.org.svg)](https://celo.org)
-[![Blog](https://img.shields.io/badge/blog-up-green)](https://medium.com/celohq)
+[![Blog](https://img.shields.io/badge/blog-up-green)](https://medium.com/celoorg)
 [![docs](https://img.shields.io/badge/docs-up-green)](https://docs.celo.org/)
 [![Youtube](https://img.shields.io/badge/YouTube%20channel-up-green)](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 [![forum](https://img.shields.io/badge/forum-up-green)](https://forum.celo.org)
 [![Discord](https://img.shields.io/discord/600834479145353243.svg)](https://discord.gg/RfHQKtY)
 [![Twitter CeloDevs](https://img.shields.io/twitter/follow/celodevs?style=social)](https://twitter.com/celodevs)
-[![Twitter CeloHQ](https://img.shields.io/twitter/follow/celohq?style=social)](https://twitter.com/celohq)
+[![Twitter CeloOrg](https://img.shields.io/twitter/follow/celoorg?style=social)](https://twitter.com/CeloOrg)
 [![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/CeloHQ?style=social)](https://www.reddit.com/r/CeloHQ/)
 
 <!-- row 3 - detailed status -->
@@ -106,9 +106,8 @@ See the [issue backlog](https://github.com/celo-org/celo-monorepo/issues) for a 
 
 The repository has the following packages (sub projects):
 
-- [analytics](packages/analytics) - Cloud Dataflow/Apache Beam jobs for processing Celo Wallet logs and telemetry
 - [attestation-service](packages/attestation-service) - service run by validators on the Celo network to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
-- [blockchain-api](packages/analytics) - service that uses Blockscout to present view of transactions by account for Celo Wallet activity feed
+- [blockchain-api](packages/blockchain-api) - service that uses Blockscout to present view of transactions by account for Celo Wallet activity feed
 - [celotool](packages/celotool) - scripts for deploying and managing testnets
 - [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/getting-started/using-the-cli))
 - [contractkit](packages/contractkit) - library to help developers and validators interact with the protocol and it's smart contracts ([docs](https://docs.celo.org/celo-sdk/contractkit))
@@ -120,14 +119,11 @@ The repository has the following packages (sub projects):
 - [mobile](packages/mobile) - Android wallet app for the Celo platform ([docs](https://docs.celo.org/getting-started/using-the-mobile-wallet), [live](https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores))
 - [notification-service](packages/notification-service) - service for managing push notifications for Celo Wallet
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
-- [react-components](packages/react-components) - no README available (improve?)
+- [react-components](packages/react-components) - generalized react native components
+- [reserve-site](packages/reserve-site) - website for ([Celo Reserve.org](https://celoreserve.org/))
 - [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
-- [transaction-metrics-exporter](packages/transaction-metrics-exporter) - monitoring tool that executes transactions on the network and exports testnet-level prometheus metrics
 - [typescript](packages/typescript) - no README available (improve?)
 - [utils](packages/utils) - no README available (improve?)
-- [verification-pool-api](packages/verification-pool-api) - service that handles a pool of Verifier App instances and requests them to direct SMS for attestation purposes (deprecated)
-- [verifier](packages/verifier) - Android verifier app to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
-- [walletkit](packages/walletkit) - common functions to access smart contracts used by Celo Wallet (deprecated)
 - [web](packages/web) - Celo website ([live](https://celo.org/))
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
@@ -153,7 +149,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [Blog](https://medium.com/celohq)
 - [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 - [Forum](https://forum.celo.org)
-- [Discord](https://discord.gg/JvJ66Wc)
+- [Discord](https://discord.gg/vRbExjv)
 - [Twitter](https://twitter.com/CeloDevs)
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
 - [Community Events](https://celo.org/community)

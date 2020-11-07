@@ -12,6 +12,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
   <View
     accessible={true}
     focusable={true}
+    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -22,7 +23,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
     style={
       Object {
         "alignItems": "center",
-        "backgroundColor": "#3C9BF4",
+        "backgroundColor": "#0768AE",
         "flexDirection": "row",
         "justifyContent": "center",
         "paddingBottom": 10,
@@ -35,22 +36,23 @@ exports[`SmartTopAlert renders correctly 1`] = `
         ],
       }
     }
+    testID="SmartTopAlertTouchable"
   >
     <Text
       style={
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           },
+          false,
           Object {
             "color": "white",
             "lineHeight": undefined,
             "textAlign": "center",
           },
-          false,
         ]
       }
     >
@@ -58,12 +60,15 @@ exports[`SmartTopAlert renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
               "color": "white",
               "lineHeight": undefined,
               "textAlign": "center",
-            },
-            Object {
-              "fontFamily": "Hind-SemiBold",
             },
           ]
         }

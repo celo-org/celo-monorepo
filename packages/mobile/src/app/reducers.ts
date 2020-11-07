@@ -1,4 +1,6 @@
-import { Actions, ActionTypes } from 'src/app/actions'
+import { Platform } from 'react-native'
+import { Actions, ActionTypes, AppState } from 'src/app/actions'
+import i18n from 'src/i18n'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
@@ -7,8 +9,14 @@ export interface State {
   numberVerified: boolean
   language: string | null
   doingBackupFlow: boolean
-  doingPinVerification: boolean
   analyticsEnabled: boolean
+  requirePinOnAppOpen: boolean
+  appState: AppState
+  locked: boolean
+  lastTimeBackgrounded: number
+  sessionId: string
+  minVersion: string | null
+  inviteModalVisible: boolean
 }
 
 const initialState = {
@@ -17,11 +25,17 @@ const initialState = {
   numberVerified: false,
   language: null,
   doingBackupFlow: false,
-  doingPinVerification: false,
   analyticsEnabled: true,
+  requirePinOnAppOpen: false,
+  appState: AppState.Active,
+  locked: false,
+  lastTimeBackgrounded: 0,
+  sessionId: '',
+  minVersion: null,
+  inviteModalVisible: false,
 }
 
-export const currentLanguageSelector = (state: RootState) => state.app.language
+export const currentLanguageSelector = (state: RootState) => state.app.language || i18n.language
 
 export const appReducer = (
   state: State | undefined = initialState,
@@ -30,12 +44,37 @@ export const appReducer = (
   switch (action.type) {
     case REHYDRATE: {
       // Ignore some persisted properties
+      const rehydratePayload = getRehydratePayload(action, 'app')
       return {
         ...state,
-        ...getRehydratePayload(action, 'app'),
-        doingPinVerification: false,
+        ...rehydratePayload,
+        appState: initialState.appState,
+        locked: rehydratePayload.requirePinOnAppOpen ?? initialState.locked,
+        sessionId: '',
       }
     }
+    case Actions.SET_APP_STATE:
+      let { appState, lastTimeBackgrounded } = state
+      switch (action.state) {
+        case 'background':
+          if (Platform.OS === 'android') {
+            lastTimeBackgrounded = Date.now()
+          }
+          appState = AppState.Background
+          break
+        case 'inactive': // occurs only on iOS
+          lastTimeBackgrounded = Date.now()
+          appState = AppState.Inactive
+          break
+        case 'active':
+          appState = AppState.Active
+          break
+      }
+      return {
+        ...state,
+        appState,
+        lastTimeBackgrounded,
+      }
     case Actions.SET_LOGGED_IN:
       return {
         ...state,
@@ -73,15 +112,35 @@ export const appReducer = (
         ...state,
         analyticsEnabled: action.enabled,
       }
-    case Actions.START_PIN_VERIFICATION:
+    case Actions.SET_LOCK_WITH_PIN_ENABLED:
       return {
         ...state,
-        doingPinVerification: true,
+        requirePinOnAppOpen: action.enabled,
       }
-    case Actions.FINISH_PIN_VERIFICATION:
+    case Actions.LOCK:
       return {
         ...state,
-        doingPinVerification: false,
+        locked: true,
+      }
+    case Actions.UNLOCK:
+      return {
+        ...state,
+        locked: false,
+      }
+    case Actions.SET_SESSION_ID:
+      return {
+        ...state,
+        sessionId: action.sessionId,
+      }
+    case Actions.MIN_APP_VERSION_DETERMINED:
+      return {
+        ...state,
+        minVersion: action.minVersion,
+      }
+    case Actions.TOGGLE_INVITE_MODAL:
+      return {
+        ...state,
+        inviteModalVisible: action.inviteModalVisible,
       }
     default:
       return state

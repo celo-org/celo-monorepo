@@ -10,12 +10,12 @@ describe(getLocalCurrencyCode, () => {
       expect(getLocalCurrencyCode(state)).toEqual('LRD')
     })
 
-    it('returns null for US phone numbers', () => {
+    it('returns USD for US phone numbers', () => {
       const state: any = {
         account: { e164PhoneNumber: '+14155552671' },
         localCurrency: { preferredCurrencyCode: undefined },
       }
-      expect(getLocalCurrencyCode(state)).toBeNull()
+      expect(getLocalCurrencyCode(state)).toEqual('USD')
     })
 
     it('returns CAD for CA phone numbers', () => {
@@ -36,12 +36,12 @@ describe(getLocalCurrencyCode, () => {
       expect(getLocalCurrencyCode(state)).toEqual('MXN')
     })
 
-    it('returns null when USD is the preferred currency', () => {
+    it('returns USD when USD is the preferred currency', () => {
       const state: any = {
         account: { e164PhoneNumber: '+14155552671' },
         localCurrency: { preferredCurrencyCode: 'USD' },
       }
-      expect(getLocalCurrencyCode(state)).toBeNull()
+      expect(getLocalCurrencyCode(state)).toEqual('USD')
     })
   })
 })

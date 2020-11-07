@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -80,5 +80,18 @@ contract MockLockedGold is ILockedGold {
   }
   function isSlasher(address slasher) external view returns (bool) {
     return slashingWhitelist[slasher];
+  }
+
+  function getPendingWithdrawals(address)
+    external
+    view
+    returns (uint256[] memory, uint256[] memory)
+  {
+    uint256[] memory empty = new uint256[](0);
+    return (empty, empty);
+  }
+
+  function getTotalPendingWithdrawals(address) external view returns (uint256) {
+    return 0;
   }
 }

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "name": "[variables('validatorUserAssignedIdentityName')]",
+      "apiVersion": "2018-11-30",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "name": "[variables('proxyUserAssignedIdentityName')]",
+      "apiVersion": "2018-11-30",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "name": "[variables('attesterUserAssignedIdentityName')]",
+      "apiVersion": "2018-11-30",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "properties": {}
+    }
+  ]
+}

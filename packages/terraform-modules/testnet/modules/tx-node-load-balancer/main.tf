@@ -11,12 +11,12 @@ locals {
 # setup. In the future, consider moving this node to live in Kubernetes to be
 # along with the services that use it.
 
-# internal load balancer for metrics & blockscout:
+# internal load balancer for cLabs-run infra:
 
 resource "google_compute_instance_group" "internal" {
   name = "${local.name_prefix}-internal-group-${random_id.internal.hex}"
 
-  instances = slice(var.tx_node_self_links, 0, 1)
+  instances = var.private_tx_node_self_links
 
   lifecycle {
     create_before_destroy = true
@@ -76,7 +76,7 @@ resource "google_compute_health_check" "internal" {
 resource "google_compute_instance_group" "external" {
   name = "${local.name_prefix}-group-${random_id.external.hex}"
 
-  instances = slice(var.tx_node_self_links, 1, length(var.tx_node_self_links))
+  instances = var.tx_node_self_links
 
   lifecycle {
     create_before_destroy = true

@@ -1,3 +1,4 @@
+import { createSelector } from 'reselect'
 import { Actions, ActionTypes, EscrowedPayment } from 'src/escrow/actions'
 import { RootState } from 'src/redux/reducers'
 
@@ -35,3 +36,14 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
 }
 
 export const sentEscrowedPaymentsSelector = (state: RootState) => state.escrow.sentEscrowedPayments
+
+export const getReclaimableEscrowPayments = createSelector(
+  sentEscrowedPaymentsSelector,
+  (sentPayments) => {
+    const currUnixTime = Date.now() / 1000
+    return sentPayments.filter((payment) => {
+      const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
+      return currUnixTime >= paymentExpiryTime
+    })
+  }
+)

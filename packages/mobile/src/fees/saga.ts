@@ -1,17 +1,17 @@
-import { getStableTokenContract } from '@celo/walletkit'
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { FeeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFeeInWei, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
-import { CeloDefaultRecipient } from 'src/send/Send'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
 import { getGasPrice } from 'src/web3/gas'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -20,9 +20,11 @@ const TAG = 'fees/saga'
 // Prevents us from having to recreate txs and estimate their gas each time
 const feeGasCache = new Map<FeeType, BigNumber>()
 // Just use default values here since it doesn't matter for fee estimation
+
+const placeHolderAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 const placeholderSendTx: BasicTokenTransfer = {
-  recipientAddress: CeloDefaultRecipient.address,
-  amount: web3.utils.fromWei('1'),
+  recipientAddress: placeHolderAddress,
+  amount: 1e-18, // 1 wei
   comment: 'Coffee or Tea?',
 }
 
@@ -58,7 +60,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
           call(
             getInviteTxGas,
             account,
-            getStableTokenContract,
+            CURRENCY_ENUM.DOLLAR,
             placeholderSendTx.amount,
             placeholderSendTx.comment
           )
@@ -69,7 +71,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
         feeInWei = yield call(
           getOrSetFee,
           FeeType.SEND,
-          call(getSendTxGas, account, getStableTokenContract, placeholderSendTx)
+          call(getSendTxGas, account, CURRENCY_ENUM.DOLLAR, placeholderSendTx)
         )
         break
       case FeeType.EXCHANGE:
@@ -79,7 +81,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
         feeInWei = yield call(
           getOrSetFee,
           FeeType.RECLAIM_ESCROW,
-          call(getReclaimEscrowGas, account, CeloDefaultRecipient.address)
+          call(getReclaimEscrowGas, account, placeHolderAddress)
         )
         break
     }
@@ -90,6 +92,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
     }
   } catch (error) {
     Logger.error(`${TAG}/estimateFeeSaga`, 'Error estimating fee', error)
+    ValoraAnalytics.track(FeeEvents.estimate_fee_failed, { error: error.message, feeType })
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
 }

@@ -1,26 +1,14 @@
-import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, select } from 'redux-saga/effects'
-import { getPincode } from 'src/account/saga'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { finishPinVerification, openDeepLink, startPinVerification } from 'src/app/actions'
-import {
-  checkAppDeprecation,
-  handleDeepLink,
-  navigatePinProtected,
-  navigateToProperScreen,
-  waitForRehydrate,
-} from 'src/app/saga'
+import * as matchers from 'redux-saga-test-plan/matchers'
+import { select } from 'redux-saga/effects'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { appLock, openDeepLink, setAppState } from 'src/app/actions'
+import { handleDeepLink, handleSetAppState } from 'src/app/saga'
+import { getAppLocked, getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { isAppVersionDeprecated } from 'src/firebase/firebase'
-import { UNLOCK_DURATION } from 'src/geth/consts'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { NavActions, navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
-import { web3 } from 'src/web3/contracts'
-import { getAccount } from 'src/web3/saga'
-import { zeroSyncSelector } from 'src/web3/selectors'
+import { handlePaymentDeeplink } from 'src/send/utils'
 
 jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
@@ -28,29 +16,7 @@ jest.mock('src/utils/time', () => ({
 
 jest.mock('src/dappkit/dappkit')
 
-const MockedAnalytics = CeloAnalytics as any
-
-const initialState = {
-  app: {
-    language: undefined,
-  },
-  verify: {},
-  web3: {},
-  account: {},
-  invite: {},
-  identity: {},
-}
-
-const navigationSagaTest = (testName: string, state: any, expectedScreen: any) => {
-  test(testName, async () => {
-    await expectSaga(navigateToProperScreen)
-      .withState(state)
-      .dispatch({ type: REHYDRATE })
-      .dispatch({ type: NavActions.SET_NAVIGATOR })
-      .run()
-    expect(navigate).toHaveBeenCalledWith(expectedScreen)
-  })
-}
+const MockedAnalytics = ValoraAnalytics as any
 
 describe('App saga', () => {
   beforeEach(() => {
@@ -58,49 +24,6 @@ describe('App saga', () => {
   })
   afterEach(() => {
     jest.clearAllMocks()
-  })
-
-  it('Version Deprecated', async () => {
-    await expectSaga(checkAppDeprecation)
-      .provide([
-        [call(waitForRehydrate), null],
-        [call(isAppVersionDeprecated), true],
-      ])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
-  })
-
-  it('Version Not Deprecated', async () => {
-    await expectSaga(checkAppDeprecation)
-      .provide([
-        [call(waitForRehydrate), null],
-        [call(isAppVersionDeprecated), false],
-      ])
-      .run()
-    expect(navigate).not.toHaveBeenCalled()
-  })
-
-  it('Navigates after verifying PIN - Forno', async () => {
-    const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(navigatePinProtected, testRoute)
-      .provide([[select(zeroSyncSelector), true]])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
-  })
-
-  it('Navigates after verifying PIN - Light node', async () => {
-    const testRoute = { routeName: 'test', params: { a: '1' } }
-    await expectSaga(navigatePinProtected, testRoute)
-      .provide([
-        [select(zeroSyncSelector), false],
-        [call(getPincode, false), '123456'],
-        [call(getAccount), 'account'],
-        [call(web3.eth.personal.unlockAccount, 'account', '123456', UNLOCK_DURATION), undefined],
-      ])
-      .put(startPinVerification())
-      .put(finishPinVerification())
-      .run()
-    expect(navigate).toHaveBeenCalledWith(testRoute.routeName, testRoute.params)
   })
 
   it('Handles Dappkit deep link', async () => {
@@ -114,7 +37,64 @@ describe('App saga', () => {
       .put(receiveAttestationMessage('12345', CodeInputType.DEEP_LINK))
       .run()
   })
-})
 
-navigationSagaTest('Navigates to the nux stack with no state', null, Stacks.NuxStack)
-navigationSagaTest('Navigates to the nux stack with no language', initialState, Stacks.NuxStack)
+  it('Handles payment deep link', async () => {
+    const data = {
+      address: '0xf7f551752A78Ce650385B58364225e5ec18D96cB',
+      displayName: 'Super 8',
+      currencyCode: 'PHP',
+      amount: '500',
+      comment: '92a53156-c0f2-11ea-b3de-0242ac13000',
+    }
+
+    const params = new URLSearchParams(data)
+    const deepLink = `celo://wallet/pay?${params.toString()}`
+
+    await expectSaga(handleDeepLink, openDeepLink(deepLink))
+      .provide([[matchers.call.fn(handlePaymentDeeplink), deepLink]])
+      .run()
+  })
+
+  it('Handles set app state', async () => {
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getRequirePinOnAppOpen), true],
+      ])
+      .put(appLock())
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), true],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getRequirePinOnAppOpen), true],
+      ])
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), Date.now()],
+        [select(getRequirePinOnAppOpen), true],
+      ])
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getRequirePinOnAppOpen), false],
+      ])
+      .run()
+
+    await expectSaga(handleSetAppState, setAppState('active'))
+      .provide([
+        [select(getAppLocked), false],
+        [select(getLastTimeBackgrounded), 0],
+        [select(getRequirePinOnAppOpen), true],
+      ])
+      .run()
+  })
+})

@@ -1,10 +1,10 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/libraries/AddressesHelper.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
@@ -24,7 +24,6 @@ library Proposals {
     uint256 execution;
   }
 
-  // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 yes;
     uint256 no;
@@ -46,6 +45,14 @@ library Proposals {
     bool approved;
     uint256 networkWeight;
     string descriptionUrl;
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
   }
 
   /**
@@ -359,8 +366,7 @@ library Proposals {
   {
     bool result;
 
-    if (dataLength > 0)
-      require(AddressesHelper.isContract(destination), "Invalid contract address");
+    if (dataLength > 0) require(Address.isContract(destination), "Invalid contract address");
 
     /* solhint-disable no-inline-assembly */
     assembly {

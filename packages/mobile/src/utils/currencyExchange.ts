@@ -13,7 +13,6 @@ export function getRateForMakerToken(
   inputToken?: CURRENCY_ENUM // Token to convert from, defaults to makerToken
 ) {
   if (!exchangeRatePair) {
-    Logger.warn(TAG, `Rate for token ${makerToken} is NaN`)
     return new BigNumber(0)
   }
 
@@ -48,12 +47,11 @@ export function getTakerAmount(makerAmount: numberT, exchangeRate: numberT, deci
     return new BigNumber(0)
   }
 
+  if (rateBN.isZero()) {
+    Logger.warn(TAG, 'Exchange rate is 0')
+    return new BigNumber(0)
+  }
   let converted = amountBN.dividedBy(rateBN)
-  Logger.debug(
-    TAG + '@getTakerAmount',
-    `Exchanging ${amountBN} at rate ${rateBN} gives ${converted}`
-  )
-
   if (decimals !== undefined) {
     converted = converted.decimalPlaces(decimals, BigNumber.ROUND_DOWN)
   }

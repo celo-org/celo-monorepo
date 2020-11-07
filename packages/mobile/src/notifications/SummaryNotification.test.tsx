@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 import * as renderer from 'react-test-renderer'
-import { placeholder } from 'src/images/Images'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 
 const props = () => ({
-  image: placeholder,
-  icon: <View />,
   title: 'Test',
+  detailsI18nKey: 'someI18nKey',
+  icon: <View />,
   items: ['a'],
   itemRenderer: (item: string, key: number) => {
     return <Text>{`test-${item}`}</Text>

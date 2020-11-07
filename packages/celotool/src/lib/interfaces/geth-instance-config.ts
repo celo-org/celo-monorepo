@@ -1,6 +1,9 @@
+import BigNumber from 'bignumber.js'
+
 export interface GethInstanceConfig {
   name: string
   validating?: boolean
+  replica?: boolean
   validatingGasPrice?: number
   syncmode: string
   port: number
@@ -19,4 +22,5 @@ export interface GethInstanceConfig {
   proxiedValidatorAddress?: string
   proxyAllowPrivateIp?: boolean
   ethstats?: string
+  gatewayFee?: BigNumber
 }

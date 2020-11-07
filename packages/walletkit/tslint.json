@@ -1,9 +1,0 @@
-{
-  "extends": ["@celo/typescript/tslint.json"],
-  "linterOptions": {
-    "include": ["**/*.ts"]
-  },
-  "rules": {
-    "no-floating-promises": true
-  }
-}

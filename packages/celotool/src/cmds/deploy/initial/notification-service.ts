@@ -1,4 +1,4 @@
-import { execCmd } from 'src/lib/utils'
+import { execCmd } from 'src/lib/cmd-utils'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'notification-service'

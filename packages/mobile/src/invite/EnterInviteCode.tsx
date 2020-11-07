@@ -1,24 +1,30 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { HeaderHeightContext } from '@react-navigation/stack'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, Clipboard, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { Trans, WithTranslation } from 'react-i18next'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
-import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
+import { OnboardingEvents } from 'src/analytics/Events'
+import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
-import { Namespaces, withTranslation } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { redeemInvite, skipInvite } from 'src/invite/actions'
-import { extractValidInviteCode, getValidInviteCodeFromReferrerData } from 'src/invite/utils'
-import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
+import {
+  ExtractedInviteCodeAndPrivateKey,
+  extractInviteCodeAndPrivateKey,
+  extractValuesFromDeepLink,
+} from 'src/invite/utils'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import TopBarTextButtonOnboarding from 'src/onboarding/TopBarTextButtonOnboarding'
+import UseBackToWelcomeScreen from 'src/onboarding/UseBackToWelcomeScreen'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -31,21 +37,18 @@ interface StateProps {
 }
 
 interface State {
+  keyboardVisible: boolean
   inputValue: string
 }
 
 interface DispatchProps {
   redeemInvite: typeof redeemInvite
   skipInvite: typeof skipInvite
-  showError: typeof showError
-  hideAlert: typeof hideAlert
 }
 
 const mapDispatchToProps = {
   redeemInvite,
   skipInvite,
-  showError,
-  hideAlert,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -60,141 +63,175 @@ const mapStateToProps = (state: RootState): StateProps => {
 type Props = StateProps & DispatchProps & WithTranslation
 
 export class EnterInviteCode extends React.Component<Props, State> {
-  static navigationOptions = nuxNavigationOptionsNoBackButton
+  static navigationOptions = {
+    ...nuxNavigationOptions,
+    headerLeft: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:cancel')}
+        // Note: redux state reset is handled by UseBackToWelcomeScreen
+        // tslint:disable-next-line: jsx-no-lambda
+        onPress={() => navigate(Screens.Welcome)}
+      />
+    ),
+    headerTitle: () => (
+      <HeaderTitleWithSubtitle
+        title={i18n.t('onboarding:inviteCode.title')}
+        subTitle={i18n.t('onboarding:step', { step: '3' })}
+      />
+    ),
+  }
 
   state: State = {
+    keyboardVisible: false,
     inputValue: '',
   }
 
   async componentDidMount() {
-    await this.checkIfValidCodeInClipboard()
-    await this.checkForReferrerCode()
+    await this.checkForInviteCode()
   }
 
-  checkForReferrerCode = async () => {
-    const validCode = await getValidInviteCodeFromReferrerData()
-    if (validCode) {
-      this.setState({ inputValue: validCode })
-      this.props.redeemInvite(validCode)
+  checkForInviteCode = async () => {
+    // Check deeplink
+    const extractedValues: ExtractedInviteCodeAndPrivateKey = await extractValuesFromDeepLink()
+    if (extractedValues) {
+      const { inviteCode, privateKey } = extractedValues
+      this.setState({ inputValue: inviteCode })
+      this.props.redeemInvite(privateKey)
+      return
     }
-  }
-
-  checkIfValidCodeInClipboard = async () => {
-    const message = await Clipboard.getString()
-    if (extractValidInviteCode(message)) {
-      this.onInputChange(message)
-    }
-  }
-  onPressImportClick = async () => {
-    navigate(Screens.ImportWallet)
-  }
-
-  onPressContinue = () => {
-    navigate(Screens.VerificationEducationScreen)
   }
 
   onPressGoToFaucet = () => {
     navigateToURI(CELO_FAUCET_LINK)
   }
 
-  onPressSkip = () => {
+  skipInvite = () => {
     this.props.skipInvite()
   }
 
+  navigateToVerification = () => {
+    navigate(Screens.VerificationEducationScreen)
+  }
+
   onInputChange = (value: string) => {
-    const inviteCode = extractValidInviteCode(value)
-    if (inviteCode) {
+    const extractedValues: ExtractedInviteCodeAndPrivateKey = extractInviteCodeAndPrivateKey(value)
+    if (extractedValues) {
+      const { inviteCode, privateKey } = extractedValues
       this.setState({ inputValue: inviteCode })
-      this.props.redeemInvite(inviteCode)
+      this.props.redeemInvite(privateKey)
     } else {
       this.setState({ inputValue: value })
     }
   }
 
-  shouldShowClipboard = (value: string) => {
-    return !!extractValidInviteCode(value)
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
+  }
+
+  shouldShowClipboard = (clipboardContent: string): boolean => {
+    const extractedValues: ExtractedInviteCodeAndPrivateKey = extractInviteCodeAndPrivateKey(
+      clipboardContent
+    )
+    return (
+      !!extractedValues &&
+      !this.state.inputValue.toLowerCase().startsWith(extractedValues.inviteCode.toLowerCase())
+    )
+  }
+
+  renderFooterButton = () => {
+    const { t, isRedeemingInvite, redeemComplete } = this.props
+
+    if (SHOW_GET_INVITE_LINK) {
+      return (
+        <Text style={styles.askInviteText}>
+          <Trans i18nKey="inviteCode.nodeCodeInviteLink" ns={Namespaces.onboarding}>
+            <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink} />
+            <Text onPress={this.skipInvite} style={styles.askInviteLink} />
+          </Trans>
+        </Text>
+      )
+    }
+
+    // This only displays in edge cases where auto-navigation after redemption is unsuccessful
+    if (redeemComplete) {
+      return (
+        <TextButton style={styles.bottomButton} onPress={this.navigateToVerification}>
+          {t('global:done')}
+        </TextButton>
+      )
+    }
+
+    if (!isRedeemingInvite) {
+      return (
+        <TextButton style={styles.bottomButton} onPress={this.skipInvite}>
+          {t('inviteCode.noCode')}
+        </TextButton>
+      )
+    }
+
+    return null
   }
 
   render() {
-    const { t, isRedeemingInvite, isSkippingInvite, redeemComplete, account } = this.props
-    const { inputValue } = this.state
+    const { t, isRedeemingInvite, isSkippingInvite, redeemComplete } = this.props
+    const { keyboardVisible, inputValue } = this.state
 
-    let codeStatus = CodeRowStatus.INPUTTING
+    let codeStatus = CodeInputStatus.INPUTTING
     if (isRedeemingInvite) {
-      codeStatus = CodeRowStatus.PROCESSING
+      codeStatus = CodeInputStatus.PROCESSING
     } else if (redeemComplete) {
-      codeStatus = CodeRowStatus.ACCEPTED
+      codeStatus = CodeInputStatus.ACCEPTED
     }
 
     return (
-      <SafeAreaView style={styles.container}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps={'always'}
-        >
-          <View>
-            <DevSkipButton nextScreen={Screens.VerificationEducationScreen} />
-            <Text style={styles.h1} testID={'InviteCodeTitle'}>
-              {t('inviteCodeText.title')}
-            </Text>
-            <Text style={fontStyles.body}>{t('inviteCodeText.body')}</Text>
-            <Text style={styles.codeHeader}>{t('inviteCodeText.codeHeader')}</Text>
-            <CodeRow
-              status={codeStatus}
-              inputValue={inputValue}
-              inputPlaceholder={t('inviteCodeText.codePlaceholder')}
-              onInputChange={this.onInputChange}
-              shouldShowClipboard={this.shouldShowClipboard}
-            />
-          </View>
-          {isSkippingInvite && (
-            <View>
-              <ActivityIndicator size="large" color={colors.celoGreen} />
-            </View>
-          )}
-          <Text style={styles.askInviteText}>
-            <Text style={fontStyles.bodySmallBold}>{t('inviteCodeText.noCode')}</Text>
-            {SHOW_GET_INVITE_LINK ? (
-              <>
-                {t('inviteCodeText.requestCodeFromFaucet')}
-                <Text onPress={this.onPressGoToFaucet} style={styles.askInviteLink}>
-                  {t('inviteCodeText.faucetLink')}
-                </Text>
-                {' ' + t('global:or') + ' '}
-                <Text onPress={this.onPressSkip} style={styles.askInviteLink}>
-                  {t('inviteCodeText.skip')}
-                </Text>
-              </>
-            ) : (
-              <>
-                {t('inviteCodeText.requestCodeNoFaucet')}
-                <Text onPress={this.onPressSkip} style={styles.askInviteLink}>
-                  {t('inviteCodeText.skip')}
-                </Text>
-              </>
+      <HeaderHeightContext.Consumer>
+        {(headerHeight) => (
+          <SafeAreaInsetsContext.Consumer>
+            {(insets) => (
+              <View style={styles.container}>
+                <UseBackToWelcomeScreen
+                  backAnalyticsEvents={[OnboardingEvents.create_account_cancel]}
+                />
+                <DevSkipButton onSkip={this.skipInvite} />
+                <KeyboardAwareScrollView
+                  style={headerHeight ? { marginTop: headerHeight } : undefined}
+                  contentContainerStyle={[
+                    styles.scrollContainer,
+                    !keyboardVisible && insets && { marginBottom: insets.bottom },
+                  ]}
+                  keyboardShouldPersistTaps={'always'}
+                >
+                  <View>
+                    <Text style={styles.body}>{t('inviteCode.body')}</Text>
+                    <CodeInput
+                      label={t('inviteCode.label')}
+                      status={codeStatus}
+                      inputValue={inputValue}
+                      inputPlaceholder={t('inviteCode.codePlaceholder')}
+                      onInputChange={this.onInputChange}
+                      shouldShowClipboard={this.shouldShowClipboard}
+                      testID={'inviteCodeInput'}
+                    />
+                    {isRedeemingInvite && (
+                      <View style={styles.loadingContainer}>
+                        <Text style={styles.loadingText}>{t('inviteCode.loadingHeader')}</Text>
+                        <Text style={styles.loadingText}>{t('inviteCode.loadingBody')}</Text>
+                      </View>
+                    )}
+                  </View>
+                  {isSkippingInvite && (
+                    <View>
+                      <ActivityIndicator size="large" color={colors.greenBrand} />
+                    </View>
+                  )}
+                  <View>{this.renderFooterButton()}</View>
+                </KeyboardAwareScrollView>
+                <KeyboardSpacer onToggle={this.onToggleKeyboard} />
+              </View>
             )}
-          </Text>
-        </KeyboardAwareScrollView>
-        <View>
-          <Button
-            onPress={this.onPressContinue}
-            disabled={isRedeemingInvite || !redeemComplete || !account}
-            text={t('continue')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            testID="ContinueInviteButton"
-          />
-          <Button
-            onPress={this.onPressImportClick}
-            disabled={isRedeemingInvite || !!account}
-            text={t('importIt')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-            testID="ContinueInviteButton"
-          />
-        </View>
-        <KeyboardSpacer />
-      </SafeAreaView>
+          </SafeAreaInsetsContext.Consumer>
+        )}
+      </HeaderHeightContext.Consumer>
     )
   }
 }
@@ -202,38 +239,44 @@ export class EnterInviteCode extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
+    backgroundColor: colors.onboardingBackground,
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
-    paddingTop: 0,
+    paddingHorizontal: 20,
+    paddingTop: 34,
     justifyContent: 'space-between',
   },
-  codeHeader: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    marginTop: 20,
-  },
-  h1: {
-    ...fontStyles.h1,
-    marginTop: 20,
+  body: {
+    ...fontStyles.regular,
+    marginBottom: 24,
   },
   askInviteText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
+    color: colors.onboardingBrownLight,
+    textAlign: 'center',
     marginTop: 20,
     marginBottom: 10,
   },
   askInviteLink: {
-    ...fontStyles.bodySmall,
     textDecorationLine: 'underline',
+  },
+  bottomButton: {
+    textAlign: 'center',
+    color: colors.onboardingBrownLight,
+    padding: 16,
+  },
+  loadingContainer: {
+    marginTop: 16,
+  },
+  loadingText: {
+    textAlign: 'center',
+    ...fontStyles.regular,
+    color: colors.onboardingBrownLight,
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxNamePin1)(EnterInviteCode))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation<Props>(Namespaces.onboarding)(EnterInviteCode))

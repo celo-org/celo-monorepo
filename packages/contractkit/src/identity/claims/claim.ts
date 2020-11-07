@@ -7,8 +7,15 @@ import {
   AttestationServiceURLClaimType,
   validateAttestationServiceUrl,
 } from './attestation-service-url'
-import { KeybaseClaim, KeybaseClaimType } from './keybase'
 import { ClaimTypes, now, SignatureType, TimestampType } from './types'
+
+export const KeybaseClaimType = t.type({
+  type: t.literal(ClaimTypes.KEYBASE),
+  timestamp: TimestampType,
+  // TODO: Validate compliant username before just interpolating
+  username: t.string,
+})
+export type KeybaseClaim = t.TypeOf<typeof KeybaseClaimType>
 
 const DomainClaimType = t.type({
   type: t.literal(ClaimTypes.DOMAIN),
@@ -22,12 +29,20 @@ const NameClaimType = t.type({
   name: t.string,
 })
 
+const StorageClaimType = t.type({
+  type: t.literal(ClaimTypes.STORAGE),
+  timestamp: TimestampType,
+  address: t.string,
+  filteredDataPaths: t.string,
+})
+
 export const ClaimType = t.union([
   AttestationServiceURLClaimType,
   AccountClaimType,
   DomainClaimType,
   KeybaseClaimType,
   NameClaimType,
+  StorageClaimType,
 ])
 
 export const SignedClaimType = t.type({
@@ -35,14 +50,17 @@ export const SignedClaimType = t.type({
   signature: SignatureType,
 })
 
+export const DOMAIN_TXT_HEADER = 'celo-site-verification'
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
+export type StorageClaim = t.TypeOf<typeof StorageClaimType>
 export type Claim =
   | AttestationServiceURLClaim
   | DomainClaim
   | KeybaseClaim
   | NameClaim
   | AccountClaim
+  | StorageClaim
 
 export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOMAIN
   ? DomainClaim
@@ -52,21 +70,24 @@ export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOM
   ? KeybaseClaim
   : K extends typeof ClaimTypes.ATTESTATION_SERVICE_URL
   ? AttestationServiceURLClaim
-  : AccountClaim
+  : K extends typeof ClaimTypes.ACCOUNT
+  ? AccountClaim
+  : StorageClaim
 
 export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data is ClaimPayload<K> =>
   data.type === type
 
 /**
  * Validates a claim made by an account, i.e. whether the claim is usable
+ * @param kit The ContractKit object
  * @param claim The claim to validate
  * @param address The address that is making the claim
  * @returns If valid, returns undefined. If invalid or unable to validate, returns a string with the error
  */
-export async function validateClaim(claim: Claim, address: string, kit: ContractKit) {
+export async function validateClaim(kit: ContractKit, claim: Claim, address: string) {
   switch (claim.type) {
     case ClaimTypes.ATTESTATION_SERVICE_URL:
-      return validateAttestationServiceUrl(claim, address, kit)
+      return validateAttestationServiceUrl(kit, claim, address)
     default:
       break
   }
@@ -96,4 +117,11 @@ export const createDomainClaim = (domain: string): DomainClaim => ({
   domain,
   timestamp: now(),
   type: ClaimTypes.DOMAIN,
+})
+
+export const createStorageClaim = (storageURL: string): StorageClaim => ({
+  address: storageURL,
+  timestamp: now(),
+  type: ClaimTypes.STORAGE,
+  filteredDataPaths: '.*',
 })

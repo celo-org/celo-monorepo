@@ -2,63 +2,35 @@
   "pageTitle": "Celo: A platform for fast, secure, stable digital payments",
   "subtitle":
     "A platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
-  "parallax": {
-    "0": "Earn cryptocurrency on your smartphone.",
-    "1": "Your phone number is your bank account.",
-    "2": "Send payments to anyone anywhere."
-  },
-  "hero": {
-    "tag":
-      "An open platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
-    "backers": "See More Backers",
-    "emailButton": "Get Our Newsletter"
-  },
-  "mission": {
-    "title": "Mission & Meaning",
-    "text": {
-      "0": "",
-      "1": "Celo, pronounced /ˈtselo/, ",
-      "2":
-        "means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.",
-      "3":
-        "If you are passionate about our mission and want to join us, learn about current opportunities here:"
-    }
-  },
-  "blog": {
-    "asseenon": "As seen on",
-    "prelude": "Read more about ",
-    "linktext": "what we're building at Celo"
-  },
-  "research": {
-    "header": "Early User Research Findings",
-    "1":
-      "As we’re building our mobile-first stable currency, we’re in our target markets doing initial research to better understand our users’ needs. Read more about the market research we’re doing ",
-    "here": "here",
-    "15": ".",
-    "2":
-      "In the spirit of decentralization, we’ve established a fellowship program open to those who’d like to collaborate with Celo, from any location and for a flexible amount of time. We’re accepting project proposals now. Please ",
-    "3": "reach out",
-    "4": " to us."
-  },
-  "aboutUsTitle": "About Us",
-  "aboutUsDescription": "Our core team, contributors, and backers",
-  "aboutUsLink": "Meet the team",
-  "applicationsTitle": "Applications",
-  "applicationsDescription":
-    "Build on top of the Celo platform to support global financial inclusion",
-  "applicationsLink": "Stay updated",
-  "technologyTitle": "Technology",
-  "technologyDescription": "Sending money is as easy as sending a text",
-  "technologyLink": "Find out how",
-  "whitePaper": "White Paper",
+  "coverText": "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
+  "coverJoinList": "Stay connected",
+  "whitePaper": "Read Celo White Paper",
+  "stabilityPaper": "Read Stability White Paper",
   "stabilityAnalysis": "Stability Analysis",
   "readMore": "Read more about our technology",
-
+  "readIntroGuide": "Read Intro Guide",
+  "benefitsTitle": "Benefits of Celo",
+  "benefitsHeading": "Mobile-First Blockchain Platform",
+  "benefit1Title": "Global Impact",
+  "benefit1Text": "A mobile-first approach that provides the opportunity to positively impact 5.6B smartphone owners globally",
+  "benefit2Title": "Solving Community Needs",
+  "benefit2Text": "Supported by a mission-aligned network of technologists, international NGOs, and organizations committed to building an inclusive financial system",
+  "benefit3Title": "Usability-focused tech innovations",
+  "benefit3Text": "Technology innovations allow Celo to truly work across devices, carriers, & countries",
+  "twoMoneyTitle": "Digital money powered by a two asset system",
+  "cUSDinfo": "cUSD (Celo Dollars) are a stable asset that follows the US Dollar. With cUSD, you can share money faster, cheaper, and more easily on your mobile phone.",
+  "CELOinfo":"CELO is a utility and governance asset for the Celo community, which has a fixed supply and variable value. With CELO, you can help shape the direction of the Celo Platform.",
+  "learnGovernance": "Learn About Governance",
+  "viewReserve": "View Reserve",
   "stayConnected": "Stay Connected",
-
+  "backers": "Early Backers",
   "systemsApproach": "We embrace a full-stack approach, reimagining technology at each layer",
   "designedWithCommunities": "Our innovations are designed with communities around the world",
   "buildOnCelo": "Build on Celo",
+  "flowersTitle": "A Gift of Heart: For Value Flowers",
+  "flowersTitleMobile": "A Gift of Heart:\nFor Value Flowers",
+  "flowersSubtitle": "Art inspired by the spirit and mission of Celo",
+  "flowersButton": "For Value Flowers",
   "buildOnCeloCopy":
     "Celo is a platform that is open and open-source, allowing for an ecosystem of powerful applications built on top, including easier cash transfer programs, peer-to-peer lending, collaborative small-scale insurance, and other digital assets and wallets.",
   "poweredByCommunity": "Powered by our community",
@@ -71,12 +43,12 @@
   "whitepaperCopy":
     "Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.",
   "stabilityAnalysisCopy":
-    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, tracks the value of the US Dollar.",
   "downloadPDF": "Download .PDF",
   "learnMore": "Learn More",
   "hero3":
     "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
-  "workOnCelo": "Work on Celo in San Francisco, Berlin, and around the world",
+  "workOnCelo": "Work on Celo in Berlin, Buenos Aires, San Francisco, and around the world",
   "viewRoles": "View Open Roles",
   "stayConnectedThanks":
     "Thanks for your contact info! We look forward to having you in the Celo community, expect our newsletter soon.",
@@ -85,5 +57,34 @@
   "reachOut": "Reach out to participate in Celo’s ecosystem",
   "receiveUpdates": "Receive the latest updates to your inbox",
   "startConversation": "Start A Conversation",
-  "recentNews": "Recent News"
+  "recentNews": "Recent News",
+  "timeline": {
+    "title": "Celo's Journey",
+    "subtitle": "Milestones",
+    "intro": "The Celo Community's past and upcoming milestones.",
+    "upcomingTitle": "Upcoming Milestones",
+    "pastTitle": "Previous Milestones",
+    "legendTitle": "Milestone Key",
+    "legend": {
+      "half": "In Progress",
+      "empty": "Pending"
+    }
+  },
+  "involve": {
+    "subtitle": "Ways to get involved with the Celo ecosystem", 
+    "title": "Choose your path with Celo",
+    "paths": [
+         {"name": "Build", "title": "Develop mobile dApps on Celo", "primary": "Learn About SDK", "secondary": "Watch a Video", "text": "Explore, build, and ship ideas for your community using Celo’s developer tools." },
+         {"name": "Grow", "title": "Scale your business on Celo",  "primary": "Apply for Grants", "secondary": "Ecosystem VC Fund", "text": "Have a product, users, and traction? Or a tangible solution for the Celo ecosystem? Take your business to the next level with funding through the Celo Grants Program or the Polychain Ecosystem VC Fund."},
+         {"name": "Validate", "title": "Operate and secure the network", "primary": "Read Docs", "secondary": "Join the Conversation",  "text": "Participate as a validator in Celo's proof of stake consensus protocol."},
+         {"name": "Partner", "title": "Join the Alliance for Prosperity", "primary": "Learn More", "secondary": "Apply for Alliance",  "text": "Take action to solve real-world problems with a growing community of mission-aligned organizations around the world."},
+         {"name": "Connect", "title": "Join the Celo movement", "primary": "Become an Ambassador", "secondary": "Join an Event",  "text": "A place to belong with fellow developers, designers, dreamers, and doers. Connect with the Celo community to share your gifts of prosperity."},
+         {"name": "Work", "title": "Work with value", "primary": "View Open Roles", "secondary": "Apply for Fellowship",  "text": "Explore opportunities at cLabs, the team that initially shaped Celo and a member of the Alliance for Prosperity. cLabs has offices in Berlin, Buenos Aires, and San Francisco, with contributors around the world."}
+    ]
+  }, 
+  "coinlist": {
+    "title": "Become a Backer of Celo",
+    "text": "Celo Gold will be available for purchase via CoinList. Everyone participating pays the same fair price and the minimum contribution is $100 USD. Available to non-US persons only, other restrictions apply.",
+    "btn": "Participate"
+  }
 }

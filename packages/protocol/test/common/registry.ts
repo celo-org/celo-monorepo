@@ -1,7 +1,6 @@
-const soliditySha3 = new (require('web3'))().utils.soliditySha3
-
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 import { RegistryInstance } from 'types'
+import { soliditySha3 } from 'web3-utils'
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 

@@ -6,12 +6,13 @@ export const assertUnreachable = (x: never): never => {
 }
 
 /**
- * Utility type to infer the Props of a ComponentType
- * Inspired by https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-navigation/index.d.ts
+ * Utility type to extract external Props of a component (respecting defaultProps)
+ * See https://github.com/Microsoft/TypeScript/issues/26704
+ * Usage: ExtractProps<typeof SomeComponent>
  */
-export type InferProps<T extends React.ComponentType<any>> = T extends React.ComponentType<infer P>
-  ? P
-  : never
+export type ExtractProps<
+  T extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>
+> = JSX.LibraryManagedAttributes<T, React.ComponentProps<T>>
 
 /**
  * Utility to workaround TypeScript not inferring a non nullable type when filtering null objects:
@@ -20,7 +21,18 @@ export type InferProps<T extends React.ComponentType<any>> = T extends React.Com
  * Usage: array.filter(isPresent)
  * See https://github.com/microsoft/TypeScript/issues/16069#issuecomment-565658443
  */
-
 export function isPresent<T>(t: T | undefined | null | void): t is T {
   return t !== undefined && t !== null
 }
+
+// As per https://www.typescriptlang.org/docs/handbook/advanced-types.html#exhaustiveness-checking
+export function assertNever(x: never): never {
+  throw new Error('Unexpected object: ' + x)
+}
+
+/**
+ * Unwrap type of promise.
+ * This can be removed once we switch to TypeScript 3.9 which directly supports the `awaited` keyword
+ * See https://github.com/microsoft/TypeScript/pull/35998
+ */
+export type Awaited<T> = T extends Promise<infer U> ? U : never

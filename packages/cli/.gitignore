@@ -4,7 +4,9 @@
 /dist
 /lib
 /tmp
+.tmp/
 node_modules
 oclif.manifest.json
 src/generated
 .devchain/
+.devchain.tar.gz

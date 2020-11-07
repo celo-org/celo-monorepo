@@ -1,21 +1,16 @@
+import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import { getIncomingPaymentRequests } from 'src/account/selectors'
-import { PaymentRequest } from 'src/account/types'
-import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses } from 'src/identity/actions'
-import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
-import {
-  NotificationList,
-  titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
-} from 'src/notifications/NotificationList'
+import { addressToE164NumberSelector, AddressToE164NumberType } from 'src/identity/reducer'
+import { HeaderTitleWithBalance } from 'src/navigator/Headers'
+import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
-import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { getIncomingPaymentRequests } from 'src/paymentRequest/selectors'
+import { PaymentRequest } from 'src/paymentRequest/types'
+import { getRequesterFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -23,60 +18,61 @@ import { RootState } from 'src/redux/reducers'
 interface StateProps {
   dollarBalance: string | null
   paymentRequests: PaymentRequest[]
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
+  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
 
-interface DispatchProps {
-  fetchPhoneAddresses: typeof fetchPhoneAddresses
-  declinePaymentRequest: typeof declinePaymentRequest
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    dollarBalance: state.stableToken.balance,
+    paymentRequests: getIncomingPaymentRequests(state),
+    addressToE164Number: addressToE164NumberSelector(state),
+    recipientCache: recipientCacheSelector(state),
+  }
 }
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  dollarBalance: state.stableToken.balance,
-  paymentRequests: getIncomingPaymentRequests(state),
-  e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-  recipientCache: recipientCacheSelector(state),
-})
+type Props = WithTranslation & StateProps
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
-
-export const listItemRenderer = (params: {
+export const listItemRenderer = (props: {
+  addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  declinePaymentRequest: typeof declinePaymentRequest
-}) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
-
-  return (
-    <View key={key}>
-      <IncomingPaymentRequestListItem
-        id={request.uid || ''}
-        amount={request.amount}
-        requester={requester}
-        comment={request.comment}
-        declinePaymentRequest={params.declinePaymentRequest}
-      />
-    </View>
-  )
-}
-
-const IncomingPaymentRequestListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
-  return (
-    <NotificationList
-      items={props.paymentRequests}
-      listItemRenderer={listItemRenderer(props)}
-      dollarBalance={props.dollarBalance}
+}) => (request: PaymentRequest, key: number | undefined = undefined) => (
+  <View key={key}>
+    <IncomingPaymentRequestListItem
+      id={request.uid || ''}
+      amount={request.amount}
+      requester={getRequesterFromPaymentRequest(
+        request,
+        props.addressToE164Number,
+        props.recipientCache
+      )}
+      comment={request.comment}
     />
-  )
-}
-
-IncomingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationOptions(
-  i18n.t('walletFlow5:incomingPaymentRequests')
+  </View>
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  fetchPhoneAddresses,
-  declinePaymentRequest,
-})(withTranslation(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))
+class IncomingPaymentRequestListScreen extends React.Component<Props> {
+  static navigationOptions = () => ({
+    headerTitle: (
+      <HeaderTitleWithBalance
+        title={i18n.t('walletFlow5:incomingPaymentRequests')}
+        token={CURRENCY_ENUM.DOLLAR}
+      />
+    ),
+  })
+
+  render = () => {
+    return (
+      <NotificationList
+        items={this.props.paymentRequests}
+        listItemRenderer={listItemRenderer(this.props)}
+        dollarBalance={this.props.dollarBalance}
+      />
+    )
+  }
+}
+
+export default connect<StateProps, {}, {}, RootState>(
+  mapStateToProps,
+  {}
+)(withTranslation<Props>(Namespaces.paymentRequestFlow)(IncomingPaymentRequestListScreen))

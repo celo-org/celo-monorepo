@@ -16,7 +16,7 @@ describe('governance tests', () => {
     networkId: 1101,
     network: 'local',
     runPath: TMP_PATH,
-    migrateTo: 16,
+    migrateTo: 19,
     instances: _.range(VALIDATORS).map((i) => ({
       name: `validator${i}`,
       validating: true,
@@ -37,7 +37,10 @@ describe('governance tests', () => {
     await context.hooks.before()
   })
 
-  after(context.hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await context.hooks.after()
+  })
 
   describe('Validator ordering', () => {
     before(async function() {

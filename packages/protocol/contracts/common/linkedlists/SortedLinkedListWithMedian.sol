@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
@@ -23,6 +23,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -34,7 +35,7 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
+  ) internal {
     list.list.insert(key, value, lesserKey, greaterKey);
     LinkedList.Element storage element = list.list.list.elements[key];
 
@@ -73,9 +74,10 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(List storage list, bytes32 key) public {
+  function remove(List storage list, bytes32 key) internal {
     MedianAction action = MedianAction.None;
     if (list.list.list.numElements == 0) {
       list.median = bytes32(0);
@@ -105,6 +107,7 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -117,31 +120,30 @@ library SortedLinkedListWithMedian {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
-    // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
-    // don't change.
-    // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
+  ) internal {
     remove(list, key);
     insert(list, key, value, lesserKey, greaterKey);
   }
 
   /**
    * @notice Inserts an element at the tail of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
-  function push(List storage list, bytes32 key) public {
+  function push(List storage list, bytes32 key) internal {
     insert(list, key, 0, bytes32(0), list.list.list.tail);
   }
 
   /**
    * @notice Removes N elements from the head of the list and returns their keys.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
-  function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
+  function popN(List storage list, uint256 n) internal returns (bytes32[] memory) {
     require(n <= list.list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       bytes32 key = list.list.list.head;
       keys[i] = key;
       remove(list, key);
@@ -151,68 +153,76 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(List storage list, bytes32 key) public view returns (bool) {
+  function contains(List storage list, bytes32 key) internal view returns (bool) {
     return list.list.contains(key);
   }
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(List storage list, bytes32 key) public view returns (uint256) {
+  function getValue(List storage list, bytes32 key) internal view returns (uint256) {
     return list.list.values[key];
   }
 
   /**
    * @notice Returns the median value of the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @return The median value.
    */
-  function getMedianValue(List storage list) public view returns (uint256) {
+  function getMedianValue(List storage list) internal view returns (uint256) {
     return getValue(list, list.median);
   }
 
   /**
    * @notice Returns the key of the first element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the first element in the list.
    */
-  function getHead(List storage list) external view returns (bytes32) {
+  function getHead(List storage list) internal view returns (bytes32) {
     return list.list.list.head;
   }
 
   /**
    * @notice Returns the key of the median element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the median element in the list.
    */
-  function getMedian(List storage list) external view returns (bytes32) {
+  function getMedian(List storage list) internal view returns (bytes32) {
     return list.median;
   }
 
   /**
    * @notice Returns the key of the last element in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The key of the last element in the list.
    */
-  function getTail(List storage list) external view returns (bytes32) {
+  function getTail(List storage list) internal view returns (bytes32) {
     return list.list.list.tail;
   }
 
   /**
    * @notice Returns the number of elements in the list.
+   * @param list A storage pointer to the underlying list.
    * @return The number of elements in the list.
    */
-  function getNumElements(List storage list) external view returns (uint256) {
+  function getNumElements(List storage list) internal view returns (uint256) {
     return list.list.list.numElements;
   }
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getElements(List storage list)
-    public
+    internal
     view
     returns (bytes32[] memory, uint256[] memory, MedianRelation[] memory)
   {
@@ -228,14 +238,16 @@ library SortedLinkedListWithMedian {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(List storage list) public view returns (bytes32[] memory) {
+  function getKeys(List storage list) internal view returns (bytes32[] memory) {
     return list.list.getKeys();
   }
 
   /**
    * @notice Moves the median pointer right or left of its current value.
+   * @param list A storage pointer to the underlying list.
    * @param action Which direction to move the median pointer.
    */
   function updateMedian(List storage list, MedianAction action) private {

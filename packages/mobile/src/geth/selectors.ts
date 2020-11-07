@@ -1,7 +1,12 @@
 import { InitializationState } from 'src/geth/reducer'
 import { RootState } from 'src/redux/reducers'
 
+export const gethInitializedSelector = (state: RootState) => state.geth.initialized
+
 export const isGethConnectedSelector = (state: RootState) =>
   state.geth.initialized === InitializationState.INITIALIZED && state.geth.connected
-export const promptZeroSyncIfNeededSelector = (state: RootState) =>
-  state.geth.promptZeroSyncIfNeeded
+
+export const chainHeadSelector = (state: RootState) => state.geth.chainHead
+
+export const gethStartedThisSessionSelector = (state: RootState) =>
+  state.geth.gethStartedThisSession

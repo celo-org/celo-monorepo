@@ -5,11 +5,11 @@ Welcome to the technical documentation site for the Celo project!
 In this documentation you’ll find information on:
 
 - An [overview](overview.md) of the high-level architecture of Celo
-- [Tutorials](getting-started/running-a-full-node.md) to get you started with the Celo codebase and the Alfajores Testnet
+- Tutorials to get you started with the [Celo SDK](developer-resources/start.md) and the [Celo networks](getting-started/choosing-a-network.md)
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
-### About Celo <a id="about-celo"></a>
+### About Celo
 
 Celo’s purpose is to empower anyone with a smartphone anywhere in the world to have access to financial services, send money to phone numbers, and pay merchants.
 
@@ -37,13 +37,13 @@ Highlights include:
 
   Extremely fast, secure synchronization between mobile devices and the Celo network means that even wallet users with high latency, low bandwidth, or high cost data tariffs can use Celo. Celo removes the need to check every header before a received header can be trusted. Performance will be further improved with BLS signature aggregation and succinct zero-knowledge proofs, via zk-SNARKs.
 
-- **Proof of Stake**
+- **Proof-of-Stake**
 
-  Celo uses a Proof of Stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
+  Celo uses a proof-of-stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
 
 - **Full Node Incentives**
 
-  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other Proof of Stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
+  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other proof-of-stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
 
 - **On-chain Governance**
 
@@ -69,7 +69,7 @@ The [Alfajores Testnet](getting-started/alfajores-testnet.md) is the first of se
 The Alfajores Testnet’s tokens hold no real world economic value. The entirety of the testnet’s data will be reset on a regular basis. This will erase your accounts, their balance and your transaction history. Your use of the Alfajores Tesnet is subject to the [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md).
 {% endhint %}
 
-The [Baklava Testnet](getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
+The [Baklava Testnet](getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive CELO at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
 
 The Celo community's work is focused on the path to a production Celo network that holds economic value. This means testing, running security audits, and building broader involvement around a longer-term roadmap. The project also continues to remain focused on user experience.
 
@@ -86,7 +86,7 @@ Celo is a project with a mission of financial inclusion that consists entirely o
 Learn more about Celo:
 
 - [Overview of Celo’s architecture ](overview.md)
-- [Technical blog posts](https://medium.com/celohq/technical/home)
+- [Technical blog posts](https://medium.com/celoorg/technology/home)
 
 Browse the code, raise an issue, or contribute a PR:
 
@@ -102,22 +102,22 @@ Try Celo out:
 
 Read the Whitepapers:
 
-- [Main Celo Whitepaper](https://storage.googleapis.com/celo_whitepapers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf) and [introductory blog post](https://medium.com/celohq/a-look-at-the-celo-whitepaper-c0061118ffd4)
-- [Stability Analysis Whitepaper](https://storage.googleapis.com/celo_whitepapers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5)
+- [Main Celo Whitepaper](https://celo.org/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf) and [introductory blog post](https://medium.com/celohq/a-look-at-the-celo-whitepaper-c0061118ffd4)
+- [Stability Analysis Whitepaper](https://celo.org/papers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5)
 - [BFTree \(Longer Term Consensus Plan\)](https://storage.googleapis.com/celo_whitepapers/BFTree%20-%20Scaling%20HotStuff%20to%20Millions%20of%20Validators.pdf)
 
 Alfajores Testnet links:
 
 - [Alfajores Testnet Faucet](https://celo.org/build/faucet) - get testnet tokens to experiment with
 - [Celo Wallet for Alfajores](https://celo.org/build/wallet) - download the Android wallet app for the testnet from the Play Store
-- [Alfajores Testnet Network Status](https://alfajores-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Alfajores Testnet Network Status](https://alfajores-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Alfajores Testnet Block Explorer](https://alfajores-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details
 
 Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
 - [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
-- [Celo Subreddit](https://www.reddit.com/r/CeloHQ/)
+- [Celo Subreddit](https://www.reddit.com/r/celo/)
 - [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)
 

@@ -2,17 +2,16 @@
 import 'node-libs-react-native/globals'
 import 'src/missingGlobals'
 import 'src/forceCommunityAsyncStorage'
+import 'src/setupE2eEnv' // This is only for E2E tests and has no effects when not running E2E tests
 import { AppRegistry } from 'react-native'
 import Logger from 'src/utils/Logger'
 import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
 import * as Sentry from '@sentry/react-native'
-import { onBackgroundNotification } from 'src/firebase/firebase'
+import 'react-native-gesture-handler'
 
-// Set this to true, if you are modifying Sentry and want to test your changes
-const enableSentryOnDebugBuild = false
-const isDevBuild = __DEV__
-const sentryEnabled = !isDevBuild || enableSentryOnDebugBuild
+// Set this to true, if you want to test Sentry on dev builds
+const sentryEnabled = !__DEV__ || false
 
 if (sentryEnabled) {
   installSentry()
@@ -33,4 +32,3 @@ const customErrorHandler = (e, isFatal) => {
 ErrorUtils.setGlobalHandler(customErrorHandler)
 
 AppRegistry.registerComponent('celo', () => App)
-AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => onBackgroundNotification)

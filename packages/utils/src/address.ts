@@ -1,3 +1,4 @@
+import { ensureLeading0x, hexToBuffer } from '@celo/base/lib/address'
 import {
   isValidPrivate,
   privateToAddress,
@@ -5,18 +6,28 @@ import {
   pubToAddress,
   toChecksumAddress,
 } from 'ethereumjs-util'
+import * as Web3Utils from 'web3-utils'
+import { isCompressed } from './ecdh'
 
-export type Address = string
-
-export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === normalizeAddress(b)
-
-export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
-
-export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.slice(2) : input)
-
-export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
-
-export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
+// Exports moved to @celo/base, forwarding them
+// here for backwards compatibility
+export {
+  Address,
+  bufferToHex,
+  ensureLeading0x,
+  eqAddress,
+  findAddressIndex,
+  getAddressChunks,
+  hexToBuffer,
+  isHexString,
+  mapAddressListDataOnto,
+  mapAddressListOnto,
+  normalizeAddress,
+  normalizeAddressWith0x,
+  NULL_ADDRESS,
+  trimLeading0x,
+} from '@celo/base/lib/address'
+export { isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
 
 export const privateKeyToAddress = (privateKey: string) =>
   toChecksumAddress(ensureLeading0x(privateToAddress(hexToBuffer(privateKey)).toString('hex')))
@@ -25,11 +36,11 @@ export const privateKeyToPublicKey = (privateKey: string) =>
   toChecksumAddress(ensureLeading0x(privateToPublic(hexToBuffer(privateKey)).toString('hex')))
 
 export const publicKeyToAddress = (publicKey: string) =>
-  toChecksumAddress(ensureLeading0x(pubToAddress(hexToBuffer(publicKey)).toString('hex')))
+  toChecksumAddress(
+    ensureLeading0x(pubToAddress(hexToBuffer(publicKey), isCompressed(publicKey)).toString('hex'))
+  )
 
 export const isValidPrivateKey = (privateKey: string) =>
   privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
-export { isValidAddress, isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
-
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const isValidAddress = (input: string): boolean => Web3Utils.isAddress(input)

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+. /etc/default/celo
+
+SECRET_DIR=$(mktemp --directory --tmpdir=/dev/shm)
+cleanup () {
+    rm -rf ${SECRET_DIR}
+}
+trap cleanup EXIT
+
+get_secret $ATTESTER_KEY_VAULT 'attesterPrivateKey' > ${SECRET_DIR}/attesterPrivateKey
+generate_password > ${SECRET_DIR}/accountPassword
+
+set -x
+
+docker run \
+  --rm \
+  -v $DATA_DIR:$DATA_DIR \
+  -v $SECRET_DIR:$SECRET_DIR \
+  $GETH_NODE_DOCKER_IMAGE \
+    account import \
+    --keystore=${SECRET_DIR} \
+    --password=${SECRET_DIR}/accountPassword \
+    ${SECRET_DIR}/attesterPrivateKey
+
+docker run \
+  --name $1 \
+  --restart=always \
+  -p 8545:8545 \
+  -v $DATA_DIR:$DATA_DIR \
+  -v $SECRET_DIR:$SECRET_DIR \
+  $GETH_NODE_DOCKER_IMAGE \
+    --password=$SECRET_DIR/accountPassword \
+    --keystore=${SECRET_DIR} \
+    --unlock=$ATTESTER_ACCOUNT_ADDRESS \
+    --bootnodes="$BOOTNODES" \
+    --rpc \
+    --rpcaddr 0.0.0.0 \
+    --rpcapi=eth,net,web3,debug,admin \
+    --networkid=${NETWORK_ID} \
+    --syncmode=full \
+    --consoleformat=json \
+    --consoleoutput=stdout \
+    --verbosity=${GETH_VERBOSITY}

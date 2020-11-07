@@ -32,6 +32,7 @@ exports[`Terms renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -69,6 +70,7 @@ exports[`Terms renders 1`] = `
         aria-level="1"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -82,7 +84,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        title
+        Celo Terms of Use and FAQ
       </h1>
     </div>
   </div>
@@ -101,6 +103,7 @@ exports[`Terms renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -130,6 +133,7 @@ exports[`Terms renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -142,7 +146,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        helpfulLinks
+        Helpful Links
       </h3>
     </div>
     <div
@@ -167,6 +171,7 @@ exports[`Terms renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -196,8 +201,6 @@ exports[`Terms renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -232,6 +235,8 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/user-agreement"
+              onClick={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -245,13 +250,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              userAgreementLink
+              User Agreement
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -290,8 +298,6 @@ exports[`Terms renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -326,6 +332,8 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/faq"
+              onClick={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -339,13 +347,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              faq
+              FAQ
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -384,8 +395,6 @@ exports[`Terms renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -420,6 +429,8 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/privacy"
+              onClick={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -433,13 +444,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              privacyPolicy
+              Privacy Policy
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -478,8 +492,6 @@ exports[`Terms renders 1`] = `
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -513,7 +525,9 @@ exports[`Terms renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="https://docs.celo.org/important-information/alfajores-testnet-disclaimer"
+              href="https://docs.celo.org/important-information/mainnet-network-disclaimer"
+              onClick={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -527,13 +541,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              disclaimer
+              Disclaimer
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -583,6 +600,7 @@ exports[`Terms renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -612,6 +630,7 @@ exports[`Terms renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -624,7 +643,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        privacy
+        A Note on Privacy
       </h3>
     </div>
     <div
@@ -649,6 +668,7 @@ exports[`Terms renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -662,6 +682,7 @@ exports[`Terms renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -673,7 +694,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        privacyNote
+        The Celo Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -682,8 +703,6 @@ exports[`Terms renders 1`] = `
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <div
           className="css-view-1dbjc4n"
@@ -717,7 +736,9 @@ exports[`Terms renders 1`] = `
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
-            href="https://docs.celo.org/celo-codebase/protocol/privacy"
+            href="https://docs.celo.org/celo-codebase/protocol/identity/phone-number-privacy"
+            onClick={[Function]}
+            rel=" noopener noreferrer"
             role="link"
             style={
               Object {
@@ -731,13 +752,16 @@ exports[`Terms renders 1`] = `
                 "fontSize": "16px",
                 "fontWeight": "500",
                 "lineHeight": "16px",
+                "marginRight": "30px",
+                "marginTop": "10px",
                 "msFlexAlign": "center",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
               }
             }
+            target="_blank"
           >
-            privacyLink
+            Privacy Documentation
             <div
               className="css-view-1dbjc4n"
               style={

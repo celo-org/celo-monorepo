@@ -7,11 +7,10 @@
 import { Avatar as BaseAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet } from 'react-native'
+import { TextStyle } from 'react-native'
 import { useSelector } from 'react-redux'
-import { defaultCountryCodeSelector } from 'src/account/reducer'
+import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const DEFAULT_ICON_SIZE = 40
@@ -22,10 +21,12 @@ interface OwnProps {
   name?: string
   address?: string
   iconSize?: number
+  displayNameStyle?: TextStyle
 }
 
 type Props = OwnProps & WithTranslation
 
+// When redesigning, consider using getDisplayName from recipient.ts
 function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   if (name) {
     return name
@@ -43,36 +44,25 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   return t('global:unknown')
 }
 
-function getE164Number(e164Number?: string, recipient?: Recipient) {
+export function getE164Number(e164Number?: string, recipient?: Recipient) {
   return e164Number || (recipient && recipient.e164PhoneNumber)
 }
 
 export function Avatar(props: Props) {
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
-  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE } = props
+  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE, displayNameStyle } = props
 
   return (
     <BaseAvatar
       {...props}
-      defaultCountryCode={defaultCountryCode}
+      defaultCountryCode={defaultCountryCode ? defaultCountryCode : undefined}
       name={getDisplayName(props)}
       e164Number={getE164Number(e164Number, recipient)}
       iconSize={iconSize}
       thumbnailPath={getRecipientThumbnail(recipient)}
-    >
-      <Image
-        source={unknownUserIcon}
-        style={[style.defaultIcon, { height: iconSize, width: iconSize }]}
-      />
-    </BaseAvatar>
+      displayNameStyle={displayNameStyle}
+    />
   )
 }
 
-const style = StyleSheet.create({
-  defaultIcon: {
-    alignSelf: 'center',
-    margin: 'auto',
-  },
-})
-
-export default withTranslation(Namespaces.sendFlow7)(Avatar)
+export default withTranslation<Props>(Namespaces.sendFlow7)(Avatar)

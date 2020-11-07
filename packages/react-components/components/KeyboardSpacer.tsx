@@ -55,6 +55,7 @@ export default class KeyboardSpacer extends React.Component<Props> {
 
   _listeners: EmitterSubscription[] = []
   _viewRef = React.createRef<View>()
+  _currentMeasureToken: object | null = null
 
   state = {
     keyboardSpace: 0,
@@ -74,7 +75,13 @@ export default class KeyboardSpacer extends React.Component<Props> {
   }
 
   relativeKeyboardHeight(viewFrame: LayoutRectangle, keyboardFrame: ScreenRect): number {
-    if (!viewFrame || !keyboardFrame) {
+    if (
+      !viewFrame ||
+      // On Android these can be undefined for unfocused screens
+      viewFrame.y === undefined ||
+      viewFrame.height === undefined ||
+      !keyboardFrame
+    ) {
       return 0
     }
 
@@ -96,7 +103,18 @@ export default class KeyboardSpacer extends React.Component<Props> {
       return
     }
 
-    this._viewRef.current.measureInWindow((x, y, width, height) => {
+    // Create a new token to cancel the async measureInWindow
+    // This is needed as both keyboardWillShow and keyboardWillHide are triggered sequentially
+    // when toggling the keyboard visibility on iOS (command + K on simulator)
+    const measureToken = (this._currentMeasureToken = {})
+
+    // Use measure and NOT measureInWindow because it's incorrect with a transparent status bar on Android
+    // see https://github.com/facebook/react-native/issues/19497
+    this._viewRef.current.measure((_x, _y, width, height, x, y) => {
+      if (this._currentMeasureToken !== measureToken) {
+        // Skip action as token is different (i.e. cancelled)
+        return
+      }
       let animationConfig = defaultAnimation
       if (event.duration) {
         animationConfig = LayoutAnimation.create(
@@ -117,6 +135,9 @@ export default class KeyboardSpacer extends React.Component<Props> {
   }
 
   resetKeyboardSpace = (event: KeyboardEvent) => {
+    // This cancels measureInWindow
+    this._currentMeasureToken = null
+
     let animationConfig = defaultAnimation
     if (event && event.duration) {
       animationConfig = LayoutAnimation.create(
@@ -132,15 +153,14 @@ export default class KeyboardSpacer extends React.Component<Props> {
   }
 
   render() {
-    if (Platform.OS === 'android') {
-      // On Android with windowSoftInputMode set to adjustResize we don't need the spacer
-      return null
-    }
+    // On Android with windowSoftInputMode set to adjustResize we don't need the spacer
+    // unless it's using fullscreen layout (which is the case with a transparent status bar)
 
     return (
       <View
         ref={this._viewRef}
         style={[styles.container, { height: this.state.keyboardSpace }, this.props.style]}
+        collapsable={false}
       />
     )
   }

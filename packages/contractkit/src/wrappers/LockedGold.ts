@@ -1,16 +1,32 @@
-import { zip } from '@celo/utils/lib/collections'
+import {
+  AddressListItem as ALI,
+  Comparator,
+  linkedListChanges as baseLinkedListChanges,
+  zip,
+} from '@celo/base/lib/collections'
 import BigNumber from 'bignumber.js'
+import { EventLog } from 'web3-core'
 import { Address } from '../base'
-import { LockedGold } from '../generated/types/LockedGold'
+import { LockedGold } from '../generated/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   tupleParser,
   valueToBigNumber,
   valueToString,
 } from '../wrappers/BaseWrapper'
+
+type AddressListItem = ALI<BigNumber>
+const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
+function linkedListChanges(
+  groups: AddressListItem[],
+  changed: AddressListItem[]
+): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
+  return baseLinkedListChanges(groups, changed, bigNumberComparator)
+}
 
 export interface VotingDetails {
   accountAddress: Address
@@ -28,13 +44,22 @@ interface AccountSummary {
   pendingWithdrawals: PendingWithdrawal[]
 }
 
-interface PendingWithdrawal {
+export interface AccountSlashed {
+  slashed: Address
+  penalty: BigNumber
+  reporter: Address
+  reward: BigNumber
+  epochNumber: number
+}
+
+export interface PendingWithdrawal {
   time: BigNumber
   value: BigNumber
 }
 
 export interface LockedGoldConfig {
   unlockingPeriod: BigNumber
+  totalLockedGold: BigNumber
 }
 
 /**
@@ -136,6 +161,17 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   )
 
   /**
+   * Returns the total amount of locked gold in the system. Note that this does not include
+   *   gold that has been unlocked but not yet withdrawn.
+   * @returns The total amount of locked gold in the system.
+   */
+  getTotalLockedGold = proxyCall(
+    this.contract.methods.getTotalLockedGold,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns the total amount of non-voting locked gold for an account.
    * @param account The account.
    * @return The total amount of non-voting locked gold for an account.
@@ -152,6 +188,19 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getConfig(): Promise<LockedGoldConfig> {
     return {
       unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      totalLockedGold: await this.getTotalLockedGold(),
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the lockedgold contract
+   * @return LockedGoldConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      unlockingPeriod: secondsToDurationString(config.unlockingPeriod),
     }
   }
 
@@ -186,5 +235,83 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       withdrawals[1],
       withdrawals[0]
     )
+  }
+
+  /**
+   * Retrieves AccountSlashed for epochNumber.
+   * @param epochNumber The epoch to retrieve AccountSlashed at.
+   */
+  async getAccountsSlashed(epochNumber: number): Promise<AccountSlashed[]> {
+    const events = await this.getPastEvents('AccountSlashed', {
+      fromBlock: await this.kit.getFirstBlockNumberForEpoch(epochNumber),
+      toBlock: await this.kit.getLastBlockNumberForEpoch(epochNumber),
+    })
+    return events.map(
+      (e: EventLog): AccountSlashed => ({
+        epochNumber,
+        slashed: e.returnValues.slashed,
+        penalty: valueToBigNumber(e.returnValues.penalty),
+        reporter: e.returnValues.reporter,
+        reward: valueToBigNumber(e.returnValues.reward),
+      })
+    )
+  }
+
+  /**
+   * Computes parameters for slashing `penalty` from `account`.
+   * @param account The account to slash.
+   * @param penalty The amount to slash as penalty.
+   * @return List of (group, voting gold) to decrement from `account`.
+   */
+  async computeInitialParametersForSlashing(account: string, penalty: BigNumber) {
+    const election = await this.kit.contracts.getElection()
+    const eligible = await election.getEligibleValidatorGroupsVotes()
+    const groups: AddressListItem[] = eligible.map((x) => ({ address: x.address, value: x.votes }))
+    return this.computeParametersForSlashing(account, penalty, groups)
+  }
+
+  async computeParametersForSlashing(
+    account: string,
+    penalty: BigNumber,
+    groups: AddressListItem[]
+  ) {
+    const changed = await this.computeDecrementsForSlashing(account, penalty, groups)
+    const changes = linkedListChanges(groups, changed)
+    return { ...changes, indices: changed.map((a) => a.index) }
+  }
+
+  // Returns how much voting gold will be decremented from the groups voted by an account
+  // Implementation follows protocol/test/common/integration slashingOfGroups()
+  private async computeDecrementsForSlashing(
+    account: Address,
+    penalty: BigNumber,
+    allGroups: AddressListItem[]
+  ) {
+    // first check how much voting gold has to be slashed
+    const nonVoting = await this.getAccountNonvotingLockedGold(account)
+    if (penalty.isLessThan(nonVoting)) {
+      return []
+    }
+    let difference = penalty.minus(nonVoting)
+    // find voted groups
+    const election = await this.kit.contracts.getElection()
+    const groups = await election.getGroupsVotedForByAccount(account)
+    const res = []
+    //
+    for (let i = groups.length - 1; i >= 0; i--) {
+      const group = groups[i]
+      const totalVotes = allGroups.find((a) => a.address === group)?.value
+      if (!totalVotes) {
+        throw new Error(`Cannot find group ${group}`)
+      }
+      const votes = await election.getTotalVotesForGroupByAccount(group, account)
+      const slashedVotes = votes.lt(difference) ? votes : difference
+      res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })
+      difference = difference.minus(slashedVotes)
+      if (difference.eq(new BigNumber(0))) {
+        break
+      }
+    }
+    return res
   }
 }

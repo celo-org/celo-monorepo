@@ -2,17 +2,19 @@ import Cookies from 'js-cookie'
 import getConfig from 'next/config'
 import { isBrowser } from 'src/utils/utils'
 
-let analytics: {
-  track: (key: string, properties?: object, options?: object) => void
-}
+const { publicRuntimeConfig } = getConfig()
 
-let segmentPromise
+let ReactGA
 
 export const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
 export const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
+const OPTIN_EXPIRE_DAYS = 365
+const OPTOUT_EXPIRE_DAYS = 1
+
 export async function canTrack() {
-  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME)
+  const allowTrack = await Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME)
+  return isBrowser() && !!allowTrack && publicRuntimeConfig.ENV !== 'development'
 }
 
 export async function showVisitorCookieConsent() {
@@ -20,21 +22,11 @@ export async function showVisitorCookieConsent() {
 }
 
 export async function initializeAnalytics() {
-  if (!isBrowser() || !(await canTrack())) {
-    return {
-      track: noTrack,
-    }
-  }
+  if (!ReactGA && (await canTrack())) {
+    ReactGA = await import('react-ga').then((mod) => mod.default)
 
-  if (!segmentPromise) {
-    segmentPromise = import('load-segment').then((mod) => mod.default)
+    ReactGA.initialize(publicRuntimeConfig.GA_KEY)
   }
-  if (!analytics) {
-    const Segment = await segmentPromise
-    const { publicRuntimeConfig } = getConfig()
-    analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
-  }
-  return analytics
 }
 
 export async function agree() {
@@ -47,16 +39,29 @@ export const disagree = () => {
   Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTOUT_EXPIRE_DAYS })
 }
 
-const OPTIN_EXPIRE_DAYS = 365
-const OPTOUT_EXPIRE_DAYS = 1
-
-export default {
-  track: async function track(key: string, properties?: object, options?: object) {
-    const segment = await initializeAnalytics()
-    return segment.track(key, properties, options)
-  },
+function noTrack() {
+  return publicRuntimeConfig.ENV === 'development' ? console.info(arguments) : null
 }
 
-function noTrack() {
-  return null
+export default {
+  track: async function track(key: string, label?: string) {
+    if (!(await canTrack())) {
+      return noTrack()
+    }
+
+    await initializeAnalytics()
+    ReactGA.event({
+      category: 'User',
+      action: key,
+      label,
+    })
+  },
+  page: async function page() {
+    if (!(await canTrack())) {
+      return noTrack()
+    }
+
+    await initializeAnalytics()
+    ReactGA.pageview(window.location.pathname + window.location.search)
+  },
 }

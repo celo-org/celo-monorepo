@@ -66,13 +66,29 @@ coverage/
 
 android/keystore.properties
 android/app/celo-release-key.keystore
+android/app/.settings
+android/.settings
 
 .vscode/
 
 # End to end tests
-e2e/tmp/
+e2e/artifacts/
 e2e_run.log
 e2e_pidcat_run.log
 
 # keys
 secrets.json
+
+# Branding
+# See scripts/sync_branding.sh
+branding/valora
+android/app/src/main/res/drawable*
+android/app/src/main/res/layout*
+android/app/src/main/res/mipmap*
+ios/celo/Base.lproj/
+ios/celo/Images.xcassets/
+src/brandingConfig.ts
+src/icons/Logo.tsx
+src/images/*
+!src/images/Images.ts
+!src/images/link-arrow.png

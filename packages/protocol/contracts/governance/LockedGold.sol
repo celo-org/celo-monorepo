@@ -1,18 +1,27 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/Math.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/ILockedGold.sol";
 
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/interfaces/ICeloVersionedContract.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is
+  ILockedGold,
+  ICeloVersionedContract,
+  ReentrancyGuard,
+  Initializable,
+  UsingRegistry
+{
   using SafeMath for uint256;
+  using Address for address payable; // prettier-ignore
 
   struct PendingWithdrawal {
     // The value of the pending withdrawal.
@@ -31,7 +40,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     PendingWithdrawal[] pendingWithdrawals;
   }
 
-  mapping(address => Balances) private balances;
+  mapping(address => Balances) internal balances;
 
   // Iterable map to store whitelisted identifiers.
   // Necessary to allow iterating over whitelisted IDs to check ID's address at runtime.
@@ -56,6 +65,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
+  event GoldRelocked(address indexed account, uint256 value);
   event GoldWithdrawn(address indexed account, uint256 value);
   event SlasherWhitelistAdded(string indexed slasherIdentifier);
   event SlasherWhitelistRemoved(string indexed slasherIdentifier);
@@ -66,17 +76,30 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 reward
   );
 
+  /**
+  * @notice Returns the storage, major, minor, and patch version of the contract.
+  * @return The storage, major, minor, and patch version of the contract.
+  */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   * @param _unlockingPeriod The unlocking period in seconds.
+   */
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    unlockingPeriod = _unlockingPeriod;
+    setUnlockingPeriod(_unlockingPeriod);
   }
 
   /**
    * @notice Sets the duration in seconds users must wait before withdrawing gold after unlocking.
    * @param value The unlocking period in seconds.
    */
-  function setUnlockingPeriod(uint256 value) external onlyOwner {
+  function setUnlockingPeriod(uint256 value) public onlyOwner {
     require(value != unlockingPeriod, "Unlocking period not changed");
     unlockingPeriod = value;
     emit UnlockingPeriodSet(value);
@@ -87,7 +110,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function lock() external payable nonReentrant {
     require(getAccounts().isAccount(msg.sender), "not account");
-    require(msg.value > 0, "no value");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
@@ -156,6 +178,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
+    // CERTORA: the slot containing the length could be MAX_UINT
     account.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
   }
@@ -177,7 +200,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    emit GoldLocked(msg.sender, value);
+    emit GoldRelocked(msg.sender, value);
   }
 
   /**
@@ -192,7 +215,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
-    require(getGoldToken().transfer(msg.sender, value), "Transfer failed");
+    require(value <= address(this).balance, "Inconsistent balance");
+    msg.sender.sendValue(value);
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -246,12 +270,26 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 length = balances[account].pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
-    for (uint256 i = 0; i < length; i++) {
+    for (uint256 i = 0; i < length; i = i.add(1)) {
       PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[i]);
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;
     }
     return (values, timestamps);
+  }
+
+  /**
+   * @notice Returns the total amount to withdraw from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return Total amount to withdraw.
+   */
+  function getTotalPendingWithdrawals(address account) external view returns (uint256) {
+    uint256 pendingWithdrawalSum = 0;
+    PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
+    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
+      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
+    }
+    return pendingWithdrawalSum;
   }
 
   function getSlashingWhitelist() external view returns (bytes32[] memory) {
@@ -291,6 +329,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
     require(slashingMap[keyBytes], "Cannot remove slasher ID not yet added.");
     require(index < slashingWhitelist.length, "Provided index exceeds whitelist bounds.");
+    require(slashingWhitelist[index] == keyBytes, "Index doesn't match identifier");
     slashingWhitelist[index] = slashingWhitelist[slashingWhitelist.length - 1];
     slashingWhitelist.pop();
     slashingMap[keyBytes] = false;
@@ -344,7 +383,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
-    communityFundPayable.transfer(maxSlash.sub(reward));
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
+    communityFundPayable.sendValue(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
 }

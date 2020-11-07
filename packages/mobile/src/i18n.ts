@@ -6,12 +6,13 @@ import {
   initReactI18next,
   WithTranslation,
   withTranslation as withTranslationI18Next,
-  WithTranslationProps,
 } from 'react-i18next'
 import * as RNLocalize from 'react-native-localize'
+import { APP_NAME, TOS_LINK } from 'src/config'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'i18n'
+const TOS_LINK_DISPLAY = TOS_LINK.replace(/^https?\:\/\//i, '')
 
 export enum Namespaces {
   accountScreen10 = 'accountScreen10',
@@ -20,7 +21,7 @@ export enum Namespaces {
   global = 'global',
   index = 'index',
   inviteFlow11 = 'inviteFlow11',
-  nuxCurrencyPhoto4 = 'nuxCurrencyPhoto4',
+  goldEducation = 'goldEducation',
   nuxNamePin1 = 'nuxNamePin1',
   nuxRestoreWallet3 = 'nuxRestoreWallet3',
   nuxVerification2 = 'nuxVerification2',
@@ -29,6 +30,8 @@ export enum Namespaces {
   paymentRequestFlow = 'paymentRequestFlow',
   walletFlow5 = 'walletFlow5',
   dappkit = 'dappkit',
+  onboarding = 'onboarding',
+  fiatExchangeFlow = 'fiatExchangeFlow',
 }
 
 const availableResources = {
@@ -41,7 +44,9 @@ const availableResources = {
 }
 
 function getLanguage() {
-  const fallback = { languageTag: 'en', isRTL: false }
+  // We fallback to `undefined` to know we couldn't find the best language
+  // In that case i18n.language will report `undefined` but will use fallbackLng internally
+  const fallback = { languageTag: undefined }
   const { languageTag } =
     RNLocalize.findBestAvailableLanguage(Object.keys(availableResources)) || fallback
   return languageTag
@@ -87,23 +92,27 @@ i18n
     debug: true,
     interpolation: {
       escapeValue: false,
+      defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK_DISPLAY },
     },
     missingInterpolationHandler: currencyInterpolator,
   })
   .catch((reason: any) => Logger.error(TAG, 'Failed init i18n', reason))
 
-RNLocalize.addEventListener('change', () => {
-  i18n
-    .changeLanguage(getLanguage())
-    .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
-})
+// Disabling this for now as we have our own language selection within the app
+// and this will change the displayed language only for the current session
+// when the device locale is changed outside of the app.
+// RNLocalize.addEventListener('change', () => {
+//   i18n
+//     .changeLanguage(getLanguage())
+//     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
+// })
 
 // Create HOC wrapper that hoists statics
 // https://react.i18next.com/latest/withtranslation-hoc#hoist-non-react-statics
-export const withTranslation = (namespace: Namespaces) => <P extends WithTranslation>(
-  component: React.ComponentType<P>
-): React.ComponentType<Omit<P, keyof WithTranslation> & WithTranslationProps> =>
-  // cast as `any` here otherwise TypeScript complained
-  hoistStatics(withTranslationI18Next(namespace)(component), component as any)
+export const withTranslation = <P extends WithTranslation>(namespace: Namespaces) => <
+  C extends React.ComponentType<P>
+>(
+  component: C
+) => hoistStatics(withTranslationI18Next(namespace)(component), component)
 
 export default i18n

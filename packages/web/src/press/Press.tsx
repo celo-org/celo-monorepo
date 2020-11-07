@@ -3,50 +3,50 @@ import { Image, ImageRequireSource, StyleSheet, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import MENU from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
-const forbes = require('./forbes-logo.png')
-const fortune = require('./fortune@2x.png')
-const coindesk = require('./coindesk-logo@2x.png')
-const techcrunch = require('./techcrunch-logo@2x.png')
-const wsj = require('./wsj-logo@2x.png')
+const forbes = require('./forbes-logo-white.png')
+const fortune = require('./fortune-white.png')
+const coindesk = require('./coindesk-logo-white.png')
+const techcrunch = require('./techcrunch-logo-white.png')
+const wsj = require('./wsj-logo-white.png')
 
 class Press extends React.PureComponent<I18nProps> {
   render() {
     const { t } = this.props
     return (
-      <GridRow
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        desktopStyle={standardStyles.sectionMarginBottom}
-      >
-        <Cell span={Spans.full} style={standardStyles.centered}>
-          <View style={styles.logoContainer}>
-            {logos.map((logo) => (
-              <a key={logo.source} href={logo.url} target={'_blank'} rel="noopener">
-                <Responsive key={logo.source} medium={[styles.logo, styles.largeLogo, logo.size]}>
-                  <Image
-                    resizeMode={'contain'}
-                    source={logo.source}
-                    style={[styles.logo, logo.size]}
-                  />
-                </Responsive>
-              </a>
-            ))}
-          </View>
-          <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
-            {/* <Button text={t('recentNews')} kind={BTN.NAKED} href={'https://medium.com/celohq'} /> */}
-            <Button
-              text={t('recentNews')}
-              kind={BTN.NAKED}
-              size={SIZE.normal}
-              href={
-                'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600'
-              }
-            />
-          </View>
-        </Cell>
-      </GridRow>
+      <View style={standardStyles.darkBackground}>
+        <GridRow
+          mobileStyle={standardStyles.sectionMarginBottomMobile}
+          tabletStyle={standardStyles.sectionMarginBottomTablet}
+          desktopStyle={standardStyles.sectionMarginBottom}
+        >
+          <Cell span={Spans.full} style={standardStyles.centered}>
+            <View style={styles.logoContainer}>
+              {logos.map((logo) => (
+                <a key={logo.url} href={logo.url} target={'_blank'} rel="noopener">
+                  <Responsive medium={[styles.logo, styles.largeLogo, logo.size]}>
+                    <Image
+                      resizeMode={'contain'}
+                      source={logo.source}
+                      style={[styles.logo, logo.size]}
+                    />
+                  </Responsive>
+                </a>
+              ))}
+            </View>
+            <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
+              <Button
+                text={t('recentNews')}
+                kind={BTN.NAKED}
+                size={SIZE.normal}
+                href={MENU.PRESS.link}
+              />
+            </View>
+          </Cell>
+        </GridRow>
+      </View>
     )
   }
 }
@@ -66,7 +66,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+    alignContent: 'center',
     justifyContent: 'center',
+    opacity: 0.7,
   },
   linkContainer: {
     alignItems: 'center',
@@ -92,12 +94,6 @@ const logos: Logo[] = [
     url:
       'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600',
   },
-  // {
-  //   source: ventureBeat,
-  //   size: {},
-  //   url:
-  //     'https://venturebeat.com/2018/09/05/googles-launchpad-studio-introduces-class-of-financial-ai-startups/',
-  // },
   {
     source: fortune,
     size: {},
@@ -107,8 +103,7 @@ const logos: Logo[] = [
   {
     source: coindesk,
     size: {},
-    url:
-      'https://www.coindesk.com/a16z-polychain-invest-25-million-into-crypto-payments-startup-celo',
+    url: 'https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project',
   },
   {
     source: techcrunch,

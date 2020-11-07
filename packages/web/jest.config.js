@@ -1,4 +1,5 @@
 const defaultConfig = require('../../jest.config.js')
+const { jsdomFlakeTracking } = require('@celo/flake-tracker/src/jest/config.js')
 
 module.exports = {
   ...defaultConfig,
@@ -8,12 +9,16 @@ module.exports = {
       tsConfig: 'tsconfig.jest.json',
     },
   },
-  setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
   moduleNameMapper: {
-    '\\.(png|jpg|jpeg)$': '<rootDir>/__mocks__/ImageStub.ts',
+    '\\.(png|jpg|jpeg|gif)$': '<rootDir>/__mocks__/ImageStub.ts',
+    '\\.(css|scss)$': '<rootDir>/__mocks__/ImageStub.ts',
+    '\\.(md)$': '<rootDir>/__mocks__/MarkdownStub.ts',
     'pages/(.*)$': '<rootDir>/pages/$1',
     'src/(.*)$': '<rootDir>/src/$1',
+    'public/(.*)$': '<rootDir>/public/$1',
   },
   preset: 'react-native-web',
-  testEnvironment: 'jsdom',
+  ...jsdomFlakeTracking,
+  setupFiles: ['./jestSetup.js', 'jest-canvas-mock'],
+  setupFilesAfterEnv: ['./jestSetupAfter.ts', ...jsdomFlakeTracking.setupFilesAfterEnv],
 }

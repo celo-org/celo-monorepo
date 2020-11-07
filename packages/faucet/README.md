@@ -1,10 +1,12 @@
+# Celo Faucet
+
+A firebase function that creates invites and/or faucets addresses
+
 ## Faucet Deployment Configuration
 
-Faucet firebase function requires a few configuration variables to work:
+The function requires a few configuration variables to work:
 
 - nodeUrl: The url for the node the faucet server will use to send transactions
-- stableTokenAddress: The StableToken contract's address
-- goldTokenAddress: The GoldToken contract's address
 - faucetGoldAmount: The amount of gold to faucet on each request
 - faucetDollarAmount: The amount of dollars to faucet on each request
 
@@ -24,26 +26,6 @@ Replace net with proper net
 
 ```
 yarn cli config:set --net alfajores --goldAmount 5000000000000000000 --dollarAmount 10000000000000000000
-```
-
-You can verify with `yarn cli config:get --net alfajores`
-
-### Setting StableToken and GoldToken Addresses
-
-To obtain the StableToken, GoldToken, and Escrow addresses on a given environment run:
-
-```bash
-celotooljs contract-addresses --e alfajores --contracts StableToken,GoldToken,Escrow
-```
-
-Replace `alfajores` by proper environment
-
-To set the address for faucet, in directory: `packages/faucet`, run:
-
-Replace `net`, `stableTokenAddress`, `goldTokenAddress`, and `escrowAddress` with proper values
-
-```bash
-yarn cli config:set --net alfajores --stableTokenAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a --goldTokenAddress 0x4813BFD311E132ade22c70dFf7e5DB045d26D070 --escrowAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a
 ```
 
 You can verify with `yarn cli config:get --net alfajores`

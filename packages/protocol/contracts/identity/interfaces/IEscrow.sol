@@ -1,8 +1,6 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 interface IEscrow {
-  function initialize(address registryAddress) external;
-
   function transfer(
     bytes32 identifier,
     address token,

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./LinkedList.sol";
@@ -17,6 +17,7 @@ library SortedLinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -28,7 +29,7 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
+  ) internal {
     require(
       key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key),
       "invalid key"
@@ -46,15 +47,17 @@ library SortedLinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
-  function remove(List storage list, bytes32 key) public {
+  function remove(List storage list, bytes32 key) internal {
     list.list.remove(key);
     list.values[key] = 0;
   }
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -67,31 +70,30 @@ library SortedLinkedList {
     uint256 value,
     bytes32 lesserKey,
     bytes32 greaterKey
-  ) public {
-    // TODO(asa): Optimize by not making any changes other than value if lesserKey and greaterKey
-    // don't change.
-    // TODO(asa): Optimize by not updating lesserKey/greaterKey for key
+  ) internal {
     remove(list, key);
     insert(list, key, value, lesserKey, greaterKey);
   }
 
   /**
    * @notice Inserts an element at the tail of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
-  function push(List storage list, bytes32 key) public {
+  function push(List storage list, bytes32 key) internal {
     insert(list, key, 0, bytes32(0), list.list.tail);
   }
 
   /**
    * @notice Removes N elements from the head of the list and returns their keys.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
-  function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
+  function popN(List storage list, uint256 n) internal returns (bytes32[] memory) {
     require(n <= list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       bytes32 key = list.list.head;
       keys[i] = key;
       remove(list, key);
@@ -101,27 +103,34 @@ library SortedLinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(List storage list, bytes32 key) public view returns (bool) {
+  function contains(List storage list, bytes32 key) internal view returns (bool) {
     return list.list.contains(key);
   }
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(List storage list, bytes32 key) public view returns (uint256) {
+  function getValue(List storage list, bytes32 key) internal view returns (uint256) {
     return list.values[key];
   }
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
-  function getElements(List storage list) public view returns (bytes32[] memory, uint256[] memory) {
+  function getElements(List storage list)
+    internal
+    view
+    returns (bytes32[] memory, uint256[] memory)
+  {
     bytes32[] memory keys = getKeys(list);
     uint256[] memory values = new uint256[](keys.length);
     for (uint256 i = 0; i < keys.length; i = i.add(1)) {
@@ -132,25 +141,27 @@ library SortedLinkedList {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
-  function getKeys(List storage list) public view returns (bytes32[] memory) {
+  function getKeys(List storage list) internal view returns (bytes32[] memory) {
     return list.list.getKeys();
   }
 
   /**
    * @notice Returns first N greatest elements of the list.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to return.
    * @return The keys of the first n elements.
    * @dev Reverts if n is greater than the number of elements in the list.
    */
-  function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
+  function headN(List storage list, uint256 n) internal view returns (bytes32[] memory) {
     return list.list.headN(n);
   }
 
-  // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.
+   * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.
    * @param greaterKey The key of the element which could be just right of the new value.
@@ -166,7 +177,7 @@ library SortedLinkedList {
     //   1. The value is less than the current lowest value
     //   2. The value is greater than the current greatest value
     //   3. The value is just greater than the value for `lesserKey`
-    //   4. The value is just less than the value for `greaerKey`
+    //   4. The value is just less than the value for `greaterKey`
     if (lesserKey == bytes32(0) && isValueBetween(list, value, lesserKey, list.list.tail)) {
       return (lesserKey, list.list.tail);
     } else if (
@@ -190,6 +201,7 @@ library SortedLinkedList {
 
   /**
    * @notice Returns whether or not a given element is between two other elements.
+   * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element whose value should be lesserKey.
    * @param greaterKey The key of the element whose value should be greaterKey.

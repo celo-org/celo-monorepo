@@ -1,17 +1,32 @@
+import {
+  InteractiveProposalBuilder,
+  ProposalBuilder,
+  proposalToJSON,
+  ProposalTransactionJSON,
+} from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
+import { readFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { buildProposalFromJsonFile } from '../../utils/governance'
 
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
 
   static flags = {
     ...BaseCommand.flags,
-    jsonTransactions: flags.string({ required: true, description: 'Path to json transactions' }),
+    jsonTransactions: flags.string({
+      exclusive: ['interactive'],
+      description: 'Path to json transactions',
+    }),
+    interactive: flags.boolean({
+      default: false,
+      exclusive: ['jsonTransactions'],
+      description:
+        'Form proposal using an interactive prompt for Celo registry contracts and functions',
+    }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
     descriptionURL: flags.string({
@@ -26,21 +41,48 @@ export default class Propose extends BaseCommand {
 
   async run() {
     const res = this.parse(Propose)
-    const proposal = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
     const account = res.flags.from
     const deposit = new BigNumber(res.flags.deposit)
     this.kit.defaultAccount = account
 
     await newCheckBuilder(this, account)
-      .hasEnoughGold(account, deposit)
+      .hasEnoughCelo(account, deposit)
       .exceedsProposalMinDeposit(deposit)
       .runChecks()
+
+    const builder = new ProposalBuilder(this.kit)
+
+    // TODO: optimize builder redundancies
+    let jsonTransactions: ProposalTransactionJSON[]
+    if (res.flags.interactive) {
+      // BUILD FROM INTERACTIVE PROMPT
+      const promptBuilder = new InteractiveProposalBuilder(builder)
+      jsonTransactions = await promptBuilder.promptTransactions()
+    } else if (res.flags.jsonTransactions) {
+      // BUILD FROM JSON
+      const jsonString = readFileSync(res.flags.jsonTransactions).toString()
+      jsonTransactions = JSON.parse(jsonString)
+    } else {
+      throw new Error('No jsonTransactions provided and interactive mode not specified')
+    }
+
+    jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
+
+    // BUILD FROM CONTRACTKIT FUNCTIONS
+    // const params = await this.kit.contracts.getBlockchainParameters()
+    // builder.addTx(params.setMinimumClientVersion(1, 8, 24), { to: params.address })
+    // builder.addWeb3Tx()
+    // builder.addProxyRepointingTx
+
+    const proposal = await builder.build()
+
+    printValueMapRecursive(proposalToJSON(this.kit, proposal))
 
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),
-      { value: res.flags.deposit },
+      { value: deposit.toString() },
       'ProposalQueued'
     )
   }

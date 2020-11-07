@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p build
+cat scripts/startup-prefix.sh > build/$1-startup.sh
+(cd $1 && tar -cvhf ../build/$1.tar .)
+cat build/$1.tar >> build/$1-startup.sh

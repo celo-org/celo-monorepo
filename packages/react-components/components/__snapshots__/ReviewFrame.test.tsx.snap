@@ -7,7 +7,6 @@ exports[`ReviewFrame renders correctly 1`] = `
       Object {
         "backgroundColor": "#FFFFFF",
         "flex": 1,
-        "justifyContent": "space-between",
       },
       undefined,
     ]
@@ -16,17 +15,16 @@ exports[`ReviewFrame renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "alignItems": "center",
-        "justifyContent": "flex-start",
         "paddingVertical": 10,
       }
     }
+    keyboardShouldPersistTaps="handled"
   >
     <View>
       <View
         style={
           Object {
-            "margin": 20,
+            "marginHorizontal": 16,
           }
         }
       />
@@ -62,7 +60,6 @@ exports[`ReviewFrame renders correctly 1`] = `
             "top": 10,
           }
         }
-        isTVSelectable={true}
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -105,5 +102,21 @@ exports[`ReviewFrame renders correctly 1`] = `
       </View>
     </View>
   </View>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
 </View>
 `;

@@ -1,4 +1,4 @@
-import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { mineBlocks, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
@@ -90,15 +90,25 @@ testWithGanache('Validators Wrapper', (web3) => {
     expect(members).toContain(validatorAccount)
   })
 
+  test('SBAT setNextCommissionUpdate', async () => {
+    const groupAccount = accounts[0]
+    await setupGroup(groupAccount)
+    await validators.setNextCommissionUpdate('0.2').sendAndWaitForReceipt({
+      from: groupAccount,
+    })
+    const commission = (await validators.getValidatorGroup(groupAccount)).nextCommission
+    expect(commission).toEqBigNumber('0.2')
+  })
+
   test('SBAT updateCommission', async () => {
     const groupAccount = accounts[0]
     await setupGroup(groupAccount)
-    let commission = (await validators.getValidatorGroup(groupAccount)).commission
-    expect(commission).toEqBigNumber('0.1')
-    await (await validators.updateCommission(new BigNumber(0.2))).sendAndWaitForReceipt({
-      from: groupAccount,
-    })
-    commission = (await validators.getValidatorGroup(groupAccount)).commission
+    const txOpts = { from: groupAccount }
+    await validators.setNextCommissionUpdate('0.2').sendAndWaitForReceipt(txOpts)
+    await mineBlocks(3, web3)
+    await validators.updateCommission().sendAndWaitForReceipt(txOpts)
+
+    const commission = (await validators.getValidatorGroup(groupAccount)).commission
     expect(commission).toEqBigNumber('0.2')
   })
 
@@ -116,6 +126,8 @@ testWithGanache('Validators Wrapper', (web3) => {
     let groupAccount: string, validator1: string, validator2: string
 
     beforeEach(async () => {
+      jest.setTimeout(30 * 1000)
+
       groupAccount = accounts[0]
       await setupGroup(groupAccount, 2)
 
@@ -155,6 +167,20 @@ testWithGanache('Validators Wrapper', (web3) => {
 
       await validators
         .reorderMember(groupAccount, validator1, 1)
+        .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
+
+      const membersAfter = await validators
+        .getValidatorGroup(groupAccount)
+        .then((group) => group.members)
+
+      expect(membersAfter).toEqual([validator2, validator1])
+    })
+
+    test('test address normalization', async () => {
+      jest.setTimeout(30 * 1000)
+
+      await validators
+        .reorderMember(groupAccount, validator2.toLowerCase(), 0)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
 
       const membersAfter = await validators

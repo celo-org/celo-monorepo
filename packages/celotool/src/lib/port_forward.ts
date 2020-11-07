@@ -1,7 +1,7 @@
 /* tslint:disable: no-console */
 import { ChildProcess, spawnSync } from 'child_process'
+import { execBackgroundCmd, execCmd } from './cmd-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import { execBackgroundCmd, execCmd } from './utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -46,8 +46,12 @@ async function getPortForwardArgs(celoEnv: string, component?: string, ports = d
     component = DEFAULT_COMPONENT
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
+  // The testnet helm chart used to have the label app=ethereum, but this was changed
+  // to app=testnet. To preserve backward compatibility, we search for both labels.
+  // It's not expected to ever have a situation where a namespace has pods with
+  // both labels.
   const podName = await execCmd(
-    `kubectl get pods --namespace ${celoEnv} -l "app=ethereum, component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}"`
+    `kubectl get pods --namespace ${celoEnv} -l "app in (ethereum,testnet), component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}"`
   )
   return ['port-forward', `--namespace=${celoEnv}`, podName[0], ...ports.split(' ')]
 }

@@ -11,6 +11,8 @@ generates:
            * REGENERATE WITH:
            * `yarn run build:gen-graphql-types`
            */
+
+          import BigNumber from 'bignumber.js'
       - 'typescript'
       - 'typescript-operations'
       # Not using typescript-react-apollo for now
@@ -22,7 +24,7 @@ generates:
       scalars:
         Timestamp: number
         Address: string
-        Decimal: string
+        Decimal: BigNumber.Value
 hooks:
   afterAllFileWrite:
     - tslint --fix

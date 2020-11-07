@@ -11,10 +11,22 @@ handlers:
     static_dir: .next/static
 
   - url: /static
-    static_dir: static
+    static_dir: public/static
 
   - url: /public
     static_dir: public
+
+  - url: /papers/whitepaper
+    static_files: public/papers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf
+    upload: public/papers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf
+
+  - url: /papers/stability
+    static_files: public/papers/Celo_Stability_Analysis.pdf
+    upload: public/papers/Celo_Stability_Analysis.pdf
+
+  - url: /papers/cbdc-velocity
+    static_files: public/papers/cLabs_CBDC_Velocity_v3.pdf
+    upload: public/papers/cLabs_CBDC_Velocity_v3.pdf
 
   - url: /.*
     script: auto
