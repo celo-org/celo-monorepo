@@ -1,5 +1,6 @@
+import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
-import { Linking, Platform } from 'react-native'
+import { Linking, Platform, Share } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { expectSaga } from 'redux-saga-test-plan'
@@ -10,6 +11,8 @@ import { PincodeType } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { features } from 'src/flags'
+import i18n from 'src/i18n'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
   InviteBy,
@@ -60,6 +63,7 @@ jest.mock('src/config', () => {
 
 SendIntentAndroid.sendSms = jest.fn()
 SendSMS.send = jest.fn()
+Share.share = jest.fn()
 
 const state = createMockStore({
   web3: { account: mockAccount },
@@ -67,8 +71,15 @@ const state = createMockStore({
 }).getState()
 
 describe(watchSendInvite, () => {
+  const komenciEnabled = features.KOMENCI
+
   beforeAll(() => {
     jest.useRealTimers()
+    features.KOMENCI = false
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
   })
 
   const dateNowStub = jest.fn(() => 1588200517518)
@@ -184,6 +195,53 @@ describe(watchSendInvite, () => {
       .run()
 
     expect(Linking.openURL).toHaveBeenCalled()
+  })
+})
+
+describe('watchSendInvite with Komenci enabled', () => {
+  const komenciEnabled = features.KOMENCI
+  const AMOUNT_TO_SEND = new BigNumber(10)
+
+  beforeAll(() => {
+    jest.useRealTimers()
+    features.KOMENCI = true
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
+  })
+
+  const dateNowStub = jest.fn(() => 1588200517518)
+  global.Date.now = dateNowStub
+
+  it('sends an invite as expected', async () => {
+    i18n.t = jest.fn((key) => key)
+
+    await expectSaga(watchSendInvite)
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getConnectedUnlockedAccount), mockAccount],
+      ])
+      .withState(state)
+      .dispatch(
+        sendInvite(mockInviteDetails.e164Number, InviteBy.SMS, AMOUNT_TO_SEND, CURRENCY_ENUM.DOLLAR)
+      )
+      .dispatch(transactionConfirmed('a uuid'))
+      .put(storeInviteeData(mockInviteDetails))
+      .put(
+        updateE164PhoneNumberAddresses(
+          {},
+          { [mockAccount.toLowerCase()]: mockInviteDetails.e164Number }
+        )
+      )
+      .run()
+
+    expect(i18n.t).toHaveBeenCalledWith('sendFlow7:inviteWithEscrowedPayment', {
+      name: state.account.name,
+      amount: AMOUNT_TO_SEND.toString(),
+      link: 'http://celo.page.link/PARAMS',
+    })
+    expect(Share.share).toHaveBeenCalledWith({ message: 'sendFlow7:inviteWithEscrowedPayment' })
   })
 })
 

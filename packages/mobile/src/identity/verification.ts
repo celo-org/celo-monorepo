@@ -12,7 +12,18 @@ import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/uti
 import functions from '@react-native-firebase/functions'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
-import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  fork,
+  put,
+  race,
+  select,
+  spawn,
+  take,
+  takeEvery,
+} from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
@@ -58,6 +69,7 @@ import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import { waitFor } from 'src/redux/sagas-helpers'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { sendTransaction } from 'src/transactions/send'
@@ -65,7 +77,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { registerAccountDek } from 'src/web3/dataEncryptionKey'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount, unlockAccount } from 'src/web3/saga'
 
 const TAG = 'identity/verification'
 
@@ -76,6 +88,14 @@ export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
 export const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
 export const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
+
+// Using hard-coded gas value to avoid running gas estimation.
+// Note: This is fragile and needs be updated if there are significant
+// changes to the contract implementation.
+const APPROVE_ATTESTATIONS_TX_GAS = 150000
+const REQUEST_ATTESTATIONS_TX_GAS = 215000
+const SELECT_ISSUERS_TX_GAS = 500000
+const COMPLETE_ATTESTATION_TX_GAS = 250000
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -88,9 +108,14 @@ export interface AttestationCode {
   issuer: string
 }
 
-export function* fetchVerificationState() {
+export function* fetchVerificationState(forceUnlockAccount?: boolean) {
   try {
-    const account: string = yield call(getConnectedUnlockedAccount)
+    const account: string = yield call(getConnectedAccount)
+    if (forceUnlockAccount) {
+      // we want to reset password before force unlock account
+      clearPasswordCaches()
+    }
+    yield call(unlockAccount, account, !!forceUnlockAccount)
     const e164Number: string = yield select(e164NumberSelector)
     const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -107,7 +132,6 @@ export function* fetchVerificationState() {
     })
     if (timeout) {
       Logger.debug(TAG, '@fetchVerificationState', 'Token balances is null or undefined')
-      yield put(setVerificationStatus(VerificationStatus.Stopped))
       return
     }
     const isBalanceSufficientForSigRetrieval = yield select(
@@ -115,7 +139,6 @@ export function* fetchVerificationState() {
     )
     if (!isBalanceSufficientForSigRetrieval) {
       Logger.debug(TAG, '@fetchVerificationState', 'Insufficient balance for sig retrieval')
-      yield put(setVerificationStatus(VerificationStatus.Stopped))
       return
     }
 
@@ -203,7 +226,7 @@ export function* restartableVerification(initialWithoutRevealing: boolean) {
     yield put(resetVerification())
     yield call(getConnectedAccount)
     if (isRestarted || (yield select(isVerificationStateExpiredSelector))) {
-      yield call(fetchVerificationState)
+      yield call(fetchVerificationState, true)
     }
 
     const { verification, restart } = yield race({
@@ -330,8 +353,6 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       }
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
-      // NOTE: I think we want the DEK registration out of the race because
-      // we want that to happen no matter what
       yield race({
         actionableAttestationCompleted: call(
           completeAttestations,
@@ -346,7 +367,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
 
       // Set acccount and data encryption key in Accounts contract
       // This is done in other places too, intentionally keeping it for more coverage
-      yield call(registerAccountDek, account)
+      yield spawn(registerAccountDek, account)
 
       receiveMessageTask?.cancel()
       if (Platform.OS === 'android') {
@@ -529,7 +550,8 @@ function* requestAttestations(
       sendTransaction,
       approveTx.txo,
       account,
-      newTransactionContext(TAG, 'Approve attestations')
+      newTransactionContext(TAG, 'Approve attestations'),
+      APPROVE_ATTESTATIONS_TX_GAS
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
 
@@ -548,7 +570,8 @@ function* requestAttestations(
       sendTransaction,
       requestTx.txo,
       account,
-      newTransactionContext(TAG, 'Request attestations')
+      newTransactionContext(TAG, 'Request attestations'),
+      REQUEST_ATTESTATIONS_TX_GAS
     )
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
   }
@@ -568,7 +591,8 @@ function* requestAttestations(
     sendTransaction,
     selectIssuersTx.txo,
     account,
-    newTransactionContext(TAG, 'Select attestation issuers')
+    newTransactionContext(TAG, 'Select attestation issuers'),
+    SELECT_ISSUERS_TX_GAS
   )
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
@@ -776,7 +800,7 @@ function* completeAttestation(
     code.code
   )
   const context = newTransactionContext(TAG, `Complete attestation from ${issuer}`)
-  yield call(sendTransaction, completeTx.txo, account, context)
+  yield call(sendTransaction, completeTx.txo, account, context, COMPLETE_ATTESTATION_TX_GAS)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 

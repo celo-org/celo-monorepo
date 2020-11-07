@@ -18,7 +18,6 @@ import { FIREBASE_ENABLED } from 'src/config'
 import { firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
 import { refreshAllBalances } from 'src/home/actions'
-import { fetchVerificationState } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { removeAccountLocally } from 'src/pincode/authentication'
@@ -79,7 +78,6 @@ function* initializeAccount() {
     ValoraAnalytics.track(OnboardingEvents.initialize_account_complete)
     yield put(initializeAccountSuccess())
     navigate(Screens.VerificationEducationScreen)
-    yield put(fetchVerificationState())
   } catch (e) {
     Logger.error(TAG, 'Failed to initialize account', e)
     ValoraAnalytics.track(OnboardingEvents.initialize_account_error, { error: e.message })

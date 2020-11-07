@@ -15,7 +15,7 @@ import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getAccountAddress, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mtwAddressSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/revoke'
@@ -36,8 +36,7 @@ export function* revokeVerificationSaga() {
     }
 
     const mtwAddress: string | null = yield select(mtwAddressSelector)
-    // TODO: Replace with `accountAddressSelector` once previous PR is merged
-    const accontAddress = mtwAddress ?? walletAddress
+    const accountAddress: string = yield call(getAccountAddress)
 
     ValoraAnalytics.track(VerificationEvents.verification_revoke_start)
     const contractKit: ContractKit = yield call(getContractKit)
@@ -51,7 +50,7 @@ export function* revokeVerificationSaga() {
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsWrapper,
-      accontAddress,
+      accountAddress,
       phoneHash
     )
 

@@ -92,7 +92,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
         return
       }
       // This action is also dispatched at the end of the initializeAccount action.
-      dispatch(fetchVerificationState())
+      dispatch(fetchVerificationState(!partOfOnboarding))
       dispatch(feelessFetchVerificationState())
     }, [account])
   )

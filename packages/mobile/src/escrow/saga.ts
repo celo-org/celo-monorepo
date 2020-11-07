@@ -140,12 +140,10 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
     ValoraAnalytics.track(EscrowEvents.escrow_transfer_start)
     const { phoneHashDetails, amount, context } = action
     const { phoneHash, pepper } = phoneHashDetails
-    const [contractKit, walletAddress]: [
-      ContractKit,
-      string,
-      string,
-      FeelessVerificationState
-    ] = yield all([call(getContractKit), call(getConnectedUnlockedAccount)])
+    const [contractKit, walletAddress]: [ContractKit, string] = yield all([
+      call(getContractKit),
+      call(getConnectedUnlockedAccount),
+    ])
 
     const [stableTokenWrapper, escrowWrapper]: [StableTokenWrapper, EscrowWrapper] = yield all([
       call([contractKit.contracts, contractKit.contracts.getStableToken]),
