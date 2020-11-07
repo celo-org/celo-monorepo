@@ -1,5 +1,4 @@
-const fetch = jest.fn()
-jest.mock('cross-fetch', () => fetch)
+import fetch from 'jest-fetch-mock'
 import abortableFetch from 'src/utils/abortableFetch'
 
 describe('abortableFetch', () => {

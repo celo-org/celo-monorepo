@@ -46,6 +46,10 @@ To support effective and responsible validators, the Foundation considers the fo
 
 * **Attestation Service.** Ability and commitment to running attestation services.
 
+* **Performance.** Performance uptime score over the past 30 days on Mainnet (or Baklava if not elected on Mainnet)
+
+* **Attestation Performance.** Attestation Performance (attestations fulfilled / requests served) over the past 30 days on Mainnet (or Baklava if not elected Mainnet)
+
 
 ### Additional Criteria
 
@@ -61,10 +65,10 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 Make sure to complete all prerequisites before applying. 
 {% endhint %}
 
-[APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/Ov9U0S)
+[APPLY FOR FOUNDATION VOTES HERE](https://c-labs.typeform.com/to/xcPM1pF9)
 
 ### Timings
-Cohort 5 application deadline: **Oct 1, 2020 at 23:59 UTC**
+Cohort 5 application deadline: **Oct 9, 2020 at 23:59 UTC**
 
 Anticipated vote date for selected applicants in Cohort 5: **Nov 2, 2020**
 
@@ -102,5 +106,3 @@ Currently receiving Foundation votes:
 * **Cohort 2:** The Great Celo Stake Off [leaderboard](https://docs.google.com/spreadsheets/d/1Me56YkCHYmsN23gSMgDb1hZ_ezN0sTjNW4kyGbAO9vc/edit#gid=1970613133) participants at ranking 1-25 -- votes will expire on Nov 1, 2020
 * **Cohort 3:** [6 validator groups](https://docs.google.com/spreadsheets/d/1OkWnr6EOeFn4pIv0zxmXFNtHLmKWf_qCJOJ4iacov-A/edit?usp=sharing) -- votes will expire on Feb 1, 2021
 * **Cohort 4:** [22 validator groups](https://docs.google.com/spreadsheets/d/1bp2nJUxqhWner-uOffBohKQc3N93e--eMpP7XOBrbGI/edit?usp=sharing) -- votes will expire on May 1, 2021
-
-

@@ -8,7 +8,9 @@ import {
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { getBlindedPhoneNumber } from '../../../common/test/utils'
+import { getBlindedPhoneNumber } from '../../../common/src/test/utils'
+
+require('dotenv').config()
 
 /**
  * CONSTS

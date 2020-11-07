@@ -13,6 +13,7 @@ exports[`Faucet renders 1`] = `
     aria-level="1"
     className="css-reset-4rbku5 css-text-901oao"
     dir="auto"
+    onClick={[Function]}
     role="heading"
     style={
       Object {
@@ -45,6 +46,7 @@ exports[`Faucet renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -74,6 +76,7 @@ exports[`Faucet renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -111,6 +114,7 @@ exports[`Faucet renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -138,15 +142,13 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           autoCapitalize="sentences"
           autoComplete="on"
           autoCorrect="on"
-          className="css-textinput-1cwyjr8"
+          className="css-textinput-11aywtz"
           data-focusable={true}
           dir="auto"
-          name="beneficiary"
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
           onKeyDown={[Function]}
-          onKeyPress={[Function]}
           onSelect={[Function]}
           placeholder="Testnet Address"
           readOnly={false}
@@ -174,6 +176,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
               "marginRight": "0px",
               "marginTop": "5px",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "outlineWidth": "0px",
               "paddingBottom": "15px",
               "paddingLeft": "10px",
@@ -188,6 +191,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -230,8 +234,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "flex-start",
@@ -245,6 +247,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -334,6 +337,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -363,6 +367,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -400,6 +405,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -418,8 +424,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -429,7 +433,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="/developers/wallet"
             onClick={[Function]}
             role="link"
@@ -455,8 +458,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -466,7 +467,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client"
             onClick={[Function]}
             role="link"
@@ -503,6 +503,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -532,6 +533,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -569,6 +571,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -598,6 +601,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -627,6 +631,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -664,6 +669,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -685,6 +691,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -698,7 +705,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -717,8 +724,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -823,6 +828,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -852,6 +858,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -889,6 +896,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -910,6 +918,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -923,7 +932,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -942,8 +951,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1042,6 +1049,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -1055,7 +1063,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -1074,8 +1082,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1174,6 +1180,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -1187,7 +1194,7 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -1206,8 +1213,6 @@ In the Celo Wallet, you can find your address by pressing the menu icon at the t
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"

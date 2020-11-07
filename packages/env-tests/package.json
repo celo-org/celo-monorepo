@@ -1,0 +1,27 @@
+{
+  "name": "@celo/env-tests",
+  "version": "1.0.0",
+  "description": "Environment tests",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@celo/contractkit": "0.4.17",
+    "@celo/utils": "0.1.20",
+    "@celo/base": "0.0.3",
+    "dotenv": "8.2.0",
+    "jest": "26.4.2"
+  },
+
+  "scripts": {
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "test": "jest --runInBand",
+    "baklava-test": "CELO_ENV=baklava CELO_PROVIDER=https://baklava-forno.celo-testnet.org jest --runInBand",
+    "alfajores-test": "CELO_ENV=alfajores CELO_PROVIDER=https://alfajores-forno.celo-testnet.org jest --runInBand",
+    "mainnet-test": "CELO_ENV=rc1 CELO_PROVIDER=https://forno.celo.org jest --runInBand"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
+}

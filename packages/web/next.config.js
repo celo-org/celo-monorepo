@@ -4,7 +4,7 @@ const serverEnvConfig = require('./server-env-config')
 
 module.exports = withImages({
   experimental: {
-    granularChunks: true,
+    modern: false,
   },
   publicRuntimeConfig: envConfig,
   serverRuntimeConfig: serverEnvConfig,

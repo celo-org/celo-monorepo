@@ -1,11 +1,12 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { assignRoleIfNotAssigned, AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity, switchToCluster } from 'src/lib/azure'
+import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import yargs from 'yargs'
+import { getAKSClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
+import { AKSClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
@@ -17,7 +18,7 @@ interface OracleAzureHsmIdentity {
   identityName: string
   keyVaultName: string
   // If a resource group is not specified, it is assumed to be the same
-  // as the kubernetes cluster resource group specified in the AzureClusterConfig
+  // as the kubernetes cluster resource group specified in the AKSClusterConfig
   resourceGroup?: string
 }
 
@@ -39,16 +40,6 @@ interface OracleConfig {
   identities: OracleIdentity[]
 }
 
-/**
- * Env vars corresponding to each value for the AzureClusterConfig for a particular context
- */
-const oracleContextAzureClusterConfigDynamicEnvVars: { [k in keyof AzureClusterConfig]: DynamicEnvVar } = {
-  subscriptionId: DynamicEnvVar.ORACLE_AZURE_SUBSCRIPTION_ID,
-  tenantId: DynamicEnvVar.ORACLE_AZURE_TENANT_ID,
-  resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
-  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
-}
-
 interface OracleKeyVaultIdentityConfig {
   addressAzureKeyVaults: string
 }
@@ -60,14 +51,14 @@ interface OracleMnemonicIdentityConfig {
 /**
  * Env vars corresponding to each value for the OracleKeyVaultIdentityConfig for a particular context
  */
-const oracleContextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
+const contextOracleKeyVaultIdentityConfigDynamicEnvVars: { [k in keyof OracleKeyVaultIdentityConfig]: DynamicEnvVar } = {
   addressAzureKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
 }
 
 /**
  * Env vars corresponding to each value for the OracleMnemonicIdentityConfig for a particular context
  */
-const oracleContextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMnemonicIdentityConfig]: DynamicEnvVar } = {
+const contextOracleMnemonicIdentityConfigDynamicEnvVars: { [k in keyof OracleMnemonicIdentityConfig]: DynamicEnvVar } = {
   addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
 }
 
@@ -77,50 +68,50 @@ function releaseName(celoEnv: string) {
 
 export async function installHelmChart(
   celoEnv: string,
-  oracleContext: string,
+  context: string,
   useForno: boolean
 ) {
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // oracle pods can reach the K8s API server to change their aad labels
-  await installOracleRBACHelmChart(celoEnv, oracleContext)
+  await installOracleRBACHelmChart(celoEnv, context)
   // Then install the oracle helm chart
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, oracleContext, useForno)
+    await helmParameters(celoEnv, context, useForno)
   )
 }
 
 export async function upgradeOracleChart(
   celoEnv: string,
-  oracleContext: string,
+  context: string,
   useFullNodes: boolean
 ) {
-  await upgradeOracleRBACHelmChart(celoEnv, oracleContext)
+  await upgradeOracleRBACHelmChart(celoEnv, context)
   return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, oracleContext, useFullNodes)
+    await helmParameters(celoEnv, context, useFullNodes)
   )
 }
 
-export async function removeHelmRelease(celoEnv: string, oracleContext: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+export async function removeHelmRelease(celoEnv: string, context: string) {
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
   await removeOracleRBACHelmRelease(celoEnv)
-  const oracleConfig = getOracleConfig(oracleContext)
+  const oracleConfig = getOracleConfig(context)
   for (const identity of oracleConfig.identities) {
     // If the identity is using Azure HSM signing, clean it up too
     if (identity.azureHsmIdentity) {
-      await deleteOracleAzureIdentity(oracleContext, identity)
+      await deleteOracleAzureIdentity(context, identity)
     }
   }
 }
 
-async function helmParameters(celoEnv: string, oracleContext: string, useForno: boolean) {
-  const oracleConfig = getOracleConfig(oracleContext)
+async function helmParameters(celoEnv: string, context: string, useForno: boolean) {
+  const oracleConfig = getOracleConfig(context)
 
   const replicas = oracleConfig.identities.length
   const kubeServiceAccountSecretNames = await rbacServiceAccountSecretNames(celoEnv, replicas)
@@ -143,7 +134,7 @@ async function helmParameters(celoEnv: string, oracleContext: string, useForno: 
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
     `--set-string oracle.unusedOracleAddresses='${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '').split(',').join('\\\,')}'`
-  ].concat(await oracleIdentityHelmParameters(oracleContext, oracleConfig))
+  ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
 }
 
 /**
@@ -151,7 +142,7 @@ async function helmParameters(celoEnv: string, oracleContext: string, useForno: 
  * Supports both private key and Azure HSM signing.
  */
 async function oracleIdentityHelmParameters(
-  oracleContext: string,
+  context: string,
   oracleConfig: OracleConfig
 ) {
   const replicas = oracleConfig.identities.length
@@ -164,7 +155,7 @@ async function oracleIdentityHelmParameters(
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
     if (oracleIdentity.azureHsmIdentity) {
-      const azureIdentity = await createOracleAzureIdentityIfNotExists(oracleContext, oracleIdentity)
+      const azureIdentity = await createOracleAzureIdentityIfNotExists(context, oracleIdentity)
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
@@ -184,10 +175,10 @@ async function oracleIdentityHelmParameters(
  * called when an oracle identity is using an Azure Key Vault for HSM signing
  */
 async function createOracleAzureIdentityIfNotExists(
-  oracleContext: string,
+  context: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAzureClusterConfig(oracleContext)
+  const clusterConfig = getAKSClusterConfig(context)
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the oracle identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -206,7 +197,7 @@ async function createOracleAzureIdentityIfNotExists(
 }
 
 async function setOracleKeyVaultPolicyIfNotSet(
-  clusterConfig: AzureClusterConfig,
+  clusterConfig: AKSClusterConfig,
   oracleIdentity: OracleIdentity,
   azureIdentity: any
 ) {
@@ -232,16 +223,16 @@ async function setOracleKeyVaultPolicyIfNotSet(
  * deleteOracleAzureIdentity deletes the key vault policy and the oracle's managed identity
  */
 async function deleteOracleAzureIdentity(
-  oracleContext: string,
+  context: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAzureClusterConfig(oracleContext)
+  const clusterConfig = getAKSClusterConfig(context)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
   return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }
 
 async function deleteOracleKeyVaultPolicy(
-  clusterConfig: AzureClusterConfig,
+  clusterConfig: AKSClusterConfig,
   oracleIdentity: OracleIdentity
 ) {
   const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
@@ -253,9 +244,9 @@ async function deleteOracleKeyVaultPolicy(
 /**
  * Gives a config for all oracles for a particular context
  */
-function getOracleConfig(oracleContext: string): OracleConfig {
+function getOracleConfig(context: string): OracleConfig {
   return {
-    identities: getOracleIdentities(oracleContext),
+    identities: getOracleIdentities(context),
   }
 }
 
@@ -264,10 +255,10 @@ function getOracleConfig(oracleContext: string): OracleConfig {
  * the identities are created from that. Otherwise, the identities are created
  * with private keys generated by the mnemonic.
  */
-function getOracleIdentities(oracleContext: string): OracleIdentity[] {
-  const { addressAzureKeyVaults } = getOracleContextDynamicEnvVarValues(
-    oracleContextOracleKeyVaultIdentityConfigDynamicEnvVars,
-    oracleContext,
+function getOracleIdentities(context: string): OracleIdentity[] {
+  const { addressAzureKeyVaults } = getContextDynamicEnvVarValues(
+    contextOracleKeyVaultIdentityConfigDynamicEnvVars,
+    context,
     {
       addressAzureKeyVaults: '',
     }
@@ -278,9 +269,9 @@ function getOracleIdentities(oracleContext: string): OracleIdentity[] {
   }
 
   // If key vaults are not set, try from mnemonic
-  const { addressesFromMnemonicCount } = getOracleContextDynamicEnvVarValues(
-    oracleContextOracleMnemonicIdentityConfigDynamicEnvVars,
-    oracleContext,
+  const { addressesFromMnemonicCount } = getContextDynamicEnvVarValues(
+    contextOracleMnemonicIdentityConfigDynamicEnvVars,
+    context,
     {
       addressesFromMnemonicCount: '',
     }
@@ -345,135 +336,35 @@ function getOracleAzureIdentityName(keyVaultName: string, address: string) {
   return `${keyVaultName}-${address}`.substring(0, maxIdentityNameLength)
 }
 
-/**
- * Fetches the env vars for a particular context
- * @param oracleContext the oracle context to use
- * @return an AzureClusterConfig for the context
- */
-export function getAzureClusterConfig(oracleContext: string): AzureClusterConfig {
-  return getOracleContextDynamicEnvVarValues(oracleContextAzureClusterConfigDynamicEnvVars, oracleContext)
-}
-
-/**
- * Gives an object with the values of dynamic environment variables for an oracle context.
- * @param dynamicEnvVars an object whose values correspond to the desired
- *   dynamic env vars to fetch.
- * @param oracleContext The oracle context
- * @param defaultValues Optional default values if the dynamic env vars are not found
- * @return an object with the same keys as dynamicEnvVars, but the values are
- *   the values of the dynamic env vars for the particular oracleContext
- */
-export function getOracleContextDynamicEnvVarValues<T>(
-  dynamicEnvVars: { [k in keyof T]: DynamicEnvVar },
-  oracleContext: string,
-  defaultValues?: { [k in keyof T]: string }
-): {
-  [k in keyof T]: string
-} {
-  return Object.keys(dynamicEnvVars).reduce(
-    (values: any, k: string) => {
-      const key = k as keyof T
-      const dynamicEnvVar = dynamicEnvVars[key]
-      const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
-        oracleContext
-      })
-      const defaultValue = defaultValues ? defaultValues[key] : undefined
-      const value = defaultValue !== undefined ?
-        fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
-        fetchEnv(dynamicEnvVarName)
-      return {
-        ...values,
-        [key]: value,
-      }
-    },
-  {})
-}
-
-/**
- * Switches to the AKS cluster associated with the given context
- */
-export function switchToAzureContextCluster(celoEnv: string, oracleContext: string) {
-  if (!isValidOracleContext(oracleContext)) {
-    throw Error(`Invalid oracle context, must be one of ${fetchEnv(envVar.ORACLE_CONTEXTS)}`)
-  }
-  const azureClusterConfig = getAzureClusterConfig(oracleContext)
-  return switchToCluster(celoEnv, azureClusterConfig)
-}
-
-/**
- * yargs argv type for an oracle related command.
- */
-export interface OracleArgv {
-  context: string
-}
-
-/**
- * Coerces the value of context to be all upper-case and underscore-separated
- * rather than dash-separated. If the resulting context does not match a regex
- * requiring all caps, alphanumeric, and dash-only characters
- * (must start with letter and not end with an underscore), it will throw.
- */
-function coerceOracleContext(rawContextStr: string) {
-  const context = rawContextStr
-    .toUpperCase()
-    .replace(/-/g, '_')
-  if (!RegExp('^[A-Z][A-Z0-9_]*[A-Z0-9]$').test(context)) {
-    throw Error(`Invalid oracle context. Raw ${rawContextStr}, implied ${context}`)
-  }
-  return context
-}
-
-function isValidOracleContext(oracleContext: string) {
-  const validOracleContexts = fetchEnv(envVar.ORACLE_CONTEXTS)
-    .split(',')
-  const validOracleContextsCoerced = validOracleContexts.map(coerceOracleContext)
-  return validOracleContextsCoerced.includes(oracleContext)
-}
-
-/**
- * Middleware for an oracle related command.
- * One of primary or secondary must be true, but not both.
- * Instead of relying on one boolean, the two booleans are used to give the commands
- * a more explicit cleaner interface.
- */
-export function addOracleMiddleware(argv: yargs.Argv) {
-  return addCeloEnvMiddleware(argv)
-    .option('context', {
-      description: 'Oracle context to perform the deployment in',
-      type: 'string',
-    })
-    .coerce('context', coerceOracleContext)
-}
-
 // Oracle RBAC------
 // We need the oracle pods to be able to change their label to accommodate
 // limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
 // To do this, we use an auth token that we get using the resources in the `oracle-rbac` chart
 
-async function installOracleRBACHelmChart(celoEnv: string, oracleContext: string) {
+async function installOracleRBACHelmChart(celoEnv: string, context: string) {
   return installGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, oracleContext)
+    rbacHelmParameters(celoEnv, context)
   )
 }
 
-async function upgradeOracleRBACHelmChart(celoEnv: string, oracleContext: string) {
+async function upgradeOracleRBACHelmChart(celoEnv: string, context: string) {
   return upgradeGenericHelmChart(
     celoEnv,
     rbacReleaseName(celoEnv),
     rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, oracleContext)
+    rbacHelmParameters(celoEnv, context)
   )
 }
 
 function removeOracleRBACHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(rbacReleaseName(celoEnv))
+  return removeGenericHelmChart(rbacReleaseName(celoEnv), celoEnv)
 }
 
-function rbacHelmParameters(celoEnv: string,  oracleContext: string) {
-  const oracleConfig = getOracleConfig(oracleContext)
+function rbacHelmParameters(celoEnv: string,  context: string) {
+  const oracleConfig = getOracleConfig(context)
   const replicas = oracleConfig.identities.length
   return [`--set environment.name=${celoEnv}`,  `--set oracle.replicas=${replicas}`,]
 }

@@ -5,14 +5,12 @@ import express from 'express'
 import expressEnforcesSsl from 'express-enforces-ssl'
 import helmet from 'helmet'
 import next from 'next'
-import nextI18NextMiddleware from 'next-i18next/middleware'
 import path from 'path'
 import { Tables } from '../fullstack/EcoFundFields'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import Sentry, { initSentryServer } from '../server/sentry'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
-import nextI18next from '../src/i18n'
 import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
 import { faucetOrInviteController } from './controllers'
@@ -114,9 +112,10 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/papers/whitepaper/chinese', (_, res) => {
     res.redirect('/papers/celo-wp-simplified-chinese.pdf')
   })
-
-  server.get('/brand', (_, res) => {
-    res.redirect('/experience/brand')
+  ;['/brand', '/grants'].forEach((slug) => {
+    server.get(slug, (_, res) => {
+      res.redirect(`/experience${slug}`)
+    })
   })
 
   server.get('/connect', (_, res) => {
@@ -178,7 +177,6 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   server.use(bodyParser.json())
-  server.use(nextI18NextMiddleware(nextI18next))
 
   server.post('/fellowship', rateLimit, async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body

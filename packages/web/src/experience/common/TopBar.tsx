@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Hamburger from 'src/header/Hamburger'
+import { useBooleanToggle } from 'src/hooks/useBooleanToggle'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import RingsGlyph from 'src/logos/RingsGlyph'
@@ -8,13 +9,12 @@ import links from 'src/shared/menu-items'
 import MobileMenu from 'src/shared/MobileMenu'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import { colors, fonts, standardStyles } from 'src/styles'
-import { useBooleanToggle } from 'src/utils/useBooleanToggle'
 interface Props {
   current: string
   kitName?: string
 }
 
-const KITS = [links.BRAND, links.EVENTS_KIT, links.MERCHANTS]
+const KITS = [links.BRAND, links.EVENTS_KIT, links.GRANT_KIT, links.MERCHANTS]
 
 export default function TopBar({ current, kitName }: Props) {
   const { isMobile } = useScreenSize()
@@ -64,10 +64,12 @@ export default function TopBar({ current, kitName }: Props) {
   )
 }
 
-function Kits({ current }) {
+const Kits = React.memo(({ current }: { current: string }) => {
+  const { isTablet } = useScreenSize()
+  const displayedKits = isTablet ? KITS.filter((kit) => kit.link !== current) : KITS
   return (
     <>
-      {KITS.map((kit) => {
+      {displayedKits.map((kit) => {
         return (
           <Navigation
             key={kit.link}
@@ -81,7 +83,7 @@ function Kits({ current }) {
       })}
     </>
   )
-}
+})
 
 const styles = StyleSheet.create({
   title: {

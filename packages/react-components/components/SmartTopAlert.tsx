@@ -1,7 +1,7 @@
 import SmallButton from '@celo/react-components/components/SmallButton'
 import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -38,7 +38,7 @@ function SmartTopAlert(props: Props) {
   const alertState = useMemo(() => {
     // tslint bug?
     // tslint:disable-next-line: no-shadowed-variable
-    const { type, title, text, buttonMessage, dismissAfter, onPress, isVisible } = props
+    const { isVisible, type, title, text, buttonMessage, dismissAfter, onPress } = props
     if (isVisible) {
       return {
         type,
@@ -53,6 +53,7 @@ function SmartTopAlert(props: Props) {
     }
   }, [
     props.timestamp,
+    props.isVisible,
     props.type,
     props.title,
     props.text,
@@ -138,7 +139,7 @@ function SmartTopAlert(props: Props) {
 
   return (
     <View style={styles.overflowContainer} testID={testID}>
-      <TouchableWithoutFeedback onPress={onPress}>
+      <TouchableWithoutFeedback onPress={onPress} testID="SmartTopAlertTouchable">
         <Animated.View
           // @ts-ignore
           ref={animatedRef}
@@ -154,8 +155,8 @@ function SmartTopAlert(props: Props) {
           ]}
         >
           {isError && <Error style={styles.errorIcon} />}
-          <Text style={[fontStyles.bodySmall, styles.text, isError && fontStyles.semiBold]}>
-            {!!title && <Text style={[styles.text, fontStyles.semiBold]}> {title} </Text>}
+          <Text style={[fontStyles.small, isError && fontStyles.small500, styles.text]}>
+            {!!title && <Text style={[fontStyles.small500, styles.text]}> {title} </Text>}
             {text}
           </Text>
           {buttonMessage && (

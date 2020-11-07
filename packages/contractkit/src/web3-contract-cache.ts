@@ -15,6 +15,8 @@ import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
+import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
+import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
 import { newMultiSig } from './generated/MultiSig'
 import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
@@ -44,6 +46,8 @@ export const ContractFactories = {
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
   [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
+  [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
@@ -114,6 +118,12 @@ export class Web3ContractCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
+  getMetaTransactionWallet(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWallet, address)
+  }
+  getMetaTransactionWalletDeployer(address: string) {
+    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
+  }
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
@@ -143,15 +153,17 @@ export class Web3ContractCache {
    * Get native web3 contract wrapper
    */
   async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
-    if (this.cacheMap[contract] == null) {
+    if (this.cacheMap[contract] == null || address !== undefined) {
       debug('Initiating contract %s', contract)
       const createFn = ProxyContracts.includes(contract)
         ? newProxy
-        : (ContractFactories[contract] as CFType[C])
-      // @ts-ignore: Too compplex union type
+        : ContractFactories[contract]
+        ? (ContractFactories[contract] as CFType[C])
+        : newProxy
+      // @ts-ignore: Too complex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
-        address ? address : await this.kit.registry.addressFor(contract)
+        address ?? (await this.kit.registry.addressFor(contract))
       ) as NonNullable<ContractCacheMap[C]>
     }
     // we know it's defined (thus the !)

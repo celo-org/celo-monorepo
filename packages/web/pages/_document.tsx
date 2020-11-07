@@ -49,7 +49,6 @@ export default class MyDocument extends Document<Props> {
     return (
       <html lang={locale} style={{ height: '100%', width: '100%' }}>
         <Head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" href={'/normalize.css'} />
 
           <link
@@ -62,7 +61,7 @@ export default class MyDocument extends Document<Props> {
             rel="stylesheet"
           />
 
-          <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+          <link key="favicon" rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         </Head>
         <body>
           <Main />

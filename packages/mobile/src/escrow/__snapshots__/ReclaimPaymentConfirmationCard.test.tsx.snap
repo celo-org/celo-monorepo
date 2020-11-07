@@ -72,7 +72,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
+            "fontFamily": "Inter-Medium",
             "fontSize": 14,
             "lineHeight": 18,
           },
@@ -149,7 +149,10 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       style={
         Array [
           Object {
-            "fontFamily": "Hind-Regular",
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
           },
           Object {
             "color": undefined,
@@ -165,7 +168,10 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       style={
         Array [
           Object {
-            "fontFamily": "Hind-Regular",
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
           },
           Object {
             "color": undefined,
@@ -181,7 +187,10 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       style={
         Array [
           Object {
-            "fontFamily": "Hind-Regular",
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
             "paddingHorizontal": 3,
           },
           Object {
@@ -233,9 +242,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 24,
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
             },
             undefined,
           ]
@@ -249,9 +258,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 15,
-            "lineHeight": 24,
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
           },
           undefined,
         ]
@@ -300,9 +309,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 24,
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
             },
             undefined,
           ]
@@ -342,20 +351,29 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           }
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/info.png",
-            }
-          }
-          style={
-            Object {
-              "height": 12,
-              "tintColor": "#B4B9BD",
-              "width": 12,
-            }
-          }
-        />
+        <svg
+          fill="none"
+          height={12}
+          style={Object {}}
+          viewBox="0 0 16 16"
+          width={12}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+          <path
+            d="M8 12V7M8 6V5"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+        </svg>
       </View>
       <Modal
         animationType="none"
@@ -563,9 +581,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 15,
-            "lineHeight": 24,
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
           },
           undefined,
         ]
@@ -626,9 +644,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 24,
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
             },
             Object {
               "color": "#2E3338",
@@ -647,9 +665,9 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 15,
-            "lineHeight": 24,
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
           },
           Object {
             "color": "#2E3338",
@@ -705,17 +723,20 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 24,
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
             },
             Object {
-              "color": "#81868B",
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             },
           ]
         }
       >
-        Celo Dollars (@
+        Celo Dollars @
          
         <Text
           numberOfLines={1}
@@ -732,7 +753,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           $
           0.75
         </Text>
-        )
       </Text>
     </View>
     <Text
@@ -740,12 +760,15 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
         Array [
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 15,
-            "lineHeight": 24,
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
           },
           Object {
-            "color": "#81868B",
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
           },
         ]
       }

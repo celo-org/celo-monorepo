@@ -7,6 +7,6 @@
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true,
   "testMatch": ["**/*.spec.js"],
-  "testTimeout": 120000,
+  "testTimeout": 300000,
   "testRunner": "jest-circus/runner"
 }

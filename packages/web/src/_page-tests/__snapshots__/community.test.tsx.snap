@@ -26,6 +26,7 @@ exports[`Community renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "paddingTop": "75px",
@@ -115,6 +116,7 @@ exports[`Community renders 1`] = `
             aria-level="1"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -130,7 +132,7 @@ exports[`Community renders 1`] = `
           >
             <span
               className="css-text-901oao css-textHasAncestor-16my406 r-animationKeyframes-clrlgt"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitAnimationDelay": "1650ms",
@@ -149,7 +151,7 @@ exports[`Community renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406 r-animationKeyframes-clrlgt"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitAnimationDelay": "3650ms",
@@ -168,7 +170,7 @@ exports[`Community renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406 r-animationKeyframes-clrlgt"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitAnimationDelay": "5250ms",
@@ -187,7 +189,7 @@ exports[`Community renders 1`] = `
             </span>
             <span
               className="css-text-901oao css-textHasAncestor-16my406 r-animationKeyframes-clrlgt"
-              dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "WebkitAnimationDelay": "6450ms",
@@ -236,6 +238,7 @@ exports[`Community renders 1`] = `
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -268,19 +271,16 @@ exports[`Community renders 1`] = `
             autoCapitalize="sentences"
             autoComplete="on"
             autoCorrect="on"
-            className="css-textinput-1cwyjr8 r-placeholderTextColor-tf24u1"
+            className="css-textinput-11aywtz r-placeholderTextColor-tf24u1"
             data-focusable={true}
             dir="auto"
-            name="email"
             onBlur={[Function]}
             onChange={[Function]}
             onFocus={[Function]}
             onKeyDown={[Function]}
-            onKeyPress={[Function]}
             onSelect={[Function]}
             placeholder="Email*"
             readOnly={false}
-            required={true}
             spellCheck={true}
             style={
               Object {
@@ -345,6 +345,7 @@ exports[`Community renders 1`] = `
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -373,13 +374,12 @@ exports[`Community renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -466,6 +466,7 @@ exports[`Community renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "MozTransitionProperty": "opacity",
@@ -500,7 +501,7 @@ exports[`Community renders 1`] = `
               </svg>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
-                dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "marginLeft": "10px",
@@ -547,6 +548,7 @@ exports[`Community renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -573,12 +575,7 @@ exports[`Community renders 1`] = `
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -599,6 +596,7 @@ exports[`Community renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -619,6 +617,7 @@ exports[`Community renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -639,12 +638,7 @@ exports[`Community renders 1`] = `
       </div>
     </div>
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -667,6 +661,7 @@ exports[`Community renders 1`] = `
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -696,6 +691,7 @@ exports[`Community renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -717,6 +713,7 @@ exports[`Community renders 1`] = `
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -823,6 +820,7 @@ exports[`Community renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -863,6 +861,7 @@ Therefore, when we design our tools, we keep in the front of our mind the people
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -892,6 +891,7 @@ Therefore, when we design our tools, we keep in the front of our mind the people
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -913,6 +913,7 @@ Therefore, when we design our tools, we keep in the front of our mind the people
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1019,6 +1020,7 @@ Therefore, when we design our tools, we keep in the front of our mind the people
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1057,6 +1059,7 @@ We believe that many of these features have great potential for positive impact,
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -1086,6 +1089,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1107,6 +1111,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1213,6 +1218,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1249,6 +1255,7 @@ We believe that many of these features have great potential for positive impact,
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -1278,6 +1285,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1299,6 +1307,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1405,6 +1414,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1454,6 +1464,7 @@ We believe that many of these features have great potential for positive impact,
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -1522,12 +1533,7 @@ We believe that many of these features have great potential for positive impact,
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -1536,6 +1542,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1554,6 +1561,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -1577,8 +1585,6 @@ We believe that many of these features have great potential for positive impact,
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -1657,6 +1663,7 @@ We believe that many of these features have great potential for positive impact,
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1691,17 +1698,13 @@ We believe that many of these features have great potential for positive impact,
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <h2
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -1734,6 +1737,7 @@ We believe that many of these features have great potential for positive impact,
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -1771,6 +1775,7 @@ We believe that many of these features have great potential for positive impact,
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -1787,26 +1792,21 @@ We believe that many of these features have great potential for positive impact,
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -1886,6 +1886,7 @@ We believe that many of these features have great potential for positive impact,
             <label
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -1903,26 +1904,21 @@ We believe that many of these features have great potential for positive impact,
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
+          onClick={[Function]}
+          onContextMenu={[Function]}
           onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
             Object {
               "MozTransitionProperty": "opacity",
               "MozUserSelect": "none",
-              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionDuration": "0s",
               "WebkitTransitionProperty": "opacity",
               "WebkitUserSelect": "none",
               "cursor": "pointer",
               "msTouchAction": "manipulation",
               "msUserSelect": "none",
               "touchAction": "manipulation",
-              "transitionDuration": "0.15s",
+              "transitionDuration": "0s",
               "transitionProperty": "opacity",
               "userSelect": "none",
             }
@@ -2002,6 +1998,7 @@ We believe that many of these features have great potential for positive impact,
             <label
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -2020,6 +2017,7 @@ We believe that many of these features have great potential for positive impact,
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2037,6 +2035,7 @@ We believe that many of these features have great potential for positive impact,
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -2056,8 +2055,6 @@ We believe that many of these features have great potential for positive impact,
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -2067,7 +2064,6 @@ We believe that many of these features have great potential for positive impact,
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="mailto:community@celo.org"
             onClick={[Function]}
             role="link"
@@ -2110,17 +2106,8 @@ We believe that many of these features have great potential for positive impact,
     >
       <div
         className="css-view-1dbjc4n"
-        onResponderGrant={[Function]}
-        onResponderReject={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminationRequest={[Function]}
         onScroll={[Function]}
-        onScrollShouldSetResponder={[Function]}
-        onStartShouldSetResponder={[Function]}
-        onStartShouldSetResponderCapture={[Function]}
-        onTouchEnd={[Function]}
         onTouchMove={[Function]}
-        onTouchStart={[Function]}
         onWheel={[Function]}
         style={
           Object {
@@ -2155,42 +2142,38 @@ We believe that many of these features have great potential for positive impact,
         >
           <div
             className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxPack": "center",
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "height": "90vh",
+                "justifyContent": "center",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+              }
+            }
           >
             <div
+              aria-label="loading"
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "height": "90vh",
-                  "justifyContent": "center",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
+                  "height": "50px",
+                  "width": "50px",
                 }
               }
             >
-              <div
-                aria-label="loading"
-                className="css-view-1dbjc4n"
+              <span
                 style={
                   Object {
-                    "height": "50px",
-                    "width": "50px",
+                    "height": "100%",
+                    "width": "100%",
                   }
                 }
-              >
-                <span
-                  style={
-                    Object {
-                      "height": "100%",
-                      "width": "100%",
-                    }
-                  }
-                />
-              </div>
+              />
             </div>
           </div>
         </div>
@@ -2218,8 +2201,6 @@ We believe that many of these features have great potential for positive impact,
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -2330,6 +2311,7 @@ We believe that many of these features have great potential for positive impact,
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2364,17 +2346,13 @@ We believe that many of these features have great potential for positive impact,
         }
       >
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <h2
             aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -2417,6 +2395,7 @@ We believe that many of these features have great potential for positive impact,
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
           "msFlexWrap": "wrap",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2616,6 +2595,7 @@ We believe that many of these features have great potential for positive impact,
           "maxWidth": "100vw",
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2656,8 +2636,6 @@ We believe that many of these features have great potential for positive impact,
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -2800,6 +2778,7 @@ We believe that many of these features have great potential for positive impact,
           "maxWidth": "100vw",
           "msFlexDirection": "column-reverse",
           "msFlexItemAlign": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -2841,6 +2820,7 @@ We believe that many of these features have great potential for positive impact,
             aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -2863,8 +2843,6 @@ We believe that many of these features have great potential for positive impact,
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -2999,6 +2977,7 @@ We believe that many of these features have great potential for positive impact,
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -3028,6 +3007,7 @@ We believe that many of these features have great potential for positive impact,
         aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -3045,6 +3025,7 @@ We believe that many of these features have great potential for positive impact,
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3061,6 +3042,7 @@ We believe that many of these features have great potential for positive impact,
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -3073,7 +3055,7 @@ We believe that many of these features have great potential for positive impact,
           }
         }
       >
-        The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible monetary system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.
+        The Celo Ecosystem Venture Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible financial system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -3107,6 +3089,7 @@ We believe that many of these features have great potential for positive impact,
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3145,7 +3128,6 @@ We believe that many of these features have great potential for positive impact,
               style={
                 Object {
                   "backgroundColor": "rgba(0,0,0,0.00)",
-                  "backgroundImage": "url(\\"image.png\\")",
                   "backgroundPosition": "center",
                   "backgroundRepeat": "no-repeat",
                   "backgroundSize": "contain",
@@ -3159,12 +3141,6 @@ We believe that many of these features have great potential for positive impact,
                   "zIndex": -1,
                 }
               }
-            />
-            <img
-              alt="Polychain"
-              className="css-accessibilityImage-9pa8cd"
-              draggable={false}
-              src="image.png"
             />
           </div>
         </div>
@@ -3182,6 +3158,7 @@ We believe that many of these features have great potential for positive impact,
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -3259,7 +3236,6 @@ We believe that many of these features have great potential for positive impact,
                 style={
                   Object {
                     "backgroundColor": "rgba(0,0,0,0.00)",
-                    "backgroundImage": "url(\\"image.png\\")",
                     "backgroundPosition": "center",
                     "backgroundRepeat": "no-repeat",
                     "backgroundSize": "contain",
@@ -3274,12 +3250,6 @@ We believe that many of these features have great potential for positive impact,
                   }
                 }
               />
-              <img
-                alt="a16z"
-                className="css-accessibilityImage-9pa8cd"
-                draggable={false}
-                src="image.png"
-              />
             </div>
           </div>
         </div>
@@ -3291,8 +3261,6 @@ We believe that many of these features have great potential for positive impact,
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <div
           className="css-view-1dbjc4n"
@@ -3453,13 +3421,12 @@ We believe that many of these features have great potential for positive impact,
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -3562,13 +3529,12 @@ We believe that many of these features have great potential for positive impact,
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -3645,6 +3611,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -3664,15 +3631,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="org"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -3701,6 +3666,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -3732,6 +3698,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -3772,6 +3739,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -3791,15 +3759,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="url"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -3828,6 +3794,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -3859,6 +3826,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -3899,6 +3867,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -3918,15 +3887,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="about"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -3955,6 +3922,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -3986,6 +3954,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4026,6 +3995,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4045,15 +4015,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="product"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 rows={3}
@@ -4083,6 +4051,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -4113,6 +4082,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4153,6 +4123,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4172,15 +4143,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="founderEmail"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -4209,6 +4178,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -4240,6 +4210,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4280,6 +4251,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4299,15 +4271,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="coFounderEmail"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -4336,6 +4306,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -4367,6 +4338,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4407,6 +4379,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4426,15 +4399,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="video"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -4463,6 +4434,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -4494,6 +4466,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4522,8 +4495,6 @@ We believe that many of these features have great potential for positive impact,
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -4537,6 +4508,7 @@ We believe that many of these features have great potential for positive impact,
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -4607,6 +4579,7 @@ We believe that many of these features have great potential for positive impact,
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -4641,7 +4614,7 @@ We believe that many of these features have great potential for positive impact,
                 </svg>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "marginLeft": "10px",
@@ -4671,6 +4644,7 @@ We believe that many of these features have great potential for positive impact,
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -4721,6 +4695,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4740,15 +4715,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="email"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -4777,6 +4750,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -4808,6 +4782,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4848,6 +4823,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4867,15 +4843,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="org"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -4904,6 +4878,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -4935,6 +4910,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -4975,6 +4951,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -4994,15 +4971,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="founderEmail"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -5031,6 +5006,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -5062,6 +5038,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -5102,6 +5079,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -5121,15 +5099,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="founderName"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -5158,6 +5134,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -5189,6 +5166,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -5229,6 +5207,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -5248,15 +5227,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="why"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 rows={3}
@@ -5286,6 +5263,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -5316,6 +5294,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -5344,8 +5323,6 @@ We believe that many of these features have great potential for positive impact,
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -5359,6 +5336,7 @@ We believe that many of these features have great potential for positive impact,
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5429,6 +5407,7 @@ We believe that many of these features have great potential for positive impact,
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -5463,7 +5442,7 @@ We believe that many of these features have great potential for positive impact,
                 </svg>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "marginLeft": "10px",
@@ -5493,6 +5472,7 @@ We believe that many of these features have great potential for positive impact,
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -5525,12 +5505,7 @@ We believe that many of these features have great potential for positive impact,
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -5553,6 +5528,7 @@ We believe that many of these features have great potential for positive impact,
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -5671,6 +5647,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -5688,6 +5665,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -5707,6 +5685,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -5726,6 +5705,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -5762,6 +5742,7 @@ We believe that many of these features have great potential for positive impact,
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -5880,6 +5861,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -5897,6 +5879,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -5916,6 +5899,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -5935,6 +5919,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -5954,8 +5939,6 @@ We believe that many of these features have great potential for positive impact,
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -5965,7 +5948,6 @@ We believe that many of these features have great potential for positive impact,
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="https://en.wikipedia.org/wiki/EigenTrust"
                   onClick={[Function]}
                   role="link"
@@ -5994,8 +5976,6 @@ We believe that many of these features have great potential for positive impact,
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
                 style={
                   Object {
                     "display": "inline",
@@ -6005,7 +5985,6 @@ We believe that many of these features have great potential for positive impact,
                 <a
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
                   data-focusable={true}
-                  dir="auto"
                   href="https://en.wikipedia.org/wiki/Sepandar_Kamvar"
                   onClick={[Function]}
                   role="link"
@@ -6050,6 +6029,7 @@ We believe that many of these features have great potential for positive impact,
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -6168,6 +6148,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -6185,6 +6166,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -6204,6 +6186,7 @@ We believe that many of these features have great potential for positive impact,
               aria-level="4"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -6223,6 +6206,7 @@ We believe that many of these features have great potential for positive impact,
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(46,51,56,1.00)",
@@ -6264,6 +6248,7 @@ We believe that many of these features have great potential for positive impact,
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -6298,17 +6283,13 @@ We believe that many of these features have great potential for positive impact,
       }
     >
       <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
+        className="css-q7lffx"
       >
         <h2
           aria-level="2"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -6328,12 +6309,7 @@ We believe that many of these features have great potential for positive impact,
     </div>
   </div>
   <div
-    className="react-reveal"
-    style={
-      Object {
-        "opacity": undefined,
-      }
-    }
+    className="css-q7lffx"
   >
     <div
       className="css-view-1dbjc4n"
@@ -6385,6 +6361,7 @@ We believe that many of these features have great potential for positive impact,
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msGridRowAlign": "center",
               "paddingBottom": "0px",
               "paddingLeft": "10px",
               "paddingRight": "10px",
@@ -6431,6 +6408,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -6450,15 +6428,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="name"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -6487,6 +6463,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -6518,6 +6495,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -6578,6 +6556,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -6597,15 +6576,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="email"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -6634,6 +6611,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -6665,6 +6643,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -6709,6 +6688,7 @@ We believe that many of these features have great potential for positive impact,
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msGridRowAlign": "center",
               "paddingBottom": "0px",
               "paddingLeft": "10px",
               "paddingRight": "10px",
@@ -6755,6 +6735,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -6774,15 +6755,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="ideas"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 rows={3}
@@ -6812,6 +6791,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -6842,6 +6822,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -6882,6 +6863,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -6901,15 +6883,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="bio"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 rows={3}
@@ -6939,6 +6919,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -6969,6 +6950,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -7009,6 +6991,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -7028,15 +7011,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="deliverables"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 rows={3}
@@ -7066,6 +7047,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -7096,6 +7078,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -7136,6 +7119,7 @@ We believe that many of these features have great potential for positive impact,
                 <label
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(129,134,139,1.00)",
@@ -7155,15 +7139,13 @@ We believe that many of these features have great potential for positive impact,
                 autoCapitalize="sentences"
                 autoComplete="on"
                 autoCorrect="on"
-                className="css-textinput-1cwyjr8"
+                className="css-textinput-11aywtz"
                 data-focusable={true}
                 dir="auto"
-                name="resume"
                 onBlur={[Function]}
                 onChange={[Function]}
                 onFocus={[Function]}
                 onKeyDown={[Function]}
-                onKeyPress={[Function]}
                 onSelect={[Function]}
                 readOnly={false}
                 spellCheck={true}
@@ -7192,6 +7174,7 @@ We believe that many of these features have great potential for positive impact,
                     "marginRight": "0px",
                     "marginTop": "0px",
                     "msFlexItemAlign": "center",
+                    "msGridRowAlign": "center",
                     "outlineWidth": "0px",
                     "paddingBottom": "15px",
                     "paddingLeft": "10px",
@@ -7223,6 +7206,7 @@ We believe that many of these features have great potential for positive impact,
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "MozTransitionProperty": "opacity",
@@ -7269,6 +7253,7 @@ We believe that many of these features have great potential for positive impact,
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -7309,8 +7294,6 @@ We believe that many of these features have great potential for positive impact,
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "center",
@@ -7324,6 +7307,7 @@ We believe that many of these features have great potential for positive impact,
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
+                onClick={[Function]}
                 role="link"
                 style={
                   Object {
@@ -7394,6 +7378,7 @@ We believe that many of these features have great potential for positive impact,
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
@@ -7428,7 +7413,7 @@ We believe that many of these features have great potential for positive impact,
                 </svg>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
-                  dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "marginLeft": "10px",
@@ -7458,6 +7443,7 @@ We believe that many of these features have great potential for positive impact,
               <div
                 className="css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 style={
                   Object {
                     "MozTransitionProperty": "opacity",
