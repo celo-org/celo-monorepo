@@ -19,6 +19,7 @@ import { ErrorWithResponse } from '../request'
 import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { MessageBirdSmsProvider } from './messagebird'
 import { NexmoSmsProvider } from './nexmo'
+import { TelekomSmsProvider } from './telekom'
 import { TwilioSmsProvider } from './twilio'
 
 // Maximum delivery attempts (including first) regardless of provider
@@ -82,6 +83,12 @@ export async function initializeSmsProviders(
       throw new Error(`Providers in SMS_PROVIDERS must be unique: dupe: ${configuredSmsProvider}`)
     }
     switch (configuredSmsProvider) {
+      case SmsProviderType.TELEKOM:
+        const telekomProvider = TelekomSmsProvider.fromEnv()
+        await telekomProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
+        smsProviders.push(telekomProvider)
+        smsProvidersByType[SmsProviderType.TELEKOM] = telekomProvider
+        break
       case SmsProviderType.MESSAGEBIRD:
         const messageBirdProvider = MessageBirdSmsProvider.fromEnv()
         await messageBirdProvider.initialize(

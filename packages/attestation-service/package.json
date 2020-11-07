@@ -45,6 +45,7 @@
     "messagebird": "^3.5.0",
     "mysql2": "^2.1.0",
     "nexmo": "2.4.2",
+    "node-fetch": "^2.6.1",
     "pg": "7.12.1",
     "pg-hstore": "2.3.3",
     "prom-client": "11.2.0",
