@@ -406,12 +406,14 @@ export class KomenciKit {
     const signature = await wallet.signMetaTransaction(tx.txo, nonce)
     const rawMetaTx = toRawTransaction(wallet.executeMetaTransaction(tx.txo, signature).txo)
 
+    console.debug(`${TAG}/submitMetaTransaction Sending mtx to Komenci: ${rawMetaTx}`)
     const resp = await this.client.exec(submitMetaTransaction(rawMetaTx))
     if (!resp.ok) {
       return resp
     }
 
     const txHash = resp.result.txHash
+    console.debug(`${TAG}/submitMetaTransaction Waiting for transaction receipt: ${txHash}`)
     return this.waitForReceipt(txHash)
   }
 

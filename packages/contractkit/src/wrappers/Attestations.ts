@@ -419,6 +419,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
+   * Returns the list of accounts associated with an identifier.
+   * @param identifier Attestation identifier (e.g. phone hash)
+   */
+  lookupAccountsForIdentifier = proxyCall(this.contract.methods.lookupAccountsForIdentifier)
+
+  /**
    * Lookup mapped wallet addresses for a given list of identifiers
    * @param identifiers Attestation identifiers (e.g. phone hashes)
    */
@@ -701,7 +707,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   async revoke(identifer: string, account: Address) {
-    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const accounts = await this.lookupAccountsForIdentifier(identifer)
     const idx = accounts.findIndex((acc) => eqAddress(acc, account))
     if (idx < 0) {
       throw new Error("Account not found in identifier's accounts")

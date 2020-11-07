@@ -1044,8 +1044,8 @@ export function* feelessCompleteAttestation(
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
 
-  yield put(feelessCompleteAttestationCode(code))
   Logger.debug(TAG + '@feelessCompleteAttestation', `Attestation for issuer ${issuer} completed`)
+  yield put(feelessCompleteAttestationCode(code))
 }
 
 // Get the code from the store if it's already there, otherwise wait for it
