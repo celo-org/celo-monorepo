@@ -2,6 +2,7 @@ import { Result } from '@celo/base'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
+import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { KomenciKit } from '@celo/komencikit/lib/kit'
 import { FetchError, TxError } from '@celo/komencikit/src/errors'
@@ -223,12 +224,19 @@ function* registerStandbyTransaction(context: TransactionContext, value: string,
 
 async function formEscrowWithdrawTxWithNoCode(
   contractKit: ContractKit,
+  mtwWrapper: MetaTransactionWalletWrapper,
   escrowWrapper: EscrowWrapper,
+  stableTokenWrapper: StableTokenWrapper,
   paymentId: string,
   privateKey: string,
-  walletAddress: string
+  walletAddress: string,
+  metaTxWalletAddress: string,
+  value: BigNumber
 ) {
-  const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: walletAddress })
+  const msgHash = contractKit.web3.utils.soliditySha3({
+    type: 'address',
+    value: metaTxWalletAddress,
+  })
   const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
     .signature
   Logger.debug(
@@ -238,7 +246,9 @@ async function formEscrowWithdrawTxWithNoCode(
 
   const { r, s, v } = splitSignature(contractKit, signature)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
-  return withdrawTx
+  const transferTx = stableTokenWrapper.transfer(walletAddress, value.toNumber())
+  const batchedTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
+  return batchedTx
 }
 
 function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
@@ -271,15 +281,28 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       token: feelessVerificationState.komenci.sessionToken,
     })
 
-    const escrowWrapper: EscrowWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getEscrow,
+    const [stableTokenWrapper, escrowWrapper, mtwWrapper]: [
+      StableTokenWrapper,
+      EscrowWrapper,
+      MetaTransactionWalletWrapper
+    ] = yield all([
+      call([contractKit.contracts, contractKit.contracts.getStableToken]),
+      call([contractKit.contracts, contractKit.contracts.getEscrow]),
+      call([contractKit.contracts, contractKit.contracts.getMetaTransactionWallet], mtwAddress),
     ])
 
     const escrowPaymentIds: string[] = yield call(
       [escrowWrapper, escrowWrapper.getReceivedPaymentIds],
       phoneHash
     )
+
+    console.log('Payment IDs: ', escrowPaymentIds)
+
+    if (escrowPaymentIds.length === 0) {
+      Logger.debug(TAG + '@withdrawFromEscrow', 'No pending payments in escrow')
+      ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
+      return
+    }
 
     const paymentIdSet: Set<string> = new Set()
     for (const paymentId of escrowPaymentIds) {
@@ -291,18 +314,30 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
     // method on an instance of the MTW then submitting like usual
     const withdrawTxSuccess: boolean[] = []
     // Using an upper bound of 1000 to be sure this doesn't run forever
-    for (let i = 0; i < 1000; i += 1) {
+    for (let i = 0; i < 1000 && paymentIdSet.size > 0; i += 1) {
       const { paymentId, privateKey } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
       if (!paymentIdSet.has(paymentId)) {
+        continue
+      }
+      paymentIdSet.delete(paymentId)
+
+      const receivedPayment = yield call(getEscrowedPayment, escrowWrapper, paymentId)
+      const value = new BigNumber(receivedPayment[3])
+      if (!value.isGreaterThan(0)) {
+        Logger.warn(TAG + '@withdrawFromEscrowUsingPepper', 'Escrow payment is empty, skipping.')
         continue
       }
 
       const withdrawTx: CeloTransactionObject<boolean> = yield formEscrowWithdrawTxWithNoCode(
         contractKit,
+        mtwWrapper,
         escrowWrapper,
+        stableTokenWrapper,
         paymentId,
         privateKey,
-        walletAddress
+        walletAddress,
+        mtwAddress,
+        value
       )
 
       try {
@@ -322,7 +357,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         withdrawTxSuccess.push(true)
       } catch (error) {
         withdrawTxSuccess.push(false)
-        Logger.debug(
+        Logger.error(
           TAG + '@withdrawFromEscrowViaKomenci',
           'Unable to withdraw from escrow. Error: ',
           error
@@ -558,7 +593,7 @@ export function* watchVerificationEnd() {
       take(IdentityActions.FEELESS_SET_VERIFICATION_STATUS),
     ])
 
-    if (update.status === VerificationStatus.Done) {
+    if (update?.status === VerificationStatus.Done) {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
@@ -567,7 +602,7 @@ export function* watchVerificationEnd() {
       } else {
         yield call(withdrawFromEscrow)
       }
-    } else if (feelessUpdate.status === VerificationStatus.Done) {
+    } else if (feelessUpdate?.status === VerificationStatus.Done) {
       yield waitForNextBlock()
       yield call(withdrawFromEscrowUsingPepper, true)
     }

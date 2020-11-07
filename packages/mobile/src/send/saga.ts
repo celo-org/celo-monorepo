@@ -194,9 +194,18 @@ function* sendPaymentOrInviteSaga({
       throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }
 
-    if (recipientAddress) {
-      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
-    } else if (recipient.e164PhoneNumber) {
+    // if (recipientAddress) {
+    //   yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
+    // } else if (recipient.e164PhoneNumber) {
+    //   yield call(
+    //     sendInvite,
+    //     recipient.e164PhoneNumber,
+    //     inviteMethod || InviteBy.SMS,
+    //     amount,
+    //     CURRENCY_ENUM.DOLLAR
+    //   )
+    // }
+    if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,
         recipient.e164PhoneNumber,

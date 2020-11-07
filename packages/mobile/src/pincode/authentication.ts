@@ -138,6 +138,7 @@ export async function getPassword(
   passwordLock = true
   let password = getCachedPassword(account)
   if (password) {
+    passwordLock = false
     return password
   }
 
