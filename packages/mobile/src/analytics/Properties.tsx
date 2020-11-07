@@ -336,11 +336,25 @@ interface InviteEventsProperties {
     escrowIncluded: boolean
     error: string
   }
+  [InviteEvents.invite_start]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+  }
+  [InviteEvents.invite_complete]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+  }
+  [InviteEvents.invite_error]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+    error: string
+  }
   [InviteEvents.invite_method_sms]: undefined
   [InviteEvents.invite_method_whatsapp]: undefined
   [InviteEvents.invite_method_error]: {
     error: string
   }
+  [InviteEvents.invite_from_menu]: undefined
 }
 
 interface EscrowEventsProperties {
