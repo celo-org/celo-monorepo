@@ -6,7 +6,6 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
-import "./interfaces/IRegistry.sol";
 import "./ExternalCall.sol";
 import "./Initializable.sol";
 import "./Signatures.sol";
@@ -263,20 +262,18 @@ contract MetaTransactionWallet is
   }
 
   /**
-   * @notice Transfers all cUSD to the `signer`.
+   * @notice Transfers an ERC20 balance to the `signer`.
    * @dev Valora <= v1.2 ignores the `walletAddress` of the user, which may result in cUSD being
    *   sent to users MetaTransactionWallets instead of their EOA. This function allows that cUSD
    *   to be transferred to the EOA without requiring action by the user.
    * @dev Expected to be deprecated once support for withdrawing from the MTW is supported in
        Valora.
-   * @return Whether or not the cUSD transfer succeeded.
+   * @return Whether or not the token transfer succeeded.
    */
-  function transferCeloDollarsToSigner() external returns (bool) {
-    bytes32 STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
-    IRegistry registry = IRegistry(0x000000000000000000000000000000000000ce10);
-    IERC20 stable = IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
-    uint256 balance = stable.balanceOf(address(this));
-    return stable.transfer(signer, balance);
+  function transferERC20ToSigner(address tokenAddress) external returns (bool) {
+    IERC20 token = IERC20(tokenAddress);
+    uint256 balance = token.balanceOf(address(this));
+    return token.transfer(signer, balance);
   }
 
   /**

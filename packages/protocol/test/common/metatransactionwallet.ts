@@ -3,14 +3,11 @@ import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import {
-  ExchangeInstance,
-  GoldTokenInstance,
   MetaTransactionWalletContract,
   MetaTransactionWalletInstance,
-  StableTokenInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
 } from 'types'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
-import BigNumber from 'bignumber.js'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
@@ -600,27 +597,20 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     })
   })
 
-  describe('#transferCeloDollarsToSigner', () => {
-    let value: BigNumber
-    let stableToken: StableTokenInstance
+  describe('#transferERC20ToSigner', () => {
+    const value = 100
+    let mockStableToken: MockStableTokenInstance
     beforeEach(async () => {
-      const sellAmount = 1000
-      const exchange: ExchangeInstance = await getDeployedProxiedContract('Exchange', artifacts)
-      const goldToken: GoldTokenInstance = await getDeployedProxiedContract('GoldToken', artifacts)
-      stableToken = await getDeployedProxiedContract('StableToken', artifacts)
-      await goldToken.approve(exchange.address, sellAmount)
-      await exchange.sell(sellAmount, 0, true)
-      value = await stableToken.balanceOf(accounts[0])
-      assert.isTrue(value.isGreaterThan(0))
-      await stableToken.transfer(wallet.address, value)
-      assertEqualBN(await stableToken.balanceOf(wallet.address), value)
-      assertEqualBN(await stableToken.balanceOf(signer), 0)
+      mockStableToken = await MockStableTokenContract.new()
+      await mockStableToken.mint(wallet.address, value)
+      assertEqualBN(await mockStableToken.balanceOf(wallet.address), value)
+      assertEqualBN(await mockStableToken.balanceOf(signer), 0)
     })
 
     it('transfers all cUSD to the signer', async () => {
-      await wallet.transferCeloDollarsToSigner()
-      assertEqualBN(await stableToken.balanceOf(wallet.address), 0)
-      assertEqualBN(await stableToken.balanceOf(signer), value)
+      await wallet.transferERC20ToSigner(mockStableToken.address)
+      assertEqualBN(await mockStableToken.balanceOf(wallet.address), 0)
+      assertEqualBN(await mockStableToken.balanceOf(signer), value)
     })
   })
 })
