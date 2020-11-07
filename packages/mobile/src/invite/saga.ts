@@ -194,8 +194,10 @@ export function* sendInvite(
       }
     )
 
-    if (features.ESCROW_WITHOUT_CODE && amount) {
-      yield call(initiateEscrowTransfer, e164Number, amount)
+    if (features.ESCROW_WITHOUT_CODE) {
+      if (amount) {
+        yield call(initiateEscrowTransfer, e164Number, amount)
+      }
       yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
       return
     }

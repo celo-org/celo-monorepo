@@ -1,6 +1,8 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base'
+import { CELO_DERIVATION_PATH_BASE } from '@celo/base/lib/account'
 import { ContractKit } from '@celo/contractkit'
 import { generateDeterministicInviteCode } from '@celo/utils/lib/account'
+import { publicKeyToAddress } from '@celo/utils/lib/address'
 
 export const splitSignature = (contractKit: ContractKit, signature: string) => {
   const sig = trimLeading0x(signature)
@@ -10,11 +12,40 @@ export const splitSignature = (contractKit: ContractKit, signature: string) => {
   return { r, s, v }
 }
 
-export const generateEscrowPaymentId = (
+export const generateEscrowPaymentIdAndPk = (
+  recipientPhoneHash: string,
   recipientPepper: string,
   addressIndex: number = 0,
   changeIndex: number = 0,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ) => {
-  generateDeterministicInviteCode(pepper, addressIndex)
+  const { publicKey, privateKey } = generateDeterministicInviteCode(
+    recipientPhoneHash,
+    recipientPepper,
+    addressIndex,
+    changeIndex,
+    derivationPath
+  )
+  const paymentId = publicKeyToAddress(publicKey)
+  return { paymentId, privateKey }
+}
+
+export const generateUniquePaymentId = (
+  existingPaymentIds: string[],
+  phoneHash: string,
+  pepper: string
+) => {
+  const paymentIdSet: Set<string> = new Set()
+  for (const paymentId of existingPaymentIds) {
+    paymentIdSet.add(paymentId)
+  }
+
+  // Using an upper bound of 1000 to be sure this doesn't run forever given
+  // the realistic amount of pending escrow txs is far less than this
+  for (let i = 0; i < 1000; i += 1) {
+    const { paymentId } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
+    if (!paymentIdSet.has(paymentId)) {
+      return paymentId
+    }
+  }
 }

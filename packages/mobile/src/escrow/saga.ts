@@ -5,10 +5,9 @@ import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { KomenciKit } from '@celo/komencikit/lib/kit'
 import { FetchError, TxError } from '@celo/komencikit/src/errors'
-import { generateDeterministicInviteCode } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
-import { all, call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
+import { all, call, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
 import { EscrowEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -25,7 +24,11 @@ import {
   reclaimEscrowPaymentSuccess,
   storeSentEscrowPayments,
 } from 'src/escrow/actions'
-import { splitSignature } from 'src/escrow/utils'
+import {
+  generateEscrowPaymentIdAndPk,
+  generateUniquePaymentId,
+  splitSignature,
+} from 'src/escrow/utils'
 import { calculateFee } from 'src/fees/saga'
 import { features } from 'src/flags'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
@@ -155,14 +158,15 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
       phoneHash
     )
 
-    // Need to increment the derivation path of the paymentId based on
-    // how many are pending to avoid collisions with existing escrow txs
-    const addressIndex = escrowPaymentIds.length
-    const { publicKey, privateKey } = generateDeterministicInviteCode(pepper, addressIndex)
-    console.log('ESCROW DATA: ')
-    console.log(addressIndex, pepper)
-    console.log(publicKey, privateKey)
-    const paymentId = publicKey
+    const paymentId: string | undefined = generateUniquePaymentId(
+      escrowPaymentIds,
+      phoneHash,
+      pepper
+    )
+
+    if (!paymentId) {
+      throw Error('Could not generate a unique paymentId for escrow. Should never happen')
+    }
 
     // Approve a transfer of funds to the Escrow contract.
     Logger.debug(TAG + '@transferToEscrowWithoutCode', 'Approving escrow transfer')
@@ -219,12 +223,10 @@ async function formEscrowWithdrawTxWithNoCode(
   contractKit: ContractKit,
   escrowWrapper: EscrowWrapper,
   paymentId: string,
-  pepper: string,
-  walletAddress: string,
-  addressIndex: number
+  privateKey: string,
+  walletAddress: string
 ) {
   const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: walletAddress })
-  const { privateKey } = generateDeterministicInviteCode(pepper, addressIndex)
   const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
     .signature
   Logger.debug(
@@ -277,18 +279,28 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       phoneHash
     )
 
+    const paymentIdSet: Set<string> = new Set()
+    for (const paymentId of escrowPaymentIds) {
+      paymentIdSet.add(paymentId)
+    }
+
     const context = newTransactionContext(TAG, 'Withdraw from escrow')
     // TODO: Batch the tranasctions and submit them together via `executeTransactions`
     // method on an instance of the MTW then submitting like usual
     const withdrawTxSuccess: boolean[] = []
-    for (let i = 0; i < escrowPaymentIds.length; i += 1) {
+    // Using an upper bound of 1000 to be sure this doesn't run forever
+    for (let i = 0; i < 1000; i += 1) {
+      const { paymentId, privateKey } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
+      if (!paymentIdSet.has(paymentId)) {
+        continue
+      }
+
       const withdrawTx: CeloTransactionObject<boolean> = yield formEscrowWithdrawTxWithNoCode(
         contractKit,
         escrowWrapper,
-        escrowPaymentIds[i],
-        pepper,
-        walletAddress,
-        i
+        paymentId,
+        privateKey,
+        walletAddress
       )
 
       try {
@@ -536,10 +548,14 @@ export function* watchFetchSentPayments() {
 
 export function* watchVerificationEnd() {
   while (true) {
-    const update: SetVerificationStatusAction = yield take(IdentityActions.SET_VERIFICATION_STATUS)
-    const feelessUpdate: FeelessSetVerificationStatusAction = yield take(
-      IdentityActions.FEELESS_SET_VERIFICATION_STATUS
-    )
+    const [update, feelessUpdate]: [
+      SetVerificationStatusAction,
+      FeelessSetVerificationStatusAction
+    ] = yield race([
+      take(IdentityActions.SET_VERIFICATION_STATUS),
+      take(IdentityActions.FEELESS_SET_VERIFICATION_STATUS),
+    ])
+
     if (update.status === VerificationStatus.Done) {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
