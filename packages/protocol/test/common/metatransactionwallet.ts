@@ -601,7 +601,8 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
     const value = 100
     let mockStableToken: MockStableTokenInstance
     beforeEach(async () => {
-      mockStableToken = await MockStableTokenContract.new()
+      const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+      mockStableToken = await MockStableToken.new()
       await mockStableToken.mint(wallet.address, value)
       assertEqualBN(await mockStableToken.balanceOf(wallet.address), value)
       assertEqualBN(await mockStableToken.balanceOf(signer), 0)
