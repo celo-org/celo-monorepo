@@ -401,12 +401,29 @@ export const v5Schema = {
     },
     addressToDisplayName: {},
   },
+  exchange: {
+    ...v3Schema.exchange,
+    isLoading: false,
+  },
   app: {
     ...v3Schema.app,
     minVersion: null,
+    inviteModalVisible: false,
+  },
+}
+
+export const v6Schema = {
+  ...v5Schema,
+  web3: {
+    ...v5Schema.web3,
+    mtwAddress: null,
+  },
+  identity: {
+    ...v5Schema.identity,
+    walletToAccountAddress: {},
   },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v5Schema as Partial<RootState>
+  return v6Schema as Partial<RootState>
 }

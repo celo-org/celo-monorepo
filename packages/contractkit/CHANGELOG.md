@@ -5,17 +5,27 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[0.4.18--dev]**
+### **[0.4.19--dev]**
 Features
-- [one-line summary] - ( [link PR] )
+- ODIS Client Update - [#5621](https://github.com/celo-org/celo-monorepo/pull/5621)]
 
 Bug Fixes
 - [one-line summary] - ( [link PR] )
 
 Other Changes
-- [one-line summary - ( [link PR] )
+- Parallelize and simplify fetching of comprensive registry address map - [#5568](https://github.com/celo-org/celo-monorepo/pull/5568)
 
 ## Published
+
+### **[0.4.18]** -- 2020-10-30
+Features
+- CIP encryption - [#5091](https://github.com/celo-org/celo-monorepo/pull/5091)
+- ODIS Client Update - [#5621](https://github.com/celo-org/celo-monorepo/pull/5621)
+- KomenciKit - [#5436](https://github.com/celo-org/celo-monorepo/pull/5436)
+
+Other Changes
+- Small change for attestation service - [#5270](https://github.com/celo-org/celo-monorepo/pull/5270)
+- CIP-08 Compressed key support - [#5624](https://github.com/celo-org/celo-monorepo/pull/5624)
 
 ### **[0.4.17]** -- 2020-10-27
 Bug Fixes
@@ -41,5 +51,6 @@ Other Changes
 - Add blockchain parameters to network config - [#5319](https://github.com/celo-org/celo-monorepo/pull/5319)
 - Make initialization of the proxy part of the governance proposal - [#5481](https://github.com/celo-org/celo-monorepo/pull/5481)
 
+## Published
 ### **[0.4.14]** -- 2020-09-23
 _Note: Changes before and including 0.4.14 are not documented_

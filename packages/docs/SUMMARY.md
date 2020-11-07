@@ -25,7 +25,7 @@
 - [cUSD Holder Guide](celo-holder-guide/cusd.md)
 - [Using a Ledger Wallet](celo-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-holder-guide/release-gold.md)
-- [Voting on Validator Groups](celo-holder-guide/voting-validators.md)
+- [Voting for Validator Groups](celo-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-holder-guide/voting-governance.md)
 - [Recovering CELO from an Ethereum Address](celo-holder-guide/eth-recovery.md)
 
@@ -38,6 +38,7 @@
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Monitoring](operations-manual/monitoring.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
+- [Proxy Overview](operations-manual/proxy.md)
 - [Validator Explorer](operations-manual/validator-explorer.md)
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 
@@ -48,6 +49,7 @@
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
   - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
+  - [Local Development Chain w/ Protocol Contracts](developer-resources/walkthroughs/development-chain.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview](developer-resources/overview.md)
@@ -92,6 +94,7 @@
     - [General](developer-resources/integrations/general.md)
     - [Checklist](developer-resources/integrations/checklist.md)
     - [Custody](developer-resources/integrations/custody.md)
+    - [Listings](developer-resources/integrations/listings.md)
     - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
@@ -135,6 +138,7 @@
       - [identity/odis/query](developer-resources/contractkit/reference/modules/_identity_odis_query_.md)
       - [AuthenticationMethod](developer-resources/contractkit/reference/enums/_identity_odis_query_.authenticationmethod.md)
       - [ErrorMessages](developer-resources/contractkit/reference/enums/_identity_odis_query_.errormessages.md)
+      - [CustomSigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.customsigner.md)
       - [EncryptionKeySigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.encryptionkeysigner.md)
       - [MatchmakingRequest](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingrequest.md)
       - [MatchmakingResponse](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingresponse.md)
@@ -455,6 +459,7 @@
       - [ProposalTransactionJSON](developer-resources/contractkit/reference/interfaces/_governance_proposals_.proposaltransactionjson.md)
       - [BlsBlindingClient](developer-resources/contractkit/reference/interfaces/_identity_odis_bls_blinding_client_.blsblindingclient.md)
       - [PhoneNumberHashDetails](developer-resources/contractkit/reference/interfaces/_identity_odis_phone_number_identifier_.phonenumberhashdetails.md)
+      - [CustomSigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.customsigner.md)
       - [EncryptionKeySigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.encryptionkeysigner.md)
       - [MatchmakingRequest](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingrequest.md)
       - [MatchmakingResponse](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingresponse.md)
