@@ -3,6 +3,7 @@
   "cancel": "Cancelar",
   "allow": "Permitir",
   "address": "Número de Cuenta",
+  "phoneNumber": "Número de teléfono",
   "transaction": {
     "operation": "Operación",
     "data": "Datos",

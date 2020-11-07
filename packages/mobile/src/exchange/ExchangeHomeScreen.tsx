@@ -3,7 +3,7 @@ import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import { SettingsItemTextValue } from '@celo/react-components/components/SettingsItem'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
@@ -21,9 +21,10 @@ import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { useExchangeRate } from 'src/exchange/hooks'
 import { exchangeHistorySelector } from 'src/exchange/reducer'
+import RestrictedCeloExchange from 'src/exchange/RestrictedCeloExchange'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import InfoIcon from 'src/icons/InfoIcon.v2'
+import InfoIcon from 'src/icons/InfoIcon'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -34,6 +35,7 @@ import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import TransactionsList from 'src/transactions/TransactionsList'
+import { useCountryFeatures } from 'src/utils/countryFeatures'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
@@ -85,6 +87,8 @@ function ExchangeHomeScreen({ navigation }: Props) {
   }, [])
 
   const { t } = useTranslation(Namespaces.exchangeFlow9)
+
+  const { RESTRICTED_CP_DOTO } = useCountryFeatures()
 
   // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
   const localCurrencyCode = null
@@ -167,16 +171,22 @@ function ExchangeHomeScreen({ navigation }: Props) {
           </View>
 
           <CeloGoldHistoryChart />
-          <CeloExchangeButtons navigation={navigation} />
+          {RESTRICTED_CP_DOTO ? (
+            <RestrictedCeloExchange onPressWithdraw={goToWithdrawCelo} />
+          ) : (
+            <CeloExchangeButtons navigation={navigation} />
+          )}
           <ItemSeparator />
           <CeloGoldOverview testID="ExchangeAccountOverview" />
           <ItemSeparator />
-          <SettingsItemTextValue
-            title={t('withdrawCelo')}
-            onPress={goToWithdrawCelo}
-            testID={'WithdrawCELO'}
-            showChevron={true}
-          />
+          {!RESTRICTED_CP_DOTO && (
+            <SettingsItemTextValue
+              title={t('withdrawCelo')}
+              onPress={goToWithdrawCelo}
+              testID={'WithdrawCELO'}
+              showChevron={true}
+            />
+          )}
           <SectionHead text={t('global:activity')} />
           <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </SafeAreaView>
@@ -188,33 +198,15 @@ function ExchangeHomeScreen({ navigation }: Props) {
 export default ExchangeHomeScreen
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   contentContainer: {
     flexGrow: 1,
   },
   header: {
     alignItems: 'center',
   },
-  exchangeEvent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
   background: {
     flex: 1,
     justifyContent: 'space-between',
-  },
-  head: {
-    backgroundColor: colors.light,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 62,
-  },
-  hamburger: {
-    position: 'absolute',
-    left: 0,
   },
   goldPrice: {
     padding: variables.contentPadding,

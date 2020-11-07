@@ -20,12 +20,18 @@ export interface EncryptionKeySigner {
   rawKey: string
 }
 
+export interface CustomSigner {
+  authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER
+  customSigner: (body: string) => Promise<string>
+}
+
 // Support signing with the DEK or with the
-export type AuthSigner = WalletKeySigner | EncryptionKeySigner
+export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner
 
 export enum AuthenticationMethod {
   WALLET_KEY = 'wallet_key',
   ENCRYPTION_KEY = 'encryption_key',
+  CUSTOM_SIGNER = 'custom_signer',
 }
 
 export interface PhoneNumberPrivacyRequest {
@@ -70,6 +76,35 @@ export interface ServiceContext {
   odisPubKey: string
 }
 
+export const ODIS_ALFAJORES_CONTEXT: ServiceContext = {
+  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net',
+  odisPubKey:
+    'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
+}
+
+export const ODIS_ALFAJORESSTAGING_CONTEXT: ServiceContext = {
+  odisUrl: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
+  odisPubKey:
+    '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
+}
+
+export const ODIS_MAINNET_CONTEXT: ServiceContext = {
+  odisUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net',
+  odisPubKey:
+    'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
+}
+
+export function getServiceContext(contextName = 'mainnet') {
+  switch (contextName) {
+    case 'alfajores':
+      return ODIS_ALFAJORES_CONTEXT
+    case 'alfajoresstaging':
+      return ODIS_ALFAJORESSTAGING_CONTEXT
+    default:
+      return ODIS_MAINNET_CONTEXT
+  }
+}
+
 /**
  * Make a request to lookup the phone number identifier or perform matchmaking
  * @param signer type of key to sign with
@@ -98,8 +133,10 @@ export async function queryOdis<ResponseType>(
     const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
     const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
     debug(`Signature is valid: ${validSignature} signed by ${dek}`)
-  } else {
+  } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     authHeader = await signer.contractKit.web3.eth.sign(bodyString, body.account)
+  } else {
+    authHeader = await signer.customSigner(bodyString)
   }
 
   const { odisUrl } = context

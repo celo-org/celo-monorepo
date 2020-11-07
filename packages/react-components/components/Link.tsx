@@ -3,7 +3,7 @@
  */
 
 import Touchable, { Props as TouchableProps } from '@celo/react-components/components/Touchable'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
 
@@ -22,7 +22,7 @@ export default function Link(props: Props) {
 
 const styles = StyleSheet.create({
   text: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     fontSize: 13,
     textDecorationLine: 'underline',
   },

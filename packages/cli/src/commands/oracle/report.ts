@@ -40,6 +40,6 @@ export default class ReportPrice extends BaseCommand {
       'sortedOracles.report',
       await sortedOracles.report(res.args.token, value, res.flags.from)
     )
-    this.log(`Reported oracle value: ${value.toString} ${res.args.token} == 1 CELO`)
+    this.log(`Reported oracle value: ${value.toString()} ${res.args.token} == 1 CELO`)
   }
 }

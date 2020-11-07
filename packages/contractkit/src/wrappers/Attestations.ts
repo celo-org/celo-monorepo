@@ -11,6 +11,7 @@ import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
+  blocksToDurationString,
   proxyCall,
   toTransactionObject,
   valueToBigNumber,
@@ -64,6 +65,7 @@ export interface AttesationServiceRevealRequest {
   // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
+  language?: string
 }
 
 export interface UnselectedRequest {
@@ -177,6 +179,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
       await sleep(pollDurationSeconds * 1000)
     }
+    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
@@ -388,6 +391,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees.
+   * @return AttestationsConfig object
    */
   async getConfig(tokens: string[]): Promise<AttestationsConfig> {
     const fees = await Promise.all(
@@ -399,6 +403,18 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return {
       attestationExpiryBlocks: await this.attestationExpiryBlocks(),
       attestationRequestFees: fees,
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the attestations contract
+   * @return AttestationsConfig object
+   */
+  async getHumanReadableConfig(tokens: string[]) {
+    const config = await this.getConfig(tokens)
+    return {
+      attestationRequestFees: config.attestationRequestFees,
+      attestationExpiry: blocksToDurationString(config.attestationExpiryBlocks),
     }
   }
 
@@ -463,6 +479,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(identifier))
   }
 
+  /**
+   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
+  async selectIssuersAfterWait(
+    identifier: string,
+    account: string,
+    timeoutSeconds?: number,
+    pollDurationSeconds?: number
+  ) {
+    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
+    return this.selectIssuers(identifier)
+  }
+
+  /**
+   * Reveal phone number to issuer
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   * @param smsRetrieverAppSig?: Android app's hash
+   */
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
@@ -484,6 +524,33 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+    })
+  }
+
+  /**
+   * Returns reveal status from validator's attestation service
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   */
+  getRevealStatus(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string,
+    pepper?: string
+  ) {
+    const urlParams = new URLSearchParams({
+      phoneNumber,
+      salt: pepper ?? '',
+      issuer,
+      account,
+    })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 

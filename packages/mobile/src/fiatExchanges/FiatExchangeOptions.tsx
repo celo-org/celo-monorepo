@@ -1,30 +1,35 @@
-import ListItem from '@celo/react-components/components/ListItem'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { NavigationProp, RouteProp } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
-import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
 import { MOONPAY_RATE_API } from 'src/config'
 import { features } from 'src/flags'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import i18n from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import QuestionIcon from 'src/icons/QuestionIcon'
-import { moonpayLogo } from 'src/images/Images'
+import { moonpayLogo, simplexLogo } from 'src/images/Images'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
-import { emptyHeader, HeaderTitleWithSubtitle } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 
@@ -38,6 +43,7 @@ type Props = RouteProps
 interface Provider {
   image: React.ReactNode
   screen: keyof StackParamList
+  supportedCurrenciesNote?: string
 }
 
 export const fiatExchangesOptionsScreenOptions = ({
@@ -50,25 +56,11 @@ export const fiatExchangesOptionsScreenOptions = ({
   function showExplanation() {
     navigation.setParams({ isExplanationOpen: true })
   }
-  const amount = (
-    <CurrencyDisplay
-      amount={{
-        value: route.params.amount,
-        currencyCode: features.CUSD_MOONPAY_ENABLED
-          ? CURRENCIES[CURRENCY_ENUM.DOLLAR].code
-          : CURRENCIES[CURRENCY_ENUM.GOLD].code,
-      }}
-    />
-  )
+
   return {
     ...emptyHeader,
     headerLeft: () => <BackButton />,
-    headerTitle: () => (
-      <HeaderTitleWithSubtitle
-        title={amount}
-        subTitle={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`)}
-      />
-    ),
+    headerTitle: i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'addFunds' : 'cashOut'}`),
     headerRight: () => (
       <TopBarIconButton icon={<QuestionIcon color={colors.greenUI} />} onPress={showExplanation} />
     ),
@@ -84,8 +76,9 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   // All currency exchange calculations handled here as
   // different providers may provide different fiat, CELO and cUSD rates
 
+  const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const localCurrency = useSelector(getLocalCurrencyCode)
-  const { amount } = route.params
+  const amount = route.params.amount || new BigNumber(0)
 
   const goToProvider = (screen: keyof StackParamList) => {
     return () =>
@@ -119,10 +112,12 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       }
     }
     // TODO: Get rates from other providers when they are added
-    getMoonpayRates().catch((error) => {
-      Logger.error(TAG, `Failed to fetch Moonpay rate for ${localCurrency} at ${amount}`, error)
-      dispatch(showError(ErrorMessages.PROVIDER_RATE_FETCH_FAILED))
-    })
+    if (amount.isGreaterThan(0)) {
+      getMoonpayRates().catch((error) => {
+        Logger.error(TAG, `Failed to fetch Moonpay rate for ${localCurrency} at ${amount}`, error)
+        dispatch(showError(ErrorMessages.PROVIDER_RATE_FETCH_FAILED))
+      })
+    }
   }, [localCurrency, amount])
 
   const providers: {
@@ -137,24 +132,35 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     ],
     addFunds: [
       {
+        image: <Image source={simplexLogo} style={styles.simplexLogo} resizeMode={'contain'} />,
+        screen: Screens.Simplex,
+        supportedCurrenciesNote: t('onlyCeloDollars'),
+      },
+      {
         image: <Image source={moonpayLogo} style={styles.moonpayLogo} resizeMode={'contain'} />,
         screen: Screens.MoonPay,
+        supportedCurrenciesNote: t('onlyCelo'),
       },
     ],
   }
 
   const { isAddFunds } = route.params
-  const { t } = useTranslation('fiatExchangeFlow')
+
   return (
     <ScrollView style={styles.container}>
-      <SafeAreaView>
+      <SafeAreaView style={styles.content}>
         <Text style={styles.pleaseSelectProvider}>{t('pleaseSelectProvider')}</Text>
-        <View>
+        <View style={styles.providersContainer}>
           {providers[isAddFunds ? 'addFunds' : 'cashOut'].map((value, idx) => {
             return (
-              <ListItem key={idx} onPress={goToProvider(value.screen)}>
+              <TouchableOpacity
+                key={idx}
+                onPress={goToProvider(value.screen)}
+                style={styles.provider}
+              >
                 {value.image}
-              </ListItem>
+                <Text style={fontStyles.small}>{value.supportedCurrenciesNote}</Text>
+              </TouchableOpacity>
             )
           })}
         </View>
@@ -175,9 +181,9 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: variables.contentPadding,
   },
-  optionTitle: {
-    ...fontStyles.regular,
-    paddingLeft: variables.contentPadding,
+  content: {
+    flex: 1,
+    flexDirection: 'column',
   },
   pleaseSelectProvider: {
     ...fontStyles.regular,
@@ -187,6 +193,24 @@ const styles = StyleSheet.create({
   moonpayLogo: {
     height: 30,
     width: 104,
+  },
+  simplexLogo: {
+    height: 59,
+    width: 111,
+  },
+  providersContainer: {
+    flex: 1,
+  },
+  provider: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: variables.contentPadding,
+    paddingRight: variables.contentPadding,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray2,
+    marginLeft: variables.contentPadding,
   },
 })
 

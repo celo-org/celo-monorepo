@@ -4,7 +4,7 @@ import { resetAndUpgradeHelmChart, upgradeHelmChart, upgradeStaticIPs } from 'sr
 import {
   uploadEnvFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
-  uploadStaticNodesToGoogleStorage,
+  uploadTestnetStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
@@ -46,6 +46,6 @@ export const handler = async (argv: TestnetArgv) => {
   } else {
     await upgradeHelmChart(argv.celoEnv, argv.useExistingGenesis)
   }
-  await uploadStaticNodesToGoogleStorage(argv.celoEnv)
+  await uploadTestnetStaticNodesToGoogleStorage(argv.celoEnv)
   await uploadEnvFileToGoogleStorage(argv.celoEnv)
 }

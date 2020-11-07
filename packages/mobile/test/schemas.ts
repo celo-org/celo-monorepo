@@ -119,7 +119,7 @@ export const vNeg1Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: {},
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -264,7 +264,7 @@ export const v0Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: [],
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -382,6 +382,7 @@ export const v5Schema = {
   },
   identity: {
     ...v3Schema.identity,
+    lastRevealAttempt: null,
     verificationState: {
       isLoading: false,
       phoneHashDetails: {
@@ -396,12 +397,33 @@ export const v5Schema = {
         total: 0,
         completed: 0,
       },
-      isBalanceSufficient: true,
       lastFetch: null,
     },
+    addressToDisplayName: {},
+  },
+  exchange: {
+    ...v3Schema.exchange,
+    isLoading: false,
+  },
+  app: {
+    ...v3Schema.app,
+    minVersion: null,
+    inviteModalVisible: false,
+  },
+}
+
+export const v6Schema = {
+  ...v5Schema,
+  web3: {
+    ...v5Schema.web3,
+    mtwAddress: null,
+  },
+  identity: {
+    ...v5Schema.identity,
+    walletToAccountAddress: {},
   },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v5Schema as Partial<RootState>
+  return v6Schema as Partial<RootState>
 }

@@ -11,35 +11,43 @@ export ENVFILE="${ENVFILE:-.env.test}"
 # Flags:
 # -p: Platform (android or ios)
 # -v (Optional): Name of virual machine to run
-# -f (Optional): Fast (skip build step)
 # -r (Optional): Use release build (by default uses debug)
 # TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 # -n (Optional): Network delay (gsm, hscsd, gprs, edge, umts, hsdpa, lte, evdo, none)
 # -d (Optional): Run in dev mode, which doesn't rebuild or reinstall the app and doesn't restart the packager.
+# -t (Optional): Run a specific test file only.
 
 PLATFORM=""
 VD_NAME="Pixel_API_29_AOSP_x86_64"
-FAST=false
 RELEASE=false
 NET_DELAY="none"
 DEV_MODE=false
-while getopts 'p:frd' flag; do
+FILE_TO_RUN=""
+while getopts 'p:t:v:n:rd' flag; do
   case "${flag}" in
     p) PLATFORM="$OPTARG" ;;
     v) VD_NAME="$OPTARG" ;;
-    f) FAST=true ;;
     r) RELEASE=true ;;
     n) NET_DELAY="$OPTARG" ;;
     d) DEV_MODE=true ;;
+    t) FILE_TO_RUN=$OPTARG ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
+
+# Flakey tracker retries don't work well with these e2e tests, so we disable them.
+export NUM_RETRIES='0'
 
 [ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 echo "Network delay: $NET_DELAY"
 
 # Start the packager and wait until ready
 startPackager() {
+    if [ "$RELEASE" = true ]; then
+      echo "Skipping metro packager in release mode"
+      return
+    fi
+    
     echo "Starting metro packager"
     yarn react-native start &
 
@@ -78,18 +86,19 @@ preloadBundle() {
 }
 
 runTest() {
-  reuse_param=""
+  extra_param=""
   if [[ $DEV_MODE == true ]]; then
-    reuse_param="--reuse"
+    extra_param="--reuse"
   fi
   yarn detox test \
     --configuration $CONFIG_NAME \
+    "${FILE_TO_RUN}" \
     --artifacts-location e2e/artifacts \
     --take-screenshots=all \
     --record-logs=failing \
     --detectOpenHandles \
     --loglevel verbose \
-    "${reuse_param}"
+    "${extra_param}" 
   TEST_STATUS=$?
 }
 
@@ -127,44 +136,41 @@ if [ $PLATFORM = "android" ]; then
     CONFIG_NAME="android.emu.release"
   fi
 
-  if [ "$FAST" = false ]; then
-    echo "Configuring the app"
-    ./scripts/run_app.sh -p $PLATFORM -b
-  fi
-
   if [ $DEV_MODE = false ]; then
     echo "Building detox"
     yarn detox build -c $CONFIG_NAME
 
     startPackager
-  fi
-  
-  NUM_DEVICES=`adb devices -l | wc -l`
-  if [ $NUM_DEVICES -gt 2 ]; then
-    echo "Emulator already running or device attached. Please shutdown / remove first"
-    exit 1
-  fi
 
-  echo "Starting the emulator"
-  $ANDROID_SDK_ROOT/emulator/emulator \
-    -avd $VD_NAME \
-    -no-boot-anim \
-    -noaudio \
-    -no-snapshot \
-    -netdelay $NET_DELAY \
-    ${CI:+-gpu swiftshader_indirect -no-window} \
-    &
+    NUM_DEVICES=`adb devices -l | wc -l`
+    if [ $NUM_DEVICES -gt 2 ]; then
+      echo "Emulator already running or device attached. Please shutdown / remove first"
+      exit 1
+    fi
 
-  echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
-  until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
-  do
-    sleep 3
-  done
+    echo "Starting the emulator"
+    $ANDROID_SDK_ROOT/emulator/emulator \
+      -avd $VD_NAME \
+      -no-boot-anim \
+      -noaudio \
+      -no-snapshot \
+      -netdelay $NET_DELAY \
+      ${CI:+-gpu swiftshader_indirect -no-window} \
+      &
+
+    echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
+    until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
+    do
+      sleep 3
+    done
+  fi
 
   runTest
 
-  echo "Closing emulator (if active)"
-  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+  if [ $DEV_MODE = false ]; then
+    echo "Closing emulator (if active)"
+    adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+  fi
 
 elif [ $PLATFORM = "ios" ]; then
   echo "Using platform ios"
@@ -173,11 +179,6 @@ elif [ $PLATFORM = "ios" ]; then
     CONFIG_NAME="ios.sim.debug"
   else
     CONFIG_NAME="ios.sim.release"
-  fi
-
-  if [ "$FAST" = false ]; then
-    echo "Configuring the app"
-    ./scripts/run_app.sh -p $PLATFORM -b
   fi
 
   if [ $DEV_MODE = false ]; then

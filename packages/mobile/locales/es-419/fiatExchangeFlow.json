@@ -1,14 +1,21 @@
 {
   "addFunds": "Añadir Fondos",
+  "exchanges": "Intercambiar",
+  "buySellOnExchanges": "Comprar/Vender en Intercambios",
   "cashOut": "Retirar",
   "cashOutComingSoon": "Retirar (Muy Pronto)",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Monto (CELO)",
+  "onlyCeloDollars": "Solo cUSD",
+  "onlyCelo": "Solo CELO",
+  "tapToCopyCeloDollarsAddress": "`Toque para copiar su dirección de {{appName}} CUSD",
   "disclaimerCeloDollars": "Los valores del dólar celo son estimados.",
   "dollarsNotYetEnabledNote": "Los Celo Dólares aún no están disponibles en ningún proveedor. Para obtener Celo Dólares, compra CELO y cámbialos por Celo Dólares dentro de Valora, bajo la pestaña CELO.",
   "pleaseSelectProvider": "Selecciona un proveedor a continuación. Estos enlaces te conectan a un servicio de terceros.",
   "explanationModal": {
     "title": "Sobre proveedores",
     "body": "Los proveedores le permiten agregar fondos o retirar dinero de tu cuenta. Determinan tus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visite el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
-  }
+  },
+  "otherFundingOptions": "Para conocer más formas de agregar y retirar fondos, visite <0>Cómo depositar fondos en mi cuenta</0>",
+  "youCanTransfer": "Puedes transferir CELO y Celo Dólares desde/hacia los siguientes exchanges utilizando tu Número de Cuenta (también conocido como dirección de Celo) - toque abajo para copiar."
 }

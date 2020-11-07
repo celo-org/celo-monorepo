@@ -246,7 +246,7 @@ export class NotificationBox extends React.Component<Props, State> {
                 notificationType: NotificationBannerTypes.invite_prompt,
                 selectedAction: NotificationBannerCTATypes.accept,
               })
-              navigate(Screens.Invite)
+              // TODO: navigate to relevant invite flow
             },
           },
           {

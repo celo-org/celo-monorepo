@@ -77,14 +77,6 @@ project.ext.react = [
         enableHermes: true,  // clean and rebuild if changing
         hermesFlagsRelease: ["-w", "-O", "-output-source-map"],
         hermesFlagsDebug: ["-w", "-O", "-output-source-map"],
-        bundleInIntegration: true,
-        devDisabledInIntegration: true,
-        bundleInAlfajores: true,
-        devDisabledInAlfajores: true,
-        bundleInPilot: true,
-        devDisabledInPilot: true,
-        bundleInMainnet: true,
-        devDisabledInMainnet: true,
         cliPath: "../../node_modules/react-native/cli.js",
         hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes",
         composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
@@ -92,11 +84,13 @@ project.ext.react = [
 ]
 
 project.ext.envConfigFiles = [
-    debug: ".env",
-    integration: ".env.integration",
+    // IMPORTANT: longer variants should be first, as react-native-config plugin matches the first prefix it finds
+    alfajoresdev: ".env.alfajoresdev",
     alfajores: ".env.alfajores",
-    pilot: ".env.pilot",
+    mainnetdev: ".env.mainnetdev",
     mainnet: ".env.mainnet",
+    apptest: ".env.test",
+    "": ".env.alfajoresdev", // Fallback
 ]
 
 project.ext.sentryCli = [
@@ -109,9 +103,9 @@ apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
 /**
  * Build for Detox should be minSdkVersion >= 18
- * Use the taskname to recognize the build is for detox
+ * Use passed property to recognize the build is for detox
  */
-def isDetoxTestBuild = gradle.startParameter.taskNames.contains("assembleAndroidTest")
+def isDetoxTestBuild = Boolean.valueOf(project.properties['isDetoxBuild'] ?: 'false')
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -165,7 +159,7 @@ android {
         minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.0.1"
+        versionName "1.3.0"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "app_name", project.env.get("APP_DISPLAY_NAME")
@@ -203,38 +197,29 @@ android {
             signingConfig signingConfigs.debug
         }
 
-        integration {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
-        }
-
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
-
+    }
+    flavorDimensions "default"
+    productFlavors {
         alfajores {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
+            dimension "default"
         }
-
-        pilot {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
+        alfajoresdev {
+            dimension "default"
         }
-
         mainnet {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            matchingFallbacks = ['release']
+            dimension "default"
+        }
+        mainnetdev {
+            dimension "default"
+        }
+        // ProductFlavor names cannot start with 'test'
+        apptest {
+            dimension "default"
         }
     }
     // applicationVariants are e.g. debug, release
@@ -268,8 +253,8 @@ dependencies {
 
     def multidex_version = "2.0.1"
     implementation 'androidx.multidex:multidex:$multidex_version'
-    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation project(':react-native-geth')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
@@ -290,10 +275,6 @@ dependencies {
     if (enableHermes) {
         def hermesPath = "../../../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")
-        integrationImplementation files(hermesPath + "hermes-release.aar")
-        alfajoresImplementation files(hermesPath + "hermes-release.aar")
-        pilotImplementation files(hermesPath + "hermes-release.aar")
-        mainnetImplementation files(hermesPath + "hermes-release.aar")
         releaseImplementation files(hermesPath + "hermes-release.aar")
     } else {
         implementation jscFlavor

@@ -86,7 +86,7 @@ Celo is a project with a mission of financial inclusion that consists entirely o
 Learn more about Celo:
 
 - [Overview of Celo’s architecture ](overview.md)
-- [Technical blog posts](https://medium.com/celohq/technical/home)
+- [Technical blog posts](https://medium.com/celoorg/technology/home)
 
 Browse the code, raise an issue, or contribute a PR:
 
@@ -117,7 +117,7 @@ Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
 - [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
-- [Celo Subreddit](https://www.reddit.com/r/CeloHQ/)
+- [Celo Subreddit](https://www.reddit.com/r/celo/)
 - [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)
 

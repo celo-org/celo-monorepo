@@ -1,8 +1,8 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import { HeaderHeightContext, StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
@@ -24,7 +24,7 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Dialog from 'src/components/Dialog'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { importBackupPhrase } from 'src/import/actions'
-import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -225,18 +225,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 16,
   },
-  logo: {
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  loadingSpinnerContainer: {
-    marginVertical: 20,
-  },
   button: {
     paddingVertical: 16,
-  },
-  wordsInput: {
-    minHeight: 80,
   },
   explanation: {
     ...fontStyles.regular,
