@@ -50,6 +50,7 @@
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
   - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
+  - [Local Development Chain w/ Protocol Contracts](developer-resources/walkthroughs/development-chain.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview](developer-resources/overview.md)
