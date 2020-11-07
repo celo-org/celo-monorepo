@@ -19,6 +19,9 @@ metadata:
       location ~ /admin/.* {
         deny all;
       }
+      location ~ /wobserver/.* {
+        deny all;
+      }
 spec:
   tls:
   - hosts:
