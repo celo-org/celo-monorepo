@@ -329,7 +329,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         withdrawTxSuccess.push(true)
       } catch (error) {
         withdrawTxSuccess.push(false)
-        Logger.debug(
+        Logger.error(
           TAG + '@withdrawFromEscrowViaKomenci',
           'Unable to withdraw from escrow. Error: ',
           error
@@ -565,7 +565,7 @@ export function* watchVerificationEnd() {
       take(IdentityActions.FEELESS_SET_VERIFICATION_STATUS),
     ])
 
-    if (update.status === VerificationStatus.Done) {
+    if (update?.status === VerificationStatus.Done) {
       // We wait for the next block because escrow can not
       // be redeemed without all the attestations completed
       yield waitForNextBlock()
@@ -574,7 +574,7 @@ export function* watchVerificationEnd() {
       } else {
         yield call(withdrawFromEscrow)
       }
-    } else if (feelessUpdate.status === VerificationStatus.Done) {
+    } else if (feelessUpdate?.status === VerificationStatus.Done) {
       yield waitForNextBlock()
       yield call(withdrawFromEscrowUsingPepper, true)
     }
