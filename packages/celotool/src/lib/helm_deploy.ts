@@ -676,6 +676,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
+    `--set geth.secondaries="${fetchEnvOrFallback('SECONDARIES', '0')}"`,
     `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
       'ISTANBUL_REQUEST_TIMEOUT_MS',
       '3000'
@@ -869,7 +870,7 @@ function useStaticIPsForGethNodes() {
 }
 
 export async function checkHelmVersion() {
-  const requiredHelmVersion = 'v3.3'
+  const requiredHelmVersion = 'v3'
   const helmOK = await outputIncludes('helm version -c --short', requiredHelmVersion, `Checking local Helm version. Required ${requiredHelmVersion}`)
   if (helmOK) {
     return true

@@ -84,6 +84,7 @@ export interface StartSessionPayload {
 
 export const StartSessionResp = t.type({
   token: t.string,
+  callbackUrl: t.union([t.undefined, t.string]),
 })
 
 export type StartSessionResp = t.TypeOf<typeof StartSessionResp>
@@ -96,9 +97,15 @@ export const startSession = action<ActionTypes.StartSession, StartSessionPayload
 )
 
 interface GetDistributedBlindedPepperPayload {
-  e164Number: string
+  blindedPhoneNumber: string
   clientVersion: string
 }
+
+export const GetCombinedSignatureResp = t.type({
+  combinedSignature: t.string,
+})
+
+export type GetCombinedSignatureResp = t.TypeOf<typeof GetCombinedSignatureResp>
 
 export const GetDistributedBlindedPepperResp = t.type({
   identifier: t.string,
@@ -110,12 +117,12 @@ export type GetDistributedBlindedPepperResp = t.TypeOf<typeof GetDistributedBlin
 export const getDistributedBlindedPepper = action<
   ActionTypes.DistributedBlindedPepper,
   GetDistributedBlindedPepperPayload,
-  GetDistributedBlindedPepperResp
+  GetCombinedSignatureResp
 >(
   ActionTypes.DistributedBlindedPepper,
   RequestMethod.POST,
   'v1/distributedBlindedPepper',
-  GetDistributedBlindedPepperResp
+  GetCombinedSignatureResp
 )
 
 // export interface DeployWalletPayload {}

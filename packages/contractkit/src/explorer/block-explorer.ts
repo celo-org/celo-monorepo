@@ -1,13 +1,11 @@
 import { Address } from '@celo/utils/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
+import BigNumber from 'bignumber.js'
+import debugFactory from 'debug'
 import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { CeloContract } from '../base'
-import {
-  getInitializeAbiOfImplementation,
-  PROXY_ABI,
-  PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE,
-  PROXY_SET_IMPLEMENTATION_SIGNATURE,
-} from '../governance/proxy'
+import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
 import {
@@ -16,6 +14,8 @@ import {
   mapFromPairs,
   obtainKitContractDetails,
 } from './base'
+
+const debug = debugFactory('kit:explorer:block')
 
 export interface CallDetails {
   contract: string
@@ -125,32 +125,28 @@ export class BlockExplorer {
       return null
     }
 
-    const contract =
-      matchedAbi.signature === PROXY_SET_IMPLEMENTATION_SIGNATURE ||
-      matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE
-        ? contractMapping.details.name + 'Proxy'
-        : contractMapping.details.name
-
     const { args, params } = parseDecodedParams(
       abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
-    // Transform delegate call data into a readable params map
-    if (
-      matchedAbi.signature === PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE &&
-      args.length === 2
-    ) {
-      const initializeAbi = getInitializeAbiOfImplementation(contract)
-      const encodedInitializeParameters = args[1].slice(10)
+    // transform numbers to big numbers in params
+    matchedAbi.inputs!.forEach((abiInput, idx) => {
+      if (abiInput.type === 'uint256') {
+        debug('transforming number param')
+        params[abiInput.name] = new BigNumber(args[idx])
+      }
+    })
 
-      const { params: initializeParams } = parseDecodedParams(
-        abi.decodeParameters(initializeAbi.inputs!, encodedInitializeParameters)
-      )
-      params[`initialize@${abi.encodeFunctionSignature(initializeAbi)}`] = initializeParams
-    }
+    // transform fixidity values to fractions in params
+    Object.keys(params)
+      .filter((key) => key.includes('fraction')) // TODO: come up with better enumeration
+      .forEach((fractionKey) => {
+        debug('transforming fixed number param')
+        params[fractionKey] = fromFixed(params[fractionKey])
+      })
 
     return {
-      contract,
+      contract: contractMapping.details.name,
       function: matchedAbi.name!,
       paramMap: params,
       argList: args,
