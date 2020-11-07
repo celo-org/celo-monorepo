@@ -114,7 +114,7 @@ Distribution of an image should occur along the following schedule:
     <td>T+1w</td>
     <td>
       <ol>
-        <li>Confirm Baklava users have upgraded without issues and that Baklava atttestation bots run successfully</li>
+        <li>Confirm Baklava users have upgraded without issues and that Baklava attestation bots run successfully</li>
         <li>Communicate T+2w Mainnet upgrade date</li>
         <li>Tag released Docker image with <code>attestation-service-mainnet</code> (removing tag from other releases)</li>
       </ol>
