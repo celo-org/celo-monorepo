@@ -264,9 +264,11 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Transfers all cUSD to the `signer`.
-   * @dev Valora v1.2 ignores the `walletAddress` of the user, which may result in cUSD being
+   * @dev Valora <= v1.2 ignores the `walletAddress` of the user, which may result in cUSD being
    *   sent to users MetaTransactionWallets instead of their EOA. This function allows that cUSD
    *   to be transferred to the EOA without requiring action by the user.
+   * @dev Expected to be deprecated once support for withdrawing from the MTW is supported in
+       Valora.
    * @return Whether or not the cUSD transfer succeeded.
    */
   function transferCeloDollarsToSigner() external returns (bool) {
