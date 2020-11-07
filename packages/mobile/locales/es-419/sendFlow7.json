@@ -48,6 +48,7 @@
   "walletAddress": "Dirección del Monedero",
   "inviteWithoutPayment": "Hola {{name}}! He estado usando {{appName}} para enviar dinero alrededor del mundo. Es facil de probar y me gustaría invitarte a hacerlo con este link: {{link}}",
   "inviteWithEscrowedPayment": "Hola {{name}}! He estado usando {{appName}} para enviar dinero alrededor del mundo. Acabo de enviarte {{amount}} Celo Dólares. Puedes descargar la App {{appName}} y usar tus Celo Dólares usando este link: {{link}.",
+  "inviteWithEscrowAndNoCode": "¡Bienvenido a Valora, {{name}}! Te he enviado Celo Dollars. Ve a {{link}} para comenzar",
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",

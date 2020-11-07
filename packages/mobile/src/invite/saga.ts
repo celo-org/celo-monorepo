@@ -26,7 +26,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
+import { ALERT_BANNER_DURATION, APP_STORE_ID, DYNAMIC_LINK_DOMAIN } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -183,16 +183,24 @@ export function* sendInvite(
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
     const name = yield select(nameSelector)
 
-    const link = yield call(generateInviteLink, inviteCode)
-    // TODO: Change copy for escrow txs without a code
-    const message = i18n.t(
-      amount ? 'sendFlow7:inviteWithEscrowedPayment' : 'sendFlow7:inviteWithoutPayment',
-      {
-        name,
-        amount: amount?.toString(),
-        link,
-      }
-    )
+    const link = features.ESCROW_WITHOUT_CODE
+      ? DYNAMIC_LINK_DOMAIN
+      : yield call(generateInviteLink, inviteCode)
+
+    let messageProp
+    if (features.ESCROW_WITHOUT_CODE && amount) {
+      messageProp = 'sendFlow7:inviteWithEscrowAndNoCode'
+    } else if (amount) {
+      messageProp = 'sendFlow7:inviteWithEscrowedPayment'
+    } else {
+      messageProp = 'sendFlow7:inviteWithoutPayment'
+    }
+
+    const message = i18n.t(messageProp, {
+      name,
+      amount: amount?.toString(),
+      link,
+    })
 
     if (features.ESCROW_WITHOUT_CODE) {
       if (amount) {

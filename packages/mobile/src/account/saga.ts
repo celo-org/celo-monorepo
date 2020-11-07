@@ -18,8 +18,8 @@ import { FIREBASE_ENABLED } from 'src/config'
 import { firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
 import { refreshAllBalances } from 'src/home/actions'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { feelessFetchVerificationState } from 'src/identity/feelessVerification'
+import { fetchVerificationState } from 'src/identity/verification'
 import { removeAccountLocally } from 'src/pincode/authentication'
 import { persistor } from 'src/redux/store'
 import { restartApp } from 'src/utils/AppRestart'
@@ -77,7 +77,8 @@ function* initializeAccount() {
     Logger.debug(TAG + '@initializeAccount', 'Account creation success')
     ValoraAnalytics.track(OnboardingEvents.initialize_account_complete)
     yield put(initializeAccountSuccess())
-    navigate(Screens.VerificationEducationScreen)
+    yield call(fetchVerificationState, true)
+    yield call(feelessFetchVerificationState)
   } catch (e) {
     Logger.error(TAG, 'Failed to initialize account', e)
     ValoraAnalytics.track(OnboardingEvents.initialize_account_error, { error: e.message })
