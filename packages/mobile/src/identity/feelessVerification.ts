@@ -594,25 +594,17 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     return null
   }
 
-  // TODO: Incorporate fix for the error on this and remove try/catch block
-  let verificationResults: Array<Result<true, WalletValidationError>>
-  try {
-    verificationResults = yield all(
-      possibleMtwAddresses.map((possibleMtwAddress) =>
-        call(
-          verifyWallet,
-          contractKit,
-          possibleMtwAddress,
-          ALLOWED_MTW_IMPLEMENTATIONS,
-          walletAddress
-        )
+  const verificationResults: Array<Result<true, WalletValidationError>> = yield all(
+    possibleMtwAddresses.map((possibleMtwAddress) =>
+      call(
+        verifyWallet,
+        contractKit,
+        possibleMtwAddress,
+        ALLOWED_MTW_IMPLEMENTATIONS,
+        walletAddress
       )
     )
-  } catch (error) {
-    Logger.debug(TAG, '@fetchVerifiedMtw', 'Unable to validate existing verified accounts')
-    Logger.error(TAG, '@fetchVerifiedMtw', error)
-    return null
-  }
+  )
 
   const verifiedMtwAddresses = possibleMtwAddresses.filter(
     (address, i) => verificationResults[i].ok

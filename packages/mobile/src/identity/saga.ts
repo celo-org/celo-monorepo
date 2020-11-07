@@ -97,7 +97,7 @@ export function* validateRecipientAddressSaga({
     }
   }
 }
-// TODO: Replicate this for feeless
+
 function* handleFetchVerificationState(action: FetchVerificationState) {
   const { forceUnlockAccount } = action
   yield call(fetchVerificationState, forceUnlockAccount)
