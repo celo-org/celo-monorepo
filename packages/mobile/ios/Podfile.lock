@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.8.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.317)
+  - CeloBlockchain (0.0.319)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
