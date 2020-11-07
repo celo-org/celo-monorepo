@@ -224,11 +224,17 @@ function* registerStandbyTransaction(context: TransactionContext, value: string,
 async function formEscrowWithdrawTxWithNoCode(
   contractKit: ContractKit,
   escrowWrapper: EscrowWrapper,
+  escrowWrapper: EscrowWrapper,
+  stableTokenWrapper: StableTokenWrapper,
   paymentId: string,
   privateKey: string,
-  walletAddress: string
+  walletAddress: string,
+  metaTransactionWalletAddress: string
 ) {
-  const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: walletAddress })
+  const msgHash = contractKit.web3.utils.soliditySha3({
+    type: 'address',
+    value: metaTranasctionWalletAddress,
+  })
   const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
     .signature
   Logger.debug(
@@ -238,7 +244,11 @@ async function formEscrowWithdrawTxWithNoCode(
 
   const { r, s, v } = splitSignature(contractKit, signature)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
-  return withdrawTx
+  // If we've already queried the escrowed payment details elsewhere, we can avoid having to make a
+  // view call here for our cUSD balance.
+  const transferTx = stableTokenWrapper.transfer(walletAddress, value)
+  const batchedTx = mtwWrapper.executeTransactions([withdrawTx, transferTx])
+  return batchedTx
 }
 
 function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
