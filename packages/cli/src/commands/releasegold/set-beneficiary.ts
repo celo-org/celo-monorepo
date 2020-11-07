@@ -1,16 +1,16 @@
 import { flags } from '@oclif/command'
 import prompts from 'prompts'
+import { ReleaseGoldBaseCommand } from '../../release-gold-base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { ReleaseGoldCommand } from './release-gold'
 
-export default class SetBeneficiary extends ReleaseGoldCommand {
+export default class SetBeneficiary extends ReleaseGoldBaseCommand {
   static description =
     "Set the beneficiary of the ReleaseGold contract. This command is gated via a multi-sig, so this is expected to be called twice: once by the contract's beneficiary and once by the contract's releaseOwner. Once both addresses call this command with the same parameters, the tx will execute."
 
   static flags = {
-    ...ReleaseGoldCommand.flags,
+    ...ReleaseGoldBaseCommand.flags,
     from: Flags.address({
       required: true,
       description: 'Address to submit multisig transaction from (one of the owners)',

@@ -1,391 +1,153 @@
-import TextInput from '@celo/react-components/components/TextInput'
-import ValidatedTextInput, {
-  PhoneValidatorProps,
-} from '@celo/react-components/components/ValidatedTextInput'
+import Expandable from '@celo/react-components/components/Expandable'
+import FormField from '@celo/react-components/components/FormField'
+import FormTextInput from '@celo/react-components/components/FormTextInput'
+import Touchable from '@celo/react-components/components/Touchable'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import SmsRetriever from '@celo/react-native-sms-retriever'
-import { Countries } from '@celo/utils/src/countries'
+import { LocalizedCountry } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
-import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import * as React from 'react'
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Autocomplete from 'react-native-autocomplete-input'
+import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
+import React, { useRef } from 'react'
+import { Platform, StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const TAG = 'PhoneNumberInput'
 
+async function requestPhoneNumber() {
+  let phoneNumber
+  try {
+    if (Platform.OS === 'android') {
+      phoneNumber = await SmsRetriever.requestPhoneNumber()
+    } else {
+      console.info(`${TAG}/requestPhoneNumber`, 'Not implemented in this platform')
+    }
+    return parsePhoneNumber(phoneNumber, '')
+  } catch (error) {
+    console.info(`${TAG}/requestPhoneNumber`, 'Could not request phone', error)
+  }
+}
+
 interface Props {
-  style?: any
-  defaultCountry?: string | null
-  setE164Number: (e164Number: string) => void
-  setCountryCode: (countryCode: string) => void
-  setIsValidNumber: (isValid: boolean) => void
-  setRegionCode?: (regionCode: string) => void
-  onInputFocus?: () => void
-  onInputChange?: () => void
-  onEndEditingPhoneNumber?: () => void
-  onEndEditingCountryCode?: () => void
-  inputCountryPlaceholder?: string
-  initialInputPhonePlaceholder?: string
-  lng?: string
-  callingCode?: boolean
-  defaultCountryCode?: string
-  defaultPhoneNumber?: string
+  label: string
+  style?: StyleProp<ViewStyle>
+  country: LocalizedCountry | undefined
+  nationalPhoneNumber: string
+  onPressCountry?: () => void
+  onChange?: (nationalPhoneNumber: string, countryCallingCode: string) => void
+  editable?: boolean
 }
 
-interface State {
-  countryQuery: string
-  countryCallingCode: string
-  regionCode: string
-  phoneNumber: string
-  countries: Countries
-  inputPhonePlaceholder?: string
-  country?: string
-}
+export default function PhoneNumberInput({
+  label,
+  style,
+  country,
+  nationalPhoneNumber,
+  onPressCountry,
+  onChange,
+  editable = true,
+}: Props) {
+  const shouldRequestPhoneNumberRef = useRef(nationalPhoneNumber.length === 0)
+  const flagEmoji = country?.emoji
+  const countryCallingCode = country?.countryCallingCode ?? ''
+  const numberPlaceholder = country?.countryPhonePlaceholder.national ?? ''
 
-export default class PhoneNumberInput extends React.Component<Props, State> {
-  state = {
-    countryQuery: '',
-    countryCallingCode: '',
-    regionCode: '',
-    phoneNumber: '',
-    // country data should be fetched before mounting to prevent a second render
-    countries: new Countries(this.props.lng),
-    inputPhonePlaceholder: this.props.initialInputPhonePlaceholder,
+  async function onPressCountryInternal() {
+    const handled = await requestPhoneNumberIfNecessary()
+    if (handled || !onPressCountry) {
+      return
+    }
+
+    onPressCountry()
   }
 
-  componentDidMount() {
-    if (this.props.defaultCountry) {
-      this.changeCountryQuery(this.props.defaultCountry)
+  // Returns true if handled
+  async function requestPhoneNumberIfNecessary() {
+    if (!shouldRequestPhoneNumberRef.current) {
+      return false
+    }
+    shouldRequestPhoneNumberRef.current = false
+
+    const parsedPhoneNumber = await requestPhoneNumber()
+    if (!parsedPhoneNumber || !onChange) {
+      return false
     }
 
-    if (this.props.defaultCountryCode) {
-      const country = this.state.countries.getCountryByPhoneCountryCode(
-        this.props.defaultCountryCode
-      )
-
-      this.changeCountryQuery(country.displayName)
-    }
-
-    if (this.props.defaultPhoneNumber) {
-      this.onChangePhoneNumber(this.props.defaultPhoneNumber)
-    }
+    onChange(parsedPhoneNumber.displayNumber, `+${parsedPhoneNumber.countryCode}`)
+    return true
   }
 
-  async getPhoneNumberFromNativePickerAndroid() {
-    try {
-      try {
-        return SmsRetriever.requestPhoneNumber()
-      } catch (error) {
-        console.info(
-          `${TAG}/triggerPhoneNumberRequestAndroid`,
-          'Could not request phone. This might be thrown if the user dismissed the modal',
-          error
-        )
-        return
-      }
-    } catch (error) {
-      console.info(`${TAG}/triggerPhoneNumberRequestAndroid`, 'Could not request phone', error)
+  function onChangePhoneNumber(newNationalPhoneNumber: string) {
+    if (onChange) {
+      onChange(newNationalPhoneNumber, countryCallingCode)
     }
   }
 
-  async triggerPhoneNumberRequest() {
-    let phone
-    try {
-      if (Platform.OS === 'android') {
-        phone = await this.getPhoneNumberFromNativePickerAndroid()
-      } else {
-        console.info(`${TAG}/triggerPhoneNumberRequest`, 'Not implemented in this platform')
-      }
-      const phoneNumber = parsePhoneNumber(phone, '')
-      if (!phoneNumber) {
-        return
-      }
-      this.setState({ phoneNumber: phoneNumber.displayNumber.toString() })
-
-      // A country code is not enough to know the country of a phone number (e.g. both the US and Canada share the +1)
-      // To get the country a Region Code is required, a two-letter country/region identifier (ISO-3166-1 Alpha2)
-      const regionCode = phoneNumber.regionCode
-
-      if (regionCode) {
-        const displayName = this.state.countries.getCountryByCode(regionCode).displayName
-        this.changeCountryQuery(displayName)
-      }
-    } catch (error) {
-      console.info(`${TAG}/triggerPhoneNumberRequest`, 'Could not request phone', error)
-    }
-  }
-
-  onCountryFocus = async () => {
-    if (this.props.onInputFocus) {
-      await this.props.onInputFocus()
-    }
-
-    if (!(this.state.phoneNumber || this.state.countryQuery)) {
-      return this.triggerPhoneNumberRequest()
-    }
-  }
-
-  changeCountryQuery = (countryQuery: string) => {
-    if (this.props.onInputChange) {
-      this.props.onInputChange()
-    }
-
-    const country = this.state.countries.getCountry(countryQuery)
-
-    if (country) {
-      const countryCallingCode = country.countryCallingCodes[0]
-      const regionCode = getRegionCodeFromCountryCode(countryCallingCode) || ''
-      this.setState(
-        {
-          countryQuery,
-          countryCallingCode,
-          regionCode,
-          // @ts-ignore
-          inputPhonePlaceholder: country.countryPhonePlaceholder.national,
-        },
-        // Reparse phone number in case user entered that first
-        () => this.onChangePhoneNumber(this.state.phoneNumber)
-      )
-      this.props.setCountryCode(countryCallingCode)
-      if (this.props.setRegionCode) {
-        this.props.setRegionCode(regionCode)
-      }
-    } else {
-      this.setState({
-        countryQuery,
-        countryCallingCode: '',
-        regionCode: '',
-      })
-      this.props.setCountryCode('')
-      if (this.props.setRegionCode) {
-        this.props.setRegionCode('')
-      }
-    }
-  }
-
-  onChangePhoneNumber = (phoneNumber: string) => {
-    if (this.props.onInputChange) {
-      this.props.onInputChange()
-    }
-    const { countryCallingCode } = this.state
-
-    const phoneDetails = parsePhoneNumber(phoneNumber, countryCallingCode)
-
-    if (phoneDetails) {
-      this.setState({
-        phoneNumber: phoneDetails.displayNumber,
-      })
-      this.props.setE164Number(phoneDetails.e164Number)
-      this.props.setIsValidNumber(true)
-    } else {
-      this.setState({
-        phoneNumber,
-      })
-      this.props.setE164Number('')
-      this.props.setIsValidNumber(false)
-    }
-  }
-
-  keyExtractor = (item: string, index: number) => {
-    return item
-  }
-
-  renderItem = ({ item: countryCode }: { item: string }) => {
-    const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(
-      countryCode
-    )
-    const onPress = () => this.changeCountryQuery(displayName)
-
-    return (
-      <TouchableOpacity onPress={onPress}>
-        <View style={style.selectCountry}>
-          <Text style={[style.autoCompleteItemText, style.emoji]}>{emoji}</Text>
-          {this.props.callingCode && (
-            <View style={style.callingCode}>
-              <Text style={style.autoCompleteItemText}>{countryCallingCodes[0]}</Text>
-            </View>
-          )}
-          <View style={style.countrySelectText}>
-            <Text style={style.autoCompleteItemText}>{displayName}</Text>
+  return (
+    <FormField style={[styles.container, style]} label={label}>
+      <View style={styles.phoneNumberContainer}>
+        <Touchable
+          onPress={onPressCountryInternal}
+          style={styles.countryCodeContainer}
+          testID="CountrySelectionButton"
+          disabled={!editable}
+        >
+          <View style={styles.countryCodeContent}>
+            <Expandable isExpandable={editable} isExpanded={false}>
+              <Text style={styles.flag} testID={'countryCodeFlag'}>
+                {flagEmoji}
+              </Text>
+              <Text style={styles.phoneCountryCode} testID={'countryCodeText'}>
+                {countryCallingCode}
+              </Text>
+            </Expandable>
           </View>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
-  renderTextInput = (props: any) => {
-    return (
-      <TextInput
-        {...props}
-        value={this.state.countryQuery}
-        underlineColorAndroid="transparent"
-        onFocus={this.onCountryFocus}
-        placeholderTextColor={colors.inactive}
-        testID={props.testID + 'TextInput'}
-      />
-    )
-  }
-
-  render() {
-    const { countryCallingCode, countryQuery } = this.state
-    const filteredCountries = this.state.countries.getFilteredCountries(countryQuery)
-    const { style: propsStyle, defaultCountry: defaultCountryName } = this.props
-
-    const { displayName: defaultDisplayName, emoji } = this.state.countries.getCountry(
-      defaultCountryName
-    )
-
-    return (
-      <View style={[propsStyle, style.container]}>
-        {!defaultDisplayName && (
-          <Autocomplete
-            autoCapitalize="none"
-            autoCorrect={false}
-            listContainerStyle={style.autoCompleteDropDown}
-            inputContainerStyle={[style.borderedBox, style.inputBox, style.inputCountry]}
-            listStyle={[style.borderedBox, style.listAutocomplete]}
-            data={filteredCountries}
-            keyExtractor={this.keyExtractor}
-            defaultValue={countryQuery}
-            onChangeText={this.changeCountryQuery}
-            onEndEditing={this.props.onEndEditingCountryCode}
-            placeholder={this.props.inputCountryPlaceholder}
-            renderItem={this.renderItem}
-            renderTextInput={this.renderTextInput}
-            testID="CountryNameField"
-          />
-        )}
-        {!!defaultDisplayName && (
-          <View style={[style.borderedBox, style.inputBox, style.defaultCountryContainer]}>
-            <Text style={style.defaultCountryFlag}>{emoji}</Text>
-            <Text style={style.defaultCountryName}>{defaultDisplayName}</Text>
-          </View>
-        )}
-        <View style={[style.phoneNumberContainer, style.borderedBox]}>
-          <Text style={style.phoneCountryCode} testID={'countryCodeText'}>
-            {countryCallingCode}
-          </Text>
-          <View style={style.line} />
-          <ValidatedTextInput<PhoneValidatorProps>
-            style={[style.inputBox, style.phoneNumberInput]}
-            placeholderTextColor={colors.inactive}
-            onChangeText={this.onChangePhoneNumber}
-            onEndEditing={this.props.onEndEditingPhoneNumber}
-            value={this.state.phoneNumber}
-            underlineColorAndroid="transparent"
-            placeholder={this.state.inputPhonePlaceholder}
-            keyboardType="phone-pad"
-            testID="PhoneNumberField"
-            validator={ValidatorKind.Phone}
-            countryCallingCode={this.state.countryCallingCode}
-          />
-        </View>
+        </Touchable>
+        <ValidatedTextInput
+          InputComponent={FormTextInput}
+          style={styles.phoneNumberInput}
+          value={nationalPhoneNumber}
+          placeholder={numberPlaceholder}
+          keyboardType="phone-pad"
+          testID="PhoneNumberField"
+          validator={ValidatorKind.Phone}
+          countryCallingCode={countryCallingCode}
+          onFocus={requestPhoneNumberIfNecessary}
+          onChangeText={onChangePhoneNumber}
+          editable={editable}
+        />
       </View>
-    )
-  }
+    </FormField>
+  )
 }
 
-const style = StyleSheet.create({
-  container: {
-    position: 'relative',
-    backgroundColor: colors.background,
-  },
-  borderedBox: {
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-  },
-  inputBox: {
-    height: 50,
-  },
+const styles = StyleSheet.create({
+  container: {},
   phoneNumberContainer: {
-    marginTop: 5,
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 2,
+    alignItems: 'stretch',
+  },
+  countryCodeContainer: {
+    width: 112,
+    paddingHorizontal: 12,
+    alignItems: 'stretch',
+    backgroundColor: colors.light,
+    borderRadius: 8,
+  },
+  countryCodeContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  flag: {
+    fontSize: 20,
+    marginRight: 4,
+  },
+  phoneCountryCode: {
+    ...fontStyles.regular,
+    flex: 1,
   },
   phoneNumberInput: {
     flex: 1,
-    marginLeft: 9,
-  },
-  phoneCountryCode: {
-    width: 60,
-    textAlign: 'center',
-    lineHeight: 35,
-  },
-  line: {
-    height: 35,
-    borderRightWidth: 1,
-    borderColor: colors.inactive,
-  },
-  inputCountry: {
-    padding: 3,
-    marginTop: 1, // 6 vs 5 top vs bot space difference
-  },
-  // @ts-ignore
-  listAutocomplete: {
-    paddingHorizontal: 0,
-    paddingVertical: 6,
-    marginHorizontal: 0,
-    flex: 1,
-    backgroundColor: colors.white,
-    borderColor: colors.inactive,
-    borderWidth: 1,
-    borderTopWidth: 1,
-    borderRadius: 3,
-    // Workaround the mess done for iOS in react-native-autocomplete-input :D
-    ...Platform.select({
-      ios: {
-        left: undefined,
-        position: 'relative',
-        right: undefined,
-        marginBottom: 6,
-      },
-    }),
-  },
-  autoCompleteDropDown: {
-    position: 'relative',
-    top: 3,
-    padding: 0,
-    flex: 1,
-  },
-  autoCompleteItemText: {
-    fontSize: 15,
-    margin: 4,
-    backgroundColor: 'transparent',
-  },
-  defaultCountryContainer: {
-    backgroundColor: colors.darkLightest,
-    paddingVertical: 11,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  defaultCountryFlag: {
-    fontSize: 23,
-    color: '#FFFFFF',
-  },
-  defaultCountryName: {
-    marginLeft: 30,
-    fontSize: 15,
-  },
-  selectCountry: {
-    flexDirection: 'row',
-    paddingVertical: 6,
-  },
-  emoji: {
-    marginLeft: 10,
-    textAlign: 'center',
-    width: 22,
-  },
-  callingCode: {
-    flex: 1,
-  },
-  countrySelectText: {
-    borderColor: colors.inactive,
-    borderWidth: 0,
-    flex: 2,
-    marginLeft: 0,
-    paddingStart: 0,
+    marginLeft: 7,
   },
 })

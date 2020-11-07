@@ -12,9 +12,7 @@ import { getInviteFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import Logger from 'src/utils/Logger'
 
-export type CalculateFeeChildren = (
-  asyncResult: UseAsyncReturn<BigNumber, never>
-) => React.ReactNode
+export type CalculateFeeChildren = (asyncResult: UseAsyncReturn<BigNumber, any>) => React.ReactNode
 
 interface CommonProps {
   children: CalculateFeeChildren
@@ -31,8 +29,10 @@ interface SendProps extends CommonProps {
   feeType: FeeType.SEND
   account: string
   recipientAddress: string
-  amount: BigNumber
+  amount: string
   comment?: string
+  includeDekFee: boolean
+  currency?: CURRENCY_ENUM
 }
 
 interface ExchangeProps extends CommonProps {
@@ -45,9 +45,6 @@ interface ReclaimEscrowProps extends CommonProps {
   account: string
   paymentID: string
 }
-
-// TODO: remove this once we use TS 3.5
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export type PropsWithoutChildren =
   | Omit<InviteProps, 'children'>
@@ -71,7 +68,10 @@ function useAsyncShowError<R, Args extends any[]>(
     // Generic error banner
     if (asyncResult.error) {
       Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
-      dispatch(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+      const errMsg = asyncResult.error.message?.includes('insufficientBalance')
+        ? ErrorMessages.INSUFFICIENT_BALANCE
+        : ErrorMessages.CALCULATE_FEE_FAILED
+      dispatch(showError(errMsg))
     }
   }, [asyncResult.error])
 
@@ -87,21 +87,39 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   return props.children(asyncResult) as React.ReactElement
 }
 
-const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
-  const asyncResult = useAsyncShowError(
+export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<BigNumber> => {
+  return useAsyncShowError(
     (
       account: string,
       recipientAddress: string,
-      amount: BigNumber,
-      comment: string = MAX_PLACEHOLDER_COMMENT
+      amount: string,
+      comment: string = MAX_PLACEHOLDER_COMMENT,
+      includeDekFee: boolean = false,
+      currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
     ) =>
-      getSendFee(account, CURRENCY_ENUM.DOLLAR, {
-        recipientAddress,
-        amount: amount.valueOf(),
-        comment,
-      }),
-    [props.account, props.recipientAddress, props.amount, props.comment]
+      getSendFee(
+        account,
+        currency,
+        {
+          recipientAddress,
+          amount,
+          comment,
+        },
+        includeDekFee
+      ),
+    [
+      props.account,
+      props.recipientAddress,
+      props.amount,
+      props.comment,
+      props.includeDekFee,
+      props.currency,
+    ]
   )
+}
+
+const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
+  const asyncResult = useSendFee(props)
   return props.children(asyncResult) as React.ReactElement
 }
 

@@ -14,18 +14,20 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
         Array [
           Object {
             "backgroundColor": "#FFFFFF",
-            "elevation": 12,
             "padding": 16,
-            "shadowColor": "black",
-            "shadowOffset": Object {
-              "height": 6,
-              "width": 0,
-            },
-            "shadowOpacity": 0.3,
-            "shadowRadius": 9.600000000000001,
           },
           Object {
             "borderRadius": 8,
+          },
+          Object {
+            "elevation": 12,
+            "shadowColor": "rgba(156, 164, 169, 0.4)",
+            "shadowOffset": Object {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 1,
+            "shadowRadius": 12,
           },
           Array [
             Object {
@@ -199,8 +201,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -237,8 +241,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -266,18 +272,20 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
         Array [
           Object {
             "backgroundColor": "#FFFFFF",
-            "elevation": 12,
             "padding": 16,
-            "shadowColor": "black",
-            "shadowOffset": Object {
-              "height": 6,
-              "width": 0,
-            },
-            "shadowOpacity": 0.3,
-            "shadowRadius": 9.600000000000001,
           },
           Object {
             "borderRadius": 8,
+          },
+          Object {
+            "elevation": 12,
+            "shadowColor": "rgba(156, 164, 169, 0.4)",
+            "shadowOffset": Object {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 1,
+            "shadowRadius": 12,
           },
           Array [
             Object {
@@ -451,8 +459,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -489,8 +499,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -510,18 +522,20 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
+      },
+      Object {
+        "elevation": 12,
+        "shadowColor": "rgba(156, 164, 169, 0.4)",
+        "shadowOffset": Object {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 1,
+        "shadowRadius": 12,
       },
       Array [
         Object {
@@ -551,13 +565,7 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/send-dollar.png",
-          }
-        }
-        style={
-          Object {
-            "height": 40,
-            "width": 40,
+            "testUri": "../../../packages/mobile/src/images/notification-incoming-request.png",
           }
         }
       />
@@ -575,8 +583,8 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 16,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 18,
             "lineHeight": 22,
             "marginBottom": 4,
           }
@@ -635,8 +643,10 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }

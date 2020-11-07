@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BackupQuiz renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "paddingBottom": 24,
@@ -12,16 +11,14 @@ exports[`BackupQuiz renders correctly 1`] = `
     }
   }
 >
-  <View
+  <RNCSafeAreaView
     style={
       Object {
         "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
         "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
+        "right": 10,
+        "top": 10,
+        "width": 60,
         "zIndex": 100,
       }
     }
@@ -39,7 +36,7 @@ exports[`BackupQuiz renders correctly 1`] = `
     >
          
     </Text>
-  </View>
+  </RNCSafeAreaView>
   <RCTScrollView
     contentContainerStyle={
       Object {
@@ -910,6 +907,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/prosper"
             >
               <Text
                 style={
@@ -959,6 +957,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/winner"
             >
               <Text
                 style={
@@ -1008,6 +1007,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/find"
             >
               <Text
                 style={
@@ -1057,6 +1057,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/donate"
             >
               <Text
                 style={
@@ -1106,6 +1107,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/tape"
             >
               <Text
                 style={
@@ -1155,6 +1157,7 @@ exports[`BackupQuiz renders correctly 1`] = `
                   "paddingVertical": 8,
                 }
               }
+              testID="backupQuiz/history"
             >
               <Text
                 style={
@@ -1172,5 +1175,5 @@ exports[`BackupQuiz renders correctly 1`] = `
       </View>
     </View>
   </RCTScrollView>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

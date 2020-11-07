@@ -10,7 +10,6 @@ const storeData = {
   goldToken: { educationCompleted: true },
   account: {
     backupCompleted: true,
-    dismissedEarnRewards: true,
     dismissedInviteFriends: true,
     accountCreationTime: new Date().getTime() - TWO_DAYS_MS,
     paymentRequests: [],
@@ -43,13 +42,21 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
     )
 
     expect(tree).toMatchSnapshot()
-    expect(showMessageMock).toHaveBeenCalledWith('testnetAlert.1', 5000, null, 'testnetAlert.0')
+    expect(showMessageMock).toHaveBeenCalledWith(
+      'testnetAlert.1',
+      5000,
+      null,
+      null,
+      'testnetAlert.0'
+    )
   })
   it('Renders when disconnected', async () => {
     const store = createMockStoreAppDisconnected()
@@ -67,6 +74,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -89,6 +98,8 @@ describe('Testnet banner', () => {
           recipientCache={{}}
           activeNotificationCount={0}
           callToActNotification={false}
+          numberVerified={true}
+          importContacts={jest.fn()}
           {...getMockI18nProps()}
         />
       </Provider>

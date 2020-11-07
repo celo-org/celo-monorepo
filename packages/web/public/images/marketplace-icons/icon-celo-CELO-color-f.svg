@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 24.1.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
 <style type="text/css">
@@ -7,7 +6,7 @@
 	.st1{fill:#F9B73E;}
 	.st2{fill:#FFFFFF;}
 </style>
-<desc>Symbol for the Celo Gold currency</desc>
+<desc>Symbol for the Celo native asset</desc>
 <path class="st0" d="M0,0h100v100H0V0z"/>
 <g>
 	<path class="st1" d="M79.4,44c0-13-10.5-23.5-23.5-23.5c-9.6,0-17.9,5.8-21.5,14.1C26.2,38.3,20.5,46.5,20.5,56
@@ -23,3 +22,4 @@
 		c9.3,0,16.9,7.6,16.9,16.9C72.9,49.4,70.4,54.1,66.6,57.2z"/>
 </g>
 </svg>
+

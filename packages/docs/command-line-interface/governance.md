@@ -13,6 +13,7 @@ USAGE
   $ celocli governance:dequeue
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) From address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -42,6 +43,7 @@ USAGE
   $ celocli governance:execute
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -73,6 +75,7 @@ USAGE
   $ celocli governance:executehotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
@@ -106,6 +109,7 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
   --jsonTransactions=jsonTransactions            (required) Path to json transactions of the hotfix
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
@@ -136,6 +140,16 @@ List live governance proposals (queued and ongoing)
 USAGE
   $ celocli governance:list
 
+OPTIONS
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
+
 EXAMPLE
   list
 ```
@@ -151,6 +165,7 @@ USAGE
   $ celocli governance:preparehotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Preparer's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -182,6 +197,7 @@ USAGE
   $ celocli governance:propose
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --deposit=deposit                                  (required) Amount of Gold to attach to proposal
 
   --descriptionURL=descriptionURL                    (required) A URL where further information about the proposal can
@@ -189,7 +205,10 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
 
-  --jsonTransactions=jsonTransactions                (required) Path to json transactions
+  --interactive                                      Form proposal using an interactive prompt for Celo registry
+                                                     contracts and functions
+
+  --jsonTransactions=jsonTransactions                Path to json transactions
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -219,6 +238,7 @@ USAGE
   $ celocli governance:revokeupvote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -248,13 +268,14 @@ USAGE
   $ celocli governance:show
 
 OPTIONS
-  --account=account        Address of account or voter
-  --hotfix=hotfix          Hash of hotfix proposal
-  --nonwhitelisters        If set, displays validators that have not whitelisted the hotfix.
-  --notwhitelisted         List validators who have not whitelisted the specified hotfix
-  --proposalID=proposalID  UUID of proposal to view
-  --raw                    Display proposal in raw bytes format
-  --whitelisters           If set, displays validators that have whitelisted the hotfix.
+  --account=account                    Address of account or voter
+  --hotfix=hotfix                      Hash of hotfix proposal
+  --jsonTransactions=jsonTransactions  Output proposal JSON to provided file
+  --nonwhitelisters                    If set, displays validators that have not whitelisted the hotfix.
+  --notwhitelisted                     List validators who have not whitelisted the specified hotfix
+  --proposalID=proposalID              UUID of proposal to view
+  --raw                                Display proposal in raw bytes format
+  --whitelisters                       If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
   show --proposalID 99
@@ -276,6 +297,7 @@ USAGE
   $ celocli governance:upvote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -347,6 +369,7 @@ USAGE
   $ celocli governance:vote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -380,6 +403,7 @@ USAGE
   $ celocli governance:whitelisthotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Whitelister's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -411,6 +435,7 @@ USAGE
   $ celocli governance:withdraw
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N

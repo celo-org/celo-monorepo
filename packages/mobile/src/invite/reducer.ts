@@ -1,3 +1,4 @@
+import { Actions as AccountActions, ActionTypes as AccountActionTypes } from 'src/account/actions'
 import { Actions, ActionTypes, InviteDetails } from 'src/invite/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -8,7 +9,7 @@ export interface State {
   isSkippingInvite: boolean
   invitees: InviteDetails[]
   redeemComplete: boolean
-  redeemedInviteCode: string | null
+  redeemedTempAccountPrivateKey: string | null
 }
 
 export const initialState: State = {
@@ -17,12 +18,12 @@ export const initialState: State = {
   isSkippingInvite: false,
   invitees: [],
   redeemComplete: false,
-  redeemedInviteCode: null,
+  redeemedTempAccountPrivateKey: null,
 }
 
 export const inviteReducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | AccountActionTypes | RehydrateAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -54,7 +55,7 @@ export const inviteReducer = (
     case Actions.REDEEM_INVITE:
       return {
         ...state,
-        redeemedInviteCode: action.inviteCode,
+        redeemedTempAccountPrivateKey: action.tempAccountPrivateKey,
         isRedeemingInvite: true,
       }
     case Actions.REDEEM_INVITE_SUCCESS:
@@ -64,6 +65,12 @@ export const inviteReducer = (
         isRedeemingInvite: false,
       }
     case Actions.REDEEM_INVITE_FAILURE:
+      return {
+        ...state,
+        redeemComplete: false,
+        isRedeemingInvite: false,
+      }
+    case AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
       return {
         ...state,
         redeemComplete: false,

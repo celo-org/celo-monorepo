@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createElement, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, unstable_createElement as createElement, View } from 'react-native-web'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { Label } from './FormComponents'
 
@@ -22,7 +22,7 @@ export function CheckboxWithLabel({
       <Checkbox checked={checked} onPress={onPress} name={name} />
 
       <Text style={[fonts.a, textStyles.medium, checkBoxStyles.labelArea]}>
-        <Label for={name} onPress={onPress} style={checkBoxStyles.label}>
+        <Label htmlFor={name} onPress={onPress} style={checkBoxStyles.label}>
           {label}
         </Label>
       </Text>
@@ -45,6 +45,7 @@ function Checkbox({ checked, onPress, name }: CheckboxProps) {
         type: 'checkbox',
         name,
         checked,
+        onChange: () => true,
         onClick: onPress,
         style: checkBoxStyles.hidden,
       })}

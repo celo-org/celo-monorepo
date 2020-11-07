@@ -7,7 +7,7 @@ export async function installHelmChart(celoEnv: string) {
   console.info(`Installing helm release ${celoEnv}-eksportisto-${suffix}`)
   const params = await helmParameters(celoEnv)
   await execCmdWithExitOnFailure(
-    `helm install ../helm-charts/eksportisto/ --name ${celoEnv}-eksportisto-${suffix} ${params.join(
+    `helm install ${celoEnv}-eksportisto-${suffix} ../helm-charts/eksportisto/ ${params.join(
       ' '
     )}
   `
@@ -26,7 +26,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 export async function removeHelmRelease(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
   console.info(`Deleting helm chart ${celoEnv}-eksportisto-${suffix}`)
-  await execCmdWithExitOnFailure(`helm del --purge ${celoEnv}-eksportisto-${suffix}`)
+  await execCmdWithExitOnFailure(`helm uninstall --namespace ${celoEnv} ${celoEnv}-eksportisto-${suffix}`)
 }
 
 function fetchSensitiveAccounts() {
@@ -45,7 +45,11 @@ async function helmParameters(celoEnv: string) {
   ]
   if (isVmBased()) {
     params.push(
-      `--set web3Provider="http://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8545"`
+      `--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`
+    )
+  } else {
+    params.push(
+      `--set web3Provider="ws://tx-nodes:8546"`
     )
   }
   return params

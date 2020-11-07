@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import DownloadButton from 'src/experience/brandkit/DownloadButton'
 import { AssetTypes } from 'src/experience/brandkit/tracking'
 import { brandStyles } from 'src/experience/common/constants'
 import AspectRatio from 'src/shared/AspectRatio'
+import Fade from 'src/shared/AwesomeFade'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
 
@@ -37,35 +37,29 @@ export default React.memo(function Showcase({
   ])
   const titleStyle = [fonts.h6, styles.title]
   return (
-    <View
-      style={[
-        brandStyles.gap,
-        standardStyles.elementalMarginTop,
-        styles.container,
-        { width: size },
-      ]}
-    >
+    <View style={[brandStyles.gap, standardStyles.elementalMarginTop, { width: size }]}>
       <Fade duration={FADE_MS}>
-        <View style={styles.previewContainer}>
-          <AspectRatio ratio={ratio}>
-            {loading ? (
-              <Spinner color={colors.primary} size="small" />
-            ) : (
-              <Image
-                // onLoadEnd={load}
-                resizeMode="contain"
-                accessibilityLabel={`Preview of ${name}`}
-                source={{ uri: preview }}
-                style={[standardStyles.image, styles[`variant-${variant}`]]}
-              />
-            )}
-          </AspectRatio>
+        <View>
+          <View style={styles.previewContainer}>
+            <AspectRatio ratio={ratio}>
+              {loading ? (
+                <Spinner color={colors.primary} size="small" />
+              ) : (
+                <Image
+                  resizeMode="contain"
+                  accessibilityLabel={`Preview of ${name}`}
+                  source={{ uri: preview }}
+                  style={[standardStyles.image, styles[`variant-${variant}`]]}
+                />
+              )}
+            </AspectRatio>
+          </View>
+          <View style={styles.text}>
+            {name && <Text style={titleStyle}>{name.trimLeft()}</Text>}
+            {description && <Text style={fonts.legal}>{description}</Text>}
+          </View>
+          {uri && <DownloadButton uri={uri} trackingData={trackingData} />}
         </View>
-        <View style={styles.text}>
-          <Text style={titleStyle}>{name}</Text>
-          <Text style={fonts.legal}>{description}</Text>
-        </View>
-        <DownloadButton uri={uri} trackingData={trackingData} />
       </Fade>
     </View>
   )
@@ -81,9 +75,6 @@ const styles = StyleSheet.create({
   },
   text: { flex: 1 },
   pullStart: { paddingLeft: 0 },
-  container: {
-    justifyContent: 'space-between',
-  },
   'variant-circle': {
     borderRadius: 60,
   },

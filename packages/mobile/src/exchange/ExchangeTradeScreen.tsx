@@ -1,8 +1,8 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -11,12 +11,12 @@ import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CeloExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -140,15 +140,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       dollarsAmount,
       this.props.localCurrencyExchangeRate
     )
-    CeloAnalytics.track(
+    ValoraAnalytics.track(
       this.isDollarToGold()
-        ? CustomEventNames.gold_buy_continue
-        : CustomEventNames.gold_sell_continue,
+        ? CeloExchangeEvents.celo_buy_continue
+        : CeloExchangeEvents.celo_sell_continue,
       {
-        localCurrencyAmount,
-        goldAmount,
+        localCurrencyAmount: localCurrencyAmount ? localCurrencyAmount.toString() : null,
+        goldAmount: goldAmount.toString(),
         inputToken,
-        goldToDollarExchangeRate,
+        goldToDollarExchangeRate: goldToDollarExchangeRate.toString(),
       }
     )
     // END: Analytics
@@ -253,7 +253,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   switchInputToken = () => {
     const inputToken = this.getOppositeInputToken()
-    CeloAnalytics.track(CustomEventNames.gold_switch_input_currency, {
+    ValoraAnalytics.track(CeloExchangeEvents.celo_toggle_input_currency, {
       to: inputToken,
     })
     this.setState({ inputToken }, () => {
@@ -278,12 +278,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
 
     return (
-      <SafeAreaView
-        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
-        // incorrect because of that
-        forceInset={{ top: 'never', bottom: 'always' }}
-        style={styles.container}
-      >
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <DisconnectBanner />
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps={'always'}
@@ -305,7 +300,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               keyboardType={'decimal-pad'}
               onChangeText={this.onChangeExchangeAmount}
               value={this.getInputValue()}
-              placeholderTextColor={'#BDBDBD'}
+              placeholderTextColor={colors.gray3}
               placeholder={'0'}
               style={styles.currencyInput}
               testID="ExchangeInput"
@@ -336,7 +331,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
           text={t(`global:review`)}
           accessibilityLabel={t('continue')}
           disabled={this.isExchangeInvalid()}
-          type={BtnTypes.TERTIARY}
+          type={BtnTypes.SECONDARY}
           size={BtnSizes.FULL}
           style={styles.reviewBtn}
           testID="ExchangeReviewButton"
@@ -351,7 +346,7 @@ export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateT
   fetchExchangeRate,
   showError,
   hideAlert,
-})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
+})(withTranslation<Props>(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {

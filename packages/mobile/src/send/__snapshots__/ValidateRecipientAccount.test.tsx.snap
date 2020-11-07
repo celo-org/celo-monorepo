@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ValidateRecipientAccount renders correctly when full validation required 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -26,9 +25,9 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
               "paddingVertical": 16,
             }
           }
@@ -87,7 +86,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   },
                   Object {
                     "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
+                    "borderColor": "#EDEEEF",
                     "borderRadius": 3,
                     "borderWidth": 1,
                     "flex": 0,
@@ -106,14 +105,19 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 rejectResponderTermination={true}
                 shouldShowClipboard={[Function]}
                 style={
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "flex": 1,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                      "paddingHorizontal": 0,
+                      "paddingVertical": 12,
+                    },
+                    undefined,
+                    undefined,
+                  ]
                 }
                 underlineColorAndroid="transparent"
                 value=""
@@ -142,10 +146,14 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
         >
           <View
             style={
-              Object {
-                "borderRadius": 100,
-                "overflow": "hidden",
-              }
+              Array [
+                Object {
+                  "overflow": "hidden",
+                },
+                Object {
+                  "borderRadius": 100,
+                },
+              ]
             }
           >
             <View
@@ -170,8 +178,9 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   "backgroundColor": "#1AB775",
                   "height": 48,
                   "justifyContent": "center",
-                  "minWidth": 98,
-                  "paddingHorizontal": 16,
+                  "minWidth": 120,
+                  "opacity": undefined,
+                  "paddingHorizontal": 24,
                   "paddingVertical": 5,
                 }
               }
@@ -242,6 +251,22 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
       </View>
     </View>
   </RCTScrollView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
   <Modal
     animationType="none"
     hardwareAccelerated={false}
@@ -254,6 +279,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
     scrollOffset={0}
     scrollOffsetMax={0}
     scrollTo={null}
+    statusBarTranslucent={true}
     supportedOrientations={
       Array [
         "portrait",
@@ -300,6 +326,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
       scrollOffset={0}
       scrollOffsetMax={0}
       scrollTo={null}
+      statusBarTranslucent={true}
       style={
         Object {
           "flex": 1,
@@ -320,24 +347,26 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
       }
       swipeThreshold={100}
     >
-      <SafeAreaView>
+      <RNCSafeAreaView>
         <View
           style={
             Array [
               Object {
                 "backgroundColor": "#FFFFFF",
-                "elevation": 12,
                 "padding": 16,
-                "shadowColor": "black",
-                "shadowOffset": Object {
-                  "height": 6,
-                  "width": 0,
-                },
-                "shadowOpacity": 0.3,
-                "shadowRadius": 9.600000000000001,
               },
               Object {
                 "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
               },
               Array [
                 Object {
@@ -354,9 +383,9 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 19,
-                "lineHeight": 26,
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
                 "paddingBottom": 4,
                 "textAlign": "center",
               }
@@ -493,18 +522,20 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {
@@ -518,7 +549,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               <View
                 style={
                   Object {
-                    "width": 200,
+                    "width": 215,
                   }
                 }
               >
@@ -549,7 +580,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                         "lineHeight": 18,
                       },
                       Object {
-                        "textAlign": "right",
+                        "textAlign": "center",
                       },
                     ]
                   }
@@ -616,17 +647,16 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
             </View>
           </View>
         </View>
-      </SafeAreaView>
+      </RNCSafeAreaView>
     </View>
   </Modal>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ValidateRecipientAccount renders correctly when partial validation required 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -648,9 +678,9 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
           style={
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
+              "fontFamily": "Jost-Medium",
+              "fontSize": 22,
+              "lineHeight": 28,
               "paddingVertical": 16,
             }
           }
@@ -710,7 +740,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -730,15 +760,21 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="k"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
+                    testID="SingleDigitInput/digit0"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -762,7 +798,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -782,15 +818,21 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="0"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
+                    testID="SingleDigitInput/digit1"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -814,7 +856,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -834,15 +876,21 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="F"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
+                    testID="SingleDigitInput/digit2"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -866,7 +914,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                       },
                       Object {
                         "backgroundColor": "#FFF",
-                        "borderColor": "#D1D5D8",
+                        "borderColor": "#EDEEEF",
                         "borderRadius": 3,
                         "borderWidth": 1,
                         "flex": 0,
@@ -886,15 +934,21 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     placeholder="4"
                     rejectResponderTermination={true}
                     style={
-                      Object {
-                        "backgroundColor": "#FFFFFF",
-                        "borderColor": "#D1D5D8",
-                        "borderRadius": 3,
-                        "flex": 1,
-                        "fontFamily": "Hind-Regular",
-                        "padding": 8,
-                      }
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "flex": 1,
+                          "fontFamily": "Inter-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 22,
+                          "paddingHorizontal": 0,
+                          "paddingVertical": 12,
+                        },
+                        undefined,
+                        undefined,
+                      ]
                     }
+                    testID="SingleDigitInput/digit3"
                     underlineColorAndroid="transparent"
                     value=""
                   />
@@ -924,10 +978,14 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
         >
           <View
             style={
-              Object {
-                "borderRadius": 100,
-                "overflow": "hidden",
-              }
+              Array [
+                Object {
+                  "overflow": "hidden",
+                },
+                Object {
+                  "borderRadius": 100,
+                },
+              ]
             }
           >
             <View
@@ -952,8 +1010,9 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   "backgroundColor": "#1AB775",
                   "height": 48,
                   "justifyContent": "center",
-                  "minWidth": 98,
-                  "paddingHorizontal": 16,
+                  "minWidth": 120,
+                  "opacity": undefined,
+                  "paddingHorizontal": 24,
                   "paddingVertical": 5,
                 }
               }
@@ -1024,6 +1083,22 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
       </View>
     </View>
   </RCTScrollView>
+  <View
+    collapsable={false}
+    style={
+      Array [
+        Object {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+        },
+        Object {
+          "height": 0,
+        },
+        undefined,
+      ]
+    }
+  />
   <Modal
     animationType="none"
     hardwareAccelerated={false}
@@ -1036,6 +1111,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
     scrollOffset={0}
     scrollOffsetMax={0}
     scrollTo={null}
+    statusBarTranslucent={true}
     supportedOrientations={
       Array [
         "portrait",
@@ -1082,6 +1158,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
       scrollOffset={0}
       scrollOffsetMax={0}
       scrollTo={null}
+      statusBarTranslucent={true}
       style={
         Object {
           "flex": 1,
@@ -1102,24 +1179,26 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
       }
       swipeThreshold={100}
     >
-      <SafeAreaView>
+      <RNCSafeAreaView>
         <View
           style={
             Array [
               Object {
                 "backgroundColor": "#FFFFFF",
-                "elevation": 12,
                 "padding": 16,
-                "shadowColor": "black",
-                "shadowOffset": Object {
-                  "height": 6,
-                  "width": 0,
-                },
-                "shadowOpacity": 0.3,
-                "shadowRadius": 9.600000000000001,
               },
               Object {
                 "borderRadius": 8,
+              },
+              Object {
+                "elevation": 12,
+                "shadowColor": "rgba(156, 164, 169, 0.4)",
+                "shadowOffset": Object {
+                  "height": 2,
+                  "width": 0,
+                },
+                "shadowOpacity": 1,
+                "shadowRadius": 12,
               },
               Array [
                 Object {
@@ -1136,9 +1215,9 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 19,
-                "lineHeight": 26,
+                "fontFamily": "Jost-Medium",
+                "fontSize": 22,
+                "lineHeight": 28,
                 "paddingBottom": 4,
                 "textAlign": "center",
               }
@@ -1275,18 +1354,20 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "elevation": 12,
                     "padding": 16,
-                    "shadowColor": "black",
-                    "shadowOffset": Object {
-                      "height": 6,
-                      "width": 0,
-                    },
-                    "shadowOpacity": 0.3,
-                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
                     "borderRadius": 8,
+                  },
+                  Object {
+                    "elevation": 12,
+                    "shadowColor": "rgba(156, 164, 169, 0.4)",
+                    "shadowOffset": Object {
+                      "height": 2,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 1,
+                    "shadowRadius": 12,
                   },
                   Array [
                     Object {
@@ -1300,7 +1381,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               <View
                 style={
                   Object {
-                    "width": 200,
+                    "width": 215,
                   }
                 }
               >
@@ -1331,7 +1412,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                         "lineHeight": 18,
                       },
                       Object {
-                        "textAlign": "right",
+                        "textAlign": "center",
                       },
                     ]
                   }
@@ -1398,8 +1479,8 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
             </View>
           </View>
         </View>
-      </SafeAreaView>
+      </RNCSafeAreaView>
     </View>
   </Modal>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

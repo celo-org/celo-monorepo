@@ -28,7 +28,7 @@ function CeloDollarsOverview({ t }: Props) {
     <View style={styles.container}>
       {dollarBalanceAmount && (
         <Text style={styles.balance} testID="DollarBalance">
-          <CurrencyDisplay style={fontStyles.semiBold} amount={dollarBalanceAmount} />
+          <CurrencyDisplay style={fontStyles.regular500} amount={dollarBalanceAmount} />
         </Text>
       )}
       {!isUsdLocalCurrency && dollarBalanceAmount && (
@@ -52,10 +52,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: variables.contentPadding,
     paddingVertical: 20,
   },
-  label: {
-    fontSize: 18,
-    color: colors.dark,
-  },
   balance: {
     fontSize: 44,
     // TODO: figure out why specifying the lineHeight with the font we're using
@@ -65,10 +61,9 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   dollarBalance: {
-    ...fontStyles.light,
-    fontSize: 18,
-    color: '#B0B5B9',
+    ...fontStyles.large,
+    color: colors.gray5,
   },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(CeloDollarsOverview)
+export default withTranslation<Props>(Namespaces.walletFlow5)(CeloDollarsOverview)

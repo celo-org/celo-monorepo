@@ -55,7 +55,7 @@ The following behaviors are considered harassment and are unacceptable within th
   * Other attributes
 
 * Posting or displaying sexually explicit or violent material.
-* Deceptive, fraudulent, or otherwise misleading communications or actions.  
+* Deceptive, fraudulent, or otherwise misleading communications or actions, including attempts to manipulate the price of any digital assets.  
 * Posting or threatening to post other people’s personally identifying information ("doxing").
 * Personal insults, including but not limited to those related to gender, sexual orientation, race, religion, or disability.
 * Inappropriate photography or recording.
@@ -86,5 +86,5 @@ This Code of Conduct is distributed under a [Creative Commons Attribution-ShareA
 
 The Celo Foundation may amend this Code of Conduct from time to time and may also vary the procedures it sets out where appropriate in a particular case. Your agreement to comply with the guidelines will be deemed agreement to any changes to it.
 
-*Last updated June 10, 2020*
+*Last updated on the 1st of September 2020*
 

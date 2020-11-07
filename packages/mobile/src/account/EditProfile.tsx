@@ -1,5 +1,4 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
@@ -7,8 +6,8 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
 import { setName } from 'src/account/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SettingsEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 
@@ -41,21 +40,17 @@ export class EditProfile extends React.Component<Props, State> {
     this.setState({ name })
   }
 
-  onEndEditing = () => {
-    CeloAnalytics.track(CustomEventNames.edit_name_input)
-  }
-
   nameSubmitted = () => {
     this.props.setName(this.state.name)
-    CeloAnalytics.track(CustomEventNames.edit_name_submit)
+    ValoraAnalytics.track(SettingsEvents.settings_profile_name_edit)
   }
 
   render() {
     const { t } = this.props
     return (
-      <ScrollView style={style.scrollView} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps="handled">
         <TextInput
-          style={[style.input, fontStyles.regular]}
+          style={styles.input}
           underlineColorAndroid={'transparent'}
           autoFocus={true}
           autoCorrect={false}
@@ -63,15 +58,15 @@ export class EditProfile extends React.Component<Props, State> {
           value={this.state.name}
           onSubmitEditing={this.nameSubmitted}
           onChangeText={this.nameValueChange}
-          onEndEditing={this.onEndEditing}
         />
       </ScrollView>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   input: {
+    ...fontStyles.regular,
     borderWidth: 1,
     borderRadius: 3,
     borderColor: '#EEEEEE',
@@ -83,10 +78,9 @@ const style = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    backgroundColor: colors.background,
   },
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
   setName,
-})(withTranslation(Namespaces.accountScreen10)(EditProfile))
+})(withTranslation<Props>(Namespaces.accountScreen10)(EditProfile))

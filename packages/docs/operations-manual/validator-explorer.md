@@ -4,7 +4,9 @@ https://celo.org/validators/explore/
 
 All of the existing validators and groups in the Celo network are included in this view. The default view shows all registered validator groups - if you click on any of the group names it will expand to show the validators affiliated with that group. You can also sort results by each column's value by clicking on the header field.
 
-If you are looking to see how your validator is performing, you should first find the group your validator is affiliated with. Then you can click on the group name to see your validator and the rest of the validators affiliated with this group.  
+If you are looking to see how your validator is performing, you should first find the group your validator is affiliated with. Then you can click on the group name to see your validator and the rest of the validators affiliated with this group.
+
+If you are running a validator group, one way to demonstrate your credibility to voters is claiming your validator badges by following the instructions [here](https://github.com/celo-org/celo-monorepo/blob/master/packages/web/validator-badges/README.md).
 
 A critical element of this explorer is the Validator Group name, which can help voters recognize organizations or active community members. This name is fetched from the `account` information registered on-chain for your validator and validator group. In order to combat name impersonation, a group can register a domain claim within their metadata, which you can read more about [here](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-codebase/protocol/identity/metadata.md). This verification is done by adding a [TXT record](https://en.wikipedia.org/wiki/TXT_record) to their domain which includes a signature of their domain claim signed by their associated account. This claim is then verified by the validator explorer. Individual users may also verify a claim using `celocli account:get-metdata`.
 

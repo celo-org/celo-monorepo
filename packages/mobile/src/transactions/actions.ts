@@ -4,10 +4,10 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/types'
-import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
   ADD_STANDBY_TRANSACTION = 'TRANSACTIONS/ADD_STANDBY_TRANSACTION',
@@ -17,6 +17,8 @@ export enum Actions {
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
   TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
   NEW_TRANSACTIONS_IN_FEED = 'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
+  REFRESH_RECENT_TX_RECIPIENTS = 'TRANSACTIONS/REFRESH_RECENT_TX_RECIPIENTS',
+  UPDATE_RECENT_TX_RECIPIENT_CACHE = 'TRANSACTIONS/UPDATE_RECENT_TX_RECIPIENT_CACHE',
 }
 
 export interface AddStandbyTransactionAction {
@@ -54,16 +56,18 @@ export interface NewTransactionsInFeedAction {
   transactions: TransactionFeedFragment[]
 }
 
+export interface UpdatedRecentTxRecipientsCacheAction {
+  type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE
+  recentTxRecipientsCache: NumberToRecipient
+}
+
 export type ActionTypes =
   | AddStandbyTransactionAction
   | RemoveStandbyTransactionAction
   | ResetStandbyTransactionsAction
   | AddHashToStandbyTransactionAction
   | NewTransactionsInFeedAction
-
-export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
-}
+  | UpdatedRecentTxRecipientsCacheAction
 
 export const addStandbyTransaction = (
   transaction: StandbyTransaction
@@ -75,6 +79,13 @@ export const addStandbyTransaction = (
 export const removeStandbyTransaction = (idx: string): RemoveStandbyTransactionAction => ({
   type: Actions.REMOVE_STANDBY_TRANSACTION,
   idx,
+})
+
+export const updateRecentTxRecipientsCache = (
+  recentTxRecipientsCache: NumberToRecipient
+): UpdatedRecentTxRecipientsCacheAction => ({
+  type: Actions.UPDATE_RECENT_TX_RECIPIENT_CACHE,
+  recentTxRecipientsCache,
 })
 
 export const resetStandbyTransactions = (): ResetStandbyTransactionsAction => ({
@@ -115,7 +126,13 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('walletFlow5:transactionHeaderSent')
+      const isCeloWithdrawal =
+        confirmationProps.amount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
+      headerText = i18n.t(
+        isCeloWithdrawal
+          ? 'walletFlow5:transactionHeaderWithdrewCelo'
+          : 'walletFlow5:transactionHeaderSent'
+      )
       break
     case TokenTransactionType.EscrowSent:
       headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')

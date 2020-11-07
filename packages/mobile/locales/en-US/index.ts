@@ -3,6 +3,7 @@ import backupKeyFlow6 from '@celo/mobile/locales/en-US/backupKeyFlow6.json'
 import dappkit from '@celo/mobile/locales/en-US/dappkit.json'
 import dev from '@celo/mobile/locales/en-US/dev.json'
 import exchangeFlow9 from '@celo/mobile/locales/en-US/exchangeFlow9.json'
+import fiatExchangeFlow from '@celo/mobile/locales/en-US/fiatExchangeFlow.json'
 import global from '@celo/mobile/locales/en-US/global.json'
 import goldEducation from '@celo/mobile/locales/en-US/goldEducation.json'
 import inviteFlow11 from '@celo/mobile/locales/en-US/inviteFlow11.json'
@@ -32,4 +33,5 @@ export default {
   dev,
   dappkit,
   onboarding,
+  fiatExchangeFlow,
 }

@@ -13,6 +13,7 @@ exports[`Faucet renders 1`] = `
     aria-level="1"
     className="css-reset-4rbku5 css-text-901oao"
     dir="auto"
+    onClick={[Function]}
     role="heading"
     style={
       Object {
@@ -45,6 +46,7 @@ exports[`Faucet renders 1`] = `
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -74,6 +76,7 @@ exports[`Faucet renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -111,6 +114,7 @@ exports[`Faucet renders 1`] = `
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -121,9 +125,9 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 Celo Dollars and 5 Celo Gold.
+        Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 cUSD and 5 CELO.
 
-In the Celo Wallet, you can find your address by pressing the Settings cog icon at the top right. Press the address to copy it to your device’s clipboard.
+In the Celo Wallet, you can find your address by pressing the menu icon at the top left and scrolling down to bottom. Press the address to copy it to your device’s clipboard.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -138,15 +142,13 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           autoCapitalize="sentences"
           autoComplete="on"
           autoCorrect="on"
-          className="css-textinput-1cwyjr8"
+          className="css-textinput-11aywtz"
           data-focusable={true}
           dir="auto"
-          name="beneficiary"
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
           onKeyDown={[Function]}
-          onKeyPress={[Function]}
           onSelect={[Function]}
           placeholder="Testnet Address"
           readOnly={false}
@@ -174,6 +176,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
               "marginRight": "0px",
               "marginTop": "5px",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "outlineWidth": "0px",
               "paddingBottom": "15px",
               "paddingLeft": "10px",
@@ -188,6 +191,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -230,8 +234,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
             style={
               Object {
                 "WebkitAlignItems": "flex-start",
@@ -245,6 +247,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              onClick={[Function]}
               role="link"
               style={
                 Object {
@@ -334,6 +337,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -363,6 +367,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -400,6 +405,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -410,7 +416,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           }
         }
       >
-        If you have an Android device, you can set up a funded account on the Alfajores Testnet by requesting a 
+        If you have an Android or iOS device, you can set up a funded account on the Alfajores Testnet by requesting a 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -418,8 +424,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -429,10 +433,8 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="/developers/wallet"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -456,8 +458,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
           style={
             Object {
               "display": "inline",
@@ -467,10 +467,8 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           <a
             className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
             data-focusable={true}
-            dir="auto"
             href="https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client"
             onClick={[Function]}
-            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -505,6 +503,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -534,6 +533,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -571,6 +571,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -600,6 +601,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -629,6 +631,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -666,6 +669,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -687,6 +691,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -700,7 +705,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -719,8 +724,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -756,7 +759,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
               dir="auto"
               href="https://forum.celo.org/"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -826,6 +828,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         "maxWidth": "100vw",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -855,6 +858,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -892,6 +896,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -913,6 +918,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -926,7 +932,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -945,8 +951,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -982,7 +986,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
               dir="auto"
               href="https://docs.celo.org/celo-codebase/wallet/intro"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1046,6 +1049,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -1059,7 +1063,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -1078,8 +1082,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1115,7 +1117,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
               dir="auto"
               href="http://alfajores-blockscout.celo-testnet.org/"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1179,6 +1180,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -1192,7 +1194,7 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
         >
           <span
             className="css-text-901oao css-textHasAncestor-16my406"
-            dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "fontWeight": "bold",
@@ -1211,8 +1213,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
           onMouseEnter={[Function]}
           onMouseLeave={[Function]}
           onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1248,7 +1248,6 @@ In the Celo Wallet, you can find your address by pressing the Settings cog icon 
               dir="auto"
               href="https://docs.celo.org/getting-started/running-a-full-node"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {

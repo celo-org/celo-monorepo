@@ -13,6 +13,7 @@ exports[`renders correctly 1`] = `
   scrollOffset={0}
   scrollOffsetMax={0}
   scrollTo={null}
+  statusBarTranslucent={true}
   supportedOrientations={
     Array [
       "portrait",
@@ -59,6 +60,7 @@ exports[`renders correctly 1`] = `
     scrollOffset={0}
     scrollOffsetMax={0}
     scrollTo={null}
+    statusBarTranslucent={true}
     style={
       Object {
         "flex": 1,
@@ -79,24 +81,26 @@ exports[`renders correctly 1`] = `
     }
     swipeThreshold={100}
   >
-    <SafeAreaView>
+    <RNCSafeAreaView>
       <View
         style={
           Array [
             Object {
               "backgroundColor": "#FFFFFF",
-              "elevation": 12,
               "padding": 16,
-              "shadowColor": "black",
-              "shadowOffset": Object {
-                "height": 6,
-                "width": 0,
-              },
-              "shadowOpacity": 0.3,
-              "shadowRadius": 9.600000000000001,
             },
             Object {
               "borderRadius": 8,
+            },
+            Object {
+              "elevation": 12,
+              "shadowColor": "rgba(156, 164, 169, 0.4)",
+              "shadowOffset": Object {
+                "height": 2,
+                "width": 0,
+              },
+              "shadowOpacity": 1,
+              "shadowRadius": 12,
             },
             Array [
               Object {
@@ -121,9 +125,9 @@ exports[`renders correctly 1`] = `
               style={
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 19,
-                  "lineHeight": 26,
+                  "fontFamily": "Jost-Medium",
+                  "fontSize": 22,
+                  "lineHeight": 28,
                   "marginBottom": 12,
                   "textAlign": "center",
                 }
@@ -194,7 +198,7 @@ exports[`renders correctly 1`] = `
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </RNCSafeAreaView>
   </View>
 </Modal>
 `;

@@ -1,13 +1,13 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import gql from 'graphql-tag'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CeloExchangeEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ExchangeItemFragment } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -24,7 +24,7 @@ export function ExchangeFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
   const { amount, makerAmount, takerAmount, status, timestamp } = props
   const onPress = () => {
-    CeloAnalytics.track(CustomEventNames.gold_activity_select)
+    ValoraAnalytics.track(CeloExchangeEvents.celo_transaction_select)
     navigateToExchangeReview(timestamp, {
       makerAmount,
       takerAmount,
@@ -80,10 +80,6 @@ export function ExchangeFeedItem(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  arrow: {
-    paddingHorizontal: 5,
-    paddingBottom: 8,
-  },
   container: {
     justifyContent: 'space-between',
     flex: 1,

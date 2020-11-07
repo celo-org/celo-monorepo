@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Debug renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
       "paddingHorizontal": 10,
@@ -135,89 +134,65 @@ exports[`Debug renders correctly 1`] = `
     style={
       Array [
         Object {
-          "alignItems": "center",
-          "borderRadius": 3,
           "flexDirection": "row",
-        },
-        Object {
-          "marginVertical": 10,
-        },
-        Object {
-          "marginBottom": 10,
         },
         Object {
           "marginBottom": 0,
           "marginHorizontal": 0,
           "marginTop": 10,
         },
-        Object {
-          "backgroundColor": "#42D689",
-        },
       ]
     }
   >
     <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
+            "overflow": "hidden",
           },
           Object {
-            "backgroundColor": "#42D689",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
+            "borderRadius": 100,
           },
         ]
       }
     >
       <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
             "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "backgroundColor": "#1AB775",
+            "height": 48,
+            "justifyContent": "center",
+            "minWidth": 120,
+            "opacity": undefined,
+            "paddingHorizontal": 24,
+            "paddingVertical": 5,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-              },
-              Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
-              },
-            ]
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
           }
         >
           Email logs to support
@@ -225,5 +200,5 @@ exports[`Debug renders correctly 1`] = `
       </View>
     </View>
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;

@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleProp, StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native'
 import { colors } from 'src/styles'
 
 interface Props {
   onPress: () => void
   isOpen: boolean
   color: colors
+  style?: StyleProp<ViewStyle>
 }
 
 const DISTANCE = 5
@@ -13,7 +14,7 @@ const DISTANCE = 5
 export default React.memo(function Hamburger(props: Props) {
   const backgroundColor = props.color
   return (
-    <TouchableOpacity onPress={props.onPress} style={styles.root}>
+    <TouchableOpacity onPress={props.onPress} style={[styles.root, props.style]}>
       <View
         style={[
           styles.bar,

@@ -1,30 +1,30 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import TextButton from '@celo/react-components/components/TextButton.v2'
-import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import TextButton from '@celo/react-components/components/TextButton'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { SendEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
 import HamburgerCard from 'src/icons/HamburgerCard'
-import InfoIcon from 'src/icons/InfoIcon.v2'
-import { validateRecipientAddress } from 'src/identity/actions'
+import InfoIcon from 'src/icons/InfoIcon'
+import { validateRecipientAddress, validateRecipientAddressReset } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
-import { emptyHeader } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -39,8 +39,8 @@ interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
-  isValidRecipient: boolean
-  isPaymentRequest?: true
+  validationSuccessful: boolean
+  isOutgoingPaymentRequest?: true
   error?: ErrorMessages | null
 }
 
@@ -51,6 +51,7 @@ interface State {
 }
 
 interface DispatchProps {
+  validateRecipientAddressReset: typeof validateRecipientAddressReset
   validateRecipientAddress: typeof validateRecipientAddress
 }
 
@@ -58,6 +59,7 @@ type OwnProps = StackScreenProps<StackParamList, Screens.ValidateRecipientAccoun
 type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapDispatchToProps = {
+  validateRecipientAddressReset,
   validateRecipientAddress,
 }
 
@@ -65,12 +67,17 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const transactionData = route.params.transactionData
   const { recipient } = transactionData
+  const { e164PhoneNumber } = recipient
   const error = state.alert ? state.alert.underlyingError : null
+  const validationSuccessful = e164PhoneNumber
+    ? !!state.identity.secureSendPhoneNumberMapping[e164PhoneNumber]?.validationSuccessful
+    : false
+
   return {
     recipient,
     transactionData,
-    isValidRecipient: state.identity.isValidRecipient,
-    isPaymentRequest: route.params.isPaymentRequest,
+    validationSuccessful,
+    isOutgoingPaymentRequest: route.params.isOutgoingPaymentRequest,
     addressValidationType: route.params.addressValidationType,
     error,
   }
@@ -78,7 +85,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 export const validateRecipientAccountScreenNavOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
+  headerLeft: () => <BackButton eventName={SendEvents.send_secure_back} />,
 })
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
@@ -88,16 +95,26 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     isModalVisible: false,
   }
 
+  componentDidMount = () => {
+    const { e164PhoneNumber } = this.props.recipient
+    if (e164PhoneNumber) {
+      this.props.validateRecipientAddressReset(e164PhoneNumber)
+    }
+  }
+
   componentDidUpdate = (prevProps: Props) => {
-    const { isValidRecipient, isPaymentRequest, transactionData } = this.props
-    if (isValidRecipient && !prevProps.isValidRecipient) {
-      if (isPaymentRequest) {
-        navigate(Screens.PaymentRequestConfirmation, { transactionData })
+    const { validationSuccessful, isOutgoingPaymentRequest, transactionData } = this.props
+
+    if (validationSuccessful && prevProps.validationSuccessful === false) {
+      if (isOutgoingPaymentRequest) {
+        navigate(Screens.PaymentRequestConfirmation, {
+          transactionData,
+          addressJustValidated: true,
+        })
       } else {
         navigate(Screens.SendConfirmation, {
           transactionData,
           addressJustValidated: true,
-          isFromScan: this.props.route.params?.isFromScan,
         })
       }
     }
@@ -106,17 +123,23 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   onPressConfirm = () => {
     const { inputValue, singleDigitInputValueArr } = this.state
     const { recipient, addressValidationType } = this.props
+    const { requesterAddress } = this.props.route.params
     const inputToValidate =
       addressValidationType === AddressValidationType.FULL
         ? inputValue
         : singleDigitInputValueArr.join('')
 
-    CeloAnalytics.track(CustomEventNames.send_secure_submit, {
-      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+    ValoraAnalytics.track(SendEvents.send_secure_submit, {
+      partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
       address: inputToValidate,
     })
 
-    this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
+    this.props.validateRecipientAddress(
+      inputToValidate,
+      addressValidationType,
+      recipient,
+      requesterAddress
+    )
   }
 
   onInputChange = (value: string) => {
@@ -130,12 +153,16 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   toggleModal = () => {
-    const validationType =
-      this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
+    const { addressValidationType } = this.props
+
     if (this.state.isModalVisible) {
-      CeloAnalytics.track(CustomEventNames.send_secure_info, { validationType })
+      ValoraAnalytics.track(SendEvents.send_secure_info, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_secure_info_dismissed, { validationType })
+      ValoraAnalytics.track(SendEvents.send_secure_info_dismissed, {
+        partialAddressValidation: addressValidationType === AddressValidationType.PARTIAL,
+      })
     }
 
     this.setState({ isModalVisible: !this.state.isModalVisible })
@@ -177,6 +204,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
             inputPlaceholder={placeholderValue}
             // tslint:disable-next-line:jsx-no-lambda
             onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+            testID={`SingleDigitInput/digit${index}`}
           />
         </View>
       )
@@ -251,7 +279,6 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
     justifyContent: 'space-between',
   },
   scrollContainer: {
@@ -336,4 +363,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))
+)(withTranslation<Props>(Namespaces.sendFlow7)(ValidateRecipientAccount))

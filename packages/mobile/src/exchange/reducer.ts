@@ -4,6 +4,7 @@ import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persi
 import { RootState } from 'src/redux/reducers'
 
 export const MAX_HISTORY_RETENTION = 30 * 24 * 3600 * 1000 // (ms) ~ 180 days
+export const ADDRESS_LENGTH = 42
 
 export interface ExchangeRatePair {
   goldMaker: string // number of dollarTokens received for one goldToken
@@ -27,6 +28,7 @@ export interface State {
     range: number
     lastTimeUpdated: number
   }
+  isLoading: boolean
 }
 
 export const initialState = {
@@ -39,6 +41,7 @@ export const initialState = {
     range: 30 * 24 * 60 * 60 * 1000, // 30 days
     lastTimeUpdated: 0,
   },
+  isLoading: false,
 }
 
 export const exchangeRatePairSelector = (state: RootState) => state.exchange.exchangeRatePair
@@ -49,6 +52,9 @@ function aggregateExchangeRates(
   granularity: number,
   range: number
 ): ExchangeRate[] {
+  if (!celoGoldExchangeRates.length) {
+    return []
+  }
   function calculateGroup(exchangeRate: ExchangeRate) {
     return Math.floor(exchangeRate.timestamp / (range / granularity))
   }
@@ -125,6 +131,21 @@ export const reducer = (
       return {
         ...state,
         history: historyReducer(state.history, action),
+      }
+    case Actions.WITHDRAW_CELO:
+      return {
+        ...state,
+        isLoading: true,
+      }
+    case Actions.WITHDRAW_CELO_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+      }
+    case Actions.WITHDRAW_CELO_FAILED:
+      return {
+        ...state,
+        isLoading: false,
       }
     default:
       return state

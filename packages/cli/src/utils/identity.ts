@@ -91,16 +91,13 @@ export abstract class ClaimCommand extends BaseCommand {
   }
 }
 
-export const claimFlags = {
-  from: Flags.address({
-    required: true,
-    description: 'Addess of the account to set metadata for',
-  }),
-}
-
 export const claimArgs = [Args.file('file', { description: 'Path of the metadata file' })]
 
-export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: ContractKit) => {
+export const displayMetadata = async (
+  metadata: IdentityMetadataWrapper,
+  kit: ContractKit,
+  tableFlags: object = {}
+) => {
   const data = await concurrentMap(5, metadata.claims, async (claim) => {
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.type)
     const validatable = VALIDATABLE_CLAIM_TYPES.includes(claim.type)
@@ -122,6 +119,9 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
         break
       case ClaimTypes.NAME:
         extra = `Name: "${claim.name}"`
+        break
+      case ClaimTypes.STORAGE:
+        extra = `URL: "${claim.address}"`
         break
       default:
         extra = JSON.stringify(claim)
@@ -151,7 +151,7 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
       status: { header: 'Status' },
       createdAt: { header: 'Created At' },
     },
-    {}
+    tableFlags
   )
 }
 

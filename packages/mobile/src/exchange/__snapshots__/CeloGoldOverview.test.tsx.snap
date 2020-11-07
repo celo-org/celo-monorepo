@@ -14,9 +14,9 @@ exports[`renders correctly when not ready 1`] = `
     style={
       Object {
         "color": "#2E3338",
-        "fontFamily": "Inter-SemiBold",
-        "fontSize": 19,
-        "lineHeight": 26,
+        "fontFamily": "Jost-Medium",
+        "fontSize": 22,
+        "lineHeight": 28,
         "marginBottom": 8,
       }
     }
@@ -33,6 +33,7 @@ exports[`renders correctly when not ready 1`] = `
         "marginBottom": 8,
       }
     }
+    testID="CeloBalance"
   >
     <Text
       numberOfLines={1}
@@ -93,9 +94,9 @@ exports[`renders correctly when ready 1`] = `
     style={
       Object {
         "color": "#2E3338",
-        "fontFamily": "Inter-SemiBold",
-        "fontSize": 19,
-        "lineHeight": 26,
+        "fontFamily": "Jost-Medium",
+        "fontSize": 22,
+        "lineHeight": 28,
         "marginBottom": 8,
       }
     }
@@ -112,6 +113,7 @@ exports[`renders correctly when ready 1`] = `
         "marginBottom": 8,
       }
     }
+    testID="CeloBalance"
   >
     <Text
       numberOfLines={1}

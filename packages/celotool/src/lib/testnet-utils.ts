@@ -7,7 +7,7 @@ import * as path from 'path'
 import { retryCmd } from '../lib/utils'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
-import { getEnvFile } from './env-utils'
+import { envVar, fetchEnvOrFallback, getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
@@ -26,7 +26,7 @@ export async function uploadTestnetInfoToGoogleStorage(
   if (uploadGenesis) {
     await uploadGenesisBlockToGoogleStorage(networkName)
   }
-  await uploadStaticNodesToGoogleStorage(networkName)
+  await uploadTestnetStaticNodesToGoogleStorage(networkName)
   await uploadBootnodeToGoogleStorage(networkName)
   await uploadEnvFileToGoogleStorage(networkName)
 }
@@ -49,8 +49,9 @@ export async function getGenesisBlockFromGoogleStorage(networkName: string) {
   return JSON.stringify(await resp.json())
 }
 
-// This will throw an error if it fails to upload
-export async function uploadStaticNodesToGoogleStorage(networkName: string) {
+// This will throw an error if it fails to upload.
+// Intended to be used for deploying testnets, not forno full nodes.
+export async function uploadTestnetStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
   const nodesData: string[] | null = await retryCmd(() =>
@@ -59,12 +60,16 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  const nodesJson = JSON.stringify(nodesData)
-  console.debug('Static nodes are ' + nodesJson + '\n')
+  return uploadStaticNodesToGoogleStorage(networkName, nodesData)
+}
+
+export async function uploadStaticNodesToGoogleStorage(fileName: string, enodes: string[]) {
+  const json = JSON.stringify(enodes)
+  console.debug(`${fileName} static nodes are ${json}\n`)
   await uploadDataToGoogleStorage(
-    nodesJson,
+    json,
     staticNodesBucketName,
-    networkName,
+    fileName,
     true,
     'application/json'
   )
@@ -190,4 +195,29 @@ export async function uploadFileToGoogleStorage(
         role: storage.acl.READER_ROLE,
       })
   }
+}
+
+// Reads the envVar VALIDATOR_PROXY_COUNTS, which indicates how many validators
+// have a certain number of proxies in the format:
+// <# of validators>:<proxy count>;<# of validators>:<proxy count>;...
+// For example, VALIDATOR_PROXY_COUNTS='2:1,3:2' will give [1,1,2,2,2]
+// The resulting array does not necessarily have the same length as the total
+// number of validators because non-proxied validators are not represented in the array
+export function getProxiesPerValidator() {
+  const arr = []
+  const valProxyCountsStr = fetchEnvOrFallback(envVar.VALIDATOR_PROXY_COUNTS, '')
+  const splitValProxyCountStrs = valProxyCountsStr.split(',').filter((counts) => counts)
+  for (const valProxyCount of splitValProxyCountStrs) {
+    const [valCountStr, proxyCountStr] = valProxyCount.split(':')
+    const valCount = parseInt(valCountStr, 10)
+    const proxyCount = parseInt(proxyCountStr, 10)
+    for (let i = 0; i < valCount; i++) {
+      arr.push(proxyCount)
+    }
+  }
+  return arr
+}
+
+export function getProxyName(celoEnv: string, validatorIndex: number, proxyIndex: number) {
+  return `${celoEnv}-validators-${validatorIndex}-proxy-${proxyIndex}`
 }

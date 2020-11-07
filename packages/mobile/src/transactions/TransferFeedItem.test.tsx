@@ -1,5 +1,6 @@
 import * as React from 'react'
 import 'react-native'
+import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
@@ -11,6 +12,7 @@ import {
   mockAccount2,
   mockAddressToE164Number,
   mockComment,
+  mockE164Number,
   mockInviteDetails,
   mockInviteDetails2,
   mockPrivateDEK,
@@ -41,6 +43,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -62,6 +66,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -83,6 +89,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -104,6 +112,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -125,6 +135,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -146,6 +158,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -167,6 +181,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -188,6 +204,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -209,6 +227,40 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for known sent invite', () => {
+    const mockStoredInviteDetails = {
+      timestamp: 10,
+      e164Number: mockInviteDetails.e164Number,
+      tempWalletAddress: '0x',
+      tempWalletPrivateKey: 'secretkey',
+      tempWalletRedeemed: false,
+      inviteCode: 'join me!',
+      inviteLink: 'joinme.com',
+    }
+    const tree = renderer.create(
+      <Provider store={mockStore}>
+        <TransferFeedItem
+          __typename="TokenTransfer"
+          status={TransactionStatus.Complete}
+          comment={''}
+          type={TokenTransactionType.InviteSent}
+          hash={'0x'}
+          amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
+          address={mockInviteDetails.e164Number}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={mockAddressToE164Number}
+          recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[mockStoredInviteDetails]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -230,6 +282,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -251,6 +305,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -272,6 +328,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -293,6 +351,8 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -314,10 +374,88 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          recentTxRecipientsCache={{}}
+          invitees={[]}
           {...getMockI18nProps()}
         />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
+  })
+  it('for known sent without recipient cache populated', () => {
+    const tree = renderer.create(
+      <Provider store={mockStore}>
+        <TransferFeedItem
+          __typename="TokenTransfer"
+          status={TransactionStatus.Complete}
+          comment={''}
+          type={TokenTransactionType.Sent}
+          hash={'0x'}
+          amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
+          address={mockAccount}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={mockAddressToE164Number}
+          recipientCache={{}}
+          recentTxRecipientsCache={mockRecipientCache}
+          invitees={[]}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  const renderFeedItemForSendWithoutCaches = (address: string) => (
+    <TransferFeedItem
+      __typename="TokenTransfer"
+      status={TransactionStatus.Complete}
+      comment={''}
+      type={TokenTransactionType.Sent}
+      hash={'0x'}
+      amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
+      address={address}
+      timestamp={1}
+      commentKey={null}
+      addressToE164Number={mockAddressToE164Number}
+      recipientCache={{}}
+      recentTxRecipientsCache={{}}
+      invitees={[]}
+    />
+  )
+  it('for known address display name show stored name on feed item', () => {
+    const contactName = 'Some name'
+    const tree = render(
+      <Provider
+        store={createMockStore({
+          identity: {
+            addressToDisplayName: {
+              [mockAccount]: contactName,
+            },
+          },
+        })}
+      >
+        {renderFeedItemForSendWithoutCaches(mockAccount)}
+      </Provider>
+    )
+    expect(tree.queryByText(contactName)).toBeTruthy()
+    expect(tree.queryByText(mockE164Number)).toBeFalsy()
+  })
+  it('for unknown address display name show phone number on feed item', () => {
+    const contactName = 'Some name'
+    const tree = render(
+      <Provider
+        store={createMockStore({
+          identity: {
+            addressToDisplayName: {
+              [mockAccount2]: contactName,
+            },
+          },
+        })}
+      >
+        {renderFeedItemForSendWithoutCaches(mockAccount)}
+      </Provider>
+    )
+    expect(tree.queryByText(contactName)).toBeFalsy()
+    expect(tree.queryByText(mockE164Number)).toBeTruthy()
   })
 })

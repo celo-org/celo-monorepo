@@ -4,4 +4,4 @@ Transactions in the Celo protocol include payments, contract calls, and other op
 
 - Gas prices must meet or exceed the [gas price minimum](./gas-pricing.md).
 - [Gateway fees](./full-node-incentives.md) may be included to incentivize full nodes to serve the transaction.
-- Gas and gateway fees may be paid in currencies other than the native Celo Gold.
+- Gas and gateway fees may be paid in currencies other than the native CELO.

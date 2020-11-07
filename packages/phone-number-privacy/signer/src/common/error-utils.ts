@@ -1,21 +1,36 @@
+import {
+  ErrorMessage,
+  logger,
+  SignMessageResponseFailure,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { Response } from 'express'
-import logger from './logger'
+import { getVersion } from '../config'
+export type ErrorType = ErrorMessage | WarningMessage
 
-export enum ErrorMessages {
-  UNKNOWN_ERROR = 'CELO_PNP_ERR_00 Something went wrong',
-  DATABASE_UPDATE_FAILURE = 'CELO_PNP_ERR_01 Failed to update database entry',
-  DATABASE_INSERT_FAILURE = 'CELO_PNP_ERR_02 Failed to insert database entry',
-  DATABASE_GET_FAILURE = 'CELO_PNP_ERR_03 Failed to get database entry',
-  INVALID_INPUT = 'CELO_PNP_ERR_04 Invalid input paramaters',
-  EXCEEDED_QUOTA = 'CELO_PNP_ERR_05 Requester exceeded salt service query quota',
-  SIGNATURE_COMPUTATION_FAILURE = 'CELO_PNP_ERR_06 Failed to compute BLS signature',
-  DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_ERR_08 Attempt to request >1 matchmaking',
-  UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_ERR_09 Unverified user attempting to matchmake',
-  UNAUTHENTICATED_USER = 'CELO_PNP_ERR_10 Missing or invalid authentication header',
-  KEY_FETCH_ERROR = 'CELO_PNP_ERR_11 Failed to retrieve key from keystore',
-}
-
-export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {
-  logger.error('Responding with error', error)
-  res.status(statusCode).json({ success: false, error })
+export function respondWithError(
+  res: Response,
+  statusCode: number,
+  err: ErrorType,
+  performedQueryCount: number = -1,
+  totalQuota: number = -1,
+  blockNumber: number = -1,
+  signature?: string
+) {
+  logger.info('Responding with error')
+  if (err in WarningMessage) {
+    logger.warn({ err })
+  } else {
+    logger.error({ err })
+  }
+  const response: SignMessageResponseFailure = {
+    success: false,
+    version: getVersion(),
+    error: err,
+    performedQueryCount,
+    totalQuota,
+    blockNumber,
+    signature,
+  }
+  res.status(statusCode).json(response)
 }

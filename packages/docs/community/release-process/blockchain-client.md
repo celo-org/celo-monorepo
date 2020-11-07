@@ -1,14 +1,10 @@
 # Blockchain Client Release Process
 
-{% hint style="warning" %}
-This release process is a work in progress. Many infrastructure components required to execute it are not in place, and the process itself is subject to change.
-{% endhint %}
-
 ## Versioning
 
 Releases of celo-blockchain are numbered according to semantic versioning, as described at [semver.org](https://semver.org).
 
-  * New releases of celo-blockchain can be expected as follows:
+New releases of celo-blockchain can be expected as follows:
   * Major releases: approximately yearly
   * Minor releases: approximately 4 times a year
   * Patch releases: as needed
@@ -19,15 +15,17 @@ All builds are identified as `unstable` (a development build) or `stable` (a com
 
 Artifacts produced by this build process (e.g. tags, binaries, Docker images) will be signed. Signatures are produced using any one of the core developer keys listed below.
 
-{% hint style="warning" %}
-Work in progress: Core developer keys are not yet hosted.
-{% endhint %}
-
-Public keys for these developers are hosted on celo.org and can be imported to `gpg` with the following command:
+Public keys for corek developers are hosted on celo.org and can be imported to `gpg` with the following command:
 
 ```bash
 gpg --auto-key-locate wkd --locate-keys $EMAIL
 ```
+
+Currently hosted core developer keys include:
+
+* victor@clabs.co
+* mariano@clabs.co
+* joshua@clabs.co
 
 ## Documentation
 
@@ -75,7 +73,7 @@ A signature should be produced over the image automatically built at the corresp
 Release image signatures can be verified with the following command:
 
 ```bash
-docker save us.gcr.io/celo-testnet/celo-node:vX.Y.Z | gpg --verify celo-blockchain-vX.Y.Z.docker.asc -
+docker save $(docker image inspect us.gcr.io/celo-org/geth:X.Y.Z -f '{{ .Id }}') | gpg --verify celo-blockchain-vX.Y.Z.docker.asc -
 ```
 
 ## Testing

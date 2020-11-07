@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js'
 import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/send/actions'
@@ -16,8 +15,7 @@ export interface PaymentInfo {
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
-  // keep a list of recent (last 24 hours) payments
-  // TODO(erdal) when do we clean this up?
+  // Keep a list of recent (last 24 hours) payments
   recentPayments: PaymentInfo[]
 }
 
@@ -42,8 +40,22 @@ export const sendReducer = (
       }
     }
     case Actions.SEND_PAYMENT_OR_INVITE:
-      return sendPaymentOrInvite(state, action.amount, action.timestamp)
+      return {
+        ...state,
+        isSending: true,
+      }
     case Actions.SEND_PAYMENT_OR_INVITE_SUCCESS:
+      const now = Date.now()
+      // Keep only the last 24 hours
+      const paymentsLast24Hours = state.recentPayments.filter(
+        (p: PaymentInfo) => timeDeltaInHours(now, p.timestamp) < 24
+      )
+      const latestPayment: PaymentInfo = { amount: action.amount.toNumber(), timestamp: now }
+      return {
+        ...state,
+        isSending: false,
+        recentPayments: [...paymentsLast24Hours, latestPayment],
+      }
     case Actions.SEND_PAYMENT_OR_INVITE_FAILURE:
       return {
         ...state,
@@ -53,23 +65,6 @@ export const sendReducer = (
       return storeLatestRecentReducer(state, action.recipient)
     default:
       return state
-  }
-}
-
-const sendPaymentOrInvite = (state: State, amount: BigNumber, timestamp: number) => {
-  const latestPayment = { timestamp, amount }
-
-  // keep only the last 24 hours
-  const paymentsLast24Hours = state.recentPayments.filter(
-    (p: PaymentInfo) => timeDeltaInHours(timestamp, p.timestamp) < 24
-  )
-
-  const recentPayments = [...paymentsLast24Hours, latestPayment]
-
-  return {
-    ...state,
-    isSending: true,
-    recentPayments,
   }
 }
 

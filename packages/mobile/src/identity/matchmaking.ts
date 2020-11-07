@@ -1,27 +1,26 @@
-import { ContractKit } from '@celo/contractkit'
-import crypto from 'crypto'
+import { OdisUtils } from '@celo/contractkit'
+import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AuthSigner, ServiceContext } from '@celo/contractkit/lib/identity/odis/query'
+import DeviceInfo from 'react-native-device-info'
 import { call, put } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import networkConfig from 'src/geth/networkConfig'
 import { addContactsMatches } from 'src/identity/actions'
-import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import { ContactMatches } from 'src/identity/types'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getAuthSignerForAccount } from 'src/web3/dataEncryptionKey'
+import { getAccountAddress, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/matchmaking'
-const MATCHMAKING_ENDPOINT = '/getContactMatches'
-// Eventually, the matchmaking process will use blinded numbers same as salt lookups
-// But for now numbers are simply hashed using this static salt
-const SALT = '__celo__'
 
 // Uses the phone number privacy service to find mutual matches between Celo users
 export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) {
-  const account: string = yield call(getConnectedUnlockedAccount)
+  const walletAddress: string = yield call(getConnectedUnlockedAccount)
+  const accountAddress: string = yield call(getAccountAddress)
+
   Logger.debug(TAG, 'Starting contact matchmaking')
-  const contractKit: ContractKit = yield call(getContractKit)
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
     getUserSelfPhoneHashDetails
   )
@@ -31,88 +30,31 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     return
   }
 
-  const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(selfPhoneDetails.e164Number)
-  const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberToRecipients)
+  const authSigner: AuthSigner = yield call(getAuthSignerForAccount, accountAddress, walletAddress)
 
-  const matchHashes: string[] = yield call(
-    postToMatchmaking,
-    account,
-    contractKit,
-    selfPhoneNumObfuscated,
-    selfPhoneDetails.phoneHash,
-    Object.keys(obfucsatedNumToE164Number)
-  )
-
-  if (!matchHashes || !matchHashes.length) {
-    Logger.debug(TAG, 'No matches found')
-    return
-  }
-
-  const matches = getMatchedContacts(e164NumberToRecipients, obfucsatedNumToE164Number, matchHashes)
-  yield put(addContactsMatches(matches))
-}
-
-function getContactNumsObfuscated(e164NumberToRecipients: NumberToRecipient) {
-  const hashes: Record<string, string> = {}
-  for (const e164Number of Object.keys(e164NumberToRecipients)) {
-    // TODO For large contact lists, would be faster to these hashes
-    // in a native module.
-    const hash = obfuscateNumberForMatchmaking(e164Number)
-    hashes[hash] = e164Number
-  }
-  return hashes
-}
-
-// Hashes the phone number using a static salt
-// This is different than the phone + unique salt hashing that
-// we use for numbers getting verified and going on chain
-// Matchmaking doesn't support per-number salts yet
-export function obfuscateNumberForMatchmaking(e164Number: string) {
-  return crypto
-    .createHash('sha256')
-    .update(e164Number + SALT)
-    .digest('base64')
-}
-
-interface MatchmakingRequest {
-  account: string
-  userPhoneNumber: string
-  contactPhoneNumbers: string[]
-  hashedPhoneNumber: string
-}
-
-interface MatchmakingResponse {
-  success: boolean
-  matchedContacts: Array<{
-    phoneNumber: string
-  }>
-}
-
-async function postToMatchmaking(
-  account: string,
-  contractKit: ContractKit,
-  selfPhoneNumObfuscated: string,
-  selfPhoneHash: string,
-  contactNumsObfuscated: string[]
-) {
-  const body: MatchmakingRequest = {
-    account,
-    userPhoneNumber: selfPhoneNumObfuscated,
-    contactPhoneNumbers: contactNumsObfuscated,
-    hashedPhoneNumber: selfPhoneHash,
+  const { odisPubKey, odisUrl } = networkConfig
+  const serviceContext: ServiceContext = {
+    odisUrl,
+    odisPubKey,
   }
 
   try {
-    const response = await postToPhoneNumPrivacyService<MatchmakingResponse>(
-      account,
-      contractKit,
-      body,
-      MATCHMAKING_ENDPOINT
+    const matchedE164Number: string[] = yield call(
+      OdisUtils.Matchmaking.getContactMatches,
+      selfPhoneDetails.e164Number,
+      Object.keys(e164NumberToRecipients),
+      accountAddress,
+      selfPhoneDetails.phoneHash,
+      authSigner,
+      serviceContext,
+      DeviceInfo.getVersion()
     )
-    return response.matchedContacts.map((match) => match.phoneNumber)
+
+    const matches = getMatchedContacts(e164NumberToRecipients, matchedE164Number)
+    yield put(addContactsMatches(matches))
   } catch (error) {
-    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
-      throw new Error(ErrorMessages.MATHMAKING_QUOTA_EXCEEDED)
+    if (error.message === ErrorMessages.ODIS_QUOTA_ERROR) {
+      throw new Error(ErrorMessages.MATCHMAKING_QUOTA_EXCEEDED)
     }
     throw error
   }
@@ -120,16 +62,10 @@ async function postToMatchmaking(
 
 function getMatchedContacts(
   e164NumberToRecipients: NumberToRecipient,
-  obfucsatedNumToE164Number: Record<string, string>,
-  matchHashes: string[]
+  matchedE164Number: string[]
 ) {
   const matches: ContactMatches = {}
-  for (const match of matchHashes) {
-    const e164Number = obfucsatedNumToE164Number[match]
-    if (!e164Number) {
-      throw new Error('Number missing in hash map, should never happen')
-    }
-
+  for (const e164Number of matchedE164Number) {
     const recipient = e164NumberToRecipients[e164Number]
     if (!recipient) {
       throw new Error('Recipient missing in recipient map, should never happen')

@@ -142,6 +142,24 @@ function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
         }
         throw new Error('Invalid Path')
       },
+      signEIP712HashedMessage: async (
+        derivationPath: string,
+        domainSeparator: Buffer,
+        structHash: Buffer
+      ) => {
+        const messageHash = ethUtil.sha3(
+          Buffer.concat([Buffer.from('1901', 'hex'), domainSeparator, structHash])
+        ) as Buffer
+
+        const trimmedKey = trimLeading0x(ledgerAddresses[derivationPath].privateKey)
+        const pkBuffer = Buffer.from(trimmedKey, 'hex')
+        const signature = ethUtil.ecsign(messageHash, pkBuffer)
+        return {
+          v: signature.v,
+          r: signature.r.toString('hex'),
+          s: signature.s.toString('hex'),
+        }
+      },
       getAppConfiguration: async () => {
         return { arbitraryDataEnabled: 1, version: '0.0.0' }
       },
@@ -179,55 +197,6 @@ describe('LedgerWallet class', () => {
       // do nothing
     })
     mockLedger(wallet, mockForceValidation)
-  })
-
-  describe('without initializing', () => {
-    let celoTransaction: Tx
-    beforeAll(() => {
-      celoTransaction = {
-        from: knownAddress,
-        to: knownAddress,
-        chainId: CHAIN_ID,
-        value: Web3.utils.toWei('1', 'ether'),
-        nonce: 0,
-        gas: '10',
-        gasPrice: '99',
-        feeCurrency: '0x',
-        gatewayFeeRecipient: '0x1234',
-        gatewayFee: '0x5678',
-        data: '0xabcdef',
-      }
-    })
-
-    test('fails calling getAccounts', () => {
-      try {
-        wallet.getAccounts()
-        throw new Error('Expected exception to be thrown')
-      } catch (e) {
-        expect(e.message).toBe('wallet needs to be initialized first')
-      }
-    })
-
-    test('fails calling hasAccount', () => {
-      try {
-        wallet.hasAccount(ACCOUNT_ADDRESS1)
-        throw new Error('Expected exception to be thrown')
-      } catch (e) {
-        expect(e.message).toBe('wallet needs to be initialized first')
-      }
-    })
-
-    test('fails calling signTransaction', async () => {
-      await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
-    })
-
-    test('fails calling signPersonalMessage', async () => {
-      await expect(wallet.signPersonalMessage(ACCOUNT_ADDRESS1, 'test')).rejects.toThrowError()
-    })
-
-    test('fails calling signTypedData', async () => {
-      await expect(wallet.signTypedData(ACCOUNT_ADDRESS1, TYPED_DATA)).rejects.toThrowError()
-    })
   })
 
   describe('after initializing', () => {

@@ -1,19 +1,11 @@
-import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { exchangeIcon, shinyDollar } from 'src/images/Images'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { FeedType } from 'src/transactions/TransactionFeed'
-
-const goToSend = () => {
-  navigate(Screens.Send)
-}
 
 interface OwnProps {
   kind: FeedType
@@ -30,38 +22,21 @@ export class NoActivity extends React.PureComponent<Props> {
     if (error) {
       return (
         <View style={styles.container}>
-          <View style={styles.circleRed} />
-          <Text style={[fontStyles.bodySecondary, styles.text]}>{t('errorLoadingActivity.0')}</Text>
-          <Text style={[fontStyles.bodySecondary, styles.text]}>{t('errorLoadingActivity.1')}</Text>
+          <Text style={styles.text}>{t('errorLoadingActivity.0')}</Text>
+          <Text style={styles.text}>{t('errorLoadingActivity.1')}</Text>
         </View>
       )
     }
 
-    if (loading) {
-      return (
-        <View style={styles.container}>
-          <ActivityIndicator style={styles.icon} size="large" color={colors.celoGreen} />
-          <Text style={[fontStyles.bodySecondary, styles.text]}>{t('loadingActivity')}</Text>
-        </View>
-      )
-    }
-
-    const image = kind === FeedType.EXCHANGE ? exchangeIcon : shinyDollar
     const statusText =
       kind === FeedType.EXCHANGE ? t('noExchangeActivity') : t('noTransactionActivity')
 
     return (
       <View style={styles.container}>
-        <Image style={styles.icon} source={image} resizeMode={'contain'} />
-        <Text style={[fontStyles.bodySecondary, styles.text]}>{statusText} </Text>
-        {kind === FeedType.HOME && (
-          <SmallButton
-            onPress={goToSend}
-            text={t('global:sendCeloDollars')}
-            solid={true}
-            style={styles.button}
-          />
+        {loading && (
+          <ActivityIndicator style={styles.icon} size="large" color={colors.greenBrand} />
         )}
+        <Text style={styles.text}>{statusText} </Text>
       </View>
     )
   }
@@ -70,8 +45,10 @@ export class NoActivity extends React.PureComponent<Props> {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    justifyContent: 'center',
+    flex: 1,
+    paddingHorizontal: 16,
+    marginTop: 32,
   },
   icon: {
     marginVertical: 20,
@@ -79,20 +56,9 @@ const styles = StyleSheet.create({
     width: 108,
   },
   text: {
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  button: {
-    marginTop: 20,
-    alignSelf: 'center',
-  },
-  circleRed: {
-    marginVertical: 20,
-    height: 30,
-    width: 30,
-    borderRadius: 15,
-    backgroundColor: colors.errorRed,
+    ...fontStyles.large,
+    color: colors.gray3,
   },
 })
 
-export default withTranslation(Namespaces.walletFlow5)(NoActivity)
+export default withTranslation<Props>(Namespaces.walletFlow5)(NoActivity)

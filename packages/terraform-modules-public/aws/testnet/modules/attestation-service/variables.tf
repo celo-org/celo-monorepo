@@ -48,11 +48,23 @@ variable twilio_account_sid {
   type = string
 }
 
-variable twilio_blacklist {
+variable twilio_unsupported_regions {
   type = string
 }
 
 variable twilio_auth_token {
+  type = string
+}
+
+variable nexmo_api_key {
+  type = string
+}
+
+variable nexmo_api_secret {
+  type = string
+}
+
+variable nexmo_unsupported_regions {
   type = string
 }
 
@@ -66,4 +78,24 @@ variable attestation_services {
     attestation_signer_private_key_file_contents = string
     attestation_signer_private_key_password      = string
   }))
+}
+
+variable iam_instance_profile {
+  type    = string
+  default = null
+}
+
+variable cloudwatch_attestation_node_log_group_name {
+  type    = string
+  default = ""
+}
+
+variable cloudwatch_attestation_service_log_group_name {
+  type    = string
+  default = ""
+}
+
+variable cloudwatch_collect_disk_and_memory_usage {
+  type    = bool
+  default = false
 }

@@ -6,6 +6,10 @@ interface Props {
   address: string
 }
 
+export function formatShortenedAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
+}
+
 export default function ShortenedAddress({ style, address }: Props) {
-  return <Text style={style}>{`${address.slice(0, 6)}...${address.slice(-4)}`}</Text>
+  return <Text style={style}>{formatShortenedAddress(address)}</Text>
 }

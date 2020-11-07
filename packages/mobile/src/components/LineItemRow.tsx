@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
 
@@ -34,7 +34,7 @@ export default function LineItemRow({
       {hasError && <Text style={textStyle}>---</Text>}
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.celoGreen} />
+          <ActivityIndicator size="small" color={colors.greenBrand} />
         </View>
       )}
     </View>
@@ -53,8 +53,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   text: {
-    ...fontStyles.body,
-    fontSize: 15,
+    ...fontStyles.regular,
     color: colors.dark,
   },
   loadingContainer: {

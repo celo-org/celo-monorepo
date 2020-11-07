@@ -1,21 +1,31 @@
-import colors from '@celo/react-components/styles/colors.v2'
-import { elevationShadowStyle } from '@celo/react-components/styles/styles'
+import colors from '@celo/react-components/styles/colors'
+import { getShadowStyle, Shadow } from '@celo/react-components/styles/styles'
 import React from 'react'
 import { StyleSheet, View, ViewProps } from 'react-native'
 
 export interface Props extends ViewProps {
   rounded?: boolean
+  shadow?: Shadow | null
   children?: React.ReactNode
 }
 
-export default function Card({ style, rounded = false, ...props }: Props) {
-  return <View style={[styles.container, rounded && styles.rounded, style]} {...props} />
+export default function Card({ style, rounded = false, shadow = Shadow.Soft, ...props }: Props) {
+  return (
+    <View
+      style={[
+        styles.container,
+        rounded && styles.rounded,
+        shadow ? getShadowStyle(shadow) : undefined,
+        style,
+      ]}
+      {...props}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.light,
-    ...elevationShadowStyle(12),
     padding: 16,
   },
   rounded: {

@@ -1,14 +1,11 @@
 import { randomBytes } from 'crypto'
-import { ec as EC } from 'elliptic'
-import { ensureLeading0x } from './address'
+import { decompressPublicKey } from './dataEncryptionKey'
 import {
   AES128DecryptAndHMAC,
   AES128EncryptAndHMAC,
   Decrypt as ECIESDecrypt,
   Encrypt as ECIESEncrypt,
 } from './ecies'
-const hkdf = require('futoin-hkdf')
-const ec = new EC('secp256k1')
 
 const ECIES_SESSION_KEY_LEN = 129
 const MIN_COMMENT_KEY_LENGTH = 33
@@ -115,42 +112,7 @@ export function decryptComment(comment: string, key: Buffer, sender: boolean): E
   }
 }
 
-/**
- * Turns a private key to a compressed public key (hex string with hex leader).
- *
- * @param {Buffer} privateKey Private key.
- * @returns {string} Corresponding compessed public key in hex encoding with '0x' leader.
- */
-export function compressedPubKey(privateKey: Buffer): string {
-  const key = ec.keyFromPrivate(privateKey)
-  return ensureLeading0x(key.getPublic(true, 'hex'))
-}
-
-/**
- * Decompresses a public key and strips out the '0x04' leading constant. This makes
- * any public key suitable to be used with this ECIES implementation.
- *
- * @param publicKey Public key in standard form (with 0x02, 0x03, or 0x04 prefix)
- * @returns Decompresssed public key without prefix.
- */
-export function decompressPublicKey(publicKey: Buffer): Buffer {
-  return Buffer.from(ec.keyFromPublic(publicKey).getPublic(false, 'hex'), 'hex').slice(1)
-}
-
-/**
- * Derives a private comment encryption key from seed private key
- *
- * @param {string} privateKey Hex encoded private account key.
- * @returns {Buffer} Comment Encryption Private key.
- */
-export function deriveCEK(privateKey: string): Buffer {
-  const buf = Buffer.from(privateKey, 'hex')
-  return hkdf(buf, 32, { hash: 'sha-256' })
-}
-
-export const commentEncryption = {
+export const CommentEncryptionUtils = {
   encryptComment,
   decryptComment,
-  compressedPubKey,
-  deriveCEK,
 }

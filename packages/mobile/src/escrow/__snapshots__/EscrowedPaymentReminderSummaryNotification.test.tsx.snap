@@ -6,18 +6,20 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
+      },
+      Object {
+        "elevation": 12,
+        "shadowColor": "rgba(156, 164, 169, 0.4)",
+        "shadowOffset": Object {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 1,
+        "shadowRadius": 12,
       },
       Array [
         Object {
@@ -47,13 +49,7 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-          }
-        }
-        style={
-          Object {
-            "height": 30,
-            "width": 30,
+            "testUri": "../../../packages/mobile/src/images/notification-invite.png",
           }
         }
       />
@@ -71,8 +67,8 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 16,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 18,
             "lineHeight": 22,
             "marginBottom": 4,
           }
@@ -131,8 +127,10 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -160,18 +158,20 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
         Array [
           Object {
             "backgroundColor": "#FFFFFF",
-            "elevation": 12,
             "padding": 16,
-            "shadowColor": "black",
-            "shadowOffset": Object {
-              "height": 6,
-              "width": 0,
-            },
-            "shadowOpacity": 0.3,
-            "shadowRadius": 9.600000000000001,
           },
           Object {
             "borderRadius": 8,
+          },
+          Object {
+            "elevation": 12,
+            "shadowColor": "rgba(156, 164, 169, 0.4)",
+            "shadowOffset": Object {
+              "height": 2,
+              "width": 0,
+            },
+            "shadowOpacity": 1,
+            "shadowRadius": 12,
           },
           Array [
             Object {
@@ -260,20 +260,52 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
         <View
           style={Object {}}
         >
-          <Image
-            resizeMode="contain"
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-              }
-            }
+          <View
             style={
-              Object {
-                "height": 30,
-                "width": 30,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                },
+                undefined,
+              ]
             }
-          />
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "justifyContent": "center",
+                  },
+                  Object {
+                    "backgroundColor": "#7AD6FE",
+                    "borderRadius": 20,
+                    "height": 40,
+                    "width": 40,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                    },
+                    Object {
+                      "fontSize": 20,
+                    },
+                  ]
+                }
+              >
+                +
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
       <View
@@ -313,8 +345,10 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -351,8 +385,10 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }
@@ -372,18 +408,20 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
     Array [
       Object {
         "backgroundColor": "#FFFFFF",
-        "elevation": 12,
         "padding": 16,
-        "shadowColor": "black",
-        "shadowOffset": Object {
-          "height": 6,
-          "width": 0,
-        },
-        "shadowOpacity": 0.3,
-        "shadowRadius": 9.600000000000001,
       },
       Object {
         "borderRadius": 8,
+      },
+      Object {
+        "elevation": 12,
+        "shadowColor": "rgba(156, 164, 169, 0.4)",
+        "shadowOffset": Object {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 1,
+        "shadowRadius": 12,
       },
       Array [
         Object {
@@ -413,13 +451,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
         resizeMode="contain"
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-          }
-        }
-        style={
-          Object {
-            "height": 30,
-            "width": 30,
+            "testUri": "../../../packages/mobile/src/images/notification-invite.png",
           }
         }
       />
@@ -437,8 +469,8 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Inter-Medium",
-            "fontSize": 16,
+            "fontFamily": "Jost-Medium",
+            "fontSize": 18,
             "lineHeight": 22,
             "marginBottom": 4,
           }
@@ -497,8 +529,10 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                 },
                 Object {
                   "fontSize": 14,
+                  "height": 16,
                   "lineHeight": 16,
                   "marginRight": 24,
+                  "minWidth": 48,
                 },
               ]
             }

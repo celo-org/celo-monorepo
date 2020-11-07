@@ -1,26 +1,32 @@
-import colors from '@celo/react-components/styles/colors.v2'
+import colors from '@celo/react-components/styles/colors'
 import { StyleSheet } from 'react-native'
 
-const PROGRESS_CIRCLE_PASSIVE_SIZE = 6
-const PROGRESS_CIRCLE_ACTIVE_SIZE = 8
+const CIRCLE_SIZE = 5
 
 const circle = {
   flex: 0,
-  borderRadius: 8,
-  marginHorizontal: 5,
+  height: CIRCLE_SIZE,
+  width: CIRCLE_SIZE,
+  borderRadius: CIRCLE_SIZE,
+  marginHorizontal: 3,
 }
 
 export default StyleSheet.create({
   circlePassive: {
     ...circle,
-    backgroundColor: colors.inactive,
-    height: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    width: PROGRESS_CIRCLE_PASSIVE_SIZE,
+    backgroundColor: colors.gray4,
   },
   circleActive: {
     ...circle,
     backgroundColor: colors.dark,
-    height: PROGRESS_CIRCLE_ACTIVE_SIZE,
-    width: PROGRESS_CIRCLE_ACTIVE_SIZE,
+  },
+  circlePassiveOnboarding: {
+    ...circle,
+    backgroundColor: colors.onboardingBrownLight,
+    opacity: 0.5,
+  },
+  circleActiveOnboarding: {
+    ...circle,
+    backgroundColor: colors.onboardingBlue,
   },
 })

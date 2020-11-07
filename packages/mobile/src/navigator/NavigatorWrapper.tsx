@@ -1,13 +1,24 @@
+import colors from '@celo/react-components/styles/colors'
 import AsyncStorage from '@react-native-community/async-storage'
-import { NavigationContainer, NavigationState } from '@react-navigation/native'
+import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Share, StyleSheet, View } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import RNShake from 'react-native-shake'
+import { nameSelector } from 'src/account/selectors'
 import AlertBanner from 'src/alert/AlertBanner'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { InviteEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { getAppLocked } from 'src/app/selectors'
+import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
-import { navigationRef } from 'src/navigator/NavigationService'
+import { isVersionBelowMinimum } from 'src/firebase/firebase'
+import i18n from 'src/i18n'
+import InviteFriendModal from 'src/invite/InviteFriendModal'
+import { generateInviteLink } from 'src/invite/saga'
+import { navigate, navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
 import useTypedSelector from 'src/redux/useSelector'
 import BackupPrompt from 'src/shared/BackupPrompt'
@@ -19,7 +30,7 @@ import Logger from 'src/utils/Logger'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // @ts-ignore https://reactnavigation.org/docs/screen-tracking/
-const getActiveRouteName = (state: NavigationState) => {
+export const getActiveRouteName = (state: NavigationState) => {
   const route = state.routes[state.index]
 
   if (route.state) {
@@ -32,11 +43,35 @@ const getActiveRouteName = (state: NavigationState) => {
 
 const RESTORE_STATE = __DEV__ && DEV_RESTORE_NAV_STATE_ON_RELOAD
 
+// Global app them used by react-navigation
+const AppTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors.light,
+  },
+}
+
 export const NavigatorWrapper = () => {
   const [isReady, setIsReady] = React.useState(RESTORE_STATE ? false : true)
   const [initialState, setInitialState] = React.useState()
   const appLocked = useTypedSelector(getAppLocked)
+  const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
+  const isInviteModalVisible = useTypedSelector((state) => state.app.inviteModalVisible)
+  const name = useTypedSelector(nameSelector)
   const routeNameRef = React.useRef()
+
+  const updateRequired = React.useMemo(() => {
+    if (!minRequiredVersion) {
+      return false
+    }
+    const version = DeviceInfo.getVersion()
+    Logger.info(
+      'NavigatorWrapper',
+      `Current version: ${version}. Required min version: ${minRequiredVersion}`
+    )
+    return isVersionBelowMinimum(version, minRequiredVersion)
+  }, [minRequiredVersion])
 
   React.useEffect(() => {
     if (navigationRef && navigationRef.current) {
@@ -71,6 +106,15 @@ export const NavigatorWrapper = () => {
     }
   }, [isReady])
 
+  React.useEffect(() => {
+    RNShake.addEventListener('ShakeEvent', () => {
+      navigate(Screens.SupportContact)
+    })
+    return () => {
+      RNShake.removeEventListener('ShakeEvent')
+    }
+  }, [])
+
   if (!isReady) {
     return null
   }
@@ -92,7 +136,7 @@ export const NavigatorWrapper = () => {
     if (previousRouteName !== currentRouteName) {
       // The line below uses the @react-native-firebase/analytics tracker
       // Change this line to use another Mobile analytics SDK
-      CeloAnalytics.page(currentRouteName, {
+      ValoraAnalytics.page(currentRouteName, {
         previousScreen: previousRouteName,
         currentScreen: currentRouteName,
       })
@@ -102,22 +146,31 @@ export const NavigatorWrapper = () => {
     routeNameRef.current = currentRouteName
   }
 
+  const onInvite = async () => {
+    const message = i18n.t('sendFlow7:inviteWithoutPayment', {
+      name,
+      link: await generateInviteLink(),
+    })
+    ValoraAnalytics.track(InviteEvents.invite_from_menu)
+    await Share.share({ message })
+  }
+
   return (
     <NavigationContainer
       ref={navigationRef}
       onStateChange={handleStateChange}
       initialState={initialState}
+      theme={AppTheme}
     >
       <View style={styles.container}>
         <Navigator />
-        {appLocked && (
-          <View style={styles.locked}>
-            <PincodeLock />
-          </View>
+        {(appLocked || updateRequired) && (
+          <View style={styles.locked}>{updateRequired ? <UpgradeScreen /> : <PincodeLock />}</View>
         )}
         <View style={styles.floating}>
-          {!appLocked && <BackupPrompt />}
+          {!appLocked && !updateRequired && <BackupPrompt />}
           <AlertBanner />
+          <InviteFriendModal isVisible={isInviteModalVisible} onInvite={onInvite} />
         </View>
       </View>
     </NavigationContainer>

@@ -68,5 +68,5 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
 )
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withTranslation(Namespaces.global)(EscrowedPaymentListScreen)
+  withTranslation<Props>(Namespaces.global)(EscrowedPaymentListScreen)
 )

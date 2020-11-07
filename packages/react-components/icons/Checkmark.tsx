@@ -1,5 +1,6 @@
+import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
-import Svg, { Rect } from 'svgs'
+import Svg, { Path } from 'svgs'
 
 interface Props {
   height?: number
@@ -9,36 +10,16 @@ interface Props {
 
 export default class Checkmark extends React.PureComponent<Props> {
   static defaultProps = {
-    height: 47,
-    width: 47,
-    color: '#45CD86',
+    height: 32,
+    width: 32,
+    color: colors.greenBrand,
   }
 
   render() {
     return (
-      <Svg
-        height={this.props.height}
-        width={this.props.width}
-        viewBox="0 0 18 18"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <Rect
-          x="6.89185"
-          y="17.0205"
-          width="8.33324"
-          height="2"
-          rx="1"
-          transform="rotate(-135 6.89185 17.0205)"
-          fill={this.props.color}
-        />
-        <Rect
-          x="5.47778"
-          y="15.6064"
-          width="14.9998"
-          height="2"
-          rx="1"
-          transform="rotate(-45 5.47778 15.6064)"
+      <Svg width={this.props.width} height={this.props.height} viewBox="0 0 32 32" fill="none">
+        <Path
+          d="M8.414 15.086a2 2 0 10-2.828 2.828l2.828-2.828zM12.5 22l-1.414 1.414a2 2 0 002.8.029L12.5 22zm13.885-10.557a2 2 0 00-2.77-2.886l2.77 2.886zm-20.8 6.471l5.5 5.5 2.83-2.828-5.5-5.5-2.83 2.828zm8.3 5.529l12.5-12-2.77-2.886-12.5 12 2.77 2.886z"
           fill={this.props.color}
         />
       </Svg>

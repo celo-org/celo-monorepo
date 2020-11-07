@@ -40,7 +40,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
           }
         }
         style={
@@ -164,7 +164,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
           }
         }
         style={
@@ -519,7 +519,286 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             }
           }
         >
-          feedItemSentTitle
+          John Doe
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                false,
+              ],
+              Object {
+                "color": "#2E3338",
+              },
+            ]
+          }
+        >
+          $
+          133.00
+        </Text>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "paddingTop": 2,
+          }
+        }
+      >
+        feedItemSentInfo
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`transfer feed item renders correctly for known sent invite 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackground",
+      "type": "ThemeAttrAndroid",
+    }
+  }
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingHorizontal": 16,
+        "paddingVertical": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "column",
+        }
+      }
+    >
+      <Image
+        source={
+          Object {
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
+          }
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "marginLeft": 16,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "marginTop": -1,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          feedItemInviteSentTitle
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                  "marginLeft": "auto",
+                  "paddingLeft": 10,
+                },
+                false,
+              ],
+              Object {
+                "color": "#2E3338",
+              },
+            ]
+          }
+        >
+          $
+          1.33
+        </Text>
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "paddingTop": 2,
+          }
+        }
+      >
+        feedItemInviteSentInfo
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`transfer feed item renders correctly for known sent without recipient cache populated 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackground",
+      "type": "ThemeAttrAndroid",
+    }
+  }
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingHorizontal": 16,
+        "paddingVertical": 12,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "column",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            undefined,
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
+                "height": 40,
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            J
+          </Text>
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "marginLeft": 16,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "marginTop": -1,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          John Doe
         </Text>
         <Text
           numberOfLines={1}
@@ -604,7 +883,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
           }
         }
         style={
@@ -889,7 +1168,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
           }
         }
         style={
@@ -1335,7 +1614,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
           }
         }
         style={
@@ -1775,7 +2054,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
       <Image
         source={
           Object {
-            "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            "testUri": "../../../packages/mobile/src/images/transaction-network.png",
           }
         }
         style={

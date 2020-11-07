@@ -1,23 +1,23 @@
-import Button from '@celo/react-components/components/Button.v2'
-import TextButton from '@celo/react-components/components/TextButton.v2'
-import { default as colors, default as colorsV2 } from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Spacing } from '@celo/react-components/styles/styles.v2'
+import Button from '@celo/react-components/components/Button'
+import TextButton from '@celo/react-components/components/TextButton'
+import colors from '@celo/react-components/styles/colors'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
-import Logo from 'src/icons/Logo.v2'
+import Logo from 'src/icons/Logo'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers.v2'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -43,7 +43,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export const navOptionsForAccount = ({ route }: NavigationProps) => {
-  if (route.params?.fromAccountScreen) {
+  if (route.params?.navigatedFromSettings) {
     return headerWithBackButton
   }
 
@@ -64,16 +64,16 @@ class BackupIntroduction extends React.Component<Props> {
   }
 
   onPressBackup = () => {
-    CeloAnalytics.track(CustomEventNames.backup_start)
+    ValoraAnalytics.track(OnboardingEvents.backup_start)
     navigate(Screens.AccountKeyEducation)
   }
 
   render() {
     const { backupCompleted, route } = this.props
-    const fromAccountScreen = route.params?.fromAccountScreen
+    const navigatedFromSettings = route.params?.navigatedFromSettings
     return (
       <SafeAreaView style={styles.container}>
-        {!fromAccountScreen && <DrawerTopBar />}
+        {!navigatedFromSettings && <DrawerTopBar />}
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (
@@ -95,7 +95,7 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
       <Logo height={32} />
       <Text style={styles.h1}>{t('introTitle')}</Text>
       <Text style={styles.body}>{t('introBody')}</Text>
-      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} />
+      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} testID="SetUpAccountKey" />
     </ScrollView>
   )
 }
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   keyArea: {
     padding: Spacing.Regular16,
-    backgroundColor: colorsV2.brownFaint,
+    backgroundColor: colors.beige,
     marginTop: Spacing.Regular16,
   },
   postSetupBody: {

@@ -1,10 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -27,6 +26,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -44,8 +44,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Book",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {
@@ -78,6 +78,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             <View
               style={
                 Object {
+                  "alignItems": "center",
                   "flexDirection": "column",
                   "justifyContent": "center",
                   "marginBottom": 10,
@@ -137,7 +138,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Inter-Medium",
                       "fontSize": 14,
                       "lineHeight": 18,
                     },
@@ -164,8 +165,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -183,8 +184,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -214,7 +215,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": undefined,
@@ -230,7 +234,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": undefined,
@@ -246,7 +253,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                       "paddingHorizontal": 3,
                     },
                     Object {
@@ -264,7 +274,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -298,15 +308,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -314,9 +324,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -365,9 +375,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
@@ -407,21 +417,230 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     }
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/info.png",
-                      }
-                    }
+                  <svg
+                    fill="none"
+                    height={12}
+                    style={Object {}}
+                    viewBox="0 0 16 16"
+                    width={12}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="7"
+                      stroke="#2E3338"
+                      stroke-width="1.25"
+                      style={Object {}}
+                    />
+                    <path
+                      d="M8 12V7M8 6V5"
+                      stroke="#2E3338"
+                      stroke-width="1.25"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Modal
+                  animationType="none"
+                  hardwareAccelerated={false}
+                  hideModalContentWhileAnimating={false}
+                  onModalHide={[Function]}
+                  onModalWillHide={[Function]}
+                  onModalWillShow={[Function]}
+                  onRequestClose={[Function]}
+                  scrollHorizontal={false}
+                  scrollOffset={0}
+                  scrollOffsetMax={0}
+                  scrollTo={null}
+                  statusBarTranslucent={true}
+                  supportedOrientations={
+                    Array [
+                      "portrait",
+                      "landscape",
+                    ]
+                  }
+                  swipeThreshold={100}
+                  transparent={true}
+                  visible={false}
+                >
+                  <View
+                    accessible={true}
+                    focusable={true}
+                    forwardedRef={[Function]}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
-                        "height": 12,
-                        "tintColor": "#BDBDBD",
-                        "width": 12,
+                        "backgroundColor": "black",
+                        "bottom": 0,
+                        "height": 1334,
+                        "left": 0,
+                        "opacity": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "width": 750,
                       }
                     }
                   />
-                </View>
+                  <View
+                    forwardedRef={[Function]}
+                    hideModalContentWhileAnimating={false}
+                    onModalHide={[Function]}
+                    onModalWillHide={[Function]}
+                    onModalWillShow={[Function]}
+                    pointerEvents="box-none"
+                    scrollHorizontal={false}
+                    scrollOffset={0}
+                    scrollOffsetMax={0}
+                    scrollTo={null}
+                    statusBarTranslucent={true}
+                    style={
+                      Object {
+                        "flex": 1,
+                        "justifyContent": "center",
+                        "margin": 37.5,
+                        "transform": Array [
+                          Object {
+                            "translateY": 0,
+                          },
+                        ],
+                      }
+                    }
+                    supportedOrientations={
+                      Array [
+                        "portrait",
+                        "landscape",
+                      ]
+                    }
+                    swipeThreshold={100}
+                  >
+                    <RNCSafeAreaView>
+                      <View
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "#FFFFFF",
+                              "padding": 16,
+                            },
+                            Object {
+                              "borderRadius": 8,
+                            },
+                            Object {
+                              "elevation": 12,
+                              "shadowColor": "rgba(156, 164, 169, 0.4)",
+                              "shadowOffset": Object {
+                                "height": 2,
+                                "width": 0,
+                              },
+                              "shadowOpacity": 1,
+                              "shadowRadius": 12,
+                            },
+                            Array [
+                              Object {
+                                "backgroundColor": "#FFFFFF",
+                                "maxHeight": "100%",
+                                "padding": 24,
+                              },
+                              undefined,
+                            ],
+                          ]
+                        }
+                      >
+                        <RCTScrollView
+                          contentContainerStyle={
+                            Object {
+                              "alignItems": "center",
+                            }
+                          }
+                        >
+                          <View>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Jost-Medium",
+                                  "fontSize": 22,
+                                  "lineHeight": 28,
+                                  "marginBottom": 12,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              securityFee
+                            </Text>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Inter-Regular",
+                                  "fontSize": 16,
+                                  "lineHeight": 22,
+                                  "marginBottom": 24,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              feeEducation
+                            </Text>
+                          </View>
+                        </RCTScrollView>
+                        <View
+                          style={
+                            Object {
+                              "flexDirection": "row",
+                              "flexWrap": "wrap",
+                              "justifyContent": "space-around",
+                              "maxWidth": "100%",
+                            }
+                          }
+                        >
+                          <View
+                            accessible={true}
+                            focusable={true}
+                            nativeBackgroundAndroid={
+                              Object {
+                                "attribute": "selectableItemBackgroundBorderless",
+                                "type": "ThemeAttrAndroid",
+                              }
+                            }
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                          >
+                            <Text
+                              style={
+                                Array [
+                                  Object {
+                                    "color": "#1AB775",
+                                    "fontFamily": "Inter-SemiBold",
+                                    "fontSize": 16,
+                                    "lineHeight": 22,
+                                  },
+                                  Object {
+                                    "paddingTop": 16,
+                                  },
+                                ]
+                              }
+                            >
+                              global:dismiss
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </RNCSafeAreaView>
+                  </View>
+                </Modal>
               </View>
               <View
                 style={
@@ -446,7 +665,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -480,15 +699,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -501,15 +720,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -559,17 +778,20 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
-                        "color": "#81868B",
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                     ]
                   }
                 >
-                  Celo Dollars (@
+                  Celo Dollars @
                    
                   <Text
                     numberOfLines={1}
@@ -586,7 +808,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     $
                     0.75
                   </Text>
-                  )
                 </Text>
               </View>
               <Text
@@ -594,12 +815,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                   ]
                 }
@@ -627,7 +851,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -637,16 +862,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -672,7 +903,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
-                "paddingHorizontal": 16,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -708,10 +940,14 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -733,11 +969,12 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#F5F4F0",
+                "backgroundColor": "#F1F0EB",
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
-                "paddingHorizontal": 16,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -759,15 +996,30 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 1`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -790,6 +1042,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -807,8 +1060,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Book",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {
@@ -841,6 +1094,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             <View
               style={
                 Object {
+                  "alignItems": "center",
                   "flexDirection": "column",
                   "justifyContent": "center",
                   "marginBottom": 10,
@@ -900,7 +1154,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Inter-Medium",
                       "fontSize": 14,
                       "lineHeight": 18,
                     },
@@ -927,8 +1181,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -946,8 +1200,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -977,7 +1231,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": undefined,
@@ -993,7 +1250,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": undefined,
@@ -1009,7 +1269,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                       "paddingHorizontal": 3,
                     },
                     Object {
@@ -1027,7 +1290,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -1061,15 +1324,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -1077,9 +1340,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -1128,9 +1391,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
@@ -1170,21 +1433,230 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/info.png",
-                      }
-                    }
+                  <svg
+                    fill="none"
+                    height={12}
+                    style={Object {}}
+                    viewBox="0 0 16 16"
+                    width={12}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="7"
+                      stroke="#2E3338"
+                      stroke-width="1.25"
+                      style={Object {}}
+                    />
+                    <path
+                      d="M8 12V7M8 6V5"
+                      stroke="#2E3338"
+                      stroke-width="1.25"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Modal
+                  animationType="none"
+                  hardwareAccelerated={false}
+                  hideModalContentWhileAnimating={false}
+                  onModalHide={[Function]}
+                  onModalWillHide={[Function]}
+                  onModalWillShow={[Function]}
+                  onRequestClose={[Function]}
+                  scrollHorizontal={false}
+                  scrollOffset={0}
+                  scrollOffsetMax={0}
+                  scrollTo={null}
+                  statusBarTranslucent={true}
+                  supportedOrientations={
+                    Array [
+                      "portrait",
+                      "landscape",
+                    ]
+                  }
+                  swipeThreshold={100}
+                  transparent={true}
+                  visible={false}
+                >
+                  <View
+                    accessible={true}
+                    focusable={true}
+                    forwardedRef={[Function]}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
-                        "height": 12,
-                        "tintColor": "#BDBDBD",
-                        "width": 12,
+                        "backgroundColor": "black",
+                        "bottom": 0,
+                        "height": 1334,
+                        "left": 0,
+                        "opacity": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "width": 750,
                       }
                     }
                   />
-                </View>
+                  <View
+                    forwardedRef={[Function]}
+                    hideModalContentWhileAnimating={false}
+                    onModalHide={[Function]}
+                    onModalWillHide={[Function]}
+                    onModalWillShow={[Function]}
+                    pointerEvents="box-none"
+                    scrollHorizontal={false}
+                    scrollOffset={0}
+                    scrollOffsetMax={0}
+                    scrollTo={null}
+                    statusBarTranslucent={true}
+                    style={
+                      Object {
+                        "flex": 1,
+                        "justifyContent": "center",
+                        "margin": 37.5,
+                        "transform": Array [
+                          Object {
+                            "translateY": 0,
+                          },
+                        ],
+                      }
+                    }
+                    supportedOrientations={
+                      Array [
+                        "portrait",
+                        "landscape",
+                      ]
+                    }
+                    swipeThreshold={100}
+                  >
+                    <RNCSafeAreaView>
+                      <View
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "#FFFFFF",
+                              "padding": 16,
+                            },
+                            Object {
+                              "borderRadius": 8,
+                            },
+                            Object {
+                              "elevation": 12,
+                              "shadowColor": "rgba(156, 164, 169, 0.4)",
+                              "shadowOffset": Object {
+                                "height": 2,
+                                "width": 0,
+                              },
+                              "shadowOpacity": 1,
+                              "shadowRadius": 12,
+                            },
+                            Array [
+                              Object {
+                                "backgroundColor": "#FFFFFF",
+                                "maxHeight": "100%",
+                                "padding": 24,
+                              },
+                              undefined,
+                            ],
+                          ]
+                        }
+                      >
+                        <RCTScrollView
+                          contentContainerStyle={
+                            Object {
+                              "alignItems": "center",
+                            }
+                          }
+                        >
+                          <View>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Jost-Medium",
+                                  "fontSize": 22,
+                                  "lineHeight": 28,
+                                  "marginBottom": 12,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              securityFee
+                            </Text>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Inter-Regular",
+                                  "fontSize": 16,
+                                  "lineHeight": 22,
+                                  "marginBottom": 24,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              feeEducation
+                            </Text>
+                          </View>
+                        </RCTScrollView>
+                        <View
+                          style={
+                            Object {
+                              "flexDirection": "row",
+                              "flexWrap": "wrap",
+                              "justifyContent": "space-around",
+                              "maxWidth": "100%",
+                            }
+                          }
+                        >
+                          <View
+                            accessible={true}
+                            focusable={true}
+                            nativeBackgroundAndroid={
+                              Object {
+                                "attribute": "selectableItemBackgroundBorderless",
+                                "type": "ThemeAttrAndroid",
+                              }
+                            }
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                          >
+                            <Text
+                              style={
+                                Array [
+                                  Object {
+                                    "color": "#1AB775",
+                                    "fontFamily": "Inter-SemiBold",
+                                    "fontSize": 16,
+                                    "lineHeight": 22,
+                                  },
+                                  Object {
+                                    "paddingTop": 16,
+                                  },
+                                ]
+                              }
+                            >
+                              global:dismiss
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </RNCSafeAreaView>
+                  </View>
+                </Modal>
               </View>
               <View
                 style={
@@ -1209,7 +1681,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -1243,15 +1715,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -1264,15 +1736,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -1322,17 +1794,20 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
-                        "color": "#81868B",
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                     ]
                   }
                 >
-                  Celo Dollars (@
+                  Celo Dollars @
                    
                   <Text
                     numberOfLines={1}
@@ -1349,7 +1824,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     $
                     0.75
                   </Text>
-                  )
                 </Text>
               </View>
               <Text
@@ -1357,12 +1831,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                   ]
                 }
@@ -1390,7 +1867,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -1400,16 +1878,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -1435,7 +1919,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
-                "paddingHorizontal": 16,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -1471,10 +1956,14 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -1496,11 +1985,12 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#F5F4F0",
+                "backgroundColor": "#F1F0EB",
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
-                "paddingHorizontal": 16,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -1522,15 +2012,30 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
 
 exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation fails 2`] = `
-<SafeAreaView
+<RNCSafeAreaView
   style={
     Object {
-      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "paddingTop": 20,
     }
@@ -1553,6 +2058,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
           "paddingVertical": 10,
         }
       }
+      keyboardShouldPersistTaps="handled"
     >
       <View>
         <View
@@ -1570,8 +2076,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Inter-Medium",
-                  "fontSize": 24,
+                  "fontFamily": "Jost-Book",
+                  "fontSize": 26,
                   "lineHeight": 32,
                 },
                 Object {
@@ -1604,6 +2110,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             <View
               style={
                 Object {
+                  "alignItems": "center",
                   "flexDirection": "column",
                   "justifyContent": "center",
                   "marginBottom": 10,
@@ -1663,7 +2170,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
+                      "fontFamily": "Inter-Medium",
                       "fontSize": 14,
                       "lineHeight": 18,
                     },
@@ -1690,8 +2197,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "alignItems": "center",
@@ -1709,8 +2216,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Inter-Regular",
-                        "fontSize": 16,
-                        "lineHeight": 22,
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                       Object {
                         "color": "#9CA4A9",
@@ -1740,7 +2247,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": undefined,
@@ -1756,7 +2266,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": undefined,
@@ -1772,7 +2285,10 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                       "paddingHorizontal": 3,
                     },
                     Object {
@@ -1790,7 +2306,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -1824,15 +2340,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
                   }
                 >
-                  amount
+                  global:amount
                 </Text>
               </View>
               <Text
@@ -1840,9 +2356,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -1891,9 +2407,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       undefined,
                     ]
@@ -1933,30 +2449,239 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/info.png",
-                      }
-                    }
+                  <svg
+                    fill="none"
+                    height={12}
+                    style={Object {}}
+                    viewBox="0 0 16 16"
+                    width={12}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="7"
+                      stroke="#2E3338"
+                      stroke-width="1.25"
+                      style={Object {}}
+                    />
+                    <path
+                      d="M8 12V7M8 6V5"
+                      stroke="#2E3338"
+                      stroke-width="1.25"
+                      style={Object {}}
+                    />
+                  </svg>
+                </View>
+                <Modal
+                  animationType="none"
+                  hardwareAccelerated={false}
+                  hideModalContentWhileAnimating={false}
+                  onModalHide={[Function]}
+                  onModalWillHide={[Function]}
+                  onModalWillShow={[Function]}
+                  onRequestClose={[Function]}
+                  scrollHorizontal={false}
+                  scrollOffset={0}
+                  scrollOffsetMax={0}
+                  scrollTo={null}
+                  statusBarTranslucent={true}
+                  supportedOrientations={
+                    Array [
+                      "portrait",
+                      "landscape",
+                    ]
+                  }
+                  swipeThreshold={100}
+                  transparent={true}
+                  visible={false}
+                >
+                  <View
+                    accessible={true}
+                    focusable={true}
+                    forwardedRef={[Function]}
+                    onClick={[Function]}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
                     style={
                       Object {
-                        "height": 12,
-                        "tintColor": "#BDBDBD",
-                        "width": 12,
+                        "backgroundColor": "black",
+                        "bottom": 0,
+                        "height": 1334,
+                        "left": 0,
+                        "opacity": 0,
+                        "position": "absolute",
+                        "right": 0,
+                        "top": 0,
+                        "width": 750,
                       }
                     }
                   />
-                </View>
+                  <View
+                    forwardedRef={[Function]}
+                    hideModalContentWhileAnimating={false}
+                    onModalHide={[Function]}
+                    onModalWillHide={[Function]}
+                    onModalWillShow={[Function]}
+                    pointerEvents="box-none"
+                    scrollHorizontal={false}
+                    scrollOffset={0}
+                    scrollOffsetMax={0}
+                    scrollTo={null}
+                    statusBarTranslucent={true}
+                    style={
+                      Object {
+                        "flex": 1,
+                        "justifyContent": "center",
+                        "margin": 37.5,
+                        "transform": Array [
+                          Object {
+                            "translateY": 0,
+                          },
+                        ],
+                      }
+                    }
+                    supportedOrientations={
+                      Array [
+                        "portrait",
+                        "landscape",
+                      ]
+                    }
+                    swipeThreshold={100}
+                  >
+                    <RNCSafeAreaView>
+                      <View
+                        style={
+                          Array [
+                            Object {
+                              "backgroundColor": "#FFFFFF",
+                              "padding": 16,
+                            },
+                            Object {
+                              "borderRadius": 8,
+                            },
+                            Object {
+                              "elevation": 12,
+                              "shadowColor": "rgba(156, 164, 169, 0.4)",
+                              "shadowOffset": Object {
+                                "height": 2,
+                                "width": 0,
+                              },
+                              "shadowOpacity": 1,
+                              "shadowRadius": 12,
+                            },
+                            Array [
+                              Object {
+                                "backgroundColor": "#FFFFFF",
+                                "maxHeight": "100%",
+                                "padding": 24,
+                              },
+                              undefined,
+                            ],
+                          ]
+                        }
+                      >
+                        <RCTScrollView
+                          contentContainerStyle={
+                            Object {
+                              "alignItems": "center",
+                            }
+                          }
+                        >
+                          <View>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Jost-Medium",
+                                  "fontSize": 22,
+                                  "lineHeight": 28,
+                                  "marginBottom": 12,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              securityFee
+                            </Text>
+                            <Text
+                              style={
+                                Object {
+                                  "color": "#2E3338",
+                                  "fontFamily": "Inter-Regular",
+                                  "fontSize": 16,
+                                  "lineHeight": 22,
+                                  "marginBottom": 24,
+                                  "textAlign": "center",
+                                }
+                              }
+                            >
+                              feeEducation
+                            </Text>
+                          </View>
+                        </RCTScrollView>
+                        <View
+                          style={
+                            Object {
+                              "flexDirection": "row",
+                              "flexWrap": "wrap",
+                              "justifyContent": "space-around",
+                              "maxWidth": "100%",
+                            }
+                          }
+                        >
+                          <View
+                            accessible={true}
+                            focusable={true}
+                            nativeBackgroundAndroid={
+                              Object {
+                                "attribute": "selectableItemBackgroundBorderless",
+                                "type": "ThemeAttrAndroid",
+                              }
+                            }
+                            onClick={[Function]}
+                            onResponderGrant={[Function]}
+                            onResponderMove={[Function]}
+                            onResponderRelease={[Function]}
+                            onResponderTerminate={[Function]}
+                            onResponderTerminationRequest={[Function]}
+                            onStartShouldSetResponder={[Function]}
+                          >
+                            <Text
+                              style={
+                                Array [
+                                  Object {
+                                    "color": "#1AB775",
+                                    "fontFamily": "Inter-SemiBold",
+                                    "fontSize": 16,
+                                    "lineHeight": 22,
+                                  },
+                                  Object {
+                                    "paddingTop": 16,
+                                  },
+                                ]
+                              }
+                            >
+                              global:dismiss
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </RNCSafeAreaView>
+                  </View>
+                </Modal>
               </View>
               <Text
                 style={
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -1969,7 +2694,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Object {
                   "borderStyle": "solid",
-                  "borderTopColor": "#EEEEEE",
+                  "borderTopColor": "#F8F9F9",
                   "borderTopWidth": 1,
                   "marginBottom": 15,
                   "marginTop": 10,
@@ -2003,15 +2728,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
+                        "fontFamily": "Inter-SemiBold",
                         "fontSize": 16,
-                        "lineHeight": 24,
+                        "lineHeight": 22,
                       },
                     ]
                   }
@@ -2024,15 +2749,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Bold",
+                      "fontFamily": "Inter-SemiBold",
                       "fontSize": 16,
-                      "lineHeight": 24,
+                      "lineHeight": 22,
                     },
                   ]
                 }
@@ -2082,17 +2807,20 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 24,
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
-                        "color": "#81868B",
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
                       },
                     ]
                   }
                 >
-                  Celo Dollars (@
+                  Celo Dollars @
                    
                   <Text
                     numberOfLines={1}
@@ -2109,7 +2837,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     $
                     0.75
                   </Text>
-                  )
                 </Text>
               </View>
               <Text
@@ -2117,12 +2844,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                   ]
                 }
@@ -2150,7 +2880,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <View
       style={
         Object {
-          "marginHorizontal": 20,
+          "marginHorizontal": 16,
+          "paddingVertical": 16,
         }
       }
     >
@@ -2160,16 +2891,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             Object {
               "flexDirection": "column",
             },
-            undefined,
+            Object {
+              "marginBottom": 16,
+            },
           ]
         }
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -2195,7 +2932,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
-                "paddingHorizontal": 16,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -2231,10 +2969,14 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
       >
         <View
           style={
-            Object {
-              "borderRadius": 100,
-              "overflow": "hidden",
-            }
+            Array [
+              Object {
+                "overflow": "hidden",
+              },
+              Object {
+                "borderRadius": 100,
+              },
+            ]
           }
         >
           <View
@@ -2256,11 +2998,12 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
             style={
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#F5F4F0",
+                "backgroundColor": "#F1F0EB",
                 "flexGrow": 1,
                 "height": 48,
                 "justifyContent": "center",
-                "paddingHorizontal": 16,
+                "opacity": undefined,
+                "paddingHorizontal": 24,
                 "paddingVertical": 5,
               }
             }
@@ -2282,6 +3025,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         </View>
       </View>
     </View>
+    <View
+      collapsable={false}
+      style={
+        Array [
+          Object {
+            "bottom": 0,
+            "left": 0,
+            "right": 0,
+          },
+          Object {
+            "height": 0,
+          },
+          undefined,
+        ]
+      }
+    />
   </View>
-</SafeAreaView>
+</RNCSafeAreaView>
 `;
