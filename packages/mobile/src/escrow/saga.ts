@@ -222,9 +222,8 @@ function* registerStandbyTransaction(context: TransactionContext, value: string,
   )
 }
 
-async function formEscrowWithdrawTxWithNoCode(
+async function formEscrowWithdrawAndTransferTxWithNoCode(
   contractKit: ContractKit,
-  mtwWrapper: MetaTransactionWalletWrapper,
   escrowWrapper: EscrowWrapper,
   stableTokenWrapper: StableTokenWrapper,
   paymentId: string,
@@ -247,8 +246,7 @@ async function formEscrowWithdrawTxWithNoCode(
   const { r, s, v } = splitSignature(contractKit, signature)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
   const transferTx = stableTokenWrapper.transfer(walletAddress, value.toString())
-  const batchedTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
-  return batchedTx
+  return { withdrawTx, transferTx }
 }
 
 function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
@@ -328,9 +326,14 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         continue
       }
 
-      const withdrawTx: CeloTransactionObject<boolean> = yield formEscrowWithdrawTxWithNoCode(
+      const {
+        withdrawTx,
+        transferTx,
+      }: {
+        withdrawTx: CeloTransactionObject<boolean>
+        transferTx: CeloTransactionObject<boolean>
+      } = yield formEscrowWithdrawAndTransferTxWithNoCode(
         contractKit,
-        mtwWrapper,
         escrowWrapper,
         stableTokenWrapper,
         paymentId,
@@ -341,9 +344,15 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       )
 
       try {
-        if (!komenciActive) {
-          yield call(sendTransaction, withdrawTx.txo, walletAddress, context)
+        // TODO: Change this back when done debugging
+        // if (!komenciActive) {
+        if (komenciActive) {
+          const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
+          yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context, 50000000)
         } else {
+          // TODO: When Komenci supports batched subsidized transactions, batch these two txs
+          // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
+          // there will be a service in place to transfer funds from MTW to EOA for users
           const withdrawTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
@@ -352,6 +361,16 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
 
           if (!withdrawTxResult.ok) {
             throw withdrawTxResult.error
+          }
+
+          const transferTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+            [komenciKit, komenciKit.submitMetaTransaction],
+            mtwAddress,
+            transferTx
+          )
+
+          if (!transferTxResult.ok) {
+            throw transferTxResult.error
           }
         }
         withdrawTxSuccess.push(true)
