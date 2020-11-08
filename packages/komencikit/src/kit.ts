@@ -492,6 +492,7 @@ export class KomenciKit {
     if (!receiptResult.ok) {
       return receiptResult
     }
+    const receipt = receiptResult.result
 
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 
