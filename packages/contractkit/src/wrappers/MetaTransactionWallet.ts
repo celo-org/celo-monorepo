@@ -163,7 +163,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   nonce = proxyCall(this.contract.methods.nonce, undefined, valueToInt)
   private getSigner = proxyCall(this.contract.methods.signer, undefined, stringIdentity)
 
-  transferERC20ToSigner: (token: Address) => CeloTransactionObject<void> = proxySend(
+  transferERC20ToSigner: (token: Address) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.transferERC20ToSigner
   )
