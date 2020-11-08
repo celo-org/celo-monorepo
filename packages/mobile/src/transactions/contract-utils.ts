@@ -1,8 +1,8 @@
 import { values } from 'lodash'
+import Logger from 'src/utils/Logger'
 import { estimateGas, getTransactionReceipt } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
-import Logger from 'src/utils/Logger'
 
 const RECEIPT_POLL_INTERVAL = 5000 // 5s
 
@@ -172,24 +172,24 @@ export async function sendTransactionAsync<T>(
   // This is a hack to prevent failure in cases where web3 has been obversed to
   // never get the receipt for transactions that do get mined.
   let timerID: number | undefined
-  let emitter: any = undefined
+  let emitter: any
   const pollTransactionReceipt = (txHash: string) => {
     timerID = setInterval(() => {
       getTransactionReceipt(txHash)
-        .then((receipt) => {
-          if (!(receipt && emitter)) {
+        .then((r) => {
+          if (!(r && emitter)) {
             return
           }
 
           // If the receipt indicates a revert, emit an error.
-          if (!receipt.status) {
+          if (!r.status) {
             emitter.emit('error', new Error('Recieved receipt for reverted transaction '))
             return
           }
 
           // Emit events to indicate success.
-          emitter.emit('receipt', receipt)
-          emitter.emit('confirmation', 1, receipt)
+          emitter.emit('receipt', r)
+          emitter.emit('confirmation', 1, r)
 
           // Prevent this timer from firing again.
           clearInterval(timerID)
