@@ -91,7 +91,7 @@ ___
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹any›*
+▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹OkResult‹Buffer‹›› | ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›››*
 
 *Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[readAsResult](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#readasresult)*
 
@@ -103,7 +103,7 @@ Name | Type |
 ------ | ------ |
 `account` | [Address](../modules/_base_.md#address) |
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹OkResult‹Buffer‹›› | ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›››*
 
 ___
 
