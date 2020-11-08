@@ -160,7 +160,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
     }
   }
 
-  if (feelessVerificationState.isLoading || verificationState.isLoading) {
+  if (feelessVerificationState.isLoading || verificationState.isLoading || !account) {
     return (
       <View style={styles.loader}>
         {account && (

@@ -246,7 +246,7 @@ async function formEscrowWithdrawTxWithNoCode(
 
   const { r, s, v } = splitSignature(contractKit, signature)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
-  const transferTx = stableTokenWrapper.transfer(walletAddress, value.toNumber())
+  const transferTx = stableTokenWrapper.transfer(walletAddress, value.toString())
   const batchedTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
   return batchedTx
 }
