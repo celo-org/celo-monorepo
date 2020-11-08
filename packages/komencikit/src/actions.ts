@@ -84,6 +84,7 @@ export interface StartSessionPayload {
 
 export const StartSessionResp = t.type({
   token: t.string,
+  callbackUrl: t.union([t.undefined, t.string]),
 })
 
 export type StartSessionResp = t.TypeOf<typeof StartSessionResp>
