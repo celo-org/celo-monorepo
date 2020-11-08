@@ -347,8 +347,12 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         // TODO: Change this back when done debugging
         // if (!komenciActive) {
         if (komenciActive) {
-          const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
-          yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context, 50000000)
+          // const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
+          // yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context, 5000000)
+          const wrappedWithdrawTx = mtwWrapper.executeTransaction(withdrawTx.txo)
+          yield call(sendTransaction, wrappedWithdrawTx.txo, walletAddress, context, 5000000)
+          const wrappedTransferTx = mtwWrapper.executeTransaction(transferTx.txo)
+          yield call(sendTransaction, wrappedTransferTx.txo, walletAddress, context, 5000000)
         } else {
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs
           // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
