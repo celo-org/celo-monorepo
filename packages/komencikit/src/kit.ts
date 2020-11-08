@@ -493,12 +493,6 @@ export class KomenciKit {
       return receiptResult
     }
 
-    const receipt = receiptResult.result
-    if (!receipt.status) {
-      // TODO: Possible to extract reason?
-      return Err(new TxRevertError(txHash, ''))
-    }
-
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 
     const events = await deployer.getPastEvents(deployer.eventTypes.WalletDeployed, {
