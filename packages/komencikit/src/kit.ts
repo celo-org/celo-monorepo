@@ -438,6 +438,11 @@ export class KomenciKit {
       return Err(new TxTimeoutError())
     }
 
+    if (!receipt.status) {
+      // TODO: Possible to extract reason?
+      return Err(new TxRevertError(txHash, ''))
+    }
+
     return Ok(receipt)
   }
 
