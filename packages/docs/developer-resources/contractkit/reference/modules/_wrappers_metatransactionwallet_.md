@@ -35,7 +35,7 @@
 
 ▸ **buildMetaTxTypedData**(`walletAddress`: [Address](_base_.md#address), `tx`: [RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md), `nonce`: number, `chainId`: number): *EIP712TypedData*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:260](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L260)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:265](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L265)*
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ ___
 
 ▸ **toRawTransaction**(`tx`: [TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any›): *[RawTransaction](../interfaces/_wrappers_metatransactionwallet_.rawtransaction.md)*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L215)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:220](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L220)*
 
 Turns any possible way to pass in a transaction into the raw values
 that are actually required. This is used both internally to normalize
@@ -78,7 +78,7 @@ ___
 
 ▸ **toTransactionBatch**(`txs`: Array‹[TransactionInput](_wrappers_metatransactionwallet_.md#transactioninput)‹any››): *object*
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L243)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWallet.ts:248](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWallet.ts#L248)*
 
 Turns an array of transaction inputs into the argument that
 need to be passed to the executeTransactions call.
