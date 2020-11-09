@@ -23,8 +23,8 @@
   "receiveOnAddress": "Dirección de cUSD/CELO",
   "receiveOnPonto": "Ponto (GCash)",
   "fundingEducationDialog": {
-    "title": "Funding your {{appName}}",
-    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a digital currency pegged to the US Dollar.\n\nTo fund your {{appName}} wallet, purchase cUSD from one of the 3rd party providers available in your location. For help go to <0>{{link}}</0>",
+    "title": "Fondeando tu {{appName}}",
+    "body": "{{appName}} hace uso de la Red Celo. {{appName}} funciona con Celo Dólares (cUSD), una moneda digital vinculada al dólar estadounidense.\n\nPara agregar fondos a {{appName}}, compra cUSD de uno de los proveedores disponibles en tu ubicación. Para obtener ayuda ve a<0>{{link}}</0>",
     "dismiss": "OK"
   },
   "explanationModal": {
