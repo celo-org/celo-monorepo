@@ -11,6 +11,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
+import { Counters, Histograms } from '../common/metrics'
 import { VERSION } from '../config'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
@@ -36,10 +37,12 @@ export async function handleGetContactMatches(
   const logger: Logger = response.locals.logger
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
+      Counters.responses.labels('400').inc()
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
+      Counters.responses.labels('401').inc()
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
@@ -47,16 +50,21 @@ export async function handleGetContactMatches(
     const { account, userPhoneNumber, contactPhoneNumbers, hashedPhoneNumber } = request.body
 
     if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
+      Counters.responses.labels('403').inc()
       respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
       return
     }
     if (await getDidMatchmaking(account, logger)) {
+      Counters.responses.labels('403').inc()
       respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
       return
     }
     const matchedContacts: ContactMatch[] = (
       await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
     ).map((numberPair) => ({ phoneNumber: numberPair }))
+    Histograms.percentOfContactsCoveredByMatchmaking.observe(
+      matchedContacts.length / contactPhoneNumbers.length
+    )
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
     await setDidMatchmaking(account, logger)
     response.json({ success: true, matchedContacts, version: VERSION })
