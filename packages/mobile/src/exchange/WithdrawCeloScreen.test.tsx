@@ -11,7 +11,7 @@ import { createMockStore, getMockStackScreenProps } from 'test/utils'
 const SAMPLE_ADDRESS = '0xcc642068bdbbdeb91f348213492d2a80ab1ed23c'
 const SAMPLE_BALANCE = '55.00001'
 
-const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloScreen)
+const mockScreenProps = getMockStackScreenProps(Screens.WithdrawCeloScreen, { isCashOut: false })
 
 const store = createMockStore({
   goldToken: { balance: SAMPLE_BALANCE },
