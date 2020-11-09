@@ -52,7 +52,7 @@ interface KomenciDatabaseConfig {
   host: string
   port: string
   username: string
-  password: string
+  passwordVaultName: string
 }
 
 /**
@@ -74,7 +74,7 @@ const contextDatabaseConfigDynamicEnvVars: { [k in keyof KomenciDatabaseConfig]:
   host: DynamicEnvVar.KOMENCI_DB_HOST,
   port: DynamicEnvVar.KOMENCI_DB_PORT,
   username: DynamicEnvVar.KOMENCI_DB_USERNAME,
-  password: DynamicEnvVar.KOMENCI_DB_PASSWORD
+  passwordVaultName: DynamicEnvVar.KOMENCI_DB_PASSWORD_VAULT_NAME
 }
 
 function releaseName(celoEnv: string) {
@@ -125,6 +125,13 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   }
 }
 
+async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: string){
+  const [password] = await execCmdWithExitOnFailure(
+    `az keyvault secret show --name ${secretName} --vault-name ${vaultName} --query value`
+  )
+  return password.replace(/\n|"/g, '')
+}
+
 async function helmParameters(celoEnv: string, context: string, useForno: boolean) {
   const komenciConfig = getKomenciConfig(context)
 
@@ -141,6 +148,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     : getFullNodeHttpRpcInternalUrl(celoEnv)
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
+  const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
+
+  // tslint:disable-next-line:no-console
+  console.log("DB PASSWORD: " + databasePassword)
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
@@ -154,7 +165,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.host=${databaseConfig.host}`,
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
-    `--set onboarding.db.password=${databaseConfig.password}`,
+    `--set onboarding.db.password=${databasePassword}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,

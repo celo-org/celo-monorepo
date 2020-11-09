@@ -163,7 +163,7 @@ export enum DynamicEnvVar {
   KOMENCI_DB_HOST = '{{ context }}_KOMENCI_DB_HOST',
   KOMENCI_DB_PORT = '{{ context }}_KOMENCI_DB_PORT',
   KOMENCI_DB_USERNAME = '{{ context }}_KOMENCI_DB_USERNAME',
-  KOMENCI_DB_PASSWORD = '{{ context }}_KOMENCI_DB_PASSWORD',
+  KOMENCI_DB_PASSWORD_VAULT_NAME = '{{ context }}_KOMENCI_DB_PASSWORD_VAULT_NAME',
 }
 
 export enum EnvTypes {

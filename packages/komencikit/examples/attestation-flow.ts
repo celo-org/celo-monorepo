@@ -22,7 +22,7 @@ const contractKit = new ContractKit(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
 const komenciKit = new KomenciKit(contractKit, account, {
-  url: 'http://localhost:3000',
+  url: 'https://komenci.celo-networks-dev.org',
 })
 
 const readline = require('readline')
