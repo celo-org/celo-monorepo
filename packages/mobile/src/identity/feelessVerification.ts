@@ -7,7 +7,11 @@ import {
   IdentifierLookupResult,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { CheckSessionResp, GetDistributedBlindedPepperResp } from '@celo/komencikit/src/actions'
+import {
+  CheckSessionResp,
+  GetDistributedBlindedPepperResp,
+  StartSessionResp,
+} from '@celo/komencikit/src/actions'
 import {
   AuthenticationFailed,
   FetchError,
@@ -127,7 +131,7 @@ export function* feelessFetchVerificationState() {
     ])
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: KOMENCI_URL,
+      url: feelessVerificationState.komenci.callbackUrl || KOMENCI_URL,
       token: feelessVerificationState.komenci.sessionToken,
     })
 
@@ -250,7 +254,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
     )
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: KOMENCI_URL,
+      url: feelessVerificationState.komenci.callbackUrl || KOMENCI_URL,
       token: feelessVerificationState.komenci.sessionToken,
     })
 
@@ -731,7 +735,7 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
     }
 
     const komenciSessionResult: Result<
-      string,
+      StartSessionResp,
       FetchError | AuthenticationFailed | LoginSignatureError
     > = yield call([komenciKit, komenciKit.startSession], captchaToken)
 
@@ -745,7 +749,8 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
         ...feelessVerificationState,
         komenci: {
           ...feelessVerificationState.komenci,
-          sessionToken: komenciSessionResult.result,
+          sessionToken: komenciSessionResult.result.token,
+          callbackUrl: komenciSessionResult.result.callbackUrl || '',
         },
       })
     )

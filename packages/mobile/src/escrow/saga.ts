@@ -273,11 +273,6 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       select(feelessVerificationStateSelector),
     ])
 
-    const komenciKit: KomenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: KOMENCI_URL,
-      token: feelessVerificationState.komenci.sessionToken,
-    })
-
     const [stableTokenWrapper, escrowWrapper, mtwWrapper]: [
       StableTokenWrapper,
       EscrowWrapper,
@@ -345,6 +340,10 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
           const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
           yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context)
         } else {
+          const komenciKit: KomenciKit = new KomenciKit(contractKit, walletAddress, {
+            url: feelessVerificationState.komenci.callbackUrl || KOMENCI_URL,
+            token: feelessVerificationState.komenci.sessionToken,
+          })
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs
           // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
           // there will be a service in place to transfer funds from MTW to EOA for users

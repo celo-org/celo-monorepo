@@ -456,6 +456,7 @@ export const v7Schema = {
         serviceAvailable: false,
         sessionActive: false,
         sessionToken: '',
+        callbackUrl: undefined,
         captchaToken: '',
         pepperFetchedByKomenci: false,
       },

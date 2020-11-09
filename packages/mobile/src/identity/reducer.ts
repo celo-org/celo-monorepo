@@ -91,6 +91,7 @@ export type FeelessUpdatableVerificationState = {
     serviceAvailable: boolean
     sessionActive: boolean
     sessionToken: string
+    callbackUrl: string | undefined
     captchaToken: string
     pepperFetchedByKomenci: boolean
   }
@@ -209,6 +210,7 @@ const initialState: State = {
       serviceAvailable: false,
       sessionActive: false,
       sessionToken: '',
+      callbackUrl: undefined,
       captchaToken: '',
       pepperFetchedByKomenci: false,
     },
