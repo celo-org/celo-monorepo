@@ -8,7 +8,12 @@ import { LocalWallet } from '@celo/contractkit/lib/wallets/local-wallet'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
-const WALLET_IMPLEMENTATION_ADDRESS = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
+const WALLET_IMPLEMENTATIONS = {
+  '1.1.0.0-p1': '0x88a2b9B8387A1823D821E406b4e951337fa1D46D',
+  '1.1.0.0-p2': '0x786ec5A4F8DCad3A58D5B1A04cc99B019E426065',
+  '1.1.0.0-p3': '0x5C9a6E3c3E862eD306E2E3348EBC8b8310A99e5A',
+}
+const WALLET_IMPLEMENTATION_ADDRESS = WALLET_IMPLEMENTATIONS['1.1.0.0-p3']
 
 const wallet = new LocalWallet()
 const pkey = Web3.utils.randomHex(32)
@@ -21,10 +26,14 @@ const web3 = new Web3(provider)
 const contractKit = new ContractKit(web3, wallet)
 const account = wallet.getAccounts()[0]
 console.log('Account: ', account)
-// const localUrl = 'https://localhost:3000'
-const alfajoresUrl = 'https://weu.komenci.celo-networks-dev.org'
+
+const serviceUrl = {
+  local: 'http://localhost:3000',
+  alfajores: 'https://weu.komenci.celo-networks-dev.org',
+}
+
 const komenciKit = new KomenciKit(contractKit, account, {
-  url: alfajoresUrl,
+  url: serviceUrl.local,
 })
 
 const readline = require('readline')
