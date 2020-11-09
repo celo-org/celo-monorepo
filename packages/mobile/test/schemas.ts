@@ -422,6 +422,11 @@ export const v6Schema = {
     ...v5Schema.identity,
     walletToAccountAddress: {},
   },
+  app: {
+    ...v5Schema.app,
+    pontoEnabled: false,
+    kotaniEnabled: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
