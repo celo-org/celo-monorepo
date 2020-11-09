@@ -1,9 +1,8 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Linking, Platform, Share } from 'react-native'
+import { Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { generateSecureRandom } from 'react-native-securerandom'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -26,7 +25,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, APP_STORE_ID, VALORA_DOMAIN } from 'src/config'
+import { APP_STORE_ID, VALORA_DOMAIN } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -273,36 +272,37 @@ function* initiateEscrowTransfer(e164Number: string, amount: BigNumber, temporar
   }
 }
 
-function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
-  try {
-    switch (inviteMode) {
-      case InviteBy.SMS: {
-        ValoraAnalytics.track(InviteEvents.invite_method_sms)
-        yield call(sendSms, e164Number, message)
-        break
-      }
-      case InviteBy.WhatsApp: {
-        ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
-        yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
-        break
-      }
-      default:
-        throw new Error('Unsupported invite mode type: ' + inviteMode)
-    }
+// TODO: Delete this if we don't decide to use it again
+// function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
+//   try {
+//     switch (inviteMode) {
+//       case InviteBy.SMS: {
+//         ValoraAnalytics.track(InviteEvents.invite_method_sms)
+//         yield call(sendSms, e164Number, message)
+//         break
+//       }
+//       case InviteBy.WhatsApp: {
+//         ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
+//         yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
+//         break
+//       }
+//       default:
+//         throw new Error('Unsupported invite mode type: ' + inviteMode)
+//     }
 
-    // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
-    yield delay(100)
-  } catch (error) {
-    // Not a critical error, allow saga to proceed
-    Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
-    ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
-    yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
-    // TODO(Rossy): We need a UI for users to review their sent invite codes and
-    // redeem them in case they are unused or unsent like this case, see #2639
-    // For now just copying the code to the clipboard and notifying user
-    Clipboard.setString(message)
-  }
-}
+//     // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
+//     yield delay(100)
+//   } catch (error) {
+//     // Not a critical error, allow saga to proceed
+//     Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
+//     ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
+//     yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
+//     // TODO(Rossy): We need a UI for users to review their sent invite codes and
+//     // redeem them in case they are unused or unsent like this case, see #2639
+//     // For now just copying the code to the clipboard and notifying user
+//     Clipboard.setString(message)
+//   }
+// }
 
 function* sendInviteSaga(action: SendInviteAction) {
   const { e164Number, inviteMode, amount, currency } = action
