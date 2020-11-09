@@ -30,6 +30,8 @@ export default NewAccountOnboarding = () => {
 
     // Skip invite code.
     await element(by.id('ButtonSkip')).tap()
+    await element(by.id('VerificationEducationSkipHeader')).tap()
+    await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
 
     // Arrived to Home screen
     await expect(element(by.id('SendOrRequestBar'))).toBeVisible()
