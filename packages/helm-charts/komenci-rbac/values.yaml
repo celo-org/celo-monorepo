@@ -1,5 +1,5 @@
 environment:
   name: default
 
-komenci:
+relayer:
   replicas: 2
