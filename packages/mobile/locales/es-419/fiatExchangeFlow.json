@@ -1,8 +1,10 @@
 {
   "addFunds": "Añadir Fondos",
+  "addFundsSubtitle": "Compra cUSD o CELO",
   "exchanges": "Intercambiar",
   "buySellOnExchanges": "Comprar/Vender en Intercambios",
   "cashOut": "Retirar",
+  "cashOutSubtitle": "Canjea cUSD o CELO por otra moneda",
   "cashOutComingSoon": "Retirar (Muy Pronto)",
   "spend": "Usar",
   "spendSubtitle": "Usa tu balance con comercios asociados",
