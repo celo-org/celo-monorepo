@@ -115,7 +115,6 @@ There are a number of environment variables in this guide, and you may use this 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
-| NETWORK_ID                           | The Celo Mainnet network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
@@ -176,7 +175,6 @@ First we are going to set up the main environment variables related to the mainn
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
-export NETWORK_ID=42220
 ```
 
 ### Pull the Celo Docker image
@@ -197,7 +195,7 @@ Next, we'll run a node on your local machine so that we can use these accounts t
 # On your local machine
 mkdir celo-accounts-node
 cd celo-accounts-node
-docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --datadir /root/.celo
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --datadir /root/.celo
 ```
 
 {% hint style="danger" %}
@@ -229,7 +227,7 @@ Notice the public address returned by this command, that can be exported and use
 ```bash
 # On the proxy machine
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --datadir /root/.celo --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --datadir /root/.celo --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
 
 **OPTIONAL**
@@ -242,7 +240,7 @@ To use the nodes, set them to the value of the `bootnodes` or `bootnodesv4` opti
 ```bash
 export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --datadir /root/.celo --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org --bootnodesv4 $COMMUNITY_ENODES
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --datadir /root/.celo --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org --bootnodesv4 $COMMUNITY_ENODES
 ```
 
 Hint: If you are running into trouble peering with the full nodes, one of the first things to check is whether your container's ports are properly configured (i.e. specifically, `-p 30303:30303 -p 30303:30303/udp` - which is set in the proxy node's command, but not the account node's command).
@@ -328,10 +326,8 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 # On the Validator machine
 cd celo-validator-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpairs=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
+docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpairs=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
-
-The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet network.
 
 At this point your Validator and Proxy machines should be configured, and both should be syncing to the network. You should see `Imported new chain segment` in your node logs, about once every 5 seconds once the node is synced to the latest block which you can find on the [Network Stats](https://stats.celo.org) page.
 
