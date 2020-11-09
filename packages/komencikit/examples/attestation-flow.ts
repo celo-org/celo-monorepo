@@ -10,16 +10,64 @@ import { compressedPubKey } from '@celo/utils/src/dataEncryptionKey'
 import Web3 from 'web3'
 import { KomenciKit } from '../src'
 
-const WALLET_IMPLEMENTATIONS = {
-  '1.1.0.0-p1': '0x88a2b9B8387A1823D821E406b4e951337fa1D46D',
-  '1.1.0.0-p2': '0x786ec5A4F8DCad3A58D5B1A04cc99B019E426065',
-  '1.1.0.0-p3': '0x5C9a6E3c3E862eD306E2E3348EBC8b8310A99e5A',
+enum Env {
+  local = 'local',
+  alfajores = 'alfajores',
+  rc1 = 'rc1',
 }
 
-const WALLET_IMPLEMENTATION_ADDRESS = WALLET_IMPLEMENTATIONS['1.1.0.0-p3']
+enum Network {
+  alfajores = 'alfajores',
+  rc1 = 'rc1',
+}
+
+let env = process.argv[2] as Env
+let network: Network
+if (Env[env] === undefined) {
+  env = Env.alfajores
+  network = Network.alfajores
+} else {
+  if (env === Env.alfajores || env === Env.local) {
+    network = Network.alfajores
+  } else if (env === Env.rc1) {
+    network = Network.rc1
+  } else {
+    throw new Error('Could not determine network')
+  }
+}
+
+const WALLET_IMPLEMENTATIONS: Record<Network, Record<string, string>> = {
+  [Network.alfajores]: {
+    '1.1.0.0-p1': '0x88a2b9B8387A1823D821E406b4e951337fa1D46D',
+    '1.1.0.0-p2': '0x786ec5A4F8DCad3A58D5B1A04cc99B019E426065',
+    '1.1.0.0-p3': '0x5C9a6E3c3E862eD306E2E3348EBC8b8310A99e5A',
+  },
+  [Network.rc1]: {
+    '1.1.0.0-p2': '0x6511FB5DBfe95859d8759AdAd5503D656E2555d7',
+  },
+}
+
+let contractVersion = process.argv[3]
+if (contractVersion === undefined) {
+  const versions = Object.keys(WALLET_IMPLEMENTATIONS[network])
+  contractVersion = versions[versions.length - 1]
+}
+if (WALLET_IMPLEMENTATIONS[network][contractVersion] === undefined) {
+  throw new Error('invalid contract version')
+}
+
+const WALLET_IMPLEMENTATION_ADDRESS = WALLET_IMPLEMENTATIONS[network][contractVersion]
+
+const ODIS_PUB_KEYS: Record<Network, string> = {
+  alfajores:
+    'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
+  rc1:
+    'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
+}
+
 console.log('Using wallet implementation: ', WALLET_IMPLEMENTATION_ADDRESS)
-const ODIS_PUB_KEY =
-  'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA'
+
+const ODIS_PUB_KEY = ODIS_PUB_KEYS[network]
 
 const wallet = new LocalWallet()
 const pkey = Web3.utils.randomHex(32)
@@ -29,7 +77,12 @@ wallet.addAccount(pkey)
 console.log('Private key: ', pkey)
 console.log('Data encryption key: ', dek)
 
-const provider = new Web3.providers.HttpProvider('https://alfajores-forno.celo-testnet.org')
+const fornoURL: Record<Network, string> = {
+  alfajores: 'https://alfajores-forno.celo-testnet.org',
+  rc1: 'https://rc1-forno.celo-testnet.org',
+}
+
+const provider = new Web3.providers.HttpProvider(fornoURL[network])
 const web3 = new Web3(provider)
 const contractKit = new ContractKit(web3, wallet)
 const account = wallet.getAccounts()[0]
@@ -38,13 +91,14 @@ console.log('Account: ', account)
 const dekPublicKey = compressedPubKey(hexToBuffer(dek))
 console.log('DEK PublicKey: ', dekPublicKey)
 
-const SERVICE_URL = {
+const SERVICE_URL: Record<Env, string> = {
   local: 'http://localhost:3000',
   alfajores: 'https://weu.komenci.celo-networks-dev.org',
+  rc1: 'https://br.komenci.celo-networks-dev.org',
 }
 
 const komenciKit = new KomenciKit(contractKit, account, {
-  url: SERVICE_URL.local,
+  url: SERVICE_URL[env],
 })
 
 const readline = require('readline')
