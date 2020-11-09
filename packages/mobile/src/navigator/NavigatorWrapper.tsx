@@ -5,7 +5,6 @@ import * as React from 'react'
 import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import RNShake from 'react-native-shake'
-import { nameSelector } from 'src/account/selectors'
 import AlertBanner from 'src/alert/AlertBanner'
 import { InviteEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -58,7 +57,6 @@ export const NavigatorWrapper = () => {
   const appLocked = useTypedSelector(getAppLocked)
   const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
   const isInviteModalVisible = useTypedSelector((state) => state.app.inviteModalVisible)
-  const name = useTypedSelector(nameSelector)
   const routeNameRef = React.useRef()
 
   const updateRequired = React.useMemo(() => {
@@ -148,7 +146,6 @@ export const NavigatorWrapper = () => {
 
   const onInvite = async () => {
     const message = i18n.t('sendFlow7:inviteWithoutPayment', {
-      name,
       link: await generateInviteLink(),
     })
     ValoraAnalytics.track(InviteEvents.invite_from_menu)
