@@ -50,6 +50,8 @@ volumes:
   value: "127.0.0.1"
 - name: DATABASE_PORT
   value: "5432"
+- name: WOBSERVER_ENABLED
+  value: "false"
 - name: MIX_ENV
   value: prod
 - name: LOGO
