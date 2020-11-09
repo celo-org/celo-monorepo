@@ -13,6 +13,7 @@ kubectl:
 
 
 relayer:
+  node_env: production
   image:
     repository: celotestnet.azurecr.io/komenci/relayer
     tag: dae43ddce108a73da07dce73875b980ff077c7d4
@@ -42,6 +43,7 @@ relayer:
     walletType: azure-hsm
 
 onboarding:
+  node_env: production
   image:
     repository: celotestnet.azurecr.io/komenci/onboarding
     tag: dae43ddce108a73da07dce73875b980ff077c7d4

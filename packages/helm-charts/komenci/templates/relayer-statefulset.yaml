@@ -117,7 +117,7 @@ spec:
 {{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.relayer "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.relayer "value_name" "privateKeyPath" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.relayer.metrics "value_name" "prometheusPort") | indent 8 }}
-
+{{ include "common.env-var" (dict "name" "NODE_ENV" "dict" .Values.relayer "value_name" "node_env") | indent 8 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.relayer "value_name" "port") | indent 8 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.relayer.onchain "value_name" "network") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer.onchain "value_name" "walletType") | indent 8 }}
