@@ -36,7 +36,7 @@ export default function FundingEducationDialog({ isVisible, onPressDismiss }: Pr
         ns={Namespaces.fiatExchangeFlow}
         values={{
           // Don't show the scheme in the link
-          link: link.replace(/^([a-z][a-z0-9+-.]*):\/\//, ''),
+          link: link.replace(/^https?:\/\//, ''),
         }}
       >
         <Text style={styles.link} onPress={onPressSupportLink} />
