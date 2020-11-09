@@ -46,6 +46,7 @@
 
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
+  - [Connecting to a local ultralight node on Alfajores testnet](developer-resources/walkthroughs/alfajores-ultralight.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
   - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
