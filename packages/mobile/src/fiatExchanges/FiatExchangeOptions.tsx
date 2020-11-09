@@ -28,8 +28,6 @@ import { useCountryFeatures } from 'src/utils/countryFeatures'
 
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
-const TAG = 'fiatExchange/FiatExchangeOptions'
-
 type RouteProps = StackScreenProps<StackParamList, Screens.FiatExchangeOptions>
 type Props = RouteProps
 

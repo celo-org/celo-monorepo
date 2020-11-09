@@ -33,11 +33,11 @@ export interface SpendMerchant {
 
 type Props = StackScreenProps<StackParamList, Screens.Spend>
 
-function Spend() {
+function Spend(props: Props) {
   const goToMerchant = (merchant: SpendMerchant) => {
     const { name, link } = merchant
     return () => {
-      ValoraAnalytics.track(FiatExchangeEvents.external_exchange_link, {
+      ValoraAnalytics.track(FiatExchangeEvents.spend_merchant_link, {
         name,
         link,
       })

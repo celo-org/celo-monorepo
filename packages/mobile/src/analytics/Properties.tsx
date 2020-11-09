@@ -598,6 +598,10 @@ interface FiatExchangeEventsProperties {
     name: string
     link: string
   }
+  [FiatExchangeEvents.spend_merchant_link]: {
+    name: string
+    link: string
+  }
 }
 
 interface GethEventsProperties {
