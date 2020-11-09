@@ -17,7 +17,7 @@
 
 • **completed**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L22)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L23)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **total**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L23)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L24)*

@@ -143,6 +143,13 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+    location ~ /admin/.* {
+      deny all;
+    }
+    location ~ /wobserver/.* {
+      deny all;
+    }
   labels:
     app: blockscout
     chart: blockscout
