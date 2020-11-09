@@ -27,6 +27,8 @@ export enum Actions {
   SET_SESSION_ID = 'SET_SESSION_ID',
   OPEN_URL = 'APP/OPEN_URL',
   MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
+  SET_PONTO_FEATURE_FLAG = 'APP/SET_PONTO_FEATURE_FLAG',
+  SET_KOTANI_FEATURE_FLAG = 'APP/SET_KOTANI_FEATURE_FLAG',
   TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
 }
 
@@ -105,6 +107,16 @@ interface MinAppVersionDeterminedAction {
   minVersion: string | null
 }
 
+interface PontoFeatureFlagSetAction {
+  type: Actions.SET_PONTO_FEATURE_FLAG
+  enabled: boolean
+}
+
+interface KotaniFeatureFlagSetAction {
+  type: Actions.SET_KOTANI_FEATURE_FLAG
+  enabled: boolean
+}
+
 export type ActionTypes =
   | SetAppState
   | SetLoggedIn
@@ -121,6 +133,8 @@ export type ActionTypes =
   | SetSessionId
   | OpenUrlAction
   | MinAppVersionDeterminedAction
+  | PontoFeatureFlagSetAction
+  | KotaniFeatureFlagSetAction
   | InviteModalAction
 
 export const setAppState = (state: string) => ({
@@ -201,6 +215,16 @@ export const minAppVersionDetermined = (
 ): MinAppVersionDeterminedAction => ({
   type: Actions.MIN_APP_VERSION_DETERMINED,
   minVersion,
+})
+
+export const setPontoFeatureFlag = (enabled: boolean) => ({
+  type: Actions.SET_PONTO_FEATURE_FLAG,
+  enabled,
+})
+
+export const setKotaniFeatureFlag = (enabled: boolean) => ({
+  type: Actions.SET_KOTANI_FEATURE_FLAG,
+  enabled,
 })
 
 export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
