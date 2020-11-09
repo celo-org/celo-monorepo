@@ -244,6 +244,9 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
   )
 
   const { r, s, v } = splitSignature(contractKit, signature)
+  console.log('r: ', r)
+  console.log('s: ', s)
+  console.log('v: ', v)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
   const transferTx = stableTokenWrapper.transfer(walletAddress, value.toString())
   return { withdrawTx, transferTx }
@@ -348,11 +351,11 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         // if (!komenciActive) {
         if (komenciActive) {
           // const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
-          // yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context, 5000000)
+          // yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context)
           const wrappedWithdrawTx = mtwWrapper.executeTransaction(withdrawTx.txo)
-          yield call(sendTransaction, wrappedWithdrawTx.txo, walletAddress, context, 5000000)
+          yield call(sendTransaction, wrappedWithdrawTx.txo, walletAddress, context)
           const wrappedTransferTx = mtwWrapper.executeTransaction(transferTx.txo)
-          yield call(sendTransaction, wrappedTransferTx.txo, walletAddress, context, 5000000)
+          yield call(sendTransaction, wrappedTransferTx.txo, walletAddress, context)
         } else {
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs
           // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
