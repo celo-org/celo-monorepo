@@ -145,7 +145,7 @@ export const SPEND_MERCHANT_LINKS: SpendMerchant[] = [
   },
   {
     name: 'Merchant Map',
-    link: '',
+    link: 'https://celo.org/experience/merchant/merchants-accepting-celo#map',
     subtitleKey: 'findMerchants',
   },
 ]
