@@ -76,7 +76,7 @@ spec:
         {{ end }}
       containers:
       - name: komenci-relayer
-        image: {{ .Values.relayer.image.repository }}:{{ .Values.relayer.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: Always
         ports:
           - name: prometheus
@@ -104,7 +104,7 @@ spec:
             ADDRESSES={{- range $index, $identity := .Values.relayer.identities -}}{{ $identity.address }},{{- end }}
             export WALLET_ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
             
-            exec yarn start relayer
+            node dist/apps/relayer/main.js
         env:
         - name: REPLICA_NAME
           valueFrom:

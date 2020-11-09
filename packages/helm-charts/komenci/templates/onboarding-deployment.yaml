@@ -18,11 +18,16 @@ spec:
         - name: komenci-onboarding
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: {{ .Values.onboarding.image.repository }}:{{ .Values.onboarding.image.tag }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 3000
+          command:
+            - bash
+            - "-c"
+            - |            
+              exec yarn start onboarding
           resources:
             {{- toYaml .Values.onboarding.resources | nindent 12 }}
           env:
