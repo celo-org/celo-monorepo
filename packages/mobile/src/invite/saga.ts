@@ -187,15 +187,9 @@ export function* sendInvite(
       ? VALORA_DOMAIN
       : yield call(generateInviteLink, inviteCode)
 
-    let messageProp
-    if (features.ESCROW_WITHOUT_CODE && amount) {
-      messageProp = 'sendFlow7:inviteWithEscrowAndNoCode'
-    } else if (amount) {
-      messageProp = 'sendFlow7:inviteWithEscrowedPayment'
-    } else {
-      messageProp = 'sendFlow7:inviteWithoutPayment'
-    }
-
+    const messageProp = amount
+      ? 'sendFlow7:inviteWithEscrowedPayment'
+      : 'sendFlow7:inviteWithoutPayment'
     const message = i18n.t(messageProp, {
       name,
       amount: amount?.toString(),
@@ -206,7 +200,7 @@ export function* sendInvite(
       if (amount) {
         yield call(initiateEscrowTransfer, e164Number, amount)
       }
-      yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+      yield call(Share.share, { message })
       return
     }
 
@@ -254,7 +248,7 @@ export function* sendInvite(
         amount: amount?.toString(),
       })
     } else {
-      yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+      yield call(Share.share, { message })
     }
   } catch (e) {
     ValoraAnalytics.track(

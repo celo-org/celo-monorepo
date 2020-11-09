@@ -25,11 +25,7 @@ import {
   reclaimEscrowPaymentSuccess,
   storeSentEscrowPayments,
 } from 'src/escrow/actions'
-import {
-  generateEscrowPaymentIdAndPk,
-  generateUniquePaymentId,
-  splitSignature,
-} from 'src/escrow/utils'
+import { generateEscrowPaymentIdAndPk, generateUniquePaymentId } from 'src/escrow/utils'
 import { calculateFee } from 'src/fees/saga'
 import { features } from 'src/flags'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
@@ -67,6 +63,7 @@ import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mtwAddressSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
+import { Sign } from 'web3-core'
 import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'escrow/saga'
@@ -235,14 +232,9 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
     value: metaTxWalletAddress,
   })
 
-  const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
-    .signature
-  Logger.debug(
-    TAG + '@withdrawFromEscrowViaKomenci',
-    `Signed message hash signature is ${signature}`
-  )
+  const { r, s, v }: Sign = await contractKit.web3.eth.accounts.sign(msgHash, privateKey)
 
-  const { r, s, v } = splitSignature(contractKit, signature)
+  Logger.debug(TAG + '@withdrawFromEscrowViaKomenci', `Signed message hash signature`)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
   const transferTx = stableTokenWrapper.transfer(walletAddress, value.toString())
   return { withdrawTx, transferTx }
@@ -431,12 +423,8 @@ function* withdrawFromEscrow() {
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // use the temporary key to sign a message. The message is the current account.
-    const signature: string = (yield contractKit.web3.eth.accounts.sign(
-      msgHash,
-      tmpWalletPrivateKey
-    )).signature
-    Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
-    const { r, s, v } = splitSignature(contractKit, signature)
+    const { r, s, v }: Sign = yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey)
+    Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature`)
 
     // Generate and send the withdrawal transaction.
     const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)

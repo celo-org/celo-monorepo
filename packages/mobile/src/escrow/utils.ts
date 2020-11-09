@@ -1,15 +1,6 @@
-import { ensureLeading0x, trimLeading0x } from '@celo/base'
-import { ContractKit } from '@celo/contractkit'
+import { ensureLeading0x } from '@celo/base'
 import { generateDeterministicInviteCode } from '@celo/utils/lib/account'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
-
-export const splitSignature = (contractKit: ContractKit, signature: string) => {
-  const sig = trimLeading0x(signature)
-  const r = `0x${sig.slice(0, 64)}`
-  const s = `0x${sig.slice(64, 128)}`
-  const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(sig.slice(128, 130)))
-  return { r, s, v }
-}
 
 export const generateEscrowPaymentIdAndPk = (
   recipientPhoneHash: string,
