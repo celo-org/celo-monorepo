@@ -23,7 +23,8 @@
   "payWithExchange": "Cryptocurrency exchange",
   "selectCashOutMethod": "Receive funds in:",
   "receiveOnAddress": "cUSD/CELO address",
-  "receiveOnPonto": "Ponto (GCash)",
+  "receiveWithPonto": "GCash (with Ponto)",
+  "receiveWithKotani": "M-PESA (with Kotani Pay)",
   "explanationModal": {
     "title": "About Providers",
     "body": "Providers allow you to add funds to or cash out from your account. They determine their own rates and restrictions depending on location, amount, and other factors. Please visit the provider website for specific help. Visit the FAQ to learn more."

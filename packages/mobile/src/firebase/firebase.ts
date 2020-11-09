@@ -234,10 +234,11 @@ export function appRemoteFeatureFlagChannel() {
 
   return eventChannel((emit: any) => {
     const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
-      const flags = snapshot.val().flags
+      const flags = snapshot.val()
+      Logger.debug(`Updated feature flags: ${JSON.stringify(flags)}`)
       emit({
-        kotaniEnabled: flags.kotaniEnabled || false,
-        pontoEnabled: flags.pontoEnabled || false,
+        kotaniEnabled: flags?.kotaniEnabled || false,
+        pontoEnabled: flags?.pontoEnabled || false,
       })
     }
     const cancel = () => {
