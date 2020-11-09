@@ -2,7 +2,8 @@ import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
 import { ExternalExchangeProvider } from 'src/fiatExchanges/ExternalExchanges'
-import { GethSyncMode } from 'src/geth/consts'
+import { SpendMerchant } from 'src/fiatExchanges/Spend'
+import { CURRENCY_ENUM, GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
 
@@ -106,32 +107,52 @@ export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price
 
 export const EXCHANGE_PROVIDER_LINKS: ExternalExchangeProvider[] = [
   {
-    name: 'Bittrex (CELO)',
+    name: 'Bittrex',
     link: 'https://bittrex.com/Market/Index?MarketName=USD-CELO',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
-    name: 'OKCoin (CELO, CUSD)',
+    name: 'OKCoin',
     link: 'https://www.okcoin.com/en/spot/trade/cusd-usd/',
+    currencies: [CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR],
   },
   {
-    name: 'OKEx (CELO)',
+    name: 'OKEx',
     link: 'https://www.okex.com/spot/trade/CELO-USDT',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
-    name: 'CoinList Pro (CELO)',
+    name: 'CoinList Pro',
     link: 'https://coinlist.co/asset/celo',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
     name: 'Coinbase Pro (CELO as CGLD)',
     link: 'https://pro.coinbase.com/trade/CGLD-USD',
+    currencies: [CURRENCY_ENUM.GOLD],
   },
   {
     name: 'Coinbase (CELO as CGLD)',
     link: 'https://www.coinbase.com',
+    currencies: [CURRENCY_ENUM.GOLD],
+  },
+]
+
+export const SPEND_MERCHANT_LINKS: SpendMerchant[] = [
+  {
+    name: 'Beam and Go',
+    link: 'https://valora.beamandgo.com/',
+  },
+  {
+    name: 'Merchant Map',
+    link: 'https://celo.org/experience/merchant/merchants-accepting-celo#map',
+    subtitleKey: 'findMerchants',
   },
 ]
 
 export const SIMPLEX_URI = 'https://valoraapp.com/simplex'
+export const PONTO_URI = 'https://withponto.com/partners/celo/valora'
+export const KOTANI_URI = 'https://kotanipay.com/partners/valora'
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN
