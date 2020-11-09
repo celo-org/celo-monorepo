@@ -108,6 +108,7 @@ export type FeelessVerificationState = {
 export interface State {
   attestationCodes: AttestationCode[]
   feelessAttestationCodes: AttestationCode[]
+  feelessProcessingInputCode: boolean
   // we store acceptedAttestationCodes to tell user if code
   // was already used even after Actions.RESET_VERIFICATION
   acceptedAttestationCodes: AttestationCode[]
@@ -148,6 +149,7 @@ export interface State {
 const initialState: State = {
   attestationCodes: [],
   feelessAttestationCodes: [],
+  feelessProcessingInputCode: false,
   acceptedAttestationCodes: [],
   feelessAcceptedAttestationCodes: [],
   numCompleteAttestations: 0,
@@ -253,6 +255,7 @@ export const reducer = (
       return {
         ...state,
         feelessAttestationCodes: [],
+        feelessProcessingInputCode: false,
         feelessNumCompleteAttestations: 0,
         feelessVerificationStatus: VerificationStatus.Stopped,
       }
@@ -270,6 +273,7 @@ export const reducer = (
       return {
         ...state,
         feelessAttestationCodes: [],
+        feelessProcessingInputCode: false,
         feelessAcceptedAttestationCodes: [],
         feelessNumCompleteAttestations: 0,
         feelessVerificationStatus: VerificationStatus.Stopped,
@@ -343,6 +347,11 @@ export const reducer = (
         ...state,
         feelessAttestationCodes: [...state.feelessAttestationCodes, action.code],
       }
+    case Actions.FEELESS_PROCESSING_INPUT_CODE:
+      return {
+        ...state,
+        feelessProcessingInputCode: action.active,
+      }
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
@@ -352,6 +361,7 @@ export const reducer = (
     case Actions.FEELESS_COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
+        feelessProcessingInputCode: false,
         ...feelessCompleteCodeReducer(state, state.feelessNumCompleteAttestations + 1),
         feelessAcceptedAttestationCodes: [...state.feelessAcceptedAttestationCodes, action.code],
       }
@@ -580,6 +590,8 @@ const feelessCompleteCodeReducer = (state: State, feelessNumCompleteAttestations
 export const attestationCodesSelector = (state: RootState) => state.identity.attestationCodes
 export const feelessAttestationCodesSelector = (state: RootState) =>
   state.identity.feelessAttestationCodes
+export const feelessProcessingInputCodeSelector = (state: RootState) =>
+  state.identity.feelessProcessingInputCode
 export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const feelessAcceptedAttestationCodesSelector = (state: RootState) =>

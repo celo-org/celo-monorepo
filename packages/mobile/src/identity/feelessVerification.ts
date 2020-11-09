@@ -39,6 +39,7 @@ import {
   Actions,
   feelessCompleteAttestationCode,
   FeelessInputAttestationCodeAction,
+  feelessProcessingInputCode,
   feelessResetVerification,
   feelessSetCompletedCodes,
   feelessSetVerificationStatus,
@@ -64,6 +65,7 @@ import {
   E164NumberToSaltType,
   feelessAcceptedAttestationCodesSelector,
   feelessAttestationCodesSelector,
+  feelessProcessingInputCodeSelector,
   FeelessVerificationState,
   feelessVerificationStateSelector,
   isFeelessVerificationStateExpiredSelector,
@@ -92,7 +94,8 @@ import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
-export const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
+export const KOMENCI_URL = 'https://weu.komenci.celo-networks-dev.org'
+// export const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
 // TODO: Populate this with expected implementation address
 const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
 const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
@@ -1029,6 +1032,13 @@ export function* feelessCompleteAttestation(
 
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
 
+  // Needed to ensure that codes inputted in quick succession are not
+  // assigned the same nonce by Komenci
+  while (yield select(feelessProcessingInputCodeSelector)) {
+    yield delay(100)
+  }
+
+  yield put(feelessProcessingInputCode(true))
   const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.completeAttestation],
     mtwAddress,
@@ -1039,6 +1049,7 @@ export function* feelessCompleteAttestation(
 
   if (!completeTxResult.ok) {
     Logger.debug(TAG, '@feelessCompleteAttestation', 'Failed complete tx')
+    yield put(feelessProcessingInputCode(false))
     throw completeTxResult.error
   }
 

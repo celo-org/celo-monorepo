@@ -430,6 +430,7 @@ export const v7Schema = {
   identity: {
     ...v6Schema.identity,
     feelessAttestationCodes: [],
+    feelessProcessingInputCode: false,
     feelessAcceptedAttestationCodes: [],
     feelessNumCompleteAttestations: 0,
     feelessVerificationStatus: 0,
