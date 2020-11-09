@@ -46,7 +46,7 @@ spec:
 {{ include "common.env-var" (dict "name" "DB_DATABASE" "dict" .Values.onboarding.db "value_name" "database") | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.onboarding.db "value_name" "synchronize") | indent 10 }}
 {{ include "common.env-var" (dict "name" "DB_SSL" "dict" .Values.onboarding.db "value_name" "ssl") | indent 10 }}
-{{ include "common.env-var" (dict "name" "NODE_ENV" "dict" .Values.onboarding "value_name" "node_env") | indent 8 }}
+{{ include "common.env-var" (dict "name" "NODE_ENV" "dict" .Values.onboarding "value_name" "node_env") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.onboarding.relayer "value_name" "host") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.onboarding.relayer "value_name" "port") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
