@@ -43,6 +43,7 @@ describe('WithdrawCeloReviewScreen', () => {
         type: Actions.WITHDRAW_CELO,
         amount: SAMPLE_AMOUNT,
         recipientAddress: SAMPLE_ADDRESS,
+        isCashOut: false,
       },
     ])
   })
