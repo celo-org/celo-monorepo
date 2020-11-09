@@ -1867,10 +1867,10 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.3.tgz#355199fe45d1f9e667ee66836a34e93828b3b5a5"
   integrity sha512-3GeGcUHCzMxCpkBHywEuoXZp1VV+yN6uEHPowxGgH2VP++qO01HMw8G5J4wlP7jN5HFt3WsZaHWfIhor/irGKg==
 
-"@celo/client@0.0.317":
-  version "0.0.317"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.317.tgz#d306f99d90f725165102ddb745824023bd872a65"
-  integrity sha512-+M9DJqEj2HIZTwq3JRr7kk1AB3iHBjC7dgdnKhFn8EVgnqnkHcRW04LhQ54CAi37szKwShg8kVpzDOs3fxuTRA==
+"@celo/client@0.0.319":
+  version "0.0.319"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.319.tgz#d8ec1f265fed3b73ec72ba2a34e043c6d400c7c4"
+  integrity sha512-5pjqAOju4NCFzYvnkPIiQnfVxqggB/8Ol8Js4ysdqHa6o/fg3u4noCkDqGc31kZzZniQvfal6a0wn9OXXSMWow==
 
 "@celo/contractkit@0.3.1":
   version "0.3.1"
@@ -2013,6 +2013,14 @@
     elliptic "6.5.3"
     express "^4.17.1"
     web3 "1.2.4"
+
+"@celo/react-native-fast-crypto@^1.8.4":
+  version "1.8.4"
+  resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.4.tgz#1aa5d435a2770289eaeada0ae814bc936d980c76"
+  integrity sha512-uyDRP07ayl8ODYm57URgMIE8GFBIm3/6BgdOOjfyuPu/E51Cdc1gnR//J0GkI/Re2CdWAu+2TE6YoBjHeirnjA==
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
 
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#b88e502":
   version "1.0.3"
@@ -24254,20 +24262,10 @@ node-fetch@^2.0.0-alpha.8, node-fetch@^2.1.2, node-fetch@^2.2.0, node-fetch@^2.3
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-node-forge@0.7.4:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.4.tgz#8e6e9f563a1e32213aa7508cded22aa791dbf986"
-  integrity sha512-8Df0906+tq/omxuCZD6PqhPaQDYuyJ1d+VITgxoIA8zvQd1ru+nMJcDChHH324MWitIgbVkAkQoGEEVJNpn/PA==
-
-node-forge@^0.7.4:
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.5.tgz#6c152c345ce11c52f465c2abd957e8639cd674df"
-  integrity sha512-MmbQJ2MTESTjt3Gi/3yG1wGpIMhUfcIypUCGtTizFR9IiccFwxSpfp0vtIZlkFclEqERemxfnSdZEMR9VqqEFQ==
-
-node-forge@^0.9.0:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.1.tgz#775368e6846558ab6676858a4d8c6e8d16c677b5"
-  integrity sha512-G6RlQt5Sb4GMBzXvhfkeFmbqR6MzhtnT7VTHuLadjkii3rdYHNdw0m8zA4BTxVIh68FicCQ2NSUANpsqkr9jvQ==
+node-forge@0.7.4, node-forge@^0.10.0, node-forge@^0.7.4, node-forge@^0.9.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
+  integrity sha512-PPmu8eEeG9saEUvI97fm4OYxXVB6bFvyNTyiUOBichBpFG8A1Ljw3bY62+5oOjDEMHRnd0Y7HQ+x7uzxOzC6JA==
 
 node-gyp-build@^4.2.0:
   version "4.2.1"
@@ -25131,10 +25129,10 @@ object-keys@~0.4.0:
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-0.4.0.tgz#28a6aae7428dd2c3a92f3d95f21335dd204e0336"
   integrity sha1-KKaq50KN0sOpLz2V8hM13SBOAzY=
 
-object-path@0.11.4, object-path@^0.11.4:
-  version "0.11.4"
-  resolved "https://registry.yarnpkg.com/object-path/-/object-path-0.11.4.tgz#370ae752fbf37de3ea70a861c23bba8915691949"
-  integrity sha1-NwrnUvvzfePqcKhhwju6iRVpGUk=
+object-path@0.11.4, object-path@^0.11.4, object-path@^0.11.5:
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/object-path/-/object-path-0.11.5.tgz#d4e3cf19601a5140a55a16ad712019a9c50b577a"
+  integrity sha512-jgSbThcoR/s+XumvGMTMf81QVBmah+/Q7K7YduKeKVWL7N111unR2d6pZZarSk6kY/caeNxUDyxOvMWyzoU2eg==
 
 object-treeify@^1.1.4:
   version "1.1.26"
@@ -27685,12 +27683,12 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@https://github.com/celo-org/react-native-bip39#93112e6":
+"react-native-bip39@https://github.com/celo-org/react-native-bip39#6f41623":
   version "2.2.0"
-  resolved "https://github.com/celo-org/react-native-bip39#93112e6dfd38ee826af7a55176f5be20d874ab6d"
+  resolved "https://github.com/celo-org/react-native-bip39#6f416235866f883d0e37e95f1b344070e9e1acda"
   dependencies:
+    "@celo/react-native-fast-crypto" "^1.8.4"
     create-hash "^1.1.0"
-    react-native-fast-crypto "https://github.com/celo-org/react-native-fast-crypto#df1c171"
     react-native-securerandom "1.0.0"
     unorm "^1.3.3"
 
@@ -27759,13 +27757,6 @@ react-native-exit-app@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
   integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
-
-"react-native-fast-crypto@https://github.com/celo-org/react-native-fast-crypto#df1c171":
-  version "1.8.3"
-  resolved "https://github.com/celo-org/react-native-fast-crypto#df1c171d5383b56199dc2ee0c59db4bfe622172b"
-  dependencies:
-    buffer "^5.0.8"
-    rfc4648 "^1.0.0"
 
 "react-native-flag-secure-android@git://github.com/kristiansorens/react-native-flag-secure-android#e234251":
   version "1.0.0"
