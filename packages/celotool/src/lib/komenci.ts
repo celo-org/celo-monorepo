@@ -166,6 +166,8 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
+    `--set onboarding.publicHostname=${getPublicHostname(celoEnv)}`,
+    `--set onboarding.publicUrl=${'https://' + getPublicHostname(celoEnv)}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
@@ -173,6 +175,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set relayer.metrics.prometheusPort=9090`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
+}
+
+function getPublicHostname(celoEnv: string): string{
+  return 'weu.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
 }
 
 /**

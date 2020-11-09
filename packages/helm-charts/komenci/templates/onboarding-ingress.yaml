@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Namespace }}.{{ .Values.domain.name }}.org
+    - {{ .Values.onboarding.publicHostname }}
     secretName: {{ .Release.Namespace }}-web-tls
   rules:
-  - host: {{ .Release.Namespace }}.{{ .Values.domain.name }}.org
+  - host: {{ .Values.onboarding.publicHostname }}
     http:
       paths:
       - path: /
