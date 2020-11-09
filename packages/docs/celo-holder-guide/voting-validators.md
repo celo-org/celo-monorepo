@@ -20,7 +20,7 @@ As a CELO holder, you have the opportunity to impact the Celo network by voting 
 
 ### Technical
 
-- **Proven identity:** Validators and groups can supply [verifiable DNS claims](../operations-manual/validator-explorer.md). You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
+- **Proven identity:** Validators and groups can supply [verifiable DNS claims](../validator-guide/validator-explorer.md). You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
 
 - **Can receive votes**: Validator Groups can receive votes up to a certain [voting cap](../celo-codebase/protocol/proof-of-stake/validator-elections.md#group-voting-caps). You cannot vote for groups with a balance that would put it beyond its cap.
 
@@ -48,7 +48,7 @@ As a CELO holder, you have the opportunity to impact the Celo network by voting 
 
 As described above, there are many criteria to consider when deciding which group to vote for. While it is highly recommended that all CELO holders do their independent research when deciding which group to vote for, another option is to vote for Validator Groups that have received votes from the Celo Foundation.
 
-The Celo Foundation has a [Validator Group voting policy](../operations-manual/celo-foundation-voting-policy.md) that it follows when voting with the CELO that it holds. This policy has been developed by the Foundation board and technical advisors with the express goal of promoting the long-term security and decentralization of the network. Validator Groups have an opportunity to apply for Foundation votes every 3 months, and a new cohort is selected based on past performance and contributions. 
+The Celo Foundation has a [Validator Group voting policy](../validator-guide/celo-foundation-voting-policy.md) that it follows when voting with the CELO that it holds. This policy has been developed by the Foundation board and technical advisors with the express goal of promoting the long-term security and decentralization of the network. Validator Groups have an opportunity to apply for Foundation votes every 3 months, and a new cohort is selected based on past performance and contributions. 
 
 You can find the [full set of Validator Groups currently receiving votes, and their addresses linked here](https://docs.google.com/spreadsheets/d/1ltVNkQfXW3lIZxXU52R3IXeD6w21oacWFVb3a-FYRBY/edit?usp=sharing).
 
@@ -59,7 +59,7 @@ The Celo ecosystem includes a number of great services for browsing registered V
 {% hint style="warning" %}
 **Warning**: Exercise caution in relying on Validator-supplied names to determine their real-world identity. Malicious participants may attempt to impersonate other Validators in order to attract votes.
 
-Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
+Validators and groups can also supply [verifiable DNS claims](../validator-guide/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a Validator or group and the supplied DNS records.
 {% endhint %}
 
 ### [Celo Validator Explorer](https://validators.celo.org) (cLabs)
