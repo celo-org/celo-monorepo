@@ -14,7 +14,7 @@ import { EscrowEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
+import { ESCROW_PAYMENT_EXPIRY_SECONDS, KOMENCI_URL } from 'src/config'
 import {
   Actions,
   EscrowedPayment,
@@ -36,7 +36,6 @@ import {
   FeelessSetVerificationStatusAction,
   SetVerificationStatusAction,
 } from 'src/identity/actions'
-import { KOMENCI_URL } from 'src/identity/feelessVerification'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import {
   addressToE164NumberSelector,

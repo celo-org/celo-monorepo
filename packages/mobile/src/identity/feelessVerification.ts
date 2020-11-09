@@ -23,7 +23,6 @@ import {
 } from '@celo/komencikit/src/errors'
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { verifyWallet } from '@celo/komencikit/src/verifyWallet'
-import { Address } from '@celo/utils/src/address'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
@@ -36,6 +35,11 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import {
+  ALLOWED_MTW_IMPLEMENTATIONS,
+  CURRENT_MTW_IMPLEMENTATION_ADDRESS,
+  KOMENCI_URL,
+} from 'src/config'
 import { features } from 'src/flags'
 import networkConfig from 'src/geth/networkConfig'
 import { refreshAllBalances } from 'src/home/actions'
@@ -97,11 +101,6 @@ import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
-
-export const KOMENCI_URL = 'https://staging-komenci.azurefd.net'
-// TODO: Populate this with expected implementation address
-const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
-const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
 
 // NOTE: This will need to change if we begin to use the `total`
 // property as a consideration for verification status

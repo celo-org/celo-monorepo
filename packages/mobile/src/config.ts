@@ -1,3 +1,4 @@
+import { Address } from '@celo/base'
 import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
@@ -136,3 +137,18 @@ export const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN
 export const VALORA_DOMAIN = 'https://valoraapp.com'
+
+export const KOMENCI_URL =
+  DEFAULT_TESTNET === 'mainnet'
+    ? 'https://mainnet-komenci.azurefd.net'
+    : 'https://staging-komenci.azurefd.net'
+
+export const ALLOWED_MTW_IMPLEMENTATIONS: Address[] =
+  DEFAULT_TESTNET === 'mainnet'
+    ? ['0x6511FB5DBfe95859d8759AdAd5503D656E2555d7']
+    : ['0x5C9a6E3c3E862eD306E2E3348EBC8b8310A99e5A', '0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
+
+export const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address =
+  DEFAULT_TESTNET === 'mainnet'
+    ? '0x6511FB5DBfe95859d8759AdAd5503D656E2555d7'
+    : '0x5C9a6E3c3E862eD306E2E3348EBC8b8310A99e5A'
