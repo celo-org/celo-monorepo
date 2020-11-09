@@ -423,7 +423,7 @@ export const v6Schema = {
     walletToAccountAddress: {},
   },
   app: {
-    ...v3Schema.app,
+    ...v5Schema.app,
     pontoEnabled: false,
     kotaniEnabled: false,
   },
