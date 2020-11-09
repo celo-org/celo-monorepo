@@ -61,5 +61,6 @@ onboarding:
     username: 'postgres'
     database: 'postgres'
     synchronize: true
+    ssl: true
   onchain:
     network: alfajores
