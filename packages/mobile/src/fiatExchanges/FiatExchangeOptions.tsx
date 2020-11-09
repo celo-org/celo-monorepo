@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   currenciesContainer: {
     flexDirection: 'column',
-    marginTop: 4,
+    marginTop: 8,
   },
   currencyItemContainer: {
     flexDirection: 'row',
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   paymentMethodsContainer: {
     flexDirection: 'column',
-    marginTop: 4,
+    marginTop: 8,
     borderWidth: 1,
     borderColor: colors.gray3,
     borderRadius: 8,
