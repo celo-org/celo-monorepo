@@ -20,14 +20,11 @@ export const generateUniquePaymentId = (
   phoneHash: string,
   pepper: string
 ) => {
-  const paymentIdSet: Set<string> = new Set()
-  for (const paymentId of existingPaymentIds) {
-    paymentIdSet.add(paymentId)
-  }
+  const paymentIdSet: Set<string> = new Set(existingPaymentIds)
 
-  // Using an upper bound of 1000 to be sure this doesn't run forever given
+  // Using an upper bound of 100 to be sure this doesn't run forever given
   // the realistic amount of pending escrow txs is far less than this
-  for (let i = 0; i < 1000; i += 1) {
+  for (let i = 0; i < 100; i += 1) {
     const { paymentId } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
     if (!paymentIdSet.has(paymentId)) {
       return paymentId

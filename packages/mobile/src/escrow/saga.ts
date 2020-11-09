@@ -14,7 +14,7 @@ import { EscrowEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ESCROW_PAYMENT_EXPIRY_SECONDS, KOMENCI_URL } from 'src/config'
+import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
   Actions,
   EscrowedPayment,
@@ -29,6 +29,7 @@ import { generateEscrowPaymentIdAndPk, generateUniquePaymentId } from 'src/escro
 import { calculateFee } from 'src/fees/saga'
 import { features } from 'src/flags'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
+import networkConfig from 'src/geth/networkConfig'
 import { waitForNextBlock } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import {
@@ -285,17 +286,14 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       return
     }
 
-    const paymentIdSet: Set<string> = new Set()
-    for (const paymentId of escrowPaymentIds) {
-      paymentIdSet.add(paymentId)
-    }
+    const paymentIdSet: Set<string> = new Set(escrowPaymentIds)
 
     const context = newTransactionContext(TAG, 'Withdraw from escrow')
     // TODO: Batch the tranasctions and submit them together via `executeTransactions`
     // method on an instance of the MTW then submitting like usual
     const withdrawTxSuccess: boolean[] = []
-    // Using an upper bound of 1000 to be sure this doesn't run forever
-    for (let i = 0; i < 1000 && paymentIdSet.size > 0; i += 1) {
+    // Using an upper bound of 100 to be sure this doesn't run forever
+    for (let i = 0; i < 100 && paymentIdSet.size > 0; i += 1) {
       const { paymentId, privateKey } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
       if (!paymentIdSet.has(paymentId)) {
         continue
@@ -332,7 +330,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
           yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context)
         } else {
           const komenciKit: KomenciKit = new KomenciKit(contractKit, walletAddress, {
-            url: feelessVerificationState.komenci.callbackUrl || KOMENCI_URL,
+            url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
             token: feelessVerificationState.komenci.sessionToken,
           })
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs

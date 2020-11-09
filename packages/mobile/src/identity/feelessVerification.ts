@@ -35,11 +35,6 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import {
-  ALLOWED_MTW_IMPLEMENTATIONS,
-  CURRENT_MTW_IMPLEMENTATION_ADDRESS,
-  KOMENCI_URL,
-} from 'src/config'
 import { features } from 'src/flags'
 import networkConfig from 'src/geth/networkConfig'
 import { refreshAllBalances } from 'src/home/actions'
@@ -129,7 +124,7 @@ export function* feelessFetchVerificationState() {
     ])
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: feelessVerificationState.komenci.callbackUrl || KOMENCI_URL,
+      url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
       token: feelessVerificationState.komenci.sessionToken,
     })
 
@@ -252,7 +247,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
     )
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: feelessVerificationState.komenci.callbackUrl || KOMENCI_URL,
+      url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
       token: feelessVerificationState.komenci.sessionToken,
     })
 
@@ -605,7 +600,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
         verifyWallet,
         contractKit,
         possibleMtwAddress,
-        ALLOWED_MTW_IMPLEMENTATIONS,
+        networkConfig.allowedMtwImplementations,
         walletAddress
       )
     )
@@ -819,7 +814,7 @@ function* fetchOrDeployMtw(
     try {
       const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
         [komenciKit, komenciKit.deployWallet],
-        CURRENT_MTW_IMPLEMENTATION_ADDRESS
+        networkConfig.currentMtwImplementationAddress
       )
 
       if (!deployWalletResult.ok) {
@@ -855,7 +850,7 @@ function* fetchOrDeployMtw(
     verifyWallet,
     contractKit,
     unverifiedMtwAddress,
-    ALLOWED_MTW_IMPLEMENTATIONS,
+    networkConfig.allowedMtwImplementations,
     walletAddress
   )
 
@@ -1035,6 +1030,7 @@ export function* feelessCompleteAttestation(
 
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
 
+  // TODO: Refactor this to check for state change in a smart way
   // Needed to ensure that codes inputted in quick succession are not
   // assigned the same nonce by Komenci
   while (yield select(feelessProcessingInputCodeSelector)) {

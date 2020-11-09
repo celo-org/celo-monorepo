@@ -87,6 +87,7 @@ export function* revokeVerificationSaga() {
 
     yield all([put(relevantStateRevoke()), put(setNumberVerified(false)), put(setMtwAddress(null))])
     ValoraAnalytics.track(VerificationEvents.verification_revoke_finish)
+    Logger.showMessage('Address revoke was successful')
   } catch (err) {
     Logger.error(TAG + '@revokeVerification', 'Error revoking verification', err)
     ValoraAnalytics.track(VerificationEvents.verification_revoke_error, {
