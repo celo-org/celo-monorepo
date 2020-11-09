@@ -142,6 +142,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     contextDatabaseConfigDynamicEnvVars,
     context
   )
+  const network = getContextDynamicEnvVarValues(
+    {network: DynamicEnvVar.KOMENCI_NETWORK},
+    context
+  )
   const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
@@ -164,6 +168,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
+    `--set onboarding.onchain.network=${network.network}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set relayer.replicas=${replicas}`,
@@ -171,6 +176,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
+    `--set relayer.onchain.network=${network.network}`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }
