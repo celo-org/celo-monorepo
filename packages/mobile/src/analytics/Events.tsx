@@ -297,6 +297,7 @@ export enum CeloExchangeEvents {
 
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
+  spend_merchant_link = 'spend_merchant_link',
 }
 
 export enum GethEvents {
