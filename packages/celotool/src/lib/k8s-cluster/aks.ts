@@ -6,6 +6,7 @@ export interface AKSClusterConfig extends BaseClusterConfig {
   tenantId: string
   resourceGroup: string
   subscriptionId: string
+  regionName: string
 }
 
 export class AKSClusterManager extends BaseClusterManager {

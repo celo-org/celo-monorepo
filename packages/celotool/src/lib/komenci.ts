@@ -149,9 +149,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
-
-  // tslint:disable-next-line:no-console
-  console.log("DB PASSWORD: " + databasePassword)
+  const clusterConfig = getAKSClusterConfig(context)
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
@@ -166,8 +164,8 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
-    `--set onboarding.publicHostname=${getPublicHostname(celoEnv)}`,
-    `--set onboarding.publicUrl=${'https://' + getPublicHostname(celoEnv)}`,
+    `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
+    `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
@@ -177,8 +175,8 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }
 
-function getPublicHostname(celoEnv: string): string{
-  return 'weu.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
+function getPublicHostname(regionName: string, celoEnv: string): string{
+  return regionName + '.' + celoEnv + '.' + fetchEnv(envVar.CLUSTER_DOMAIN_NAME) + '.org'
 }
 
 /**

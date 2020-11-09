@@ -14,6 +14,7 @@ const contextAKSClusterConfigDynamicEnvVars: { [k in keyof Omit<AKSClusterConfig
   subscriptionId: DynamicEnvVar.AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.AZURE_TENANT_ID,
   resourceGroup: DynamicEnvVar.AZURE_KUBERNETES_RESOURCE_GROUP,
+  regionName: DynamicEnvVar.AZURE_REGION_NAME,
 }
 
 /**
