@@ -30,7 +30,7 @@ export const countryFeatures = {
     SD: true,
     SY: true,
   },
-  SIMPLEX_DISABLED: {
+  MOONPAY_DISABLED: {
     US: true,
   },
   PONTO_SUPPORTED: {

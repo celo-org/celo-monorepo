@@ -118,7 +118,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const isAddFunds = route.params?.isAddFunds ?? true
   const localCurrency = useSelector(getLocalCurrencyCode)
-  const { SIMPLEX_DISABLED, KOTANI_SUPPORTED, PONTO_SUPPORTED } = useCountryFeatures()
+  const { MOONPAY_DISABLED, KOTANI_SUPPORTED, PONTO_SUPPORTED } = useCountryFeatures()
   const pontoEnabled = useSelector(pontoEnabledSelector)
   const kotaniEnabled = useSelector(kotaniEnabledSelector)
   const showPonto = pontoEnabled && PONTO_SUPPORTED
@@ -126,9 +126,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
 
   Logger.debug(`Ponto: ${pontoEnabled} Kotani: ${kotaniEnabled}`)
 
-  const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(
-    isAddFunds && SIMPLEX_DISABLED ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
-  )
+  const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(CURRENCY_ENUM.DOLLAR)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
     isAddFunds ? PaymentMethod.FIAT : PaymentMethod.EXCHANGE
   )
@@ -181,7 +179,6 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderTopLeftRadius: 8,
               borderTopRightRadius: 8,
             }}
-            enabled={!SIMPLEX_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT}
           />
           <View style={styles.currencySeparator} />
           <CurrencyRadioItem
@@ -193,6 +190,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderBottomLeftRadius: 8,
               borderBottomRightRadius: 8,
             }}
+            enabled={!MOONPAY_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT}
           />
         </View>
       </ScrollView>
@@ -206,7 +204,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               text={t('payWithFiat')}
               selected={selectedPaymentMethod === PaymentMethod.FIAT}
               onSelect={onSelectPaymentMethod(PaymentMethod.FIAT)}
-              enabled={!SIMPLEX_DISABLED || selectedCurrency !== CURRENCY_ENUM.DOLLAR}
+              enabled={!MOONPAY_DISABLED || selectedCurrency !== CURRENCY_ENUM.GOLD}
             />
           )}
           <PaymentMethodRadioItem
