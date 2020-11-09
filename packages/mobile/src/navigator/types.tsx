@@ -129,6 +129,9 @@ export type StackParamList = {
       }
     | undefined
   [Screens.Licenses]: undefined
+  [Screens.LocalProviderCashOut]: {
+    uri: string
+  }
   [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {

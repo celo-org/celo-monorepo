@@ -11,8 +11,10 @@ import { useTranslation } from 'react-i18next'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
+import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
+import { PONTO_URI } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import RadioIcon from 'src/icons/RadioIcon'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -114,6 +116,9 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const isAddFunds = route.params?.isAddFunds ?? true
   const localCurrency = useSelector(getLocalCurrencyCode)
   const { SIMPLEX_DISABLED } = useCountryFeatures()
+  const pontoEnabled = useSelector(pontoEnabledSelector) // TODO make Only available in Philippines
+  const kotaniEnabled = useSelector(kotaniEnabledSelector) // Only available in Kenya
+
   const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(
     isAddFunds && SIMPLEX_DISABLED ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
   )
@@ -126,6 +131,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.ExternalExchanges, {
         currency: selectedCurrency,
       })
+    } else if (selectedPaymentMethod === PaymentMethod.PONTO) {
+      navigate(Screens.LocalProviderCashOut, { uri: PONTO_URI })
     } else {
       navigate(selectedCurrency === CURRENCY_ENUM.GOLD ? Screens.MoonPay : Screens.Simplex, {
         localAmount: new BigNumber(0),
@@ -202,7 +209,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
                 text={t('receiveOnPonto')}
                 selected={selectedPaymentMethod === PaymentMethod.PONTO}
                 onSelect={onSelectPaymentMethod(PaymentMethod.PONTO)}
-                enabled={false}
+                enabled={true}
               />
             </>
           )}
