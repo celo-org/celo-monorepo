@@ -24,3 +24,11 @@ redirects:
   celo-gold-holder-guide/release-gold: celo-holder-guide/release-gold.md
   celo-gold-holder-guide/voting-governance: celo-holder-guide/voting-governance.md
   celo-gold-holder-guide/voting-validators: celo-holder-guide/voting-validators.md
+  celo-owner-guide/quick-start: celo-holder-guide/quick-start.md
+  celo-owner-guide/cusd: celo-holder-guide/cusd.md
+  celo-owner-guide/ledger: celo-holder-guide/ledger.md
+  celo-owner-guide/release-gold: celo-holder-guide/release-gold.md
+  celo-owner-guide/voting-validators: celo-holder-guide/voting-validators.md
+  celo-owner-guide/voting-governance: celo-holder-guide/voting-governance.md
+  celo-owner-guide/eth-recovery: celo-holder-guide/eth-recovery.md
+  
