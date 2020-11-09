@@ -27,13 +27,16 @@ export const rootLogger: Logger = createLogger({
   streams: [stream],
 })
 
-export function loggerMiddleware(req: Request, res: Response, next: NextFunction) {
+export function loggerMiddleware(req: Request, res: Response, next?: NextFunction): Logger {
   const requestLogger = rootLogger.child({
     endpoint: req.url,
-    session: req.body.session, // May be undefined
+    sessionID: req.body.sessionID, // May be undefined
   })
 
   res.locals.logger = requestLogger
   requestLogger.info({ req })
-  next()
+  if (next) {
+    next()
+  }
+  return requestLogger
 }

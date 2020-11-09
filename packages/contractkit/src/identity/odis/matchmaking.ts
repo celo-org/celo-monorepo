@@ -24,7 +24,8 @@ export async function getContactMatches(
   phoneNumberIdentifier: string,
   signer: AuthSigner,
   context: ServiceContext,
-  clientVersion?: string
+  clientVersion?: string,
+  sessionID?: string
 ): Promise<E164Number[]> {
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
@@ -36,6 +37,10 @@ export async function getContactMatches(
     hashedPhoneNumber: phoneNumberIdentifier,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
+  }
+
+  if (sessionID) {
+    body.sessionID = sessionID
   }
 
   const response = await queryOdis<MatchmakingResponse>(signer, body, context, MATCHMAKING_ENDPOINT)

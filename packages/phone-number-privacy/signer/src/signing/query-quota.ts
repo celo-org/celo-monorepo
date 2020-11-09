@@ -23,6 +23,7 @@ import { getContractKit } from '../web3/contracts'
 export interface GetQuotaRequest {
   account: string
   hashedPhoneNumber?: string
+  sessionID?: string
 }
 
 export interface GetQuotaResponse {

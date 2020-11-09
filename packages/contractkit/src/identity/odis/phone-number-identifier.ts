@@ -9,7 +9,7 @@ import {
   queryOdis,
   ServiceContext,
   SignMessageRequest,
-  SignMessageResponse,
+  SignMessageResponse
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -91,7 +91,8 @@ export async function getBlindedPhoneNumberSignature(
   context: ServiceContext,
   base64BlindedMessage: string,
   selfPhoneHash?: string,
-  clientVersion?: string
+  clientVersion?: string,
+  sessionID?: string
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
@@ -99,7 +100,11 @@ export async function getBlindedPhoneNumberSignature(
     blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,
     version: clientVersion ? clientVersion : 'unknown',
-    authenticationMethod: signer.authenticationMethod,
+    authenticationMethod: signer.authenticationMethod
+  }
+
+  if (sessionID) {
+    body.sessionID = sessionID
   }
 
   const response = await queryOdis<SignMessageResponse>(

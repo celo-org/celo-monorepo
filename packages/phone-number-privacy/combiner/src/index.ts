@@ -1,4 +1,5 @@
-import { logger } from '@celo/phone-number-privacy-common'
+import { loggerMiddleware } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
@@ -10,7 +11,8 @@ require('dotenv').config()
 export const getDistributedBlindedSalt = functions
   .region('us-central1', 'europe-west3')
   .https.onRequest(async (req, res) => {
-    logger.info('Begin getDistributedBlindedSalt request')
+    const logger: Logger = loggerMiddleware(req, res)
+    logger.info('Received getDistributedBlindedSalt request')
     logger.info({ req })
     await handleGetBlindedMessageSig(req, res)
     logger.info('Sent getDistributedBlindedSalt response')
@@ -21,6 +23,7 @@ export const getDistributedBlindedSalt = functions
 export const getBlindedMessageSig = functions
   .region('us-central1', 'europe-west3')
   .https.onRequest(async (req, res) => {
+    const logger: Logger = loggerMiddleware(req, res)
     logger.info('Received getBlindedMessageSig request')
     logger.info({ req })
     await handleGetBlindedMessageSig(req, res)
@@ -32,6 +35,7 @@ export const getBlindedMessageSig = functions
 export const getContactMatches = functions
   .region('us-central1', 'europe-west3')
   .https.onRequest(async (req, res) => {
+    const logger: Logger = loggerMiddleware(req, res)
     logger.info('Received getContactMatches request')
     logger.info({ req })
     await handleGetContactMatches(req, res)

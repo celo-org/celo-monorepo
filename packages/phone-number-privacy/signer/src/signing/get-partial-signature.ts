@@ -27,7 +27,7 @@ export interface GetBlindedMessagePartialSigRequest {
   blindedQueryPhoneNumber: string
   hashedPhoneNumber?: string
   timestamp?: number
-  session?: string
+  sessionID?: string
 }
 
 export async function handleGetBlindedMessagePartialSig(
@@ -39,7 +39,7 @@ export async function handleGetBlindedMessagePartialSig(
   const logger: Logger = response.locals.logger
   logger.info('Begin handleGetBlindedMessagePartialSig request')
 
-  if (!request.body.session) {
+  if (!request.body.sessionID) {
     Counters.signatureRequestsWithoutSessionID.inc()
   }
 

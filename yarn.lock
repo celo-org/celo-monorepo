@@ -1995,10 +1995,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.14":
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.14.tgz#1c62962054b294d063cd42b0577ce69b6b6100a8"
-  integrity sha512-szTdAAIxiMUsMB0B/c/JUh1UGjJgWZe5rWosN6LnQvshdjI0Tk8hUtaCDG+QZ7HGpiBWydX1ZXgZ+sBZnVF/pg==
+"@celo/phone-number-privacy-common@1.0.17":
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.17.tgz#690f0a9e87738d135fcdedde8ebd88a4090672dd"
+  integrity sha512-m9laINU62I6QIn8NkybxK82jrg5LnYe/OmcCJKsHlnFjKJmTTTQZaoPng6IOJ3dm2diTbRBWw5TkPnbHWU+Afg==
   dependencies:
     "@celo/contractkit" "0.4.17"
     "@celo/utils" "0.1.21"
@@ -2014,25 +2014,6 @@
     express "^4.17.1"
     web3 "1.2.4"
 
-"@celo/phone-number-privacy-common@1.0.15":
-  version "1.0.15"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.15.tgz#4e56889dac6f1f653e675ed5ba6adc241b960c1a"
-  integrity sha512-gi3vy7wIj3bfqLICoM3TKovvXHA45A14jUH0B+s+Ed+TB3p7P1+fuYTID9fJC6R0NU/3jzaaSavOqB8bHhMi3A==
-  dependencies:
-    "@celo/contractkit" "0.4.17"
-    "@celo/utils" "0.1.21"
-    "@types/btoa" "^1.2.3"
-    bignumber.js "^9.0.0"
-    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
-    btoa "1.2.1"
-    bunyan "1.8.12"
-    bunyan-debug-stream "2.0.0"
-    bunyan-gke-stackdriver "0.1.2"
-    dotenv "^8.2.0"
-    elliptic "6.5.3"
-    express "^4.17.1"
-    web3 "1.2.4"
-    
 "@celo/react-native-fast-crypto@^1.8.4":
   version "1.8.4"
   resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.4.tgz#1aa5d435a2770289eaeada0ae814bc936d980c76"
@@ -6446,7 +6427,7 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-7.0.2.tgz#b17f16cf933597e10d6d78eae3251e692ce8b0ce"
   integrity sha512-ZvO2tAcjmMi8V/5Z3JsyofMe3hasRcaw88cto5etSVMwVQfeivGAlEYmaQgceUSVYFofVjT+ioHsATjdWcFt1w==
 
-"@types/node-fetch@2.5.5", "@types/node-fetch@^2.5.0":
+"@types/node-fetch@2.5.5":
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.5.tgz#cd264e20a81f4600a6c52864d38e7fef72485e92"
   integrity sha512-IWwjsyYjGw+em3xTvWVQi5MgYKbRs0du57klfTaZkv/B24AEQ/p/IopNeqIYNy3EsfHOpg8ieQSDomPcsYMHpA==

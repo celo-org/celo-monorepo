@@ -1,6 +1,7 @@
-import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { getDatabase } from '../database'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
+import { NumberPair, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
 function numberPairs() {
   return getDatabase()<NumberPair>(NUMBER_PAIRS_TABLE)
@@ -11,7 +12,8 @@ function numberPairs() {
  */
 export async function getNumberPairContacts(
   userPhone: string,
-  contactPhones: string[]
+  contactPhones: string[],
+  logger: Logger
 ): Promise<string[]> {
   try {
     const contentPairs = await numberPairs()
@@ -34,7 +36,8 @@ export async function getNumberPairContacts(
  */
 export async function setNumberPairContacts(
   userPhone: string,
-  contactPhones: string[]
+  contactPhones: string[],
+  logger: Logger
 ): Promise<void> {
   const rows: any = []
   for (const contactPhone of contactPhones) {

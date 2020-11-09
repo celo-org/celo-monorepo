@@ -1,5 +1,6 @@
-import { ErrorMessage, logger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
+import Logger from 'bunyan'
 import config from '../config'
 
 export interface ServicePartialSignature {
@@ -15,7 +16,8 @@ export class BLSCryptographyClient {
 
   public async addSignature(
     serviceResponse: ServicePartialSignature,
-    blindedMessage: string
+    blindedMessage: string,
+    logger: Logger
   ): Promise<void> {
     const polynomial = config.thresholdSignature.polynomial
     const sigBuffer = Buffer.from(serviceResponse.signature, 'base64')
@@ -50,7 +52,6 @@ export class BLSCryptographyClient {
       const err = new Error(
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.verifiedSignatures.length}/${threshold}`
       )
-      logger.error({ err })
       throw err
     }
     const result = threshold_bls.combine(threshold, flattenSigsArray(this.verifiedSignatures))
