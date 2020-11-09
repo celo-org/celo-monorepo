@@ -37,6 +37,9 @@ import ExternalExchanges, {
 import FiatExchangeOptions, {
   fiatExchangesOptionsScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeOptions'
+import LocalProviderCashOut, {
+  localProviderCashOutOptions,
+} from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
 import Simplex, { simplexOptions } from 'src/fiatExchanges/Simplex'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
@@ -425,6 +428,11 @@ const settingsScreens = (Navigator: typeof Stack) => (
       options={fiatExchangesOptionsScreenOptions}
       name={Screens.FiatExchangeOptions}
       component={FiatExchangeOptions}
+    />
+    <Navigator.Screen
+      options={localProviderCashOutOptions}
+      name={Screens.LocalProviderCashOut}
+      component={LocalProviderCashOut}
     />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
     <Navigator.Screen options={simplexOptions} name={Screens.Simplex} component={Simplex} />

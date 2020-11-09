@@ -33,4 +33,10 @@ export const countryFeatures = {
   SIMPLEX_DISABLED: {
     US: true,
   },
+  PONTO_SUPPORTED: {
+    PH: true,
+  },
+  KOTANI_SUPPORTED: {
+    KE: true,
+  },
 }

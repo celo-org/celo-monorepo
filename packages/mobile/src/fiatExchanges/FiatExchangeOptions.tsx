@@ -12,8 +12,10 @@ import { useTranslation } from 'react-i18next'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
+import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
+import { KOTANI_URI, PONTO_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
@@ -25,6 +27,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
+import Logger from 'src/utils/Logger'
 
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
@@ -36,6 +39,7 @@ enum PaymentMethod {
   EXCHANGE = 'EXCHANGE',
   ADDRESS = 'ADDRESS',
   PONTO = 'PONTO',
+  KOTANI = 'KOTANI',
 }
 
 export const fiatExchangesOptionsScreenOptions = ({
@@ -114,7 +118,14 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const isAddFunds = route.params?.isAddFunds ?? true
   const localCurrency = useSelector(getLocalCurrencyCode)
-  const { SIMPLEX_DISABLED } = useCountryFeatures()
+  const { SIMPLEX_DISABLED, KOTANI_SUPPORTED, PONTO_SUPPORTED } = useCountryFeatures()
+  const pontoEnabled = useSelector(pontoEnabledSelector)
+  const kotaniEnabled = useSelector(kotaniEnabledSelector)
+  const showPonto = pontoEnabled && PONTO_SUPPORTED
+  const showKotani = kotaniEnabled && KOTANI_SUPPORTED
+
+  Logger.debug(`Ponto: ${pontoEnabled} Kotani: ${kotaniEnabled}`)
+
   const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(
     isAddFunds && SIMPLEX_DISABLED ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
   )
@@ -128,6 +139,10 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.ExternalExchanges, {
         currency: selectedCurrency,
       })
+    } else if (selectedPaymentMethod === PaymentMethod.PONTO) {
+      navigate(Screens.LocalProviderCashOut, { uri: PONTO_URI })
+    } else if (selectedPaymentMethod === PaymentMethod.KOTANI) {
+      navigate(Screens.LocalProviderCashOut, { uri: KOTANI_URI })
     } else {
       navigate(selectedCurrency === CURRENCY_ENUM.GOLD ? Screens.MoonPay : Screens.Simplex, {
         localAmount: new BigNumber(0),
@@ -207,12 +222,22 @@ function FiatExchangeOptions({ route, navigation }: Props) {
                 onSelect={onSelectPaymentMethod(PaymentMethod.ADDRESS)}
                 enabled={false}
               />
-              <PaymentMethodRadioItem
-                text={t('receiveOnPonto')}
-                selected={selectedPaymentMethod === PaymentMethod.PONTO}
-                onSelect={onSelectPaymentMethod(PaymentMethod.PONTO)}
-                enabled={false}
-              />
+              {showPonto && (
+                <PaymentMethodRadioItem
+                  text={t('receiveWithPonto')}
+                  selected={selectedPaymentMethod === PaymentMethod.PONTO}
+                  onSelect={onSelectPaymentMethod(PaymentMethod.PONTO)}
+                  enabled={true}
+                />
+              )}
+              {showKotani && (
+                <PaymentMethodRadioItem
+                  text={t('receiveWithKotani')}
+                  selected={selectedPaymentMethod === PaymentMethod.KOTANI}
+                  onSelect={onSelectPaymentMethod(PaymentMethod.KOTANI)}
+                  enabled={true}
+                />
+              )}
             </>
           )}
         </View>
