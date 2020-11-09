@@ -273,6 +273,18 @@ interface VerificationEventsProperties {
     issuer: any
     error: string
   }
+  [VerificationEvents.verification_reveal_attestation_status]: {
+    success: boolean
+    identifier: string
+    account: string
+    issuer: string
+    attempt: number
+    countryCode: string
+    status: string
+    provider: string
+    duration: number
+    errors: any
+  }
   [VerificationEvents.verification_revoke_start]: undefined
   [VerificationEvents.verification_revoke_finish]: undefined
   [VerificationEvents.verification_revoke_error]: {
@@ -324,11 +336,25 @@ interface InviteEventsProperties {
     escrowIncluded: boolean
     error: string
   }
+  [InviteEvents.invite_start]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+  }
+  [InviteEvents.invite_complete]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+  }
+  [InviteEvents.invite_error]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+    error: string
+  }
   [InviteEvents.invite_method_sms]: undefined
   [InviteEvents.invite_method_whatsapp]: undefined
   [InviteEvents.invite_method_error]: {
     error: string
   }
+  [InviteEvents.invite_from_menu]: undefined
 }
 
 interface EscrowEventsProperties {

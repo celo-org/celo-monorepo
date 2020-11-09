@@ -1,6 +1,7 @@
 import { normalizeAddressWith0x } from '@celo/base'
 import { Err, Ok } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
+import { WasmBlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
 import Web3 from 'web3'
 import { ActionTypes } from './actions'
 import { AuthenticationFailed, KomenciErrorTypes, ServiceUnavailable, Unauthorised } from './errors'
@@ -11,10 +12,27 @@ jest.mock('./verifyWallet', () => ({
   verifyWallet: () => Promise.resolve(Ok(true)),
 }))
 
+const mockE164Number = '+14155550000'
+const expectedPhoneHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
+const expectedPepper = 'nHIvMC9B4j2+H'
+const mockCombinedSignature = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
+const ODIS_PUB_KEY =
+  '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
 // @ts-ignore
 contractKit.web3 = { eth: { sign: jest.fn() } }
+
+jest.mock('@celo/contractkit/lib/identity/odis/bls-blinding-client', () => {
+  // tslint:disable-next-line:no-shadowed-variable
+  class WasmBlsBlindingClient {
+    blindMessage = (m: string) => m
+    unblindAndVerifyMessage = (m: string) => m
+  }
+  return {
+    WasmBlsBlindingClient,
+  }
+})
 
 describe('KomenciKit', () => {
   beforeEach(() => {
@@ -40,7 +58,7 @@ describe('KomenciKit', () => {
       // @ts-ignore
       expect(kit.options).toMatchObject(defaults)
       // @ts-ignore
-      expect(kit.client.url).toEqual(defaults.url)
+      expect(kit.client.callbackUrl).toEqual(defaults.url)
     })
   })
 
@@ -101,11 +119,17 @@ describe('KomenciKit', () => {
     describe('when the request succeeds', () => {
       it('records the token and returns Ok', async () => {
         const kit = kitWithOptions()
-        jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Ok({ token: 'komenci-token' }))
+        jest
+          .spyOn((kit as any).client, 'exec')
+          .mockResolvedValue(Ok({ token: 'komenci-token', callbackUrl: 'https://updatedCallback' }))
         const setTokenSpy = jest.spyOn((kit as any).client, 'setToken')
+        const setCallbackUrlSpy = jest.spyOn((kit as any).client, 'setCallbackUrl')
 
-        await expect(kit.startSession('captcha-token')).resolves.toEqual(Ok('komenci-token'))
+        await expect(kit.startSession('captcha-token')).resolves.toEqual(
+          Ok({ token: 'komenci-token', callbackUrl: 'https://updatedCallback' })
+        )
         expect(setTokenSpy).toHaveBeenCalledWith('komenci-token')
+        expect(setCallbackUrlSpy).toHaveBeenCalledWith('https://updatedCallback')
       })
     })
   })
@@ -117,14 +141,15 @@ describe('KomenciKit', () => {
         .spyOn((kit as any).client, 'exec')
         .mockResolvedValue(Err(new Unauthorised()))
 
-      await kit.getDistributedBlindedPepper('phone-number', 'client-version')
+      const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
+      await kit.getDistributedBlindedPepper(mockE164Number, 'client-version', blsBlindingClient)
 
       expect(execSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
           action: ActionTypes.DistributedBlindedPepper,
           payload: {
-            e164Number: 'phone-number',
+            blindedPhoneNumber: Buffer.from(mockE164Number).toString('base64'),
             clientVersion: 'client-version',
           },
         })
@@ -136,8 +161,9 @@ describe('KomenciKit', () => {
         const kit = kitWithOptions()
         jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Err(new Unauthorised()))
 
+        const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
         await expect(
-          kit.getDistributedBlindedPepper('phone-number', 'client-version')
+          kit.getDistributedBlindedPepper('phone-number', 'client-version', blsBlindingClient)
         ).resolves.toEqual(Err(new Unauthorised()))
       })
     })
@@ -147,14 +173,15 @@ describe('KomenciKit', () => {
         const kit = kitWithOptions()
         jest
           .spyOn((kit as any).client, 'exec')
-          .mockResolvedValue(Ok({ identifier: 'pn-identifier', pepper: 'pn-pepper' }))
+          .mockResolvedValue(Ok({ combinedSignature: mockCombinedSignature }))
 
+        const blsBlindingClient = new WasmBlsBlindingClient(ODIS_PUB_KEY)
         await expect(
-          kit.getDistributedBlindedPepper('phone-number', 'client-version')
+          kit.getDistributedBlindedPepper(mockE164Number, 'client-version', blsBlindingClient)
         ).resolves.toEqual(
           Ok({
-            identifier: 'pn-identifier',
-            pepper: 'pn-pepper',
+            identifier: expectedPhoneHash,
+            pepper: expectedPepper,
           })
         )
       })
