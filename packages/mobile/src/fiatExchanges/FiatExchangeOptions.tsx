@@ -1,4 +1,5 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -13,7 +14,9 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import BackButton from 'src/components/BackButton'
 import Dialog from 'src/components/Dialog'
+import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import i18n, { Namespaces } from 'src/i18n'
+import InfoIcon from 'src/icons/InfoIcon'
 import RadioIcon from 'src/icons/RadioIcon'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
@@ -24,8 +27,6 @@ import { StackParamList } from 'src/navigator/types'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
 
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
-
-const TAG = 'fiatExchange/FiatExchangeOptions'
 
 type RouteProps = StackScreenProps<StackParamList, Screens.FiatExchangeOptions>
 type Props = RouteProps
@@ -120,6 +121,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
     isAddFunds ? PaymentMethod.FIAT : PaymentMethod.EXCHANGE
   )
+  const [isEducationDialogVisible, setEducationDialogVisible] = useState(false)
 
   const goToProvider = () => {
     if (selectedPaymentMethod === PaymentMethod.EXCHANGE) {
@@ -141,11 +143,18 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const onSelectCurrency = (currency: CURRENCY_ENUM) => () => setSelectedCurrency(currency)
   const onSelectPaymentMethod = (paymentMethod: PaymentMethod) => () =>
     setSelectedPaymentMethod(paymentMethod)
+  const onPressInfoIcon = () => setEducationDialogVisible(true)
+  const onPressDismissEducationDialog = () => setEducationDialogVisible(false)
 
   return (
     <SafeAreaView style={styles.content}>
       <ScrollView style={styles.topContainer}>
-        <Text style={styles.selectDigitalCurrency}>{t('selectDigitalCurrency')}</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.selectDigitalCurrency}>{t('selectDigitalCurrency')}</Text>
+          <Touchable onPress={onPressInfoIcon} hitSlop={variables.iconHitslop}>
+            <InfoIcon size={14} color={colors.gray3} />
+          </Touchable>
+        </View>
         <View style={styles.currenciesContainer}>
           <CurrencyRadioItem
             title={t('celoDollar')}
@@ -216,6 +225,10 @@ function FiatExchangeOptions({ route, navigation }: Props) {
           testID={'GoToProviderButton'}
         />
       </View>
+      <FundingEducationDialog
+        isVisible={isEducationDialogVisible}
+        onPressDismiss={onPressDismissEducationDialog}
+      />
       <Dialog
         title={t('explanationModal.title')}
         isVisible={route.params?.isExplanationOpen ?? false}
@@ -233,17 +246,24 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+    backgroundColor: colors.gray1,
   },
   topContainer: {
     paddingHorizontal: variables.contentPadding,
+    backgroundColor: colors.light,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: variables.contentPadding,
   },
   selectDigitalCurrency: {
     ...fontStyles.regular,
-    marginTop: variables.contentPadding,
+    marginRight: 12,
   },
   currenciesContainer: {
     flexDirection: 'column',
-    marginTop: 4,
+    marginTop: 8,
   },
   currencyItemContainer: {
     flexDirection: 'row',
@@ -265,7 +285,6 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flexDirection: 'column',
-    backgroundColor: colors.gray1,
     paddingHorizontal: variables.contentPadding,
   },
   selectPaymentMethod: {
@@ -274,7 +293,7 @@ const styles = StyleSheet.create({
   },
   paymentMethodsContainer: {
     flexDirection: 'column',
-    marginTop: 4,
+    marginTop: 8,
     borderWidth: 1,
     borderColor: colors.gray3,
     borderRadius: 8,
