@@ -141,6 +141,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.LocalProviderCashOut, { uri: PONTO_URI })
     } else if (selectedPaymentMethod === PaymentMethod.KOTANI) {
       navigate(Screens.LocalProviderCashOut, { uri: KOTANI_URI })
+    } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
+      navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
     } else {
       navigate(selectedCurrency === CURRENCY_ENUM.GOLD ? Screens.MoonPay : Screens.Simplex, {
         localAmount: new BigNumber(0),
@@ -179,6 +181,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderTopLeftRadius: 8,
               borderTopRightRadius: 8,
             }}
+            enabled={selectedPaymentMethod !== PaymentMethod.ADDRESS}
           />
           <View style={styles.currencySeparator} />
           <CurrencyRadioItem
@@ -204,7 +207,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               text={t('payWithFiat')}
               selected={selectedPaymentMethod === PaymentMethod.FIAT}
               onSelect={onSelectPaymentMethod(PaymentMethod.FIAT)}
-              enabled={!MOONPAY_DISABLED || selectedCurrency !== CURRENCY_ENUM.GOLD}
+              enabled={!MOONPAY_DISABLED || selectedCurrency === CURRENCY_ENUM.DOLLAR}
             />
           )}
           <PaymentMethodRadioItem
@@ -218,7 +221,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
                 text={t('receiveOnAddress')}
                 selected={selectedPaymentMethod === PaymentMethod.ADDRESS}
                 onSelect={onSelectPaymentMethod(PaymentMethod.ADDRESS)}
-                enabled={false}
+                enabled={selectedCurrency === CURRENCY_ENUM.GOLD}
               />
               {showPonto && (
                 <PaymentMethodRadioItem

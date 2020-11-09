@@ -222,8 +222,11 @@ export type StackParamList = {
     amount: BigNumber
     recipientAddress: string
     feeEstimate: BigNumber
+    isCashOut: boolean
   }
-  [Screens.WithdrawCeloScreen]: undefined
+  [Screens.WithdrawCeloScreen]: {
+    isCashOut: boolean
+  }
 }
 
 // tslint:disable-next-line: interface-over-type-literal
