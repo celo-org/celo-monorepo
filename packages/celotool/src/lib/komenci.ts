@@ -146,6 +146,10 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     {network: DynamicEnvVar.KOMENCI_NETWORK},
     context
   )
+  const recaptcha = getContextDynamicEnvVarValues(
+    {keyVault: DynamicEnvVar.KOMENCI_RECAPTCHA_SECRET_VAULT_NAME},
+    context
+  )
   const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
@@ -153,7 +157,9 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
+  const recaptchaToken = await getPasswordFromKeyVaultSecret(recaptcha.keyVault, 'RECAPTCHA-SECRET-KEY')
   const clusterConfig = getAKSClusterConfig(context)
+
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
@@ -162,6 +168,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
     `--set komenci.azureHsm.initTryCount=5`,
     `--set komenci.azureHsm.initMaxRetryBackoffMs=30000`,
+    `--set onboarding.recaptchaToken=${recaptchaToken}`,
     `--set onboarding.replicas=${replicas}`,
     `--set onboarding.relayerUrls=${clusterIP}`,
     `--set onboarding.db.host=${databaseConfig.host}`,

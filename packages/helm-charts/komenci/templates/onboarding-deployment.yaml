@@ -35,7 +35,9 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-{{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding "value_name" "ruleSignatureEnable") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding.ruleEnabled "value_name" "signature") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RULE_CAPTCHA_ENABLED" "dict" .Values.onboarding.ruleEnabled "value_name" "captcha") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RECAPTCHA_TOKEN" "dict" .Values.onboarding "value_name" "recaptchaToken") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_DISTRIBUTED_BLINDED_PEPPER" "dict" .Values.onboarding.quota "value_name" "distributedBlindePepper") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_REQUEST_SUBSIDISED_ATTESTATION" "dict" .Values.onboarding.quota "value_name" "requestSubsidisedAttestation") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_SUBMIT_META_TRANSACTION" "dict" .Values.onboarding.quota "value_name" "submitMetaTransaction") | indent 10 }}

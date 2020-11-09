@@ -48,7 +48,10 @@ onboarding:
     repository: celotestnet.azurecr.io/komenci/onboarding
     tag: dae43ddce108a73da07dce73875b980ff077c7d4
   replicas: 2
-  ruleSignatureEnable: true
+  ruleEnabled:
+      signature: true
+      captcha: true
+  recaptchaToken: 'from-secret'
   quota:
     distributedBlindePepper: 1
     requestSubsidisedAttestation: 10
