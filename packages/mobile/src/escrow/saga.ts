@@ -165,8 +165,6 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
       pepper
     )
 
-    console.log('Payment ID: ', paymentId)
-
     if (!paymentId) {
       throw Error('Could not generate a unique paymentId for escrow. Should never happen')
     }
@@ -237,19 +235,14 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
     value: metaTxWalletAddress,
   })
 
-  console.log('msgHash: ', msgHash)
-  console.log('metaTxWalletAddress: ', metaTxWalletAddress)
   const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
     .signature
   Logger.debug(
     TAG + '@withdrawFromEscrowViaKomenci',
     `Signed message hash signature is ${signature}`
   )
-  console.log('signature: ', signature)
+
   const { r, s, v } = splitSignature(contractKit, signature)
-  console.log('r: ', r)
-  console.log('s: ', s)
-  console.log('v: ', v)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
   const transferTx = stableTokenWrapper.transfer(walletAddress, value.toString())
   return { withdrawTx, transferTx }
@@ -300,8 +293,6 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       phoneHash
     )
 
-    console.log('Payment IDs: ', escrowPaymentIds)
-
     if (escrowPaymentIds.length === 0) {
       Logger.debug(TAG + '@withdrawFromEscrow', 'No pending payments in escrow')
       ValoraAnalytics.track(OnboardingEvents.escrow_redeem_complete)
@@ -324,8 +315,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
         continue
       }
       paymentIdSet.delete(paymentId)
-      console.log('paymentId: ', paymentId)
-      console.log('privateKey: ', privateKey)
+
       const receivedPayment = yield call(getEscrowedPayment, escrowWrapper, paymentId)
       const value = new BigNumber(receivedPayment[3])
       if (!value.isGreaterThan(0)) {
@@ -351,15 +341,9 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
       )
 
       try {
-        // TODO: Change this back when done debugging
-        // if (!komenciActive) {
-        if (komenciActive) {
-          // const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
-          // yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context)
-          const wrappedWithdrawTx = mtwWrapper.executeTransaction(withdrawTx.txo)
-          yield call(sendTransaction, wrappedWithdrawTx.txo, walletAddress, context)
-          const wrappedTransferTx = mtwWrapper.executeTransaction(transferTx.txo)
-          yield call(sendTransaction, wrappedTransferTx.txo, walletAddress, context)
+        if (!komenciActive) {
+          const wrappedBatchTx = mtwWrapper.executeTransactions([withdrawTx.txo, transferTx.txo])
+          yield call(sendTransaction, wrappedBatchTx.txo, walletAddress, context)
         } else {
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs
           // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
