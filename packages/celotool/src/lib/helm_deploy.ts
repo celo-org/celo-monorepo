@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
@@ -195,8 +196,39 @@ export async function installCertManagerAndNginx() {
     `nginx-ingress-release exists, skipping install`
   )
   if (!nginxIngressReleaseExists) {
-    await execCmdWithExitOnFailure(`helm install nginx-ingress-release stable/nginx-ingress`)
+    const valueFilePath = `/tmp/nginx-testnet-values.yaml`
+    nginxHelmParameters(valueFilePath)
+    await execCmdWithExitOnFailure(`helm install -n default \
+    nginx-ingress-release ingress-nginx/ingress-nginx \
+    -f ${valueFilePath}
+    `)
   }
+}
+
+function nginxHelmParameters(valueFilePath: string) {
+  const logFormat = `{"timestamp": "$time_iso8601", "requestID": "$req_id", "proxyUpstreamName":
+  "$proxy_upstream_name", "proxyAlternativeUpstreamName": "$proxy_alternative_upstream_name","upstreamStatus":
+  "$upstream_status", "upstreamAddr": "$upstream_addr","httpRequest":{"requestMethod":
+  "$request_method", "requestUrl": "$host$request_uri", "status": $status,"requestSize":
+  "$request_length", "responseSize": "$upstream_response_length", "userAgent":
+  "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
+  "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
+
+  const valueFileContent = `
+controller:
+  autoscaling:
+    enabled: "true"
+  config:
+    log-format-escape-json: "true"
+    log-format-upstream: '${logFormat}'
+  metrics:
+    enabled: "true"
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
 export async function installCertManager() {
