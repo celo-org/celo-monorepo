@@ -22,6 +22,11 @@
   "selectCashOutMethod": "Recibe los fondos en:",
   "receiveOnAddress": "Dirección de cUSD/CELO",
   "receiveOnPonto": "Ponto (GCash)",
+  "fundingEducationDialog": {
+    "title": "Funding your {{appName}}",
+    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a digital currency pegged to the US Dollar.\n\nTo fund your {{appName}} wallet, purchase cUSD from one of the 3rd party providers available in your location. For help go to <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
   "explanationModal": {
     "title": "Sobre proveedores",
     "body": "Los proveedores le permiten agregar fondos o retirar dinero de tu cuenta. Determinan tus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visite el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
