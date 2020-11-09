@@ -246,9 +246,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
+    backgroundColor: colors.gray1,
   },
   topContainer: {
     paddingHorizontal: variables.contentPadding,
+    backgroundColor: colors.light,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -283,7 +285,6 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flexDirection: 'column',
-    backgroundColor: colors.gray1,
     paddingHorizontal: variables.contentPadding,
   },
   selectPaymentMethod: {

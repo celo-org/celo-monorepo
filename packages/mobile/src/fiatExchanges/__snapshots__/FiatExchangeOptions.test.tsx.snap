@@ -4,6 +4,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
 <View
   style={
     Object {
+      "backgroundColor": "#F8F9F9",
       "flex": 1,
       "flexDirection": "column",
       "justifyContent": "space-between",
@@ -13,6 +14,7 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
   <RCTScrollView
     style={
       Object {
+        "backgroundColor": "#FFFFFF",
         "paddingHorizontal": 16,
       }
     }
@@ -280,7 +282,6 @@ exports[`FiatExchangeOptions renders correctly 1`] = `
   <View
     style={
       Object {
-        "backgroundColor": "#F8F9F9",
         "flexDirection": "column",
         "paddingHorizontal": 16,
       }
