@@ -39,4 +39,7 @@ export const countryFeatures = {
   KOTANI_SUPPORTED: {
     KE: true,
   },
+  FIAT_SPEND_ENABLED: {
+    PH: true,
+  },
 }

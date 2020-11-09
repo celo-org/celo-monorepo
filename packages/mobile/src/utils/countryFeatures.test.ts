@@ -12,6 +12,7 @@ describe(getCountryFeaturesSelector, () => {
 
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
+        "FIAT_SPEND_ENABLED": false,
         "KOTANI_SUPPORTED": false,
         "MOONPAY_DISABLED": true,
         "PONTO_SUPPORTED": false,
@@ -30,6 +31,7 @@ describe(getCountryFeaturesSelector, () => {
 
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
+        "FIAT_SPEND_ENABLED": true,
         "KOTANI_SUPPORTED": false,
         "MOONPAY_DISABLED": false,
         "PONTO_SUPPORTED": true,
@@ -48,6 +50,7 @@ describe(getCountryFeaturesSelector, () => {
 
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
+        "FIAT_SPEND_ENABLED": false,
         "KOTANI_SUPPORTED": false,
         "MOONPAY_DISABLED": false,
         "PONTO_SUPPORTED": false,
@@ -66,6 +69,7 @@ describe(getCountryFeaturesSelector, () => {
 
     expect(getCountryFeaturesSelector(state)).toMatchInlineSnapshot(`
       Object {
+        "FIAT_SPEND_ENABLED": false,
         "KOTANI_SUPPORTED": false,
         "MOONPAY_DISABLED": false,
         "PONTO_SUPPORTED": false,
