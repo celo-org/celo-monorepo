@@ -26,8 +26,13 @@
   "receiveWithPonto": "GCash (with Ponto)",
   "receiveWithKotani": "M-PESA (with Kotani Pay)",
   "fundingEducationDialog": {
-    "title": "Funding your {{appName}}",
-    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a digital currency pegged to the US Dollar.\n\nTo fund your {{appName}} wallet, purchase cUSD from one of the 3rd party providers available in your location. For help go to <0>{{link}}</0>",
+    "title": "Funding {{appName}}",
+    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a stable digital currency tracking the US Dollar.\n\nTo fund your {{appName}} wallet, purchase cUSD from one of the 3rd party providers available in your location. For more information please visit <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
+  "cashOutEducationDialog": {
+    "title": "Withdraw from {{appName}}",
+    "body": "{{appName}} is powered by the Celo Network. {{appName}} runs on Celo Dollars (cUSD), a stable digital currency tracking the US Dollar.\n\nTo withdraw your {{appName}} balance, sell cUSD with one of the 3rd party providers available in your location. For more information please visit <0>{{link}}</0>",
     "dismiss": "OK"
   },
   "explanationModal": {

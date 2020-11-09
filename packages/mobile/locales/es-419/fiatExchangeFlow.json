@@ -26,8 +26,13 @@
   "receiveWithPonto": "GCash (con Ponto)",
   "receiveWithKotani": "M-PESA (con Kotani Pay)",
   "fundingEducationDialog": {
-    "title": "Fondeando tu {{appName}}",
-    "body": "{{appName}} hace uso de la Red Celo. {{appName}} funciona con Celo Dólares (cUSD), una moneda digital vinculada al dólar estadounidense.\n\nPara agregar fondos a {{appName}}, compra cUSD de uno de los proveedores disponibles en tu ubicación. Para obtener ayuda ve a<0>{{link}}</0>",
+    "title": "Fondeando {{appName}}",
+    "body": "{{appName}} corre sobre la Red Celo. {{appName}} funciona con Celo Dólares (cUSD), una moneda digital estable vinculada al dólar estadounidense.\n\nPara agregar fondos a {{appName}}, compra cUSD de uno de los proveedores disponibles en tu ubicación. Para más información por favor visita <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
+  "cashOutEducationDialog": {
+    "title": "Retira de {{appName}}",
+    "body": "{{appName}} corre sobre la Red Celo. {{appName}} funciona con Celo Dólares (cUSD), una moneda digital estable vinculada al dólar estadounidense.\n\nPara retirar tu balance de {{appName}}, vende cUSD en uno de los proveedores disponibles en tu ubicación. Para más información por favor visita <0>{{link}}</0>",
     "dismiss": "OK"
   },
   "explanationModal": {

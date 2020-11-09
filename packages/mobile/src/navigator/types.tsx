@@ -91,7 +91,6 @@ export type StackParamList = {
   [Screens.FiatExchangeOptions]: {
     isAddFunds?: boolean
     amount?: BigNumber
-    isExplanationOpen?: boolean
   }
   [Screens.MoonPay]: {
     localAmount: BigNumber

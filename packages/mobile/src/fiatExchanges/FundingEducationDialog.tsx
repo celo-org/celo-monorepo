@@ -10,9 +10,10 @@ import { navigateToURI } from 'src/utils/linking'
 interface Props {
   isVisible: boolean
   onPressDismiss: () => void
+  isCashIn: boolean
 }
 
-export default function FundingEducationDialog({ isVisible, onPressDismiss }: Props) {
+export default function FundingEducationDialog({ isVisible, onPressDismiss, isCashIn }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
 
   const link = FUNDING_LINK
@@ -24,15 +25,16 @@ export default function FundingEducationDialog({ isVisible, onPressDismiss }: Pr
     setTimeout(() => onPressDismiss(), 10)
   }
 
+  const textBase = isCashIn ? 'fundingEducationDialog' : 'cashOutEducationDialog'
   return (
     <Dialog
-      title={t('fundingEducationDialog.title')}
+      title={t(`${textBase}.title`)}
       isVisible={isVisible}
-      actionText={t('fundingEducationDialog.dismiss')}
+      actionText={t(`${textBase}.dismiss`)}
       actionPress={onPressDismiss}
     >
       <Trans
-        i18nKey="fundingEducationDialog.body"
+        i18nKey={`${textBase}.body`}
         ns={Namespaces.fiatExchangeFlow}
         values={{
           // Don't show the scheme in the link

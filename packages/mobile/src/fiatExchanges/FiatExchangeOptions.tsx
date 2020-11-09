@@ -14,7 +14,6 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
-import Dialog from 'src/components/Dialog'
 import { KOTANI_URI, PONTO_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import i18n, { Namespaces } from 'src/i18n'
@@ -151,10 +150,6 @@ function FiatExchangeOptions({ route, navigation }: Props) {
     }
   }
 
-  const onDismiss = () => {
-    navigation.setParams({ isExplanationOpen: false })
-  }
-
   const onSelectCurrency = (currency: CURRENCY_ENUM) => () => setSelectedCurrency(currency)
   const onSelectPaymentMethod = (paymentMethod: PaymentMethod) => () =>
     setSelectedPaymentMethod(paymentMethod)
@@ -254,15 +249,8 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       <FundingEducationDialog
         isVisible={isEducationDialogVisible}
         onPressDismiss={onPressDismissEducationDialog}
+        isCashIn={isAddFunds}
       />
-      <Dialog
-        title={t('explanationModal.title')}
-        isVisible={route.params?.isExplanationOpen ?? false}
-        actionText={t('global:dismiss')}
-        actionPress={onDismiss}
-      >
-        {t('explanationModal.body')}
-      </Dialog>
     </SafeAreaView>
   )
 }
