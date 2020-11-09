@@ -1,7 +1,7 @@
 PODS:
   - Analytics (3.8.0)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.317)
+  - CeloBlockchain (0.0.319)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
@@ -324,7 +324,7 @@ PODS:
     - React-Core
   - react-native-contacts (5.0.0):
     - React
-  - react-native-fast-crypto (1.8.3):
+  - react-native-fast-crypto (1.8.4):
     - React
   - react-native-geth (1.0.0):
     - CeloBlockchain
@@ -527,7 +527,7 @@ DEPENDENCIES:
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
   - react-native-contacts (from `../../../node_modules/react-native-contacts`)
-  - react-native-fast-crypto (from `../../../node_modules/react-native-fast-crypto`)
+  - "react-native-fast-crypto (from `../../../node_modules/@celo/react-native-fast-crypto`)"
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
@@ -657,7 +657,7 @@ EXTERNAL SOURCES:
   react-native-contacts:
     :path: "../../../node_modules/react-native-contacts"
   react-native-fast-crypto:
-    :path: "../../../node_modules/react-native-fast-crypto"
+    :path: "../../../node_modules/@celo/react-native-fast-crypto"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -760,7 +760,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Analytics: fcf79ebc393a7d77befb8d43ce296353ba9ede3d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: 84bc1cf8faace08aeecdeb24a30f0492b4c266cf
+  CeloBlockchain: 2b3bc8846dff06152d3fcc59c14c43c9740c0a72
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
@@ -805,7 +805,7 @@ SPEC CHECKSUMS:
   react-native-camera: 1b52abea404d04e040edb3e74b7c5523c01a3089
   react-native-config: e8c71f602c92ddd2f5c24b0b7a90d239ecab8d9f
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
-  react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
+  react-native-fast-crypto: 149fd8fd16e1f9bd6b6be2b8295fe0eb76923602
   react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89

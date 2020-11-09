@@ -29,6 +29,7 @@ export enum Actions {
   MIN_APP_VERSION_DETERMINED = 'APP/MIN_APP_VERSION_DETERMINED',
   SET_PONTO_FEATURE_FLAG = 'APP/SET_PONTO_FEATURE_FLAG',
   SET_KOTANI_FEATURE_FLAG = 'APP/SET_KOTANI_FEATURE_FLAG',
+  TOGGLE_INVITE_MODAL = 'APP/TOGGLE_INVITE_MODAL',
 }
 
 export interface SetAppState {
@@ -76,6 +77,11 @@ interface SetAnalyticsEnabled {
 interface SetRequirePinOnAppOpen {
   type: Actions.SET_LOCK_WITH_PIN_ENABLED
   enabled: boolean
+}
+
+interface InviteModalAction {
+  type: Actions.TOGGLE_INVITE_MODAL
+  inviteModalVisible: boolean
 }
 
 export interface Lock {
@@ -129,6 +135,7 @@ export type ActionTypes =
   | MinAppVersionDeterminedAction
   | PontoFeatureFlagSetAction
   | KotaniFeatureFlagSetAction
+  | InviteModalAction
 
 export const setAppState = (state: string) => ({
   type: Actions.SET_APP_STATE,
@@ -218,4 +225,9 @@ export const setPontoFeatureFlag = (enabled: boolean) => ({
 export const setKotaniFeatureFlag = (enabled: boolean) => ({
   type: Actions.SET_KOTANI_FEATURE_FLAG,
   enabled,
+})
+
+export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalAction => ({
+  type: Actions.TOGGLE_INVITE_MODAL,
+  inviteModalVisible,
 })
