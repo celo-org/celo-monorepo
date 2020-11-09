@@ -78,7 +78,7 @@ function WithdrawCeloReviewScreen({ route }: Props) {
 WithdrawCeloReviewScreen.navigationOptions = ({
   route,
 }: {
-  route: RouteProp<StackParamList, Screens.WithdrawCeloScreen>
+  route: RouteProp<StackParamList, Screens.WithdrawCeloReviewScreen>
 }) => {
   const onCancel = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_cancel)
