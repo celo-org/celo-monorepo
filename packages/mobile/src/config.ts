@@ -135,3 +135,4 @@ export const SIMPLEX_URI = 'https://valoraapp.com/simplex'
 
 export const APP_STORE_ID = Config.APP_STORE_ID
 export const DYNAMIC_LINK_DOMAIN = Config.DYNAMIC_LINK_DOMAIN
+export const VALORA_DOMAIN = 'http://valoraapp.com'

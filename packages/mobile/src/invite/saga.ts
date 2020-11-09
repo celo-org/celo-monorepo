@@ -26,7 +26,7 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, APP_STORE_ID, DYNAMIC_LINK_DOMAIN } from 'src/config'
+import { ALERT_BANNER_DURATION, APP_STORE_ID, VALORA_DOMAIN } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -184,7 +184,7 @@ export function* sendInvite(
     const name = yield select(nameSelector)
 
     const link = features.ESCROW_WITHOUT_CODE
-      ? DYNAMIC_LINK_DOMAIN
+      ? VALORA_DOMAIN
       : yield call(generateInviteLink, inviteCode)
 
     let messageProp
