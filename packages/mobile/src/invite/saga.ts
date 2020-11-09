@@ -260,7 +260,11 @@ export function* sendInvite(
   }
 }
 
-function* initiateEscrowTransfer(e164Number: string, amount: BigNumber, temporaryAddress?: string) {
+export function* initiateEscrowTransfer(
+  e164Number: string,
+  amount: BigNumber,
+  temporaryAddress?: string
+) {
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
     const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
