@@ -304,7 +304,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
     // method on an instance of the MTW then submitting like usual
     const withdrawTxSuccess: boolean[] = []
     // Using an upper bound of 1000 to be sure this doesn't run forever
-    for (let i = 1000; i >= 0; i -= 1) {
+    for (let i = 0; i < 1000 && paymentIdSet.size > 0; i += 1) {
       const { paymentId, privateKey } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
       if (!paymentIdSet.has(paymentId)) {
         continue
