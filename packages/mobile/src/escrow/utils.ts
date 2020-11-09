@@ -21,8 +21,7 @@ export const generateEscrowPaymentIdAndPk = (
     recipientPepper,
     addressIndex
   )
-  const paymentId = publicKeyToAddress(publicKey)
-  return { paymentId, privateKey }
+  return { paymentId: publicKeyToAddress(publicKey), privateKey: ensureLeading0x(privateKey) }
 }
 
 export const generateUniquePaymentId = (

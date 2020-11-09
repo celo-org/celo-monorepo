@@ -236,13 +236,16 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
     type: 'address',
     value: metaTxWalletAddress,
   })
+
+  console.log('msgHash: ', msgHash)
+  console.log('metaTxWalletAddress: ', metaTxWalletAddress)
   const signature: string = (await contractKit.web3.eth.accounts.sign(msgHash, privateKey))
     .signature
   Logger.debug(
     TAG + '@withdrawFromEscrowViaKomenci',
     `Signed message hash signature is ${signature}`
   )
-
+  console.log('signature: ', signature)
   const { r, s, v } = splitSignature(contractKit, signature)
   console.log('r: ', r)
   console.log('s: ', s)
@@ -315,13 +318,14 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
     // method on an instance of the MTW then submitting like usual
     const withdrawTxSuccess: boolean[] = []
     // Using an upper bound of 1000 to be sure this doesn't run forever
-    for (let i = 0; i < 1000 && paymentIdSet.size > 0; i += 1) {
+    for (let i = 1000; i >= 0; i -= 1) {
       const { paymentId, privateKey } = generateEscrowPaymentIdAndPk(phoneHash, pepper, i)
       if (!paymentIdSet.has(paymentId)) {
         continue
       }
       paymentIdSet.delete(paymentId)
-
+      console.log('paymentId: ', paymentId)
+      console.log('privateKey: ', privateKey)
       const receivedPayment = yield call(getEscrowedPayment, escrowWrapper, paymentId)
       const value = new BigNumber(receivedPayment[3])
       if (!value.isGreaterThan(0)) {
