@@ -140,6 +140,10 @@ It is also important to [monitor Attestation Service](attestation-service.md#mon
 
 Shows current and historic data on validator signatures collected in each block on Mainnet.
 
+### [Virtual Hive Celo Network Validator Exporter](https://github.com/virtualhive/celo-network-validator-exporter)
+
+Prometheus exporter that scrapes downtime and meta information for a specified validator signer address from the Celo blockchain. All data is collected from a blockchain node via RPC.
+
 _Please raise a Pull Request against [this page](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-holder-guide/voting-validators.md) to add/amend details of any community services!_
 
 <!--
