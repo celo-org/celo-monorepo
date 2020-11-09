@@ -43,7 +43,7 @@
   "soldGold": "Sold CELO",
   "exchangeRateInfo": "Trades are floating estimates",
   "rateInfoTitle": "Floating change rate",
-  "rateInfoBody": "Your amount could change depending on the market conditions.  Your final amount will be no more than 1% deviated from the estimate.",
+  "rateInfoBody": "Your amount could change depending on the market conditions. Your final amount will be no more than 1% deviated from the estimate.",
   "accountAddressLabel": "Account No. or Address",
   "celoAmountLabel": "Amount (CELO)",
   "maxSymbol": "Max",
