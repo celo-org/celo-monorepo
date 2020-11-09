@@ -12,7 +12,7 @@ To be completely independent and have a reliable view into the latest chain data
 
 You can just clone [`celo-blockchain`](https://github.com/celo-org/celo-blockchain) and then run `make geth` to receive the binary.
 
-By default, `geth` will use `/root/.celo` as the data dir, if you would like to change that specify the `--datadir` argument. For common testnets, we are hosting the genesis blocks under `https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${NETWORK_NAME}\?alt\=media`. To initiate your datadir, run `geth init genesis.json` to add the genesis block.
+By default, `geth` will use `/root/.celo` as the data dir, if you would like to change that specify the `--datadir` argument.
 
 This is all you should need to connect to a network:
 
