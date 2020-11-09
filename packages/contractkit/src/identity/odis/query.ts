@@ -38,6 +38,7 @@ export interface PhoneNumberPrivacyRequest {
   account: string
   authenticationMethod: AuthenticationMethod
   version?: string
+  sessionID?: string
 }
 
 export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
