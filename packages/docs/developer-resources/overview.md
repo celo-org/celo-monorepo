@@ -5,7 +5,7 @@ on Celo.
 
 ## Quick Start Guides
 
-View the [Developer Quick Start page](start.md) to get started using the Celo SDKs with guided coding exercises.
+View the [Developer Code Examples page](start.md) to get started using the Celo SDKs with guided coding exercises.
 
 ## Tools
 
