@@ -34,7 +34,7 @@ export const countryFeatures = {
     US: true,
   },
   PONTO_SUPPORTED: {
-    US: true,
+    PH: true,
   },
   KOTANI_SUPPORTED: {
     KE: true,
