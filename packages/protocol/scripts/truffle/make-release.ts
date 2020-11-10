@@ -1,6 +1,7 @@
 // tslint:disable: max-classes-per-file
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
+import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
@@ -21,26 +22,6 @@ import { RegistryInstance } from 'types'
  *   --network alfajores --build_directory build/alfajores/ --report report.json \
  *   --initialize_data initialize_data.json --proposal proposal.json
  */
-
-class ContractDependencies {
-  dependencies: Map<string, string[]>
-  constructor(libraries: { [library: string]: string[] }) {
-    this.dependencies = new Map()
-    Object.keys(libraries).forEach((lib: string) => {
-      libraries[lib].forEach((contract: string) => {
-        if (this.dependencies.has(contract)) {
-          this.dependencies.get(contract).push(lib)
-        } else {
-          this.dependencies.set(contract, [lib])
-        }
-      })
-    })
-  }
-
-  public get = (contract: string): string[] => {
-    return this.dependencies.has(contract) ? this.dependencies.get(contract) : []
-  }
-}
 
 class ContractAddresses {
   static async create(contracts: string[], registry: RegistryInstance) {
@@ -149,7 +130,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const fullReport = readJsonSync(argv.report)
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
-    const dependencies = new ContractDependencies(linkedLibraries)
+    const dependencies = getCeloContractDependencies()
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
     )
