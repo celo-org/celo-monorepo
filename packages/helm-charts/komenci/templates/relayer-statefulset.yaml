@@ -76,7 +76,7 @@ spec:
         {{ end }}
       containers:
       - name: komenci-relayer
-        image: {{ .Values.relayer.image.repository }}:{{ .Values.relayer.image.tag }}
+        image: {{ .Values.komenci.image.repository }}:{{ .Values.komenci.image.tag }}
         imagePullPolicy: Always
         ports:
           - name: prometheus
