@@ -35,6 +35,7 @@ if (Env[env] === undefined) {
     throw new Error('Could not determine network')
   }
 }
+console.log('Using env: ' + network)
 
 const WALLET_IMPLEMENTATIONS: Record<Network, Record<string, string>> = {
   [Network.alfajores]: {
