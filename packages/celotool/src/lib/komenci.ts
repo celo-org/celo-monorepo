@@ -146,7 +146,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     {
       network: DynamicEnvVar.KOMENCI_NETWORK,
       reCaptchaKeyVault: DynamicEnvVar.KOMENCI_RECAPTCHA_SECRET_VAULT_NAME,
-      captchaRuleEnabled: DynamicEnvVar.KOMENCI_RULE_ENABLED_CAPTCHA
+      captchaBypassEnabled: DynamicEnvVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_ENABLED,
     },
     context
   )
@@ -178,7 +178,8 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.onchain.network=${vars.network}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
-    `--set onboarding.ruleEnabled.captcha=${vars.captchaRuleEnabled}`,
+    `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
+    `--set onboarding.ruleConfig.captcha.bypassEnabled=${fetchEnv(envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN)}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
