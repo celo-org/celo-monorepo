@@ -111,7 +111,7 @@ const run = async () => {
   const attestations = await contractKit.contracts.getAttestations()
   console.log('Attestations: ', attestations.address)
   console.log('Starting')
-  const startSession = await komenciKit.startSession('captcha-token')
+  const startSession = await komenciKit.startSession('special-bypass-captcha-token')
 
   console.log('StartSession: ', startSession)
   if (!startSession.ok) {
