@@ -11,6 +11,7 @@ export function runOracleTest(context: Context) {
       await fundAccount(context, TestAccounts.Exchange, ONE.times(2))
     })
 
+    // TODO: Check if oracle account is authorized
     test('report a rate', async () => {
       const from = await getKey(context.mnemonic, TestAccounts.Oracle)
       context.kit.addAccount(from.privateKey)

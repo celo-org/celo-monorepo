@@ -2,7 +2,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { generateKeys, generateMnemonic } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
-import { beforeAll, describe, test } from '@jest/globals'
+import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import Logger from 'bunyan'
 import twilio from 'twilio'
@@ -48,10 +48,7 @@ export function runAttestationTest(
   describe('Attestation Test', () => {
     const logger = context.logger.child({ test: 'attestation' })
 
-    beforeAll(async () => {
-      // Check for TWILIO ENV vars
-    })
-
+    // TODO: Check for TWILIO ENV vars
     test('receive attestations for a phone number', async () => {
       const root = await getKey(context.mnemonic, TestAccounts.Root)
       context.kit.addAccount(root.privateKey)

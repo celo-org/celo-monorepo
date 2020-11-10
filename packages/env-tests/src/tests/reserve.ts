@@ -11,6 +11,7 @@ export function runReserveTest(context: Context) {
       await fundAccount(context, TestAccounts.ReserveCustodian, ONE.times(2))
     })
 
+    // TODO: Check if reserve account is authorized
     test('move funds from the Reserve to a custodian and back', async () => {
       const spender = await getKey(context.mnemonic, TestAccounts.ReserveSpender)
       const custodian = await getKey(context.mnemonic, TestAccounts.ReserveCustodian)
