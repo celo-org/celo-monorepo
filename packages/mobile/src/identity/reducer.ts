@@ -364,7 +364,7 @@ export const reducer = (
       return {
         ...state,
         feelessProcessingInputCode: false,
-        ...feelessCompleteCodeReducer(state, state.feelessNumCompleteAttestations + 1),
+        feelessNumCompleteAttestations: state.feelessNumCompleteAttestations + 1,
         feelessAcceptedAttestationCodes: [...state.feelessAcceptedAttestationCodes, action.code],
       }
     case Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES:
