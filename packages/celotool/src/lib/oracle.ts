@@ -5,7 +5,7 @@ import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInte
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { getAKSClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
+import { getAKSClusterConfig, getContextDynamicEnvVarValues, serviceName } from './context-utils'
 import { AKSClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -178,7 +178,7 @@ async function createOracleAzureIdentityIfNotExists(
   context: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAKSClusterConfig(context)
+  const clusterConfig = getAKSClusterConfig(context, serviceName.Oracle)
   const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the oracle identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -226,7 +226,7 @@ async function deleteOracleAzureIdentity(
   context: string,
   oracleIdentity: OracleIdentity
 ) {
-  const clusterConfig = getAKSClusterConfig(context)
+  const clusterConfig = getAKSClusterConfig(context, serviceName.Oracle)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
   return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }

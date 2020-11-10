@@ -1,4 +1,9 @@
-import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import {
+  addContextMiddleware,
+  ContextArgv,
+  serviceName,
+  switchToContextCluster,
+} from 'src/lib/context-utils'
 import { removeHelmRelease } from 'src/lib/komenci'
 import { DestroyArgv } from '../destroy'
 
@@ -11,6 +16,6 @@ type KomenciDestroyArgv = DestroyArgv & ContextArgv
 export const builder = addContextMiddleware
 
 export const handler = async (argv: KomenciDestroyArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
+  await switchToContextCluster(argv.celoEnv, argv.context, serviceName.Komenci)
   await removeHelmRelease(argv.celoEnv, argv.context)
 }

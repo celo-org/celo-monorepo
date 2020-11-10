@@ -1,5 +1,5 @@
 import stringHash from 'string-hash'
-import { getAKSClusterConfig, getAWSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext } from './context-utils'
+import { getAKSClusterConfig, getAWSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext, serviceName } from './context-utils'
 import { DynamicEnvVar, envVar, fetchEnv } from './env-utils'
 import { CloudProvider } from './k8s-cluster/base'
 import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
@@ -126,7 +126,7 @@ function getAKSFullNodeDeploymentConfig(context: string): AKSFullNodeDeploymentC
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(context)
   return {
     ...fullNodeDeploymentConfig,
-    clusterConfig: getAKSClusterConfig(context),
+    clusterConfig: getAKSClusterConfig(context, serviceName.Fullnode),
   }
 }
 
