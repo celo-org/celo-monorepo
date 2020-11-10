@@ -21,6 +21,7 @@ import {
   requestSubsidisedAttestations,
   startSession,
   StartSessionPayload,
+  StartSessionResp,
   submitMetaTransaction,
 } from './actions'
 import { KomenciClient } from './client'
@@ -114,7 +115,7 @@ export class KomenciKit {
    */
   startSession = async (
     captchaToken: string
-  ): Promise<Result<string, FetchError | AuthenticationFailed | LoginSignatureError>> => {
+  ): Promise<Result<StartSessionResp, FetchError | AuthenticationFailed | LoginSignatureError>> => {
     const signatureResp = await this.getLoginSignature(captchaToken)
     if (!signatureResp.ok) {
       return signatureResp
@@ -130,7 +131,10 @@ export class KomenciKit {
 
     if (resp.ok) {
       this.client.setToken(resp.result.token)
-      return Ok(resp.result.token)
+      if (resp.result.callbackUrl) {
+        this.client.setCallbackUrl(resp.result.callbackUrl)
+      }
+      return Ok(resp.result)
     } else if (resp.error.errorType === FetchErrorTypes.Unauthorised) {
       return Err(new AuthenticationFailed())
     }
@@ -408,6 +412,7 @@ export class KomenciKit {
     }
 
     const txHash = resp.result.txHash
+    console.debug(`${TAG}/submitMetaTransaction Waiting for transaction receipt: ${txHash}`)
     return this.waitForReceipt(txHash)
   }
 
@@ -430,6 +435,11 @@ export class KomenciKit {
 
     if (receipt == null) {
       return Err(new TxTimeoutError())
+    }
+
+    if (!receipt.status) {
+      // TODO: Possible to extract reason?
+      return Err(new TxRevertError(txHash, ''))
     }
 
     return Ok(receipt)
@@ -481,12 +491,7 @@ export class KomenciKit {
     if (!receiptResult.ok) {
       return receiptResult
     }
-
     const receipt = receiptResult.result
-    if (!receipt.status) {
-      // TODO: Possible to extract reason?
-      return Err(new TxRevertError(txHash, ''))
-    }
 
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 

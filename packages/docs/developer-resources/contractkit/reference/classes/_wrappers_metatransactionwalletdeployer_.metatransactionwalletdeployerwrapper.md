@@ -14,14 +14,10 @@
 
 ### Properties
 
-* [canDeploy](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#candeploy)
-* [changeDeployerPermission](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#changedeployerpermission)
 * [deploy](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#deploy)
 * [eventTypes](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#eventtypes)
 * [events](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#events)
-* [getWallet](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#getwallet)
 * [methodIds](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#methodids)
-* [owner](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md#owner)
 
 ### Accessors
 
@@ -52,47 +48,11 @@ Name | Type |
 
 ## Properties
 
-###  canDeploy
-
-• **canDeploy**: *function* = proxyCall(this.contract.methods.canDeploy, undefined, identity)
-
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L8)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
-###  changeDeployerPermission
-
-• **changeDeployerPermission**: *function* = proxySend(this.kit, this.contract.methods.changeDeployerPermission)
-
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L11)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
 ###  deploy
 
 • **deploy**: *function* = proxySend(this.kit, this.contract.methods.deploy)
 
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L12)*
+*Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L7)*
 
 #### Type declaration:
 
@@ -131,24 +91,6 @@ ___
 
 ___
 
-###  getWallet
-
-• **getWallet**: *function* = proxyCall(this.contract.methods.wallets, undefined, stringIdentity)
-
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L7)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
 ###  methodIds
 
 • **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
@@ -168,24 +110,6 @@ ___
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L47)*
 
 #### Type declaration:
-
-___
-
-###  owner
-
-• **owner**: *function* = proxyCall(this.contract.methods.owner, undefined, stringIdentity)
-
-*Defined in [packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MetaTransactionWalletDeployer.ts#L9)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
 
 ## Accessors
 

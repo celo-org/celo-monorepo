@@ -3,7 +3,7 @@ import { TypeDocOptionMap } from 'typedoc'
 
 // TODO(yorke): make function package agnostic and move to `packages/utils`
 const pkgName = 'contractkit'
-const indent = '    '
+const indent = '  '
 
 const config: Partial<TypeDocOptionMap> = JSON.parse(readFileSync('./typedoc.json').toString())
 const localSummaryPath = `${config.out!}/SUMMARY.md`

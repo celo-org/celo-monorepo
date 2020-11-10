@@ -58,7 +58,7 @@ describe('KomenciKit', () => {
       // @ts-ignore
       expect(kit.options).toMatchObject(defaults)
       // @ts-ignore
-      expect(kit.client.url).toEqual(defaults.url)
+      expect(kit.client.callbackUrl).toEqual(defaults.url)
     })
   })
 
@@ -119,11 +119,17 @@ describe('KomenciKit', () => {
     describe('when the request succeeds', () => {
       it('records the token and returns Ok', async () => {
         const kit = kitWithOptions()
-        jest.spyOn((kit as any).client, 'exec').mockResolvedValue(Ok({ token: 'komenci-token' }))
+        jest
+          .spyOn((kit as any).client, 'exec')
+          .mockResolvedValue(Ok({ token: 'komenci-token', callbackUrl: 'https://updatedCallback' }))
         const setTokenSpy = jest.spyOn((kit as any).client, 'setToken')
+        const setCallbackUrlSpy = jest.spyOn((kit as any).client, 'setCallbackUrl')
 
-        await expect(kit.startSession('captcha-token')).resolves.toEqual(Ok('komenci-token'))
+        await expect(kit.startSession('captcha-token')).resolves.toEqual(
+          Ok({ token: 'komenci-token', callbackUrl: 'https://updatedCallback' })
+        )
         expect(setTokenSpy).toHaveBeenCalledWith('komenci-token')
+        expect(setCallbackUrlSpy).toHaveBeenCalledWith('https://updatedCallback')
       })
     })
   })

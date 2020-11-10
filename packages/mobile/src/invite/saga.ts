@@ -1,9 +1,8 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Linking, Platform, Share } from 'react-native'
+import { Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { generateSecureRandom } from 'react-native-securerandom'
 import SendIntentAndroid from 'react-native-send-intent'
@@ -14,19 +13,18 @@ import {
   delay,
   put,
   race,
-  select,
   spawn,
   take,
   TakeEffect,
   takeLeading,
 } from 'redux-saga/effects'
 import { Actions as AccountActions } from 'src/account/actions'
-import { nameSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
+import { WEB_LINK } from 'src/brandingConfig'
+import { APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -34,7 +32,7 @@ import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
-import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
@@ -47,8 +45,6 @@ import {
   sendInviteFailure,
   sendInviteSuccess,
   SENTINEL_INVITE_COMMENT,
-  skipInviteFailure,
-  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
@@ -110,11 +106,13 @@ export async function getInviteFee(
 }
 
 export function getInvitationVerificationFeeInDollars() {
-  return new BigNumber(features.KOMENCI ? 0 : INVITE_FEE)
+  const inviteFee = features.ESCROW_WITHOUT_CODE ? 0 : INVITE_FEE
+  return new BigNumber(inviteFee)
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return getInvitationVerificationFeeInDollars().multipliedBy(1e18)
+  const inviteFee = features.ESCROW_WITHOUT_CODE ? 0 : INVITE_FEE
+  return new BigNumber(inviteFee).multipliedBy(1e18)
 }
 
 export async function generateInviteLink(inviteCode?: string) {
@@ -168,6 +166,7 @@ export function* sendInvite(
   currency?: CURRENCY_ENUM
 ) {
   const escrowIncluded = !!amount
+
   try {
     ValoraAnalytics.track(
       features.KOMENCI ? InviteEvents.invite_start : InviteEvents.invite_tx_start,
@@ -180,17 +179,27 @@ export function* sendInvite(
     )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
-    const name = yield select(nameSelector)
 
-    const link = yield call(generateInviteLink, inviteCode)
-    const message = i18n.t(
-      amount ? 'sendFlow7:inviteWithEscrowedPayment' : 'sendFlow7:inviteWithoutPayment',
-      {
-        name,
-        amount: amount?.toString(),
-        link,
+    const link = features.ESCROW_WITHOUT_CODE
+      ? WEB_LINK
+      : yield call(generateInviteLink, inviteCode)
+
+    const messageProp = amount
+      ? 'sendFlow7:inviteWithEscrowedPayment'
+      : 'sendFlow7:inviteWithoutPayment'
+    const message = i18n.t(messageProp, {
+      name,
+      amount: amount?.toString(),
+      link,
+    })
+
+    if (features.ESCROW_WITHOUT_CODE) {
+      if (amount) {
+        yield call(initiateEscrowTransfer, e164Number, amount)
       }
-    )
+      yield call(Share.share, { message })
+      return
+    }
 
     const inviteDetails: InviteDetails = {
       timestamp: Date.now(),
@@ -222,7 +231,7 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
+      yield call(initiateEscrowTransfer, e164Number, amount, temporaryAddress)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
@@ -236,7 +245,7 @@ export function* sendInvite(
         amount: amount?.toString(),
       })
     } else {
-      yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+      yield call(Share.share, { message })
     }
   } catch (e) {
     ValoraAnalytics.track(
@@ -248,13 +257,15 @@ export function* sendInvite(
   }
 }
 
-function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+export function* initiateEscrowTransfer(
+  e164Number: string,
+  amount: BigNumber,
+  temporaryAddress?: string
+) {
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
-    let phoneHash: string
     const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    phoneHash = phoneHashDetails.phoneHash
-    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
+    yield put(transferEscrowedPayment(phoneHashDetails, amount, context, temporaryAddress))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {
@@ -263,36 +274,37 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
   }
 }
 
-function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
-  try {
-    switch (inviteMode) {
-      case InviteBy.SMS: {
-        ValoraAnalytics.track(InviteEvents.invite_method_sms)
-        yield call(sendSms, e164Number, message)
-        break
-      }
-      case InviteBy.WhatsApp: {
-        ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
-        yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
-        break
-      }
-      default:
-        throw new Error('Unsupported invite mode type: ' + inviteMode)
-    }
+// TODO: Delete this if we don't decide to use it again
+// function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
+//   try {
+//     switch (inviteMode) {
+//       case InviteBy.SMS: {
+//         ValoraAnalytics.track(InviteEvents.invite_method_sms)
+//         yield call(sendSms, e164Number, message)
+//         break
+//       }
+//       case InviteBy.WhatsApp: {
+//         ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
+//         yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
+//         break
+//       }
+//       default:
+//         throw new Error('Unsupported invite mode type: ' + inviteMode)
+//     }
 
-    // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
-    yield delay(100)
-  } catch (error) {
-    // Not a critical error, allow saga to proceed
-    Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
-    ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
-    yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
-    // TODO(Rossy): We need a UI for users to review their sent invite codes and
-    // redeem them in case they are unused or unsent like this case, see #2639
-    // For now just copying the code to the clipboard and notifying user
-    Clipboard.setString(message)
-  }
-}
+//     // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
+//     yield delay(100)
+//   } catch (error) {
+//     // Not a critical error, allow saga to proceed
+//     Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
+//     ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
+//     yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
+//     // TODO(Rossy): We need a UI for users to review their sent invite codes and
+//     // redeem them in case they are unused or unsent like this case, see #2639
+//     // For now just copying the code to the clipboard and notifying user
+//     Clipboard.setString(message)
+//   }
+// }
 
 function* sendInviteSaga(action: SendInviteAction) {
   const { e164Number, inviteMode, amount, currency } = action
@@ -396,29 +408,6 @@ export function* doRedeemInvite(tempAccountPrivateKey: string) {
   }
 }
 
-export function* skipInvite() {
-  yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
-  try {
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
-    yield call(getOrCreateAccount)
-    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
-    // (`setHasSeenVerificationNux` though the user hasn't seen it),
-    // we should prefer a more atomic approach with a meaningful action type
-    yield put(refreshAllBalances())
-    yield put(setHasSeenVerificationNux(true))
-    Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
-    navigateHome()
-    yield put(skipInviteSuccess())
-  } catch (e) {
-    Logger.error(TAG, 'Failed to skip invite', e)
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
-    yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
-    yield put(skipInviteFailure())
-  }
-}
-
 function* addTempAccountToWallet(tempAccountPrivateKey: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
@@ -506,5 +495,4 @@ export function* watchRedeemInvite() {
 export function* inviteSaga() {
   yield spawn(watchSendInvite)
   yield spawn(watchRedeemInvite)
-  yield spawn(skipInvite)
 }
