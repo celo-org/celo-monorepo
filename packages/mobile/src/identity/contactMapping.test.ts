@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/base'
+import { eqAddress, NULL_ADDRESS } from '@celo/base'
 import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -34,7 +34,6 @@ import {
   mockContactWithPhone2,
   mockE164Number,
   mockE164NumberHash,
-  nullAddress,
 } from 'test/values'
 
 const recipients = contactsToRecipients(mockContactList, '+1')
@@ -191,7 +190,7 @@ describe('Fetch Addresses Saga', () => {
     }
 
     const mockAccountsWrapper = {
-      getWalletAddress: jest.fn(() => nullAddress),
+      getWalletAddress: jest.fn(() => NULL_ADDRESS),
     }
 
     await expectSaga(fetchAddressesAndValidateSaga, {
@@ -250,7 +249,7 @@ describe('Fetch Addresses Saga', () => {
           return mockWallet2
         }
 
-        return nullAddress
+        return NULL_ADDRESS
       }),
     }
 
@@ -317,7 +316,7 @@ describe('Fetch Addresses Saga', () => {
           return mockWallet3
         }
 
-        return nullAddress
+        return NULL_ADDRESS
       }),
     }
 

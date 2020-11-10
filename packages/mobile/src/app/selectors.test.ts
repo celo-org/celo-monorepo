@@ -16,7 +16,7 @@ describe(verificationPossibleSelector, () => {
       )
     ).toBe(true)
   })
-  it('returns true when balance is sufficient', () => {
+  it('returns true when balance is sufficient and there are no Komenci errors', () => {
     // balance is sufficient
     expect(
       verificationPossibleSelector(
@@ -24,7 +24,14 @@ describe(verificationPossibleSelector, () => {
           account: { e164PhoneNumber: mockE164Number },
           stableToken: { balance: '0.01' },
           goldToken: { balance: '0' },
-          identity: { e164NumberToSalt: {} },
+          identity: {
+            e164NumberToSalt: {},
+            feelessVerificationState: {
+              komenci: {
+                errorTimestamps: [],
+              },
+            },
+          },
         })
       )
     ).toBe(true)
@@ -39,7 +46,7 @@ describe(verificationPossibleSelector, () => {
       )
     ).toBe(true)
   })
-  it('returns true when balance is not sufficient', () => {
+  it('returns false when balance is not sufficient and there are Komenci errors', () => {
     // balance is not sufficient
     expect(
       verificationPossibleSelector(
@@ -47,9 +54,37 @@ describe(verificationPossibleSelector, () => {
           account: { e164PhoneNumber: mockE164Number },
           stableToken: { balance: '0.009' },
           goldToken: { balance: '0.004' },
-          identity: { e164NumberToSalt: {} },
+          identity: {
+            e164NumberToSalt: {},
+            feelessVerificationState: {
+              komenci: {
+                errorTimestamps: [Date.now(), Date.now(), Date.now()],
+              },
+            },
+          },
         })
       )
     ).toBe(false)
+  })
+
+  it('returns true when balance is not sufficient and there are < 2 Komenci errors', () => {
+    // balance is not sufficient
+    expect(
+      verificationPossibleSelector(
+        getMockStoreData({
+          account: { e164PhoneNumber: mockE164Number },
+          stableToken: { balance: '0.009' },
+          goldToken: { balance: '0.004' },
+          identity: {
+            e164NumberToSalt: {},
+            feelessVerificationState: {
+              komenci: {
+                errorTimestamps: [Date.now()],
+              },
+            },
+          },
+        })
+      )
+    ).toBe(true)
   })
 })
