@@ -405,7 +405,8 @@ export function* skipInvite() {
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
-    navigateHome()
+    // navigateHome()
+    navigate(Screens.VerificationEducationScreen)
     yield put(skipInviteSuccess())
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
