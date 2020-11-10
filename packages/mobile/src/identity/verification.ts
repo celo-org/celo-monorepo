@@ -6,13 +6,24 @@ import {
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { KomenciKit } from '@celo/komencikit/src/kit'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import functions from '@react-native-firebase/functions'
-import BigNumber from 'bignumber.js'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
-import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import {
+  all,
+  call,
+  delay,
+  fork,
+  put,
+  race,
+  select,
+  spawn,
+  take,
+  takeEvery,
+} from 'redux-saga/effects'
 import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showErrorOrFallback } from 'src/alert/actions'
@@ -26,6 +37,8 @@ import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
   completeAttestationCode,
+  feelessInputAttestationCode,
+  feelessSetLastRevealAttempt,
   inputAttestationCode,
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
@@ -38,10 +51,15 @@ import {
   StartVerificationAction,
   udpateVerificationState,
 } from 'src/identity/actions'
+import {
+  feelessCompleteAttestation,
+  feelessRequestAttestations,
+} from 'src/identity/feelessVerification'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   acceptedAttestationCodesSelector,
   attestationCodesSelector,
+  feelessAcceptedAttestationCodesSelector,
   isBalanceSufficientForSigRetrievalSelector,
   isVerificationStateExpiredSelector,
   VerificationState,
@@ -68,8 +86,8 @@ export const ESTIMATED_COST_PER_ATTESTATION = 0.051
 export const VERIFICATION_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 export const BALANCE_CHECK_TIMEOUT = 5 * 1000 // 5 seconds
 export const MAX_ACTIONABLE_ATTESTATIONS = 5
-const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
-const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
+export const REVEAL_RETRY_DELAY = 10 * 1000 // 10 seconds
+export const ANDROID_DELAY_REVEAL_ATTESTATION = 5000 // 5 sec after each
 
 // Using hard-coded gas value to avoid running gas estimation.
 // Note: This is fragile and needs be updated if there are significant
@@ -159,6 +177,8 @@ export function* fetchVerificationState(forceUnlockAccount?: boolean) {
     )
   } catch (error) {
     Logger.error(TAG, 'Error occured during fetching verification state', error)
+  } finally {
+    yield put(setVerificationStatus(VerificationStatus.Stopped))
   }
 }
 
@@ -334,15 +354,20 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
 
       yield put(setVerificationStatus(VerificationStatus.CompletingAttestations))
       yield race({
-        actionableAttestationCompleted: all([
-          call(completeAttestations, attestationsWrapper, account, phoneHashDetails, attestations),
-          // Set acccount and data encryption key in Accounts contract
-          // This is done in other places too, intentionally keeping it for more coverage
-          call(registerAccountDek, account),
-        ]),
+        actionableAttestationCompleted: call(
+          completeAttestations,
+          attestationsWrapper,
+          account,
+          phoneHashDetails,
+          attestations
+        ),
         // This is needed, because we can have more actionableAttestations than NUM_ATTESTATIONS_REQUIRED
         requiredAttestationsCompleted: call(requiredAttestationsCompleted),
       })
+
+      // Set acccount and data encryption key in Accounts contract
+      // This is done in other places too, intentionally keeping it for more coverage
+      yield spawn(registerAccountDek, account)
 
       receiveMessageTask?.cancel()
       if (Platform.OS === 'android') {
@@ -384,39 +409,47 @@ export function* requiredAttestationsCompleted() {
   }
 }
 
-export function* balanceSufficientForAttestations(attestationsRemaining: number) {
-  const userBalance = yield select(stableTokenBalanceSelector)
-  return new BigNumber(userBalance).isGreaterThan(
-    attestationsRemaining * ESTIMATED_COST_PER_ATTESTATION
-  )
-}
-
 // Requests if necessary additional attestations and returns all revealable attestations
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
   account: string,
   currentActionableAttestations: ActionableAttestation[],
-  attestationsNeeded: number
+  attestationsNeeded: number,
+  isFeelessVerification: boolean = false,
+  komenciKit?: KomenciKit
 ) {
   let attestations = currentActionableAttestations
 
   // Any verification failure past this point will be after sending a tx
   // so do not prompt forno retry as these failures are not always
   // light client related, and account may have insufficient balance
-  yield put(setRetryVerificationWithForno(false))
+  if (!isFeelessVerification) {
+    yield put(setRetryVerificationWithForno(false))
+  }
   while (attestations.length < attestationsNeeded) {
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_start, {
       currentAttestation: attestations.length,
     })
     // Request any additional attestations beyond the original set
-    yield call(
-      requestAttestations,
-      attestationsWrapper,
-      attestationsNeeded - attestations.length,
-      phoneHash,
-      account
-    )
+    if (isFeelessVerification && komenciKit) {
+      yield call(
+        feelessRequestAttestations,
+        komenciKit,
+        attestationsWrapper,
+        attestationsNeeded - attestations.length,
+        phoneHash,
+        account
+      )
+    } else {
+      yield call(
+        requestAttestations,
+        attestationsWrapper,
+        attestationsNeeded - attestations.length,
+        phoneHash,
+        account
+      )
+    }
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_complete)
 
     // Check if we have a sufficient set now by fetching the new total set
@@ -432,7 +465,7 @@ export function* requestAndRetrieveAttestations(
   return attestations
 }
 
-async function getActionableAttestations(
+export async function getActionableAttestations(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
   account: string
@@ -564,11 +597,12 @@ function* requestAttestations(
   ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
 }
 
-function attestationCodeReceiver(
+export function attestationCodeReceiver(
   attestationsWrapper: AttestationsWrapper,
   phoneHash: string,
   account: string,
-  allIssuers: string[]
+  allIssuers: string[],
+  isFeelessVerification: boolean = false
 ) {
   return function*(action: ReceiveAttestationMessageAction) {
     if (!action || !action.message) {
@@ -585,7 +619,8 @@ function attestationCodeReceiver(
         throw new Error('No code extracted from message')
       }
 
-      const existingCode = yield call(isCodeAlreadyAccepted, code)
+      const existingCode: string = yield call(isCodeAlreadyAccepted, code, isFeelessVerification)
+
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
         ValoraAnalytics.track(VerificationEvents.verification_code_received, {
@@ -627,7 +662,11 @@ function attestationCodeReceiver(
         throw new Error('Code is not valid')
       }
 
-      yield put(inputAttestationCode({ code, issuer }))
+      if (isFeelessVerification) {
+        yield put(feelessInputAttestationCode({ code, issuer }))
+      } else {
+        yield put(inputAttestationCode({ code, issuer }))
+      }
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
@@ -640,16 +679,19 @@ function* getCodeForIssuer(issuer: string) {
   return existingCodes.find((c) => c.issuer === issuer)
 }
 
-function* isCodeAlreadyAccepted(code: string) {
-  const existingCodes: AttestationCode[] = yield select(acceptedAttestationCodesSelector)
+function* isCodeAlreadyAccepted(code: string, isFeelessVerification: boolean = false) {
+  const existingCodes: AttestationCode[] = isFeelessVerification
+    ? yield select(feelessAcceptedAttestationCodesSelector)
+    : yield select(acceptedAttestationCodesSelector)
   return existingCodes.find((c) => c.code === code)
 }
 
-function* revealAttestations(
+export function* revealAttestations(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestations: ActionableAttestation[]
+  attestations: ActionableAttestation[],
+  isFeelessVerification: boolean = false
 ) {
   Logger.debug(TAG + '@revealAttestations', `Revealing ${attestations.length} attestations`)
   const reveals = []
@@ -673,27 +715,48 @@ function* revealAttestations(
     }
     reveals.push(success)
   }
-  yield put(setLastRevealAttempt(Date.now()))
+  if (isFeelessVerification) {
+    yield put(feelessSetLastRevealAttempt(Date.now()))
+  } else {
+    yield put(setLastRevealAttempt(Date.now()))
+  }
   return reveals
 }
-function* completeAttestations(
+
+export function* completeAttestations(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestations: ActionableAttestation[]
+  attestations: ActionableAttestation[],
+  isFeelessVerification: boolean = false,
+  komenciKit?: KomenciKit
 ) {
   Logger.debug(
     TAG + '@completeNeededAttestations',
     `Completing ${attestations.length} attestations`
   )
-  yield all(
-    attestations.map((attestation) => {
-      return call(completeAttestation, attestationsWrapper, account, phoneHashDetails, attestation)
-    })
-  )
+  if (isFeelessVerification && komenciKit) {
+    yield all(
+      attestations.map((attestation) => {
+        return call(feelessCompleteAttestation, komenciKit, account, phoneHashDetails, attestation)
+      })
+    )
+  } else {
+    yield all(
+      attestations.map((attestation) => {
+        return call(
+          completeAttestation,
+          attestationsWrapper,
+          account,
+          phoneHashDetails,
+          attestation
+        )
+      })
+    )
+  }
 }
 
-function* revealAttestation(
+export function* revealAttestation(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
@@ -755,7 +818,7 @@ function* completeAttestation(
   yield put(completeAttestationCode(code))
 }
 
-function* tryRevealPhoneNumber(
+export function* tryRevealPhoneNumber(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
