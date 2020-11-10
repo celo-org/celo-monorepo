@@ -63,6 +63,7 @@ Using these tools, a contract release candidate can be built, deployed, and prop
 
 Use the following script to compile contracts at a release tag and verify that the deployed network bytecode matches the compiled bytecode.
 ```bash
+# Run from `packages/protocol` in the celo-monorepo
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 PREVIOUS_RELEASE="celo-core-contracts-v${N-1}.${NETWORK}"
 # A -f boolean flag can be provided to use a forno full node to connect to the provided network
