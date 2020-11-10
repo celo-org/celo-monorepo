@@ -23,7 +23,10 @@ const TAG = 'identity/revoke'
 // i.e. accounts with 1-2 attestations but not 3+
 export function* revokeVerificationSaga() {
   Logger.debug(TAG + '@revokeVerification', 'Revoking previous verification')
+  let mtwAddress: string | null = null
   try {
+    mtwAddress = yield select(mtwAddressSelector)
+    ValoraAnalytics.track(VerificationEvents.verification_revoke_start, { feeless: !!mtwAddress })
     const walletAddress: string | null = yield call(getConnectedUnlockedAccount)
     const e164Number: string | null = yield select(e164NumberSelector)
 
@@ -34,14 +37,12 @@ export function* revokeVerificationSaga() {
       throw new Error('e164 number not set')
     }
 
-    const mtwAddress: string | null = yield select(mtwAddressSelector)
     const accountAddress: string = yield call(getAccountAddress)
     Logger.debug(
       TAG + '@revokeVerification',
       `Checking for attestaions on ${mtwAddress ? 'MTW' : 'EOA'} account address ${accountAddress}`
     )
 
-    ValoraAnalytics.track(VerificationEvents.verification_revoke_start)
     const contractKit: ContractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
@@ -86,12 +87,13 @@ export function* revokeVerificationSaga() {
       : () => revokeVerificationState()
 
     yield all([put(relevantStateRevoke()), put(setNumberVerified(false)), put(setMtwAddress(null))])
-    ValoraAnalytics.track(VerificationEvents.verification_revoke_finish)
+    ValoraAnalytics.track(VerificationEvents.verification_revoke_finish, { feeless: !!mtwAddress })
     Logger.showMessage('Address revoke was successful')
   } catch (err) {
     Logger.error(TAG + '@revokeVerification', 'Error revoking verification', err)
     ValoraAnalytics.track(VerificationEvents.verification_revoke_error, {
       error: err.message,
+      feeless: !!mtwAddress,
     })
 
     // TODO i18n and use showError banner

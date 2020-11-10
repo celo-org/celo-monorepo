@@ -430,6 +430,7 @@ export function* requestAndRetrieveAttestations(
   while (attestations.length < attestationsNeeded) {
     ValoraAnalytics.track(VerificationEvents.verification_request_attestation_start, {
       currentAttestation: attestations.length,
+      feeless: isFeelessVerification,
     })
     // Request any additional attestations beyond the original set
     if (isFeelessVerification && komenciKit) {
@@ -450,7 +451,9 @@ export function* requestAndRetrieveAttestations(
         account
       )
     }
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_complete)
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_complete, {
+      feeless: isFeelessVerification,
+    })
 
     // Check if we have a sufficient set now by fetching the new total set
     attestations = yield call(getActionableAttestations, attestationsWrapper, phoneHash, account)
@@ -458,6 +461,7 @@ export function* requestAndRetrieveAttestations(
       VerificationEvents.verification_request_all_attestations_refresh_progress,
       {
         attestationsRemaining: attestationsNeeded - attestations.length,
+        feeless: isFeelessVerification,
       }
     )
   }
@@ -609,6 +613,7 @@ export function attestationCodeReceiver(
       Logger.error(TAG + '@attestationCodeReceiver', 'Received empty code. Ignoring.')
       ValoraAnalytics.track(VerificationEvents.verification_code_received, {
         context: 'Empty code',
+        feeless: isFeelessVerification,
       })
       return
     }
@@ -625,6 +630,7 @@ export function attestationCodeReceiver(
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
         ValoraAnalytics.track(VerificationEvents.verification_code_received, {
           context: 'Code already exists',
+          feeless: isFeelessVerification,
         })
         if (
           CodeInputType.MANUAL === action.inputType ||
@@ -634,7 +640,9 @@ export function attestationCodeReceiver(
         }
         return
       }
-      ValoraAnalytics.track(VerificationEvents.verification_code_received)
+      ValoraAnalytics.track(VerificationEvents.verification_code_received, {
+        feeless: isFeelessVerification,
+      })
       const issuer = yield call(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
         phoneHash,
@@ -648,7 +656,10 @@ export function attestationCodeReceiver(
 
       Logger.debug(TAG + '@attestationCodeReceiver', `Received code for issuer ${issuer}`)
 
-      ValoraAnalytics.track(VerificationEvents.verification_code_validate_start, { issuer })
+      ValoraAnalytics.track(VerificationEvents.verification_code_validate_start, {
+        issuer,
+        feeless: isFeelessVerification,
+      })
       const isValidRequest = yield call(
         [attestationsWrapper, attestationsWrapper.validateAttestationCode],
         phoneHash,
@@ -656,7 +667,10 @@ export function attestationCodeReceiver(
         issuer,
         code
       )
-      ValoraAnalytics.track(VerificationEvents.verification_code_validate_complete, { issuer })
+      ValoraAnalytics.track(VerificationEvents.verification_code_validate_complete, {
+        issuer,
+        feeless: isFeelessVerification,
+      })
 
       if (!isValidRequest) {
         throw new Error('Code is not valid')
@@ -701,7 +715,8 @@ export function* revealAttestations(
       attestationsWrapper,
       account,
       phoneHashDetails,
-      attestation
+      attestation,
+      isFeelessVerification
     )
     // TODO (i1skn): remove this clause when
     // https://github.com/celo-org/celo-labs/issues/578 is resolved.
@@ -760,16 +775,21 @@ export function* revealAttestation(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation
+  attestation: ActionableAttestation,
+  isFeelessVerification: boolean
 ) {
   const issuer = attestation.issuer
-  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, { issuer })
+  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_start, {
+    issuer,
+    feeless: isFeelessVerification,
+  })
   return yield call(
     tryRevealPhoneNumber,
     attestationsWrapper,
     account,
     phoneHashDetails,
-    attestation
+    attestation,
+    isFeelessVerification
   )
 }
 
@@ -822,7 +842,8 @@ export function* tryRevealPhoneNumber(
   attestationsWrapper: AttestationsWrapper,
   account: string,
   phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation
+  attestation: ActionableAttestation,
+  isFeelessVerification: boolean
 ) {
   const issuer = attestation.issuer
   Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing an attestation for issuer: ${issuer}`)
@@ -854,6 +875,7 @@ export function* tryRevealPhoneNumber(
       ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
         neededRetry: false,
         issuer,
+        feeless: isFeelessVerification,
       })
       return true
     }
@@ -876,6 +898,7 @@ export function* tryRevealPhoneNumber(
         ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_revealed, {
           neededRetry: true,
           issuer,
+          feeless: isFeelessVerification,
         })
         return true
       }
@@ -908,6 +931,7 @@ export function* tryRevealPhoneNumber(
     ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_error, {
       issuer,
       error: error.message,
+      feeless: isFeelessVerification,
     })
     return false
   }

@@ -109,7 +109,7 @@ const VERIFIED_ATTESTATION_STATUS = {
 export function* feelessFetchVerificationState() {
   Logger.debug(TAG, '@feelessFetchVerificationState', 'Starting fetch')
   try {
-    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
+    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start, { feeless: true })
     const [contractKit, walletAddress, feelessVerificationState, e164Number]: [
       ContractKit,
       string,
@@ -158,6 +158,7 @@ export function* feelessFetchVerificationState() {
     const status: AttestationsStatus = yield call(fetchAttestationStatus, contractKit)
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
+      feeless: true,
     })
   } catch (error) {
     Logger.error(TAG, 'Error occured while fetching verification state', error)
@@ -168,7 +169,7 @@ export function* feelessFetchVerificationState() {
 }
 
 export function* feelessStartVerification(action: StartVerificationAction) {
-  ValoraAnalytics.track(VerificationEvents.verification_start)
+  ValoraAnalytics.track(VerificationEvents.verification_start, { feeless: true })
 
   Logger.debug(TAG, 'Starting verification')
 
@@ -179,16 +180,16 @@ export function* feelessStartVerification(action: StartVerificationAction) {
   })
 
   if (result === true) {
-    ValoraAnalytics.track(VerificationEvents.verification_complete)
+    ValoraAnalytics.track(VerificationEvents.verification_complete, { feeless: true })
     Logger.debug(TAG, 'Verification completed successfully')
   } else if (result) {
-    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result })
+    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result, feeless: true })
     Logger.debug(TAG, 'Verification failed')
   } else if (cancel) {
-    ValoraAnalytics.track(VerificationEvents.verification_cancel)
+    ValoraAnalytics.track(VerificationEvents.verification_cancel, { feeless: true })
     Logger.debug(TAG, 'Verification cancelled')
   } else if (timeout) {
-    ValoraAnalytics.track(VerificationEvents.verification_timeout)
+    ValoraAnalytics.track(VerificationEvents.verification_timeout, { feeless: true })
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
     yield put(feelessSetVerificationStatus(VerificationStatus.Failed))
@@ -221,6 +222,7 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
       const { status }: FeelessVerificationState = yield select(feelessVerificationStateSelector)
       ValoraAnalytics.track(VerificationEvents.verification_resend_messages, {
         count: status.numAttestationsRemaining,
+        feeless: true,
       })
     } else {
       return verification
@@ -318,7 +320,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       )
 
       if (!withoutRevealing) {
-        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start, {
+          feeless: true,
+        })
         // Request codes for the already existing attestations if any.
         // We check after which ones were successful
         const reveals: boolean[] = yield call(
@@ -339,6 +343,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           // request more attestations
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
             attestationsToRequest,
+            feeless: true,
           })
           attestations = yield call(
             requestAndRetrieveAttestations,
@@ -352,6 +357,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
             issuers,
+            feeless: true,
           })
 
           // start listening for the new list of attestations
@@ -379,7 +385,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             true
           )
         }
-        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete, {
+          feeless: true,
+        })
       }
 
       yield put(feelessSetVerificationStatus(VerificationStatus.CompletingAttestations))
@@ -960,7 +968,9 @@ export function* feelessRequestAttestations(
       throw approveTxResult.error
     }
 
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
+      feeless: true,
+    })
 
     Logger.debug(
       `${TAG}@feelessRequestAttestations`,
@@ -978,11 +988,16 @@ export function* feelessRequestAttestations(
       throw requestTxResult.error
     }
 
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent, {
+      feeless: true,
+    })
   }
 
   Logger.debug(`${TAG}@feelessRequestAttestations`, 'Waiting for block to select issuers')
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
+  ValoraAnalytics.track(
+    VerificationEvents.verification_request_attestation_await_issuer_selection,
+    { feeless: true }
+  )
 
   yield call(
     [attestationsWrapper, attestationsWrapper.waitForSelectingIssuers],
@@ -991,7 +1006,9 @@ export function* feelessRequestAttestations(
   )
 
   Logger.debug(`${TAG}@feelessRequestAttestations`, 'Selecting issuers')
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
+  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer, {
+    feeless: true,
+  })
 
   const selectIssuersTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.selectIssuers],
@@ -1004,7 +1021,9 @@ export function* feelessRequestAttestations(
     throw selectIssuersTxResult.error
   }
 
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
+  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent, {
+    feeless: true,
+  })
 }
 
 export function* feelessGetCodeForIssuer(issuer: string) {
@@ -1021,11 +1040,13 @@ export function* feelessCompleteAttestation(
   const issuer = attestation.issuer
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_start, {
     issuer,
+    feeless: true,
   })
   const code: AttestationCode = yield call(feelessWaitForAttestationCode, issuer)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_complete, {
     issuer,
+    feeless: true,
   })
 
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
@@ -1052,7 +1073,10 @@ export function* feelessCompleteAttestation(
     throw completeTxResult.error
   }
 
-  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
+  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, {
+    issuer,
+    feeless: true,
+  })
 
   Logger.debug(TAG + '@feelessCompleteAttestation', `Attestation for issuer ${issuer} completed`)
   yield put(feelessCompleteAttestationCode(code))

@@ -201,7 +201,7 @@ export function* registerWalletAndDekViaKomenci(
   accountAddress: string,
   walletAddress: string
 ) {
-  ValoraAnalytics.track(OnboardingEvents.account_dek_register_start)
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_start, { feeless: true })
 
   Logger.debug(
     `${TAG}@registerAccountDekViaKomenci`,
@@ -209,7 +209,7 @@ export function* registerWalletAndDekViaKomenci(
   )
 
   yield call(getConnectedUnlockedAccount)
-  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked)
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked, { feeless: true })
 
   const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
   if (!privateDataKey) {
@@ -231,13 +231,14 @@ export function* registerWalletAndDekViaKomenci(
     walletAddress,
     publicDataKey
   )
-  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked, { feeless: true })
 
   if (upToDate) {
     Logger.debug(`${TAG}@registerAccountDekViaKomenci`, 'Address and DEK up to date, skipping.')
     yield put(registerDataEncryptionKey())
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
       newRegistration: false,
+      feeless: true,
     })
     return
   }
@@ -269,6 +270,7 @@ export function* registerWalletAndDekViaKomenci(
   yield put(registerDataEncryptionKey())
   ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
     newRegistration: true,
+    feeless: true,
   })
 }
 
