@@ -56,6 +56,8 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
+const MAX_ESCROW_VALUE = new BigNumber(20)
+
 export interface TransactionDataInput {
   recipient: Recipient
   amount: BigNumber
@@ -121,16 +123,6 @@ function SendAmount(props: Props) {
     dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
   }, [])
 
-  useEffect(() => {
-    if (
-      reviewButtonPressed &&
-      recipientVerificationStatus !== RecipientVerificationStatus.UNKNOWN
-    ) {
-      isOutgoingPaymentRequest ? onRequest() : onSend()
-      setReviewButtonPressed(false)
-    }
-  }, [reviewButtonPressed, recipientVerificationStatus])
-
   const maxLength = React.useMemo(() => {
     const decimalPos = amount.indexOf(decimalSeparator ?? '.')
     if (decimalPos === -1) {
@@ -188,6 +180,29 @@ function SendAmount(props: Props) {
     recipient,
     secureSendPhoneNumberMapping
   )
+
+  useEffect(() => {
+    if (reviewButtonPressed) {
+      if (recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN) {
+        // Wait until the recipient status is fetched.
+        return
+      } else if (
+        recipientVerificationStatus === RecipientVerificationStatus.UNVERIFIED &&
+        dollarAmount.isGreaterThan(MAX_ESCROW_VALUE)
+      ) {
+        const maxAmount = convertDollarsToLocalAmount(MAX_ESCROW_VALUE, localCurrencyExchangeRate)
+        dispatch(
+          showError(ErrorMessages.MAX_ESCROW_TRANSFER_EXCEEDED, ALERT_BANNER_DURATION, {
+            maxAmount: maxAmount?.toFixed(2),
+            symbol: localCurrencySymbol,
+          })
+        )
+      } else {
+        isOutgoingPaymentRequest ? onRequest() : onSend()
+      }
+      setReviewButtonPressed(false)
+    }
+  }, [reviewButtonPressed, recipientVerificationStatus])
 
   const getTransactionData = React.useCallback(
     (type: TokenTransactionType): TransactionDataInput => ({

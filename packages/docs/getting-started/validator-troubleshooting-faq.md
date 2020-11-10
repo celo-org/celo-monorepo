@@ -7,8 +7,6 @@ You may desire to reset your local chain state when updating parameters or wishi
 ```bash
 # Remove the celo state directory
 sudo rm -rf celo
-# Recreate the genesis state
-sudo docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 ```
 ## How do I backup a local Celo private key?
 It's important that local accounts are properly backed up for disaster recovery. The local keystore files are encrypted with the specified account password and stored in the keystore directory. To copy this file to your local machine you may use ssh:

@@ -1,7 +1,10 @@
 import { values } from 'lodash'
-import { estimateGas } from 'src/web3/utils'
+import Logger from 'src/utils/Logger'
+import { estimateGas, getTransactionReceipt } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
+
+const RECEIPT_POLL_INTERVAL = 5000 // 5s
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -165,6 +168,38 @@ export async function sendTransactionAsync<T>(
     })
   }
 
+  // Periodically check for an transaction receipt, and inject events if one is found.
+  // This is a hack to prevent failure in cases where web3 has been obversed to
+  // never get the receipt for transactions that do get mined.
+  let timerID: number | undefined
+  let emitter: any
+  const pollTransactionReceipt = (txHash: string) => {
+    timerID = setInterval(() => {
+      getTransactionReceipt(txHash)
+        .then((r) => {
+          if (!(r && emitter)) {
+            return
+          }
+
+          // If the receipt indicates a revert, emit an error.
+          if (!r.status) {
+            emitter.emit('error', new Error('Recieved receipt for reverted transaction '))
+            return
+          }
+
+          // Emit events to indicate success.
+          emitter.emit('receipt', r)
+          emitter.emit('confirmation', 1, r)
+
+          // Prevent this timer from firing again.
+          clearInterval(timerID)
+        })
+        .catch((error) => {
+          Logger.error('Exception in polling for transaction receipt', error)
+        })
+    }, RECEIPT_POLL_INTERVAL)
+  }
+
   try {
     logger(Started)
     const txParams: Tx = {
@@ -181,7 +216,8 @@ export async function sendTransactionAsync<T>(
       logger(EstimatedGas(estimatedGas))
     }
 
-    tx.send({ ...txParams, gas: estimatedGas })
+    emitter = tx.send({ ...txParams, gas: estimatedGas })
+    emitter
       // @ts-ignore
       .once('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
@@ -195,6 +231,7 @@ export async function sendTransactionAsync<T>(
         if (resolvers.transactionHash) {
           resolvers.transactionHash(txHash)
         }
+        pollTransactionReceipt(txHash)
       })
       .once('confirmation', (confirmationNumber: number) => {
         logger(Confirmed(confirmationNumber))
@@ -203,6 +240,11 @@ export async function sendTransactionAsync<T>(
       .once('error', (error: Error) => {
         logger(Failed(error))
         rejectAll(error)
+      })
+      .finally(() => {
+        if (timerID !== undefined) {
+          clearInterval(timerID)
+        }
       })
   } catch (error) {
     logger(Exception(error))

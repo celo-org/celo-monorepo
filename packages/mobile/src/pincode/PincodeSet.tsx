@@ -64,7 +64,7 @@ export class PincodeSet extends React.Component<Props, State> {
       return Screens.ImportWallet
     }
 
-    return Screens.EnterInviteCode
+    return Screens.VerificationEducationScreen
   }
 
   onChangePin1 = (pin1: string) => {

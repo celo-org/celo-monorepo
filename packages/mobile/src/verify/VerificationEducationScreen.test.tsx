@@ -133,6 +133,17 @@ describe('VerificationEducationScreen with KOMENCI enabled', () => {
       stableToken: {
         balance: '0',
       },
+      identity: {
+        feelessVerificationState: {
+          komenci: {
+            serviceAvailable: true,
+          },
+          status: {
+            numAttestationsRemaining: 3,
+          },
+          actionableAttestations: [],
+        },
+      },
     })
     const { toJSON, queryByTestId, queryByText } = render(
       <Provider store={store}>
