@@ -2148,6 +2148,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.3.tgz#355199fe45d1f9e667ee66836a34e93828b3b5a5"
   integrity sha512-3GeGcUHCzMxCpkBHywEuoXZp1VV+yN6uEHPowxGgH2VP++qO01HMw8G5J4wlP7jN5HFt3WsZaHWfIhor/irGKg==
 
+"@celo/base@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.4.tgz#7b39af537bb3ff44e6a5898f225ec95c3c867f90"
+  integrity sha512-XD9gaIe1m+6FsT/g7L08yASgxbyagFdOPRwWWrd1SZey8h7O6WGKriUo1ZuL0Zyrth/NGOS0s1Cs7An1Q9UDNw==
+
 "@celo/client@0.0.319":
   version "0.0.319"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.319.tgz#d8ec1f265fed3b73ec72ba2a34e043c6d400c7c4"
