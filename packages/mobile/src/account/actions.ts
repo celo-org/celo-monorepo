@@ -12,6 +12,9 @@ export enum Actions {
   SET_PINCODE_SUCCESS = 'ACCOUNT/SET_PINCODE_SUCCESS',
   SET_PINCODE_FAILURE = 'ACCOUNT/SET_PINCODE_FAILURE',
   SET_ACCOUNT_CREATION_TIME = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME',
+  INITIALIZE_ACCOUNT = 'ACCOUNT/INITIALIZE_ACCOUNT',
+  INITIALIZE_ACCOUNT_SUCCESS = 'ACCOUNT/INITIALIZE_ACCOUNT_SUCCESS',
+  INITIALIZE_ACCOUNT_FAILURE = 'ACCOUNT/INITIALIZE_ACCOUNT_FAILURE',
   SET_BACKUP_COMPLETED = 'ACCOUNT/SET_BACKUP_COMPLETED',
   SET_BACKUP_DELAYED = 'ACCOUNT/SET_BACKUP_DELAYED',
   TOGGLE_BACKUP_STATE = 'ACCOUNT/TOGGLE_BACKUP_STATE',
@@ -71,6 +74,18 @@ export interface SetPincodeSuccessAction {
 
 export interface SetPincodeFailureAction {
   type: Actions.SET_PINCODE_FAILURE
+}
+
+export interface InitializeAccountAction {
+  type: Actions.INITIALIZE_ACCOUNT
+}
+
+export interface InitializeAccountSuccessAction {
+  type: Actions.INITIALIZE_ACCOUNT_SUCCESS
+}
+
+export interface InitializeAccountFailureAction {
+  type: Actions.INITIALIZE_ACCOUNT_FAILURE
 }
 
 export interface SetAccountCreationAction {
@@ -133,6 +148,9 @@ export type ActionTypes =
   | SetPincodeAction
   | SetPincodeSuccessAction
   | SetPincodeFailureAction
+  | InitializeAccountAction
+  | InitializeAccountSuccessAction
+  | InitializeAccountFailureAction
   | SetAccountCreationAction
   | SetBackupCompletedAction
   | SetBackupDelayedAction
@@ -204,6 +222,18 @@ export const setPincodeSuccess = (pincodeType: PincodeType): SetPincodeSuccessAc
 
 export const setPincodeFailure = (): SetPincodeFailureAction => ({
   type: Actions.SET_PINCODE_FAILURE,
+})
+
+export const initializeAccount = (): InitializeAccountAction => ({
+  type: Actions.INITIALIZE_ACCOUNT,
+})
+
+export const initializeAccountSuccess = (): InitializeAccountSuccessAction => ({
+  type: Actions.INITIALIZE_ACCOUNT_SUCCESS,
+})
+
+export const initializeAccountFailure = (): InitializeAccountFailureAction => ({
+  type: Actions.INITIALIZE_ACCOUNT_FAILURE,
 })
 
 export const setAccountCreationTime = (): SetAccountCreationAction => ({

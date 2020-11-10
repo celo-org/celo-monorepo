@@ -97,10 +97,15 @@ export const MOONPAY_PUBLIC_KEY = keyOrUndefined(
   Config.SECRETS_KEY,
   'MOONPAY_PUBLIC_KEY'
 )
-export const RECAPTCHA_SITE_KEY = keyOrUndefined(
+export const RECAPTCHA_SITE_KEY_ALFAJORES = keyOrUndefined(
   secretsFile,
   Config.SECRETS_KEY,
-  'RECAPTCHA_SITE_KEY'
+  'RECAPTCHA_SITE_KEY_ALFAJORES'
+)
+export const RECAPTCHA_SITE_KEY_MAINNET = keyOrUndefined(
+  secretsFile,
+  Config.SECRETS_KEY,
+  'RECAPTCHA_SITE_KEY_MAINNET'
 )
 export const SAFETYNET_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SAFETYNET_KEY')
 export const MOONPAY_RATE_API = `https://api.moonpay.io/v3/currencies/celo/price?apiKey=${MOONPAY_PUBLIC_KEY}`

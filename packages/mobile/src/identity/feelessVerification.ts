@@ -7,7 +7,11 @@ import {
   IdentifierLookupResult,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { CheckSessionResp, GetDistributedBlindedPepperResp } from '@celo/komencikit/src/actions'
+import {
+  CheckSessionResp,
+  GetDistributedBlindedPepperResp,
+  StartSessionResp,
+} from '@celo/komencikit/src/actions'
 import {
   AuthenticationFailed,
   FetchError,
@@ -19,7 +23,6 @@ import {
 } from '@celo/komencikit/src/errors'
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { verifyWallet } from '@celo/komencikit/src/verifyWallet'
-import { Address } from '@celo/utils/src/address'
 import { AttestationsStatus } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
@@ -39,6 +42,7 @@ import {
   Actions,
   feelessCompleteAttestationCode,
   FeelessInputAttestationCodeAction,
+  feelessProcessingInputCode,
   feelessResetVerification,
   feelessSetCompletedCodes,
   feelessSetVerificationStatus,
@@ -64,6 +68,7 @@ import {
   E164NumberToSaltType,
   feelessAcceptedAttestationCodesSelector,
   feelessAttestationCodesSelector,
+  feelessProcessingInputCodeSelector,
   FeelessVerificationState,
   feelessVerificationStateSelector,
   isFeelessVerificationStateExpiredSelector,
@@ -92,11 +97,6 @@ import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'identity/feelessVerification'
 
-const KOMENCI_URL = 'https://komenci.celo-networks-dev.org'
-// TODO: Populate this with expected implementation address
-const ALLOWED_MTW_IMPLEMENTATIONS: Address[] = ['0x88a2b9B8387A1823D821E406b4e951337fa1D46D']
-const CURRENT_MTW_IMPLEMENTATION_ADDRESS: Address = '0x88a2b9B8387A1823D821E406b4e951337fa1D46D'
-
 // NOTE: This will need to change if we begin to use the `total`
 // property as a consideration for verification status
 const VERIFIED_ATTESTATION_STATUS = {
@@ -109,7 +109,7 @@ const VERIFIED_ATTESTATION_STATUS = {
 export function* feelessFetchVerificationState() {
   Logger.debug(TAG, '@feelessFetchVerificationState', 'Starting fetch')
   try {
-    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start)
+    ValoraAnalytics.track(VerificationEvents.verification_fetch_status_start, { feeless: true })
     const [contractKit, walletAddress, feelessVerificationState, e164Number]: [
       ContractKit,
       string,
@@ -124,7 +124,7 @@ export function* feelessFetchVerificationState() {
     ])
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: KOMENCI_URL,
+      url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
       token: feelessVerificationState.komenci.sessionToken,
     })
 
@@ -158,6 +158,7 @@ export function* feelessFetchVerificationState() {
     const status: AttestationsStatus = yield call(fetchAttestationStatus, contractKit)
     ValoraAnalytics.track(VerificationEvents.verification_fetch_status_complete, {
       ...status,
+      feeless: true,
     })
   } catch (error) {
     Logger.error(TAG, 'Error occured while fetching verification state', error)
@@ -168,7 +169,7 @@ export function* feelessFetchVerificationState() {
 }
 
 export function* feelessStartVerification(action: StartVerificationAction) {
-  ValoraAnalytics.track(VerificationEvents.verification_start)
+  ValoraAnalytics.track(VerificationEvents.verification_start, { feeless: true })
 
   Logger.debug(TAG, 'Starting verification')
 
@@ -179,16 +180,16 @@ export function* feelessStartVerification(action: StartVerificationAction) {
   })
 
   if (result === true) {
-    ValoraAnalytics.track(VerificationEvents.verification_complete)
+    ValoraAnalytics.track(VerificationEvents.verification_complete, { feeless: true })
     Logger.debug(TAG, 'Verification completed successfully')
   } else if (result) {
-    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result })
+    ValoraAnalytics.track(VerificationEvents.verification_error, { error: result, feeless: true })
     Logger.debug(TAG, 'Verification failed')
   } else if (cancel) {
-    ValoraAnalytics.track(VerificationEvents.verification_cancel)
+    ValoraAnalytics.track(VerificationEvents.verification_cancel, { feeless: true })
     Logger.debug(TAG, 'Verification cancelled')
   } else if (timeout) {
-    ValoraAnalytics.track(VerificationEvents.verification_timeout)
+    ValoraAnalytics.track(VerificationEvents.verification_timeout, { feeless: true })
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT))
     yield put(feelessSetVerificationStatus(VerificationStatus.Failed))
@@ -221,6 +222,7 @@ export function* feelessRestartableVerification(initialWithoutRevealing: boolean
       const { status }: FeelessVerificationState = yield select(feelessVerificationStateSelector)
       ValoraAnalytics.track(VerificationEvents.verification_resend_messages, {
         count: status.numAttestationsRemaining,
+        feeless: true,
       })
     } else {
       return verification
@@ -247,7 +249,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
     )
 
     const komenciKit = new KomenciKit(contractKit, walletAddress, {
-      url: KOMENCI_URL,
+      url: feelessVerificationState.komenci.callbackUrl || networkConfig.komenciUrl,
       token: feelessVerificationState.komenci.sessionToken,
     })
 
@@ -318,7 +320,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       )
 
       if (!withoutRevealing) {
-        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start)
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_start, {
+          feeless: true,
+        })
         // Request codes for the already existing attestations if any.
         // We check after which ones were successful
         const reveals: boolean[] = yield call(
@@ -339,6 +343,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           // request more attestations
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_start, {
             attestationsToRequest,
+            feeless: true,
           })
           attestations = yield call(
             requestAndRetrieveAttestations,
@@ -352,6 +357,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
           )
           ValoraAnalytics.track(VerificationEvents.verification_request_all_attestations_complete, {
             issuers,
+            feeless: true,
           })
 
           // start listening for the new list of attestations
@@ -379,7 +385,9 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
             true
           )
         }
-        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete)
+        ValoraAnalytics.track(VerificationEvents.verification_reveal_all_attestations_complete, {
+          feeless: true,
+        })
       }
 
       yield put(feelessSetVerificationStatus(VerificationStatus.CompletingAttestations))
@@ -600,7 +608,7 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
         verifyWallet,
         contractKit,
         possibleMtwAddress,
-        ALLOWED_MTW_IMPLEMENTATIONS,
+        networkConfig.allowedMtwImplementations,
         walletAddress
       )
     )
@@ -728,7 +736,7 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
     }
 
     const komenciSessionResult: Result<
-      string,
+      StartSessionResp,
       FetchError | AuthenticationFailed | LoginSignatureError
     > = yield call([komenciKit, komenciKit.startSession], captchaToken)
 
@@ -742,7 +750,8 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
         ...feelessVerificationState,
         komenci: {
           ...feelessVerificationState.komenci,
-          sessionToken: komenciSessionResult.result,
+          sessionToken: komenciSessionResult.result.token,
+          callbackUrl: komenciSessionResult.result.callbackUrl || '',
         },
       })
     )
@@ -813,7 +822,7 @@ function* fetchOrDeployMtw(
     try {
       const deployWalletResult: Result<string, FetchError | TxError | InvalidWallet> = yield call(
         [komenciKit, komenciKit.deployWallet],
-        CURRENT_MTW_IMPLEMENTATION_ADDRESS
+        networkConfig.currentMtwImplementationAddress
       )
 
       if (!deployWalletResult.ok) {
@@ -849,7 +858,7 @@ function* fetchOrDeployMtw(
     verifyWallet,
     contractKit,
     unverifiedMtwAddress,
-    ALLOWED_MTW_IMPLEMENTATIONS,
+    networkConfig.allowedMtwImplementations,
     walletAddress
   )
 
@@ -959,7 +968,9 @@ export function* feelessRequestAttestations(
       throw approveTxResult.error
     }
 
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent)
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_approve_tx_sent, {
+      feeless: true,
+    })
 
     Logger.debug(
       `${TAG}@feelessRequestAttestations`,
@@ -977,11 +988,16 @@ export function* feelessRequestAttestations(
       throw requestTxResult.error
     }
 
-    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent)
+    ValoraAnalytics.track(VerificationEvents.verification_request_attestation_request_tx_sent, {
+      feeless: true,
+    })
   }
 
   Logger.debug(`${TAG}@feelessRequestAttestations`, 'Waiting for block to select issuers')
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_await_issuer_selection)
+  ValoraAnalytics.track(
+    VerificationEvents.verification_request_attestation_await_issuer_selection,
+    { feeless: true }
+  )
 
   yield call(
     [attestationsWrapper, attestationsWrapper.waitForSelectingIssuers],
@@ -990,7 +1006,9 @@ export function* feelessRequestAttestations(
   )
 
   Logger.debug(`${TAG}@feelessRequestAttestations`, 'Selecting issuers')
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer)
+  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_select_issuer, {
+    feeless: true,
+  })
 
   const selectIssuersTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.selectIssuers],
@@ -1003,7 +1021,9 @@ export function* feelessRequestAttestations(
     throw selectIssuersTxResult.error
   }
 
-  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent)
+  ValoraAnalytics.track(VerificationEvents.verification_request_attestation_issuer_tx_sent, {
+    feeless: true,
+  })
 }
 
 export function* feelessGetCodeForIssuer(issuer: string) {
@@ -1020,15 +1040,25 @@ export function* feelessCompleteAttestation(
   const issuer = attestation.issuer
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_start, {
     issuer,
+    feeless: true,
   })
   const code: AttestationCode = yield call(feelessWaitForAttestationCode, issuer)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_complete, {
     issuer,
+    feeless: true,
   })
 
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
 
+  // TODO: Refactor this to check for state change in a smart way
+  // Needed to ensure that codes inputted in quick succession are not
+  // assigned the same nonce by Komenci
+  while (yield select(feelessProcessingInputCodeSelector)) {
+    yield delay(100)
+  }
+
+  yield put(feelessProcessingInputCode(true))
   const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.completeAttestation],
     mtwAddress,
@@ -1039,13 +1069,17 @@ export function* feelessCompleteAttestation(
 
   if (!completeTxResult.ok) {
     Logger.debug(TAG, '@feelessCompleteAttestation', 'Failed complete tx')
+    yield put(feelessProcessingInputCode(false))
     throw completeTxResult.error
   }
 
-  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, { issuer })
+  ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_complete, {
+    issuer,
+    feeless: true,
+  })
 
-  yield put(feelessCompleteAttestationCode(code))
   Logger.debug(TAG + '@feelessCompleteAttestation', `Attestation for issuer ${issuer} completed`)
+  yield put(feelessCompleteAttestationCode(code))
 }
 
 // Get the code from the store if it's already there, otherwise wait for it
