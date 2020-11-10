@@ -12,9 +12,7 @@ import { getInviteFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import Logger from 'src/utils/Logger'
 
-export type CalculateFeeChildren = (
-  asyncResult: UseAsyncReturn<BigNumber, never>
-) => React.ReactNode
+export type CalculateFeeChildren = (asyncResult: UseAsyncReturn<BigNumber, any>) => React.ReactNode
 
 interface CommonProps {
   children: CalculateFeeChildren

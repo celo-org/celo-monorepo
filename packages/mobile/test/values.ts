@@ -19,9 +19,12 @@ import {
   RecipientWithQrCode,
 } from 'src/recipients/recipient'
 
+export const nullAddress = '0x0'
+
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
 export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
+export const mockAccount3 = '0x1230000000000000000000000000000000007E57'
 
 export const mockMnemonic =
   'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
@@ -128,6 +131,12 @@ export const mockTransactionData = {
   recipient: mockInvitableRecipient2,
   amount: new BigNumber(1),
   type: TokenTransactionType.Sent,
+}
+
+export const mockInviteTransactionData = {
+  recipient: mockInvitableRecipient2,
+  amount: new BigNumber(1),
+  type: TokenTransactionType.InviteSent,
 }
 
 export const mockInvitableRecipient3: RecipientWithContact = {

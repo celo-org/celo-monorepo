@@ -28,7 +28,7 @@ const argv = yargs
   })
   .option('new_contracts', {
     alias: 'n',
-    description: 'Old contracts build artifacts folder',
+    description: 'New contracts build artifacts folder',
     type: 'string',
     demandOption: true,
   })
