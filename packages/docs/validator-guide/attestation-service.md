@@ -85,7 +85,7 @@ Unlike Twilio and Nexmo, you will need to enter the callback URL for [delivery r
 
 ## Installation
 
-This section uses several environment variables defined during the validator setup. You'll need to export `CELO_IMAGE`, `NETWORK_ID` and `CELO_VALIDATOR_RG_ADDRESS` on this machine.
+This section uses several environment variables defined during the validator setup. You'll need to export `CELO_IMAGE` and `CELO_VALIDATOR_RG_ADDRESS` on this machine.
 
 Setting up an Attestation Service first requires an [Attestation Signer key](key-management/detailed.md#authorized-attestation-signers) to be registered (Similar to Validator and Vote signer keys). For that let's start our node on the Attestations machine (keep track of the password you use for this account):
 
@@ -111,12 +111,12 @@ export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
-You can now run the node for the attestation service in the background. In the below command remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`:
+You can now run the node for the attestation service in the background with the following command. Remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`.  And, if you want to run the attestation service for Baklava, add the `--baklava` flag.
 
 ```bash
 # On the Attestation machine
 echo <CELO-ATTESTATION-SIGNER-PASSWORD> > .password
-docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --allow-insecure-unlock
+docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --allow-insecure-unlock
 ```
 
 ### Database Configuration
