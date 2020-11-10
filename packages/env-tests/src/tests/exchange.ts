@@ -22,7 +22,7 @@ export function runExchangeTest(context: Context) {
 
       const previousGoldBalance = await goldToken.balanceOf(from.address)
       const goldAmount = await exchange.quoteUsdSell(ONE)
-      logger.debug('quote selling cUSD', { rate: goldAmount.toString() })
+      logger.debug({ rate: goldAmount.toString() }, 'quote selling cUSD')
 
       const approveTx = await stableToken.approve(exchange.address, ONE.toString()).send()
       await approveTx.waitReceipt()
@@ -39,15 +39,18 @@ export function runExchangeTest(context: Context) {
       await sellTx.getHash()
       const receipt = await sellTx.waitReceipt()
 
-      logger.debug('Sold cUSD', { receipt })
+      logger.debug({ receipt }, 'Sold cUSD')
 
       // Sell more to receive at least 1 cUSD back
       const goldAmountToSell = (await goldToken.balanceOf(from.address)).minus(previousGoldBalance)
 
-      logger.debug('Loss to exchange', {
-        goldAmount: goldAmount.toString(),
-        goldAmountToSell: goldAmountToSell.toString(),
-      })
+      logger.debug(
+        {
+          goldAmount: goldAmount.toString(),
+          goldAmountToSell: goldAmountToSell.toString(),
+        },
+        'Loss to exchange'
+      )
 
       const approveGoldTx = await goldToken
         .approve(exchange.address, goldAmountToSell.toString())
@@ -65,7 +68,7 @@ export function runExchangeTest(context: Context) {
         .send()
       const sellGoldReceipt = await sellGoldTx.waitReceipt()
 
-      logger.debug('Sold CELO', { receipt: sellGoldReceipt })
+      logger.debug({ receipt: sellGoldReceipt }, 'Sold CELO')
     })
   })
 }

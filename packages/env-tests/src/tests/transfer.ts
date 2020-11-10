@@ -18,22 +18,28 @@ export function runTransfercUSDTest(context: Context) {
       context.kit.defaultFeeCurrency = stableToken.address
 
       const toBalanceBefore = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance Before', {
-        balance: toBalanceBefore.toString(),
-        account: to.address,
-      })
+      logger.debug(
+        {
+          balance: toBalanceBefore.toString(),
+          account: to.address,
+        },
+        'Get Balance Before'
+      )
 
       const receipt = await stableToken
         .transfer(to.address, ONE.toString())
         .sendAndWaitForReceipt({ from: from.address })
 
-      logger.debug('Transferred', { receipt })
+      logger.debug({ receipt }, 'Transferred')
 
       const toBalanceAfter = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance After', {
-        balance: toBalanceAfter.toString(),
-        account: to.address,
-      })
+      logger.debug(
+        {
+          balance: toBalanceAfter.toString(),
+          account: to.address,
+        },
+        'Get Balance After'
+      )
 
       expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
     })
