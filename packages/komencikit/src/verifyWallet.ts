@@ -22,18 +22,18 @@ const PROXY_BYTECODE_SHA3 = '0x69f56de93d0b1eb15364c67a2756afbc0b3112e544f64c4bf
 
 export const verifyWallet = async (
   contractKit: ContractKit,
-  walletAddress: Address,
+  metaTxWalletAddress: Address,
   allowedImplementations: Address[],
   expectedSigner: Address
 ): Promise<Result<true, WalletValidationError>> => {
-  const code = await contractKit.web3.eth.getCode(walletAddress)
+  const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
 
   if (soliditySha3(stripBzz(code)) !== PROXY_BYTECODE_SHA3) {
-    return Err(new InvalidBytecode(walletAddress))
+    return Err(new InvalidBytecode(metaTxWalletAddress))
   }
 
   const actualImplementationRaw = await contractKit.web3.eth.call({
-    to: walletAddress,
+    to: metaTxWalletAddress,
     data: GET_IMPLEMENTATION_ABI.signature,
   })
   const actualImplementation = normalizeAddress(
@@ -48,18 +48,18 @@ export const verifyWallet = async (
   if (normalizedAllowedImplementations.indexOf(actualImplementation) === -1) {
     return Err(
       new InvalidImplementation(
-        walletAddress,
+        metaTxWalletAddress,
         actualImplementation,
         normalizedAllowedImplementations
       )
     )
   }
 
-  const wallet = await contractKit.contracts.getMetaTransactionWallet(walletAddress)
+  const wallet = await contractKit.contracts.getMetaTransactionWallet(metaTxWalletAddress)
   const actualSigner = normalizeAddress(await wallet.signer())
   const normalizedExpectedSigner = normalizeAddress(expectedSigner)
   if (actualSigner !== normalizedExpectedSigner) {
-    return Err(new InvalidSigner(walletAddress, actualSigner, normalizedExpectedSigner))
+    return Err(new InvalidSigner(metaTxWalletAddress, actualSigner, normalizedExpectedSigner))
   }
 
   return Ok(true)
