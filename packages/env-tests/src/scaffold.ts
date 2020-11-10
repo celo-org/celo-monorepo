@@ -49,7 +49,6 @@ export enum TestAccounts {
   GovernanceApprover,
   ReserveSpender,
   ReserveCustodian,
-  Attestation,
 }
 
 export const ONE = new BigNumber('1000000000000000000')
