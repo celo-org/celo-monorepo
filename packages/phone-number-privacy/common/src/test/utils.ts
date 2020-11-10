@@ -1,3 +1,4 @@
+import { Signature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
@@ -5,13 +6,19 @@ import Web3 from 'web3'
 
 export function createMockAttestation(completed: number, total: number) {
   return {
-    getAttestationStat: jest.fn(() => ({ completed, total })),
+    getVerifiedStatus: jest.fn(() => ({ completed, total })),
   }
 }
 
 export function createMockToken(balance: BigNumber) {
   return {
     balanceOf: jest.fn(() => balance),
+  }
+}
+
+export function createMockAccounts(walletAddress: string) {
+  return {
+    getWalletAddress: jest.fn(() => walletAddress),
   }
 }
 
@@ -37,6 +44,7 @@ export enum ContractRetrieval {
   getAttestations = 'getAttestations',
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
+  getAccounts = 'getAccounts',
 }
 
 export function createMockWeb3(txCount: number) {
@@ -64,4 +72,21 @@ export async function replenishQuota(account: string, contractKit: any) {
   const goldToken = await contractKit.contracts.getGoldToken()
   const selfTransferTx = goldToken.transfer(account, 1)
   await selfTransferTx.sendAndWaitForReceipt()
+}
+
+export async function registerWalletAddress(
+  accountAddress: string,
+  walletAddress: string,
+  walletAddressPk: string,
+  contractKit: any
+) {
+  const accounts = await contractKit.contracts.getAccounts()
+  const pop = await accounts.generateProofOfKeyPossessionLocally(
+    accountAddress,
+    walletAddress,
+    walletAddressPk
+  )
+  await accounts
+    .setWalletAddress(walletAddress, pop as Signature)
+    .sendAndWaitForReceipt({ from: accountAddress } as any)
 }

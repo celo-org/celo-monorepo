@@ -10,6 +10,8 @@ import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes }
 import { ec as EC } from 'elliptic'
 const ec = new EC('secp256k1')
 
+export const IV_LENGTH = 16
+
 /**
  * Increments big endian uint32
  *
@@ -54,6 +56,20 @@ const ConcatKDF = (px: Buffer, kdLen: number) => {
 }
 
 /**
+ * AES-128 CTR encrypt
+ * @param {Buffer} encryptionKey
+ * @param {Buffer} iv
+ * @param {Buffer} plaintext
+ * @returns {Buffer} ciphertext
+ */
+export function AES128Encrypt(encryptionKey: Buffer, iv: Buffer, plaintext: Buffer) {
+  const cipher = createCipheriv('aes-128-ctr', encryptionKey, iv)
+  const firstChunk = cipher.update(plaintext)
+  const secondChunk = cipher.final()
+  return Buffer.concat([iv, firstChunk, secondChunk])
+}
+
+/**
  * AES-128 CTR encrypt with message authentication
  * @param {Buffer} encryptionKey
  * @param {Buffer} macKey
@@ -65,16 +81,28 @@ export function AES128EncryptAndHMAC(
   macKey: Buffer,
   plaintext: Buffer
 ): Buffer {
-  const iv = randomBytes(16)
-  const cipher = createCipheriv('aes-128-ctr', encryptionKey, iv)
-  const firstChunk = cipher.update(plaintext)
-  const secondChunk = cipher.final()
-  const dataToMac = Buffer.concat([iv, firstChunk, secondChunk])
+  const iv = randomBytes(IV_LENGTH)
+  const dataToMac = AES128Encrypt(encryptionKey, iv, plaintext)
   const mac = createHmac('sha256', macKey)
     .update(dataToMac)
     .digest()
 
   return Buffer.concat([dataToMac, mac])
+}
+
+/**
+ * AES-128 CTR decrypt
+ * @param {Buffer} encryptionKey
+ * @param {Buffer} iv
+ * @param {Buffer} ciphertext
+ * @returns {Buffer} plaintext
+ */
+export function AES128Decrypt(encryptionKey: Buffer, iv: Buffer, ciphertext: Buffer) {
+  const cipher = createDecipheriv('aes-128-ctr', encryptionKey, iv)
+  const firstChunk = cipher.update(ciphertext)
+  const secondChunk = cipher.final()
+
+  return Buffer.concat([firstChunk, secondChunk])
 }
 
 /**
@@ -89,8 +117,8 @@ export function AES128DecryptAndHMAC(
   macKey: Buffer,
   ciphertext: Buffer
 ): Buffer {
-  const iv = ciphertext.slice(0, 16)
-  const message = ciphertext.slice(16, ciphertext.length - 32)
+  const iv = ciphertext.slice(0, IV_LENGTH)
+  const message = ciphertext.slice(IV_LENGTH, ciphertext.length - 32)
   const mac = ciphertext.slice(ciphertext.length - 32, ciphertext.length)
   const dataToMac = Buffer.concat([iv, message])
   const computedMac = createHmac('sha256', macKey)
@@ -99,11 +127,8 @@ export function AES128DecryptAndHMAC(
   if (!mac.equals(computedMac)) {
     throw new Error('MAC mismatch')
   }
-  const cipher = createDecipheriv('aes-128-ctr', encryptionKey, iv)
-  const firstChunk = cipher.update(message)
-  const secondChunk = cipher.final()
 
-  return Buffer.concat([firstChunk, secondChunk])
+  return AES128Decrypt(encryptionKey, iv, message)
 }
 
 /**

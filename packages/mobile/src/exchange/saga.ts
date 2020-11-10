@@ -19,6 +19,8 @@ import {
   setExchangeRate,
   setTobinTax,
   WithdrawCeloAction,
+  withdrawCeloFailed,
+  withdrawCeloSuccess,
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -185,7 +187,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       throw new Error('Invalid exchange rate')
     }
 
-    context = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
+    context = yield call(createStandbyTx, makerToken, makerAmount, exchangeRate, account)
 
     const contractKit = yield call(getContractKit)
 
@@ -293,7 +295,8 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     contractKit.defaultAccount = account
 
-    const tx: CeloTransactionObject<string> = yield exchangeContract.exchange(
+    const tx: CeloTransactionObject<string> = yield call(
+      exchangeContract.exchange,
       convertedMakerAmount.toString(),
       convertedTakerAmount.toString(),
       sellGold
@@ -306,7 +309,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, 'No transaction ID. Did not exchange.')
       return
     }
-    yield call(sendAndMonitorTransaction, tx, account, context)
+    yield call(
+      sendAndMonitorTransaction,
+      tx,
+      account,
+      context,
+      undefined, // currency, undefined because it's an exchange and we need both.
+      makerToken
+    )
     ValoraAnalytics.track(CeloExchangeEvents.celo_exchange_complete, {
       txId: context.id,
       currency: makerToken,
@@ -371,10 +381,10 @@ function* celoToDollarAmount(amount: BigNumber) {
 function* withdrawCelo(action: WithdrawCeloAction) {
   let context: TransactionContext | null = null
   try {
-    const { recipientAddress, amount } = action
+    const { recipientAddress, amount, isCashOut } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
-    navigate(Screens.ExchangeHomeScreen)
+    navigate(isCashOut ? Screens.WalletHome : Screens.ExchangeHomeScreen)
 
     context = newTransactionContext(TAG, 'Withdraw CELO')
     yield put(
@@ -412,16 +422,20 @@ function* withdrawCelo(action: WithdrawCeloAction) {
     const dollarAmount = yield call(celoToDollarAmount, amount)
     yield put(sendPaymentOrInviteSuccess(dollarAmount))
 
+    yield put(withdrawCeloSuccess())
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_completed, {
       amount: amount.toString(),
     })
   } catch (error) {
     Logger.error(TAG, 'Error withdrawing CELO', error)
-    if (context?.id) {
-      yield put(removeStandbyTransaction(context.id))
-    }
 
-    yield put(showError(ErrorMessages.TRANSACTION_FAILED))
+    const errorToShow =
+      error.message === ErrorMessages.INCORRECT_PIN
+        ? ErrorMessages.INCORRECT_PIN
+        : ErrorMessages.TRANSACTION_FAILED
+    yield put(withdrawCeloFailed(context?.id, errorToShow))
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_error, {
       error,
     })

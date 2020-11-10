@@ -91,30 +91,14 @@ exports[`FiatExchange renders correctly 1`] = `
   <View
     style={
       Object {
-        "flex": 1,
-        "justifyContent": "center",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
       }
     }
   >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/fiat-exchange.png",
-        }
-      }
-      style={
-        Object {
-          "alignSelf": "center",
-        }
-      }
-    />
     <View
       style={
         Object {
-          "alignItems": "center",
-          "height": 112,
-          "justifyContent": "flex-end",
           "marginLeft": 16,
           "paddingRight": 16,
           "paddingVertical": 16,
@@ -124,10 +108,10 @@ exports[`FiatExchange renders correctly 1`] = `
       <Text
         style={
           Object {
-            "color": "#2E3338",
-            "fontFamily": "Jost-Medium",
-            "fontSize": 22,
-            "lineHeight": 28,
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
             "marginBottom": 4,
           }
         }
@@ -140,7 +124,7 @@ exports[`FiatExchange renders correctly 1`] = `
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
+              "fontFamily": "Inter-Medium",
               "fontSize": 18,
               "lineHeight": 24,
               "marginBottom": 2,
@@ -155,27 +139,20 @@ exports[`FiatExchange renders correctly 1`] = `
         $
         0.00
       </Text>
-      <Text
-        numberOfLines={1}
-        style={
-          Array [
-            Object {
-              "color": "#9CA4A9",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#9CA4A9",
-            },
-          ]
-        }
-      >
-        
-        0.00
-         global:celoDollars
-      </Text>
     </View>
+    <Image
+      resizeMode="contain"
+      source={
+        Object {
+          "testUri": "../../../packages/mobile/src/images/fiat-exchange.png",
+        }
+      }
+      style={
+        Object {
+          "marginRight": 16,
+        }
+      }
+    />
   </View>
   <View
     style={
@@ -222,13 +199,26 @@ exports[`FiatExchange renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Inter-Regular",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
               }
             }
           >
             fiatExchangeFlow:addFunds
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+                "marginTop": 2,
+              }
+            }
+          >
+            fiatExchangeFlow:addFundsSubtitle
           </Text>
         </View>
       </View>
@@ -271,46 +261,28 @@ exports[`FiatExchange renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Inter-Regular",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
               }
             }
           >
-            fiatExchangeFlow:buySellOnExchanges
+            fiatExchangeFlow:cashOut
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+                "marginTop": 2,
+              }
+            }
+          >
+            fiatExchangeFlow:cashOutSubtitle
           </Text>
         </View>
-      </View>
-    </View>
-    <View
-      style={
-        Object {
-          "backgroundColor": "#FFFFFF",
-        }
-      }
-    >
-      <View
-        style={
-          Object {
-            "borderBottomColor": "#EDEEEF",
-            "borderBottomWidth": 1,
-            "marginLeft": 16,
-            "paddingVertical": 16,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#B4B9BD",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-            }
-          }
-        >
-          fiatExchangeFlow:cashOutComingSoon
-        </Text>
       </View>
     </View>
   </View>

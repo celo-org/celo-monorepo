@@ -13,6 +13,7 @@ USAGE
   $ celocli account:authorize
 
 OPTIONS
+  -k, --privateKey=privateKey                          Use a private key to sign local transactions with
   -r, --role=vote|validator|attestation                (required) Role to delegate
 
   --blsKey=0x                                          The BLS public key that the validator is using for consensus,
@@ -22,9 +23,6 @@ OPTIONS
                                                        signature on the account address. 48 bytes.
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)        Use a specific gas currency for transaction fees (defaults to
-                                                       'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                    [default: 1] If --useLedger is set, this will get the first N
                                                        addresses for local signing
@@ -67,10 +65,6 @@ View Celo Dollar and Gold balances for an address
 USAGE
   $ celocli account:balance ADDRESS
 
-OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
 EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -89,13 +83,11 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --address=address                                  (required) The address of the account you want to claim
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -131,13 +123,11 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --force                                            Ignore URL validity checks
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -172,13 +162,11 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --domain=domain                                    (required) The domain you want to claim
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -210,11 +198,10 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -248,11 +235,10 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -286,11 +272,10 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -324,11 +309,10 @@ ARGUMENTS
   FILE  Path where the metadata should be saved
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
                                                      authorized signer for the address in the metadata
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -360,8 +344,11 @@ ARGUMENTS
   ADDRESS  Address to get metadata for
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+  -x, --extended                                 show extra columns
+  --columns=columns                              only show provided columns (comma-separated)
+  --csv                                          output is csv format [alias: --output=csv]
+  --filter=filter                                filter property by partial string matching, ex: name=foo
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
@@ -371,6 +358,14 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --no-header                                    hide table header from output
+
+  --no-truncate                                  do not truncate output to fit screen
+
+  --output=csv|json|yaml                         output in a more machine friendly format
+
+  --sort=sort                                    property to sort by (prepend '-' for descending)
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -389,8 +384,7 @@ USAGE
   $ celocli account:list
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
@@ -420,10 +414,6 @@ USAGE
 ARGUMENTS
   ACCOUNT  Account address
 
-OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
 EXAMPLE
   lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -439,6 +429,9 @@ USAGE
   $ celocli account:new
 
 OPTIONS
+  -k, --privateKey=privateKey
+      Use a private key to sign local transactions with
+
   --addressIndex=addressIndex
       Choose the address index for the derivation path
 
@@ -453,6 +446,16 @@ OPTIONS
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
 
+  --ledgerAddresses=ledgerAddresses
+      [default: 1] If --useLedger is set, this will get the first N addresses for local signing
+
+  --ledgerConfirmAddress
+      Set it to ask confirmation for the address of the transaction from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses
+      [default: [0]] If --useLedger is set, this will get the array of index addresses for local signing. Example
+      --ledgerCustomAddresses "[4,99]"
+
   --mnemonicPath=mnemonicPath
       Instead of generating a new mnemonic (seed phrase), use the user-supplied mnemonic instead. Path to a file that
       contains all the mnemonic words separated by a space (example: "word1 word2 word3 ... word24"). If the words are a
@@ -462,6 +465,9 @@ OPTIONS
       Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
       and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
       address.
+
+  --useLedger
+      Set it to use a ledger wallet
 
 EXAMPLES
   new
@@ -482,10 +488,8 @@ USAGE
   $ celocli account:offchain-read
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -518,11 +522,9 @@ USAGE
   $ celocli account:offchain-write
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --directory=directory                              (required) To which directory data should be written
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address with which to sign
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -556,11 +558,10 @@ USAGE
   $ celocli account:proof-of-possession
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
+
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
-                                                        'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
@@ -592,6 +593,9 @@ USAGE
   $ celocli account:recover-old
 
 OPTIONS
+  -k, --privateKey=privateKey
+      Use a private key to sign local transactions with
+
   --addressIndex=addressIndex
       Choose the address index for the derivation path
 
@@ -606,6 +610,16 @@ OPTIONS
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
 
+  --ledgerAddresses=ledgerAddresses
+      [default: 1] If --useLedger is set, this will get the first N addresses for local signing
+
+  --ledgerConfirmAddress
+      Set it to ask confirmation for the address of the transaction from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses
+      [default: [0]] If --useLedger is set, this will get the array of index addresses for local signing. Example
+      --ledgerCustomAddresses "[4,99]"
+
   --mnemonicPath=mnemonicPath
       (required) Path to a file that contains all the mnemonic words separated by a space (example: "word1 word2 word3 ...
       word24"). If the words are a language other than English, the --language flag must be used. Only BIP39 mnemonics are
@@ -615,6 +629,9 @@ OPTIONS
       Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
       and the index specified using the addressIndex flag. Every passphrase generates a different private key and wallet
       address.
+
+  --useLedger
+      Set it to use a ledger wallet
 
 EXAMPLES
   recover-old --mnemonicPath some_folder/my_mnemonic_file
@@ -637,10 +654,8 @@ USAGE
   $ celocli account:register
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -663,20 +678,17 @@ EXAMPLES
 
 _See code: [packages/cli/src/commands/account/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register.ts)_
 
-### Register-metadata
+### Register-data-encryption-key
 
-Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
+Register a data encryption key for an account on chain. This key can be used to encrypt data to you such as offchain metadata or transaction comments
 
 ```
 USAGE
-  $ celocli account:register-metadata
+  $ celocli account:register-data-encryption-key
 
 OPTIONS
-  --force                                            Ignore metadata validity checks
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)      Use a specific gas currency for transaction fees (defaults to
-                                                     'auto' which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set the data encryption key for
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -687,6 +699,51 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --publicKey=publicKey                              (required) The public key you want to register
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  register-data-encryption-key --publicKey 0x...  --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+```
+
+_See code: [packages/cli/src/commands/account/register-data-encryption-key.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/register-data-encryption-key.ts)_
+
+### Register-metadata
+
+Register metadata URL for an account where users will be able to retieve the metadata file and verify your claims
+
+```
+USAGE
+  $ celocli account:register-metadata
+
+OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+  -x, --extended                                     show extra columns
+  --columns=columns                                  only show provided columns (comma-separated)
+  --csv                                              output is csv format [alias: --output=csv]
+  --filter=filter                                    filter property by partial string matching, ex: name=foo
+  --force                                            Ignore metadata validity checks
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --no-header                                        hide table header from output
+
+  --no-truncate                                      do not truncate output to fit screen
+
+  --output=csv|json|yaml                             output in a more machine friendly format
+
+  --sort=sort                                        property to sort by (prepend '-' for descending)
 
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
 
@@ -707,10 +764,8 @@ USAGE
   $ celocli account:set-name
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
-                                                        'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
@@ -741,8 +796,7 @@ USAGE
   $ celocli account:show ADDRESS
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
@@ -770,8 +824,7 @@ USAGE
   $ celocli account:show-claimed-accounts ADDRESS
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
@@ -802,8 +855,11 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+  -x, --extended                                 show extra columns
+  --columns=columns                              only show provided columns (comma-separated)
+  --csv                                          output is csv format [alias: --output=csv]
+  --filter=filter                                filter property by partial string matching, ex: name=foo
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
@@ -813,6 +869,14 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --no-header                                    hide table header from output
+
+  --no-truncate                                  do not truncate output to fit screen
+
+  --output=csv|json|yaml                         output in a more machine friendly format
+
+  --sort=sort                                    property to sort by (prepend '-' for descending)
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -834,14 +898,8 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --duration=duration                            Duration in seconds to leave the account unlocked. Unlocks until the
-                                                 node exits by default.
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)  Use a specific gas currency for transaction fees (defaults to 'auto'
-                                                 which uses whatever feeCurrency is available)
-
-  --password=password                            Password used to unlock the account. If not specified, you will be
-                                                 prompted for a password.
+  --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until the node exits by default.
+  --password=password  Password used to unlock the account. If not specified, you will be prompted for a password.
 
 EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -859,11 +917,10 @@ USAGE
   $ celocli account:verify-proof-of-possession
 
 OPTIONS
+  -k, --privateKey=privateKey                           Use a private key to sign local transactions with
+
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)         Use a specific gas currency for transaction fees (defaults to
-                                                        'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing

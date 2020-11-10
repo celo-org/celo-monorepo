@@ -38,7 +38,7 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   }
 
   async removeChart() {
-    await removeGenericHelmChart(this.rbacReleaseName())
+    await removeGenericHelmChart(this.rbacReleaseName(), this.celoEnv)
     return super.removeChart()
   }
 

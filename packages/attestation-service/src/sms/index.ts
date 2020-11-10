@@ -17,6 +17,7 @@ import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel, AttestationStatus } from '../models/attestation'
 import { ErrorWithResponse } from '../request'
 import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
+import { MessageBirdSmsProvider } from './messagebird'
 import { NexmoSmsProvider } from './nexmo'
 import { TwilioSmsProvider } from './twilio'
 
@@ -81,9 +82,17 @@ export async function initializeSmsProviders(
       throw new Error(`Providers in SMS_PROVIDERS must be unique: dupe: ${configuredSmsProvider}`)
     }
     switch (configuredSmsProvider) {
+      case SmsProviderType.MESSAGEBIRD:
+        const messageBirdProvider = MessageBirdSmsProvider.fromEnv()
+        await messageBirdProvider.initialize(
+          deliveryStatusURLForProviderType(configuredSmsProvider)
+        )
+        smsProviders.push(messageBirdProvider)
+        smsProvidersByType[SmsProviderType.MESSAGEBIRD] = messageBirdProvider
+        break
       case SmsProviderType.NEXMO:
         const nexmoProvider = NexmoSmsProvider.fromEnv()
-        await nexmoProvider.initialize()
+        await nexmoProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
         smsProviders.push(nexmoProvider)
         smsProvidersByType[SmsProviderType.NEXMO] = nexmoProvider
         break
@@ -148,7 +157,7 @@ export function configuredSmsProviders() {
 }
 
 export function smsProvidersWithDeliveryStatus() {
-  return smsProviders.filter((provider) => provider.supportsDeliveryStatus())
+  return smsProviders.filter((provider) => provider.deliveryStatusMethod())
 }
 
 export function unsupportedRegionCodes() {

@@ -164,31 +164,35 @@ export async function getPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   addressSid: string,
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string
 ) {
   const phoneNumber = await chooseFromAvailablePhoneNumbers(
     attestations,
     twilioClient,
-    maximumNumberOfAttestations
+    maximumNumberOfAttestations,
+    salt
   )
 
   if (phoneNumber !== undefined) {
     return phoneNumber
   }
 
-  return createPhoneNumber(attestations, twilioClient, addressSid, maximumNumberOfAttestations)
+  return createPhoneNumber(attestations, twilioClient, addressSid, maximumNumberOfAttestations, salt)
 }
 
 export async function chooseFromAvailablePhoneNumbers(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string,
 ) {
   const availableNumbers = await twilioClient.incomingPhoneNumbers.list()
   const usableNumber = await findSuitableNumber(
     attestations,
     availableNumbers.map((number) => number.phoneNumber),
-    maximumNumberOfAttestations
+    maximumNumberOfAttestations,
+    salt
   )
   return usableNumber
 }
@@ -196,13 +200,14 @@ export async function chooseFromAvailablePhoneNumbers(
 async function findSuitableNumber(
   attestations: AttestationsWrapper,
   numbers: string[],
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string,
 ) {
   const attestedAccountsLookup = await attestations.lookupIdentifiers(
-    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n))
+    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n, salt))
   )
   return numbers.find((number) => {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(number)
+    const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
     const allAccounts = attestedAccountsLookup[phoneHash]
 
     if (!allAccounts) {
@@ -221,9 +226,10 @@ export async function createPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   addressSid: string,
-  maximumNumberOfAttestations: number
+  maximumNumberOfAttestations: number,
+  salt: string
 ) {
-  const countryCodes = ['GB', 'DE', 'AU']
+  const countryCodes = ['GB', 'US']
   let attempts = 0
   while (true) {
     const countryCode = sample(countryCodes)
@@ -233,7 +239,8 @@ export async function createPhoneNumber(
     const usableNumber = await findSuitableNumber(
       attestations,
       numbers.map((number) => number.phoneNumber),
-      maximumNumberOfAttestations
+      maximumNumberOfAttestations,
+      salt
     )
 
     if (!usableNumber) {

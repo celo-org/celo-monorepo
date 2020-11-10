@@ -81,7 +81,7 @@ export class GethNativeBridgeWallet extends RemoteWallet<GethNativeBridgeSigner>
    * @dev overrides WalletBase.signTransaction
    */
   async signTransaction(txParams: Tx) {
-    Logger.info(`${TAG}@signTransaction`, `Signing transaction to: ${txParams.to}`)
+    Logger.info(`${TAG}@signTransaction`, `Signing transaction: ${JSON.stringify(txParams)}`)
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress)

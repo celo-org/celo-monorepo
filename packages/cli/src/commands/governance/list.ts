@@ -10,12 +10,13 @@ export default class List extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
+    ...(cli.table.flags() as object),
   }
 
   static examples = ['list']
 
   async run() {
-    this.parse(List)
+    const res = this.parse(List)
 
     const governance = await this.kit.contracts.getGovernance()
     const queue = await governance.getQueue()
@@ -26,10 +27,14 @@ export default class List extends BaseCommand {
     const sortedQueue = governance.sortedQueue(unexpiredQueue)
 
     console.log(chalk.magenta.bold('Queued Proposals:'))
-    cli.table(sortedQueue, {
-      ID: { get: (p) => valueToString(p.proposalID) },
-      upvotes: { get: (p) => valueToString(p.upvotes) },
-    })
+    cli.table(
+      sortedQueue,
+      {
+        ID: { get: (p) => valueToString(p.proposalID) },
+        upvotes: { get: (p) => valueToString(p.upvotes) },
+      },
+      res.flags
+    )
 
     const dequeue = await governance.getDequeue(true)
     const expiredDequeueMap = await concurrentMap(5, dequeue, governance.isDequeuedProposalExpired)
@@ -38,10 +43,14 @@ export default class List extends BaseCommand {
     const proposals = zip((proposalID, stage) => ({ proposalID, stage }), unexpiredDequeue, stages)
 
     console.log(chalk.blue.bold('Dequeued Proposals:'))
-    cli.table(proposals, {
-      ID: { get: (p) => valueToString(p.proposalID) },
-      stage: {},
-    })
+    cli.table(
+      proposals,
+      {
+        ID: { get: (p) => valueToString(p.proposalID) },
+        stage: {},
+      },
+      res.flags
+    )
 
     console.log(chalk.red.bold('Expired Proposals:'))
     const expiredQueue = queue
@@ -50,8 +59,12 @@ export default class List extends BaseCommand {
     const expiredDequeue = dequeue
       .filter((_, idx) => expiredDequeueMap[idx])
       .map((_, idx) => dequeue[idx])
-    cli.table(expiredQueue.concat(expiredDequeue), {
-      ID: { get: (id) => valueToString(id) },
-    })
+    cli.table(
+      expiredQueue.concat(expiredDequeue),
+      {
+        ID: { get: (id) => valueToString(id) },
+      },
+      res.flags
+    )
   }
 }

@@ -120,6 +120,11 @@ export class ContractKit {
     this.contracts = new WrapperCache(this)
   }
 
+  getWallet() {
+    assertIsCeloProvider(this.web3.currentProvider)
+    return this.web3.currentProvider.wallet
+  }
+
   async getTotalBalance(address: string): Promise<AccountBalance> {
     const celoToken = await this.contracts.getGoldToken()
     const stableToken = await this.contracts.getStableToken()
@@ -175,6 +180,54 @@ export class ContractKit {
       contracts[8].getConfig(),
       contracts[9].getConfig(),
       contracts[10].getConfig(),
+      contracts[11].getConfig(),
+    ])
+    return {
+      exchange: res[0],
+      election: res[1],
+      attestations: res[2],
+      governance: res[3],
+      lockedGold: res[4],
+      sortedOracles: res[5],
+      gasPriceMinimum: res[6],
+      reserve: res[7],
+      stableToken: res[8],
+      validators: res[9],
+      downtimeSlasher: res[10],
+      blockchainParameters: res[11],
+    }
+  }
+
+  async getHumanReadableNetworkConfig() {
+    const token1 = await this.registry.addressFor(CeloContract.GoldToken)
+    const token2 = await this.registry.addressFor(CeloContract.StableToken)
+    const promises: Array<Promise<any>> = [
+      this.contracts.getExchange(),
+      this.contracts.getElection(),
+      this.contracts.getAttestations(),
+      this.contracts.getGovernance(),
+      this.contracts.getLockedGold(),
+      this.contracts.getSortedOracles(),
+      this.contracts.getGasPriceMinimum(),
+      this.contracts.getReserve(),
+      this.contracts.getStableToken(),
+      this.contracts.getValidators(),
+      this.contracts.getDowntimeSlasher(),
+      this.contracts.getBlockchainParameters(),
+    ]
+    const contracts = await Promise.all(promises)
+    const res = await Promise.all([
+      contracts[0].getHumanReadableConfig(),
+      contracts[1].getConfig(),
+      contracts[2].getHumanReadableConfig([token1, token2]),
+      contracts[3].getHumanReadableConfig(),
+      contracts[4].getHumanReadableConfig(),
+      contracts[5].getHumanReadableConfig(),
+      contracts[6].getConfig(),
+      contracts[7].getConfig(),
+      contracts[8].getHumanReadableConfig(),
+      contracts[9].getHumanReadableConfig(),
+      contracts[10].getHumanReadableConfig(),
       contracts[11].getConfig(),
     ])
     return {

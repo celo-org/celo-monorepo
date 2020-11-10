@@ -25,6 +25,9 @@ Celo Core Contracts deployed to a live network without the `getVersion()` functi
 
 Mixin contracts and libraries are considered part of the contracts that consume them. When a mixin or library has changed, all contracts that consume them should be considered to have changed as well, and thus the contracts should have their version numbers incremented and should be re-deployed as part of the next smart contract release.
 
+### Initialize Data
+
+Whenever Celo Core Contracts need to be re-initialized, their initialization arguments should be checked into version control under `packages/protocol/releaseData/initializationData/release${N}.json`.
 
 ### Release management in Git/Github
 
@@ -91,7 +94,7 @@ STORAGE updates are adopted by deploying a new proxy/implementation pair. These 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
 RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
-yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "initialize_data.json" -p "proposal.json"
+yarn make-release -b $RELEASE_CANDIDATE -n $NETWORK -r "report.json" -i "releaseData/initializationData/release${N}.json" -p "proposal.json"
 ```
 
 The proposal encodes STORAGE updates by repointing the Registry to the new proxy. Storage compatible upgrades are encoded by repointing the existing proxy's implementation.
@@ -115,7 +118,7 @@ celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_pr
 
 ### Verify Proposed Release
 
-Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly.
+Verify that the proposed upgrade activates contract addresses which match compiled bytecode from the tagged release candidate exactly. Include initialization data from the CGP to verify via (add `-i initialization_data.json` in that case)
 
 ```bash
 RELEASE_CANDIDATE="celo-core-contracts-v${N}.rc${X}"
@@ -181,6 +184,9 @@ After a successful release execution on a testnet, the resulting network state s
     celocli governance:propose --jsonTransactions <jsonFile> --deposit <number> --from <addr> --descriptionURL https://gist.github.com/yorhodes/46430eacb8ed2f73f7bf79bef9d58a33
     ```
 
+### Automated environment tests
+
+Stakeholders can use the `env-tests` package in `celo-monorepo` to run an automated test suite against the network
 
 ### Performance
 
@@ -229,6 +235,7 @@ Deploying a new contract release should occur with the following process. On-cha
         <li>If all issues in the audit report have straightforward fixes:
           <ol>
             <li> Submit a governance proposal draft using this format: https://github.com/celo-org/celo-proposals/blob/master/CGPs/template.md</li>
+            <li> Add any initialization data to the CGP that should be included as part of the proposal</li>
             <li> Announce forthcoming smart contract release on: https://forum.celo.org/c/governance</li>
           </ol>
         </li>

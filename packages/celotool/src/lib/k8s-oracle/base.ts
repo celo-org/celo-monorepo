@@ -45,7 +45,7 @@ export abstract class BaseOracleDeployer {
   }
 
   async removeChart() {
-    await removeGenericHelmChart(this.releaseName)
+    await removeGenericHelmChart(this.releaseName, this.celoEnv)
   }
 
   async helmParameters() {

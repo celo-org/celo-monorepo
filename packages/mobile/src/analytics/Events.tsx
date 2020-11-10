@@ -146,6 +146,7 @@ export enum VerificationEvents {
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
   verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+  verification_reveal_attestation_status = 'verification_reveal_attestation_status',
 
   verification_revoke_start = 'verification_revoke_start',
   verification_revoke_finish = 'verification_revoke_finish',
@@ -176,9 +177,13 @@ export enum InviteEvents {
   invite_tx_start = 'invite_tx_start',
   invite_tx_complete = 'invite_tx_complete',
   invite_tx_error = 'invite_tx_error',
+  invite_start = 'invite_start',
+  invite_complete = 'invite_complete',
+  invite_error = 'invite_error',
   invite_method_sms = 'invite_method_sms',
   invite_method_whatsapp = 'invite_method_whatsapp',
   invite_method_error = 'invite_method_error',
+  invite_from_menu = 'invite_from_menu',
 }
 
 export enum EscrowEvents {
@@ -292,6 +297,7 @@ export enum CeloExchangeEvents {
 
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
+  spend_merchant_link = 'spend_merchant_link',
 }
 
 export enum GethEvents {

@@ -34,13 +34,15 @@ import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
 import ExternalExchanges, {
   externalExchangesScreenOptions,
 } from 'src/fiatExchanges/ExternalExchanges'
-import FiatExchangeAmount, {
-  fiatExchangesAmountScreenOptions,
-} from 'src/fiatExchanges/FiatExchangeAmount'
 import FiatExchangeOptions, {
   fiatExchangesOptionsScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeOptions'
+import LocalProviderCashOut, {
+  localProviderCashOutOptions,
+} from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
+import Simplex, { simplexOptions } from 'src/fiatExchanges/Simplex'
+import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
@@ -417,21 +419,23 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={SupportContact}
     />
     <Navigator.Screen
-      options={fiatExchangesAmountScreenOptions}
-      name={Screens.FiatExchangeAmount}
-      component={FiatExchangeAmount}
-    />
-    <Navigator.Screen
       options={externalExchangesScreenOptions}
       name={Screens.ExternalExchanges}
       component={ExternalExchanges}
     />
+    <Navigator.Screen options={spendScreenOptions} name={Screens.Spend} component={Spend} />
     <Navigator.Screen
       options={fiatExchangesOptionsScreenOptions}
       name={Screens.FiatExchangeOptions}
       component={FiatExchangeOptions}
     />
+    <Navigator.Screen
+      options={localProviderCashOutOptions}
+      name={Screens.LocalProviderCashOut}
+      component={LocalProviderCashOut}
+    />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
+    <Navigator.Screen options={simplexOptions} name={Screens.Simplex} component={Simplex} />
   </>
 )
 
