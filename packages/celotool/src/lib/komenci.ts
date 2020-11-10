@@ -179,7 +179,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
-    `--set onboarding.ruleConfig.captcha.bypassEnabled=${fetchEnv(envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN)}`,
+    `--set onboarding.ruleConfig.captcha.bypassToken=${fetchEnv(envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN)}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
