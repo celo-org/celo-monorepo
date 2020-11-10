@@ -20,7 +20,6 @@ export default class ParseEvents extends BaseCommand {
     const stableToken = await this.kit.contracts.getStableToken()
     const balances = await stableToken.getAccountBalances(fromBlock, toBlock)
     printValueMapRecursive(balances)
-    // console.log(balances.keys())
-    console.log('Total accounts reported:', balances.size)
+    console.log('Total accounts reported:', Object.keys(balances).length)
   }
 }
