@@ -90,6 +90,11 @@
         "cp /tmp/start.sh /var/lib/cloud/scripts/per-instance/start.sh",
         "chmod +x /var/lib/cloud/scripts/per-instance/start.sh"
       ]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+      "inline": ["find / -name \"authorized_keys\" -exec rm -f {} \\;"]
     }
   ]
 }
