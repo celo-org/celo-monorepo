@@ -1,3 +1,4 @@
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { generateKeys, generateMnemonic } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
@@ -38,7 +39,12 @@ async function fundAttestationAccount(
   )
 }
 
-export function runAttestationTest(context: Context) {
+export function runAttestationTest(
+  context: Context,
+  attetationsToRequest = 3,
+  configuredPepper = 'HARDCODED_PEPPER',
+  odisContext = 'mainnet'
+) {
   describe('Attestation Test', () => {
     const logger = context.logger.child({ test: 'attestation' })
 
@@ -68,17 +74,17 @@ export function runAttestationTest(context: Context) {
 
       const { identifier, pepper } = await getIdentifierAndPepper(
         context.kit,
-        'mainnet',
+        odisContext,
         fromAddress,
         phoneNumber.phoneNumber,
-        'salt'
+        configuredPepper
       )
       logger.debug({ phoneNumber: phoneNumber.phoneNumber, identifier, pepper }, 'get phone number')
 
       // Actually start requesting
       const attestations = await context.kit.contracts.getAttestations()
 
-      await requestMoreAttestations(attestations, identifier, 3, fromAddress, {})
+      await requestMoreAttestations(attestations, identifier, attetationsToRequest, fromAddress, {})
 
       const attestationsToComplete = await attestations.getActionableAttestations(
         identifier,
@@ -109,13 +115,13 @@ export function runAttestationTest(context: Context) {
         attestationsToComplete,
         {},
         logger,
-        3
+        attetationsToRequest
       )
 
       const attestationStat = await attestations.getAttestationStat(identifier, fromAddress)
 
-      expect(attestationStat.total).toEqual(3)
-      expect(attestationStat.completed).toEqual(3)
+      expect(attestationStat.total).toEqual(attetationsToRequest)
+      expect(attestationStat.completed).toEqual(attetationsToRequest)
 
       // move back funds to root
       const stableBalanceRoot = await stableToken.balanceOf(fromAddress)
