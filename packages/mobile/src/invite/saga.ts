@@ -14,14 +14,12 @@ import {
   delay,
   put,
   race,
-  select,
   spawn,
   take,
   TakeEffect,
   takeLeading,
 } from 'redux-saga/effects'
 import { Actions as AccountActions } from 'src/account/actions'
-import { nameSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -180,13 +178,11 @@ export function* sendInvite(
     )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
-    const name = yield select(nameSelector)
 
     const link = yield call(generateInviteLink, inviteCode)
     const message = i18n.t(
       amount ? 'sendFlow7:inviteWithEscrowedPayment' : 'sendFlow7:inviteWithoutPayment',
       {
-        name,
         amount: amount?.toString(),
         link,
       }
@@ -409,7 +405,8 @@ export function* skipInvite() {
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
-    navigateHome()
+    // navigateHome()
+    navigate(Screens.VerificationEducationScreen)
     yield put(skipInviteSuccess())
   } catch (e) {
     Logger.error(TAG, 'Failed to skip invite', e)
