@@ -12,7 +12,8 @@ import { KomenciKit } from '../src'
 
 enum Env {
   local = 'local',
-  alfajores = 'alfajores',
+  alfajores_weu = 'alfajores_weu',
+  alfajores_eus = 'alfajores_eus',
   rc1 = 'rc1',
 }
 
@@ -24,10 +25,10 @@ enum Network {
 let env = process.argv[2] as Env
 let network: Network
 if (Env[env] === undefined) {
-  env = Env.alfajores
+  env = Env.alfajores_eus
   network = Network.alfajores
 } else {
-  if (env === Env.alfajores || env === Env.local) {
+  if (env === Env.alfajores_weu || env === Env.alfajores_eus || env === Env.local) {
     network = Network.alfajores
   } else if (env === Env.rc1) {
     network = Network.rc1
@@ -93,7 +94,8 @@ console.log('DEK PublicKey: ', dekPublicKey)
 
 const SERVICE_URL: Record<Env, string> = {
   local: 'http://localhost:3000',
-  alfajores: 'https://weu.komenci.celo-networks-dev.org',
+  alfajores_weu: 'https://weu.komenci.celo-networks-dev.org',
+  alfajores_eus: 'https://eus.komenci.celo-networks-dev.org',
   rc1: 'https://br.komenci.celo-networks-dev.org',
 }
 
