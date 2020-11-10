@@ -5,6 +5,8 @@ import {
   FORNO_ENABLED_INITIALLY,
   GETH_USE_FULL_NODE_DISCOVERY,
   GETH_USE_STATIC_NODES,
+  RECAPTCHA_SITE_KEY_ALFAJORES,
+  RECAPTCHA_SITE_KEY_MAINNET,
 } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
@@ -27,6 +29,7 @@ interface NetworkConfig {
   komenciUrl: string
   allowedMtwImplementations: string[]
   currentMtwImplementationAddress: string
+  recaptchaSiteKey: string
 }
 
 const signMoonpayUrlStaging =
@@ -64,6 +67,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     komenciUrl: KOMENCI_URL_STAGING,
     allowedMtwImplementations: ALLOWED_MTW_IMPLEMENTATIONS_STAGING,
     currentMtwImplementationAddress: CURRENT_MTW_IMPLEMENTATION_ADDRESS_STAGING,
+    recaptchaSiteKey: RECAPTCHA_SITE_KEY_ALFAJORES,
   },
   [Testnets.mainnet]: {
     nodeDir: `.${Testnets.mainnet}`,
@@ -78,6 +82,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     komenciUrl: KOMENCI_URL_MAINNET,
     allowedMtwImplementations: ALLOWED_MTW_IMPLEMENTATIONS_MAINNET,
     currentMtwImplementationAddress: CURRENT_MTW_IMPLEMENTATION_ADDRESS_MAINNET,
+    recaptchaSiteKey: RECAPTCHA_SITE_KEY_MAINNET,
   },
 }
 

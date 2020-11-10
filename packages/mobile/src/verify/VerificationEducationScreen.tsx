@@ -19,7 +19,8 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { setNumberVerified } from 'src/app/actions'
 import { numberVerifiedSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
-import { RECAPTCHA_SITE_KEY, WEB_LINK } from 'src/config'
+import { WEB_LINK } from 'src/config'
+import networkConfig from 'src/geth/networkConfig'
 import i18n, { Namespaces } from 'src/i18n'
 import {
   feelessFetchVerificationState,
@@ -256,7 +257,7 @@ function VerificationEducationScreen({ route, navigation }: Props) {
           title={t('global:close')}
         />
         <GoogleReCaptcha
-          siteKey={RECAPTCHA_SITE_KEY}
+          siteKey={networkConfig.recaptchaSiteKey}
           url={WEB_LINK}
           languageCode={i18n.language}
           onMessage={handleCaptchaResolved}
