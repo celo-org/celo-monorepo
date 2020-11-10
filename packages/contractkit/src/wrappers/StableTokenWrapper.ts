@@ -30,10 +30,6 @@ export interface StableTokenConfig {
   inflationParameters: InflationParameters
 }
 
-interface BalanceMap {
-  [key: string]: number
-}
-
 /**
  * Stable token with variable supply (cUSD)
  */
@@ -228,20 +224,31 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     value: string | number
   ) => CeloTransactionObject<boolean> = proxySend(this.kit, this.contract.methods.transferFrom)
 
-  async getAccountBalances(): Promise<BalanceMap> {
-    let balances: BalanceMap = {}
+  async getAccountBalances(
+    fromBlock: string,
+    toBlock: string
+  ): Promise<Map<string, BigNumber | undefined>> {
+    let balances: Map<string, BigNumber | undefined> = new Map()
     ;(
       await this.getPastEvents('Transfer', {
-        fromBlock: 0,
-        toBlock: 300,
+        fromBlock,
+        toBlock,
       })
     ).forEach(function(eventlog: EventLog) {
-      let amount = eventlog.returnValues.value
-      balances[eventlog.returnValues.to]
-        ? (balances[eventlog.returnValues.to] += amount)
-        : (balances[eventlog.returnValues.to] = amount)
-      balances[eventlog.returnValues.from] -= amount
+      let amount = valueToBigNumber(eventlog.returnValues.value)
+      let to = eventlog.returnValues.to
+      let from = eventlog.returnValues.from
+
+      balances.get(to)
+        ? // @ts-ignore
+          balances.set(to, balances.get(to).plus(amount))
+        : balances.set(to, amount)
+      balances.get(from)
+        ? // @ts-ignore
+          balances.set(from, balances.get(from).minus(amount))
+        : balances.set(from, new BigNumber(0))
     })
+
     return balances
   }
 }
