@@ -7,7 +7,7 @@ import {
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'
-import { path } from 'path'
+import { resolve } from 'path'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
@@ -61,7 +61,7 @@ export default class Propose extends BaseCommand {
       jsonTransactions = await promptBuilder.promptTransactions()
     } else if (res.flags.jsonTransactions) {
       // BUILD FROM JSON
-      const jsonString = readFileSync(path.resolve(__dirname, res.flags.jsonTransactions)).toString()
+      const jsonString = readFileSync(resolve(__dirname, res.flags.jsonTransactions)).toString()
       jsonTransactions = JSON.parse(jsonString)
     } else {
       throw new Error('No jsonTransactions provided and interactive mode not specified')
