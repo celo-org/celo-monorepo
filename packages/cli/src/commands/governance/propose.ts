@@ -61,7 +61,7 @@ export default class Propose extends BaseCommand {
       jsonTransactions = await promptBuilder.promptTransactions()
     } else if (res.flags.jsonTransactions) {
       // BUILD FROM JSON
-      const jsonString = readFileSync(resolve(__dirname, res.flags.jsonTransactions)).toString()
+      const jsonString = readFileSync(resolve(res.flags.jsonTransactions)).toString()
       jsonTransactions = JSON.parse(jsonString)
     } else {
       throw new Error('No jsonTransactions provided and interactive mode not specified')
