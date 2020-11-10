@@ -412,6 +412,7 @@ export class KomenciKit {
     }
 
     const txHash = resp.result.txHash
+    console.debug(`${TAG}/submitMetaTransaction Waiting for transaction receipt: ${txHash}`)
     return this.waitForReceipt(txHash)
   }
 
@@ -434,6 +435,11 @@ export class KomenciKit {
 
     if (receipt == null) {
       return Err(new TxTimeoutError())
+    }
+
+    if (!receipt.status) {
+      // TODO: Possible to extract reason?
+      return Err(new TxRevertError(txHash, ''))
     }
 
     return Ok(receipt)
@@ -485,12 +491,7 @@ export class KomenciKit {
     if (!receiptResult.ok) {
       return receiptResult
     }
-
     const receipt = receiptResult.result
-    if (!receipt.status) {
-      // TODO: Possible to extract reason?
-      return Err(new TxRevertError(txHash, ''))
-    }
 
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 

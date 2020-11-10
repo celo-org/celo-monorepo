@@ -44,6 +44,7 @@
   "invalidPhone": "Invalid phone number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
   "needMoreFundsToSend": "Need more funds to send payment",
+  "maxEscrowTransferExceeded": "The maximum amount to transfer to unverified users is {{symbol}}{{maxAmount}}",
   "invalidAmount": "Invalid amount",
   "invalidCode": "Invalid Verification Code",
   "confirm": "Confirm",
