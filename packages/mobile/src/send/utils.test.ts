@@ -209,6 +209,7 @@ describe('send/utils', () => {
           amount: new BigNumber(mockUriData[0].amount.valueOf()),
           recipientAddress: mockUriData[0].address.toLowerCase(),
           feeEstimate: new BigNumber(0),
+          isCashOut: false,
         })
       })
 

@@ -57,7 +57,7 @@ function ExchangeHomeScreen({ navigation }: Props) {
 
   function goToWithdrawCelo() {
     ValoraAnalytics.track(CeloExchangeEvents.celo_home_withdraw)
-    navigation.navigate(Screens.WithdrawCeloScreen)
+    navigation.navigate(Screens.WithdrawCeloScreen, { isCashOut: false })
   }
 
   const scrollPosition = useRef(new Animated.Value(0)).current
