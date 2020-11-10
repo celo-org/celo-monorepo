@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
 import Dialog from 'src/components/Dialog'
-import { FUNDING_LINK } from 'src/config'
+import { HELP_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { navigateToURI } from 'src/utils/linking'
 
@@ -16,7 +16,7 @@ interface Props {
 export default function FundingEducationDialog({ isVisible, onPressDismiss, isCashIn }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
 
-  const link = FUNDING_LINK
+  const link = HELP_LINK
 
   const onPressSupportLink = () => {
     navigateToURI(link)
