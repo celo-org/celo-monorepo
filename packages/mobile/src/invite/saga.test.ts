@@ -219,7 +219,7 @@ describe('watchSendInvite with Komenci enabled', () => {
   const dateNowStub = jest.fn(() => 1588200517518)
   global.Date.now = dateNowStub
 
-  it('sends an invite as expected', async () => {
+  it.skip('sends an invite as expected', async () => {
     i18n.t = jest.fn((key) => key)
 
     await expectSaga(watchSendInvite)
