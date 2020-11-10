@@ -49,8 +49,12 @@ onboarding:
     tag: dae43ddce108a73da07dce73875b980ff077c7d4
   replicas: 2
   ruleEnabled:
-      signature: true
-      captcha: true
+    signature: true
+    captcha: true
+  ruleConfig:
+    captcha:
+      bypassEnabled: false
+      bypassToken: "special-bypass-captcha-token"
   recaptchaToken: 'from-secret'
   quota:
     distributedBlindePepper: 1

@@ -142,12 +142,12 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     contextDatabaseConfigDynamicEnvVars,
     context
   )
-  const network = getContextDynamicEnvVarValues(
-    {network: DynamicEnvVar.KOMENCI_NETWORK},
-    context
-  )
-  const recaptcha = getContextDynamicEnvVarValues(
-    {keyVault: DynamicEnvVar.KOMENCI_RECAPTCHA_SECRET_VAULT_NAME},
+  const vars = getContextDynamicEnvVarValues(
+    {
+      network: DynamicEnvVar.KOMENCI_NETWORK,
+      reCaptchaKeyVault: DynamicEnvVar.KOMENCI_RECAPTCHA_SECRET_VAULT_NAME,
+      captchaBypassEnabled: DynamicEnvVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_ENABLED,
+    },
     context
   )
   const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
@@ -157,7 +157,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
-  const recaptchaToken = await getPasswordFromKeyVaultSecret(recaptcha.keyVault, 'RECAPTCHA-SECRET-KEY')
+  const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.reCaptchaKeyVault, 'RECAPTCHA-SECRET-KEY')
   const clusterConfig = getAKSClusterConfig(context)
 
   return [
@@ -175,15 +175,17 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
-    `--set onboarding.onchain.network=${network.network}`,
+    `--set onboarding.onchain.network=${vars.network}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
+    `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
+    `--set onboarding.ruleConfig.captcha.bypassToken=${fetchEnv(envVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_TOKEN)}`,
     `--set relayer.replicas=${replicas}`,
     `--set relayer.rpcProviderUrls.http=${httpRpcProviderUrl}`,
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
-    `--set relayer.onchain.network=${network.network}`,
+    `--set relayer.onchain.network=${vars.network}`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }

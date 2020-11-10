@@ -37,6 +37,8 @@ spec:
                 fieldPath: metadata.name
 {{ include "common.env-var" (dict "name" "RULE_SIGNATURE_ENABLED" "dict" .Values.onboarding.ruleEnabled "value_name" "signature") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RULE_CAPTCHA_ENABLED" "dict" .Values.onboarding.ruleEnabled "value_name" "captcha") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RULE_CAPTCHA_CONFIG_BYPASS_ENABLED" "dict" .Values.onboarding.ruleConfig.captcha "value_name" "bypassEnabled") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RULE_CAPTCHA_CONFIG_BYPASS_TOKEN" "dict" .Values.onboarding.ruleConfig.captcha "value_name" "bypassToken") | indent 10 }}
 {{ include "common.env-var" (dict "name" "RECAPTCHA_TOKEN" "dict" .Values.onboarding "value_name" "recaptchaToken") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_DISTRIBUTED_BLINDED_PEPPER" "dict" .Values.onboarding.quota "value_name" "distributedBlindePepper") | indent 10 }}
 {{ include "common.env-var" (dict "name" "QUOTA_REQUEST_SUBSIDISED_ATTESTATION" "dict" .Values.onboarding.quota "value_name" "requestSubsidisedAttestation") | indent 10 }}
@@ -54,6 +56,18 @@ spec:
 {{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 10 }}
 {{ include "common.env-var" (dict "name" "PUBLIC_URL" "dict" .Values.onboarding "value_name" "publicUrl") | indent 10 }}
+          readinessProbe:
+            httpGet:
+              path: /v1/health
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 10
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
