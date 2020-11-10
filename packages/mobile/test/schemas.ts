@@ -435,6 +435,7 @@ export const v7Schema = {
   identity: {
     ...v6Schema.identity,
     feelessAttestationCodes: [],
+    feelessProcessingInputCode: false,
     feelessAcceptedAttestationCodes: [],
     feelessNumCompleteAttestations: 0,
     feelessVerificationStatus: 0,
@@ -460,6 +461,7 @@ export const v7Schema = {
         serviceAvailable: false,
         sessionActive: false,
         sessionToken: '',
+        callbackUrl: undefined,
         captchaToken: '',
         pepperFetchedByKomenci: false,
       },
