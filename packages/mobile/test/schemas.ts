@@ -423,6 +423,49 @@ export const v6Schema = {
     ...v5Schema.identity,
     walletToAccountAddress: {},
   },
+  app: {
+    ...v5Schema.app,
+    pontoEnabled: false,
+    kotaniEnabled: false,
+  },
+}
+
+export const v7Schema = {
+  ...v6Schema,
+  identity: {
+    ...v6Schema.identity,
+    feelessAttestationCodes: [],
+    feelessAcceptedAttestationCodes: [],
+    feelessNumCompleteAttestations: 0,
+    feelessVerificationStatus: 0,
+    feelessVerificationState: {
+      isLoading: false,
+      isActive: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+      komenci: {
+        errorTimestamps: [],
+        unverifiedMtwAddress: null,
+        serviceAvailable: false,
+        sessionActive: false,
+        sessionToken: '',
+        captchaToken: '',
+        pepperFetchedByKomenci: false,
+      },
+    },
+    feelessLastRevealAttempt: null,
+  },
 }
 
 export const v7Schema = {

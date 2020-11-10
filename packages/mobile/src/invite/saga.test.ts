@@ -236,7 +236,6 @@ describe('watchSendInvite with Komenci enabled', () => {
       .run()
 
     expect(i18n.t).toHaveBeenCalledWith('sendFlow7:inviteWithEscrowedPayment', {
-      name: state.account.name,
       amount: AMOUNT_TO_SEND.toString(),
       link: WEB_LINK,
     })

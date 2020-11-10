@@ -13,14 +13,12 @@ import {
   delay,
   put,
   race,
-  select,
   spawn,
   take,
   TakeEffect,
   takeLeading,
 } from 'redux-saga/effects'
 import { Actions as AccountActions } from 'src/account/actions'
-import { nameSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
@@ -181,7 +179,6 @@ export function* sendInvite(
     )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
-    const name = yield select(nameSelector)
 
     const link = features.ESCROW_WITHOUT_CODE
       ? WEB_LINK

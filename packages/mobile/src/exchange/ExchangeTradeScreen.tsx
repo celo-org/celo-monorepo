@@ -20,12 +20,14 @@ import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import Dialog from 'src/components/Dialog'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import InfoIcon from 'src/icons/InfoIcon'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
   convertDollarsToLocalAmount,
@@ -47,6 +49,7 @@ interface State {
   makerToken: CURRENCY_ENUM
   makerTokenAvailableBalance: string
   inputAmount: string
+  exchangeRateInfoDialogVisible: boolean
 }
 
 interface StateProps {
@@ -79,6 +82,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     makerToken: CURRENCY_ENUM.DOLLAR,
     makerTokenAvailableBalance: '',
     inputAmount: '', // Raw amount entered, can be cGLD, cUSD or local currency
+    exchangeRateInfoDialogVisible: false,
   }
 
   componentDidMount() {
@@ -268,8 +272,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     }
   }
 
+  toggleExchangeRateInfoDialog = () => {
+    this.setState((state) => ({
+      exchangeRateInfoDialogVisible: !state.exchangeRateInfoDialogVisible,
+    }))
+  }
+
   render() {
     const { t, exchangeRatePair } = this.props
+    const { exchangeRateInfoDialogVisible } = this.state
 
     const exchangeRateDisplay = getRateForMakerToken(
       exchangeRatePair,
@@ -326,6 +337,14 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             amount={<CurrencyDisplay amount={this.getSubtotalAmount()} />}
           />
         </KeyboardAwareScrollView>
+        <TouchableOpacity onPress={this.toggleExchangeRateInfoDialog}>
+          <LineItemRow
+            title={t('exchangeRateInfo')}
+            titleIcon={<InfoIcon size={14} />}
+            style={styles.exchangeRateInfo}
+            textStyle={styles.exchangeRateInfoText}
+          />
+        </TouchableOpacity>
         <Button
           onPress={this.goToReview}
           text={t(`global:review`)}
@@ -336,6 +355,14 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
           style={styles.reviewBtn}
           testID="ExchangeReviewButton"
         />
+        <Dialog
+          title={t('rateInfoTitle')}
+          isVisible={exchangeRateInfoDialogVisible}
+          actionText={t('global:dismiss')}
+          actionPress={this.toggleExchangeRateInfoDialog}
+        >
+          {t('rateInfoBody')}
+        </Dialog>
         <KeyboardSpacer />
       </SafeAreaView>
     )
@@ -387,6 +414,14 @@ const styles = StyleSheet.create({
     lineHeight: Platform.select({ android: 39, ios: 30 }), // vertical align = center
     height: 60, // setting height manually b.c. of bug causing text to jump on Android
     color: colors.goldDark,
+  },
+  exchangeRateInfo: {
+    justifyContent: 'center',
+  },
+  exchangeRateInfoText: {
+    ...fontStyles.small,
+    color: colors.gray5,
+    marginRight: 4,
   },
   reviewBtn: {
     padding: variables.contentPadding,
