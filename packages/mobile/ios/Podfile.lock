@@ -353,8 +353,8 @@ PODS:
     - React
   - react-native-udp (2.6.1):
     - React
-  - react-native-webview (10.8.3):
-    - React
+  - react-native-webview (10.10.2):
+    - React-Core
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
   - React-RCTAnimation (0.62.2):
@@ -833,7 +833,7 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-webview: 598605cd213f5096e695f5b33fbee210a47e60ab
+  react-native-webview: 0aa2cde4ee7e3e1c5fffdf64dbce9c709aa18155
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
