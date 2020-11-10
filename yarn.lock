@@ -2148,6 +2148,11 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.3.tgz#355199fe45d1f9e667ee66836a34e93828b3b5a5"
   integrity sha512-3GeGcUHCzMxCpkBHywEuoXZp1VV+yN6uEHPowxGgH2VP++qO01HMw8G5J4wlP7jN5HFt3WsZaHWfIhor/irGKg==
 
+"@celo/base@0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.4.tgz#7b39af537bb3ff44e6a5898f225ec95c3c867f90"
+  integrity sha512-XD9gaIe1m+6FsT/g7L08yASgxbyagFdOPRwWWrd1SZey8h7O6WGKriUo1ZuL0Zyrth/NGOS0s1Cs7An1Q9UDNw==
+
 "@celo/client@0.0.319":
   version "0.0.319"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.319.tgz#d8ec1f265fed3b73ec72ba2a34e043c6d400c7c4"
@@ -2207,6 +2212,41 @@
     "@azure/keyvault-secrets" "^4.1.0"
     "@celo/base" "0.0.3"
     "@celo/utils" "0.1.21"
+    "@ledgerhq/hw-app-eth" "^5.11.0"
+    "@ledgerhq/hw-transport" "^5.11.0"
+    "@types/asn1js" "^0.0.2"
+    asn1js "^2.0.26"
+    aws-sdk "^2.705.0"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    elliptic "6.5.3"
+    eth-lib "^0.2.8"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    inquirer "^7.0.5"
+    io-ts "2.0.1"
+    qrcode "^1.4.4"
+    secp256k1 "^4.0.0"
+    web3 "1.2.4"
+    web3-core "1.2.4"
+    web3-core-helpers "1.2.4"
+    web3-eth "1.2.4"
+    web3-eth-abi "1.2.4"
+    web3-eth-contract "1.2.4"
+    web3-utils "1.2.11"
+
+"@celo/contractkit@0.4.18":
+  version "0.4.18"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.18.tgz#de7ea039a9a6a90f0a07ba8c3422c7588b17299f"
+  integrity sha512-2if3siK1t0Bqo407H2jNITddWaA6yHNmIOfI87l/zboTGPnkGe1zb2zQPjA/LpdkKWOCk/ld14ARAN8Y8jTSCA==
+  dependencies:
+    "@azure/identity" "^1.1.0"
+    "@azure/keyvault-keys" "^4.1.0"
+    "@azure/keyvault-secrets" "^4.1.0"
+    "@celo/base" "0.0.4"
+    "@celo/utils" "0.1.22"
     "@ledgerhq/hw-app-eth" "^5.11.0"
     "@ledgerhq/hw-transport" "^5.11.0"
     "@types/asn1js" "^0.0.2"
@@ -2349,6 +2389,33 @@
   integrity sha512-SByYSNvIg9X0m1xKFy5DYgE9CJ5lwgUHJEamwUHAe9mJdKrJftD2noTCc18xmkqF3X3Nyd7vArWJFaTT035T8A==
   dependencies:
     "@celo/base" "0.0.3"
+    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
+    bigi "^1.1.0"
+    bignumber.js "^9.0.0"
+    bip32 "2.0.5"
+    bip39 "3.0.2"
+    bls12377js "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6"
+    bn.js "4.11.8"
+    buffer-reverse "^1.0.1"
+    country-data "^0.0.31"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.5.3"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    google-libphonenumber "^3.2.4"
+    io-ts "2.0.1"
+    keccak256 "^1.0.0"
+    lodash "^4.17.14"
+    numeral "^2.0.6"
+    web3-eth-abi "1.2.4"
+    web3-utils "1.2.4"
+
+"@celo/utils@0.1.22":
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.22.tgz#a1ac56b61af5235212537c31e487c7cc911d681c"
+  integrity sha512-d8ZuOsgIju52J7SCJArUmrMCfKLdi8wPWqZB5TihEwLR6zRx5I4RdMOuprHx3/eNGaYHHcK2iaPc+JeU4ayNcQ==
+  dependencies:
+    "@celo/base" "0.0.4"
     "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^9.0.0"
