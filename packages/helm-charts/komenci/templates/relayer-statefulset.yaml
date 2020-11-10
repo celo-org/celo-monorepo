@@ -121,6 +121,16 @@ spec:
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.relayer "value_name" "port") | indent 8 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.relayer.onchain "value_name" "network") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer.onchain "value_name" "walletType") | indent 8 }}
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
         volumeMounts:
         - name: private-key-volume
           readOnly: true

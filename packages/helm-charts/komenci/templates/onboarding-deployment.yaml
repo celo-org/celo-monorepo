@@ -56,6 +56,18 @@ spec:
 {{ include "common.env-var" (dict "name" "RELAYER_RPC_TIMEOUT_MS" "dict" .Values.onboarding.relayer "value_name" "rpcTimeoutMs") | indent 10 }}
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.onboarding.onchain "value_name" "network") | indent 10 }}
 {{ include "common.env-var" (dict "name" "PUBLIC_URL" "dict" .Values.onboarding "value_name" "publicUrl") | indent 10 }}
+          readinessProbe:
+            httpGet:
+              path: /v1/health
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 10
       {{- with .Values.onboarding.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
