@@ -5,6 +5,6 @@
     "outDir": "lib",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "types/**/*", "src/utils/timezones.json", "../../node_modules/@celo/contractkit/types"],
+  "include": ["src/**/*", "types/**/*", "src/utils/timezones.json", "../../node_modules/@celo/contractkit/types", "index.d.ts"],
   "references": [{ "path": "../utils" }]
 }
