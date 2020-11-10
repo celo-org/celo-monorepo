@@ -1,0 +1,16 @@
+diff --git a/node_modules/@segment/analytics-react-native-appsflyer/ios/main.m b/node_modules/@segment/analytics-react-native-appsflyer/ios/main.m
+index 96cd1ab..bf59501 100644
+--- a/node_modules/@segment/analytics-react-native-appsflyer/ios/main.m
++++ b/node_modules/@segment/analytics-react-native-appsflyer/ios/main.m
+@@ -8,8 +8,9 @@
+ 
+ #import <React/RCTBridgeModule.h>
+ #import <RNAnalytics/RNAnalytics.h>
+-#if defined(__has_include) && __has_include(<segment-appsflyer-ios/SEGAppsFlyerIntegrationFactory.h>)
+-#import <segment-appsflyer-ios/SEGAppsFlyerIntegrationFactory.h>
++#if defined(__has_include) && __has_include(<segment_appsflyer_ios/SEGAppsFlyerIntegrationFactory.h>)
++// Remove this patch once a release lands with https://github.com/segmentio/analytics-react-native/pull/240
++#import <segment_appsflyer_ios/SEGAppsFlyerIntegrationFactory.h>
+ #else
+ #import <segment-appsflyer-ios/SEGAppsFlyerIntegrationFactory.h>
+ #endif

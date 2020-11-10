@@ -10,6 +10,7 @@ export const features = {
   SHOW_CASH_OUT: true,
   PNP_USE_DEK_FOR_AUTH: true,
   KOMENCI: true,
+  ESCROW_WITHOUT_CODE: true,
 }
 
 export const pausedFeatures = {

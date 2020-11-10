@@ -42,7 +42,6 @@
 - [Securing Celo Nodes and Services](validator-guide/securing-nodes-and-services.md)
 - [Monitoring](validator-guide/monitoring.md)
 - [Upgrading a Node](validator-guide/node-upgrades.md)
-- [Proxy Overview](validator-guide/proxy.md)
 - [Validator Explorer](validator-guide/validator-explorer.md)
 - [Celo Foundation Voting Policy](validator-guide/celo-foundation-voting-policy.md)
 
@@ -462,6 +461,7 @@
     - [ProposalTransactionJSON](developer-resources/contractkit/reference/interfaces/_governance_proposals_.proposaltransactionjson.md)
     - [BlsBlindingClient](developer-resources/contractkit/reference/interfaces/_identity_odis_bls_blinding_client_.blsblindingclient.md)
     - [PhoneNumberHashDetails](developer-resources/contractkit/reference/interfaces/_identity_odis_phone_number_identifier_.phonenumberhashdetails.md)
+    - [CustomSigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.customsigner.md)
     - [EncryptionKeySigner](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.encryptionkeysigner.md)
     - [MatchmakingRequest](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingrequest.md)
     - [MatchmakingResponse](developer-resources/contractkit/reference/interfaces/_identity_odis_query_.matchmakingresponse.md)
