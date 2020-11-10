@@ -1,28 +1,39 @@
-import { ContractKit } from '@celo/contractkit'
 import { describe, expect, test } from '@jest/globals'
+import { Context } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runTransfercUSDTest(kit: ContractKit, fundingMnemonic: string) {
+export function runTransfercUSDTest(context: Context) {
   describe('Transfer Test', () => {
+    const logger = context.logger.child({ test: 'transfer' })
     beforeAll(async () => {
-      await fundAccount(kit, fundingMnemonic, TestAccounts.TransferFrom, ONE.times(2))
+      await fundAccount(context, TestAccounts.TransferFrom, ONE.times(10))
     })
 
     test('transfer cUSD', async () => {
-      const from = await getKey(fundingMnemonic, TestAccounts.TransferFrom)
-      const to = await getKey(fundingMnemonic, TestAccounts.TransferTo)
-      kit.addAccount(from.privateKey)
-      kit.addAccount(to.privateKey)
-      const stableToken = await kit.contracts.getStableToken()
-      kit.defaultFeeCurrency = stableToken.address
+      const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
+      const to = await getKey(context.mnemonic, TestAccounts.TransferTo)
+      context.kit.addAccount(from.privateKey)
+      context.kit.addAccount(to.privateKey)
+      const stableToken = await context.kit.contracts.getStableToken()
+      context.kit.defaultFeeCurrency = stableToken.address
 
       const toBalanceBefore = await stableToken.balanceOf(to.address)
+      logger.debug('Get Balance Before', {
+        balance: toBalanceBefore.toString(),
+        account: to.address,
+      })
 
-      await stableToken
+      const receipt = await stableToken
         .transfer(to.address, ONE.toString())
         .sendAndWaitForReceipt({ from: from.address })
 
+      logger.debug('Transferred', { receipt })
+
       const toBalanceAfter = await stableToken.balanceOf(to.address)
+      logger.debug('Get Balance After', {
+        balance: toBalanceAfter.toString(),
+        account: to.address,
+      })
 
       expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
     })
