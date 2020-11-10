@@ -1,4 +1,4 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
 import config from '../config'
@@ -17,8 +17,9 @@ export class BLSCryptographyClient {
   public async addSignature(
     serviceResponse: ServicePartialSignature,
     blindedMessage: string,
-    logger: Logger
+    logger?: Logger
   ): Promise<void> {
+    logger = logger ?? rootLogger
     const polynomial = config.thresholdSignature.polynomial
     const sigBuffer = Buffer.from(serviceResponse.signature, 'base64')
 

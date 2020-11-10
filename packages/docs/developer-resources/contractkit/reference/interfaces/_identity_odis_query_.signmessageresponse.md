@@ -17,7 +17,7 @@
 
 • **combinedSignature**: *string*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L57)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L58)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **success**: *boolean*
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L56)*
+*Defined in [packages/contractkit/src/identity/odis/query.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L57)*

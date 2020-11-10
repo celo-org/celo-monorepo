@@ -14,6 +14,7 @@
 
 * [account](_identity_odis_query_.phonenumberprivacyrequest.md#account)
 * [authenticationMethod](_identity_odis_query_.phonenumberprivacyrequest.md#authenticationmethod)
+* [sessionID](_identity_odis_query_.phonenumberprivacyrequest.md#optional-sessionid)
 * [version](_identity_odis_query_.phonenumberprivacyrequest.md#optional-version)
 
 ## Properties
@@ -31,6 +32,14 @@ ___
 • **authenticationMethod**: *[AuthenticationMethod](../enums/_identity_odis_query_.authenticationmethod.md)*
 
 *Defined in [packages/contractkit/src/identity/odis/query.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L39)*
+
+___
+
+### `Optional` sessionID
+
+• **sessionID**? : *undefined | string*
+
+*Defined in [packages/contractkit/src/identity/odis/query.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L41)*
 
 ___
 
