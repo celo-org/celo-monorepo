@@ -61,7 +61,7 @@ onboarding:
     requestSubsidisedAttestation: 10
     submitMetaTransaction: 20
   relayer:
-    host: komenci-relayer
+    host: alfajores-relayer
     port: 3000
     rpcTimeoutMs: 5000
   db:

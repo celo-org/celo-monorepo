@@ -185,6 +185,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
+    `--set relayer.host=${celoEnv + "-relayer"}`,
     `--set relayer.onchain.network=${vars.network}`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))

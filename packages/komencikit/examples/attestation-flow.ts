@@ -96,7 +96,7 @@ console.log('DEK PublicKey: ', dekPublicKey)
 const SERVICE_URL: Record<Env, string> = {
   local: 'http://localhost:3000',
   alfajores_weu: 'https://weu.komenci.celo-networks-dev.org',
-  alfajores_eus: 'https://eus.komenci.celo-networks-dev.org',
+  alfajores_eus: 'https://eus.komenci.alfajores.celo-testnet.org',
   rc1: 'https://br.komenci.celo-networks-dev.org',
 }
 
