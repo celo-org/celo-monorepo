@@ -21,9 +21,9 @@ function startInBgAndWaitForString() {
     local gotIt=0
     while [[ $gotIt != 1 ]]; do
         local line
-        read line <$pipe
+        read line
         if echo "$line" | grep "$patternToWaitFor" > /dev/null; then
             gotIt=1
         fi
-    done
+    done <$pipe
 }
