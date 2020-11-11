@@ -56,10 +56,22 @@ export async function generateMnemonic(
 
 export function validateMnemonic(
   mnemonic: string,
-  language?: MnemonicLanguages,
+  defaultLanguage: MnemonicLanguages = MnemonicLanguages.english,
   bip39ToUse: Bip39 = bip39Wrapper
 ) {
-  return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
+  const mnemonicWords = mnemonic.trim().split(' ')
+  // Make sure the language received is the first one checked.
+  const languages = [
+    defaultLanguage,
+    ...getAllLanguages().filter((lang) => lang !== defaultLanguage),
+  ]
+  for (const language of languages) {
+    const wordList = getWordList(language)
+    if (mnemonicWords.every((word) => wordList.includes(word))) {
+      return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
+    }
+  }
+  return false
 }
 
 export async function generateKeys(
@@ -143,6 +155,19 @@ function getWordList(language?: MnemonicLanguages) {
     default:
       return bip39.wordlists.english
   }
+}
+
+function getAllLanguages() {
+  return [
+    MnemonicLanguages.chinese_simplified,
+    MnemonicLanguages.chinese_traditional,
+    MnemonicLanguages.english,
+    MnemonicLanguages.french,
+    MnemonicLanguages.italian,
+    MnemonicLanguages.japanese,
+    MnemonicLanguages.korean,
+    MnemonicLanguages.spanish,
+  ]
 }
 
 export const AccountUtils = {
