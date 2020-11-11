@@ -43,6 +43,8 @@ spec:
         env:
         - name: DISABLE_WEBAPP
           value: "true"
+        - name: POOL_SIZE
+          value: {{ .Values.blockscout.indexer.pool_size | quote }}
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
     {{- with .Values.nodeSelector }}
