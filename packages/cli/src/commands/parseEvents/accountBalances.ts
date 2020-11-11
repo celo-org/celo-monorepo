@@ -3,7 +3,7 @@ import fs from 'fs'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
 
-export default class ParseEvents extends BaseCommand {
+export default class AccountBalances extends BaseCommand {
   static description = 'Parses Events for data'
 
   static flags = {
@@ -19,7 +19,7 @@ export default class ParseEvents extends BaseCommand {
   static examples = ['status']
 
   async run() {
-    const res = this.parse(ParseEvents)
+    const res = this.parse(AccountBalances)
     const fromBlock = res.flags.fromBlock
     const toBlock = res.flags.toBlock
     const outputJson = res.flags.outputJson

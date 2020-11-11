@@ -6,6 +6,7 @@ import { appendPath } from '@celo/base/lib/string'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
+import { EventLog } from 'web3-core'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
@@ -724,6 +725,27 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       throw new Error("Account not found in identifier's accounts")
     }
     return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
+  }
+
+  async addrsWithNAttestations(n: number, toBlock: string): Promise<string[]> {
+    let issuers: { [k: string]: string[] } = {}
+    let returnAddrs: string[] = []
+    ;(
+      await this.getPastEvents('AttestationCompleted', {
+        fromBlock: 0,
+        toBlock,
+      })
+    ).forEach(function(eventlog: EventLog) {
+      const account: string = eventlog.returnValues.account
+      const issuer: string = eventlog.returnValues.issuer
+      if (issuers[account] && issuers[account].indexOf(issuer) === -1) {
+        issuers[account].push(issuer)
+      } else {
+        issuers[account] = [issuer]
+      }
+      if (issuers[account].length === n) returnAddrs.push(account)
+    })
+    return returnAddrs.filter((acct, index) => returnAddrs.indexOf(acct) == index)
   }
 }
 
