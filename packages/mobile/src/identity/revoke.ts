@@ -24,6 +24,7 @@ const TAG = 'identity/revoke'
 export function* revokeVerificationSaga() {
   Logger.debug(TAG + '@revokeVerification', 'Revoking previous verification')
   let mtwAddress: string | null = null
+  yield call(getConnectedUnlockedAccount)
   try {
     mtwAddress = yield select(mtwAddressSelector)
     ValoraAnalytics.track(VerificationEvents.verification_revoke_start, { feeless: !!mtwAddress })
