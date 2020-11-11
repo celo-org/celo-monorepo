@@ -31,6 +31,7 @@ export enum Actions {
   RECEIVE_ATTESTATION_MESSAGE = 'IDENTITY/RECEIVE_ATTESTATION_MESSAGE',
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
   FEELESS_INPUT_ATTESTATION_CODE = 'IDENTITY/FEELESS_INPUT_ATTESTATION_CODE',
+  FEELESS_PROCESSING_INPUT_CODE = 'IDENTITY/FEELESS_PROCESSING_INPUT_CODE',
   COMPLETE_ATTESTATION_CODE = 'IDENTITY/COMPLETE_ATTESTATION_CODE',
   FEELESS_COMPLETE_ATTESTATION_CODE = 'IDENTITY/FEELESS_COMPLETE_ATTESTATION_CODE',
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
@@ -140,6 +141,11 @@ export interface InputAttestationCodeAction {
 export interface FeelessInputAttestationCodeAction {
   type: Actions.FEELESS_INPUT_ATTESTATION_CODE
   code: AttestationCode
+}
+
+export interface FeelessProcessingInputCodeAction {
+  type: Actions.FEELESS_PROCESSING_INPUT_CODE
+  active: boolean
 }
 
 export interface CompleteAttestationCodeAction {
@@ -306,6 +312,7 @@ export type ActionTypes =
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | FeelessInputAttestationCodeAction
+  | FeelessProcessingInputCodeAction
   | CompleteAttestationCodeAction
   | FeelessCompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
@@ -428,6 +435,11 @@ export const feelessInputAttestationCode = (
 ): FeelessInputAttestationCodeAction => ({
   type: Actions.FEELESS_INPUT_ATTESTATION_CODE,
   code,
+})
+
+export const feelessProcessingInputCode = (active: boolean): FeelessProcessingInputCodeAction => ({
+  type: Actions.FEELESS_PROCESSING_INPUT_CODE,
+  active,
 })
 
 export const completeAttestationCode = (code: AttestationCode): CompleteAttestationCodeAction => ({

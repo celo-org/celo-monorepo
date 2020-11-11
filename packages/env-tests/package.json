@@ -5,9 +5,12 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@celo/contractkit": "0.4.17",
+    "@celo/contractkit": "0.4.18",
     "@celo/utils": "0.1.20",
     "@celo/base": "0.0.3",
+    "bunyan": "1.8.12",
+    "bunyan-gke-stackdriver": "0.1.2",
+    "bunyan-debug-stream": "2.0.0",
     "dotenv": "8.2.0",
     "jest": "26.4.2"
   },
