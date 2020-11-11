@@ -36,11 +36,7 @@ spec:
         backend:
           serviceName: {{ .Release.Name }}-web
           servicePort: 4000
-      - path: /(graphql|graphiql)
-        backend:
-          serviceName: {{ .Release.Name }}-api
-          servicePort: 4000
-      - path: /api/.*
+      - path: /(graphql|graphiql|api)
         backend:
           serviceName: {{ .Release.Name }}-api
           servicePort: 4000
