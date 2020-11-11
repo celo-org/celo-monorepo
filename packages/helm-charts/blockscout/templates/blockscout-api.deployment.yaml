@@ -1,54 +1,56 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-web
+  name: {{ .Release.Name }}-api
   labels:
     app: blockscout
     chart: blockscout
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
-    component: blockscout-web
+    component: blockscout-api
 spec:
-  replicas: {{ .Values.blockscout.replicas }}
+  replicas: 1
   selector:
     matchLabels:
       app: blockscout
       release: {{ .Release.Name }}
-      component: blockscout-web
+      component: blockscout-api
   template:
     metadata:
       labels:
         app: blockscout
         release: {{ .Release.Name }}
-        component: blockscout-web
+        component: blockscout-api
     spec:
       containers:
-      - name: blockscout-web
-        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
+      - name: blockscout-api
+        image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command:
         - /bin/sh
         - -c
         args:
         - |
-           sleep 5
            exec mix cmd --app block_scout_web mix phx.server | sed 's/^iex(1)> //'
         ports:
         - name: http
           containerPort: 4000
         resources:
           requests:
-            memory: 250M
-            cpu: 200m
+            memory: 500Mi
+            cpu: 500m
         env:
-        - name: PORT
-          value: "4000"
+        - name: DISABLE_WEBAPP
+          value: "true"
+        - name: DISABLE_WRITE_API
+          value: "true"
         - name: DISABLE_INDEXER
           value: "true"
         - name: POOL_SIZE
-          value: {{ .Values.blockscout.web.pool_size | quote }}
+          value: {{ .Values.blockscout.api.pool_size | quote }}
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
+{{$data := dict "Values" .Values "DbSuffix" "-replica"}}
+{{ include "celo.blockscout-db-sidecar" $data  | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
