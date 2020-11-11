@@ -1,10 +1,12 @@
 import { newKit } from '@celo/contractkit'
 import { describe } from '@jest/globals'
-import { clearAllFundsToRoot, loadFromEnvFile } from './scaffold'
+import { loadFromEnvFile } from './env'
+import { rootLogger } from './logger'
+import { clearAllFundsToRoot } from './scaffold'
 import { runExchangeTest } from './tests/exchange'
 import { runTransfercUSDTest } from './tests/transfer'
 
-jest.setTimeout(30000)
+jest.setTimeout(120000)
 function runTests() {
   const envName = loadFromEnvFile()
 
@@ -15,11 +17,12 @@ function runTests() {
   const mnemonic = process.env.MNEMONIC!
 
   describe('Run tests in context of monorepo', () => {
-    runTransfercUSDTest(kit, mnemonic)
-    runExchangeTest(kit, mnemonic)
+    // TODO: Assert maximum loss after test
+    runTransfercUSDTest({ kit, mnemonic, logger: rootLogger })
+    runExchangeTest({ kit, mnemonic, logger: rootLogger })
 
     afterAll(async () => {
-      await clearAllFundsToRoot(kit, mnemonic)
+      await clearAllFundsToRoot({ kit, mnemonic, logger: rootLogger })
     })
   })
 }
