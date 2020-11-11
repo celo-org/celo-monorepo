@@ -18,7 +18,6 @@ import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import { Counters } from '../common/metrics'
 import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
@@ -52,19 +51,16 @@ export async function handleGetBlindedMessageSig(
   const logger: Logger = response.locals.logger
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      Counters.responses.labels('400').inc()
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
-      Counters.responses.labels('401').inc()
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
     logger.debug('Requesting signatures')
     await requestSignatures(request, response)
   } catch (e) {
-    Counters.responses.labels('500').inc()
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }
@@ -194,7 +190,6 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Lo
           totalQuota: response.signMessageResponse.totalQuota,
         }
       })
-      Counters.discrepenciesInSignerQuotaMeasurements.inc()
       logger.error({ values }, `Discrepancy found in signers' measured quota values`)
       discrepancyFound = true
     }
@@ -208,7 +203,6 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Lo
           blockNumber: response.signMessageResponse.blockNumber,
         }
       })
-      Counters.discrepenciesInSignerBlockNumbers.inc()
       logger.error(
         { values },
         `Discrepancy found in signers' latest block number that exceeds threshold`
@@ -243,7 +237,6 @@ function requestSignature(
 
 function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   if (errorCodes.size > 1) {
-    Counters.discrepenciesInSignerResponses.inc()
     logger.error({ errorCodes }, ErrorMessage.INCONSISTENT_SIGNER_RESPONSES)
   }
 
@@ -275,11 +268,14 @@ function handleMissingSignatures(
   response: Response,
   logger: Logger
 ) {
-  const errorCode: number = majorityErrorCode ?? 500
-  Counters.responses.labels(errorCode.toString()).inc()
   if (majorityErrorCode === 403) {
     respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
   } else {
-    respondWithError(response, errorCode, ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES, logger)
+    respondWithError(
+      response,
+      majorityErrorCode || 500,
+      ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+      logger
+    )
   }
 }
