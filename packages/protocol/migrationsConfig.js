@@ -113,6 +113,7 @@ const DefaultConfig = {
     signatories: [network.from],
     numRequiredConfirmations: 1,
     numInternalRequiredConfirmations: 1,
+    useMultiSig: true,
   },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
