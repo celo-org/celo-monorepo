@@ -46,6 +46,8 @@ spec:
           value: "true"
         - name: DISABLE_INDEXER
           value: "true"
+        - name: POOL_SIZE
+          value: {{ .Values.blockscout.api.pool_size | quote }}
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
 {{$data := dict "Values" .Values "DbSuffix" "-replica"}}
 {{ include "celo.blockscout-db-sidecar" $data  | indent 6 }}
