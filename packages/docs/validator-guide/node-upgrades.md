@@ -71,6 +71,8 @@ Validators can be configured as primaries or replicas. By default validators sta
 1. Pull the latest docker image.
 2. Start a new validator node on a second host in replica mode (`--istanbul.replica` flag). It should be otherwise configured exactly the same as the existing validator.
     * It needs to connect to the exisiting proxies and the validator signing key to connect to other validators in listen mode.
+    * Nodes save if they a replica or not in the `replicastate` folder inside the datadir on the first startup if that folder does not yet exist. If the folder exists, nodes will use the saved configuration over the command line arguments. Deleting this folder prior to staring the node will allow the command line configuration to take precedence.
+   * {% hint style="warning" %} If reconfiguring a node to be a replica or reusing a data directory, make sure that the node was previously configured as replica or that the `replicastate` folder is removed.  {% endhint %}
 3. Once the replica is synced and has validator enode urls for all validators, it is ready to swapped in.
     * Check validator enode urls with `istanbul.valEnodeTableInfo` in the geth console. The field `enode` should be filled in for each validator peer.
 4. In the geth console on the primary run `istanbul.stopAtBlock(xxxx)`
