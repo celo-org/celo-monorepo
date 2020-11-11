@@ -39,8 +39,6 @@ mv build/contracts $BUILD_DIR
 echo "- Run local network"
 # yarn devchain generate-tar devchain.tar.gz
 yarn devchain run-tar devchain.tar.gz >> $LOG_FILE &
-GANACHE_PID=$!
-echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
 
 echo "Waiting for ganache to start"
 # sleep 20
@@ -64,4 +62,5 @@ yarn truffle exec --network development ./scripts/truffle/make-release.js --buil
 echo "- Verify release"
 yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
 
+GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
 kill $GANACHE_PID
