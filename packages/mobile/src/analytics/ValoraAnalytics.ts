@@ -1,5 +1,4 @@
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
-import AppsFlyer from '@segment/analytics-react-native-appsflyer'
 import Firebase from '@segment/analytics-react-native-firebase'
 import { sha256 } from 'ethereumjs-util'
 import DeviceInfo from 'react-native-device-info'
@@ -43,18 +42,14 @@ async function getDeviceInfo() {
 }
 
 const SEGMENT_OPTIONS: analytics.Configuration = {
-  using: [Firebase, AppsFlyer],
+  using: [Firebase],
   flushAt: 20,
   debug: __DEV__,
   trackAppLifecycleEvents: true,
   recordScreenViews: true,
   ios: {
-    trackAdvertising: true,
+    trackAdvertising: false,
     trackDeepLinks: true,
-  },
-  android: {
-    flushInterval: 60000, // 60 seconds
-    collectDeviceId: true,
   },
 }
 
