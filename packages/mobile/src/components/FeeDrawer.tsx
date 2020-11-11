@@ -10,7 +10,9 @@ import { LayoutAnimation, StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { EncryptionFeeIcon, ExchangeFeeIcon, SecurityFeeIcon } from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
+import { features } from 'src/flags'
 import { Namespaces } from 'src/i18n'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 
 interface Props {
   isEstimate?: boolean
@@ -26,6 +28,7 @@ interface Props {
   feeHasError?: boolean
   totalFee?: BigNumber
   testID?: string
+  currencyInfo?: CurrencyInfo
 }
 
 export default function FeeDrawer({
@@ -42,6 +45,7 @@ export default function FeeDrawer({
   feeHasError,
   totalFee,
   testID,
+  currencyInfo,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const [expanded, setExpanded] = useState(false)
@@ -90,7 +94,11 @@ export default function FeeDrawer({
             title={''}
             amount={
               totalFeeAmount && (
-                <CurrencyDisplay amount={totalFeeAmount} formatType={FormatType.Fee} />
+                <CurrencyDisplay
+                  amount={totalFeeAmount}
+                  formatType={FormatType.Fee}
+                  currencyInfo={currencyInfo}
+                />
               )
             }
             isLoading={feeLoading}
@@ -100,10 +108,10 @@ export default function FeeDrawer({
       </Touchable>
       {expanded && (
         <View>
-          {isInvite && inviteFeeAmount && (
+          {!features.ESCROW_WITHOUT_CODE && isInvite && inviteFeeAmount && (
             <LineItemRow
               title={t('inviteFee')}
-              amount={<CurrencyDisplay amount={inviteFeeAmount} />}
+              amount={<CurrencyDisplay amount={inviteFeeAmount} currencyInfo={currencyInfo} />}
               textStyle={styles.dropDownText}
             />
           )}
@@ -113,7 +121,11 @@ export default function FeeDrawer({
               titleIcon={<ExchangeFeeIcon />}
               amount={
                 exchangeAmount && (
-                  <CurrencyDisplay amount={exchangeAmount} formatType={FormatType.Fee} />
+                  <CurrencyDisplay
+                    amount={exchangeAmount}
+                    formatType={FormatType.Fee}
+                    currencyInfo={currencyInfo}
+                  />
                 )
               }
               textStyle={styles.dropDownText}
@@ -123,7 +135,13 @@ export default function FeeDrawer({
             <LineItemRow
               title={t('encryption.feeLabel')}
               titleIcon={<EncryptionFeeIcon />}
-              amount={<CurrencyDisplay amount={dekFeeAmount} formatType={FormatType.Fee} />}
+              amount={
+                <CurrencyDisplay
+                  amount={dekFeeAmount}
+                  formatType={FormatType.Fee}
+                  currencyInfo={currencyInfo}
+                />
+              }
               textStyle={styles.dropDownText}
             />
           )}
@@ -133,7 +151,11 @@ export default function FeeDrawer({
             titleIcon={<SecurityFeeIcon />}
             amount={
               securityAmount && (
-                <CurrencyDisplay amount={securityAmount} formatType={FormatType.Fee} />
+                <CurrencyDisplay
+                  amount={securityAmount}
+                  formatType={FormatType.Fee}
+                  currencyInfo={currencyInfo}
+                />
               )
             }
             isLoading={feeLoading}

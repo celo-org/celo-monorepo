@@ -27,19 +27,6 @@ const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.DOLLAR]: null,
 }
 
-const hardcodedTokenContractAddresses: {
-  [network: string]: { [key in CURRENCY_ENUM]?: string }
-} = {
-  alfajores: {
-    [CURRENCY_ENUM.GOLD]: '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9',
-    [CURRENCY_ENUM.DOLLAR]: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
-  },
-  mainnet: {
-    [CURRENCY_ENUM.GOLD]: '0x471EcE3750Da237f93B8E339c536989b8978a438',
-    [CURRENCY_ENUM.DOLLAR]: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
-  },
-}
-
 function* getWeiPerUnit(token: CURRENCY_ENUM) {
   let weiPerUnit = contractWeiPerUnit[token]
   if (!weiPerUnit) {
@@ -62,15 +49,13 @@ export function* convertToContractDecimals(value: BigNumber, token: CURRENCY_ENU
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
-  // Try the hardcoded list of contract addresses first.
-  const address = hardcodedTokenContractAddresses[DEFAULT_TESTNET]?.[CURRENCY_ENUM.GOLD]
-  Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token} at ${address}`)
-  const contractKit = await getContractKitAsync()
+  Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
+  const contractKit = await getContractKitAsync(false)
   switch (token) {
     case CURRENCY_ENUM.GOLD:
-      return contractKit.contracts.getGoldToken(address)
+      return contractKit.contracts.getGoldToken()
     case CURRENCY_ENUM.DOLLAR:
-      return contractKit.contracts.getStableToken(address)
+      return contractKit.contracts.getStableToken()
     default:
       throw new Error(`Could not fetch contract for unknown token ${token}`)
   }
@@ -235,7 +220,7 @@ export function tokenTransferFactory({
 }
 
 export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
-  const contractKit = await getContractKitAsync()
+  const contractKit = await getContractKitAsync(false)
   switch (currency) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.registry.addressFor(CeloContract.GoldToken)

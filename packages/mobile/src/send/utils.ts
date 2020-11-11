@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { call, put, select, take } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -12,15 +12,14 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
 import { E164NumberToAddressType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { RecipientVerificationStatus } from 'src/identity/types'
-import {
-  Actions,
-  FetchCurrentRateFailureAction,
-  FetchCurrentRateSuccessAction,
-  selectPreferredCurrency,
-} from 'src/localCurrency/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount, convertLocalAmountToDollars } from 'src/localCurrency/convert'
-import { getLocalCurrencyExchangeRate, getLocalCurrencySymbol } from 'src/localCurrency/selectors'
+import { fetchExchangeRate } from 'src/localCurrency/saga'
+import {
+  getLocalCurrencyCode,
+  getLocalCurrencyExchangeRate,
+  getLocalCurrencySymbol,
+} from 'src/localCurrency/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { UriData, uriDataFromUrl } from 'src/qrcode/schema'
@@ -182,7 +181,7 @@ export function* handleSendPaymentData(
   }
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
-    address: data.address!,
+    address: data.address.toLowerCase(),
     displayId: data.e164PhoneNumber,
     displayName: data.displayName || cachedRecipient?.displayName || 'anonymous',
     e164PhoneNumber: data.e164PhoneNumber,
@@ -192,36 +191,43 @@ export function* handleSendPaymentData(
   }
   yield put(storeLatestInRecents(recipient))
 
-  if (data.currencyCode) {
-    yield put(selectPreferredCurrency(data.currencyCode as LocalCurrencyCode))
-    const action: FetchCurrentRateSuccessAction | FetchCurrentRateFailureAction = yield take([
-      Actions.FETCH_CURRENT_RATE_SUCCESS,
-      Actions.FETCH_CURRENT_RATE_FAILURE,
-    ])
-    if (action.type === Actions.FETCH_CURRENT_RATE_FAILURE) {
-      yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
-      Logger.warn(TAG, '@handleSendPaymentData failed to fetch current rate')
-      return
-    }
-  }
-
   if (data.amount) {
-    // TODO: integrate with SendConfirmation component
-    const exchangeRate = yield select(getLocalCurrencyExchangeRate)
-    const amount = convertLocalAmountToDollars(data.amount, exchangeRate)
-    if (!amount) {
-      Logger.warn(TAG, '@handleSendPaymentData null amount')
-      return
+    if (data.token === 'CELO') {
+      navigate(Screens.WithdrawCeloReviewScreen, {
+        amount: new BigNumber(data.amount),
+        recipientAddress: data.address.toLowerCase(),
+        feeEstimate: new BigNumber(0),
+        isCashOut: false,
+      })
+    } else if (data.token === 'cUSD' || !data.token) {
+      const currency = data.currencyCode
+        ? (data.currencyCode as LocalCurrencyCode)
+        : yield select(getLocalCurrencyCode)
+      const exchangeRate: string = yield call(fetchExchangeRate, currency)
+      const dollarAmount = convertLocalAmountToDollars(data.amount, exchangeRate)
+      if (!dollarAmount) {
+        Logger.warn(TAG, '@handleSendPaymentData null amount')
+        return
+      }
+      const transactionData: TransactionDataInput = {
+        recipient,
+        amount: dollarAmount,
+        reason: data.comment,
+        type: TokenTransactionType.PayPrefill,
+      }
+      navigate(Screens.SendConfirmation, {
+        transactionData,
+        isFromScan: true,
+        currencyInfo: { localCurrencyCode: currency, localExchangeRate: exchangeRate },
+      })
     }
-    const transactionData: TransactionDataInput = {
-      recipient,
-      amount,
-      reason: data.comment,
-      type: TokenTransactionType.PayPrefill,
-    }
-    navigate(Screens.SendConfirmation, { transactionData, isFromScan: true })
   } else {
-    navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    if (data.token === 'CELO') {
+      Logger.warn(TAG, '@handleSendPaymentData no amount given in CELO withdrawal')
+      return
+    } else if (data.token === 'cUSD' || !data.token) {
+      navigate(Screens.SendAmount, { recipient, isFromScan: true, isOutgoingPaymentRequest })
+    }
   }
 }
 

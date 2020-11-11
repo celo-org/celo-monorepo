@@ -28,7 +28,7 @@ const argv = yargs
   })
   .option('new_contracts', {
     alias: 'n',
-    description: 'Old contracts build artifacts folder',
+    description: 'New contracts build artifacts folder',
     type: 'string',
     demandOption: true,
   })
@@ -88,7 +88,7 @@ try {
       )
       const mismatches = versionChecker.excluding(exclude).mismatches()
       if (mismatches.isEmpty()) {
-        out('Actual version numbers match expected\n')
+        out('Success! Actual version numbers match expected\n')
         process.exit(0)
       } else {
         console.error(`Version mismatch detected:\n${JSON.stringify(mismatches, null, 4)}`)

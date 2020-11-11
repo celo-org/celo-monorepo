@@ -100,6 +100,7 @@ export function* sendAndMonitorTransaction<T>(
   account: string,
   context: TransactionContext,
   currency?: CURRENCY_ENUM,
+  feeCurrency?: CURRENCY_ENUM,
   staticGas?: number
 ) {
   try {
@@ -111,6 +112,7 @@ export function* sendAndMonitorTransaction<T>(
         tx.txo,
         account,
         context,
+        feeCurrency,
         nonce,
         staticGas
       )

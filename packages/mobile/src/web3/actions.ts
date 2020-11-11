@@ -3,6 +3,7 @@ export enum Actions {
   SET_NONCE = 'WEB3/SET_NONCE',
   FETCH_NONCE = 'WEB3/FETCH_NONCE',
   SET_ACCOUNT_IN_WEB3_KEYSTORE = 'WEB3/SET_ACCOUNT_IN_WEB3_KEYSTORE',
+  SET_MTW_ADDRESS = 'WEB3/SET_MTW_ADDRESS',
   SET_DATA_ENCRYPTION_KEY = 'WEB3/SET_DATA_ENCRYPTION_KEY',
   REGISTER_DATA_ENCRYPTION_KEY = 'WEB3/REGISTER_DATA_ENCRYPTION_KEY',
   SET_PROGRESS = 'WEB3/SET_PROGRESS',
@@ -26,6 +27,11 @@ export interface SetNonceAction {
 
 export interface FetchNonceAction {
   type: Actions.FETCH_NONCE
+}
+
+export interface SetMtwAddressAction {
+  type: Actions.SET_MTW_ADDRESS
+  address: string | null
 }
 
 export interface SetAccountInWeb3KeystoreAction {
@@ -70,6 +76,7 @@ export type ActionTypes =
   | SetAccountAction
   | SetNonceAction
   | FetchNonceAction
+  | SetMtwAddressAction
   | SetAccountInWeb3KeystoreAction
   | SetIsFornoAction
   | ToggleIsFornoAction
@@ -95,6 +102,13 @@ export function setNonce(nonce: number): SetNonceAction {
 export function fetchNonce(): FetchNonceAction {
   return {
     type: Actions.FETCH_NONCE,
+  }
+}
+
+export const setMtwAddress = (address: string | null): SetMtwAddressAction => {
+  return {
+    type: Actions.SET_MTW_ADDRESS,
+    address: address?.toLowerCase() ?? address,
   }
 }
 

@@ -1,10 +1,21 @@
 import { Address } from '@celo/utils/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
+import BigNumber from 'bignumber.js'
+import debugFactory from 'debug'
 import { Block, Transaction } from 'web3-eth'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { PROXY_ABI, PROXY_SET_IMPLEMENTATION_SIGNATURE } from '../governance/proxy'
+import { CeloContract } from '../base'
+import { PROXY_ABI } from '../governance/proxy'
 import { ContractKit } from '../kit'
 import { parseDecodedParams } from '../utils/web3-utils'
-import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
+import {
+  ContractDetails,
+  getContractDetailsFromContract,
+  mapFromPairs,
+  obtainKitContractDetails,
+} from './base'
+
+const debug = debugFactory('kit:explorer:block')
 
 export interface CallDetails {
   contract: string
@@ -32,23 +43,27 @@ export async function newBlockExplorer(kit: ContractKit) {
   return new BlockExplorer(kit, await obtainKitContractDetails(kit))
 }
 
+const getContractMappingFromDetails = (cd: ContractDetails) => ({
+  details: cd,
+  fnMapping: mapFromPairs(
+    (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
+      .filter((ad) => ad.type === 'function')
+      .map((ad) => [ad.signature, ad])
+  ),
+})
+
 export class BlockExplorer {
   private addressMapping: Map<Address, ContractMapping>
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
-      contractDetails.map((cd) => [
-        cd.address,
-        {
-          details: cd,
-          fnMapping: mapFromPairs(
-            (cd.jsonInterface.concat(PROXY_ABI) as ABIDefinition[])
-              .filter((ad) => ad.type === 'function')
-              .map((ad) => [ad.signature, ad])
-          ),
-        },
-      ])
+      contractDetails.map((cd) => [cd.address, getContractMappingFromDetails(cd)])
     )
+  }
+
+  async updateContractDetailsMapping(name: string, address: string) {
+    const cd = await getContractDetailsFromContract(this.kit, name as CeloContract, address)
+    this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {
@@ -110,17 +125,28 @@ export class BlockExplorer {
       return null
     }
 
-    const contract =
-      matchedAbi.signature === PROXY_SET_IMPLEMENTATION_SIGNATURE
-        ? contractMapping.details.name + 'Proxy'
-        : contractMapping.details.name
-
     const { args, params } = parseDecodedParams(
       abi.decodeParameters(matchedAbi.inputs!, encodedParameters)
     )
 
+    // transform numbers to big numbers in params
+    matchedAbi.inputs!.forEach((abiInput, idx) => {
+      if (abiInput.type === 'uint256') {
+        debug('transforming number param')
+        params[abiInput.name] = new BigNumber(args[idx])
+      }
+    })
+
+    // transform fixidity values to fractions in params
+    Object.keys(params)
+      .filter((key) => key.includes('fraction')) // TODO: come up with better enumeration
+      .forEach((fractionKey) => {
+        debug('transforming fixed number param')
+        params[fractionKey] = fromFixed(params[fractionKey])
+      })
+
     return {
-      contract,
+      contract: contractMapping.details.name,
       function: matchedAbi.name!,
       paramMap: params,
       argList: args,

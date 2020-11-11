@@ -7,6 +7,7 @@ export interface State {
   latestBlockNumber: number
   account: string | null
   nonce: number | null
+  mtwAddress: string | null
   accountInWeb3Keystore: string | null
   // The DEK private key
   dataEncryptionKey: string | null
@@ -24,6 +25,7 @@ const initialState: State = {
   latestBlockNumber: 0,
   account: null,
   nonce: null,
+  mtwAddress: null,
   accountInWeb3Keystore: null,
   dataEncryptionKey: null,
   isDekRegistered: false,
@@ -61,6 +63,11 @@ export const reducer = (
       return {
         ...state,
         nonce: action.nonce,
+      }
+    case Actions.SET_MTW_ADDRESS:
+      return {
+        ...state,
+        mtwAddress: action.address,
       }
     case Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE:
       return {

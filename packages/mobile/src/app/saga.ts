@@ -1,26 +1,39 @@
-import { AppState, Linking } from 'react-native'
+import { AppState } from 'react-native'
 import { eventChannel } from 'redux-saga'
-import { call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import {
+  call,
+  cancelled,
+  put,
+  select,
+  spawn,
+  take,
+  takeEvery,
+  takeLatest,
+} from 'redux-saga/effects'
 import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import {
   Actions,
   appLock,
+  minAppVersionDetermined,
   OpenDeepLink,
-  openDeepLink,
+  OpenUrlAction,
   SetAppState,
   setAppState,
+  setKotaniFeatureFlag,
   setLanguage,
+  setPontoFeatureFlag,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { isAppVersionDeprecated } from 'src/firebase/firebase'
+import { appRemoteFeatureFlagChannel, appVersionDeprecationChannel } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handlePaymentDeeplink, handleTxDeeplink } from 'src/send/utils'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
 import { parse } from 'url'
@@ -37,36 +50,66 @@ const DO_NOT_LOCK_PERIOD = 30000 // 30 sec
 // Work that's done before other sagas are initalized
 // Be mindful to not put long blocking tasks here
 export function* appInit() {
-  let isDeprecated: boolean = false
-  if (false) {
-    isDeprecated = yield call(isAppVersionDeprecated)
-  }
-
-  if (isDeprecated) {
-    Logger.warn(TAG, 'App version is deprecated')
-    navigate(Screens.UpgradeScreen)
-    return
-  } else {
-    Logger.debug(TAG, 'App version is valid')
-  }
-
   const language = yield select(currentLanguageSelector)
   if (language) {
     yield put(setLanguage(language))
   }
 
-  const deepLink: string | null = yield call(Linking.getInitialURL)
   const inSync = yield call(clockInSync)
   if (!inSync) {
     navigate(Screens.SetClock)
     return
   }
-  if (deepLink) {
-    // TODO: this should dispatch (put) but since this appInit
-    // is called before the listener is set, we do it this way.
-    // This is fragile, change me :D
-    yield call(handleDeepLink, openDeepLink(deepLink))
+}
+
+export function* appVersionSaga() {
+  const appVersionChannel = yield call(appVersionDeprecationChannel)
+  if (!appVersionChannel) {
     return
+  }
+  try {
+    while (true) {
+      const minRequiredVersion = yield take(appVersionChannel)
+      Logger.info(TAG, `Required min version: ${minRequiredVersion}`)
+      // Note: The NavigatorWrapper will read this value from the store and
+      // show the UpdateScreen if necessary.
+      yield put(minAppVersionDetermined(minRequiredVersion))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@appVersionSaga`, error)
+  } finally {
+    if (yield cancelled()) {
+      appVersionChannel.close()
+    }
+  }
+}
+
+interface RemoteFeatureFlags {
+  kotaniEnabled: boolean
+  pontoEnabled: boolean
+}
+
+export function* appRemoteFeatureFlagSaga() {
+  const remoteFeatureFlagChannel = yield call(appRemoteFeatureFlagChannel)
+  if (!remoteFeatureFlagChannel) {
+    return
+  }
+  try {
+    while (true) {
+      const flags: RemoteFeatureFlags = yield take(remoteFeatureFlagChannel)
+      Logger.info(
+        TAG,
+        `Updated flags to ponto: ${flags.pontoEnabled} and kotani: ${flags.kotaniEnabled}`
+      )
+      yield put(setPontoFeatureFlag(flags.pontoEnabled))
+      yield put(setKotaniFeatureFlag(flags.kotaniEnabled))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@appRemoteFeatureFlagSaga`, error)
+  } finally {
+    if (yield cancelled()) {
+      remoteFeatureFlagChannel.close()
+    }
   }
 }
 
@@ -89,6 +132,16 @@ export function* handleDeepLink(action: OpenDeepLink) {
 
 export function* watchDeepLinks() {
   yield takeLatest(Actions.OPEN_DEEP_LINK, handleDeepLink)
+}
+
+export function* handleOpenUrl(action: OpenUrlAction) {
+  const { url } = action
+  Logger.debug(TAG, 'Handling url', url)
+  yield call(navigateToURI, url)
+}
+
+export function* watchOpenUrl() {
+  yield takeEvery(Actions.OPEN_URL, handleOpenUrl)
 }
 
 function createAppStateChannel() {
@@ -134,6 +187,7 @@ export function* handleSetAppState(action: SetAppState) {
 
 export function* appSaga() {
   yield spawn(watchDeepLinks)
+  yield spawn(watchOpenUrl)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)
 }

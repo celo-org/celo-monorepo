@@ -21,6 +21,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 interface State {
   pin: string
   errorText: string | undefined
+  pinIsCorrect: boolean
 }
 
 interface StateProps {
@@ -43,6 +44,14 @@ class PincodeEnter extends React.Component<Props, State> {
   state = {
     pin: '',
     errorText: undefined,
+    pinIsCorrect: false,
+  }
+
+  componentWillUnmount() {
+    const onCancel = this.props.route.params.onCancel
+    if (onCancel && !this.state.pinIsCorrect) {
+      onCancel()
+    }
   }
 
   onChangePin = (pin: string) => {
@@ -50,6 +59,7 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onCorrectPin = (pin: string) => {
+    this.setState({ pinIsCorrect: true })
     const onSuccess = this.props.route.params.onSuccess
     if (onSuccess) {
       onSuccess(pin)

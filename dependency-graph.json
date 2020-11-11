@@ -73,6 +73,14 @@
     "location": "packages/docs",
     "dependencies": []
   },
+  "@celo/env-tests": {
+    "location": "packages/env-tests",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
   "@celo/faucet-app": {
     "location": "packages/faucet",
     "dependencies": [
@@ -83,6 +91,14 @@
   "@celo/flake-tracker": {
     "location": "packages/flake-tracker",
     "dependencies": []
+  },
+  "@celo/komencikit": {
+    "location": "packages/komencikit",
+    "dependencies": [
+      "@celo/base",
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
   },
   "@celo/metadata-crawler": {
     "location": "packages/metadata-crawler",
@@ -96,6 +112,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/flake-tracker",
+      "@celo/komencikit",
       "@celo/react-components",
       "@celo/typescript",
       "@celo/utils"
@@ -165,6 +182,14 @@
     "location": "packages/phone-number-privacy/common",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-monitor": {
+    "location": "packages/phone-number-privacy/monitor",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]
   },

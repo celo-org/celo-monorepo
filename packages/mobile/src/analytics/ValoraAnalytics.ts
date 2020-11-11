@@ -1,4 +1,5 @@
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
+import AppsFlyer from '@segment/analytics-react-native-appsflyer'
 import Firebase from '@segment/analytics-react-native-firebase'
 import { sha256 } from 'ethereumjs-util'
 import DeviceInfo from 'react-native-device-info'
@@ -12,12 +13,12 @@ const TAG = 'ValoraAnalytics'
 
 async function getDeviceInfo() {
   return {
-    AppName: await DeviceInfo.getApplicationName(),
-    Brand: await DeviceInfo.getBrand(),
-    BuildNumber: await DeviceInfo.getBuildNumber(),
-    BundleId: await DeviceInfo.getBundleId(),
+    AppName: DeviceInfo.getApplicationName(),
+    Brand: DeviceInfo.getBrand(),
+    BuildNumber: DeviceInfo.getBuildNumber(),
+    BundleId: DeviceInfo.getBundleId(),
     Carrier: await DeviceInfo.getCarrier(),
-    DeviceId: await DeviceInfo.getDeviceId(),
+    DeviceId: DeviceInfo.getDeviceId(),
     FirstInstallTime: await DeviceInfo.getFirstInstallTime(),
     FontScale: await DeviceInfo.getFontScale(),
     FreeDiskStorage: await DeviceInfo.getFreeDiskStorage(),
@@ -26,31 +27,34 @@ async function getDeviceInfo() {
     LastUpdateTime: await DeviceInfo.getLastUpdateTime(),
     Manufacturer: await DeviceInfo.getManufacturer(),
     MaxMemory: await DeviceInfo.getMaxMemory(),
-    Model: await DeviceInfo.getModel(),
-    ReadableVersion: await DeviceInfo.getReadableVersion(),
-    SystemName: await DeviceInfo.getSystemName(),
-    SystemVersion: await DeviceInfo.getSystemVersion(),
+    Model: DeviceInfo.getModel(),
+    ReadableVersion: DeviceInfo.getReadableVersion(),
+    SystemName: DeviceInfo.getSystemName(),
+    SystemVersion: DeviceInfo.getSystemVersion(),
     TotalDiskCapacity: await DeviceInfo.getTotalDiskCapacity(),
     TotalMemory: await DeviceInfo.getTotalMemory(),
-    UniqueID: await DeviceInfo.getUniqueId(),
+    UniqueID: DeviceInfo.getUniqueId(),
     UserAgent: await DeviceInfo.getUserAgent(),
-    Version: await DeviceInfo.getVersion(),
+    Version: DeviceInfo.getVersion(),
     isEmulator: await DeviceInfo.isEmulator(),
-    isTablet: await DeviceInfo.isTablet(),
+    isTablet: DeviceInfo.isTablet(),
     UsedMemory: await DeviceInfo.getUsedMemory(),
   }
 }
 
 const SEGMENT_OPTIONS: analytics.Configuration = {
-  using: [Firebase],
+  using: [Firebase, AppsFlyer],
   flushAt: 20,
-  trackAttributionData: false,
   debug: __DEV__,
   trackAppLifecycleEvents: true,
   recordScreenViews: true,
   ios: {
-    trackAdvertising: false,
+    trackAdvertising: true,
     trackDeepLinks: true,
+  },
+  android: {
+    flushInterval: 60000, // 60 seconds
+    collectDeviceId: true,
   },
 }
 

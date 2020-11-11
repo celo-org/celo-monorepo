@@ -6,9 +6,13 @@ import PhoneIllo from 'src/download/PhoneIllo'
 // import RequestFunds from 'src/fauceting/RequestFunds'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import Android from 'src/icons/Android'
+import Apple from 'src/icons/Apple'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import { standardStyles, textStyles } from 'src/styles'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { CeloLinks } from 'src/shared/menu-items'
+import { colors, standardStyles, textStyles } from 'src/styles'
 
 export default withScreenSize(
   withNamespaces(NameSpaces.download)(function DownloadCover({
@@ -41,7 +45,22 @@ export default withScreenSize(
               <H4 style={[textStyles.invert, isMobile && textStyles.center]}>
                 {t('coverSubTitle')}
               </H4>
-              {/* <RequestFunds kind={RequestType.Invite} /> */}
+              <Button
+                style={styles.button}
+                iconLeft={<Android size={18} color={colors.primary} />}
+                kind={BTN.NAKED}
+                size={SIZE.big}
+                text={'Android'}
+                href={CeloLinks.playStoreDevWallet}
+              />
+              <Button
+                style={styles.button}
+                iconLeft={<Apple size={18} color={colors.primary} />}
+                kind={BTN.NAKED}
+                size={SIZE.big}
+                text={'iOS'}
+                href={CeloLinks.appStoreDevWallet}
+              />
             </View>
             <View style={[standardStyles.centered, styles.flex1, phoneStyle(screen)]}>
               <PhoneIllo />
@@ -65,6 +84,9 @@ function phoneStyle(screen: ScreenSizes) {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    marginTop: 30,
+  },
   container: {
     justifyContent: 'space-between',
   },

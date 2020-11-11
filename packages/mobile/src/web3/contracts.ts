@@ -15,7 +15,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { isProviderConnectionError } from 'src/geth/geth'
 import { GethNativeBridgeWallet } from 'src/geth/GethNativeBridgeWallet'
-import { waitForGethInitialized } from 'src/geth/saga'
+import { waitForGethInitialized, waitForGethSync, waitForGethSyncAsync } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import { getHttpProvider, getIpcProvider } from 'src/web3/providers'
@@ -132,7 +132,7 @@ async function waitForContractKit(tries: number) {
   return contractKit
 }
 
-export function* getContractKit() {
+export function* getContractKit(waitForSync: boolean = true) {
   if (!contractKit) {
     yield initContractKitLock.acquire()
     try {
@@ -144,17 +144,26 @@ export function* getContractKit() {
       initContractKitLock.release()
     }
   }
+
+  if (waitForSync) {
+    yield call(waitForGethSync)
+  }
+
   return contractKit
 }
 
 // Used for cases where CK must be access outside of a saga
-// DO NOT MERGE: Should this be changed as well?
-export async function getContractKitAsync(): Promise<ContractKit> {
+export async function getContractKitAsync(waitForSync: boolean = true): Promise<ContractKit> {
   await waitForContractKit(WAIT_FOR_CONTRACT_KIT_RETRIES)
   if (!contractKit) {
     Logger.warn(`${TAG}@getContractKitAsync`, 'contractKit is undefined')
     throw new Error('contractKit is undefined')
   }
+
+  if (waitForSync) {
+    await waitForGethSyncAsync()
+  }
+
   return contractKit
 }
 
@@ -190,13 +199,13 @@ export async function getWalletAsync() {
 }
 
 // Convinience util for getting the kit's web3 instance
-export function* getWeb3() {
-  const kit: ContractKit = yield call(getContractKit)
+export function* getWeb3(waitForSync: boolean = true) {
+  const kit: ContractKit = yield call(getContractKit, waitForSync)
   return kit.web3
 }
 
 // Used for cases where the kit's web3 must be accessed outside a saga
-export async function getWeb3Async(): Promise<Web3> {
-  const kit = await getContractKitAsync()
+export async function getWeb3Async(waitForSync: boolean = true): Promise<Web3> {
+  const kit = await getContractKitAsync(waitForSync)
   return kit.web3
 }
