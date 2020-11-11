@@ -50,7 +50,6 @@ export enum SendTransactionLogEventType {
   Confirmed,
   Failed,
   Exception,
-  Signed,
 }
 
 export type SendTransactionLogEvent =
@@ -61,7 +60,6 @@ export type SendTransactionLogEvent =
   | Confirmed
   | Failed
   | Exception
-  | Signed
 
 interface Started {
   type: SendTransactionLogEventType.Started
@@ -85,11 +83,6 @@ interface EstimatedGas {
 function EstimatedGas(gas: number): EstimatedGas {
   return { type: SendTransactionLogEventType.EstimatedGas, gas }
 }
-
-interface Signed {
-  type: SendTransactionLogEventType.Signed
-}
-const Signed: Signed = { type: SendTransactionLogEventType.Signed }
 
 interface ReceiptReceived {
   type: SendTransactionLogEventType.ReceiptReceived
@@ -262,110 +255,5 @@ export async function sendTransactionAsync<T>(
     receipt,
     transactionHash,
     confirmation,
-  }
-}
-
-export async function sendSignedTransactionAsync<T>(
-  rawTx: string,
-  logger: TxLogger = emptyTxLogger
-): Promise<TxPromises> {
-  // @ts-ignore
-  const resolvers: TxPromiseResolvers = {}
-  // @ts-ignore
-  const rejectors: TxPromiseReject = {}
-
-  const receipt: Promise<TransactionReceipt> = new Promise((resolve, reject) => {
-    resolvers.receipt = resolve
-    rejectors.receipt = reject
-  })
-
-  const transactionHash: Promise<string> = new Promise((resolve, reject) => {
-    resolvers.transactionHash = resolve
-    rejectors.transactionHash = reject
-  })
-
-  const confirmation: Promise<boolean> = new Promise((resolve, reject) => {
-    resolvers.confirmation = resolve
-    rejectors.confirmation = reject
-  })
-
-  const rejectAll = (error: Error) => {
-    values(rejectors).map((reject) => {
-      // @ts-ignore
-      reject(error)
-    })
-  }
-
-  try {
-    logger(Started)
-    const kit = await getContractKitAsync()
-    await kit.web3.eth
-      .sendSignedTransaction(rawTx)
-      // @ts-ignore
-      .once('receipt', (r: TransactionReceipt) => {
-        logger(ReceiptReceived(r))
-        if (resolvers.receipt) {
-          resolvers.receipt(r)
-        }
-      })
-      .once('transactionHash', (txHash: string) => {
-        logger(TransactionHashReceived(txHash))
-
-        if (resolvers.transactionHash) {
-          resolvers.transactionHash(txHash)
-        }
-      })
-      .once('confirmation', (confirmationNumber: number) => {
-        logger(Confirmed(confirmationNumber))
-        resolvers.confirmation(true)
-      })
-      .once('error', (error: Error) => {
-        logger(Failed(error))
-        rejectAll(error)
-      })
-  } catch (error) {
-    logger(Exception(error))
-    rejectAll(error)
-  }
-
-  return {
-    receipt,
-    transactionHash,
-    confirmation,
-  }
-}
-
-export async function signTransactionAsync<T>(
-  tx: TransactionObject<T>,
-  account: string,
-  feeCurrencyAddress: string | undefined,
-  logger: TxLogger = emptyTxLogger,
-  estimatedGas: number,
-  gasPrice: string,
-  nonce: number
-): Promise<{
-  raw: string
-  tx: any
-}> {
-  const chainId = hardcodedChainIds[DEFAULT_TESTNET]
-  const txParams: Tx = {
-    gas: estimatedGas,
-    from: account,
-    feeCurrency: feeCurrencyAddress,
-    // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-    // the suggested price in the selected feeCurrency.
-    gasPrice: gasPrice ?? '0',
-    nonce,
-    chainId,
-  }
-  try {
-    // @ts-ignore - this is not a part of the type definition, but exists in web3.
-    // This will give the tx data without actually sending it.
-    const request = await tx.send.request(txParams)
-    const wallet = await getWalletAsync()
-    return await wallet.signTransaction(request.params[0])
-  } catch (e) {
-    logger(Exception(e))
-    throw e
   }
 }

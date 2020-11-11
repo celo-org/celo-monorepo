@@ -90,7 +90,6 @@ if [ "$PLATFORM" = "android" ]; then
     exit 1
   fi
 
-  fi
   case "$RELEASE" in
     true) BUILD_TYPE="Release" ;;
     *) BUILD_TYPE="Debug" ;;

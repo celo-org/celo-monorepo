@@ -7,11 +7,9 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { getCurrencyAddress, getTokenContract } from 'src/tokens/saga'
 import {
-  sendSignedTransactionAsync,
   sendTransactionAsync,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
-  signTransactionAsync,
 } from 'src/transactions/contract-utils'
 import { TransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
@@ -49,13 +47,6 @@ const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
           txId,
           description: context.description,
           fornoMode,
-        })
-        break
-      case SendTransactionLogEventType.Signed:
-        Logger.debug(tag, `Signing transaction with id ${txId}`)
-        ValoraAnalytics.track(TransactionEvents.transaction_signed, {
-          txId,
-          description: context.description,
         })
         break
       case SendTransactionLogEventType.EstimatedGas:
@@ -104,29 +95,6 @@ const getLogger = (context: TransactionContext, fornoMode?: boolean) => {
         assertNever(event)
     }
   }
-}
-
-export function* signTransactionPromise(
-  tx: TransactionObject<any>,
-  account: string,
-  context: TransactionContext,
-  nonce: number,
-  staticGas: number,
-  gasPrice: BigNumber
-) {
-  const stableToken = yield getTokenContract(CURRENCY_ENUM.DOLLAR)
-  const signedTx = yield call(
-    signTransactionAsync,
-    tx,
-    account,
-    // always use stabletoken
-    stableToken.address,
-    getLogger(context, false),
-    staticGas,
-    gasPrice.toString(),
-    nonce
-  )
-  return signedTx
 }
 
 // Sends a transaction and async returns promises for the txhash, confirmation, and receipt
@@ -191,16 +159,6 @@ export function* sendTransactionPromises(
     gasPrice?.toString(),
     nonce
   )
-  return transactionPromises
-}
-
-export function* sendSignedTransactionPromises(rawTx: string, context: TransactionContext) {
-  Logger.debug(
-    `${TAG}@sendSignedTransactionPromises`,
-    `Going to send a signed transaction with id ${context.id}`
-  )
-
-  const transactionPromises = yield call(sendSignedTransactionAsync, rawTx, getLogger(context))
   return transactionPromises
 }
 

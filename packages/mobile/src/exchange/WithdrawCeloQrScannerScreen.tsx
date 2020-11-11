@@ -26,11 +26,7 @@ type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloQrScannerScree
 
 function fetchAddressFromQrData(data: string): string | null {
   try {
-    const parsedData = uriDataFromUrl(data)
-    if (!parsedData.address) {
-      return null
-    }
-    return parsedData.address
+    return uriDataFromUrl(data).address ?? null
   } catch (error) {
     return null
   }

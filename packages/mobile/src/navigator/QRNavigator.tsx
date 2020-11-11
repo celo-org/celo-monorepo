@@ -143,10 +143,7 @@ export default function QRNavigator() {
       initialLayout={initialLayout}
     >
       <Tab.Screen name={Screens.QRCode} options={{ title: t('myCode') }}>
-        {(props) => {
-          // @ts-ignore - very hacky fix to not deal with certain props not being there
-          return <QRCode {...props} qrSvgRef={qrSvgRef} />
-        }}
+        {(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
       </Tab.Screen>
       <Tab.Screen name={Screens.QRScanner} options={{ title: t('scanCode') }}>
         {(props) => <AnimatedScannerScene {...props} position={position} />}

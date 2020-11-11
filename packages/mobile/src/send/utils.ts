@@ -175,10 +175,6 @@ export function* handleSendPaymentData(
   cachedRecipient?: RecipientWithContact,
   isOutgoingPaymentRequest?: true
 ) {
-  if (!data.address) {
-    Logger.warn(TAG, '@handleSendSignedTxData address not specified in deeplink')
-    return
-  }
   const recipient: RecipientWithQrCode = {
     kind: RecipientKind.QrCode,
     address: data.address.toLowerCase(),
@@ -231,51 +227,11 @@ export function* handleSendPaymentData(
   }
 }
 
-export function* handleSendSignedTxData(data: UriData) {
-  // DON'T MERGE: just a hacky way to signify a signed txn
-  const fakeRecipient: RecipientWithQrCode = {
-    kind: RecipientKind.QrCode,
-    address: data.address!,
-    displayId: data.e164PhoneNumber,
-    displayName: data.displayName || 'anonymous',
-    e164PhoneNumber: data.e164PhoneNumber,
-    phoneNumberLabel: 'fake',
-    thumbnailPath: 'fake',
-    contactId: 'fake',
-  }
-
-  // DON'T MERGE: just a hacky way to signify a signed txn
-  const fakeAmount: BigNumber = new BigNumber('1')
-
-  const transactionData: TransactionDataInput = {
-    recipient: fakeRecipient,
-    amount: fakeAmount,
-    reason: data.comment,
-    type: TokenTransactionType.SendSignedTx,
-  }
-  console.log('before: ', transactionData.amount)
-  navigate(Screens.SendConfirmation, {
-    transactionData,
-    isFromScan: true,
-    signedTx: data.rawSignedTransaction,
-  })
-}
-
 export function* handlePaymentDeeplink(deeplink: string) {
   try {
     const paymentData = uriDataFromUrl(deeplink)
     yield call(handleSendPaymentData, paymentData)
   } catch (e) {
     Logger.warn('handlePaymentDeepLink', `deeplink ${deeplink} failed with ${e}`)
-  }
-}
-
-export function* handleTxDeeplink(deeplink: string) {
-  try {
-    const data = uriDataFromUrl(deeplink)
-    Logger.debug('handleTxDeepLink got data', JSON.stringify(data))
-    yield call(handleSendSignedTxData, data)
-  } catch (e) {
-    Logger.warn('handleTxDeepLink', `deeplink ${deeplink} failed with ${e}`)
   }
 }

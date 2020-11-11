@@ -19,7 +19,6 @@ import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { fetchNonce } from 'src/web3/actions'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const REFRESH_TIMEOUT = 15000
@@ -43,7 +42,6 @@ export function* refreshBalances() {
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
   yield put(fetchSentEscrowPayments())
-  yield put(fetchNonce())
 }
 
 export function* autoRefreshSaga() {

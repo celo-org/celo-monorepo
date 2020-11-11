@@ -378,7 +378,6 @@ export const v5Schema = {
   },
   web3: {
     ...v3Schema.web3,
-    nonce: 5,
     dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
     commentKey: undefined,
   },

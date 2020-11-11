@@ -21,18 +21,20 @@ import {
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
-  SendSignedTxAction,
   ShareQRCodeAction,
 } from 'src/send/actions'
 import { transferStableToken } from 'src/stableToken/actions'
-import { BasicTokenTransfer } from 'src/tokens/saga'
-import { sendAndMonitorSignedTransaction } from 'src/transactions/saga'
+import {
+  BasicTokenTransfer,
+  createTokenTransferTransaction,
+  getCurrencyAddress,
+} from 'src/tokens/saga'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
-// import { estimateGas } from 'src/web3/utils'
+import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'send/saga'
 
@@ -216,21 +218,8 @@ function* sendPaymentOrInviteSaga({
   }
 }
 
-function* sendSignedTxSaga({ rawTx }: SendSignedTxAction) {
-  try {
-    const context = newTransactionContext(TAG, 'Send signed tx')
-    yield call(sendAndMonitorSignedTransaction, rawTx, context)
-    navigateHome()
-    // TODO: show success
-  } catch (e) {
-    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
-    // TODO: show failure and change above error message
-  }
-}
-
 export function* watchSendPaymentOrInvite() {
   yield takeLeading(Actions.SEND_PAYMENT_OR_INVITE, sendPaymentOrInviteSaga)
-  yield takeLeading(Actions.SEND_SIGNED_TXN, sendSignedTxSaga)
 }
 
 export function* sendSaga() {

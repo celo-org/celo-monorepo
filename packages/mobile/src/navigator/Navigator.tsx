@@ -82,7 +82,6 @@ import PaymentRequestUnavailable, {
 } from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
-import QRCode from 'src/qrcode/QRCode'
 import { RootState } from 'src/redux/reducers'
 import { store } from 'src/redux/store'
 import Send from 'src/send/Send'
@@ -247,7 +246,6 @@ const sendScreens = (Navigator: typeof Stack) => (
       component={SendAmount}
       options={sendAmountScreenNavOptions}
     />
-    <Navigator.Screen name={Screens.QRCode} component={QRCode} options={headerWithBackButton} />
     <Navigator.Screen
       name={Screens.SendConfirmation}
       component={SendConfirmation}

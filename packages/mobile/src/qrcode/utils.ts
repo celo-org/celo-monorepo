@@ -102,9 +102,6 @@ export function* handleBarcode(
   let qrData: UriData
   try {
     qrData = uriDataFromUrl(barcode.data)
-    if (!qrData.address) {
-      throw Error('QR data did not include address')
-    }
   } catch (e) {
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     Logger.error(TAG, 'qr scan failed', e)
@@ -114,7 +111,7 @@ export function* handleBarcode(
   if (secureSendTxData) {
     const success = yield call(
       handleSecureSend,
-      qrData.address!,
+      qrData.address,
       e164NumberToAddress,
       secureSendTxData,
       requesterAddress
@@ -139,7 +136,7 @@ export function* handleBarcode(
   }
 
   const cachedRecipient = getRecipientFromAddress(
-    qrData.address!,
+    qrData.address,
     addressToE164Number,
     recipientCache
   )

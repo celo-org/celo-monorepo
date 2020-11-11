@@ -32,7 +32,7 @@ import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { handlePaymentDeeplink, handleTxDeeplink } from 'src/send/utils'
+import { handlePaymentDeeplink } from 'src/send/utils'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
@@ -122,8 +122,6 @@ export function* handleDeepLink(action: OpenDeepLink) {
       yield put(receiveAttestationMessage(rawParams.path.substr(3), CodeInputType.DEEP_LINK))
     } else if (rawParams.path.startsWith('/pay')) {
       yield call(handlePaymentDeeplink, deepLink)
-    } else if (rawParams.path.startsWith('/tx')) {
-      yield call(handleTxDeeplink, deepLink)
     } else if (rawParams.path.startsWith('/dappkit')) {
       handleDappkitDeepLink(deepLink)
     }

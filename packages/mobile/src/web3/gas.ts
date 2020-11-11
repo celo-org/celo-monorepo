@@ -33,8 +33,6 @@ export async function getGasPrice(
 }
 
 async function fetchGasPrice(currency: CURRENCY_ENUM) {
-  // DO NOT MERGE: Short circuit gas price calculation
-  return new BigNumber(500000000)
   const contractKit = await getContractKitAsync()
   const [gasPriceMinimum, address] = await Promise.all([
     contractKit.contracts.getGasPriceMinimum(),

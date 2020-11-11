@@ -17,33 +17,24 @@ import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, isProviderConnectionError } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
-import { isGethConnectedSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { networkConnectedSelector } from 'src/networkInfo/selectors'
 import { getPasswordSaga } from 'src/pincode/authentication'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
   completeWeb3Sync,
-  FetchNonceAction,
   setAccount,
   SetAccountAction,
   setFornoMode,
   SetIsFornoAction,
-  setNonce,
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
 import { destroyContractKit, getWallet, getWeb3, initContractKit } from 'src/web3/contracts'
 import { createAccountDek } from 'src/web3/dataEncryptionKey'
-import {
-  currentAccountSelector,
-  fornoSelector,
-  nonceSelector,
-  mtwAddressSelector,
-} from 'src/web3/selectors'
+import { currentAccountSelector, fornoSelector, mtwAddressSelector } from 'src/web3/selectors'
 import { blockIsFresh, getLatestBlock } from 'src/web3/utils'
 import { BlockHeader } from 'web3-eth'
 
@@ -296,16 +287,6 @@ export function* getConnectedAccount() {
   return account
 }
 
-export function* getUnlockedAccount() {
-  const account: string = yield call(getAccount)
-  const success: boolean = yield call(unlockAccount, account)
-  if (success) {
-    return account
-  } else {
-    throw new Error(ErrorMessages.INCORRECT_PIN)
-  }
-}
-
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)
@@ -348,61 +329,12 @@ export function* toggleFornoMode({ fornoMode }: SetIsFornoAction) {
   }
 }
 
-export function* fetchNonce(_: FetchNonceAction) {
-  try {
-    const account = yield call(getConnectedAccount)
-    const web3 = yield call(getWeb3)
-    const nonce = yield call(web3.eth.getTransactionCount, account, 'pending')
-    yield put(setNonce(nonce))
-    Logger.debug(TAG + '@fetchNonce', `Updated nonce to ${nonce} from view call`)
-  } catch (error) {
-    Logger.error(TAG + '@fetchNonce', 'Error fetching in the current nonce', error)
-  }
-}
-
-export function* getNonce() {
-  const connected =
-    (yield select(isGethConnectedSelector)) && (yield select(networkConnectedSelector))
-
-  if (connected) {
-    try {
-      const account = yield call(getConnectedAccount)
-      const web3 = yield call(getWeb3)
-      const nonce = yield call(web3.eth.getTransactionCount, account, 'pending')
-      yield put(setNonce(nonce))
-      Logger.debug(TAG + '@getNonce', `Updated nonce to ${nonce} from view call`)
-    } catch (error) {
-      Logger.error(TAG + '@getNonce', 'Error fetching in the current nonce', error)
-    }
-  }
-
-  const nonce = yield select(nonceSelector)
-  Logger.debug(TAG + '@getNonce', `Using cached nonce value: ${nonce}`)
-  return nonce
-}
-
-// DO NOT MERGE:
-// This uses a weak version of nonce reservation, as it will be reset if the nonce is ever fetched from the chain.
-// Essentially it would have no effect when used in an online manner, and it would not prevent race conditions.
-export function* reserveNonce() {
-  const nonce = yield call(getNonce)
-  Logger.debug(TAG + '@reserveNonce', `Incrementing nonce to reserve nonce ${nonce}`)
-  yield put(setNonce(nonce + 1))
-  return nonce
-}
-
 export function* watchFornoMode() {
   yield takeLatest(Actions.TOGGLE_IS_FORNO, toggleFornoMode)
-}
-
-export function* watchFetchNonce() {
-  // DO NOT MERGE: Perhaps this should be takeLeading instead.
-  yield takeLatest(Actions.FETCH_NONCE, fetchNonce)
 }
 
 export function* web3Saga() {
   yield spawn(initContractKit)
   yield spawn(watchFornoMode)
   yield spawn(waitWeb3LastBlock)
-  yield spawn(watchFetchNonce)
 }

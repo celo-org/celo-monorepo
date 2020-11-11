@@ -7,16 +7,13 @@ import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { DEFAULT_TESTNET } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
-import { sendAndMonitorTransaction, signTransaction } from 'src/transactions/saga'
+import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { TransactionContext, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedAccount, getUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
@@ -116,7 +113,6 @@ interface TokenTransferFactory {
   currency: CURRENCY_ENUM
   fetchAction: () => any
   staticGas?: number
-  gasPrice?: BigNumber
 }
 
 // TODO(martinvol) this should go to the SDK
@@ -127,7 +123,7 @@ export async function createTokenTransferTransaction(
   const { recipientAddress, amount, comment } = transferAction
   const contract = await getTokenContract(currency)
 
-  const decimals = 18 // await contract.decimals()
+  const decimals = await contract.decimals()
   const decimalBigNum = new BigNumber(decimals)
   const decimalFactor = new BigNumber(10).pow(decimalBigNum.toNumber())
   const convertedAmount = new BigNumber(amount).multipliedBy(decimalFactor).toFixed(0)
@@ -160,7 +156,6 @@ export function tokenTransferFactory({
   currency,
   fetchAction,
   staticGas,
-  gasPrice,
 }: TokenTransferFactory) {
   return function*() {
     while (true) {
@@ -189,7 +184,8 @@ export function tokenTransferFactory({
       )
 
       try {
-        const account = yield call(getUnlockedAccount)
+        const account = yield call(getConnectedUnlockedAccount)
+
         const tx: CeloTransactionObject<boolean> = yield call(
           createTokenTransferTransaction,
           currency,
@@ -200,12 +196,7 @@ export function tokenTransferFactory({
           }
         )
 
-        // NOTE ---- this is the normal flow
-        if (false) {
-          yield call(sendAndMonitorTransaction, tx, account, context, currency, staticGas)
-        }
-        const signedTx = yield call(signTransaction, tx, account, context)
-        navigate(Screens.QRCode, { rawSignedTransaction: signedTx.raw as string })
+        yield call(sendAndMonitorTransaction, tx, account, context, currency, undefined, staticGas)
       } catch (error) {
         Logger.error(tag, 'Error transfering token', error)
         yield put(removeStandbyTransaction(context.id))

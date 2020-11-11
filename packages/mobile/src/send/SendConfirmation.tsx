@@ -141,6 +141,7 @@ function SendConfirmation(props: Props) {
   const onSendClick = () => {
     if (type === TokenTransactionType.InviteSent) {
       setModalVisible(true)
+    } else {
       sendOrInvite()
     }
   }
@@ -223,8 +224,7 @@ function SendConfirmation(props: Props) {
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
-    const isPrimaryButtonDisabled =
-      isSending || !userHasEnough || /* !appConnected || */ !!asyncFee.error
+    const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
 
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()

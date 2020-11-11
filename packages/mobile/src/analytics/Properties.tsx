@@ -588,10 +588,6 @@ interface TransactionEventsProperties {
     description?: string
     fornoMode?: boolean
   }
-  [TransactionEvents.transaction_signed]: {
-    txId: string
-    description?: string
-  }
   [TransactionEvents.transaction_gas_estimated]: {
     txId: string
     estimatedGas: number

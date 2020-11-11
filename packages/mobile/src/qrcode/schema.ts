@@ -13,7 +13,7 @@ import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { parse } from 'url'
 
 export const UriDataType = ioType({
-  address: ioUnion([ioUndefined, AddressType]),
+  address: AddressType,
   displayName: ioUnion([ioUndefined, ioString]),
   e164PhoneNumber: ioUnion([ioUndefined, E164PhoneNumberType]),
   currencyCode: ioUnion([ioUndefined, ioKeyof(LocalCurrencyCode)]),
@@ -32,9 +32,8 @@ export const uriDataFromJson = (obj: object): UriData => {
 }
 export const uriDataFromUrl = (url: string) => uriDataFromJson(parse(decodeURI(url), true).query)
 
-export enum UriMethod {
+enum UriMethod {
   pay = 'pay',
-  tx = 'tx',
 }
 
 // removes undefined parameters for serialization

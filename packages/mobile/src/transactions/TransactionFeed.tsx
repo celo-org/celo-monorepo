@@ -17,10 +17,10 @@ import { recentTxRecipientsCacheSelector } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import { TransactionStatus } from 'src/transactions/types'
 import { groupFeedItemsInSections } from 'src/transactions/utils'
-// import Logger from 'src/utils/Logger'
+import Logger from 'src/utils/Logger'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
-// const TAG = 'transactions/TransactionFeed'
+const TAG = 'transactions/TransactionFeed'
 
 export enum FeedType {
   HOME = 'home',
@@ -87,12 +87,10 @@ function TransactionFeed({ kind, loading, error, data }: Props) {
     return groupFeedItemsInSections(data)
   }, [kind, data])
 
-  /* Render the cached transaction feed, even if we are offline.
   if (error) {
+    // Log an error, but continue to show any events we have cached.
     Logger.error(TAG, 'Failure while loading transaction feed', error)
-    return <NoActivity kind={kind} loading={loading} error={error} />
   }
-  */
 
   if (!data || data.length === 0) {
     return <NoActivity kind={kind} loading={loading} error={error} />
