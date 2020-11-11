@@ -8,7 +8,7 @@ import { keccak256 } from 'ethereumjs-util'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { join, sep } from 'path'
-import OffchainDataWrapper, { OffchainErrorTypes } from '../offchain-data-wrapper'
+import { OffchainDataWrapper, OffchainErrorTypes } from '../offchain-data-wrapper'
 import {
   InvalidDataError,
   InvalidKey,

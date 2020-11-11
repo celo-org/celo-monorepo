@@ -1,5 +1,5 @@
 import * as t from 'io-ts'
-import OffchainDataWrapper from '../../offchain-data-wrapper'
+import { OffchainDataWrapper } from '../../offchain-data-wrapper'
 import { PrivateSimpleAccessor, PublicSimpleAccessor } from './simple'
 
 const NameSchema = t.type({

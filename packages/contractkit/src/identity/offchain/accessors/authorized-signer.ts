@@ -3,7 +3,7 @@ import { Err, makeAsyncThrowable } from '@celo/base/lib/result'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
 import * as t from 'io-ts'
 import { toChecksumAddress } from 'web3-utils'
-import OffchainDataWrapper, { OffchainErrors } from '../../offchain-data-wrapper'
+import { OffchainDataWrapper, OffchainErrors } from '../../offchain-data-wrapper'
 import { buildEIP712TypedData, deserialize } from '../utils'
 import { OffchainError } from './errors'
 

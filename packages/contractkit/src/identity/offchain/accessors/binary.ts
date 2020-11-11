@@ -1,6 +1,6 @@
 import { Address, trimLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok } from '@celo/base/lib/result'
-import OffchainDataWrapper from '../../offchain-data-wrapper'
+import { OffchainDataWrapper } from '../../offchain-data-wrapper'
 import { readEncrypted, signBuffer, writeEncrypted } from '../utils'
 import { OffchainError } from './errors'
 import { PrivateAccessor, PublicAccessor } from './interfaces'

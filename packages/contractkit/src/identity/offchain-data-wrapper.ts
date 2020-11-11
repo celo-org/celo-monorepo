@@ -51,7 +51,20 @@ export type OffchainErrors =
   | NoStorageRootProvidedData
   | NoStorageProvider
 
-export default class OffchainDataWrapper {
+export interface OffchainDataWrapper {
+  kit: ContractKit
+  signer: Address
+  self: Address
+  writeDataTo(data: Buffer, signature: Buffer, dataPath: string): Promise<OffchainErrors | void>
+  readDataFromAsResult<DataType>(
+    account: Address,
+    dataPath: string,
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
+  ): Promise<Result<Buffer, OffchainErrors>>
+}
+
+export class BasicDataWrapper implements OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
   signer: string
 

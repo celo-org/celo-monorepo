@@ -1,7 +1,7 @@
 import { Address, trimLeading0x } from '@celo/base'
 import { Err, makeAsyncThrowable, Result } from '@celo/base/lib/result'
 import * as t from 'io-ts'
-import OffchainDataWrapper from '../../offchain-data-wrapper'
+import { OffchainDataWrapper } from '../../offchain-data-wrapper'
 import { buildEIP712TypedData, deserialize, readEncrypted, writeEncrypted } from '../utils'
 import { InvalidDataError, OffchainError, SchemaErrors } from './errors'
 import { PrivateAccessor, PublicAccessor } from './interfaces'

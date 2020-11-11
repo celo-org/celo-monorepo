@@ -200,4 +200,5 @@ export const SignatureUtils = {
   parseSignature,
   parseSignatureWithoutPrefix,
   serializeSignature,
+  recoverEIP712TypedDataSigner,
 }
