@@ -40,11 +40,17 @@ mv build/contracts $BUILD_DIR
 
 echo "- Run local network"
 startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.gz >> $LOG_FILE
-GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
-echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
-
-echo "Waiting for ganache to start"
-# sleep 20
+function killGanache () {
+    local GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    if [[ -n $GANACHE_PID ]]; then
+        echo "Killing ganache"
+        kill $GANACHE_PID
+    fi
+}
+# Ganache is started in the background and will not exit by itself.
+# `killGanache` will be called when this script exits (successfully or not) and
+# clean up the background process.
+trap killGanache EXIT
 
 # Move back to branch from which we started
 git checkout -
@@ -64,5 +70,3 @@ yarn truffle exec --network development ./scripts/truffle/make-release.js --buil
 # From verify-release.sh
 echo "- Verify release"
 yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
-
-kill $GANACHE_PID
