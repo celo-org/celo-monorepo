@@ -347,6 +347,8 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 # Load configuration to files
 mkdir -p $DATA_DIR/account
+# note that since v1.1.0, genesis block and bootnodes are derived dynamically based on --baklava flag being passed to geth
+# leaving the genesis and bootnodes commands below as comments until the questions around how to best handle these for testnets are resolved
 #echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
 #echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
 echo -n '${rid}' > $DATA_DIR/replica_id

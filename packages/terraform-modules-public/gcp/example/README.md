@@ -344,7 +344,7 @@
     ######
     # use this script on an attestation signer tx-node to generate a proof of possession, needed for key rotation
 
-    CELO_IMAGE=us.gcr.io/celo-org/celo-node:f4bda6d027f0af6c68ae4d146abe791739ae6cba
+    CELO_IMAGE=us.gcr.io/celo-org/geth:1.1.0
     CELO_ATTESTATION_SIGNER_ADDRESS=YOUR_ATTESTATION_SIGNER_ADDRESS
     CELO_VALIDATOR_RG_ADDRESS=YOUR_VALIDATOR_RELEASE_GOLD_ADDRESS
 
