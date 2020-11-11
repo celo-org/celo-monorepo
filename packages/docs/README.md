@@ -4,23 +4,23 @@ Welcome to the technical documentation site for the Celo project!
 
 In this documentation you’ll find information on:
 
-- An [overview](/packages/docs/overview.md) of the high-level architecture of Celo
-- Tutorials to get you started with the [Celo SDK](/packages/docs/developer-resources/start.md) and the [Celo networks](/packages/docs/getting-started/choosing-a-network.md)
-- Reference documentation about the [Celo protocol](/packages/docs/celo-codebase/protocol/) and [wallet](/packages/docs/celo-codebase/wallet/)
-- How to make technical [contributions](/packages/docs/community/contributing.md) to the project and community
+- An [overview](overview.md) of the high-level architecture of Celo
+- Tutorials to get you started with the [Celo SDK](developer-resources/start.md) and the [Celo networks](getting-started/choosing-a-network.md)
+- Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
+- How to make technical [contributions](community/contributing.md) to the project and community
 
 ## Quick Reference
 
 - CELO Owners
-  - [Start here](/packages/docs/celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
+  - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
 - Validator & Node Operators
-  - Check out the [Validator overview page](/packages/docs/validator-guide/overview.md).
-  - Consider running a node on the [Baklava testnet](/packages/docs/getting-started/baklava-testnet.md) before getting started on Mainnet.
-  - Learn more about running nodes on [Mainnet](/packages/docs/getting-started/mainnet.md).
+  - Check out the [Validator overview page](validator-guide/overview.md).
+  - Consider running a node on the [Baklava testnet](getting-started/baklava-testnet.md) before getting started on Mainnet.
+  - Learn more about running nodes on [Mainnet](getting-started/mainnet.md).
 - Developers
-  - Start at the [developer tools page](/packages/docs/developer-resources/overview.md) for help building a DApp or service on the Celo network.
+  - Start at the [developer tools page](developer-resources/overview.md) for help building a DApp or service on the Celo network.
 - Integration Guide
-  - [This section](/packages/docs/developer-resources/integrations/integrations.md) includes guides on common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
+  - [This section](developer-resources/integrations/integrations.md) includes guides on common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
 
 ### About Celo
 
@@ -76,13 +76,13 @@ The Celo project is at a prototype stage.
 
 The code is entirely open source and available on [GitHub](https://github.com/celo-org). Versions of all the major components of both the protocol and wallet exist, but the platform as a whole is under active development and testing by the Celo community.
 
-The [Alfajores Testnet](/packages/docs/getting-started/alfajores-testnet.md) is the first of several networks designed for testing and for developers to experiment and learn more about Celo. You can set up an account, receive funds, and try out the Celo Wallet and Celo CLI. [Get started here](/packages/docs/getting-started/faucet.md).
+The [Alfajores Testnet](getting-started/alfajores-testnet.md) is the first of several networks designed for testing and for developers to experiment and learn more about Celo. You can set up an account, receive funds, and try out the Celo Wallet and Celo CLI. [Get started here](getting-started/faucet.md).
 
 {% hint style="warning" %}
-The Alfajores Testnet’s tokens hold no real world economic value. The entirety of the testnet’s data will be reset on a regular basis. This will erase your accounts, their balance and your transaction history. Your use of the Alfajores Tesnet is subject to the [Alfajores Testnet Disclaimer](/packages/docs/important-information/alfajores-testnet-disclaimer.md).
+The Alfajores Testnet’s tokens hold no real world economic value. The entirety of the testnet’s data will be reset on a regular basis. This will erase your accounts, their balance and your transaction history. Your use of the Alfajores Tesnet is subject to the [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md).
 {% endhint %}
 
-The [Baklava Testnet](/packages/docs/getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive CELO at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
+The [Baklava Testnet](getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive CELO at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
 
 The Celo community's work is focused on the path to a production Celo network that holds economic value. This means testing, running security audits, and building broader involvement around a longer-term roadmap. The project also continues to remain focused on user experience.
 
@@ -92,26 +92,26 @@ The team working on Celo anticipates working to improve and expand the range of 
 While development proceeds, Celo’s protocol and its APIs will evolve and any smart contracts or applications built to operate on Alfajores or with respect to the current codebase may become incompatible.
 {% endhint %}
 
-Celo is a project with a mission of financial inclusion that consists entirely of open source code, is deployed as an open, decentralized runtime, and promotes open governance. Make it your project too. Please [get involved](/packages/docs/community/contributing.md)!
+Celo is a project with a mission of financial inclusion that consists entirely of open source code, is deployed as an open, decentralized runtime, and promotes open governance. Make it your project too. Please [get involved](community/contributing.md)!
 
 ### Useful Links <a id="useful-links"></a>
 
 Learn more about Celo:
 
-- [Overview of Celo’s architecture ](/packages/docs/overview.md)
+- [Overview of Celo’s architecture ](overview.md)
 - [Technical blog posts](https://medium.com/celoorg/technology/home)
 
 Browse the code, raise an issue, or contribute a PR:
 
 - [Monorepo GitHub Page](https://github.com/celo-org/celo-monorepo)
 - [Celo Client GitHub Page](https://github.com/celo-org/celo-blockchain)
-- [Contributing Guide](/packages/docs/community/contributing.md)
+- [Contributing Guide](community/contributing.md)
 - [Celo Build Page](https://celo.org/build)
 
 Try Celo out:
 
-- [Using the Mobile Wallet](/packages/docs/getting-started/using-the-mobile-wallet.md) on the Alfajores Testnet
-- [Introduction to the CLI ](/packages/docs/command-line-interface/introduction.md)on the Alfajores Testnet
+- [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md) on the Alfajores Testnet
+- [Introduction to the CLI ](command-line-interface/introduction.md)on the Alfajores Testnet
 
 Read the Whitepapers:
 
