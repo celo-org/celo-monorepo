@@ -1,5 +1,5 @@
 PODS:
-  - Analytics (3.8.0)
+  - Analytics (4.1.1)
   - boost-for-react-native (1.63.0)
   - CeloBlockchain (0.0.319)
   - DoubleConversion (1.1.6)
@@ -352,8 +352,8 @@ PODS:
     - React
   - react-native-udp (2.6.1):
     - React
-  - react-native-webview (10.8.3):
-    - React
+  - react-native-webview (10.10.2):
+    - React-Core
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
   - React-RCTAnimation (0.62.2):
@@ -413,10 +413,10 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - RNAnalytics (1.1.1-beta.2):
-    - Analytics
+  - RNAnalytics (1.3.2):
+    - Analytics (~> 4.1)
     - React
-  - RNAnalyticsIntegration-Firebase (1.1.1-beta.2):
+  - RNAnalyticsIntegration-Firebase (1.3.2):
     - Analytics
     - React
     - RNAnalytics
@@ -487,13 +487,13 @@ PODS:
     - React
   - RNSVG (12.1.0):
     - React
-  - Segment-Firebase (2.6.1):
-    - Analytics (~> 3.2)
+  - Segment-Firebase (2.7.0):
+    - Analytics
     - Firebase/Core (~> 6.2)
     - FirebaseAnalytics (~> 6.1)
-    - Segment-Firebase/Core (= 2.6.1)
-  - Segment-Firebase/Core (2.6.1):
-    - Analytics (~> 3.2)
+    - Segment-Firebase/Core (= 2.7.0)
+  - Segment-Firebase/Core (2.7.0):
+    - Analytics
     - Firebase/Core (~> 6.2)
     - FirebaseAnalytics (~> 6.1)
   - Sentry (5.2.0):
@@ -577,7 +577,7 @@ DEPENDENCIES:
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
-  - Segment-Firebase
+  - Segment-Firebase (~> 2.7.0)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -758,7 +758,7 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Analytics: fcf79ebc393a7d77befb8d43ce296353ba9ede3d
+  Analytics: 952eac761f84ba0a508a4cf691598654073f9e3d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   CeloBlockchain: 2b3bc8846dff06152d3fcc59c14c43c9740c0a72
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
@@ -818,7 +818,7 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-webview: 598605cd213f5096e695f5b33fbee210a47e60ab
+  react-native-webview: 0aa2cde4ee7e3e1c5fffdf64dbce9c709aa18155
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -829,8 +829,8 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  RNAnalytics: bf9743995acee035396822c40bcdd1b87e90ba76
-  RNAnalyticsIntegration-Firebase: 87b33dc507fd78b2f1f97d65fe022442ba0c367b
+  RNAnalytics: ac18ac964dd53bac7f957994412963e8e2568c4d
+  RNAnalyticsIntegration-Firebase: daed87b7ab56636ed0098326eb92e26fdfc198c2
   RNCAsyncStorage: 453cd7c335ec9ba3b877e27d02238956b76f3268
   RNCClipboard: 546484405eaa1c8a3eccce77b8c8871242e73b20
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
@@ -854,11 +854,11 @@ SPEC CHECKSUMS:
   RNSentry: 2bae4ffee2e66376ef42cb845a494c3bde17bc56
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
-  Segment-Firebase: 9ac8c3bf9d5c6dcaf248408aca604e023c4b5aad
+  Segment-Firebase: 41677a446f58989db69912059949107afb0c3f38
   Sentry: 6e04bc3e11bf771ca79140a112de64dcfbc7d8cb
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: bf6bcaf04d3bf278794ddd460f4ab1dfd9f3e440
+PODFILE CHECKSUM: 386101f93bf1b36b7baf2831056a15e005ec5fd5
 
 COCOAPODS: 1.10.0

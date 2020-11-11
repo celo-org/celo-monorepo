@@ -87,11 +87,6 @@ export default RestoreAccountOnboarding = () => {
     await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
   })
 
-  it.skip('Verify', async () => {
-    // skipping for now
-    // TODO(erdal): implement
-  })
-
   it('Wallet Home', async () => {
     await expect(element(by.id('SendOrRequestBar'))).toBeVisible()
   })
