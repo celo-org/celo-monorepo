@@ -2,10 +2,10 @@
 // tslint:disable: no-console
 import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/report'
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { linkedLibraries } from '@celo/protocol/migrationsConfig'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
-import { CeloContractName } from 'lib/registry-utils'
 import { basename, join } from 'path'
 import { RegistryInstance } from 'types'
 
