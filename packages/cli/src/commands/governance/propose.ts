@@ -1,4 +1,8 @@
-import { ProposalBuilder, proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
+import {
+  ProposalBuilder,
+  proposalToJSON,
+  ProposalTransactionJSON,
+} from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
 import { BigNumber } from 'bignumber.js'
 import { readFileSync } from 'fs'
@@ -42,7 +46,7 @@ export default class Propose extends BaseCommand {
 
     // BUILD FROM JSON
     const jsonString = readFileSync(res.flags.jsonTransactions).toString()
-    const jsonTransactions = JSON.parse(jsonString)
+    const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
 
     // BUILD FROM CONTRACTKIT FUNCTIONS
