@@ -26,6 +26,8 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
 
   const trie = new SecureTrie()
   await trie.put(hexToBuffer(OWNER_POSITION), rlpEncode(owner))
+  // for future use
+  // await trie.put(hexToBuffer(IMPLEMENTATION_POSITION), rlpEncode(implementation))
 
   return proof.storageHash === ensureLeading0x(trie.root.toString('hex'))
 }
