@@ -7,9 +7,9 @@ import {
   stripMetadata,
   verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
+import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { verifyProxyStorageProof } from 'lib/proxy-utils'
 import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
 
@@ -99,7 +99,9 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
       throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
     }
 
-    console.log(`Proposed Proxy deployed at ${proxyAddress} matches ${contract}Proxy`)
+    console.log(
+      `Proxy deployed at ${proxyAddress} matches ${contract}Proxy (implementation and storage)`
+    )
   }
 
   // check implementation deployment
@@ -131,7 +133,11 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
   } else {
-    console.log(`Contract deployed at ${implementationAddress} matches ${contract}`)
+    console.log(
+      `${
+        isLibrary(contract, context) ? 'Library' : 'Contract'
+      } deployed at ${implementationAddress} matches ${contract}`
+    )
   }
 
   // push unvisited libraries to DFS queue
