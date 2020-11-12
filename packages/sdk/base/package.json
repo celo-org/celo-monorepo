@@ -23,6 +23,7 @@
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1",
     "bignumber.js": "^9.0.0",
-    "elliptic": "^6.5.3"
+    "elliptic": "^6.5.3",
+    "web3-utils": "1.2.11"
   }
 }

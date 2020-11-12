@@ -44,7 +44,7 @@ const Exchange = {
   exchange: jest.fn(),
 }
 
-const web3 = new Web3()
+const web3 = new Web3('http://localhost:8545')
 
 const connection = new Connection(web3)
 
