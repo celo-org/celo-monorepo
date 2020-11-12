@@ -1,9 +1,9 @@
 import stringHash from 'string-hash'
-import { getAKSClusterConfig, getAWSClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext } from './context-utils'
+import { getAksClusterConfig, getAwsClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext } from './context-utils'
 import { DynamicEnvVar, envVar, fetchEnv } from './env-utils'
 import { CloudProvider } from './k8s-cluster/base'
-import { AKSFullNodeDeploymentConfig } from './k8s-fullnode/aks'
-import { AWSFullNodeDeploymentConfig } from './k8s-fullnode/aws'
+import { AksFullNodeDeploymentConfig } from './k8s-fullnode/aks'
+import { AwsFullNodeDeploymentConfig } from './k8s-fullnode/aws'
 import { BaseFullNodeDeploymentConfig } from './k8s-fullnode/base'
 import { GCPFullNodeDeploymentConfig } from './k8s-fullnode/gcp'
 import { getFullNodeDeployer } from './k8s-fullnode/utils'
@@ -26,8 +26,8 @@ const contextFullNodeDeploymentEnvVars: {
 const deploymentConfigGetterByCloudProvider: {
   [key in CloudProvider]: (context: string) => BaseFullNodeDeploymentConfig
 } = {
-  [CloudProvider.AWS]: getAWSFullNodeDeploymentConfig,
-  [CloudProvider.AZURE]: getAKSFullNodeDeploymentConfig,
+  [CloudProvider.AWS]: getAwsFullNodeDeploymentConfig,
+  [CloudProvider.AZURE]: getAksFullNodeDeploymentConfig,
   [CloudProvider.GCP]: getGCPFullNodeDeploymentConfig,
 }
 
@@ -120,24 +120,24 @@ function getFullNodeDeploymentConfig(context: string) : BaseFullNodeDeploymentCo
 }
 
 /**
- * For a given context, returns the appropriate AKSFullNodeDeploymentConfig
+ * For a given context, returns the appropriate AksFullNodeDeploymentConfig
  */
-function getAKSFullNodeDeploymentConfig(context: string): AKSFullNodeDeploymentConfig {
+function getAksFullNodeDeploymentConfig(context: string): AksFullNodeDeploymentConfig {
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(context)
   return {
     ...fullNodeDeploymentConfig,
-    clusterConfig: getAKSClusterConfig(context),
+    clusterConfig: getAksClusterConfig(context),
   }
 }
 
 /**
- * For a given context, returns the appropriate AWSFullNodeDeploymentConfig
+ * For a given context, returns the appropriate AwsFullNodeDeploymentConfig
  */
-function getAWSFullNodeDeploymentConfig(context: string): AWSFullNodeDeploymentConfig {
+function getAwsFullNodeDeploymentConfig(context: string): AwsFullNodeDeploymentConfig {
   const fullNodeDeploymentConfig: BaseFullNodeDeploymentConfig = getFullNodeDeploymentConfig(context)
   return {
     ...fullNodeDeploymentConfig,
-    clusterConfig: getAWSClusterConfig(context),
+    clusterConfig: getAwsClusterConfig(context),
   }
 }
 
