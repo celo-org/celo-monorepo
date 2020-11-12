@@ -71,15 +71,6 @@ export class Connection {
   }
 
   /**
-   * Token in which the gas will be paid. Should be a currency listed in the FeeCurrencyWhitelist contract
-   * default: undefined (CELO)
-   * @param tokenAddress
-   */
-  async setFeeCurrency(tokenAddress?: Address) {
-    this.config.feeCurrency = tokenAddress
-  }
-
-  /**
    * Set default account for generated transactions (eg. tx.from )
    */
   set defaultAccount(address: Address | undefined) {

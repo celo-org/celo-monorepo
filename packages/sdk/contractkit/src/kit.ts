@@ -1,4 +1,13 @@
-import { Address, Connection, ReadOnlyWallet } from '@celo/connect'
+import {
+  Address,
+  CeloTx,
+  CeloTxObject,
+  Connection,
+  ReadOnlyWallet,
+  TransactionResult,
+} from '@celo/connect'
+import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
+import { Signature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
@@ -193,11 +202,6 @@ export class ContractKit {
     }
   }
 
-  // For backwards compatibility
-  set defaultAccount(address: Address | undefined) {
-    this.connection.defaultAccount = address
-  }
-
   /**
    * Set CeloToken to use to pay for gas fees
    * @param token cUSD (StableToken) or CELO (GoldToken)
@@ -205,7 +209,10 @@ export class ContractKit {
   async setFeeCurrency(token: CeloToken): Promise<void> {
     const address =
       token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
-    await this.connection.setFeeCurrency(address)
+    if (address) {
+      await this.updateGasPriceInConnectionLayer(address)
+    }
+    this.connection.defaultFeeCurrency = address
   }
 
   // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
@@ -252,5 +259,79 @@ export class ContractKit {
     } else {
       return epochNumber + 1
     }
+  }
+
+  // *** NOTICE ***
+  // Next functions exists for backwards compatibility
+  // These should be consumed via connection to avoid future deprecation issues
+
+  set defaultAccount(address: Address | undefined) {
+    this.connection.defaultAccount = address
+  }
+
+  get defaultAccount(): Address | undefined {
+    return this.connection.defaultAccount
+  }
+
+  set gasInflationFactor(factor: number) {
+    this.connection.defaultGasInflationFactor = factor
+  }
+
+  get gasInflationFactor() {
+    return this.connection.defaultGasInflationFactor
+  }
+
+  set gasPrice(price: number) {
+    this.connection.defaultGasPrice = price
+  }
+
+  get gasPrice() {
+    return this.connection.defaultGasPrice
+  }
+
+  set defaultFeeCurrency(address: Address | undefined) {
+    this.connection.defaultFeeCurrency = address
+  }
+
+  get defaultFeeCurrency() {
+    return this.connection.defaultFeeCurrency
+  }
+
+  isListening(): Promise<boolean> {
+    return this.connection.isListening()
+  }
+
+  isSyncing(): Promise<boolean> {
+    return this.connection.isSyncing()
+  }
+
+  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
+    if (tx.feeCurrency && tx.gasPrice === '0') {
+      await this.updateGasPriceInConnectionLayer(tx.feeCurrency)
+    }
+    return this.connection.fillGasPrice(tx)
+  }
+
+  async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
+    return this.connection.sendTransaction(tx)
+  }
+
+  async sendTransactionObject(
+    txObj: CeloTxObject<any>,
+    tx?: Omit<CeloTx, 'data'>
+  ): Promise<TransactionResult> {
+    return this.connection.sendTransactionObject(txObj, tx)
+  }
+
+  async signTypedData(signer: string, typedData: EIP712TypedData): Promise<Signature> {
+    return this.connection.signTypedData(signer, typedData)
+  }
+
+  stop() {
+    this.connection.stop()
+  }
+
+  get web3() {
+    return this.connection.web3
   }
 }
