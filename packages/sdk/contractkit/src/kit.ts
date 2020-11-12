@@ -8,6 +8,7 @@ import {
 } from '@celo/connect'
 import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { Signature } from '@celo/utils/lib/signatureUtils'
+import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
@@ -31,7 +32,7 @@ import { ValidatorsConfig } from './wrappers/Validators'
  * Creates a new instance of the `ContractKit` with a web3 instance
  * @param web3 Web3 instance
  */
-export function newKitFromWeb3(web3: Web3, wallet?: ReadOnlyWallet) {
+export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWallet()) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
