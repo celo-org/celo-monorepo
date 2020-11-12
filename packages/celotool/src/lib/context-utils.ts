@@ -9,11 +9,46 @@ import { getClusterManager } from './k8s-cluster/utils'
 /**
  * Env vars corresponding to each value for the AksClusterConfig for a particular context
  */
-const contextAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
-  clusterName: DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+const contextAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider' | 'clusterName' | 'resourceGroup'>]: DynamicEnvVar } = {
   subscriptionId: DynamicEnvVar.AZURE_SUBSCRIPTION_ID,
   tenantId: DynamicEnvVar.AZURE_TENANT_ID,
-  resourceGroup: DynamicEnvVar.AZURE_KUBERNETES_RESOURCE_GROUP,
+  regionName: DynamicEnvVar.AZURE_REGION_NAME,
+}
+
+/**
+ * Env vars corresponding to each value for the Komenci AksClusterConfig for a particular context
+ */
+const contextKomenciAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+  ...contextAksClusterConfigDynamicEnvVars,
+  clusterName: DynamicEnvVar.KOMENCI_KUBERNETES_CLUSTER_NAME,
+  resourceGroup: DynamicEnvVar.KOMENCI_AZURE_KUBERNETES_RESOURCE_GROUP,
+}
+
+/**
+ * Env vars corresponding to each value for the Oracle AksClusterConfig for a particular context
+ */
+const contextOracleAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+  ...contextAksClusterConfigDynamicEnvVars,
+  clusterName: DynamicEnvVar.ORACLE_KUBERNETES_CLUSTER_NAME,
+  resourceGroup: DynamicEnvVar.ORACLE_AZURE_KUBERNETES_RESOURCE_GROUP,
+}
+
+/**
+ * Env vars corresponding to each value for the Fullnode AksClusterConfig for a particular context
+ */
+const contextFullnodeAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+  ...contextAksClusterConfigDynamicEnvVars,
+  clusterName: DynamicEnvVar.FULL_NODES_KUBERNETES_CLUSTER_NAME,
+  resourceGroup: DynamicEnvVar.FULL_NODES_AZURE_KUBERNETES_RESOURCE_GROUP,
+}
+
+/**
+ * Env vars corresponding to each value for the Fullnode AksClusterConfig for a particular context
+ */
+const contextFornoAksClusterConfigDynamicEnvVars: { [k in keyof Omit<AksClusterConfig, 'cloudProvider'>]: DynamicEnvVar } = {
+  ...contextAksClusterConfigDynamicEnvVars,
+  clusterName: DynamicEnvVar.FORNO_KUBERNETES_CLUSTER_NAME,
+  resourceGroup: DynamicEnvVar.FORNO_AZURE_KUBERNETES_RESOURCE_GROUP,
 }
 
 /**
@@ -35,11 +70,18 @@ const contextGCPClusterConfigDynamicEnvVars: { [k in keyof Omit<GCPClusterConfig
 }
 
 const clusterConfigGetterByCloudProvider: {
-  [key in CloudProvider]: (context: string) => BaseClusterConfig
+  [key in CloudProvider]: (context: string, serviceName?: serviceName) => BaseClusterConfig
 } = {
   [CloudProvider.AWS]: getAwsClusterConfig,
   [CloudProvider.AZURE]: getAksClusterConfig,
   [CloudProvider.GCP]: getGCPClusterConfig,
+}
+
+export enum serviceName {
+  Oracle,
+  Komenci,
+  Fullnode,
+  Forno
 }
 
 export function getCloudProviderFromContext(context: string): CloudProvider {
@@ -56,8 +98,30 @@ export function getCloudProviderFromContext(context: string): CloudProvider {
  * @param context the context to use
  * @return an AksClusterConfig for the context
  */
-export function getAksClusterConfig(context: string): AksClusterConfig {
-  const azureDynamicEnvVars = getContextDynamicEnvVarValues(contextAksClusterConfigDynamicEnvVars, context)
+export function getAksClusterConfig(context: string, service?: serviceName): AksClusterConfig {
+  let contextDynamicEnvVars
+  switch(service){
+    case serviceName.Oracle: {
+      contextDynamicEnvVars = contextOracleAksClusterConfigDynamicEnvVars
+      break
+    }
+    case serviceName.Komenci: {
+      contextDynamicEnvVars = contextKomenciAksClusterConfigDynamicEnvVars
+      break
+    }
+    case serviceName.Fullnode: {
+      contextDynamicEnvVars = contextFullnodeAksClusterConfigDynamicEnvVars
+      break
+    }
+    case serviceName.Forno: {
+      contextDynamicEnvVars = contextFornoAksClusterConfigDynamicEnvVars
+      break
+    }
+    default: {
+      throw new Error("Unexpected service name " + serviceName)
+    }
+  }
+  const azureDynamicEnvVars = getContextDynamicEnvVarValues(contextDynamicEnvVars, context)
   const clusterConfig: AksClusterConfig = {
     cloudProvider: CloudProvider.AZURE,
     ...azureDynamicEnvVars
@@ -132,21 +196,21 @@ export function getContextDynamicEnvVarValues<T>(
 /**
  * Reads the context and switches to the appropriate Azure or AWS Cluster
  */
-export async function switchToContextCluster(celoEnv: string, context: string, checkOrPromptIfStagingOrProduction: boolean = true) {
+export async function switchToContextCluster(celoEnv: string, context: string, service: serviceName, checkOrPromptIfStagingOrProduction: boolean = true) {
   if (!isValidContext(context)) {
     throw Error(`Invalid context, must be one of ${fetchEnv(envVar.CONTEXTS)}`)
   }
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
-  const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context)
+  const clusterManager: BaseClusterManager = getClusterManagerForContext(celoEnv, context, service)
   await clusterManager.switchToClusterContext()
   return clusterManager
 }
 
-export function getClusterManagerForContext(celoEnv: string, context: string) {
+export function getClusterManagerForContext(celoEnv: string, context: string, service: serviceName) {
   const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
-  const clusterConfig = clusterConfigGetterByCloudProvider[cloudProvider](context)
+  const clusterConfig = clusterConfigGetterByCloudProvider[cloudProvider](context, service)
   return getClusterManager(cloudProvider, celoEnv, clusterConfig)
 }
 
