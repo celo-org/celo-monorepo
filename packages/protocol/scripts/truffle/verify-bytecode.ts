@@ -2,7 +2,7 @@ import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecod
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 import { readJsonSync } from 'fs-extra'
-import { OwnableInstance, ProxyInstance, RegistryInstance } from 'types'
+import { ProxyInstance, RegistryInstance } from 'types'
 
 /*
  * This script verifies that a given set of smart contract bytecodes corresponds
@@ -24,7 +24,6 @@ import { OwnableInstance, ProxyInstance, RegistryInstance } from 'types'
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
-const Ownable: Truffle.Contract<OwnableInstance> = artifacts.require('Ownable')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal', 'initialize_data'],
@@ -45,7 +44,6 @@ module.exports = async (callback: (error?: any) => number) => {
       registry,
       proposal,
       Proxy,
-      Ownable,
       web3,
       initializationData
     )
