@@ -371,6 +371,7 @@ function SendConfirmation(props: Props) {
           {features.KOMENCI ? (
             <InviteAndSendModal
               isVisible={modalVisible}
+              // TODO: we should refactor name display, this is fragile, we shouldn't compare against the english string. Here and in other places!
               name={!displayName || displayName === 'Mobile #' ? e164PhoneNumber! : displayName}
               onInvite={sendInvite}
               onCancel={cancelModal}
