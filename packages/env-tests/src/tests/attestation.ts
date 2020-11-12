@@ -8,6 +8,7 @@ import Logger from 'bunyan'
 import twilio from 'twilio'
 import { Context } from '../context'
 import { envVar, fetchEnv } from '../env'
+import { getKey, ONE, TestAccounts } from '../scaffold'
 import {
   getIdentifierAndPepper,
   getPhoneNumber,
@@ -15,8 +16,7 @@ import {
   reportErrors,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
-} from '../lib/attestation'
-import { getKey, ONE, TestAccounts } from '../scaffold'
+} from '../shared/attestation'
 
 async function fundAttestationAccount(
   context: Context,
