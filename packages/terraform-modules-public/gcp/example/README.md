@@ -299,6 +299,176 @@
 
 17. Troubleshooting
 
-    If your new validator isn't signing, check and make sure that both the proxy and the validator are synced, and that the enode variable for the proxy is set correctly in terraform.tfvars.
+    If your new validator isn't signing, check the following:
+    
+    * Make sure that both the proxy and the validator are synced.  You can verify this in the geth console:
+    ```console
+    docker exec -it geth geth attach
+    eth.syncing
+    ```
+    * Ensure that the validator signer key is unlocked on the validator:
+    ```console
+    docker exec -it geth geth attach
+    personal
+    ```
+    * Ensure that the proxy has >100 peers
+    ```console
+    docker exec -it geth geth attach
+    admin.peers.length
+    ```
+    * Check that the enode variable for the proxy is set correctly in terraform.tfvars.
+    * Verify network connectivity from the validator to the proxy on tcp/30503
+
+18. Attestation Service
+
+    First generate a new account to use for the attestation signer.
+
+    ```console
+    celocli account:new
+    ```
+
+    Use these values for the `attestation_signer_accounts` attributes:
+
+        * account_addresses
+        * private_keys
+        * account_passwords
+        
+    Put these into terraform.tfvars.
+
+    Now, on a system which has access to the attestation_signer private key, generate a proof of possession for that key as follows:
+
+    ```bash
+    #!/bin/bash
+    set -x
+
+    ######
+    # use this script on an attestation signer tx-node to generate a proof of possession, needed for key rotation
+
+    CELO_IMAGE=us.gcr.io/celo-org/geth:1.1.0
+    CELO_ATTESTATION_SIGNER_ADDRESS=YOUR_ATTESTATION_SIGNER_ADDRESS
+    CELO_VALIDATOR_RG_ADDRESS=YOUR_VALIDATOR_RELEASE_GOLD_ADDRESS
+
+    # On the Attestation machine
+    docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
+    ```
+
+    Use the generated signature to authorize a new attestation signer as follows:
+
+    ```bash
+    #!/bin/bash
+    set -x
+
+    ######
+    # use this script to authorize a new attestation signer
+    # signed by the validator release gold account
+
+    CELO_ATTESTATION_SIGNER_SIGNATURE=YOUR_SIGNATURE_FROM_PREVIOUS_STEP
+    CELO_ATTESTATION_SIGNER_ADDRESS=YOUR_ATTESTATION_SIGNER_ADDRESS
+    CELO_VALIDATOR_RG_ADDRESS=YOUR_VALIDATOR_RELEASE_GOLD_ADDRESS
+
+    npx celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer $CELO_ATTESTATION_SIGNER_ADDRESS --useLedger --ledgerCustomAddresses=[1]
+    ```
+
+  19. Update DNS with public IP of attestation service
+      
+      This could be done via terraform down the track.
+      This DNS name must be used in for the ATTESTATION_URL parameter used in the next step.
+
+      Terminating SSL for the attestation service is presently out of scope for this doc, but can be set up quickly and easily using GCP load balancing, Cloudflare, or nginx as a reverse proxy.
+
+      The attestation service requires that the following routes be exposed to the Internet to function correctly:
+      * POST /attestations
+      * POST /test_attestations
+      * GET /get_attestations
+      * POST /delivery_status_twilio
+      * GET /status
+      * GET /healthz
+      * GET /metrics
+
+  20. Validator metadata
+
+      First create validator metadata as follows:
+
+      ```console
+      celocli account:create-metadata ./validator_metadata.json --from $CELO_VALIDATOR_RG_ADDRESS
+      ```
+
+    Claim the validator account on the group account:
+
+    ```celocli account:claim-account ./validator_metadata.json --address $CELO_VALIDATOR_GROUP_RG_ADDRESS --from $CELO_ATTESTATION_SIGNER_ADDRESS```
+
+    Now claim your attestation URL.  Note this must be run on a node that has the attestation signer key unlocked:
+    
+    ```console
+    celocli account:claim-attestation-service-url ./validator_metadata.json --url https://YOUR_ATTESTATION_URL --from $CELO_ATTESTATION_SIGNER_ADDRESS
+    ```
+
+    Now register this url on-chain:
+    ```console
+    celocli releasegold:set-account --contract $CELO_VALIDATOR_RG_ADDRESS --property metaURL --value "https://YOUR_VALIDATOR_METADATA_URL"
+    ```
+
+    Verify that this worked as expected by running:
+
+    ```console
+    celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
+    ```
+
+    Verify that the attestation service works by running:
+
+    ```console
+    celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber "YOUR_PHONE_NUM" --message "hello world"
+    ```
+
+  21. Group metadata
+
+    First create the group metadata
+
+    ```console
+    celocli account:create-metadata ./group_metadata.json --from $CELO_VALIDATOR_GROUP_RG_ADDRESS 
+    ```
+
+    Now set the group's name on chain
+
+    ```console
+    celocli releasegold:set-account --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --property name --value YourGroupName
+    ```
+
+    ```console
+    celocli account:claim-domain ./group_metadata.json --domain YOURDOMAIN --from $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS --useLedger --ledgerCustomAddresses=[2]
+    ```
+
+    This will output your claim signed under the provided signer address. This output should then be recorded via a DNS TXT Record on your domain.
+
+    Now test that the metadata has been created successfully:
+
+    ```console
+    celocli account:show-metadata ./group_metadata.json
+    ```
+
+    Next claim the validator address from the group account:
+
+    ```console
+    celocli account:claim-account ./group_metadata.json --address $CELO_VALIDATOR_RG_ADDRESS --from $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS --useLedger --ledgerCustomAddresses=[2]
+    ```
+
+    Now let's submit the corresponding claim from the validator account on the group account 
+
+    ```console
+    celocli account:claim-account ./validator_metadata.json --address $CELO_VALIDATOR_GROUP_RG_ADDRESS --from $CELO_ATTESTATION_SIGNER_ADDRESS
+    ```console
+
+    Now upload the validator_metadata.json and group_metadata.json to a publicly available location.  
+
+    Finally, test that everything is properly configured:
+
+    ```console
+    celocli account:get-metadata $CELO_VALIDATOR_GROUP_RG_ADDRESS
+    celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
+    ```
+
+# Areas for improvement
+* move sshd to non standard port to reduce brute force noise
+
 
 

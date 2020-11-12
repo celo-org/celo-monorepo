@@ -1,0 +1,34 @@
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+apiVersion: networking.k8s.io/v1beta1
+{{ else }}
+apiVersion: extensions/v1beta1
+{{ end -}}
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-api-ingress
+  labels:
+    app: blockscout
+    chart: blockscout
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: blockscout-api-ingress
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~ /admin/.* {
+        deny all;
+      }
+spec:
+  tls:
+  - hosts:
+    - {{ .Release.Name }}-api.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Name }}-api-tls
+  rules:
+  - host: {{ .Release.Name }}-api.{{ .Values.domain.name }}.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Release.Name }}-api
+          servicePort: 4000

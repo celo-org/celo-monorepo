@@ -23,7 +23,7 @@ const getChangedLinkedLibraries = (linkedLibraries: string[], codeReport: ASTCod
 const reportToChanges = (report: LibraryLinkingReport): LibraryLinkingChange[] => {
   return Object.keys(report).map(contract => {
     return report[contract].map(library => new LibraryLinkingChange(contract, library))
-  }).reduce((changes, contractChanges) => changes.concat(contractChanges))
+  }).reduce((changes, contractChanges) => changes.concat(contractChanges), [])
 }
 
 export const reportLibraryLinkingIncompatibilities = (linkedLibraries: { [library: string]: string[] }, codeReport: ASTCodeCompatibilityReport): LibraryLinkingChange[] => {
