@@ -769,8 +769,10 @@ export async function importPrivateKey(
   verbose: boolean
 ) {
   const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
-
-  fs.writeFileSync(keyFile, instance.privateKey!, { flag: 'a' })
+  if (!instance.privateKey) {
+    throw new Error('Unexpected empty private key')
+  }
+  fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
   if (verbose) {
     console.info(`geth:${instance.name}: import account`)
@@ -870,6 +872,7 @@ export async function startGeth(
     rpcport,
     wsport,
     validating,
+    replica,
     validatingGasPrice,
     bootnodeEnode,
     isProxy,
@@ -952,7 +955,10 @@ export async function startGeth(
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine', '--minerthreads=10')
+    if (!replica) {
+      gethArgs.push(`--nodekeyhex=${privateKey}`)
+    }
 
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
@@ -961,13 +967,16 @@ export async function startGeth(
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
     }
+    if (replica) {
+      gethArgs.push('--istanbul.replica')
+    }
   } else if (isProxy) {
     gethArgs.push('--proxy.proxy')
     if (proxyport) {
       gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
     gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    // gethArgs.push(`--nodekeyhex=${privateKey}`)
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {
@@ -980,7 +989,7 @@ export async function startGeth(
     if (proxyAllowPrivateIp) {
       gethArgs.push('--proxy.allowprivateip=true')
     }
-    gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
+    gethArgs.push(`--proxy.proxyenodeurlpairs=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
   if (privateKey || ethstats) {
@@ -1166,7 +1175,7 @@ export async function connectPeers(instances: GethInstanceConfig[], verbose: boo
 // Add validator 0 as a peer of each other validator.
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
-    instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    instances.filter(({ wsport, rpcport, validating, isProxy, isProxied }) => ((validating && !isProxied) || isProxy)  && (wsport || rpcport))
   )
 }
 

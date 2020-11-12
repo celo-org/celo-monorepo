@@ -532,7 +532,6 @@ export async function deleteStaticIPs(celoEnv: string) {
 }
 
 export async function deletePersistentVolumeClaims(celoEnv: string, componentLabels: string[]) {
-  console.info(`Deleting persistent volume claims for ${celoEnv}`)
   for (const component of componentLabels) {
     await deletePersistentVolumeClaimsCustomLabels(celoEnv, 'component', component)
   }
@@ -543,7 +542,7 @@ export async function deletePersistentVolumeClaimsCustomLabels(
   label: string,
   value: string
 ) {
-  console.info(`Deleting persistent volume claims for ${namespace}`)
+  console.info(`Deleting persistent volume claims for labels ${label}=${value} in namespace ${namespace}`)
   try {
     const [output] = await execCmd(
       `kubectl delete pvc --selector='${label}=${value}' --namespace ${namespace}`
@@ -676,6 +675,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
+    `--set geth.secondaries="${fetchEnvOrFallback('SECONDARIES', '0')}"`,
     `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
       'ISTANBUL_REQUEST_TIMEOUT_MS',
       '3000'
@@ -719,9 +719,12 @@ export async function installGenericHelmChart(
   celoEnv: string,
   releaseName: string,
   chartDir: string,
-  parameters: string[]
+  parameters: string[],
+  buildDependencies: boolean = true
 ) {
-  await buildHelmChartDependencies(chartDir)
+  if (buildDependencies) {
+    await buildHelmChartDependencies(chartDir)
+  }
 
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
@@ -869,7 +872,7 @@ function useStaticIPsForGethNodes() {
 }
 
 export async function checkHelmVersion() {
-  const requiredHelmVersion = 'v3.3'
+  const requiredHelmVersion = 'v3'
   const helmOK = await outputIncludes('helm version -c --short', requiredHelmVersion, `Checking local Helm version. Required ${requiredHelmVersion}`)
   if (helmOK) {
     return true

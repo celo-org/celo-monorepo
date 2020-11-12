@@ -33,6 +33,7 @@ export default class Show extends BaseCommand {
       default: 1,
       description: 'Show results for the last N epochs',
     }),
+    ...(cli.table.flags() as object),
   }
 
   static args = []
@@ -188,7 +189,7 @@ export default class Show extends BaseCommand {
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
-        { 'no-truncate': !res.flags.truncate }
+        res.flags
       )
     } else if (groupVoterRewards.length > 0) {
       console.info('')
@@ -202,7 +203,7 @@ export default class Show extends BaseCommand {
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
-        { 'no-truncate': !res.flags.truncate }
+        res.flags
       )
     }
 
@@ -234,7 +235,7 @@ export default class Show extends BaseCommand {
           group: { get: (e) => e.group.address },
           epochNumber: {},
         },
-        { 'no-truncate': !res.flags.truncate }
+        res.flags
       )
     }
 
@@ -257,7 +258,7 @@ export default class Show extends BaseCommand {
           validatorScore: { get: (e) => e.validator.score.toFixed() },
           epochNumber: {},
         },
-        { 'no-truncate': !res.flags.truncate }
+        res.flags
       )
     }
 
@@ -273,7 +274,7 @@ export default class Show extends BaseCommand {
           reward: { get: (e) => e.reward.toFixed() },
           epochNumber: {},
         },
-        { 'no-truncate': !res.flags.truncate }
+        res.flags
       )
     }
 

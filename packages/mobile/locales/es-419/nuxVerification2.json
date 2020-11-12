@@ -29,6 +29,7 @@
   },
   "loading": {
     "confirming": "Confirmando…",
+    "pleaseKeepAppOpen": "Mantén la aplicación abierta",
     "learnMore": "Aprende más",
     "card1": "Para asegurarnos de que tu número sea realmente tuyo, te enviaremos tres mensajes de texto.",
     "card2": "Una vez que se confirme tu número, podrás enviar y recibir fondos fácilmente a tu número de teléfono.",

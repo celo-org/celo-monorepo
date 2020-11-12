@@ -1,4 +1,4 @@
-import { Address, isHexString } from '@celo/base/lib/address'
+import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
 import {
   ABIDefinition,
   CeloTransactionObject,
@@ -6,6 +6,7 @@ import {
   CeloTxPending,
   Contract,
   getAbiTypes,
+  parseDecodedParams,
 } from '@celo/connect'
 import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
@@ -13,6 +14,7 @@ import {
   getInitializeAbiOfImplementation,
   setImplementationOnProxy,
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI,
+  SET_IMPLEMENTATION_ABI,
 } from '@celo/contractkit/lib/proxy'
 import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import {
@@ -23,8 +25,11 @@ import {
 import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
+import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
+
+const debug = debugFactory('governance:proposals')
 
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
@@ -61,6 +66,12 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
+  tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
+
+const isProxySetFunction = (tx: ProposalTransactionJSON) =>
+  tx.function === SET_IMPLEMENTATION_ABI.name!
+
 /**
  * Convert a compiled proposal to a human-readable JSON form using network information.
  * @param kit Contract kit instance used to resolve addresses to contract names.
@@ -73,6 +84,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
+    debug(`decoding tx ${tx}`)
     const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
@@ -89,6 +101,22 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     if (isRegistryRepoint(jsonTx)) {
       const [name, address] = jsonTx.args
       await blockExplorer.updateContractDetailsMapping(name, address)
+    } else if (isProxySetFunction(jsonTx)) {
+      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+    } else if (isProxySetAndInitFunction(jsonTx)) {
+      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+
+      // Transform delegate call initialize args into a readable params map
+      const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
+
+      // 8 bytes for function sig
+      const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
+      const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
+
+      const { params: initParams } = parseDecodedParams(
+        kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
+      )
+      jsonTx.params![`initialize@${initSig}`] = initParams
     }
 
     proposalJson.push(jsonTx)
@@ -193,7 +221,7 @@ export class ProposalBuilder {
     ) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.connection.web3.eth.abi.encodeFunctionCall(
-        await getInitializeAbiOfImplementation(tx.contract, this.kit),
+        getInitializeAbiOfImplementation(tx.contract as any),
         tx.args[1]
       )
     }

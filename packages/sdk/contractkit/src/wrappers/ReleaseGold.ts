@@ -8,9 +8,11 @@ import {
   BaseWrapper,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   stringIdentity,
   stringToSolidityBytes,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToInt,
   valueToString,
@@ -73,6 +75,21 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       numReleasePeriods: valueToInt(releaseSchedule.numReleasePeriods),
       releasePeriod: valueToInt(releaseSchedule.releasePeriod),
       amountReleasedPerPeriod: valueToBigNumber(releaseSchedule.amountReleasedPerPeriod),
+    }
+  }
+
+  /**
+   * Returns the underlying Release schedule of the ReleaseGold contract
+   * @return A ReleaseSchedule.
+   */
+  async getHumanReadableReleaseSchedule() {
+    const releaseSchedule = await this.getReleaseSchedule()
+
+    return {
+      ...releaseSchedule,
+      releaseCliff: unixSecondsTimestampToDateString(releaseSchedule.releaseCliff),
+      releaseStartTime: unixSecondsTimestampToDateString(releaseSchedule.releaseStartTime),
+      releasePeriod: secondsToDurationString(releaseSchedule.releasePeriod),
     }
   }
 

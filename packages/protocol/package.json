@@ -13,6 +13,7 @@
     "pretest": "yarn run build",
     "test": "rm test/**/*.js ; node runTests.js",
     "test:coverage": "yarn run test --coverage",
+    "test:devchain-release": "./scripts/bash/release-on-devchain.sh",
     "gas": "yarn run test --gas",
     "build:ts": "rm -f migrations/*.js* && tsc -b",
     "build:sol": "ts-node ./scripts/build.ts",

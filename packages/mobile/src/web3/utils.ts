@@ -1,4 +1,4 @@
-import { BlockHeader, CeloTx, CeloTxObject } from '@celo/connect'
+import { BlockHeader, CeloTx, CeloTxObject, CeloTxReceipt } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
@@ -29,6 +29,13 @@ export async function estimateGas(txObj: CeloTxObject<any>, txParams: CeloTx) {
     await contractKit.connection.estimateGasWithInflationFactor(txParams, gasEstimator, caller)
   )
   return gas
+}
+
+// Fetches the transaction receipt for a given hash, returning null if the transaction has not been mined.
+export async function getTransactionReceipt(txHash: string): Promise<CeloTxReceipt | null> {
+  Logger.debug(TAG, `Getting transaction receipt for ${txHash}`)
+  const web3 = await getWeb3Async(false)
+  return web3.eth.getTransactionReceipt(txHash)
 }
 
 // Note: This returns Promise<Block>

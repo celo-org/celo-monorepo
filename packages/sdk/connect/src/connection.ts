@@ -318,8 +318,15 @@ export class Connection {
       if (called.startsWith('0x08c379a')) {
         revertReason = decodeStringParameter(this.getAbiCoder(), called.substring(10))
       }
-      debugGasEstimation('estimatedGas failed: %s', revertReason)
-      return Promise.reject(`Gas estimation failed: ${revertReason}`)
+      debugGasEstimation('Recover transaction failure reason', {
+        called,
+        data: tx.data,
+        to: tx.to,
+        from: tx.from,
+        error: e,
+        revertReason,
+      })
+      return Promise.reject(`Gas estimation failed: ${revertReason} or ${e}`)
     }
   }
 

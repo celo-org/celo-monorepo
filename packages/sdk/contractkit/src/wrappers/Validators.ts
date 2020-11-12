@@ -7,8 +7,10 @@ import BigNumber from 'bignumber.js'
 import { Validators } from '../generated/Validators'
 import {
   BaseWrapper,
+  blocksToDurationString,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   stringToSolidityBytes,
   tupleParser,
   valueToBigNumber,
@@ -166,6 +168,29 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       membershipHistoryLength: valueToBigNumber(res[3]),
       slashingMultiplierResetPeriod: res[4],
       commissionUpdateDelay: res[5],
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the validators contract
+   * @return ValidatorsConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const validatorLockedGoldRequirements = {
+      ...config.validatorLockedGoldRequirements,
+      duration: secondsToDurationString(config.validatorLockedGoldRequirements.duration),
+    }
+    const groupLockedGoldRequirements = {
+      ...config.groupLockedGoldRequirements,
+      duration: secondsToDurationString(config.groupLockedGoldRequirements.duration),
+    }
+    return {
+      ...config,
+      slashingMultiplierResetPeriod: secondsToDurationString(config.slashingMultiplierResetPeriod),
+      commissionUpdateDelay: blocksToDurationString(config.commissionUpdateDelay),
+      validatorLockedGoldRequirements,
+      groupLockedGoldRequirements,
     }
   }
 

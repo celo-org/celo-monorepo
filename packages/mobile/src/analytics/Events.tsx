@@ -94,9 +94,9 @@ export enum OnboardingEvents {
   invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
   invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
-  invite_redeem_skip_start = 'invite_redeem_skip_start',
-  invite_redeem_skip_complete = 'invite_redeem_skip_complete',
-  invite_redeem_skip_error = 'invite_redeem_skip_error',
+  initialize_account_start = 'initialize_account_start',
+  initialize_account_complete = 'initialize_account_complete',
+  initialize_account_error = 'initialize_account_error',
 
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
@@ -146,6 +146,7 @@ export enum VerificationEvents {
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
   verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+  verification_reveal_attestation_status = 'verification_reveal_attestation_status',
 
   verification_revoke_start = 'verification_revoke_start',
   verification_revoke_finish = 'verification_revoke_finish',
@@ -176,9 +177,13 @@ export enum InviteEvents {
   invite_tx_start = 'invite_tx_start',
   invite_tx_complete = 'invite_tx_complete',
   invite_tx_error = 'invite_tx_error',
+  invite_start = 'invite_start',
+  invite_complete = 'invite_complete',
+  invite_error = 'invite_error',
   invite_method_sms = 'invite_method_sms',
   invite_method_whatsapp = 'invite_method_whatsapp',
   invite_method_error = 'invite_method_error',
+  invite_from_menu = 'invite_from_menu',
 }
 
 export enum EscrowEvents {
@@ -292,6 +297,7 @@ export enum CeloExchangeEvents {
 
 export enum FiatExchangeEvents {
   external_exchange_link = 'external_exchange_link',
+  spend_merchant_link = 'spend_merchant_link',
 }
 
 export enum GethEvents {

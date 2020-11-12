@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 const HEX_REGEX = /^0x[0-9A-F]*$/i
 
 export type Address = string
@@ -5,6 +7,8 @@ export type Address = string
 export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === normalizeAddress(b)
 
 export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
+
+export const isNullAddress = (a: Address) => new BigNumber(normalizeAddress(a)).isZero()
 
 export const normalizeAddressWith0x = (a: Address) => ensureLeading0x(a).toLowerCase()
 

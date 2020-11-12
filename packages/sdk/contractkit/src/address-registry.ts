@@ -1,4 +1,5 @@
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
+import { zip } from '@celo/base/lib/collections'
 import debugFactory from 'debug'
 import { CeloContract, RegisteredContracts } from './base'
 import { newRegistry, Registry } from './generated/Registry'
@@ -16,7 +17,7 @@ export class AddressRegistry {
   private readonly registry: Registry
   private readonly cache: Map<CeloContract, Address> = new Map()
 
-  constructor(private readonly kit: ContractKit) {
+  constructor(kit: ContractKit) {
     this.cache.set(CeloContract.Registry, REGISTRY_CONTRACT_ADDRESS)
     this.registry = newRegistry(kit.connection.web3, REGISTRY_CONTRACT_ADDRESS)
   }
@@ -28,13 +29,9 @@ export class AddressRegistry {
     if (!this.cache.has(contract)) {
       const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const hash = this.kit.connection.web3.utils.soliditySha3({
-        type: 'string',
-        value: proxyStrippedContract,
-      })
-      const address = await this.registry.methods.getAddressFor(hash!).call()
+      const address = await this.registry.methods.getAddressForString(proxyStrippedContract).call()
 
-      debug('Fetched address:  %s = %s', address)
+      debug('Fetched address %s', address)
       if (!address || address === NULL_ADDRESS) {
         throw new Error(`Failed to get address for ${contract} from the Registry`)
       }
@@ -45,19 +42,10 @@ export class AddressRegistry {
   }
 
   /**
-   * Get the address for all possible `CeloContract`
+   * Get the address mapping for known registered contracts
    */
-
-  async allAddresses(): Promise<Record<CeloContract, Address | null>> {
-    const res: Partial<Record<CeloContract, Address | null>> = {}
-    for (const contract of RegisteredContracts) {
-      try {
-        res[contract] = await this.addressFor(contract)
-      } catch (error) {
-        res[contract] = null
-        debug(`Failed to find address for ${contract}: ${error.message}`)
-      }
-    }
-    return res as Record<CeloContract, Address | null>
+  async addressMapping() {
+    const addresses = await Promise.all(RegisteredContracts.map((r) => this.addressFor(r)))
+    return new Map(zip((r, a) => [r, a], RegisteredContracts, addresses))
   }
 }

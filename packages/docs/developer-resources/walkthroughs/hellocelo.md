@@ -269,11 +269,10 @@ Congratulations! You have accomplished a lot in this short introduction to devel
 
 We covered:
 
-* Installing and setting up ContractKit 
+* Installing and setting up ContractKit
 * Connecting to the Celo Alfajores network
 * Getting the CELO contract wrapper
 * Reading account balances using the CELO wrapper
 * Generating a new account in Celo
 * Funding an account using the Celo Alfajores Faucet
 * Sending CELO
-

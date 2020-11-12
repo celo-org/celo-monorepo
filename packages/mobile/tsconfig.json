@@ -3,6 +3,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
     "baseUrl": ".",
     "importHelpers": true,
     "jsx": "react",
@@ -18,5 +19,5 @@
   },
   "include": ["src", "../contractkit/types"],
   "exclude": ["node_modules", "vendor", ".bundle"],
-  "references": [{ "path": "../sdk/utils" }]
+  "references": [{ "path": "../sdk/utils" }, { "path": "../komencikit" }, { "path": "../sdk/contractkit" }]
 }

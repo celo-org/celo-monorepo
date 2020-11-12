@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
   BaseWrapper,
+  blocksToDurationString,
   proxyCall,
   proxySend,
   solidityBytesToString,
@@ -57,6 +58,18 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
     return {
       slashableDowntime: res[0],
       slashingIncentives: res[1],
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the downtime slasher contract
+   * @return DowntimeSlasherConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      slashableDowntime: blocksToDurationString(config.slashableDowntime),
     }
   }
 

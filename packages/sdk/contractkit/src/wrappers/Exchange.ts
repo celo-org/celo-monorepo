@@ -7,7 +7,9 @@ import {
   identity,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToFrac,
   valueToString,
@@ -192,6 +194,20 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       lastBucketUpdate: res[4],
     }
   }
+
+  /**
+   * @dev Returns human readable configuration of the exchange contract
+   * @return ExchangeConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      updateFrequency: secondsToDurationString(config.updateFrequency),
+      lastBucketUpdate: unixSecondsTimestampToDateString(config.lastBucketUpdate),
+    }
+  }
+
   /**
    * Returns the exchange rate estimated at buyAmount.
    * @param buyAmount The amount of buyToken in wei to estimate the exchange rate at

@@ -4,7 +4,14 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { CeloContract, CeloToken } from '../base'
 import { SortedOracles } from '../generated/SortedOracles'
-import { BaseWrapper, proxyCall, valueToBigNumber, valueToFrac, valueToInt } from './BaseWrapper'
+import {
+  BaseWrapper,
+  proxyCall,
+  secondsToDurationString,
+  valueToBigNumber,
+  valueToFrac,
+  valueToInt,
+} from './BaseWrapper'
 
 export enum MedianRelation {
   Undefined,
@@ -172,6 +179,17 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async getConfig(): Promise<SortedOraclesConfig> {
     return {
       reportExpirySeconds: await this.reportExpirySeconds(),
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the sortedoracles contract
+   * @return SortedOraclesConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      reportExpiry: secondsToDurationString(config.reportExpirySeconds),
     }
   }
 

@@ -177,9 +177,9 @@ interface OnboardingEventsProperties {
   [OnboardingEvents.invite_redeem_move_funds_start]: undefined
   [OnboardingEvents.invite_redeem_move_funds_complete]: undefined
 
-  [OnboardingEvents.invite_redeem_skip_start]: undefined
-  [OnboardingEvents.invite_redeem_skip_complete]: undefined
-  [OnboardingEvents.invite_redeem_skip_error]: {
+  [OnboardingEvents.initialize_account_start]: undefined
+  [OnboardingEvents.initialize_account_complete]: undefined
+  [OnboardingEvents.initialize_account_error]: {
     error: string
   }
 
@@ -189,97 +189,197 @@ interface OnboardingEventsProperties {
     error: string
   }
 
-  [OnboardingEvents.account_dek_register_start]: undefined
-  [OnboardingEvents.account_dek_register_account_unlocked]: undefined
-  [OnboardingEvents.account_dek_register_account_checked]: undefined
+  [OnboardingEvents.account_dek_register_start]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [OnboardingEvents.account_dek_register_account_unlocked]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [OnboardingEvents.account_dek_register_account_checked]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
   [OnboardingEvents.account_dek_register_complete]: {
     newRegistration: boolean
+    feeless?: boolean
   }
 }
 
 interface VerificationEventsProperties {
-  [VerificationEvents.verification_start]: undefined
-  [VerificationEvents.verification_complete]: undefined
+  [VerificationEvents.verification_start]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_complete]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
   [VerificationEvents.verification_error]: {
     error: string
+    feeless?: true
   }
-  [VerificationEvents.verification_cancel]: undefined
-  [VerificationEvents.verification_timeout]: undefined
+  [VerificationEvents.verification_cancel]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_timeout]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
 
   [VerificationEvents.verification_hash_retrieved]: {
     phoneHash: string
     address: string
+    feeless?: boolean
   }
-  [VerificationEvents.verification_fetch_status_start]: undefined
+  [VerificationEvents.verification_fetch_status_start]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
   [VerificationEvents.verification_fetch_status_complete]: {
     isVerified: boolean
     numAttestationsRemaining: number
     total: number
     completed: number
+    feeless?: boolean
   }
 
   [VerificationEvents.verification_request_all_attestations_start]: {
     attestationsToRequest: number
+    feeless?: boolean
   }
   [VerificationEvents.verification_request_all_attestations_refresh_progress]: {
     attestationsRemaining: number
+    feeless?: boolean
   }
   [VerificationEvents.verification_request_all_attestations_complete]: {
     issuers: string[]
+    feeless?: boolean
   }
 
   [VerificationEvents.verification_request_attestation_start]: {
     currentAttestation: number
+    feeless?: boolean
   }
-  [VerificationEvents.verification_request_attestation_approve_tx_sent]: undefined
-  [VerificationEvents.verification_request_attestation_request_tx_sent]: undefined
-  [VerificationEvents.verification_request_attestation_await_issuer_selection]: undefined
-  [VerificationEvents.verification_request_attestation_select_issuer]: undefined
-  [VerificationEvents.verification_request_attestation_issuer_tx_sent]: undefined
-  [VerificationEvents.verification_request_attestation_complete]: undefined
-
-  [VerificationEvents.verification_code_received]:
-    | undefined
+  [VerificationEvents.verification_request_attestation_approve_tx_sent]:
     | {
-        context: string
+        feeless?: boolean
       }
+    | undefined
+  [VerificationEvents.verification_request_attestation_request_tx_sent]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_request_attestation_await_issuer_selection]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_request_attestation_select_issuer]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_request_attestation_issuer_tx_sent]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_request_attestation_complete]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_code_received]: {
+    context?: string
+    feeless?: boolean
+  }
   [VerificationEvents.verification_code_validate_start]: {
     issuer: any
+    feeless?: boolean
   }
   [VerificationEvents.verification_code_validate_complete]: {
     issuer: any
+    feeless?: boolean
   }
-
-  [VerificationEvents.verification_reveal_all_attestations_start]: undefined
+  [VerificationEvents.verification_reveal_all_attestations_start]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
   [VerificationEvents.verification_reveal_attestation_revealed]: {
     issuer: any
     neededRetry: boolean
+    feeless?: boolean
   }
   [VerificationEvents.verification_reveal_attestation_await_code_start]: {
     issuer: any
+    feeless?: boolean
   }
-  [VerificationEvents.verification_reveal_all_attestations_complete]: undefined
+  [VerificationEvents.verification_reveal_all_attestations_complete]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
 
   [VerificationEvents.verification_reveal_attestation_start]: {
     issuer: any
+    feeless?: boolean
   }
   [VerificationEvents.verification_reveal_attestation_await_code_complete]: {
     issuer: any
+    feeless?: boolean
   }
   [VerificationEvents.verification_reveal_attestation_complete]: {
     issuer: any
+    feeless?: boolean
   }
   [VerificationEvents.verification_reveal_attestation_error]: {
     issuer: any
     error: string
+    feeless?: boolean
   }
-  [VerificationEvents.verification_revoke_start]: undefined
-  [VerificationEvents.verification_revoke_finish]: undefined
+  [VerificationEvents.verification_reveal_attestation_status]: {
+    success: boolean
+    identifier: string
+    account: string
+    issuer: string
+    attempt: number
+    countryCode: string
+    status: string
+    provider: string
+    duration: number
+    errors: any
+    feeless?: boolean
+  }
+  [VerificationEvents.verification_revoke_start]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
+  [VerificationEvents.verification_revoke_finish]:
+    | {
+        feeless?: boolean
+      }
+    | undefined
   [VerificationEvents.verification_revoke_error]: {
     error: string
+    feeless?: boolean
   }
   [VerificationEvents.verification_resend_messages]: {
     count: number
+    feeless?: boolean
   }
 }
 
@@ -324,11 +424,25 @@ interface InviteEventsProperties {
     escrowIncluded: boolean
     error: string
   }
+  [InviteEvents.invite_start]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+  }
+  [InviteEvents.invite_complete]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+  }
+  [InviteEvents.invite_error]: {
+    escrowIncluded: boolean
+    amount: string | undefined
+    error: string
+  }
   [InviteEvents.invite_method_sms]: undefined
   [InviteEvents.invite_method_whatsapp]: undefined
   [InviteEvents.invite_method_error]: {
     error: string
   }
+  [InviteEvents.invite_from_menu]: undefined
 }
 
 interface EscrowEventsProperties {
@@ -583,6 +697,10 @@ interface CeloExchangeEventsProperties {
 
 interface FiatExchangeEventsProperties {
   [FiatExchangeEvents.external_exchange_link]: {
+    name: string
+    link: string
+  }
+  [FiatExchangeEvents.spend_merchant_link]: {
     name: string
     link: string
   }

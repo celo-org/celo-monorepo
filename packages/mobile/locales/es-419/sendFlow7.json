@@ -46,8 +46,8 @@
   "sentEscrowPayment": "Pago de depósito enviado",
   "mobileNumber": "Número de teléfono",
   "walletAddress": "Dirección del Monedero",
-  "inviteSMS": "¡Bienvenido a {{appName}}! Obtén {{appName}} en {{link}} e ingresa tu código para comenzar: {{code}}",
-  "inviteSMSWithEscrowedPayment": "¡Bienvenido a {{appName}}! Te he enviado Dólares Celo. Obtén en {{link}} e ingresa tu código para comenzar: {{code}}",
+  "inviteWithoutPayment": "Hola! Estoy usando {{appName}} para enviar dinero alrededor del mundo. Es fácil de usar y me gustaría invitarte a probarla con este link: {{link}}",
+  "inviteWithEscrowedPayment": "Hola! Estoy usando {{appName}} para enviar dinero alrededor del mundo. Acabo de enviarte {{amount}} Celo Dólares. Puedes descargar la App {{appName}} y usar tus Celo Dólares usando este link: {{link}.",
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
@@ -119,7 +119,7 @@
   "encryption": {
     "warningLabel": "Este comentario no será encriptado",
     "warningModalHeader": "Sobre Cifrado",
-    "warningModalBody": "El cifrado garantiza que tus comentarios se mantengan privados. Valora utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe tuprimera transacción.",
+    "warningModalBody": "El cifrado garantiza que tus comentarios se mantengan privados. {{appName}} utiliza el cifrado en los comentarios de transacciones cuando el remitente y el receptor tienen esta función configurada. La configuración normalmente se realizará automáticamente una vez que un usuario envíe tuprimera transacción.",
     "feeLabel": "Tarifa de Cifrado Unica",
     "feeModalHeader": "Tarifa de Cifrado Unica",
     "feeModalBody": "El cifrado ayuda a mantener la privacidad de tus datos confidenciales. Se agrega una pequeña tarifa única a tu primera transacción para configurar el cifrado. Esto garantiza que tus comentarios se envíen de forma segura y privada."
