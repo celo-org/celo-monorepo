@@ -25,7 +25,7 @@ Provides an abstraction on Azure Key Vault for performing signing operations
 
 ###  constructor
 
-\+ **new AzureKeyVaultClient**(`vaultName`: string): *[AzureKeyVaultClient](_utils_azure_key_vault_client_.azurekeyvaultclient.md)*
+\+ **new AzureKeyVaultClient**(`vaultName`: string, `credential?`: TokenCredential): *[AzureKeyVaultClient](_utils_azure_key_vault_client_.azurekeyvaultclient.md)*
 
 *Defined in [packages/contractkit/src/utils/azure-key-vault-client.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/azure-key-vault-client.ts#L22)*
 
@@ -34,6 +34,7 @@ Provides an abstraction on Azure Key Vault for performing signing operations
 Name | Type |
 ------ | ------ |
 `vaultName` | string |
+`credential?` | TokenCredential |
 
 **Returns:** *[AzureKeyVaultClient](_utils_azure_key_vault_client_.azurekeyvaultclient.md)*
 
