@@ -102,7 +102,7 @@ This should be used in tandem with `verify-deployed -b $PREVIOUS_RELEASE -n $NET
 ### Deploy New Contracts
 
 Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network. (Use `-d` to dry-run the deploy).
-STORAGE updates are adopted by deploying a new proxy/implementation pair. These new contracts may need to be initialized, for which values can be provided. Outputs a JSON contract upgrade governance proposal.
+STORAGE updates are adopted by deploying a new proxy/implementation pair. This script outputs a JSON contract upgrade governance proposal.
 
 ```bash
 NETWORK=${"baklava"|"alfajores"|"mainnet"}
@@ -145,7 +145,7 @@ yarn verify-release -p "upgrade_proposal.json" -b $RELEASE_CANDIDATE -n $NETWORK
 
 ### Verify Executed Release
 
-After a release executes via Governance, you can use `verify-deployed` again to check that the resulting network state reflects the tagged release candidate indeed:
+After a release executes via Governance, you can use `verify-deployed` again to check that the resulting network state does indeed reflect the tagged release candidate:
 
 ```bash
 RELEASE="celo-core-contracts-v${N}.rc${X}"
