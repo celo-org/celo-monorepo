@@ -59,7 +59,7 @@ For these to run, you may need to follow the [setup instructions](https://github
 
 Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
 
-### Verify Current Bytecode on the Network
+### Verify the previous Release on the Network
 
 `verify-deployed` is a script that allows you to assess whether the bytecode on the given network matches the source code of a particular commit. It will run through the Celo Core Contracts and verify that the contracts' bytecodes as specified in the `Registry` match. Here, we will want to sanity-check that our network is running the previous release's audited commit.
 ```bash
@@ -72,16 +72,20 @@ yarn verify-deployed -n $NETWORK -b $PREVIOUS_RELEASE -f
 
 ### Check Backward Compatibility
 
-This script performs some automatic checks to ensure that smart contract
-versions have been updated correctly.
+This script performs some automatic checks to ensure that the smart contract versions in source code have been set correctly with respect to the latest release. It is run as part of CI and helps ensure that backwards incompatibilities are not accidentally introduced by requiring that devs manually update version numbers whenever smart contract changes are made.
 
-Specifically, it compiles candidate and current release contracts to check storage layout and ABI backwards compatibility, subject to the following exceptions:
-  1. If the STORAGE version has changed, does not perform backwards compatibility checks
-  2. If the MAJOR version has changed, checks storage layout compatibility but not ABI compatibility
+Specifically, it compiles the latest and candidate releases and compares smart contracts:
 
-Versions being updated correctly means that no backwards incompatibilities were
-introduced on accident. For changed contracts, checks that new version number is strictly greater than previous release. For unchanged contracts, checks that version number exactly matches previous release.
-​
+1. Storage layout, to detect storage version changes
+2. ABI, to detect major and minor version changes
+3. Bytecode, to detect patch version changes
+
+Finally, it checks release candidate smart contract version numbers and requires that they have been updated appropriately since the latest release by following semantic versioning as defined in the [Versioning section](#Versioning) above.
+
+The following exceptions apply:
+- If the STORAGE version has changed, does not perform backwards compatibility checks
+- If the MAJOR version has changed, checks storage layout compatibility but not ABI compatibility
+
 Critically, this ensures that proxied contracts do not experience storage
 collisions between implementation versions. See [this
 article](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#storage-collisions-between-implementation-versions)
@@ -99,7 +103,7 @@ yarn check-versions -a $PREVIOUS_RELEASE -b $RELEASE_CANDIDATE -r "report.json"
 
 This should be used in tandem with `verify-deployed -b $PREVIOUS_RELEASE -n $NETWORK` to ensure the compatibility checks compare the release candidate to what is actually active on the network.
 
-### Deploy New Contracts
+### Deploy the release candidate
 
 Use the following script to build a candidate release and, using the corresponding backwards compatibility report, deploy **changed** contracts to the specified network. (Use `-d` to dry-run the deploy).
 STORAGE updates are adopted by deploying a new proxy/implementation pair. This script outputs a JSON contract upgrade governance proposal.
@@ -129,7 +133,7 @@ Fetch the upgrade proposal and output the JSON encoded proposal contents.
 celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
 ```
 
-### Verify Proposed Release
+### Verify Proposed Release Candidate
 
 This script serves the same purpose as `verify-deployed` but for a not-yet
 accepted contract upgrade (in the form of the proposal.json you fetched in the step prior). It gives you the confidence that the branch specified in the `-b` flag in (same as `check-versions`) will be the resulting network state of the proposal if executed. It does so by going over all Celo Core Contracts and determining updates to the Registry pointers, proxy or implementation contracts and verifying their implied bytecode against the compiled source code.
