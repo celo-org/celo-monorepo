@@ -10,12 +10,14 @@ import {
 } from '@celo/connect'
 import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
+// tslint:disable: ordered-imports
 import {
   getInitializeAbiOfImplementation,
   setImplementationOnProxy,
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI,
   SET_IMPLEMENTATION_ABI,
 } from '@celo/contractkit/lib/proxy'
+// tslint:enable: ordered-imports
 import { valueToString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import {
   hotfixToParams,
