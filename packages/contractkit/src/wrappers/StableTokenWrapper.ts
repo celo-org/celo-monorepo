@@ -248,4 +248,20 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     })
     return balances
   }
+
+  async getTransferEvents(
+    fromBlock: number,
+    toBlock: number,
+    batchSize: number,
+    prevEvents: EventLog[] = []
+  ): Promise<EventLog[]> {
+    // if inclusive range is larger than batchsize, keep reducing range recursively, work back up
+    if (toBlock - fromBlock >= batchSize) {
+      const prevToBlock = toBlock - batchSize
+      prevEvents = await this.getTransferEvents(fromBlock, prevToBlock, batchSize, prevEvents)
+      fromBlock = toBlock - batchSize + 1 // +1 because of inclusivity of range
+    }
+    const events = await this.getPastEvents('Transfer', { fromBlock, toBlock })
+    return prevEvents.concat(events)
+  }
 }
