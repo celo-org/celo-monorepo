@@ -130,6 +130,7 @@ celocli governance:propose --deposit 100e18 --from $YOUR_ADDRESS --jsonTransacti
 Fetch the upgrade proposal and output the JSON encoded proposal contents.
 
 ```bash
+# Make sure you run at least celocli 0.0.60
 celocli governance:show --proposalID <proposalId> --jsonTransactions "upgrade_proposal.json"
 ```
 
