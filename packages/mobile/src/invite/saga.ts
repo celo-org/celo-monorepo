@@ -188,7 +188,6 @@ export function* sendInvite(
       ? 'sendFlow7:inviteWithEscrowedPayment'
       : 'sendFlow7:inviteWithoutPayment'
     const message = i18n.t(messageProp, {
-      name,
       amount: amount?.toString(),
       link,
     })
