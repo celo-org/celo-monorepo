@@ -6,15 +6,15 @@ import {
   waitForStaticIPDetachment
 } from '../azure'
 import { execCmdWithExitOnFailure } from '../cmd-utils'
-import { AKSClusterConfig } from '../k8s-cluster/aks'
+import { AksClusterConfig } from '../k8s-cluster/aks'
 import { deleteResource } from '../kubernetes'
 import { BaseFullNodeDeployer, BaseFullNodeDeploymentConfig } from './base'
 
-export interface AKSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
-  clusterConfig: AKSClusterConfig
+export interface AksFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
+  clusterConfig: AksClusterConfig
 }
 
-export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
+export class AksFullNodeDeployer extends BaseFullNodeDeployer {
   async additionalHelmParameters() {
     const staticIps = (await this.allocateStaticIPs()).join(',')
     return [
@@ -84,7 +84,7 @@ export class AKSFullNodeDeployer extends BaseFullNodeDeployer {
     return registerStaticIPIfNotRegistered(`${this.staticIPNamePrefix}-${index}`, resourceGroup)
   }
 
-  get deploymentConfig(): AKSFullNodeDeploymentConfig {
-    return this._deploymentConfig as AKSFullNodeDeploymentConfig
+  get deploymentConfig(): AksFullNodeDeploymentConfig {
+    return this._deploymentConfig as AksFullNodeDeploymentConfig
   }
 }
