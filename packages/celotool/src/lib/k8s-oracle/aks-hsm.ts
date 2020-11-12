@@ -36,7 +36,8 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   async helmParameters() {
     return [
       ...await super.helmParameters(),
-      `--set kube.cloudProvider=azure`
+      `--set kube.cloudProvider=azure`,
+      `--set oracle.walletType=AZURE_HSM`
     ]
   }
 
@@ -126,7 +127,7 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
   ) {
     const azureIdentity = await getIdentity(this.clusterConfig, this.azureHsmIdentityName(oracleHsmIdentity))
     return execCmdWithExitOnFailure(
-      `az keyvault delete-policy --name ${oracleHsmIdentity.keyVaultName} --object-id ${azureIdentity.principalId} -g ${this.clusterConfig.resourceGroup}`
+      `az keyvault delete-policy --name ${oracleHsmIdentity.keyVaultName} --object-id ${azureIdentity.principalId} -g ${oracleHsmIdentity.resourceGroup}`
     )
   }
 

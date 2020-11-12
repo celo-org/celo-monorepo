@@ -17,6 +17,13 @@ export class PrivateKeyOracleDeployer extends BaseOracleDeployer {
     super(deploymentConfig, celoEnv)
   }
 
+  async helmParameters() {
+    return [
+      ...await super.helmParameters(),
+      `--set oracle.walletType=PRIVATE_KEY`
+    ]
+  }
+
   async oracleIdentityHelmParameters() {
     const params: string[] = await super.oracleIdentityHelmParameters()
     for (let i = 0; i < this.replicas; i++) {
