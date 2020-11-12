@@ -65,8 +65,8 @@ variable geth_node_docker_image {
   type        = map(string)
 
   default = {
-    repository = "us.gcr.io/celo-org/celo-node"
-    tag        = "mainnet"
+    repository = "us.gcr.io/celo-org/geth"
+    tag        = "1.1.0"
   }
 }
 
@@ -294,6 +294,7 @@ variable "stackdriver_logging_metrics" {
       filter      = "resource.type=gce_instance AND \"blocks\" AND \"Imported new chain segment\""
     }
 
+    # note that this log isn't firing anymore on successfully proposing a block (on 1.1.0) FIXME
     tf_eth_block_mined = {
       description = "Block mined"
       filter = "resource.type=gce_instance AND \"Successfully sealed new block\""
