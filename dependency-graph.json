@@ -215,7 +215,8 @@
       "@celo/dev-utils",
       "@celo/flake-tracker",
       "@celo/protocol",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/dappkit": {
