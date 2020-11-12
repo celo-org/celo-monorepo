@@ -86,6 +86,7 @@
       "@celo/base",
       "@celo/connect",
       "@celo/contractkit",
+      "@celo/identity",
       "@celo/utils"
     ]
   },

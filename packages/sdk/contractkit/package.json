@@ -28,8 +28,8 @@
   "dependencies": {
     "@celo/base": "0.0.5-dev",
     "@celo/connect": "0.0.2-dev",
-    "@celo/wallet-local": "0.0.1-dev",
     "@celo/utils": "0.1.23-dev",
+    "@celo/wallet-local": "0.0.1-dev",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
