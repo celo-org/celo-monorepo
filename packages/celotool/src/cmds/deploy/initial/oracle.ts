@@ -5,7 +5,7 @@ import {
   serviceName,
   switchToContextCluster,
 } from 'src/lib/context-utils'
-import { installHelmChart } from 'src/lib/oracle'
+import { getOracleDeployerForContext } from 'src/lib/oracle'
 import yargs from 'yargs'
 
 export const command = 'oracle'
@@ -26,6 +26,16 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleInitialArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context, serviceName.Oracle)
-  await installHelmChart(argv.celoEnv, argv.context, argv.useForno)
+  const clusterManager = await switchToContextCluster(
+    argv.celoEnv,
+    argv.context,
+    serviceName.Oracle
+  )
+  const deployer = getOracleDeployerForContext(
+    argv.celoEnv,
+    argv.context,
+    argv.useForno,
+    clusterManager
+  )
+  await deployer.installChart()
 }

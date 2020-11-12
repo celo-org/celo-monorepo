@@ -1,12 +1,12 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
-import { assignRoleIfNotAssigned, createIdentityIfNotExists, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
+import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl, getRelayerHttpRpcInternalUrl } from 'src/lib/endpoints'
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { getAKSClusterConfig, getContextDynamicEnvVarValues, serviceName } from './context-utils'
-import { AKSClusterConfig } from './k8s-cluster/aks'
+import { getAksClusterConfig, getContextDynamicEnvVarValues, serviceName } from './context-utils'
+import { AksClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/komenci'
 const rbacHelmChartPath = '../helm-charts/komenci-rbac'
@@ -158,7 +158,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
   const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.reCaptchaKeyVault, 'RECAPTCHA-SECRET-KEY')
-  const clusterConfig = getAKSClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
 
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
@@ -236,8 +236,8 @@ async function createKomenciAzureIdentityIfNotExists(
   context: string,
   komenciIdentity: KomenciIdentity
 ) {
-  const clusterConfig = getAKSClusterConfig(context, serviceName.Komenci)
-  const identity = await createIdentityIfNotExists(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName!)
+  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const identity = await createIdentityIdempotent(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the komenci identity.
   // Get the correct object ID depending on the cluster configuration, either
   // the service principal or the managed service identity.
@@ -250,14 +250,14 @@ async function createKomenciAzureIdentityIfNotExists(
     // assigneePrincipalType = 'MSI'
     assigneePrincipalType = 'ServicePrincipal'
   }
-  await assignRoleIfNotAssigned(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
+  await assignRoleIdempotent(assigneeObjectId, assigneePrincipalType, identity.id, 'Managed Identity Operator')
   // Allow the komenci identity to access the correct key vault
   await setKomenciKeyVaultPolicyIfNotSet(clusterConfig, komenciIdentity, identity)
   return identity
 }
 
 async function setKomenciKeyVaultPolicyIfNotSet(
-  clusterConfig: AKSClusterConfig,
+  clusterConfig: AksClusterConfig,
   komenciIdentity: KomenciIdentity,
   azureIdentity: any
 ) {
@@ -286,13 +286,13 @@ async function deleteKomenciAzureIdentity(
   context: string,
   komenciIdentity: KomenciIdentity
 ) {
-  const clusterConfig = getAKSClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
   await deleteKomenciKeyVaultPolicy(clusterConfig, komenciIdentity)
   return deleteIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)
 }
 
 async function deleteKomenciKeyVaultPolicy(
-  clusterConfig: AKSClusterConfig,
+  clusterConfig: AksClusterConfig,
   komenciIdentity: KomenciIdentity
 ) {
   const azureIdentity = await getIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)

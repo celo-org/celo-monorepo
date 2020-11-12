@@ -2,14 +2,14 @@ import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
-export interface AKSClusterConfig extends BaseClusterConfig {
+export interface AksClusterConfig extends BaseClusterConfig {
   tenantId: string
   resourceGroup: string
   subscriptionId: string
   regionName: string
 }
 
-export class AKSClusterManager extends BaseClusterManager {
+export class AksClusterManager extends BaseClusterManager {
   async switchToSubscription() {
     let currentTenantId = null
     try {
@@ -51,8 +51,8 @@ export class AKSClusterManager extends BaseClusterManager {
     }
   }
 
-  get clusterConfig(): AKSClusterConfig {
-    return this._clusterConfig as AKSClusterConfig
+  get clusterConfig(): AksClusterConfig {
+    return this._clusterConfig as AksClusterConfig
   }
 
   get kubernetesContextName(): string {
