@@ -142,6 +142,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/configuration-snippet: |
     location ~ /admin/.* {
