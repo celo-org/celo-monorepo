@@ -1,5 +1,10 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import {
+  addContextMiddleware,
+  ContextArgv,
+  serviceName,
+  switchToContextCluster,
+} from 'src/lib/context-utils'
 import { installFullNodeChart } from 'src/lib/fullnodes'
 import yargs from 'yargs'
 
@@ -30,6 +35,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: FullNodeInitialArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context)
+  await switchToContextCluster(argv.celoEnv, argv.context, serviceName.Fullnode)
   await installFullNodeChart(argv.celoEnv, argv.context, argv.staticNodes, argv.createNEG)
 }
