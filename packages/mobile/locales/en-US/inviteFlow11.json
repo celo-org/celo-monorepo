@@ -26,7 +26,7 @@
   "sendAndInvite": "Send & Invite",
   "inviteAndSendDialog": {
     "title": "Invite and Send",
-    "body": "Your Payment to {{name}} will be waiting for them once they verify their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
+    "body": "Your payment to {{name}} will be waiting for them once they verify their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
     "button": "Invite"
   }
 }
