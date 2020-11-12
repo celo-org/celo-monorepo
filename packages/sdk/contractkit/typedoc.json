@@ -8,6 +8,6 @@
   "ignoreCompilerErrors": true,
   "hideGenerator": "true",
   "theme": "gitbook",
-  "out": "../docs/developer-resources/contractkit/reference",
+  "out": "../../docs/developer-resources/contractkit/reference",
   "gitRevision": "master"
 }
