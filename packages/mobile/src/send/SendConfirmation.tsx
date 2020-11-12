@@ -40,7 +40,7 @@ import {
 } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
-import InviteFriendModal from 'src/invite/InviteFriendModal'
+import InviteAndSendModal from 'src/invite/InviteAndSendModal'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
@@ -229,6 +229,8 @@ function SendConfirmation(props: Props) {
     const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
 
+    const { displayName, e164PhoneNumber } = transactionData.recipient
+
     const subtotalAmount = {
       value: amount || inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
@@ -244,7 +246,7 @@ function SendConfirmation(props: Props) {
     } else {
       primaryBtnInfo = {
         action: onSendClick,
-        text: t('global:send'),
+        text: isInvite ? t('inviteFlow11:sendAndInvite') : t('global:send'),
         disabled: isPrimaryButtonDisabled,
       }
     }
@@ -367,8 +369,9 @@ function SendConfirmation(props: Props) {
             )}
           </View>
           {features.KOMENCI ? (
-            <InviteFriendModal
+            <InviteAndSendModal
               isVisible={modalVisible}
+              name={!displayName || displayName === 'Mobile #' ? e164PhoneNumber! : displayName}
               onInvite={sendInvite}
               onCancel={cancelModal}
             />

@@ -22,5 +22,11 @@
     "title": "Invita a un amigo",
     "body": "Conecta y comparte valor con tus amigos y familia en {{appName}}.",
     "button": "Invitar"
+  },
+  "sendAndInvite": "Send & Invite",
+  "inviteAndSendDialog": {
+    "title": "Invite and Send",
+    "body": "Your Payment to {{name}} will be waiting for them once they verify their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
+    "button": "Invitar"
   }
 }
