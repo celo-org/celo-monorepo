@@ -89,6 +89,20 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     '0x000000000000000000000000000000000000ce10',
   ]
 
+  const bytecode = await web3.eth.getCode(config.beneficiary)
+  if (bytecode !== '0x') {
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message: `Beneficiary ${config.beneficiary} is a smart contract which might cause loss of funds if not properly configured. Are you sure you want to continue? (y/n)`,
+    })
+
+    if (!response.confirmation) {
+      console.info(chalk.yellow('Skipping grant due to user response'))
+      return
+    }
+  }
+
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(config.numReleasePeriods) * Number(config.amountReleasedPerPeriod) +
@@ -108,6 +122,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       ? '\n\tDebug: Contract init args: ' + JSON.stringify(contractInitializationArgs)
       : '') +
     '\n\tDeploy this grant? (y/n)'
+
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
