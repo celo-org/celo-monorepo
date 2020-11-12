@@ -3,6 +3,8 @@ import { call, put, spawn, take, takeLeading } from 'redux-saga/effects'
 import {
   Actions,
   ClearStoredAccountAction,
+  initializeAccountFailure,
+  initializeAccountSuccess,
   SetPincodeAction,
   setPincodeFailure,
   setPincodeSuccess,
@@ -15,10 +17,12 @@ import { clearStoredMnemonic } from 'src/backup/utils'
 import { FIREBASE_ENABLED } from 'src/config'
 import { firebaseSignOut } from 'src/firebase/firebase'
 import { deleteNodeData } from 'src/geth/geth'
+import { refreshAllBalances } from 'src/home/actions'
 import { removeAccountLocally } from 'src/pincode/authentication'
 import { persistor } from 'src/redux/store'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
+import { getOrCreateAccount } from 'src/web3/saga'
 
 const TAG = 'account/saga'
 
@@ -62,6 +66,22 @@ function* clearStoredAccountSaga({ account }: ClearStoredAccountAction) {
   }
 }
 
+function* initializeAccount() {
+  Logger.debug(TAG + '@initializeAccount', 'Creating account')
+  try {
+    ValoraAnalytics.track(OnboardingEvents.initialize_account_start)
+    yield call(getOrCreateAccount)
+    yield put(refreshAllBalances())
+    Logger.debug(TAG + '@initializeAccount', 'Account creation success')
+    ValoraAnalytics.track(OnboardingEvents.initialize_account_complete)
+    yield put(initializeAccountSuccess())
+  } catch (e) {
+    Logger.error(TAG, 'Failed to initialize account', e)
+    ValoraAnalytics.track(OnboardingEvents.initialize_account_error, { error: e.message })
+    yield put(initializeAccountFailure())
+  }
+}
+
 export function* watchSetPincode() {
   yield takeLeading(Actions.SET_PINCODE, setPincode)
 }
@@ -71,7 +91,12 @@ export function* watchClearStoredAccount() {
   yield call(clearStoredAccountSaga, action)
 }
 
+export function* watchInitializeAccount() {
+  yield takeLeading(Actions.INITIALIZE_ACCOUNT, initializeAccount)
+}
+
 export function* accountSaga() {
   yield spawn(watchSetPincode)
   yield spawn(watchClearStoredAccount)
+  yield spawn(watchInitializeAccount)
 }

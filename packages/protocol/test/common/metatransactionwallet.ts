@@ -2,7 +2,12 @@ import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/l
 import { Address, ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { generateTypedDataHash, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
+import {
+  MetaTransactionWalletContract,
+  MetaTransactionWalletInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
+} from 'types'
 
 const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
   'MetaTransactionWallet'
@@ -589,6 +594,24 @@ contract('MetaTransactionWallet', (accounts: string[]) => {
           })
         })
       })
+    })
+  })
+
+  describe('#transferERC20ToSigner', () => {
+    const value = 100
+    let mockStableToken: MockStableTokenInstance
+    beforeEach(async () => {
+      const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+      mockStableToken = await MockStableToken.new()
+      await mockStableToken.mint(wallet.address, value)
+      assertEqualBN(await mockStableToken.balanceOf(wallet.address), value)
+      assertEqualBN(await mockStableToken.balanceOf(signer), 0)
+    })
+
+    it('transfers all cUSD to the signer', async () => {
+      await wallet.transferERC20ToSigner(mockStableToken.address)
+      assertEqualBN(await mockStableToken.balanceOf(wallet.address), 0)
+      assertEqualBN(await mockStableToken.balanceOf(signer), value)
     })
   })
 })

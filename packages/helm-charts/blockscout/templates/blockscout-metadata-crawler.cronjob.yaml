@@ -41,7 +41,7 @@ spec:
               name: tmp-pod
               readOnly: true
           - name: metadata-crawler
-            image: {{ .Values.blockscout.metadata_crawler.image.repository }}:{{ .Values.blockscout.metadata_crawler.repository.tag }}
+            image: {{ .Values.blockscout.metadata_crawler.image.repository }}:{{ .Values.blockscout.metadata_crawler.image.tag }}
             imagePullPolicy: IfNotPresent
             command:
             - /bin/sh

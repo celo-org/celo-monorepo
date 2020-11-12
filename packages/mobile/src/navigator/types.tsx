@@ -63,7 +63,6 @@ export type StackParamList = {
   }
   [Screens.Debug]: undefined
   [Screens.DrawerNavigator]: undefined
-  [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
     errorMessage?: string
   }
@@ -84,15 +83,13 @@ export type StackParamList = {
       makerTokenBalance: string
     }
   }
-  [Screens.ExternalExchanges]: undefined
-  [Screens.FiatExchange]: undefined
-  [Screens.FiatExchangeAmount]: {
-    isAddFunds: boolean
+  [Screens.ExternalExchanges]: {
+    currency: CURRENCY_ENUM
   }
+  [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeOptions]: {
-    isAddFunds: boolean
+    isAddFunds?: boolean
     amount?: BigNumber
-    isExplanationOpen?: boolean
   }
   [Screens.MoonPay]: {
     localAmount: BigNumber
@@ -130,6 +127,9 @@ export type StackParamList = {
       }
     | undefined
   [Screens.Licenses]: undefined
+  [Screens.LocalProviderCashOut]: {
+    uri: string
+  }
   [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {
@@ -183,6 +183,7 @@ export type StackParamList = {
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
     | undefined
   [Screens.Simplex]: undefined
+  [Screens.Spend]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
@@ -219,8 +220,11 @@ export type StackParamList = {
     amount: BigNumber
     recipientAddress: string
     feeEstimate: BigNumber
+    isCashOut: boolean
   }
-  [Screens.WithdrawCeloScreen]: undefined
+  [Screens.WithdrawCeloScreen]: {
+    isCashOut: boolean
+  }
 }
 
 // tslint:disable-next-line: interface-over-type-literal

@@ -1,3 +1,5 @@
+import { Logger } from './logger'
+
 const TAG = 'utils/src/async'
 
 /** Sleep for a number of milliseconds */
@@ -13,7 +15,8 @@ export const retryAsync = async <T extends any[], U>(
   inFunction: InFunction<T, U>,
   tries: number,
   params: T,
-  delay = 100
+  delay = 100,
+  logger: Logger | null = null
 ) => {
   let saveError
   for (let i = 0; i < tries; i++) {
@@ -23,7 +26,9 @@ export const retryAsync = async <T extends any[], U>(
     } catch (error) {
       await sleep(delay)
       saveError = error
-      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}:`, error)
+      if (logger) {
+        logger(`${TAG}/@retryAsync, Failed to execute function on try #${i}:`, error)
+      }
     }
   }
 
@@ -37,7 +42,8 @@ export const retryAsyncWithBackOff = async <T extends any[], U>(
   tries: number,
   params: T,
   delay = 100,
-  factor = 1.5
+  factor = 1.5,
+  logger: Logger | null = null
 ) => {
   let saveError
   for (let i = 0; i < tries; i++) {
@@ -47,7 +53,9 @@ export const retryAsyncWithBackOff = async <T extends any[], U>(
     } catch (error) {
       await sleep(Math.pow(factor, i) * delay)
       saveError = error
-      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
+      if (logger) {
+        logger(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
+      }
     }
   }
 
@@ -63,7 +71,8 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
   dontRetry: string[],
   params: T,
   delay = 100,
-  factor = 1.5
+  factor = 1.5,
+  logger: Logger | null = null
 ) => {
   let saveError
   for (let i = 0; i < tries; i++) {
@@ -75,7 +84,9 @@ export const selectiveRetryAsyncWithBackOff = async <T extends any[], U>(
         throw error
       }
       saveError = error
-      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
+      if (logger) {
+        logger(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
+      }
     }
     if (i < tries - 1) {
       await sleep(Math.pow(factor, i) * delay)

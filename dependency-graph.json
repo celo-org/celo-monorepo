@@ -112,6 +112,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/flake-tracker",
+      "@celo/komencikit",
       "@celo/react-components",
       "@celo/typescript",
       "@celo/utils"
