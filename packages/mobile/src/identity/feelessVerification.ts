@@ -4,7 +4,6 @@ import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phon
 import {
   ActionableAttestation,
   AttestationsWrapper,
-  IdentifierLookupResult,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import {
@@ -52,10 +51,6 @@ import {
   updateE164PhoneNumberSalts,
 } from 'src/identity/actions'
 import { ReactBlsBlindingClient } from 'src/identity/bls-blinding-client'
-import {
-  getAddressesFromLookupResult,
-  lookupAttestationIdentifiers,
-} from 'src/identity/contactMapping'
 import {
   hasExceededKomenciErrorQuota,
   KomenciDisabledError,
@@ -270,12 +265,13 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
 
       // Now that we are guarnateed to have the phoneHash, check again to see if the
       // user already has a verified MTW
-      yield call(reFetchVerifiedMtw, contractKit, walletAddress, e164Number)
+      yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
 
       const mtwIsVerified = yield call(isMtwVerified)
 
       if (mtwIsVerified) {
-        yield call(endFeelessVerification)
+        // TODO: Need some sort of success animation for this
+        yield call(endFeelessVerification, komenciKit, walletAddress)
         return true
       }
 
@@ -413,9 +409,7 @@ export function* feelessDoVerificationFlow(withoutRevealing: boolean = false) {
       }
     }
 
-    // Intentionally calling this a second time. No-op if they already registered so no harm done
-    yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
-    yield call(endFeelessVerification)
+    yield call(endFeelessVerification, komenciKit, walletAddress)
     return true
   } catch (error) {
     Logger.error(TAG, 'Error occured during feeless verification flow', error)
@@ -595,8 +589,26 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     e164Number
   )
   const { phoneHash } = phoneHashDetails
-  const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
-  const possibleMtwAddresses = getAddressesFromLookupResult(lookupResult, phoneHash)
+
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  const associatedAccounts: string[] = yield call(
+    [attestationsWrapper, attestationsWrapper.lookupAccountsForIdentifier],
+    phoneHash
+  )
+
+  const accountAttestationStatuses: AttestationsStatus[] = yield all(
+    associatedAccounts.map((account) =>
+      call(getAttestationsStatus, attestationsWrapper, account, phoneHash)
+    )
+  )
+
+  const possibleMtwAddresses: string[] = associatedAccounts.filter(
+    (account, i) => accountAttestationStatuses[i].isVerified
+  )
 
   if (!possibleMtwAddresses) {
     Logger.debug(TAG, '@fetchVerifiedMtw', 'No verified MTW found')
@@ -614,6 +626,8 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
       )
     )
   )
+
+  console.log('Verification Results: ', verificationResults)
 
   const verifiedMtwAddresses = possibleMtwAddresses.filter(
     (address, i) => verificationResults[i].ok
@@ -644,21 +658,6 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
   )
 
   return verifiedMtwAddress
-}
-
-function* reFetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164Number: string) {
-  Logger.debug(TAG, '@reFetchVerifiedMtw', 'Starting fetch')
-  const feelessVerificationState: FeelessVerificationState = yield select(
-    feelessVerificationStateSelector
-  )
-
-  const { pepperFetchedByKomenci } = feelessVerificationState.komenci
-  // If Komenci was used to fetch their pepper, check if the they have a verified
-  // account. If user already had their pepper, then check would have happened
-  // in `feelessFetchVerificationState`
-  if (pepperFetchedByKomenci) {
-    yield call(fetchVerifiedMtw, contractKit, walletAddress, e164Number)
-  }
 }
 
 function* isMtwVerified() {
@@ -769,6 +768,7 @@ function* fetchPhoneHashDetails(komenciKit: KomenciKit, e164Number: string) {
   try {
     yield call(fetchPhoneHashDetailsFromCache, e164Number)
   } catch (error) {
+    Logger.debug(TAG, '@fetchPhoneHashDetails', 'Pepper not in cache, fetching from Komenci')
     const feelessVerificationState: FeelessVerificationState = yield select(
       feelessVerificationStateSelector
     )
@@ -1138,7 +1138,7 @@ function* feelessWaitForAttestationCode(issuer: string) {
   }
 }
 
-function* endFeelessVerification() {
+function* endFeelessVerification(komenciKit: KomenciKit, walletAddress: string) {
   const feelessVerificationState: FeelessVerificationState = yield select(
     feelessVerificationStateSelector
   )
@@ -1147,7 +1147,8 @@ function* endFeelessVerification() {
   if (!mtwAddress) {
     throw Error('Dev error: Tried ending feeless verification too early')
   }
-
+  // Intentionally calling this a second time. No-op if they already registered so no harm done
+  yield call(feelessDekAndWalletRegistration, komenciKit, walletAddress)
   yield put(setNumberVerified(true))
   yield put(setMtwAddress(mtwAddress))
   yield put(feelessSetVerificationStatus(VerificationStatus.Done))
