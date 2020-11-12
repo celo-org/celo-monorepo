@@ -108,6 +108,7 @@
     "truffle-typings": "^1.0.6",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
-    "yargs": "^14.0.0"
+    "yargs": "^14.0.0",
+    "merkle-patricia-tree": "4.0.0"
   }
 }

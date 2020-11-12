@@ -1,13 +1,16 @@
+// tslint:disable: no-console
+import { ensureLeading0x } from '@celo/base/lib/address'
 import {
   LibraryAddresses,
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyLibraryPrefix,
+  verifyAndStripLibraryPrefix,
 } from '@celo/protocol/lib/bytecode'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { OwnableInstance, ProxyInstance, RegistryInstance } from 'types'
+import { verifyProxyStorageProof } from 'lib/proxy-utils'
+import { ProxyInstance, RegistryInstance } from 'types'
 import Web3 from 'web3'
 
 const ignoredContracts = [
@@ -25,7 +28,6 @@ interface VerificationContext {
   registry: RegistryInstance
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
-  Ownable: Truffle.Contract<OwnableInstance>
   web3: Web3
 }
 interface InitializationData {
@@ -78,75 +80,43 @@ const getOnchainBytecode = async (address: string, context: VerificationContext)
 const isLibrary = (contract: string, context: VerificationContext) =>
   contract in context.libraryAddresses.addresses
 
-const getImplementationAddress = async (contract: string, context: VerificationContext) => {
-  // Where we find the implementation address depends on two factors:
-  // 1. Is the contract affected by a governance proposal?
-  // 2. Is the contract registered in the Registry or a linked library?
-
-  if (isImplementationChanged(contract, context)) {
-    return getProposedImplementationAddress(contract, context)
-  }
-
-  if (isLibrary(contract, context)) {
-    return `0x${context.libraryAddresses.addresses[contract]}`
-  }
-
-  // contract is registered but we need to check if the proxy is affected by the proposal
-  const proxyAddress = isProxyChanged(contract, context)
-    ? getProposedProxyAddress(contract, context)
-    : await context.registry.getAddressForString(contract)
-
-  const proxyName = `${contract}Proxy`
-  const deployedProxyBytecode = await getOnchainBytecode(proxyAddress, context)
-  const sourceProxyBytecode = getSourceBytecode(proxyName, context)
-  if (deployedProxyBytecode !== sourceProxyBytecode) {
-    throw new Error(`${proxyName}'s onchain and compiled bytecodes do not match`)
-  } else {
-    // tslint:disable-next-line: no-console
-    console.log(`Proxy deployed at ${proxyAddress} matches ${proxyName}`)
-  }
-  // at() returns a promise despite Typescript labelling the await as extraneous
-  const proxy: ProxyInstance = await context.Proxy.at(
-    context.web3.utils.toChecksumAddress(proxyAddress)
-  )
-
-  const governanceAddr = await context.registry.getAddressForString('Governance')
-  // verify proxy owner is governance
-  const proxyOwner = await proxy._getOwner()
-  if (proxyOwner !== governanceAddr) {
-    throw new Error(
-      `${proxyName}'s owner ${proxyOwner} does not match governance ${governanceAddr}`
-    )
-  } else {
-    console.log(`${proxyName}'s owner is governance`)
-  }
-
-  // verify implementation owner is governance
-  const implementationAddress = await proxy._getImplementation()
-  const ownable: OwnableInstance = await context.Ownable.at(
-    context.web3.utils.toChecksumAddress(implementationAddress)
-  )
-  const implOwner = await ownable.owner()
-  if (implOwner !== governanceAddr) {
-    throw new Error(`${contract}'s owner ${implOwner} does not match governance ${governanceAddr}`)
-  } else {
-    console.log(`${contract}'s owner is governance`)
-  }
-
-  return implementationAddress
-}
-
 const dfsStep = async (queue: string[], visited: Set<string>, context: VerificationContext) => {
   const contract = queue.pop()
   // mark current DFS node as visited
   visited.add(contract)
 
-  // get source code
+  // check proxy deployment
+  if (isProxyChanged(contract, context)) {
+    const proxyAddress = getProposedProxyAddress(contract, context)
+    const governanceAddr = await context.registry.getAddressForString('Governance')
+    if (!(await verifyProxyStorageProof(context.web3, proxyAddress, governanceAddr))) {
+      throw new Error(`Proposed ${contract}Proxy has impure storage`)
+    }
+
+    const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
+    const sourceProxyBytecode = getSourceBytecode(`${contract}Proxy`, context)
+    if (onchainProxyBytecode !== sourceProxyBytecode) {
+      throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
+    }
+
+    console.log(`Proposed Proxy deployed at ${proxyAddress} matches ${contract}Proxy`)
+  }
+
+  // check implementation deployment
   const sourceBytecode = getSourceBytecode(contract, context)
   const sourceLibraryPositions = new LibraryPositions(sourceBytecode)
 
-  // get deployed code
-  const implementationAddress = await getImplementationAddress(contract, context)
+  let implementationAddress: string
+  if (isImplementationChanged(contract, context)) {
+    implementationAddress = getProposedImplementationAddress(contract, context)
+  } else if (isLibrary(contract, context)) {
+    implementationAddress = ensureLeading0x(context.libraryAddresses.addresses[contract])
+  } else {
+    const proxyAddress = await context.registry.getAddressForString(contract)
+    const proxy = await context.Proxy.at(proxyAddress) // necessary await
+    implementationAddress = await proxy._getImplementation()
+  }
+
   let onchainBytecode = await getOnchainBytecode(implementationAddress, context)
   context.libraryAddresses.collect(onchainBytecode, sourceLibraryPositions)
 
@@ -154,22 +124,14 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
 
   // normalize library bytecodes
   if (isLibrary(contract, context)) {
-    linkedSourceBytecode = verifyLibraryPrefix(
-      linkedSourceBytecode,
-      '0000000000000000000000000000000000000000'
-    )
-    onchainBytecode = verifyLibraryPrefix(onchainBytecode, implementationAddress)
+    linkedSourceBytecode = verifyAndStripLibraryPrefix(linkedSourceBytecode)
+    onchainBytecode = verifyAndStripLibraryPrefix(onchainBytecode, implementationAddress)
   }
 
   if (onchainBytecode !== linkedSourceBytecode) {
     throw new Error(`${contract}'s onchain and compiled bytecodes do not match`)
   } else {
-    // tslint:disable-next-line: no-console
-    console.log(
-      `${
-        isLibrary(contract, context) ? 'Library' : 'Contract'
-      } deployed at ${implementationAddress} matches ${contract}`
-    )
+    console.log(`Contract deployed at ${implementationAddress} matches ${contract}`)
   }
 
   // push unvisited libraries to DFS queue
@@ -244,15 +206,17 @@ export const verifyBytecodes = async (
   registry: RegistryInstance,
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
-  Ownable: Truffle.Contract<OwnableInstance>,
-  web3: Web3,
+  _web3: Web3,
   initializationData: InitializationData = {}
 ) => {
   assertValidProposalTransactions(proposal)
-  assertValidInitializationData(artifacts, proposal, web3, initializationData)
+  assertValidInitializationData(artifacts, proposal, _web3, initializationData)
 
   const queue = contracts.filter((contract) => !ignoredContracts.includes(contract))
   const visited: Set<string> = new Set(queue)
+
+  // truffle web3 version does not have getProof
+  const web3 = new Web3(_web3.currentProvider)
 
   const context: VerificationContext = {
     artifacts,
@@ -260,7 +224,6 @@ export const verifyBytecodes = async (
     registry,
     proposal,
     Proxy,
-    Ownable,
     web3,
   }
 
