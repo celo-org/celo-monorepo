@@ -47,7 +47,7 @@ spec:
         args:
         - |
           RID=${POD_NAME##*-}
-          TOKEN_ENV_VAR_NAME="TOKEN_$RID"\
+          TOKEN_ENV_VAR_NAME="TOKEN_$RID"
           {{ if (eq .Values.kube.cloudProvider "azure") }}
           # Azure
           CMD="label pod $POD_NAME aadpodidbinding=$POD_NAME-identity-binding"
