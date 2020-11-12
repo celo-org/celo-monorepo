@@ -1,4 +1,3 @@
-import { Connection } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 
@@ -44,9 +43,9 @@ const Exchange = {
   exchange: jest.fn(),
 }
 
-const web3 = new Web3('http://localhost:8545')
+const web3 = new Web3()
 
-const connection = new Connection(web3)
+const connection = { web3: web3 }
 
 const kit = {
   contracts: {
