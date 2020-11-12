@@ -213,7 +213,7 @@ describe('Mnemonic validation', () => {
       const password = await generateKeys(mnemonics[i], 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys[i])
     }
-    // Spanish mnemonic is detected even if we pass english.
-    expect(validateMnemonic(spanishMnemonic, MnemonicLanguages.english)).toBeTruthy()
+    expect(validateMnemonic(spanishMnemonic, MnemonicLanguages.english)).toBeFalsy()
+    expect(validateMnemonic(spanishMnemonic)).toBeTruthy()
   })
 })

@@ -56,15 +56,13 @@ export async function generateMnemonic(
 
 export function validateMnemonic(
   mnemonic: string,
-  defaultLanguage: MnemonicLanguages = MnemonicLanguages.english,
+  defaultLanguage?: MnemonicLanguages,
   bip39ToUse: Bip39 = bip39Wrapper
 ) {
   const mnemonicWords = mnemonic.trim().split(' ')
-  // Make sure the language received is the first one checked.
-  const languages = [
-    defaultLanguage,
-    ...getAllLanguages().filter((lang) => lang !== defaultLanguage),
-  ]
+  const languages = defaultLanguage
+    ? [defaultLanguage]
+    : getAllLanguages().filter((lang) => lang !== defaultLanguage)
   for (const language of languages) {
     const wordList = getWordList(language)
     if (mnemonicWords.every((word) => wordList.includes(word))) {
