@@ -37,6 +37,7 @@ import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
 import networkConfig from 'src/geth/networkConfig'
+import { waitForNextBlock } from 'src/geth/saga'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -1030,6 +1031,40 @@ export function* feelessGetCodeForIssuer(issuer: string) {
   const existingCodes: AttestationCode[] = yield select(feelessAttestationCodesSelector)
   return existingCodes.find((c) => c.issuer === issuer)
 }
+// Codes that are auto-imported or pasted in quick sucsession may revert due to being submitted by Komenci
+// with the same nonce as the previous code. Adding retry logic to attempt the tx again in that case
+// TODO: Batch all available `complete` tranactions once Komenci supports it
+function* submitCompleteTxAndRetryOnRevert(
+  komenciKit: KomenciKit,
+  mtwAddress: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  code: AttestationCode
+) {
+  const numOfRetries = 3
+  let completeTxResult: Result<TransactionReceipt, FetchError | TxError>
+  for (let i = 0; i < numOfRetries; i += 1) {
+    completeTxResult = yield call(
+      [komenciKit, komenciKit.completeAttestation],
+      mtwAddress,
+      phoneHashDetails.phoneHash,
+      code.issuer,
+      code.code
+    )
+
+    if (completeTxResult.ok) {
+      return completeTxResult
+    }
+
+    // If it's not a revert error, or this is the last retry, then return result
+    const errorString = completeTxResult.error.toString().toLowerCase()
+    if (!errorString.includes('revert') || i + 1 === numOfRetries) {
+      return completeTxResult
+    }
+
+    Logger.debug(TAG, '@feelessCompleteAttestation', `Failed complete tx on retry #${i + 1}`)
+    yield call(waitForNextBlock)
+  }
+}
 
 export function* feelessCompleteAttestation(
   komenciKit: KomenciKit,
@@ -1043,6 +1078,8 @@ export function* feelessCompleteAttestation(
     feeless: true,
   })
   const code: AttestationCode = yield call(feelessWaitForAttestationCode, issuer)
+  const existingCodes: AttestationCode[] = yield select(feelessAttestationCodesSelector)
+  const codePosition = existingCodes.indexOf(code)
 
   ValoraAnalytics.track(VerificationEvents.verification_reveal_attestation_await_code_complete, {
     issuer,
@@ -1051,25 +1088,26 @@ export function* feelessCompleteAttestation(
 
   Logger.debug(TAG + '@feelessCompleteAttestation', `Completing code for issuer: ${code.issuer}`)
 
-  // TODO: Refactor this to check for state change in a smart way
-  // Needed to ensure that codes inputted in quick succession are not
-  // assigned the same nonce by Komenci
+  // Make each concurrent completion attempt wait a sec for where they are relative to other codes
+  // to ensure `processingInputCode` has enough time to properly gate the tx. 0-index code
+  // will have 0 delay, 1-index code will have 1 sec delay, etc.
+  yield delay(codePosition * 1000)
   while (yield select(feelessProcessingInputCodeSelector)) {
-    yield delay(100)
+    yield delay(Math.random() * 1000)
   }
 
   yield put(feelessProcessingInputCode(true))
   const completeTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
-    [komenciKit, komenciKit.completeAttestation],
+    submitCompleteTxAndRetryOnRevert,
+    komenciKit,
     mtwAddress,
-    phoneHashDetails.phoneHash,
-    code.issuer,
-    code.code
+    phoneHashDetails,
+    code
   )
+  yield put(feelessProcessingInputCode(false))
 
   if (!completeTxResult.ok) {
     Logger.debug(TAG, '@feelessCompleteAttestation', 'Failed complete tx')
-    yield put(feelessProcessingInputCode(false))
     throw completeTxResult.error
   }
 
