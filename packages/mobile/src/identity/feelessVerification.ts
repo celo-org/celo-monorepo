@@ -627,8 +627,6 @@ function* fetchVerifiedMtw(contractKit: ContractKit, walletAddress: string, e164
     )
   )
 
-  console.log('Verification Results: ', verificationResults)
-
   const verifiedMtwAddresses = possibleMtwAddresses.filter(
     (address, i) => verificationResults[i].ok
   )
