@@ -9,7 +9,6 @@ import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { AddressValidationType } from 'src/identity/reducer'
-import { ImportContactsStatus } from 'src/identity/types'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
@@ -107,7 +106,6 @@ export type StackParamList = {
     | undefined
     | {
         onPressSkip?: () => void
-        importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.NameAndNumber]:
