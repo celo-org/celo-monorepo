@@ -363,7 +363,6 @@ export const reducer = (
     case Actions.FEELESS_COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
-        feelessProcessingInputCode: false,
         feelessNumCompleteAttestations: state.feelessNumCompleteAttestations + 1,
         feelessAcceptedAttestationCodes: [...state.feelessAcceptedAttestationCodes, action.code],
       }
