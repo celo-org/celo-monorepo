@@ -118,7 +118,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   const isAddFunds = route.params?.isAddFunds ?? true
   const localCurrency = useSelector(getLocalCurrencyCode)
   const {
-    SIMPLEX_ENABLED,
+    SIMPLEX_DISABLED,
     MOONPAY_DISABLED,
     KOTANI_SUPPORTED,
     PONTO_SUPPORTED,
@@ -131,10 +131,10 @@ function FiatExchangeOptions({ route, navigation }: Props) {
   Logger.debug(`Ponto: ${pontoEnabled} Kotani: ${kotaniEnabled}`)
 
   const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(
-    SIMPLEX_ENABLED ? CURRENCY_ENUM.DOLLAR : CURRENCY_ENUM.GOLD
+    SIMPLEX_DISABLED ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
   )
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
-    isAddFunds && (SIMPLEX_ENABLED || !MOONPAY_DISABLED)
+    isAddFunds && (!SIMPLEX_DISABLED || !MOONPAY_DISABLED)
       ? PaymentMethod.FIAT
       : PaymentMethod.EXCHANGE
   )
@@ -186,7 +186,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               borderTopRightRadius: 8,
             }}
             enabled={
-              (SIMPLEX_ENABLED || selectedPaymentMethod !== PaymentMethod.FIAT) &&
+              (!SIMPLEX_DISABLED || selectedPaymentMethod !== PaymentMethod.FIAT) &&
               selectedPaymentMethod !== PaymentMethod.ADDRESS
             }
           />
@@ -216,7 +216,7 @@ function FiatExchangeOptions({ route, navigation }: Props) {
               onSelect={onSelectPaymentMethod(PaymentMethod.FIAT)}
               enabled={
                 (!MOONPAY_DISABLED || selectedCurrency === CURRENCY_ENUM.DOLLAR) &&
-                (SIMPLEX_ENABLED || selectedCurrency === CURRENCY_ENUM.GOLD)
+                (!SIMPLEX_DISABLED || selectedCurrency === CURRENCY_ENUM.GOLD)
               }
             />
           )}
