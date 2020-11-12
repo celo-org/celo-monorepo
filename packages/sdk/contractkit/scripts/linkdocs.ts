@@ -15,7 +15,7 @@ const modifiedLocalSummary = localSummary
   .replace(pathRegex, (match) => `(${localPathPrefix}/${match.slice(1, -1)})`)
   .replace(/\*/g, indent + '-')
 
-const globalSummaryPath = '../docs/SUMMARY.md'
+const globalSummaryPath = '../../docs/SUMMARY.md'
 const globalSummary = readFileSync(globalSummaryPath).toString()
 
 // Adding the indent to the tag, otherwise the markdows has poor preview

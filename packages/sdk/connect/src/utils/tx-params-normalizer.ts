@@ -46,6 +46,9 @@ export class TxParamsNormalizer {
     return this.chainId
   }
 
+  // Right now, Forno does not expose a node's coinbase so we can't
+  // set the gatewayFeeRecipient. Once that is fixed, we can reenable
+  // this.
   // @ts-ignore - see comment above
   private async getCoinbase(): Promise<string> {
     if (this.gatewayFeeRecipient === null) {
