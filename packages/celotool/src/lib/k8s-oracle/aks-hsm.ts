@@ -37,7 +37,9 @@ export class AksHsmOracleDeployer extends RbacOracleDeployer {
     return [
       ...await super.helmParameters(),
       `--set kube.cloudProvider=azure`,
-      `--set oracle.walletType=AZURE_HSM`
+      `--set oracle.azureHsm.initTryCount=5`,
+      `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
+      `--set oracle.walletType=AZURE_HSM`,
     ]
   }
 

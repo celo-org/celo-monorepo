@@ -59,9 +59,6 @@ export abstract class BaseOracleDeployer {
       `--set environment.name=${this.celoEnv}`,
       `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
       `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-      // TODO change this & the corresponding oracle env var
-      `--set oracle.azureHsm.initTryCount=5`,
-      `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
       `--set oracle.replicas=${this.replicas}`,
       `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
       `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
