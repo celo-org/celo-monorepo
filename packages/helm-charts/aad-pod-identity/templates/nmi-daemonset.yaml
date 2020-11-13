@@ -35,14 +35,21 @@ spec:
         image: {{ .Values.nmi.image.repo }}:{{ .Values.nmi.image.tag }}
         imagePullPolicy: Always
         args:
+          {{- if semverCompare "<= 1.6.1-0" .Values.nmi.image.tag }}
           - "--host-ip=$(HOST_IP)"
+          {{- end }}
           - "--node=$(NODE_NAME)"
           - "--prometheus-port={{ .Values.nmi.prometheusPort }}"
+          {{- if .Values.nmi.probePort }}
+          - --http-probe-port={{ .Values.nmi.probePort }}
+          {{- end }}        
         env:
+          {{- if semverCompare "<= 1.6.1-0" .Values.nmi.image.tag }}
           - name: HOST_IP
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          {{- end }}
           - name: NODE_NAME
             valueFrom:
               fieldRef:

@@ -1,4 +1,4 @@
-import { DefaultAzureCredential } from '@azure/identity'
+import { DefaultAzureCredential, TokenCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
 import { SecretClient } from '@azure/keyvault-secrets'
 import { BigNumber } from 'bignumber.js'
@@ -12,7 +12,7 @@ export class AzureKeyVaultClient {
   private readonly vaultName: string
   // Unique URI of the Azure Key Vault
   private readonly vaultUri: string
-  private readonly credential: DefaultAzureCredential
+  private readonly credential: TokenCredential
   private readonly keyClient: KeyClient
   private readonly SIGNING_ALGORITHM: string = 'ECDSA256'
   private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
@@ -21,12 +21,12 @@ export class AzureKeyVaultClient {
   >()
   private readonly secretClient: SecretClient
 
-  constructor(vaultName: string) {
+  constructor(vaultName: string, credential?: TokenCredential) {
     this.vaultName = vaultName
     this.vaultUri = `https://${this.vaultName}.vault.azure.net`
     // DefaultAzureCredential supports service principal or managed identity
     // If using a service principal, you must set the appropriate environment vars
-    this.credential = new DefaultAzureCredential()
+    this.credential = credential || new DefaultAzureCredential()
     this.keyClient = new KeyClient(this.vaultUri, this.credential)
     this.secretClient = new SecretClient(this.vaultUri, this.credential)
   }

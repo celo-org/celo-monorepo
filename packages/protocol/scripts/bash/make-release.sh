@@ -49,7 +49,7 @@ rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 
 git checkout -
-yarn build
+yarn build:ts
 
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \

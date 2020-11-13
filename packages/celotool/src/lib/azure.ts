@@ -1,14 +1,14 @@
 import sleep from 'sleep-promise'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { retryCmd } from 'src/lib/utils'
-import { AKSClusterConfig } from './k8s-cluster/aks'
+import { AksClusterConfig } from './k8s-cluster/aks'
 
 /**
  * getIdentity gets basic info on an existing identity. If the identity doesn't
  * exist, undefined is returned
  */
 export async function getIdentity(
-  clusterConfig: AKSClusterConfig,
+  clusterConfig: AksClusterConfig,
   identityName: string
 ) {
   const [matchingIdentitiesStr] = await execCmdWithExitOnFailure(
@@ -22,10 +22,10 @@ export async function getIdentity(
   return matchingIdentities[0]
 }
 
-// createIdentityIfNotExists creates an identity if it doesn't already exist.
+// createIdentityIdempotent creates an identity if it doesn't already exist.
 // Returns an object including basic info on the identity.
-export async function createIdentityIfNotExists(
-  clusterConfig: AKSClusterConfig,
+export async function createIdentityIdempotent(
+  clusterConfig: AksClusterConfig,
   identityName: string
 ) {
   const identity = await getIdentity(clusterConfig, identityName)
@@ -44,7 +44,7 @@ export async function createIdentityIfNotExists(
 /**
  * deleteIdentity gets basic info on an existing identity
  */
-export function deleteIdentity(clusterConfig: AKSClusterConfig, identityName: string) {
+export function deleteIdentity(clusterConfig: AksClusterConfig, identityName: string) {
   return execCmdWithExitOnFailure(
     `az identity delete -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
   )
@@ -61,7 +61,7 @@ async function roleIsAssigned(assignee: string, scope: string, role: string) {
   return parseInt(matchingAssignedRoles.trim(), 10) > 0
 }
 
-export async function assignRoleIfNotAssigned(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
+export async function assignRoleIdempotent(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
   if (await roleIsAssigned(assigneeObjectId, scope, role)) {
     console.info(`Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`)
     return
@@ -76,7 +76,7 @@ export async function assignRoleIfNotAssigned(assigneeObjectId: string, assignee
   )
 }
 
-export async function getAKSNodeResourceGroup(clusterConfig: AKSClusterConfig) {
+export async function getAKSNodeResourceGroup(clusterConfig: AksClusterConfig) {
   const [nodeResourceGroup] = await execCmdWithExitOnFailure(
     `az aks show --name ${clusterConfig.clusterName} --resource-group ${clusterConfig.resourceGroup} --query nodeResourceGroup -o tsv`
   )
@@ -86,7 +86,7 @@ export async function getAKSNodeResourceGroup(clusterConfig: AKSClusterConfig) {
 /**
  * Gets the AKS Service Principal Object ID if one exists. Otherwise, an empty string is given.
  */
-export async function getAKSServicePrincipalObjectId(clusterConfig: AKSClusterConfig) {
+export async function getAKSServicePrincipalObjectId(clusterConfig: AksClusterConfig) {
   // Get the correct object ID depending on the cluster configuration
   // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
   const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
@@ -108,7 +108,7 @@ export async function getAKSServicePrincipalObjectId(clusterConfig: AKSClusterCo
  * If an AKS cluster is using a managed service identity, the objectId is returned.
  * Otherwise, an empty string is given.
  */
-export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AKSClusterConfig) {
+export async function getAKSManagedServiceIdentityObjectId(clusterConfig: AksClusterConfig) {
   const [managedIdentityObjectId] = await execCmdWithExitOnFailure(
     `az aks show -n ${clusterConfig.clusterName} --query identityProfile.kubeletidentity.objectId -g ${clusterConfig.resourceGroup} -o tsv`
   )
