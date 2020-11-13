@@ -232,11 +232,15 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
     const lookupResult: string[] = yield call(lookupAttestationIdentifiers, phoneHash)
 
     // Check that there are verified addresses.
-    const onChainAddresses = yield call(getAddressesFromLookupResult, lookupResult, phoneHash)
+    const onChainAddresses: string[] = yield call(
+      getAddressesFromLookupResult,
+      lookupResult,
+      phoneHash
+    )
     if (!onChainAddresses || !onChainAddresses.length) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
-        `Phone number and/or salt claimed by address ${d.address} is not verified. Values are incorrect or sender is impersonating another number`
+        `Phone number and/or salt claimed by address ${metadata.address} is not verified. Values are incorrect or sender is impersonating another number`
       )
       continue
     }
