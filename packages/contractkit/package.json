@@ -30,8 +30,8 @@
     "@azure/identity": "^1.1.0",
     "@azure/keyvault-keys": "^4.1.0",
     "@azure/keyvault-secrets": "^4.1.0",
-    "@celo/base": "file:../base",
-    "@celo/utils": "file:../utils",
+    "@celo/base": "*",
+    "@celo/utils": "*",
     "@ledgerhq/hw-app-eth": "^5.11.0",
     "@ledgerhq/hw-transport": "^5.11.0",
     "@types/asn1js": "^0.0.2",
@@ -58,8 +58,8 @@
     "inquirer": "^7.0.5"
   },
   "devDependencies": {
-    "@celo/dev-utils": "file:../dev-utils",
-    "@celo/flake-tracker": "file:../flake-tracker",
+    "@celo/dev-utils": "*",
+    "@celo/flake-tracker": "*",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",

@@ -6,8 +6,8 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/contractkit": "file:../contractkit",
-    "@celo/utils": "file:../utils",
+    "@celo/contractkit": "*",
+    "@celo/utils": "*",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
     "@google-cloud/storage": "^2.4.3",
@@ -32,8 +32,8 @@
     "yargs": "14.0.0"
   },
   "devDependencies": {
-    "@celo/dev-utils": "file:../dev-utils",
-    "@celo/flake-tracker": "file:../flake-tracker",
+    "@celo/dev-utils": "*",
+    "@celo/flake-tracker": "*",
     "@celo/protocol": "*",
     "@types/bunyan": "1.8.4",
     "@types/chai": "^4.1.3",

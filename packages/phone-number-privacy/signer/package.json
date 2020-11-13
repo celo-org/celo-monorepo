@@ -45,7 +45,7 @@
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
-    "@celo/flake-tracker": "file:../flake-tracker"
+    "@celo/flake-tracker": "*"
   },
   "engines": {
     "node": "10"

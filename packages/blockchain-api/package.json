@@ -40,7 +40,7 @@
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
-    "@celo/flake-tracker": "file:../flake-tracker"
+    "@celo/flake-tracker": "*"
   },
   "resolutions": {
     "**/cross-fetch": "3.0.4"

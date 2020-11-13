@@ -22,9 +22,9 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "file:../contractkit",
-    "@celo/base": "file:../base",
-    "@celo/utils": "file:../utils",
+    "@celo/contractkit": "*",
+    "@celo/base": "*",
+    "@celo/utils": "*",
     "cross-fetch": "^3.0.6",
     "fp-ts": "^2.8.4",
     "io-ts": "^2.2.11"

@@ -48,7 +48,7 @@
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#e933297",
-    "@celo/utils": "file:../utils",
+    "@celo/utils": "*",
     "@openzeppelin/upgrades": "^2.8.0",
     "apollo-client": "^2.4.13",
     "bip39": "^3.0.2",
@@ -86,7 +86,7 @@
     "web3-utils": "1.2.4"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "file:../flake-tracker",
+    "@celo/flake-tracker": "*",
     "@celo/typechain-target-web3-v1-celo": "0.0.2",
     "@celo/typescript": "0.0.1",
     "@types/bn.js": "^4.11.0",

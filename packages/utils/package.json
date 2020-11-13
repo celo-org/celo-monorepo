@@ -18,7 +18,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "file:../base",
+    "@celo/base": "*",
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bigi": "^1.1.0",
     "bignumber.js": "^9.0.0",
@@ -41,7 +41,7 @@
     "web3-utils": "1.2.4"
   },
   "devDependencies": {
-    "@celo/flake-tracker": "file:../flake-tracker",
+    "@celo/flake-tracker": "*",
     "@celo/typescript": "0.0.1",
     "@types/country-data": "^0.0.0",
     "@types/elliptic": "^6.4.9",
