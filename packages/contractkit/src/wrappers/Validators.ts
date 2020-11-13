@@ -616,19 +616,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
-   * Returns the group membership for `validator`.
-   * @param validator Address of validator to retrieve group membership for.
+   * Returns the group membership for validator account.
+   * @param account Address of validator account to retrieve group membership for.
    * @param blockNumber Block number to retrieve group membership at.
    * @return Group and membership history index for `validator`.
    */
   async getValidatorMembershipHistoryIndex(
-    validator: Validator,
+    account: Address,
     blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
     const blockEpoch = await this.kit.getEpochNumberOfBlock(
       blockNumber || (await this.kit.web3.eth.getBlockNumber())
     )
-    const account = await this.validatorSignerToAccount(validator.signer)
     const membershipHistory = await this.getValidatorMembershipHistory(account)
     const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
     const group = membershipHistory[historyIndex].group
