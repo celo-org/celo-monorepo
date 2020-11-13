@@ -14,7 +14,7 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import { kotaniEnabledSelector, pontoEnabledSelector } from 'src/app/selectors'
 import BackButton from 'src/components/BackButton'
-import { KOTANI_URI, PONTO_URI } from 'src/config'
+import { KOTANI_URI, PONTO_URI, SIMPLEX_URI } from 'src/config'
 import FundingEducationDialog from 'src/fiatExchanges/FundingEducationDialog'
 import i18n, { Namespaces } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon'
@@ -26,7 +26,9 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { useCountryFeatures } from 'src/utils/countryFeatures'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const FALLBACK_CURRENCY = LocalCurrencyCode.USD
 
@@ -116,6 +118,7 @@ function PaymentMethodRadioItem({
 function FiatExchangeOptions({ route, navigation }: Props) {
   const { t } = useTranslation(Namespaces.fiatExchangeFlow)
   const isAddFunds = route.params?.isAddFunds ?? true
+  const account = useSelector(currentAccountSelector)
   const localCurrency = useSelector(getLocalCurrencyCode)
   const {
     SIMPLEX_DISABLED,
@@ -130,11 +133,9 @@ function FiatExchangeOptions({ route, navigation }: Props) {
 
   Logger.debug(`Ponto: ${pontoEnabled} Kotani: ${kotaniEnabled}`)
 
-  const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(
-    SIMPLEX_DISABLED ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
-  )
+  const [selectedCurrency, setSelectedCurrency] = useState<CURRENCY_ENUM>(CURRENCY_ENUM.DOLLAR)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(
-    isAddFunds && (!SIMPLEX_DISABLED || !MOONPAY_DISABLED)
+    isAddFunds && !SIMPLEX_DISABLED && !MOONPAY_DISABLED
       ? PaymentMethod.FIAT
       : PaymentMethod.EXCHANGE
   )
@@ -151,8 +152,10 @@ function FiatExchangeOptions({ route, navigation }: Props) {
       navigate(Screens.LocalProviderCashOut, { uri: KOTANI_URI })
     } else if (selectedPaymentMethod === PaymentMethod.ADDRESS) {
       navigate(Screens.WithdrawCeloScreen, { isCashOut: true })
+    } else if (selectedCurrency === CURRENCY_ENUM.DOLLAR) {
+      navigateToURI(`${SIMPLEX_URI}?address=${account}`)
     } else {
-      navigate(selectedCurrency === CURRENCY_ENUM.GOLD ? Screens.MoonPay : Screens.Simplex, {
+      navigate(Screens.MoonPay, {
         localAmount: new BigNumber(0),
         currencyCode: localCurrency || FALLBACK_CURRENCY,
       })
