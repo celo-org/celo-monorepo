@@ -37,11 +37,13 @@ describe('Contact', () => {
             '<br/><br/><b>{"version":"appVersion","address":"0x0000000000000000000000000000000000007e57","sessionId":"","network":"alfajores"}</b><br/><br/><b>Support logs are attached...</b>',
           recipients: ['support@celo.org'],
           subject: 'Celo support for +1415555XXXX',
-          attachment: {
-            path: combinedLogsPath,
-            type: 'text',
-            name: '',
-          },
+          attachments: [
+            {
+              path: combinedLogsPath,
+              type: 'text',
+              name: '',
+            },
+          ],
         }),
         expect.any(Function)
       )
