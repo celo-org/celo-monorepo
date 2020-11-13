@@ -19,8 +19,8 @@ import { features } from 'src/flags'
 import i18n from 'src/i18n'
 import { updateE164PhoneNumberAddresses, updateE164PhoneNumberSalts } from 'src/identity/actions'
 import {
-  getAddressesFromLookupResult,
-  lookupAttestationIdentifiers,
+  filterNonVerifiedAddresses,
+  lookupAccountAddressesForIdentifier,
 } from 'src/identity/contactMapping'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import {
@@ -234,16 +234,15 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
   }
 
   const verifiedTx = []
-
   for (const metadata of data) {
     const phoneHash = getPhoneHash(metadata.e164Number, metadata.salt)
     metadata.phoneHash = phoneHash
-    const lookupResult: Address[] = yield call(lookupAttestationIdentifiers, phoneHash)
+    const accountAddresses: Address[] = yield call(lookupAccountAddressesForIdentifier, phoneHash)
 
     // Check that there are verified addresses.
     const onChainAddresses: Address[] = yield call(
-      getAddressesFromLookupResult,
-      lookupResult,
+      filterNonVerifiedAddresses,
+      accountAddresses,
       phoneHash
     )
     if (!onChainAddresses || !onChainAddresses.length) {
@@ -253,7 +252,6 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
       )
       continue
     }
-
     const walletAddresses: Address[] = yield all(
       onChainAddresses.map((accountAddress) =>
         call(accountsWrapper.getWalletAddress, accountAddress)

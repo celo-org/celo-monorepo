@@ -13,7 +13,7 @@ import {
   encryptComment,
   extractPhoneNumberMetadata,
 } from 'src/identity/commentEncryption'
-import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
+import { lookupAccountAddressesForIdentifier } from 'src/identity/contactMapping'
 import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
 import { getContractKitAsync } from 'src/web3/contracts'
 import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
@@ -236,10 +236,14 @@ describe(checkTxsForIdentityMetadata, () => {
     const mockAttestationsWrapper = {
       getAttestationStat: jest.fn(() => stats),
     }
+    const mockAccountsWrapper = {
+      getWalletAddress: jest.fn((address) => address),
+    }
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
         [select(dataEncryptionKeySelector), mockPrivateDEK2],
-        [matchers.call.fn(lookupAttestationIdentifiers), lookupResult],
+        [matchers.call.fn(lookupAccountAddressesForIdentifier), lookupResult],
+        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapper,
@@ -261,7 +265,7 @@ describe(checkTxsForIdentityMetadata, () => {
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
         [select(dataEncryptionKeySelector), mockPrivateDEK2],
-        [matchers.call.fn(lookupAttestationIdentifiers), {}],
+        [matchers.call.fn(lookupAccountAddressesForIdentifier), {}],
       ])
       .run()
   })

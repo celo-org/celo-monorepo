@@ -222,8 +222,8 @@ export function* fetchAddressesAndValidateSaga({
 function* getAccountAddresses(e164Number: string) {
   const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
   const phoneHash = phoneHashDetails.phoneHash
-  const lookupResult: string[] = yield call(lookupAttestationIdentifiers, phoneHash)
-  return yield call(getAddressesFromLookupResult, lookupResult, phoneHash)
+  const accountAddresses: Address[] = yield call(lookupAccountAddressesForIdentifier, phoneHash)
+  return yield call(filterNonVerifiedAddresses, accountAddresses, phoneHash)
 }
 
 function* fetchWalletAddresses(e164Number: string) {
@@ -260,7 +260,7 @@ function* fetchWalletAddresses(e164Number: string) {
 }
 
 // Returns a list of account addresses for the identifier received.
-export function* lookupAttestationIdentifiers(id: string) {
+export function* lookupAccountAddressesForIdentifier(id: string) {
   const contractKit = yield call(getContractKit)
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -272,8 +272,8 @@ export function* lookupAttestationIdentifiers(id: string) {
 
 // Deconstruct the lookup result and return
 // any addresess that are considered verified
-export function* getAddressesFromLookupResult(lookupResult: Address[], phoneHash: string) {
-  if (!lookupResult) {
+export function* filterNonVerifiedAddresses(accountAddresses: Address[], phoneHash: string) {
+  if (!accountAddresses) {
     return []
   }
 
@@ -284,7 +284,7 @@ export function* getAddressesFromLookupResult(lookupResult: Address[], phoneHash
   ])
 
   const verifiedAccountAddresses: Address[] = []
-  for (const address of lookupResult) {
+  for (const address of accountAddresses) {
     if (!isValidNon0Address(address)) {
       continue
     }
