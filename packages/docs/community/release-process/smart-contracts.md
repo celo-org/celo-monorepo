@@ -59,6 +59,10 @@ For these to run, you may need to follow the [setup instructions](https://github
 
 Using these tools, a contract release candidate can be built, deployed, and proposed for upgrade automatically on a specified network. Subsequently, stakeholders can verify the release candidate against a governance upgrade proposal's contents on the network.
 
+Typical script options:
+- By default, the scripts expect a celo-blockchain RPC at port 8545 locally. With `-f` you can specify the scripts to use a hosted forno node
+- By default, scripts will output verbose logs under `/tmp/celo-${script-name}.log`. You can change the location of the log output with `-l file.log`
+
 ### Verify the previous Release on the Network
 
 `verify-deployed` is a script that allows you to assess whether the bytecode on the given network matches the source code of a particular commit. It will run through the Celo Core Contracts and verify that the contracts' bytecodes as specified in the `Registry` match. Here, we will want to sanity-check that our network is running the previous release's audited commit.
