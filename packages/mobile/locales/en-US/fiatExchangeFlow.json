@@ -19,7 +19,7 @@
   "dollarsNotYetEnabledNote": "Celo Dollars are not yet available on any providers. To get Celo Dollars, purchase CELO and exchange it for Celo Dollars in the CELO tab.",
   "selectDigitalCurrency": "Select a digital currency",
   "selectPaymentMethod": "Pay with:",
-  "payWithFiat": "Debit, credit, or bank account",
+  "payWithFiat": "Debit card or bank account",
   "payWithExchange": "Cryptocurrency exchange",
   "selectCashOutMethod": "Receive funds in:",
   "receiveOnAddress": "cUSD/CELO address",
