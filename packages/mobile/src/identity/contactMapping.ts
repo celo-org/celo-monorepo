@@ -1,3 +1,4 @@
+import { Address } from '@celo/base'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationStat, AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
@@ -222,7 +223,7 @@ function* getAccountAddresses(e164Number: string) {
   const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
   const phoneHash = phoneHashDetails.phoneHash
   const lookupResult: string[] = yield call(lookupAttestationIdentifiers, phoneHash)
-  return yield call(getAddressesFromLookupResult, lookupResult, phoneHash) || []
+  return yield call(getAddressesFromLookupResult, lookupResult, phoneHash)
 }
 
 function* fetchWalletAddresses(e164Number: string) {
@@ -232,8 +233,8 @@ function* fetchWalletAddresses(e164Number: string) {
     contractKit.contracts.getAccounts,
   ])
 
-  const accountAddresses: string[] = yield call(getAccountAddresses, e164Number)
-  const walletAddresses: string[] = yield all(
+  const accountAddresses: Address[] = yield call(getAccountAddresses, e164Number)
+  const walletAddresses: Address[] = yield all(
     accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
   )
 
@@ -258,7 +259,7 @@ function* fetchWalletAddresses(e164Number: string) {
   return possibleUserAddresses
 }
 
-// Returns a list of accounts for the identifier received.
+// Returns a list of account addresses for the identifier received.
 export function* lookupAttestationIdentifiers(id: string) {
   const contractKit = yield call(getContractKit)
   const attestationsWrapper: AttestationsWrapper = yield call([
@@ -271,7 +272,7 @@ export function* lookupAttestationIdentifiers(id: string) {
 
 // Deconstruct the lookup result and return
 // any addresess that are considered verified
-export function* getAddressesFromLookupResult(lookupResult: string[], phoneHash: string) {
+export function* getAddressesFromLookupResult(lookupResult: Address[], phoneHash: string) {
   if (!lookupResult) {
     return []
   }
@@ -282,7 +283,7 @@ export function* getAddressesFromLookupResult(lookupResult: string[], phoneHash:
     contractKit.contracts.getAttestations,
   ])
 
-  const verifiedAddresses: string[] = []
+  const verifiedAccountAddresses: Address[] = []
   for (const address of lookupResult) {
     if (!isValidNon0Address(address)) {
       continue
@@ -302,10 +303,10 @@ export function* getAddressesFromLookupResult(lookupResult: string[], phoneHash:
       )
       continue
     }
-    verifiedAddresses.push(address.toLowerCase())
+    verifiedAccountAddresses.push(address.toLowerCase())
   }
 
-  return verifiedAddresses
+  return verifiedAccountAddresses
 }
 
 const isValidNon0Address = (address: string) =>

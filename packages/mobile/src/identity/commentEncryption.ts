@@ -2,7 +2,9 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
+import { Address } from '@celo/base'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
@@ -10,7 +12,7 @@ import {
 } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { memoize, values } from 'lodash'
-import { call, put, select } from 'redux-saga/effects'
+import { all, call, put, select } from 'redux-saga/effects'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { features } from 'src/flags'
@@ -30,6 +32,7 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { getContractKit } from 'src/web3/contracts'
 import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
@@ -220,6 +223,12 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
   // 2. Some duped phone hashes could be true, others false
   // 3. And a given phoneHash could legitimately have multiple addresses
 
+  const contractKit = yield call(getContractKit)
+  const accountsWrapper: AccountsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAccounts,
+  ])
+
   if (!data || !data.length) {
     return []
   }
@@ -229,10 +238,10 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
   for (const metadata of data) {
     const phoneHash = getPhoneHash(metadata.e164Number, metadata.salt)
     metadata.phoneHash = phoneHash
-    const lookupResult: string[] = yield call(lookupAttestationIdentifiers, phoneHash)
+    const lookupResult: Address[] = yield call(lookupAttestationIdentifiers, phoneHash)
 
     // Check that there are verified addresses.
-    const onChainAddresses: string[] = yield call(
+    const onChainAddresses: Address[] = yield call(
       getAddressesFromLookupResult,
       lookupResult,
       phoneHash
@@ -245,7 +254,12 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
       continue
     }
 
-    if (!onChainAddresses.find((a) => eqAddress(a, metadata.address))) {
+    const walletAddresses: Address[] = yield all(
+      onChainAddresses.map((accountAddress) =>
+        call(accountsWrapper.getWalletAddress, accountAddress)
+      )
+    )
+    if (!walletAddresses.find((a) => eqAddress(a, metadata.address))) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
         `Phone number and/or salt claimed by address ${metadata.address} does not match any on-chain addresses. Values are incorrect or sender is impersonating another number`
