@@ -36,6 +36,13 @@ spec:
         ports:
         - name: http
           containerPort: 4000
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: http
+          initialDelaySeconds: 5
+          failureThreshold: 3
+          periodSeconds: 5
         resources:
           requests:
             memory: 500Mi
