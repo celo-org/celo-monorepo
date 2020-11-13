@@ -1,6 +1,8 @@
+import debugFactory from 'debug'
 import { Tx } from 'web3-core'
 import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
 const web3EthAbi = require('web3-eth-abi')
+const debugWeb3Utils = debugFactory('web3:utils')
 
 export const getAbiTypes = (abi: ABIDefinition[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)
@@ -32,6 +34,14 @@ export const estimateGas = async (
     if (called.startsWith('0x08c379a')) {
       revertReason = web3EthAbi.decodeParameter('string', '0x' + called.substring(10))
     }
-    return Promise.reject(`Gas estimation failed: ${revertReason}`)
+    debugWeb3Utils('Recover transaction failure reason', {
+      called,
+      data: tx.data,
+      to: tx.to,
+      from: tx.from,
+      error: e,
+      revertReason,
+    })
+    return Promise.reject(`Gas estimation failed: ${revertReason} or ${e}`)
   }
 }

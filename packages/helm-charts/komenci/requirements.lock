@@ -1,0 +1,9 @@
+dependencies:
+- name: common
+  repository: file://../common
+  version: 0.1.0
+- name: postgresql
+  repository: https://marketplace.azurecr.io/helm/v1/repo
+  version: 8.10.13
+digest: sha256:d8bb2dfe6077f4daabee0a9397f8801931efce1abec6dd33a1fe65954cdfbe47
+generated: "2020-10-27T15:03:06.171937505+01:00"
