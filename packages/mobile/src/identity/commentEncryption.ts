@@ -3,7 +3,6 @@
 // because these manage comment metadata
 
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
-import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
@@ -225,38 +224,35 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
     return []
   }
 
-  const phoneHashes = new Set<string>()
-  data.map((d) => {
-    const phoneHash = getPhoneHash(d.e164Number, d.salt)
-    phoneHashes.add(phoneHash)
-    d.phoneHash = phoneHash
-  })
+  const verifiedTx = []
 
-  const lookupResult: IdentifierLookupResult = yield call(
-    lookupAttestationIdentifiers,
-    Array.from(phoneHashes)
-  )
+  for (const metadata of data) {
+    const phoneHash = getPhoneHash(metadata.e164Number, metadata.salt)
+    metadata.phoneHash = phoneHash
+    const lookupResult: string[] = yield call(lookupAttestationIdentifiers, phoneHash)
 
-  return data.filter((d) => {
-    const onChainAddresses = getAddressesFromLookupResult(lookupResult, d.phoneHash!)
+    // Check that there are verified addresses.
+    const onChainAddresses = yield call(getAddressesFromLookupResult, lookupResult, phoneHash)
     if (!onChainAddresses || !onChainAddresses.length) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
         `Phone number and/or salt claimed by address ${d.address} is not verified. Values are incorrect or sender is impersonating another number`
       )
-      return false
+      continue
     }
 
-    if (!onChainAddresses.find((a) => eqAddress(a, d.address))) {
+    if (!onChainAddresses.find((a) => eqAddress(a, metadata.address))) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
-        `Phone number and/or salt claimed by address ${d.address} does not match any on-chain addresses. Values are incorrect or sender is impersonating another number`
+        `Phone number and/or salt claimed by address ${metadata.address} does not match any on-chain addresses. Values are incorrect or sender is impersonating another number`
       )
-      return false
+      continue
     }
 
-    return true
-  })
+    verifiedTx.push(metadata)
+  }
+
+  return verifiedTx
 }
 
 // Dispatch updates to store with the new information

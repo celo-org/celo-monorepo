@@ -1,5 +1,5 @@
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
-import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationStat } from '@celo/contractkit/lib/wrappers/Attestations'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
@@ -15,6 +15,7 @@ import {
 } from 'src/identity/commentEncryption'
 import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
 import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
+import { getContractKitAsync } from 'src/web3/contracts'
 import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 import { getMockStoreData } from 'test/utils'
@@ -23,7 +24,6 @@ import {
   mockAccount2,
   mockComment,
   mockE164Number,
-  mockE164NumberHashWithPepper,
   mockE164NumberPepper,
   mockPrivateDEK,
   mockPrivateDEK2,
@@ -226,15 +226,24 @@ describe(checkTxsForIdentityMetadata, () => {
   ]
 
   it('Finds metadata and dispatches updates', async () => {
-    const lookupResult: IdentifierLookupResult = {
-      [mockE164NumberHashWithPepper]: {
-        [mockAccount]: { completed: 3, total: 5 },
-      },
+    const contractKit = await getContractKitAsync()
+
+    const lookupResult: string[] = [mockAccount]
+    const stats: AttestationStat = {
+      completed: 3,
+      total: 5,
+    }
+    const mockAttestationsWrapper = {
+      getAttestationStat: jest.fn(() => stats),
     }
     await expectSaga(checkTxsForIdentityMetadata, { transactions })
       .provide([
         [select(dataEncryptionKeySelector), mockPrivateDEK2],
         [matchers.call.fn(lookupAttestationIdentifiers), lookupResult],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
         [select(e164NumberToSaltSelector), {}],
         [select(e164NumberToAddressSelector), {}],
       ])
