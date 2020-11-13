@@ -262,8 +262,8 @@ describe('SendConfirmation with Komenci enabled', () => {
     )
 
     expect(tree).toMatchSnapshot()
-    expect(tree.queryByTestId('InviteFriendModal')?.props.isVisible).toBe(false)
+    expect(tree.queryByTestId('InviteAndSendModal')?.props.isVisible).toBe(false)
     fireEvent.press(tree.getByTestId('ConfirmButton'))
-    expect(tree.queryByTestId('InviteFriendModal')?.props.isVisible).toBe(true)
+    expect(tree.queryByTestId('InviteAndSendModal')?.props.isVisible).toBe(true)
   })
 })

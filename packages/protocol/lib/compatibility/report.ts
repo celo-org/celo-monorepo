@@ -69,7 +69,7 @@ export class CategorizedChanges {
     reports: ASTReports,
     categorizer: Categorizer): CategorizedChanges {
     const storage = reports.storage.filter(r => !r.compatible)
-    const c = categorize(reports.code.getChanges(), categorizer)
+    const c = categorize(reports.code.getChanges().concat(reports.libraryLinking), categorizer)
     const major = c[ChangeType.Major]
     const minor = c[ChangeType.Minor]
     const patch = c[ChangeType.Patch]
