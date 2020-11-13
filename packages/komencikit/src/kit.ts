@@ -1,4 +1,4 @@
-import { Address, normalizeAddressWith0x, serializeSignature, Signature, sleep } from '@celo/base'
+import { Address, normalizeAddressWith0x, serializeSignature, sleep } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import { BlsBlindingClient } from '@celo/contractkit/lib/identity/odis/bls-blinding-client'
@@ -21,6 +21,7 @@ import {
   requestSubsidisedAttestations,
   startSession,
   StartSessionPayload,
+  StartSessionResp,
   submitMetaTransaction,
 } from './actions'
 import { KomenciClient } from './client'
@@ -114,7 +115,7 @@ export class KomenciKit {
    */
   startSession = async (
     captchaToken: string
-  ): Promise<Result<string, FetchError | AuthenticationFailed | LoginSignatureError>> => {
+  ): Promise<Result<StartSessionResp, FetchError | AuthenticationFailed | LoginSignatureError>> => {
     const signatureResp = await this.getLoginSignature(captchaToken)
     if (!signatureResp.ok) {
       return signatureResp
@@ -130,7 +131,10 @@ export class KomenciKit {
 
     if (resp.ok) {
       this.client.setToken(resp.result.token)
-      return Ok(resp.result.token)
+      if (resp.result.callbackUrl) {
+        this.client.setCallbackUrl(resp.result.callbackUrl)
+      }
+      return Ok(resp.result)
     } else if (resp.error.errorType === FetchErrorTypes.Unauthorised) {
       return Err(new AuthenticationFailed())
     }
@@ -297,10 +301,10 @@ export class KomenciKit {
    * @param metaTxWalletAddress - The MetaTxWallet selecting issuers
    * @param identifier - the phone number identifier
    */
-  public async approveAttestations(
+  public approveAttestations = async (
     metaTxWalletAddress: string,
     attestationsRequested: number
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     const approveTx = await attestations.approveAttestationFee(attestationsRequested)
     return this.submitMetaTransaction(metaTxWalletAddress, approveTx)
@@ -313,10 +317,10 @@ export class KomenciKit {
    * @param metaTxWalletAddress - The MetaTxWallet selecting issuers
    * @param identifier - the phone number identifier
    */
-  public async selectIssuers(
+  public selectIssuers = async (
     metaTxWalletAddress: string,
     identifier: string
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     await attestations.waitForSelectingIssuers(identifier, metaTxWalletAddress)
     return this.submitMetaTransaction(metaTxWalletAddress, attestations.selectIssuers(identifier))
@@ -331,12 +335,12 @@ export class KomenciKit {
    * @param issuer - the issuer ID
    * @param code - the code
    */
-  public async completeAttestation(
+  public completeAttestation = async (
     metaTxWalletAddress: string,
     identifier: string,
     issuer: Address,
     code: string
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const attestations = await this.contractKit.contracts.getAttestations()
     return this.submitMetaTransaction(
       metaTxWalletAddress,
@@ -354,17 +358,21 @@ export class KomenciKit {
    * @param walletAddress The wallet address to set for the account
    * @param proofOfPossession Signature from the wallet address key over the sender's address
    */
-  public async setAccount(
+  public setAccount = async (
     metaTxWalletAddress: string,
     name: string,
     dataEncryptionKey: string,
-    walletAddress: Address,
-    proofOfPossession: Signature | null = null
-  ): Promise<Result<TransactionReceipt, FetchError | TxError>> {
+    walletAddress: Address
+  ): Promise<Result<TransactionReceipt, FetchError | TxError>> => {
     const accounts = await this.contractKit.contracts.getAccounts()
+    const proofOfPossession = await accounts.generateProofOfKeyPossession(
+      metaTxWalletAddress,
+      walletAddress
+    )
+
     return this.submitMetaTransaction(
       metaTxWalletAddress,
-      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession).txo
+      accounts.setAccount(name, dataEncryptionKey, walletAddress, proofOfPossession)
     )
   }
 
@@ -404,6 +412,7 @@ export class KomenciKit {
     }
 
     const txHash = resp.result.txHash
+    console.debug(`${TAG}/submitMetaTransaction Waiting for transaction receipt: ${txHash}`)
     return this.waitForReceipt(txHash)
   }
 
@@ -426,6 +435,11 @@ export class KomenciKit {
 
     if (receipt == null) {
       return Err(new TxTimeoutError())
+    }
+
+    if (!receipt.status) {
+      // TODO: Possible to extract reason?
+      return Err(new TxRevertError(txHash, ''))
     }
 
     return Ok(receipt)
@@ -477,12 +491,7 @@ export class KomenciKit {
     if (!receiptResult.ok) {
       return receiptResult
     }
-
     const receipt = receiptResult.result
-    if (!receipt.status) {
-      // TODO: Possible to extract reason?
-      return Err(new TxRevertError(txHash, ''))
-    }
 
     const deployer = await this.contractKit.contracts.getMetaTransactionWalletDeployer(receipt.to)
 

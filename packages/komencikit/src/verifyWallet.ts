@@ -2,7 +2,7 @@ import { Address, normalizeAddress } from '@celo/base'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
 import { GET_IMPLEMENTATION_ABI } from '@celo/contractkit/lib/governance/proxy'
-import Proxy from '@celo/protocol/build/contracts/Proxy.json'
+import { soliditySha3 } from 'web3-utils'
 import {
   InvalidBytecode,
   InvalidImplementation,
@@ -10,24 +10,30 @@ import {
   WalletValidationError,
 } from './errors'
 
+/*
+ * It is highly unlikely (but not impossible) that we will ever need
+ * to use a new proxy implementation for the MTW, therefore we're
+ * using this static SHA3 of the stripped bytecode to verify integrity.
+ * If this ever needs to change it will be part of a bigger effort.
+ *
+ * See: `scripts/proxy-bytecode-sha3.js` or run `yarn proxy:sha3`
+ */
+const PROXY_BYTECODE_SHA3 = '0x69f56de93d0b1eb15364c67a2756afbc0b3112e544f64c4bf2c7bcdf287f0a91'
+
 export const verifyWallet = async (
   contractKit: ContractKit,
-  walletAddress: Address,
+  metaTxWalletAddress: Address,
   allowedImplementations: Address[],
   expectedSigner: Address
 ): Promise<Result<true, WalletValidationError>> => {
-  const code = await contractKit.web3.eth.getCode(walletAddress)
-  // XXX: I'm unsure whether this is safe or if we should store the
-  // bytecode as a constant in `mobile` and pass it into KomenciKit
-  // I'm unsure if we should protect from the `Proxy` contract output
-  // in protocol from changing, or there are already constraints put in
-  // place for that not to happen.
-  if (stripBzz(code) !== stripBzz(Proxy.deployedBytecode)) {
-    return Err(new InvalidBytecode(walletAddress))
+  const code = await contractKit.web3.eth.getCode(metaTxWalletAddress)
+
+  if (soliditySha3(stripBzz(code)) !== PROXY_BYTECODE_SHA3) {
+    return Err(new InvalidBytecode(metaTxWalletAddress))
   }
 
   const actualImplementationRaw = await contractKit.web3.eth.call({
-    to: walletAddress,
+    to: metaTxWalletAddress,
     data: GET_IMPLEMENTATION_ABI.signature,
   })
   const actualImplementation = normalizeAddress(
@@ -42,18 +48,18 @@ export const verifyWallet = async (
   if (normalizedAllowedImplementations.indexOf(actualImplementation) === -1) {
     return Err(
       new InvalidImplementation(
-        walletAddress,
+        metaTxWalletAddress,
         actualImplementation,
         normalizedAllowedImplementations
       )
     )
   }
 
-  const wallet = await contractKit.contracts.getMetaTransactionWallet(walletAddress)
+  const wallet = await contractKit.contracts.getMetaTransactionWallet(metaTxWalletAddress)
   const actualSigner = normalizeAddress(await wallet.signer())
   const normalizedExpectedSigner = normalizeAddress(expectedSigner)
   if (actualSigner !== normalizedExpectedSigner) {
-    return Err(new InvalidSigner(walletAddress, actualSigner, normalizedExpectedSigner))
+    return Err(new InvalidSigner(metaTxWalletAddress, actualSigner, normalizedExpectedSigner))
   }
 
   return Ok(true)

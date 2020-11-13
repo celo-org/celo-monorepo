@@ -1,35 +1,36 @@
 import { concurrentMap } from '@celo/base'
-import { ContractKit } from '@celo/contractkit'
 import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { config } from 'dotenv'
-import { existsSync } from 'fs'
-import path from 'path'
+import { Context } from './context'
 
-export async function fundAccount(
-  kit: ContractKit,
-  mnemonic: string,
-  account: TestAccounts,
-  value: BigNumber
-) {
-  const root = await getKey(mnemonic, TestAccounts.Root)
-  const recipient = await getKey(mnemonic, account)
-  kit.addAccount(root.privateKey)
-  const stableToken = await kit.contracts.getStableToken()
+export async function fundAccount(context: Context, account: TestAccounts, value: BigNumber) {
+  const root = await getKey(context.mnemonic, TestAccounts.Root)
+  const recipient = await getKey(context.mnemonic, account)
+  const logger = context.logger.child({
+    index: account,
+    account: root.address,
+    value: value.toString(),
+    address: recipient.address,
+  })
+  context.kit.addAccount(root.privateKey)
+
+  const stableToken = await context.kit.contracts.getStableToken()
 
   const rootBalance = await stableToken.balanceOf(root.address)
-
   if (rootBalance.lte(value)) {
+    logger.error('error funding test account', { rootBalance: rootBalance.toString() })
     throw new Error(
       `Root account ${root.address}'s balance (${rootBalance.toPrecision(
         4
       )}) is not enough for transferring ${value.toPrecision(4)}`
     )
   }
-  await stableToken
+  const receipt = await stableToken
     .transfer(recipient.address, value.toString())
     .sendAndWaitForReceipt({ from: root.address })
+
+  logger.debug('funded test account', { receipt })
 }
 
 export async function getKey(mnemonic: string, account: TestAccounts) {
@@ -46,20 +47,39 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(kit: ContractKit, mnemonic: string) {
+export async function clearAllFundsToRoot(context: Context) {
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
   )
-  const root = await getKey(mnemonic, TestAccounts.Root)
-  const stableToken = await kit.contracts.getStableToken()
-  const goldToken = await kit.contracts.getGoldToken()
+  const root = await getKey(context.mnemonic, TestAccounts.Root)
+  context.logger.debug('clear test fund accounts', { account: root.address })
+  const stableToken = await context.kit.contracts.getStableToken()
+  const goldToken = await context.kit.contracts.getGoldToken()
   await concurrentMap(5, accounts, async (_val, index) => {
     if (index === 0) {
       return
     }
-    const account = await getKey(mnemonic, index)
-    kit.addAccount(account.privateKey)
+    const account = await getKey(context.mnemonic, index)
+    context.kit.addAccount(account.privateKey)
+
+    const celoBalance = await goldToken.balanceOf(account.address)
+    if (celoBalance.gt(ONE)) {
+      await goldToken
+        .transfer(
+          root.address,
+          celoBalance
+            .times(0.99)
+            .integerValue(BigNumber.ROUND_DOWN)
+            .toString()
+        )
+        .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
+      context.logger.debug('cleared CELO', {
+        index,
+        value: celoBalance.toString(),
+        address: account.address,
+      })
+    }
 
     const balance = await stableToken.balanceOf(account.address)
     if (balance.gt(ONE)) {
@@ -72,45 +92,11 @@ export async function clearAllFundsToRoot(kit: ContractKit, mnemonic: string) {
             .toString()
         )
         .sendAndWaitForReceipt({ feeCurrency: stableToken.address, from: account.address })
-    }
-
-    const celoBalance = await goldToken.balanceOf(account.address)
-    if (celoBalance.gt(ONE)) {
-      await goldToken
-        .transfer(
-          root.address,
-          celoBalance
-            .times(0.99)
-            .integerValue(BigNumber.ROUND_DOWN)
-            .toString()
-        )
-        .sendAndWaitForReceipt({ from: account.address })
+      context.logger.debug('cleared cUSD', {
+        index,
+        value: balance.toString(),
+        address: account.address,
+      })
     }
   })
-}
-
-// Only use this if in monorepo and env files are as expected and in dev
-export function loadFromEnvFile() {
-  const envName = process.env.CELO_ENV
-
-  if (!envName) {
-    return
-  }
-
-  const envFile = getEnvFile(envName, '.mnemonic')
-  config({ path: envFile })
-
-  return envName
-}
-
-export const monorepoRoot = path.resolve(process.cwd(), './../..')
-export const genericEnvFilePath = path.resolve(monorepoRoot, '.env')
-
-export function getEnvFile(celoEnv: string, envBegining: string = '') {
-  const filePath: string = path.resolve(monorepoRoot, `.env${envBegining}.${celoEnv}`)
-  if (existsSync(filePath)) {
-    return filePath
-  } else {
-    return `${genericEnvFilePath}${envBegining}`
-  }
 }

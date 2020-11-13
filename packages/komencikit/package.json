@@ -19,15 +19,17 @@
     "clean": "tsc -b . --clean",
     "prepublishOnly": "yarn build",
     "test": "jest --runInBand",
-    "lint": "tslint -c tslint.json --project ."
+    "lint": "tslint -c tslint.json --project .",
+    "proxy:sha3": "node ./scripts/proxy-bytecode-sha3"
   },
   "dependencies": {
-    "@celo/contractkit": "*",
     "@celo/base": "*",
+    "@celo/contractkit": "*",
     "@celo/utils": "*",
     "cross-fetch": "^3.0.6",
     "fp-ts": "^2.8.4",
-    "io-ts": "^2.2.11"
+    "io-ts": "^2.2.11",
+    "web3-utils": "^1.3.0"
   },
   "engines": {
     "node": ">=8.13.0"

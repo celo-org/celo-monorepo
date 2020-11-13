@@ -1,7 +1,7 @@
 PODS:
-  - Analytics (3.8.0)
+  - Analytics (4.1.1)
   - boost-for-react-native (1.63.0)
-  - CeloBlockchain (0.0.317)
+  - CeloBlockchain (0.0.319)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
@@ -324,21 +324,23 @@ PODS:
     - React-Core
   - react-native-contacts (5.0.0):
     - React
-  - react-native-fast-crypto (1.8.3):
+  - react-native-fast-crypto (1.8.4):
     - React
   - react-native-geth (1.0.0):
     - CeloBlockchain
     - React
   - react-native-keep-awake (4.0.0):
     - React
-  - react-native-mail (4.1.0):
-    - React
+  - react-native-mail (6.0.0):
+    - React-Core
   - react-native-netinfo (5.8.0):
     - React
+  - react-native-randombytes (3.6.0):
+    - React-Core
   - react-native-safe-area-context (3.0.6):
     - React
-  - react-native-secure-randombytes (3.0.2):
-    - React
+  - react-native-shake (3.5.0):
+    - React-Core
   - react-native-simple-toast (1.1.2):
     - React
     - Toast (~> 4.0.0)
@@ -350,8 +352,8 @@ PODS:
     - React
   - react-native-udp (2.6.1):
     - React
-  - react-native-webview (10.8.3):
-    - React
+  - react-native-webview (10.10.2):
+    - React-Core
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
   - React-RCTAnimation (0.62.2):
@@ -411,10 +413,10 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - RNAnalytics (1.1.1-beta.2):
-    - Analytics
+  - RNAnalytics (1.3.2):
+    - Analytics (~> 4.1)
     - React
-  - RNAnalyticsIntegration-Firebase (1.1.1-beta.2):
+  - RNAnalyticsIntegration-Firebase (1.3.2):
     - Analytics
     - React
     - RNAnalytics
@@ -485,13 +487,13 @@ PODS:
     - React
   - RNSVG (12.1.0):
     - React
-  - Segment-Firebase (2.6.1):
-    - Analytics (~> 3.2)
+  - Segment-Firebase (2.7.0):
+    - Analytics
     - Firebase/Core (~> 6.2)
     - FirebaseAnalytics (~> 6.1)
-    - Segment-Firebase/Core (= 2.6.1)
-  - Segment-Firebase/Core (2.6.1):
-    - Analytics (~> 3.2)
+    - Segment-Firebase/Core (= 2.7.0)
+  - Segment-Firebase/Core (2.7.0):
+    - Analytics
     - Firebase/Core (~> 6.2)
     - FirebaseAnalytics (~> 6.1)
   - Sentry (5.2.0):
@@ -525,13 +527,14 @@ DEPENDENCIES:
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
   - react-native-contacts (from `../../../node_modules/react-native-contacts`)
-  - react-native-fast-crypto (from `../../../node_modules/react-native-fast-crypto`)
+  - "react-native-fast-crypto (from `../../../node_modules/@celo/react-native-fast-crypto`)"
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
+  - react-native-randombytes (from `../../../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
-  - react-native-secure-randombytes (from `../../../node_modules/react-native-secure-randombytes`)
+  - react-native-shake (from `../../../node_modules/react-native-shake`)
   - react-native-simple-toast (from `../../../node_modules/react-native-simple-toast`)
   - react-native-sms (from `../../../node_modules/react-native-sms`)
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
@@ -574,7 +577,7 @@ DEPENDENCIES:
   - "RNSentry (from `../../../node_modules/@sentry/react-native`)"
   - RNShare (from `../../../node_modules/react-native-share`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
-  - Segment-Firebase
+  - Segment-Firebase (~> 2.7.0)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -654,7 +657,7 @@ EXTERNAL SOURCES:
   react-native-contacts:
     :path: "../../../node_modules/react-native-contacts"
   react-native-fast-crypto:
-    :path: "../../../node_modules/react-native-fast-crypto"
+    :path: "../../../node_modules/@celo/react-native-fast-crypto"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -663,10 +666,12 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-mail"
   react-native-netinfo:
     :path: "../../../node_modules/@react-native-community/netinfo"
+  react-native-randombytes:
+    :path: "../../../node_modules/react-native-randombytes"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
-  react-native-secure-randombytes:
-    :path: "../../../node_modules/react-native-secure-randombytes"
+  react-native-shake:
+    :path: "../../../node_modules/react-native-shake"
   react-native-simple-toast:
     :path: "../../../node_modules/react-native-simple-toast"
   react-native-sms:
@@ -753,9 +758,9 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Analytics: fcf79ebc393a7d77befb8d43ce296353ba9ede3d
+  Analytics: 952eac761f84ba0a508a4cf691598654073f9e3d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: 84bc1cf8faace08aeecdeb24a30f0492b4c266cf
+  CeloBlockchain: 2b3bc8846dff06152d3fcc59c14c43c9740c0a72
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
@@ -800,19 +805,20 @@ SPEC CHECKSUMS:
   react-native-camera: 1b52abea404d04e040edb3e74b7c5523c01a3089
   react-native-config: e8c71f602c92ddd2f5c24b0b7a90d239ecab8d9f
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
-  react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
+  react-native-fast-crypto: 149fd8fd16e1f9bd6b6be2b8295fe0eb76923602
   react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
-  react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
+  react-native-mail: 88305252f4c3fb0157015ff8a7ac9c41b321a0dd
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957
+  react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-safe-area-context: e22a8ca00f758273d2408953965cb8db67da7925
-  react-native-secure-randombytes: 2d98715ff6b15bdc519cf7d4475dad9d3e96a2c0
+  react-native-shake: 41a1ea8ec541fccf3f01566edef8d3cb722b00e3
   react-native-simple-toast: 58b71ef003f01d2c0bf5dcd2fdccc75861dabade
   react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-tcp: e1a8c3ac010774cd71811989805ff3eaebb62f17
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
-  react-native-webview: 598605cd213f5096e695f5b33fbee210a47e60ab
+  react-native-webview: 0aa2cde4ee7e3e1c5fffdf64dbce9c709aa18155
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -823,8 +829,8 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  RNAnalytics: bf9743995acee035396822c40bcdd1b87e90ba76
-  RNAnalyticsIntegration-Firebase: 87b33dc507fd78b2f1f97d65fe022442ba0c367b
+  RNAnalytics: ac18ac964dd53bac7f957994412963e8e2568c4d
+  RNAnalyticsIntegration-Firebase: daed87b7ab56636ed0098326eb92e26fdfc198c2
   RNCAsyncStorage: 453cd7c335ec9ba3b877e27d02238956b76f3268
   RNCClipboard: 546484405eaa1c8a3eccce77b8c8871242e73b20
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
@@ -848,11 +854,11 @@ SPEC CHECKSUMS:
   RNSentry: 2bae4ffee2e66376ef42cb845a494c3bde17bc56
   RNShare: fea1801315aa8875d6db73a4010b14afcd568765
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
-  Segment-Firebase: 9ac8c3bf9d5c6dcaf248408aca604e023c4b5aad
+  Segment-Firebase: 41677a446f58989db69912059949107afb0c3f38
   Sentry: 6e04bc3e11bf771ca79140a112de64dcfbc7d8cb
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: e38c669823181b25b0d68e1d32554a4d8041b562
+PODFILE CHECKSUM: 386101f93bf1b36b7baf2831056a15e005ec5fd5
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.0

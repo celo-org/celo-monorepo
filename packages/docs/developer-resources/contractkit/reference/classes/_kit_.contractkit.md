@@ -31,6 +31,7 @@
 * [getEpochNumberOfBlock](_kit_.contractkit.md#getepochnumberofblock)
 * [getEpochSize](_kit_.contractkit.md#getepochsize)
 * [getFirstBlockNumberForEpoch](_kit_.contractkit.md#getfirstblocknumberforepoch)
+* [getHumanReadableNetworkConfig](_kit_.contractkit.md#gethumanreadablenetworkconfig)
 * [getLastBlockNumberForEpoch](_kit_.contractkit.md#getlastblocknumberforepoch)
 * [getNetworkConfig](_kit_.contractkit.md#getnetworkconfig)
 * [getTotalBalance](_kit_.contractkit.md#gettotalbalance)
@@ -49,7 +50,7 @@
 
 \+ **new ContractKit**(`web3`: Web3, `wallet?`: [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)): *[ContractKit](_kit_.contractkit.md)*
 
-*Defined in [packages/contractkit/src/kit.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L104)*
+*Defined in [packages/contractkit/src/kit.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L105)*
 
 **Parameters:**
 
@@ -66,7 +67,7 @@ Name | Type |
 
 • **_web3Contracts**: *[Web3ContractCache](_web3_contract_cache_.web3contractcache.md)*
 
-*Defined in [packages/contractkit/src/kit.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L100)*
+*Defined in [packages/contractkit/src/kit.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L101)*
 
 factory for core contract's native web3 wrappers
 
@@ -76,7 +77,7 @@ ___
 
 • **contracts**: *[WrapperCache](_contract_cache_.wrappercache.md)*
 
-*Defined in [packages/contractkit/src/kit.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L102)*
+*Defined in [packages/contractkit/src/kit.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L103)*
 
 factory for core contract's kit wrappers
 
@@ -86,7 +87,7 @@ ___
 
 • **registry**: *[AddressRegistry](_address_registry_.addressregistry.md)*
 
-*Defined in [packages/contractkit/src/kit.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L98)*
+*Defined in [packages/contractkit/src/kit.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L99)*
 
 core contract's address registry
 
@@ -96,7 +97,7 @@ ___
 
 • **web3**: *Web3*
 
-*Defined in [packages/contractkit/src/kit.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L105)*
+*Defined in [packages/contractkit/src/kit.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L106)*
 
 ## Accessors
 
@@ -104,7 +105,7 @@ ___
 
 • **get defaultAccount**(): *[Address](../modules/_base_.md#address) | undefined*
 
-*Defined in [packages/contractkit/src/kit.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L226)*
+*Defined in [packages/contractkit/src/kit.ts:275](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L275)*
 
 Default account for generated transactions (eg. tx.from)
 
@@ -112,7 +113,7 @@ Default account for generated transactions (eg. tx.from)
 
 • **set defaultAccount**(`address`: [Address](../modules/_base_.md#address) | undefined): *void*
 
-*Defined in [packages/contractkit/src/kit.ts:218](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L218)*
+*Defined in [packages/contractkit/src/kit.ts:267](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L267)*
 
 Set default account for generated transactions (eg. tx.from )
 
@@ -130,7 +131,7 @@ ___
 
 • **get defaultFeeCurrency**(): *undefined | string*
 
-*Defined in [packages/contractkit/src/kit.ts:259](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L259)*
+*Defined in [packages/contractkit/src/kit.ts:308](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L308)*
 
 Set the ERC20 address for the token to use to pay for transaction fees.
 The ERC20 must be whitelisted for gas.
@@ -141,7 +142,7 @@ Set to `null` to use CELO
 
 • **set defaultFeeCurrency**(`address`: [Address](../modules/_base_.md#address) | undefined): *void*
 
-*Defined in [packages/contractkit/src/kit.ts:255](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L255)*
+*Defined in [packages/contractkit/src/kit.ts:304](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L304)*
 
 Set the ERC20 address for the token to use to pay for transaction fees.
 The ERC20 must be whitelisted for gas.
@@ -162,13 +163,13 @@ ___
 
 • **get gasInflationFactor**(): *number*
 
-*Defined in [packages/contractkit/src/kit.ts:235](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L235)*
+*Defined in [packages/contractkit/src/kit.ts:284](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L284)*
 
 **Returns:** *number*
 
 • **set gasInflationFactor**(`factor`: number): *void*
 
-*Defined in [packages/contractkit/src/kit.ts:231](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L231)*
+*Defined in [packages/contractkit/src/kit.ts:280](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L280)*
 
 **Parameters:**
 
@@ -184,13 +185,13 @@ ___
 
 • **get gasPrice**(): *number*
 
-*Defined in [packages/contractkit/src/kit.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L243)*
+*Defined in [packages/contractkit/src/kit.ts:292](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L292)*
 
 **Returns:** *number*
 
 • **set gasPrice**(`price`: number): *void*
 
-*Defined in [packages/contractkit/src/kit.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L239)*
+*Defined in [packages/contractkit/src/kit.ts:288](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L288)*
 
 **Parameters:**
 
@@ -206,7 +207,7 @@ Name | Type |
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [packages/contractkit/src/kit.ts:210](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L210)*
+*Defined in [packages/contractkit/src/kit.ts:259](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L259)*
 
 **Parameters:**
 
@@ -222,7 +223,7 @@ ___
 
 ▸ **fillGasPrice**(`tx`: Tx): *Promise‹Tx›*
 
-*Defined in [packages/contractkit/src/kit.ts:284](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L284)*
+*Defined in [packages/contractkit/src/kit.ts:333](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L333)*
 
 **Parameters:**
 
@@ -238,7 +239,7 @@ ___
 
 ▸ **getEpochNumberOfBlock**(`blockNumber`: number): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/kit.ts:427](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L427)*
+*Defined in [packages/contractkit/src/kit.ts:478](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L478)*
 
 **Parameters:**
 
@@ -254,7 +255,7 @@ ___
 
 ▸ **getEpochSize**(): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/kit.ts:400](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L400)*
+*Defined in [packages/contractkit/src/kit.ts:451](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L451)*
 
 **Returns:** *Promise‹number›*
 
@@ -264,7 +265,7 @@ ___
 
 ▸ **getFirstBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/kit.ts:407](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L407)*
+*Defined in [packages/contractkit/src/kit.ts:458](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L458)*
 
 **Parameters:**
 
@@ -276,11 +277,21 @@ Name | Type |
 
 ___
 
+###  getHumanReadableNetworkConfig
+
+▸ **getHumanReadableNetworkConfig**(): *Promise‹object›*
+
+*Defined in [packages/contractkit/src/kit.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L202)*
+
+**Returns:** *Promise‹object›*
+
+___
+
 ###  getLastBlockNumberForEpoch
 
 ▸ **getLastBlockNumberForEpoch**(`epochNumber`: number): *Promise‹number›*
 
-*Defined in [packages/contractkit/src/kit.ts:417](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L417)*
+*Defined in [packages/contractkit/src/kit.ts:468](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L468)*
 
 **Parameters:**
 
@@ -296,7 +307,7 @@ ___
 
 ▸ **getNetworkConfig**(): *Promise‹[NetworkConfig](../interfaces/_kit_.networkconfig.md)›*
 
-*Defined in [packages/contractkit/src/kit.ts:150](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L150)*
+*Defined in [packages/contractkit/src/kit.ts:151](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L151)*
 
 **Returns:** *Promise‹[NetworkConfig](../interfaces/_kit_.networkconfig.md)›*
 
@@ -306,7 +317,7 @@ ___
 
 ▸ **getTotalBalance**(`address`: string): *Promise‹AccountBalance›*
 
-*Defined in [packages/contractkit/src/kit.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L128)*
+*Defined in [packages/contractkit/src/kit.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L129)*
 
 **Parameters:**
 
@@ -322,7 +333,7 @@ ___
 
 ▸ **getWallet**(): *[ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)*
 
-*Defined in [packages/contractkit/src/kit.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L123)*
+*Defined in [packages/contractkit/src/kit.ts:124](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L124)*
 
 **Returns:** *[ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)*
 
@@ -332,7 +343,7 @@ ___
 
 ▸ **isListening**(): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/kit.ts:263](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L263)*
+*Defined in [packages/contractkit/src/kit.ts:312](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L312)*
 
 **Returns:** *Promise‹boolean›*
 
@@ -342,7 +353,7 @@ ___
 
 ▸ **isSyncing**(): *Promise‹boolean›*
 
-*Defined in [packages/contractkit/src/kit.ts:267](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L267)*
+*Defined in [packages/contractkit/src/kit.ts:316](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L316)*
 
 **Returns:** *Promise‹boolean›*
 
@@ -352,7 +363,7 @@ ___
 
 ▸ **sendTransaction**(`tx`: Tx): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [packages/contractkit/src/kit.ts:305](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L305)*
+*Defined in [packages/contractkit/src/kit.ts:354](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L354)*
 
 Send a transaction to celo-blockchain.
 
@@ -375,7 +386,7 @@ ___
 
 ▸ **sendTransactionObject**(`txObj`: TransactionObject‹any›, `tx?`: Omit‹Tx, "data"›): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [packages/contractkit/src/kit.ts:330](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L330)*
+*Defined in [packages/contractkit/src/kit.ts:379](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L379)*
 
 **Parameters:**
 
@@ -392,7 +403,7 @@ ___
 
 ▸ **setFeeCurrency**(`token`: [CeloToken](../modules/_base_.md#celotoken)): *Promise‹void›*
 
-*Defined in [packages/contractkit/src/kit.ts:205](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L205)*
+*Defined in [packages/contractkit/src/kit.ts:254](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L254)*
 
 Set CeloToken to use to pay for gas fees
 
@@ -410,7 +421,7 @@ ___
 
 ▸ **signTypedData**(`signer`: string, `typedData`: EIP712TypedData): *Promise‹Signature›*
 
-*Defined in [packages/contractkit/src/kit.ts:363](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L363)*
+*Defined in [packages/contractkit/src/kit.ts:414](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L414)*
 
 **Parameters:**
 
@@ -427,6 +438,6 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [packages/contractkit/src/kit.ts:438](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L438)*
+*Defined in [packages/contractkit/src/kit.ts:489](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L489)*
 
 **Returns:** *void*

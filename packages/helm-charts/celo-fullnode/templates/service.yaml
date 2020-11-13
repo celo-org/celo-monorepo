@@ -61,4 +61,4 @@ spec:
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
   selector:
 {{ include "common.standard.labels" .  | indent 4 }}
-  component: celo-fullnode
+    component: celo-fullnode
