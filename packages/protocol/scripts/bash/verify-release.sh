@@ -25,7 +25,7 @@ while getopts 'b:n:p:fl:i:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
-    i) INITIALIZE_DATA="--initialize_data ../../${OPTARG}" ;;
+    i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
     p) PROPOSAL="$(realpath $OPTARG)" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
