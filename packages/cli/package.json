@@ -98,6 +98,15 @@
       "dkg": {
         "description": "Publish your locally computed DKG results to the blockchain"
       },
+      "events": {
+        "description": "Fetch and parse events data"
+      },
+      "events:fetch": {
+        "description": "Fetch events data from blockchain"
+      },
+      "events:parse": {
+        "description": "Parse and transform events data into relevant information"
+      },
       "election": {
         "description": "Participate in and view the state of Validator Elections"
       },

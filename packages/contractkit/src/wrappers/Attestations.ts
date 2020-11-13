@@ -727,25 +727,25 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.revoke(identifer, idx))
   }
 
-  async addrsWithNAttestations(n: number, toBlock: string): Promise<string[]> {
-    let issuers: { [k: string]: string[] } = {}
-    let returnAddrs: string[] = []
-    ;(
-      await this.getPastEvents('AttestationCompleted', {
-        fromBlock: 0,
-        toBlock,
-      })
-    ).forEach(function(eventlog: EventLog) {
-      const account: string = eventlog.returnValues.account
-      const issuer: string = eventlog.returnValues.issuer
-      if (issuers[account] && issuers[account].indexOf(issuer) === -1) {
-        issuers[account].push(issuer)
-      } else {
-        issuers[account] = [issuer]
-      }
-      if (issuers[account].length === n) returnAddrs.push(account)
-    })
-    return returnAddrs.filter((acct, index) => returnAddrs.indexOf(acct) == index)
+  async getAttestationCompletedEvents(
+    fromBlock: number,
+    toBlock: number,
+    batchSize: number,
+    prevEvents: EventLog[] = []
+  ): Promise<EventLog[]> {
+    // if inclusive range is larger than batchsize, keep reducing range recursively, work back up
+    if (toBlock - fromBlock >= batchSize) {
+      const prevToBlock = toBlock - batchSize
+      prevEvents = await this.getAttestationCompletedEvents(
+        fromBlock,
+        prevToBlock,
+        batchSize,
+        prevEvents
+      )
+      fromBlock = toBlock - batchSize + 1 // +1 because of inclusivity of range
+    }
+    const events = await this.getPastEvents('AttestationCompleted', { fromBlock, toBlock })
+    return prevEvents.concat(events)
   }
 }
 

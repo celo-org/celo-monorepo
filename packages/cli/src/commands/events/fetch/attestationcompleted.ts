@@ -1,9 +1,9 @@
 import { flags } from '@oclif/command'
 import fs from 'fs'
-import { BaseCommand } from '../../base'
+import { BaseCommand } from '../../../base'
 
-export default class TransferEventscUSD extends BaseCommand {
-  static description = 'Parses Events for data'
+export default class AttestationCompletedEvents extends BaseCommand {
+  static description = 'Fetch AttestationCompleted events from Attestations contract'
 
   static flags = {
     ...BaseCommand.flags,
@@ -18,13 +18,13 @@ export default class TransferEventscUSD extends BaseCommand {
   static examples = ['status']
 
   async run() {
-    const res = this.parse(TransferEventscUSD)
+    const res = this.parse(AttestationCompletedEvents)
     const fromBlock = res.flags.fromBlock
     const toBlock = res.flags.toBlock
     const batchSize = res.flags.batchSize
-    const stableToken = await this.kit.contracts.getStableToken()
-    const events = await stableToken.getTransferEvents(fromBlock, toBlock, batchSize)
-    const outputFile = `transferEventsCUSD-${fromBlock}-${toBlock}.json`
+    const stableToken = await this.kit.contracts.getAttestations()
+    const events = await stableToken.getAttestationCompletedEvents(fromBlock, toBlock, batchSize)
+    const outputFile = `attestation-completed-events-${fromBlock}-${toBlock}.json`
     fs.writeFile(outputFile, JSON.stringify(events, null, 2), (err) => {
       if (err) throw err
     })
