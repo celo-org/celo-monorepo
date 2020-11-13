@@ -29,6 +29,7 @@ interface VerificationContext {
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
+  network: string
 }
 interface InitializationData {
   [contractName: string]: any[]
@@ -89,7 +90,11 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   if (isProxyChanged(contract, context)) {
     const proxyAddress = getProposedProxyAddress(contract, context)
     const governanceAddr = await context.registry.getAddressForString('Governance')
-    if (!(await verifyProxyStorageProof(context.web3, proxyAddress, governanceAddr))) {
+    // ganache does not support eth_getProof
+    if (
+      context.network !== 'development' &&
+      !(await verifyProxyStorageProof(context.web3, proxyAddress, governanceAddr))
+    ) {
       throw new Error(`Proposed ${contract}Proxy has impure storage`)
     }
 
@@ -213,7 +218,8 @@ export const verifyBytecodes = async (
   proposal: ProposalTx[],
   Proxy: Truffle.Contract<ProxyInstance>,
   _web3: Web3,
-  initializationData: InitializationData = {}
+  initializationData: InitializationData = {},
+  network = 'development'
 ) => {
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
@@ -231,6 +237,7 @@ export const verifyBytecodes = async (
     proposal,
     Proxy,
     web3,
+    network,
   }
 
   while (queue.length > 0) {
