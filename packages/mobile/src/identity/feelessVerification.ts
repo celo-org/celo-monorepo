@@ -720,7 +720,8 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
     feelessVerificationStateSelector
   )
 
-  const { sessionActive, captchaToken, sessionToken } = feelessVerificationState.komenci
+  const { sessionActive, captchaToken } = feelessVerificationState.komenci
+  let { sessionToken } = feelessVerificationState.komenci
 
   // If there isn't an active session, start one. Need to include `sessionActive`
   // because that's the only way we'll know if Komenci session is active but
@@ -743,12 +744,14 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
       throw komenciSessionResult.error
     }
 
+    sessionToken = komenciSessionResult.result.token
+
     yield put(
       feelessUpdateVerificationState({
         ...feelessVerificationState,
         komenci: {
           ...feelessVerificationState.komenci,
-          sessionToken: komenciSessionResult.result.token,
+          sessionToken,
           callbackUrl: komenciSessionResult.result.callbackUrl || '',
         },
       })
@@ -757,6 +760,8 @@ function* startOrResumeKomenciSession(komenciKit: KomenciKit, e164Number: string
     // Fetch session state now that we are sure to have a token
     yield call(fetchKomenciSessionState, komenciKit, e164Number)
   }
+
+  Logger.debug(TAG, 'Session active. sessionToken: ', sessionToken)
 }
 
 // Checks if phoneHash is in cache, if it's not it asks Komenci to get it,
