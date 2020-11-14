@@ -240,12 +240,12 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
     const accountAddresses: Address[] = yield call(lookupAccountAddressesForIdentifier, phoneHash)
 
     // Check that there are verified addresses.
-    const onChainAddresses: Address[] = yield call(
+    const verifiedAccountAddresses: Address[] = yield call(
       filterNonVerifiedAddresses,
       accountAddresses,
       phoneHash
     )
-    if (!onChainAddresses || !onChainAddresses.length) {
+    if (verifiedAccountAddresses.length === 0) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
         `Phone number and/or salt claimed by address ${metadata.address} is not verified. Values are incorrect or sender is impersonating another number`
@@ -253,11 +253,11 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
       continue
     }
     const walletAddresses: Address[] = yield all(
-      onChainAddresses.map((accountAddress) =>
+      verifiedAccountAddresses.map((accountAddress) =>
         call(accountsWrapper.getWalletAddress, accountAddress)
       )
     )
-    if (!walletAddresses.find((a) => eqAddress(a, metadata.address))) {
+    if (!walletAddresses.some((walletAddress) => eqAddress(walletAddress, metadata.address))) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
         `Phone number and/or salt claimed by address ${metadata.address} does not match any on-chain addresses. Values are incorrect or sender is impersonating another number`
