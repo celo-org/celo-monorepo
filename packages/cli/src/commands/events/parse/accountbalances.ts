@@ -23,20 +23,23 @@ export default class AccountBalances extends BaseCommand {
     // const outputJson = res.flags.outputJson
     const res = this.parse(AccountBalances)
     const events = JSON.parse(fs.readFileSync(res.flags.eventsJson, 'utf8'))
+    const outputJson = res.flags.outputJson
     const filter = res.flags.filterByAddrs
-    const filterByAddrs = filter ? JSON.parse(fs.readFileSync(res.flags.eventsJson, 'utf8')) : []
+    const filterByAddrs = filter
+      ? JSON.parse(fs.readFileSync(res.flags.eventsJson, 'utf8'))
+      : undefined
     const balances = await accountBalances(events, filterByAddrs)
 
-    // // Output results to a JSON file if set
-    // if (outputJson) {
-    //   fs.writeFile(
-    //     `balances${fromBlock}-${toBlock}.json`,
-    //     JSON.stringify(balances, null, 2),
-    //     (err) => {
-    //       if (err) throw err
-    //     }
-    //   )
-    // }
+    // Output results to a JSON file if set
+    if (outputJson) {
+      fs.writeFile(
+        `balances${filter ? '-filtered' : ''}.json`,
+        JSON.stringify(balances, null, 2),
+        (err) => {
+          if (err) throw err
+        }
+      )
+    }
 
     printValueMapRecursive(balances)
     console.log('Total accounts reported:', Object.keys(balances).length)

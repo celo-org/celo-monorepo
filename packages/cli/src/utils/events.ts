@@ -3,9 +3,10 @@ import { EventLog } from 'web3-core'
 
 export async function accountBalances(
   events: EventLog[],
-  addressFilter: string[] = []
+  addressFilter: string[] | undefined
 ): Promise<{ [address: string]: BigNumber }> {
   let balances: { [address: string]: BigNumber } = {}
+
   events.forEach(function(eventlog: EventLog) {
     checkEventType(eventlog, 'Transfer')
     let amount = eventlog.returnValues.value
@@ -18,7 +19,7 @@ export async function accountBalances(
       ? (balances[from] = balances[from].minus(amount))
       : (balances[from] = new BigNumber(0))
   })
-  return addressFilter.length < 1 ? balances : filterObject(balances, addressFilter)
+  return addressFilter ? filterObject(balances, addressFilter) : balances
 }
 
 export async function attestedAccounts(events: EventLog[], minimum: number): Promise<string[]> {
