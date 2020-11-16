@@ -14,7 +14,8 @@ enum Env {
   local = 'local',
   alfajores_weu = 'alfajores_weu',
   alfajores_eus = 'alfajores_eus',
-  rc1 = 'rc1',
+  rc1_br = 'rc1_br',
+  rc1_sea = 'rc1_sea',
 }
 
 enum Network {
@@ -30,7 +31,7 @@ if (Env[env] === undefined) {
 } else {
   if (env === Env.alfajores_weu || env === Env.alfajores_eus || env === Env.local) {
     network = Network.alfajores
-  } else if (env === Env.rc1) {
+  } else if (env === Env.rc1_br || env === Env.rc1_sea) {
     network = Network.rc1
   } else {
     throw new Error('Could not determine network')
@@ -97,7 +98,8 @@ const SERVICE_URL: Record<Env, string> = {
   local: 'http://localhost:3000',
   alfajores_weu: 'https://weu.komenci.alfajores.celo-testnet.org',
   alfajores_eus: 'https://eus.komenci.alfajores.celo-testnet.org',
-  rc1: 'https://br.komenci.celo-networks-dev.org',
+  rc1_br: 'https://br.komenci.rc1.celo-testnet.org',
+  rc1_sea: 'https://sea.komenci.rc1.celo-testnet.org',
 }
 
 const komenciKit = new KomenciKit(contractKit, account, {
