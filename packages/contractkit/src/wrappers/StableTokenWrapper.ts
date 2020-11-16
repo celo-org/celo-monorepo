@@ -215,56 +215,18 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     this.contract.methods.transfer
   )
 
-  /**
-   * Transfers StableToken from one address to another on behalf of a user.
-   * @param from The address to transfer StableToken from.
-   * @param to The address to transfer StableToken to.
-   * @param value The amount of StableToken to transfer.
-   * @return True if the transaction succeeds.
-   */
-  transferFrom: (
-    from: string,
-    to: string,
-    value: string | number
-  ) => CeloTransactionObject<boolean> = proxySend(this.kit, this.contract.methods.transferFrom)
-
-  async getAccountBalances(fromBlock: string, toBlock: string): Promise<BalanceMap> {
-    let balances: BalanceMap = {}
-    ;(
-      await this.getPastEvents('Transfer', {
-        fromBlock,
-        toBlock,
-      })
-    ).forEach(function(eventlog: EventLog) {
-      let amount = eventlog.returnValues.value
-      let to = eventlog.returnValues.to
-      let from = eventlog.returnValues.from
-      balances[to]
-        ? (balances[to] = balances[to].plus(amount))
-        : (balances[to] = new BigNumber(amount))
-      balances[from]
-        ? (balances[from] = balances[from].minus(amount))
-        : (balances[from] = new BigNumber(0))
-    })
-    return balances
-  }
-
   async getTransferEvents(
     fromBlock: number,
     toBlock: number,
     batchSize: number,
     prevEvents: EventLog[] = []
   ): Promise<EventLog[]> {
-    console.log('FROMBLOCK ', fromBlock)
-    console.log('TOBLOCK ', toBlock)
     // if inclusive range is larger than batchsize, keep reducing range recursively, work back up
     if (toBlock - fromBlock >= batchSize) {
-      console.log('inside IF')
       const prevToBlock = toBlock - batchSize
       prevEvents = await this.getTransferEvents(fromBlock, prevToBlock, batchSize, prevEvents)
       fromBlock = toBlock - batchSize + 1 // +1 because of inclusivity of range
     }
-    console.log('outsideIF')
     const events = await this.getPastEvents('Transfer', { fromBlock, toBlock })
     return prevEvents.concat(events)
   }
