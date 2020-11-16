@@ -14,7 +14,7 @@ set -euo pipefail
 BRANCH=""
 NETWORK=""
 FORNO=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-verify-deployed.log"
 
 while getopts 'b:n:rfl:' flag; do
   case "${flag}" in

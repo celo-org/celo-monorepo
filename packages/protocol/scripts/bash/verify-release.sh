@@ -19,7 +19,7 @@ NETWORK=""
 PROPOSAL=""
 FORNO=""
 INITIALIZE_DATA=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-verify-release.log"
 
 while getopts 'b:n:p:fl:i:' flag; do
   case "${flag}" in
