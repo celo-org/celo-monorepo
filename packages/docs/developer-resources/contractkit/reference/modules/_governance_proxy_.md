@@ -28,7 +28,7 @@
   SET_AND_INITIALIZE_IMPLEMENTATION_ABI,
 ]
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L82)*
+*Defined in [contractkit/src/governance/proxy.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L82)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **PROXY_SET_AND_INITIALIZE_IMPLEMENTATION_SIGNATURE**: *string* = SET_AND_INITIALIZE_IMPLEMENTATION_ABI.signature
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L89)*
+*Defined in [contractkit/src/governance/proxy.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L89)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **PROXY_SET_IMPLEMENTATION_SIGNATURE**: *string* = SET_IMPLEMENTATION_ABI.signature
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L88)*
+*Defined in [contractkit/src/governance/proxy.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L88)*
 
 ## Functions
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **getInitializeAbiOfImplementation**(`proxyContractName`: keyof typeof initializeAbiMap): *AbiItem*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L123)*
+*Defined in [contractkit/src/governance/proxy.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L123)*
 
 **Parameters:**
 
@@ -68,25 +68,25 @@ Name | Type |
 
 ### ▪ **GET_IMPLEMENTATION_ABI**: *object*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L30)*
+*Defined in [contractkit/src/governance/proxy.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L30)*
 
 ###  constant
 
 • **constant**: *true* = true
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L31)*
+*Defined in [contractkit/src/governance/proxy.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L31)*
 
 ###  inputs
 
 • **inputs**: *never[]* = []
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L32)*
+*Defined in [contractkit/src/governance/proxy.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L32)*
 
 ###  name
 
 • **name**: *string* = "_getImplementation"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L33)*
+*Defined in [contractkit/src/governance/proxy.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L33)*
 
 ###  outputs
 
@@ -97,31 +97,31 @@ Name | Type |
     },
   ]
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L34)*
+*Defined in [contractkit/src/governance/proxy.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L34)*
 
 ###  payable
 
 • **payable**: *false* = false
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L40)*
+*Defined in [contractkit/src/governance/proxy.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L40)*
 
 ###  signature
 
 • **signature**: *string* = "0x42404e07"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L43)*
+*Defined in [contractkit/src/governance/proxy.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L43)*
 
 ###  stateMutability
 
 • **stateMutability**: *"view"* = "view"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L41)*
+*Defined in [contractkit/src/governance/proxy.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L41)*
 
 ###  type
 
 • **type**: *"function"* = "function"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L42)*
+*Defined in [contractkit/src/governance/proxy.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L42)*
 
 ___
 
@@ -129,13 +129,13 @@ ___
 
 ### ▪ **SET_AND_INITIALIZE_IMPLEMENTATION_ABI**: *object*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L62)*
+*Defined in [contractkit/src/governance/proxy.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L62)*
 
 ###  constant
 
 • **constant**: *false* = false
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L63)*
+*Defined in [contractkit/src/governance/proxy.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L63)*
 
 ###  inputs
 
@@ -150,43 +150,43 @@ ___
     },
   ]
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L64)*
+*Defined in [contractkit/src/governance/proxy.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L64)*
 
 ###  name
 
 • **name**: *string* = "_setAndInitializeImplementation"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L74)*
+*Defined in [contractkit/src/governance/proxy.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L74)*
 
 ###  outputs
 
 • **outputs**: *never[]* = []
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L75)*
+*Defined in [contractkit/src/governance/proxy.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L75)*
 
 ###  payable
 
 • **payable**: *true* = true
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L76)*
+*Defined in [contractkit/src/governance/proxy.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L76)*
 
 ###  signature
 
 • **signature**: *string* = "0x03386ba3"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L79)*
+*Defined in [contractkit/src/governance/proxy.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L79)*
 
 ###  stateMutability
 
 • **stateMutability**: *"payable"* = "payable"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L77)*
+*Defined in [contractkit/src/governance/proxy.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L77)*
 
 ###  type
 
 • **type**: *"function"* = "function"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L78)*
+*Defined in [contractkit/src/governance/proxy.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L78)*
 
 ___
 
@@ -194,13 +194,13 @@ ___
 
 ### ▪ **SET_IMPLEMENTATION_ABI**: *object*
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L46)*
+*Defined in [contractkit/src/governance/proxy.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L46)*
 
 ###  constant
 
 • **constant**: *false* = false
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L47)*
+*Defined in [contractkit/src/governance/proxy.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L47)*
 
 ###  inputs
 
@@ -211,40 +211,40 @@ ___
     },
   ]
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L48)*
+*Defined in [contractkit/src/governance/proxy.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L48)*
 
 ###  name
 
 • **name**: *string* = "_setImplementation"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L54)*
+*Defined in [contractkit/src/governance/proxy.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L54)*
 
 ###  outputs
 
 • **outputs**: *never[]* = []
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L55)*
+*Defined in [contractkit/src/governance/proxy.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L55)*
 
 ###  payable
 
 • **payable**: *false* = false
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L56)*
+*Defined in [contractkit/src/governance/proxy.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L56)*
 
 ###  signature
 
 • **signature**: *string* = "0xbb913f41"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L59)*
+*Defined in [contractkit/src/governance/proxy.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L59)*
 
 ###  stateMutability
 
 • **stateMutability**: *"nonpayable"* = "nonpayable"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L57)*
+*Defined in [contractkit/src/governance/proxy.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L57)*
 
 ###  type
 
 • **type**: *"function"* = "function"
 
-*Defined in [packages/contractkit/src/governance/proxy.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L58)*
+*Defined in [contractkit/src/governance/proxy.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proxy.ts#L58)*

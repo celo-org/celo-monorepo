@@ -16,4 +16,4 @@
 
 • **rate**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/SortedOracles.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L47)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L47)*

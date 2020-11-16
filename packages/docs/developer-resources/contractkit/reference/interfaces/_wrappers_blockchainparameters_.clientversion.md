@@ -18,7 +18,7 @@
 
 • **major**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L6)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L6)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **minor**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L7)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L7)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **patch**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L8)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L8)*

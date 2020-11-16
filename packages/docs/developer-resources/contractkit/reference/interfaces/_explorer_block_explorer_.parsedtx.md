@@ -17,7 +17,7 @@
 
 • **callDetails**: *[CallDetails](_explorer_block_explorer_.calldetails.md)*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L28)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L28)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **tx**: *Transaction*
 
-*Defined in [packages/contractkit/src/explorer/block-explorer.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L29)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L29)*

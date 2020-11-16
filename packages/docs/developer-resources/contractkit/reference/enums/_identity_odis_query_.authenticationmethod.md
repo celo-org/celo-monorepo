@@ -14,7 +14,7 @@
 
 • **CUSTOM_SIGNER**: = "custom_signer"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L34)*
+*Defined in [contractkit/src/identity/odis/query.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L34)*
 
 ___
 
@@ -22,7 +22,7 @@ ___
 
 • **ENCRYPTION_KEY**: = "encryption_key"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L33)*
+*Defined in [contractkit/src/identity/odis/query.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L33)*
 
 ___
 
@@ -30,4 +30,4 @@ ___
 
 • **WALLET_KEY**: = "wallet_key"
 
-*Defined in [packages/contractkit/src/identity/odis/query.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L32)*
+*Defined in [contractkit/src/identity/odis/query.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/odis/query.ts#L32)*

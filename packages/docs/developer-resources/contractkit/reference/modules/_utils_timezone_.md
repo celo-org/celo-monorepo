@@ -18,7 +18,7 @@
 
 ▸ **_testSetTimezoneOverride**(`zone`: string | undefined): *void*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L7)*
+*Defined in [contractkit/src/utils/timezone.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L7)*
 
 **Parameters:**
 
@@ -34,7 +34,7 @@ ___
 
 ▸ **timezone**(`tz?`: undefined | string): *[Timezone](../interfaces/_utils_timezone_.timezone.md) | undefined*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L41)*
+*Defined in [contractkit/src/utils/timezone.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L41)*
 
 **Parameters:**
 

@@ -35,7 +35,7 @@
 
 *Overrides [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[constructor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#constructor)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/pictures.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L10)*
+*Defined in [contractkit/src/identity/offchain/accessors/pictures.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L10)*
 
 **Parameters:**
 
@@ -53,29 +53,19 @@ Name | Type |
 
 *Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[dataPath](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#datapath)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L42)*
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L42)*
 
 ___
 
 ###  read
 
-• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
+• **read**: *any* = makeAsyncThrowable(this.readAsResult.bind(this))
 
 *Implementation of [PrivateAccessor](../interfaces/_identity_offchain_accessors_interfaces_.privateaccessor.md).[read](../interfaces/_identity_offchain_accessors_interfaces_.privateaccessor.md#read)*
 
 *Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[read](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#read)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L52)*
-
-#### Type declaration:
-
-▸ (...`args`: TArgs): *Promise‹TResult›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | TArgs |
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L52)*
 
 ___
 
@@ -85,17 +75,17 @@ ___
 
 *Overrides [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[wrapper](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#wrapper)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/pictures.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L11)*
+*Defined in [contractkit/src/identity/offchain/accessors/pictures.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L11)*
 
 ## Methods
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹OkResult‹Buffer‹›› | ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›››*
+▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹any›*
 
 *Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[readAsResult](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#readasresult)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L48)*
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L48)*
 
 **Parameters:**
 
@@ -103,7 +93,7 @@ Name | Type |
 ------ | ------ |
 `account` | [Address](../modules/_base_.md#address) |
 
-**Returns:** *Promise‹OkResult‹Buffer‹›› | ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›››*
+**Returns:** *Promise‹any›*
 
 ___
 
@@ -113,7 +103,7 @@ ___
 
 *Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[write](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#write)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L44)*
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L44)*
 
 **Parameters:**
 

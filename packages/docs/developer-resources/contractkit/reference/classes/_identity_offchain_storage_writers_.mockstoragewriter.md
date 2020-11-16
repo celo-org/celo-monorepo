@@ -30,7 +30,7 @@
 
 *Overrides [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[constructor](_identity_offchain_storage_writers_.localstoragewriter.md#constructor)*
 
-*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L55)*
+*Defined in [contractkit/src/identity/offchain/storage-writers.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L55)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **fetchMock**: *any*
 
-*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
+*Defined in [contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **mockedStorageRoot**: *string*
 
-*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
+*Defined in [contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 *Overrides [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[root](_identity_offchain_storage_writers_.localstoragewriter.md#root)*
 
-*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
+*Defined in [contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
 
 ## Methods
 
@@ -76,7 +76,7 @@ ___
 
 *Overrides [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[write](_identity_offchain_storage_writers_.localstoragewriter.md#write)*
 
-*Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L59)*
+*Defined in [contractkit/src/identity/offchain/storage-writers.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L59)*
 
 **Parameters:**
 

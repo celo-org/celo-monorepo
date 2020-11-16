@@ -17,7 +17,7 @@
 
 ▸ **buildEIP712TypedData**<**DataType**>(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `path`: string, `data`: DataType | Buffer, `type?`: t.Type‹DataType›): *Promise‹EIP712TypedData›*
 
-*Defined in [packages/contractkit/src/identity/offchain/utils.ts:274](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L274)*
+*Defined in [contractkit/src/identity/offchain/utils.ts:274](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L274)*
 
 **Type parameters:**
 
@@ -40,7 +40,7 @@ ___
 
 ▸ **deserialize**<**DataType**>(`type`: Type‹DataType›, `buf`: Buffer): *Result‹DataType, [SchemaErrors](_identity_offchain_accessors_errors_.md#schemaerrors)›*
 
-*Defined in [packages/contractkit/src/identity/offchain/utils.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L257)*
+*Defined in [contractkit/src/identity/offchain/utils.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L257)*
 
 **Type parameters:**
 
@@ -61,7 +61,7 @@ ___
 
 ▸ **readEncrypted**(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `dataPath`: string, `senderAddress`: [Address](_base_.md#address)): *Promise‹Result‹Buffer, [SchemaErrors](_identity_offchain_accessors_errors_.md#schemaerrors)››*
 
-*Defined in [packages/contractkit/src/identity/offchain/utils.ts:227](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L227)*
+*Defined in [contractkit/src/identity/offchain/utils.ts:227](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L227)*
 
 Reads and decrypts a payload that has been encrypted to your data encryption key. Will
 resolve the symmetric key used to encrypt the payload.
@@ -82,7 +82,7 @@ ___
 
 ▸ **resolvePath**(`base`: string, `path`: string): *string*
 
-*Defined in [packages/contractkit/src/identity/offchain/utils.ts:382](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L382)*
+*Defined in [contractkit/src/identity/offchain/utils.ts:382](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L382)*
 
 We want users to be able to specify a root + path as their base
 storage url, https://example.com/store-under/path, for example. Constructing
@@ -104,7 +104,7 @@ ___
 
 ▸ **signBuffer**(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `dataPath`: string, `buf`: Buffer): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/identity/offchain/utils.ts:331](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L331)*
+*Defined in [contractkit/src/identity/offchain/utils.ts:331](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L331)*
 
 **Parameters:**
 
@@ -122,7 +122,7 @@ ___
 
 ▸ **writeEncrypted**(`wrapper`: [OffchainDataWrapper](../classes/_identity_offchain_data_wrapper_.offchaindatawrapper.md), `dataPath`: string, `data`: Buffer, `toAddresses`: [Address](_base_.md#address)[], `symmetricKey?`: Buffer): *Promise‹[SchemaErrors](_identity_offchain_accessors_errors_.md#schemaerrors) | void›*
 
-*Defined in [packages/contractkit/src/identity/offchain/utils.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L134)*
+*Defined in [contractkit/src/identity/offchain/utils.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/utils.ts#L134)*
 
 Handles encrypting the data with a symmetric key, then distributing said key to each address
 in the `toAddresses` array.

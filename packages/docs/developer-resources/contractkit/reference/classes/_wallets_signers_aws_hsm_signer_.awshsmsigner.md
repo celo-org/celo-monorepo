@@ -29,7 +29,7 @@
 
 \+ **new AwsHsmSigner**(`kms`: KMS, `keyId`: string, `publicKey`: BigNumber): *[AwsHsmSigner](_wallets_signers_aws_hsm_signer_.awshsmsigner.md)*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L27)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L27)*
 
 **Parameters:**
 
@@ -47,7 +47,7 @@ Name | Type |
 
 ▸ **computeSharedSecret**(`_publicKey`: string): *Promise‹Buffer‹››*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L118)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L118)*
 
 **Parameters:**
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **decrypt**(`_ciphertext`: Buffer): *Promise‹Buffer‹››*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L112)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L112)*
 
 **Parameters:**
 
@@ -79,7 +79,7 @@ ___
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L108)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L108)*
 
 **Returns:** *string*
 
@@ -89,7 +89,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹[Signature](_utils_signature_utils_.signature.md)›*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L85)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L85)*
 
 **Parameters:**
 
@@ -105,7 +105,7 @@ ___
 
 ▸ **signTransaction**(`addToV`: number, `encodedTx`: [RLPEncodedTx](../interfaces/_utils_signing_utils_.rlpencodedtx.md)): *Promise‹[Signature](_utils_signature_utils_.signature.md)›*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L73)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L73)*
 
 **Parameters:**
 
@@ -122,7 +122,7 @@ ___
 
 ▸ **signTypedData**(`typedData`: EIP712TypedData): *Promise‹[Signature](_utils_signature_utils_.signature.md)›*
 
-*Defined in [packages/contractkit/src/wallets/signers/aws-hsm-signer.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L97)*
+*Defined in [contractkit/src/wallets/signers/aws-hsm-signer.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/aws-hsm-signer.ts#L97)*
 
 **Parameters:**
 

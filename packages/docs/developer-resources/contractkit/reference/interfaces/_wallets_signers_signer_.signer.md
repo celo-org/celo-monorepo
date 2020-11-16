@@ -29,7 +29,7 @@
 
 • **computeSharedSecret**: *function*
 
-*Defined in [packages/contractkit/src/wallets/signers/signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L18)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L18)*
 
 #### Type declaration:
 
@@ -47,7 +47,7 @@ ___
 
 • **decrypt**: *function*
 
-*Defined in [packages/contractkit/src/wallets/signers/signer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L17)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L17)*
 
 #### Type declaration:
 
@@ -65,7 +65,7 @@ ___
 
 • **getNativeKey**: *function*
 
-*Defined in [packages/contractkit/src/wallets/signers/signer.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L16)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L16)*
 
 #### Type declaration:
 
@@ -77,7 +77,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [packages/contractkit/src/wallets/signers/signer.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L14)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L14)*
 
 #### Type declaration:
 
@@ -95,7 +95,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [packages/contractkit/src/wallets/signers/signer.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L10)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L10)*
 
 Signs the message and returns an EVM transaction
 
@@ -120,7 +120,7 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [packages/contractkit/src/wallets/signers/signer.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L15)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L15)*
 
 #### Type declaration:
 

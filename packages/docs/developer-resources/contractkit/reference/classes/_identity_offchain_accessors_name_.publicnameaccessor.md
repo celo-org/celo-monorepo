@@ -36,7 +36,7 @@
 
 *Overrides [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[constructor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#constructor)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/name.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/name.ts#L11)*
+*Defined in [contractkit/src/identity/offchain/accessors/name.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/name.ts#L11)*
 
 **Parameters:**
 
@@ -54,29 +54,19 @@ Name | Type |
 
 *Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[dataPath](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#datapath)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L21)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L21)*
 
 ___
 
 ###  read
 
-• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
+• **read**: *any* = makeAsyncThrowable(this.readAsResult.bind(this))
 
 *Implementation of [PublicAccessor](../interfaces/_identity_offchain_accessors_interfaces_.publicaccessor.md).[read](../interfaces/_identity_offchain_accessors_interfaces_.publicaccessor.md#read)*
 
 *Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[read](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#read)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L61)*
-
-#### Type declaration:
-
-▸ (...`args`: TArgs): *Promise‹TResult›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | TArgs |
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L61)*
 
 ___
 
@@ -86,7 +76,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[type](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#type)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L20)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L20)*
 
 ___
 
@@ -96,7 +86,7 @@ ___
 
 *Overrides [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[wrapper](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#wrapper)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/name.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/name.ts#L12)*
+*Defined in [contractkit/src/identity/offchain/accessors/name.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/name.ts#L12)*
 
 ## Methods
 
@@ -106,7 +96,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[readAsResult](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readasresult)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L46)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L46)*
 
 **Parameters:**
 
@@ -124,7 +114,7 @@ ___
 
 *Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[write](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#write)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L30)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L30)*
 
 **Parameters:**
 

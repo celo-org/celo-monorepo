@@ -19,7 +19,7 @@
 
 • **baseline**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L49)*
+*Defined in [contractkit/src/wrappers/Governance.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L49)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **baselineFloor**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L50)*
+*Defined in [contractkit/src/wrappers/Governance.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L50)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **baselineQuorumFactor**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L52)*
+*Defined in [contractkit/src/wrappers/Governance.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L52)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **baselineUpdateFactor**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Governance.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L51)*
+*Defined in [contractkit/src/wrappers/Governance.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L51)*

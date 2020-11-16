@@ -20,4 +20,4 @@
 
 Ƭ **OffchainErrors**: *FetchError | InvalidSignature | NoStorageRootProvidedData | NoStorageProvider*
 
-*Defined in [packages/contractkit/src/identity/offchain-data-wrapper.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L48)*
+*Defined in [contractkit/src/identity/offchain-data-wrapper.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain-data-wrapper.ts#L48)*

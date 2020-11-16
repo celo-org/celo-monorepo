@@ -18,7 +18,7 @@
 
 • **blockGasLimit**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L12)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L12)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **intrinsicGasForAlternativeFeeCurrency**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L14)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L14)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **minimumClientVersion**: *[ClientVersion](_wrappers_blockchainparameters_.clientversion.md)*
 
-*Defined in [packages/contractkit/src/wrappers/BlockchainParameters.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L13)*
+*Defined in [contractkit/src/wrappers/BlockchainParameters.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BlockchainParameters.ts#L13)*

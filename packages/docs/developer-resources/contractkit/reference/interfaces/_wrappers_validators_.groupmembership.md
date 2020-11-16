@@ -17,7 +17,7 @@
 
 • **epoch**: *number*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L71)*
+*Defined in [contractkit/src/wrappers/Validators.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L71)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **group**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L72)*
+*Defined in [contractkit/src/wrappers/Validators.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L72)*

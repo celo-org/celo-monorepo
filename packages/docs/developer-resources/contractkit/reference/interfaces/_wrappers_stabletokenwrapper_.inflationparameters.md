@@ -19,7 +19,7 @@
 
 • **factor**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/StableTokenWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L20)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L20)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **factorLastUpdated**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/StableTokenWrapper.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L22)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L22)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **rate**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/StableTokenWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L19)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L19)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **updatePeriod**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/StableTokenWrapper.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L21)*
+*Defined in [contractkit/src/wrappers/StableTokenWrapper.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/StableTokenWrapper.ts#L21)*

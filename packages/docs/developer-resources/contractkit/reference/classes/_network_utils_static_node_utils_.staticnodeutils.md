@@ -19,7 +19,7 @@
 
 ▸ **getRegionalStaticNodesAsync**(`networkName`: string, `region?`: undefined | string): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/network-utils/static-node-utils.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L110)*
+*Defined in [contractkit/src/network-utils/static-node-utils.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L110)*
 
 Fetches the static nodes (as JSON data) from Google Storage corresponding
 to the best available region for this caller.
@@ -41,7 +41,7 @@ ___
 
 ▸ **getStaticNodeRegion**(`networkName`: string, `tz?`: undefined | string): *string*
 
-*Defined in [packages/contractkit/src/network-utils/static-node-utils.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L88)*
+*Defined in [contractkit/src/network-utils/static-node-utils.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L88)*
 
 Resolves the best region to use for static node connections.
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **getStaticNodesAsync**(`networkName`: string): *Promise‹string›*
 
-*Defined in [packages/contractkit/src/network-utils/static-node-utils.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L123)*
+*Defined in [contractkit/src/network-utils/static-node-utils.ts:123](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L123)*
 
 Fetches the static nodes (as JSON data) from Google Storage.
 If the network is not working, the method will reject the returned promise
@@ -87,6 +87,6 @@ ___
 
 ▸ **getStaticNodesGoogleStorageBucketName**(): *string*
 
-*Defined in [packages/contractkit/src/network-utils/static-node-utils.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L74)*
+*Defined in [contractkit/src/network-utils/static-node-utils.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/static-node-utils.ts#L74)*
 
 **Returns:** *string*

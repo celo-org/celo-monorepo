@@ -29,7 +29,7 @@
 
 • **read**: *function*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/interfaces.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/interfaces.ts#L6)*
+*Defined in [contractkit/src/identity/offchain/accessors/interfaces.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/interfaces.ts#L6)*
 
 #### Type declaration:
 
@@ -47,7 +47,7 @@ ___
 
 • **readAsResult**: *function*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/interfaces.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/interfaces.ts#L7)*
+*Defined in [contractkit/src/identity/offchain/accessors/interfaces.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/interfaces.ts#L7)*
 
 #### Type declaration:
 
@@ -65,7 +65,7 @@ ___
 
 • **write**: *function*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/interfaces.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/interfaces.ts#L5)*
+*Defined in [contractkit/src/identity/offchain/accessors/interfaces.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/interfaces.ts#L5)*
 
 #### Type declaration:
 

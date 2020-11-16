@@ -41,7 +41,7 @@ in a type parameter is supported for runtime type safety.
 
 \+ **new PublicSimpleAccessor**(`wrapper`: [OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md), `type`: Type‹DataType›, `dataPath`: string): *[PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L17)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L17)*
 
 **Parameters:**
 
@@ -59,27 +59,17 @@ Name | Type |
 
 • **dataPath**: *string*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L21)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L21)*
 
 ___
 
 ###  read
 
-• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
+• **read**: *any* = makeAsyncThrowable(this.readAsResult.bind(this))
 
 *Implementation of [PublicAccessor](../interfaces/_identity_offchain_accessors_interfaces_.publicaccessor.md).[read](../interfaces/_identity_offchain_accessors_interfaces_.publicaccessor.md#read)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L61)*
-
-#### Type declaration:
-
-▸ (...`args`: TArgs): *Promise‹TResult›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | TArgs |
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L61)*
 
 ___
 
@@ -87,7 +77,7 @@ ___
 
 • **type**: *Type‹DataType›*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L20)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L20)*
 
 ___
 
@@ -95,7 +85,7 @@ ___
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L19)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L19)*
 
 ## Methods
 
@@ -103,7 +93,7 @@ ___
 
 ▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹Result‹DataType, [SchemaErrors](../modules/_identity_offchain_accessors_errors_.md#schemaerrors)››*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L46)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L46)*
 
 **Parameters:**
 
@@ -119,7 +109,7 @@ ___
 
 ▸ **write**(`data`: DataType): *Promise‹undefined | [InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹››*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L30)*
+*Defined in [contractkit/src/identity/offchain/accessors/simple.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L30)*
 
 **Parameters:**
 

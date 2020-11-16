@@ -35,7 +35,7 @@
 
 *Overrides [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[constructor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#constructor)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/pictures.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L4)*
+*Defined in [contractkit/src/identity/offchain/accessors/pictures.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L4)*
 
 **Parameters:**
 
@@ -53,29 +53,19 @@ Name | Type |
 
 *Inherited from [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[dataPath](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#datapath)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L12)*
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L12)*
 
 ___
 
 ###  read
 
-• **read**: *function* = makeAsyncThrowable(this.readAsResult.bind(this))
+• **read**: *any* = makeAsyncThrowable(this.readAsResult.bind(this))
 
 *Implementation of [PublicAccessor](../interfaces/_identity_offchain_accessors_interfaces_.publicaccessor.md).[read](../interfaces/_identity_offchain_accessors_interfaces_.publicaccessor.md#read)*
 
 *Inherited from [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[read](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#read)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L35)*
-
-#### Type declaration:
-
-▸ (...`args`: TArgs): *Promise‹TResult›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | TArgs |
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L35)*
 
 ___
 
@@ -85,17 +75,17 @@ ___
 
 *Overrides [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[wrapper](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#wrapper)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/pictures.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L5)*
+*Defined in [contractkit/src/identity/offchain/accessors/pictures.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L5)*
 
 ## Methods
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹ErrorResult‹[OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹›› | OkResult‹Buffer‹›››*
+▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹any›*
 
 *Inherited from [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[readAsResult](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#readasresult)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L26)*
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L26)*
 
 **Parameters:**
 
@@ -103,7 +93,7 @@ Name | Type |
 ------ | ------ |
 `account` | [Address](../modules/_base_.md#address) |
 
-**Returns:** *Promise‹ErrorResult‹[OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹›› | OkResult‹Buffer‹›››*
+**Returns:** *Promise‹any›*
 
 ___
 
@@ -113,7 +103,7 @@ ___
 
 *Inherited from [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[write](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#write)*
 
-*Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L14)*
+*Defined in [contractkit/src/identity/offchain/accessors/binary.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L14)*
 
 **Parameters:**
 

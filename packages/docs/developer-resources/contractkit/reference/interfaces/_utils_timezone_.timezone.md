@@ -19,7 +19,7 @@
 
 • **comments**? : *undefined | string*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L22)*
+*Defined in [contractkit/src/utils/timezone.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L22)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **coordinates**? : *[Coordinates](_utils_timezone_.coordinates.md)*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L21)*
+*Defined in [contractkit/src/utils/timezone.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L21)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **countryCodes**? : *string[]*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L20)*
+*Defined in [contractkit/src/utils/timezone.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L20)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **name**: *string*
 
-*Defined in [packages/contractkit/src/utils/timezone.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L19)*
+*Defined in [contractkit/src/utils/timezone.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/timezone.ts#L19)*

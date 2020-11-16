@@ -20,7 +20,7 @@
 
 • **frozenReserveGoldDays**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L17)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L17)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **frozenReserveGoldStartBalance**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L15)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L15)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **frozenReserveGoldStartDay**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L16)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L16)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **otherReserveAddresses**: *string[]*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L18)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L18)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **tobinTaxStalenessThreshold**: *BigNumber*
 
-*Defined in [packages/contractkit/src/wrappers/Reserve.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L14)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L14)*
