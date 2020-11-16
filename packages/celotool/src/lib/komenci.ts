@@ -5,7 +5,7 @@ import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInte
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { getAksClusterConfig, getContextDynamicEnvVarValues, serviceName } from './context-utils'
+import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/komenci'
@@ -158,7 +158,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
   const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.reCaptchaKeyVault, 'RECAPTCHA-SECRET-KEY')
-  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context)
 
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
@@ -236,7 +236,7 @@ async function createKomenciAzureIdentityIfNotExists(
   context: string,
   komenciIdentity: KomenciIdentity
 ) {
-  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context)
   const identity = await createIdentityIdempotent(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the komenci identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -286,7 +286,7 @@ async function deleteKomenciAzureIdentity(
   context: string,
   komenciIdentity: KomenciIdentity
 ) {
-  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context)
   await deleteKomenciKeyVaultPolicy(clusterConfig, komenciIdentity)
   return deleteIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)
 }
