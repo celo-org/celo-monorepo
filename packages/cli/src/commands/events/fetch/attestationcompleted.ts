@@ -22,8 +22,8 @@ export default class AttestationCompletedEvents extends BaseCommand {
     const fromBlock = res.flags.fromBlock
     const toBlock = res.flags.toBlock
     const batchSize = res.flags.batchSize
-    const stableToken = await this.kit.contracts.getAttestations()
-    const events = await stableToken.getAttestationCompletedEvents(fromBlock, toBlock, batchSize)
+    const attestations = await this.kit.contracts.getAttestations()
+    const events = await attestations.getAttestationCompletedEvents(fromBlock, toBlock, batchSize)
     const outputFile = `attestation-completed-events-${fromBlock}-${toBlock}.json`
     fs.writeFile(outputFile, JSON.stringify(events, null, 2), (err) => {
       if (err) throw err
