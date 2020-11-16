@@ -53,10 +53,6 @@ export async function initDatabase(doTestQuery = true) {
     debug: DEV_MODE,
   })
 
-  if (doTestQuery) {
-    await executeTestQuery(db)
-  }
-
   logger.info('Running Migrations')
 
   // This deletes the old migrations from before we used the .js extension.
@@ -75,6 +71,10 @@ export async function initDatabase(doTestQuery = true) {
     directory: './dist/migrations',
     loadExtensions: ['.js'],
   })
+
+  if (doTestQuery) {
+    await executeTestQuery(db)
+  }
 
   logger.info('Database initialized successfully')
   return db
