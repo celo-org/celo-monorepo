@@ -256,7 +256,7 @@ function* fetchWalletAddresses(e164Number: string) {
     }
   }
   yield put(updateWalletToAccountAddress(walletToAccountAddress))
-  return [...possibleUserAddresses]
+  return Array.from(possibleUserAddresses)
 }
 
 // Returns a list of account addresses for the identifier received.
