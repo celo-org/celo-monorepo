@@ -320,7 +320,12 @@ export class InteractiveProposalBuilder {
             }
           },
         })
-        args.push(inputAnswer[functionInput.name])
+
+        // @ts-ignore
+        const answer: string = inputAnswer[functionInput.name]
+        const transformedValue =
+          functionInput.type === 'uint256' ? new BigNumber(answer).toString() : answer
+        args.push(transformedValue)
       }
 
       // prompt for value only when tx is payable

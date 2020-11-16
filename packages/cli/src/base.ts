@@ -105,6 +105,14 @@ export abstract class BaseCommand extends Command {
     return this._web3
   }
 
+  async newWeb3() {
+    const res: ParserOutput<any, any> = this.parse()
+    const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
+    return nodeUrl && nodeUrl.endsWith('.ipc')
+      ? new Web3(new Web3.providers.IpcProvider(nodeUrl, net))
+      : new Web3(nodeUrl)
+  }
+
   get kit() {
     if (!this._kit) {
       this._kit = newKitFromWeb3(this.web3)
