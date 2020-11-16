@@ -250,7 +250,7 @@ export async function pollForMessagesAndCompleteAttestations(
 
     await completeTx.sendAndWaitForReceipt(txParams)
 
-    logger.info({ issuer: res.issuer }, 'Completed attestation')
+    logger.info({ issuer: res.issuer, identifier, account }, 'Completed attestation')
     attestationsToComplete = await attestations.getActionableAttestations(identifier, account)
   }
 }
