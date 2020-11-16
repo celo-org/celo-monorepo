@@ -26,6 +26,7 @@ interface VerificationContext {
   artifacts: BuildArtifacts
   libraryAddresses: LibraryAddresses
   registry: RegistryInstance
+  governanceAddress: string
   proposal: ProposalTx[]
   Proxy: Truffle.Contract<ProxyInstance>
   web3: Web3
@@ -89,24 +90,21 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
   // check proxy deployment
   if (isProxyChanged(contract, context)) {
     const proxyAddress = getProposedProxyAddress(contract, context)
-    const governanceAddr = await context.registry.getAddressForString('Governance')
     // ganache does not support eth_getProof
     if (
       context.network !== 'development' &&
-      !(await verifyProxyStorageProof(context.web3, proxyAddress, governanceAddr))
+      !(await verifyProxyStorageProof(context.web3, proxyAddress, context.governanceAddress))
     ) {
       throw new Error(`Proposed ${contract}Proxy has impure storage`)
     }
 
     const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
-    const sourceProxyBytecode = getSourceBytecode(`${contract}Proxy`, context)
+    const sourceProxyBytecode = getSourceBytecode(`Proxy`, context)
     if (onchainProxyBytecode !== sourceProxyBytecode) {
       throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
     }
 
-    console.log(
-      `Proxy deployed at ${proxyAddress} matches ${contract}Proxy (implementation and storage)`
-    )
+    console.log(`Proxy deployed at ${proxyAddress} matches ${contract}Proxy (bytecode and storage)`)
   }
 
   // check implementation deployment
@@ -230,10 +228,12 @@ export const verifyBytecodes = async (
   // truffle web3 version does not have getProof
   const web3 = new Web3(_web3.currentProvider)
 
+  const governanceAddress = await registry.getAddressForString('Governance')
   const context: VerificationContext = {
     artifacts,
     libraryAddresses: new LibraryAddresses(),
     registry,
+    governanceAddress,
     proposal,
     Proxy,
     web3,
