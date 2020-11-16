@@ -1,10 +1,10 @@
 import { sleep } from '@celo/base'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
-import { Context } from '../context'
+import { EnvTestContext } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runExchangeTest(context: Context) {
+export function runExchangeTest(context: EnvTestContext) {
   describe('Exchange Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
     beforeAll(async () => {

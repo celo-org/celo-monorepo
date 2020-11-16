@@ -2,11 +2,15 @@ import { concurrentMap } from '@celo/base'
 import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { Context } from './context'
+import { EnvTestContext } from './context'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
-export async function fundAccount(context: Context, account: TestAccounts, value: BigNumber) {
+export async function fundAccount(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber
+) {
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   const recipient = await getKey(context.mnemonic, account)
   const logger = context.logger.child({
@@ -53,7 +57,7 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(context: Context) {
+export async function clearAllFundsToRoot(context: EnvTestContext) {
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index

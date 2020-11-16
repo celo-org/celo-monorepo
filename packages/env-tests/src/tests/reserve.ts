@@ -1,9 +1,9 @@
 import { CeloContract } from '@celo/contractkit'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
-import { Context } from '../context'
+import { EnvTestContext } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
-export function runReserveTest(context: Context) {
+export function runReserveTest(context: EnvTestContext) {
   describe('Reserve Test', () => {
     const logger = context.logger.child({ test: 'reserve' })
     beforeAll(async () => {

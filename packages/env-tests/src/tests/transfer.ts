@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals'
-import { Context } from '../context'
+import { EnvTestContext } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runTransfercUSDTest(context: Context) {
+export function runTransfercUSDTest(context: EnvTestContext) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
     beforeAll(async () => {
