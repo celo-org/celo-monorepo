@@ -489,7 +489,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Updates sender's approval status in regards to allowing an attestation identifier
+   * Updates sender's approval status on whether to allow an attestation identifier
    * mapping to be transfered from one address to another.
    * @param identifier The identifier for this attestation.
    * @param index The index of the account in the accounts array.

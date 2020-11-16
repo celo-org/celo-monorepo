@@ -194,7 +194,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     this.buy(amount, maxUSDAmount, true)
 
   /**
-   * Exchanges amount of cUsd in exchange for at least minGoldAmount of CELO
+   * Buy amount of cUsd in exchange for at least minGoldAmount of CELO
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of cUsd the user is selling to the exchange
    * @param maxGoldAmount The maximum amount of CELO the user will pay for this

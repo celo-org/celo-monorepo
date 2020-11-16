@@ -372,7 +372,7 @@ ___
 
 *Defined in [packages/contractkit/src/wrappers/Attestations.ts:500](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L500)*
 
-Updates sender's approval status in regards to allowing an attestation identifier
+Updates sender's approval status on whether to allow an attestation identifier
 mapping to be transfered from one address to another.
 
 **Parameters:**

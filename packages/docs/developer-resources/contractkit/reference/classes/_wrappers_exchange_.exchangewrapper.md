@@ -397,7 +397,7 @@ Contract address
 
 *Defined in [packages/contractkit/src/wrappers/Exchange.ts:203](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L203)*
 
-Exchanges amount of cUsd in exchange for at least minGoldAmount of CELO
+Buy amount of cUsd in exchange for at least minGoldAmount of CELO
 Requires the amount to have been approved to the exchange
 
 **Parameters:**
