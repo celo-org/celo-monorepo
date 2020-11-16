@@ -19,6 +19,7 @@ export async function accountBalances(
       ? (balances[from] = balances[from].minus(amount))
       : (balances[from] = new BigNumber(0))
   })
+  console.log('ADDRESS FILTER', addressFilter)
   return addressFilter ? filterObject(balances, addressFilter) : balances
 }
 

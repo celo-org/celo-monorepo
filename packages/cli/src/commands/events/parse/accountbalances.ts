@@ -1,5 +1,6 @@
 import { flags } from '@oclif/command'
 import fs from 'fs'
+import { EventLog } from 'web3-core'
 import { BaseCommand } from '../../../base'
 import { printValueMapRecursive } from '../../../utils/cli'
 import { accountBalances } from '../../../utils/events'
@@ -9,8 +10,12 @@ export default class AccountBalances extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    eventsJson: flags.string({ required: true, description: 'file containing transfer events' }),
-    filterByAddrs: flags.string({
+    eventsJson: flags.string({
+      required: true,
+      multiple: true,
+      description: 'file containing transfer events',
+    }),
+    filter: flags.string({
       required: false,
       description: 'json file with list of addresses to filter by',
     }),
@@ -20,14 +25,15 @@ export default class AccountBalances extends BaseCommand {
   }
 
   async run() {
-    // const outputJson = res.flags.outputJson
     const res = this.parse(AccountBalances)
-    const events = JSON.parse(fs.readFileSync(res.flags.eventsJson, 'utf8'))
     const outputJson = res.flags.outputJson
-    const filter = res.flags.filterByAddrs
-    const filterByAddrs = filter
-      ? JSON.parse(fs.readFileSync(res.flags.eventsJson, 'utf8'))
-      : undefined
+    const filter = res.flags.filter
+    const filterByAddrs = filter ? JSON.parse(fs.readFileSync(filter, 'utf8')) : undefined
+    // parse multiple Json events input files
+    const events = res.flags.eventsJson.reduce((arr: EventLog[], eventsArr): EventLog[] => {
+      const events = JSON.parse(fs.readFileSync(eventsArr, 'utf8'))
+      return arr.concat(events)
+    }, [])
     const balances = await accountBalances(events, filterByAddrs)
 
     // Output results to a JSON file if set

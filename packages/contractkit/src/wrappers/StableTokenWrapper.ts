@@ -255,12 +255,16 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     batchSize: number,
     prevEvents: EventLog[] = []
   ): Promise<EventLog[]> {
+    console.log('FROMBLOCK ', fromBlock)
+    console.log('TOBLOCK ', toBlock)
     // if inclusive range is larger than batchsize, keep reducing range recursively, work back up
     if (toBlock - fromBlock >= batchSize) {
+      console.log('inside IF')
       const prevToBlock = toBlock - batchSize
       prevEvents = await this.getTransferEvents(fromBlock, prevToBlock, batchSize, prevEvents)
       fromBlock = toBlock - batchSize + 1 // +1 because of inclusivity of range
     }
+    console.log('outsideIF')
     const events = await this.getPastEvents('Transfer', { fromBlock, toBlock })
     return prevEvents.concat(events)
   }
