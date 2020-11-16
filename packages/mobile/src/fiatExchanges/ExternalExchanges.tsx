@@ -2,6 +2,8 @@ import ListItem from '@celo/react-components/components/ListItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { CURRENCY_ENUM } from '@celo/utils'
+import { StackScreenProps } from '@react-navigation/stack'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -14,6 +16,8 @@ import { EXCHANGE_PROVIDER_LINKS } from 'src/config'
 import i18n from 'src/i18n'
 import LinkArrow from 'src/icons/LinkArrow'
 import { emptyHeader } from 'src/navigator/Headers'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { navigateToURI } from 'src/utils/linking'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -28,9 +32,12 @@ export const externalExchangesScreenOptions = () => {
 export interface ExternalExchangeProvider {
   name: string
   link: string
+  currencies: CURRENCY_ENUM[]
 }
 
-function ExternalExchanges() {
+type Props = StackScreenProps<StackParamList, Screens.ExternalExchanges>
+
+function ExternalExchanges({ route }: Props) {
   const account = useSelector(currentAccountSelector)
 
   const goToProvider = (provider: ExternalExchangeProvider) => {
@@ -45,12 +52,20 @@ function ExternalExchanges() {
   }
 
   const { t } = useTranslation('fiatExchangeFlow')
-  const providers: ExternalExchangeProvider[] = EXCHANGE_PROVIDER_LINKS // TODO Dynamically fetch exchange provider links so they can be updated between releases
+
+  // TODO Dynamically fetch exchange provider links so they can be updated between releases
+  const providers: ExternalExchangeProvider[] = EXCHANGE_PROVIDER_LINKS.filter(
+    (provider) => provider.currencies.indexOf(route.params.currency) >= 0
+  )
 
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
-        <Text style={styles.pleaseSelectProvider}>{t('youCanTransfer')}</Text>
+        <Text style={styles.pleaseSelectProvider}>
+          {t('youCanTransfer', {
+            currency: route.params.currency === CURRENCY_ENUM.DOLLAR ? t('celoDollars') : 'CELO',
+          })}
+        </Text>
         <View style={styles.accountNumberContainer}>
           <View style={styles.accountNoTextContainer}>
             <Text style={styles.accountNoText}>Account</Text>

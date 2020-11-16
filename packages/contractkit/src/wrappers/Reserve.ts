@@ -2,7 +2,13 @@ import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address } from '../base'
 import { Reserve } from '../generated/Reserve'
-import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
+import {
+  BaseWrapper,
+  fixidityValueToBigNumber,
+  proxyCall,
+  proxySend,
+  valueToBigNumber,
+} from './BaseWrapper'
 
 export interface ReserveConfig {
   tobinTaxStalenessThreshold: BigNumber
@@ -24,6 +30,11 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     this.contract.methods.tobinTaxStalenessThreshold,
     undefined,
     valueToBigNumber
+  )
+  dailySpendingRatio = proxyCall(
+    this.contract.methods.getDailySpendingRatio,
+    undefined,
+    fixidityValueToBigNumber
   )
   isSpender: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isSpender)
   transferGold = proxySend(this.kit, this.contract.methods.transferGold)

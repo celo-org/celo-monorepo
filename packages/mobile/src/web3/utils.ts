@@ -6,7 +6,7 @@ import { ChainHead } from 'src/geth/actions'
 import Logger from 'src/utils/Logger'
 import { getWeb3, getWeb3Async } from 'src/web3/contracts'
 import { Tx } from 'web3-core'
-import { BlockHeader, TransactionObject } from 'web3-eth'
+import { BlockHeader, TransactionObject, TransactionReceipt } from 'web3-eth'
 
 const TAG = 'web3/utils'
 
@@ -29,6 +29,13 @@ export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
     .times(GAS_INFLATION_FACTOR)
     .integerValue()
   return gas
+}
+
+// Fetches the transaction receipt for a given hash, returning null if the transaction has not been mined.
+export async function getTransactionReceipt(txHash: string): Promise<TransactionReceipt | null> {
+  Logger.debug(TAG, `Getting transaction receipt for ${txHash}`)
+  const web3 = await getWeb3Async(false)
+  return web3.eth.getTransactionReceipt(txHash)
 }
 
 // Note: This returns Promise<Block>
