@@ -125,6 +125,11 @@ export const pagePaths = {
     name: 'Press',
     link: '/press',
   },
+  PLUMO: {
+    name: 'Plumo',
+    link: '/plumo',
+    isDark: true,
+  },
   TECH: {
     name: 'Technology',
     link: '/technology',

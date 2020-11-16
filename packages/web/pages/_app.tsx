@@ -41,7 +41,8 @@ class MyApp extends App {
     return (
       this.props.router.asPath.startsWith('/animation') ||
       this.isBrand() ||
-      this.props.router.asPath.startsWith(pagePaths.FLOWERS.link)
+      this.props.router.asPath.startsWith(pagePaths.FLOWERS.link) ||
+      this.props.router.asPath.startsWith(pagePaths.PLUMO.link)
     )
   }
 
