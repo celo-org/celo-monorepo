@@ -113,7 +113,8 @@ async function fetchOrGenerateKey(
 
   if (
     existingKey.error.errorType === SchemaErrorTypes.OffchainError &&
-    existingKey.error.error.errorType === OffchainErrorTypes.NoStorageRootProvidedData
+    (existingKey.error.error.errorType === OffchainErrorTypes.NoStorageRootProvidedData ||
+      existingKey.error.error.errorType === OffchainErrorTypes.FetchError)
   ) {
     return Ok(randomBytes(16))
   }

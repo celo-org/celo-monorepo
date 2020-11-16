@@ -1,5 +1,6 @@
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
 import { Storage } from '@google-cloud/storage'
+import { toChecksumAddress } from 'ethereumjs-util'
 import * as functions from 'firebase-functions'
 
 const storage = new Storage()
@@ -27,7 +28,7 @@ const validators: UploadValidator[] = [
   },
   {
     match: (path: string) => !!path.match(/\/ciphertexts\/[a-fA-F0-9]+$/),
-    range: () => [130, 130],
+    range: () => [128, 130],
   },
 ]
 
@@ -59,7 +60,7 @@ export const authorize = functions.https.onCall(async (payload, context) => {
 
       const [min, max] = validator.range()
 
-      const file = bucket.file(`${signer}${path}`)
+      const file = bucket.file(`${toChecksumAddress(signer)}${path}`)
       return file
         .generateSignedPostPolicyV4({
           expires: Date.now() + FIVE_MINUTES,

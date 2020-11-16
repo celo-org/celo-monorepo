@@ -1,6 +1,8 @@
-import { ensureLeading0x, Ok, Result } from '@celo/base'
+import { ensureLeading0x, eqAddress, Err, Ok, Result } from '@celo/base'
 import { Address, ContractKit, newKit } from '@celo/contractkit'
 import {
+  FetchError,
+  InvalidSignature,
   OffchainDataWrapper,
   OffchainErrors,
 } from '@celo/contractkit/lib/identity/offchain-data-wrapper'
@@ -8,7 +10,13 @@ import {
   PrivateNameAccessor,
   PublicNameAccessor,
 } from '@celo/contractkit/lib/identity/offchain/accessors/name'
-import { privateKeyToPublicKey, publicKeyToAddress } from '@celo/utils/lib/address'
+import { buildEIP712TypedData, resolvePath } from '@celo/contractkit/lib/identity/offchain/utils'
+import {
+  privateKeyToPublicKey,
+  publicKeyToAddress,
+  toChecksumAddress,
+} from '@celo/utils/lib/address'
+import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { SignedPostPolicyV4Output } from '@google-cloud/storage'
 import FormData from 'form-data'
 import * as t from 'io-ts'
@@ -27,6 +35,12 @@ writerKit.defaultAccount = writerAddress
 const readerPrivate = '0xfb90684bb1b8c11ec0cc95725985207f99a6813d6335012befd1495bd0ff9535'
 const readerPublic = privateKeyToPublicKey(readerPrivate)
 const readerAddress = publicKeyToAddress(readerPublic)
+const readerEncryptionKeyPrivate =
+  '0x2ad897e057bf61f16fd5a9aa94632ef47bb3819bd5a51d4b8afd7cbededbc7ba'
+const readerKit = newKit('https://alfajores-forno.celo-testnet.org')
+readerKit.addAccount(readerPrivate)
+readerKit.addAccount(readerEncryptionKeyPrivate)
+readerKit.defaultAccount = readerAddress
 
 async function call(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
   const { result } = await fetch('http://localhost:5001/celo-testnet/us-central1/authorize', {
@@ -40,6 +54,8 @@ async function call(data: any, signature: string): Promise<SignedPostPolicyV4Out
 
   return result as SignedPostPolicyV4Output[]
 }
+
+const valoraMetadataUrl = 'https://storage.googleapis.com/celo-test-alexh-bucket'
 
 class UploadServiceDataWrapper implements OffchainDataWrapper {
   signer: Address
@@ -91,32 +107,84 @@ class UploadServiceDataWrapper implements OffchainDataWrapper {
   }
 
   async readDataFromAsResult<DataType>(
-    _account: Address,
-    _dataPath: string,
+    account: Address,
+    dataPath: string,
     _checkOffchainSigners: boolean,
-    _type?: t.Type<DataType>
+    type?: t.Type<DataType>
   ): Promise<Result<Buffer, OffchainErrors>> {
-    throw new Error('Not implemented')
-    return Ok(Buffer.from([]))
+    let dataResponse, signatureResponse
+
+    const accountRoot = `${valoraMetadataUrl}/${toChecksumAddress(account)}`
+    try {
+      ;[dataResponse, signatureResponse] = await Promise.all([
+        fetch(resolvePath(accountRoot, dataPath)),
+        fetch(resolvePath(accountRoot, `${dataPath}.signature`)),
+      ])
+    } catch (error) {
+      return Err(new FetchError(error))
+    }
+
+    if (!dataResponse.ok) {
+      return Err(new FetchError(new Error(dataResponse.statusText)))
+    }
+    if (!signatureResponse.ok) {
+      return Err(new FetchError(new Error(signatureResponse.statusText)))
+    }
+
+    const [dataBody, signatureBody] = await Promise.all([
+      dataResponse.arrayBuffer(),
+      signatureResponse.arrayBuffer(),
+    ])
+
+    const body = Buffer.from(dataBody)
+    const signature = ensureLeading0x(Buffer.from(signatureBody).toString('hex'))
+
+    const toParse = type ? JSON.parse(body.toString()) : body
+    const typedData = await buildEIP712TypedData(this, dataPath, toParse, type)
+    const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
+    if (eqAddress(guessedSigner, account)) {
+      return Ok(body)
+    }
+
+    return Err(new InvalidSignature())
   }
 }
 
 async function main() {
-  const offchainWrapper = new UploadServiceDataWrapper(writerKit)
-  const publicWriter = new PublicNameAccessor(offchainWrapper)
-  const privateWriter = new PrivateNameAccessor(offchainWrapper)
+  const writerWrapper = new UploadServiceDataWrapper(writerKit)
+  const readerWrapper = new UploadServiceDataWrapper(readerKit)
 
-  const publicWriteError = await publicWriter.write({ name: 'Alex ' })
+  const publicWriter = new PublicNameAccessor(writerWrapper)
+  const privateWriter = new PrivateNameAccessor(writerWrapper)
+
+  const publicReader = new PublicNameAccessor(readerWrapper)
+  const privateReader = new PrivateNameAccessor(readerWrapper)
+
+  const publicWriteError = await publicWriter.write({ name: 'Alex' })
   if (publicWriteError) {
     console.log('Public accessor failed to write', publicWriteError)
     return
   }
 
-  const privateWriteError = await privateWriter.write({ name: 'Alex ' }, [readerAddress])
-  if (privateWriteError) {
-    console.log('Public accessor failed to write', privateWriteError)
+  const publicResult = await publicReader.readAsResult(writerAddress)
+  if (!publicResult.ok) {
+    console.log('Public failed', publicResult)
     return
   }
+  console.log(publicResult.result)
+
+  const privateWriteError = await privateWriter.write({ name: 'Alex' }, [readerAddress])
+  if (privateWriteError) {
+    console.log('Private accessor failed to write', privateWriteError)
+    return
+  }
+
+  const privateResult = await privateReader.readAsResult(writerAddress)
+  if (!privateResult.ok) {
+    console.log('Private read failed', privateResult)
+    return
+  }
+  console.log(privateResult.result)
 }
 
 main()
