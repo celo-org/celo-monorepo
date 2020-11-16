@@ -55,18 +55,6 @@ export async function initDatabase(doTestQuery = true) {
 
   logger.info('Running Migrations')
 
-  // This deletes the old migrations from before we used the .js extension.
-  // Without this step, knex thinks the migrations folder is corrupt.
-  // This really only needs to be run once per signer so it can be removed
-  // in future realeases.
-  await db
-    .table('knex_migrations')
-    .delete()
-    .whereIn('name', [
-      '20200330212224_create-accounts-table.ts',
-      '20200811163913_create_requests_table.ts',
-    ])
-
   await db.migrate.latest({
     directory: './dist/migrations',
     loadExtensions: ['.js'],
