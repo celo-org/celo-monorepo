@@ -6,6 +6,7 @@ export interface AksClusterConfig extends BaseClusterConfig {
   tenantId: string
   resourceGroup: string
   subscriptionId: string
+  regionName: string
 }
 
 export class AksClusterManager extends BaseClusterManager {
@@ -45,7 +46,7 @@ export class AksClusterManager extends BaseClusterManager {
     if (!aadPodIdentityExists) {
       console.info('Installing aad-pod-identity')
       await execCmdWithExitOnFailure(
-        `helm install aad-pod-identity ../helm-charts/aad-pod-identity`
+        `helm install aad-pod-identity aad-pod-identity/aad-pod-identity`
       )
     }
   }

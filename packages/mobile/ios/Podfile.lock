@@ -331,8 +331,8 @@ PODS:
     - React
   - react-native-keep-awake (4.0.0):
     - React
-  - react-native-mail (4.1.0):
-    - React
+  - react-native-mail (6.0.0):
+    - React-Core
   - react-native-netinfo (5.8.0):
     - React
   - react-native-randombytes (3.6.0):
@@ -808,7 +808,7 @@ SPEC CHECKSUMS:
   react-native-fast-crypto: 149fd8fd16e1f9bd6b6be2b8295fe0eb76923602
   react-native-geth: 51d17abd8bac4b80c4e12adb446242ba1407a0c3
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
-  react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
+  react-native-mail: 88305252f4c3fb0157015ff8a7ac9c41b321a0dd
   react-native-netinfo: b9650ab1b8b4362b3c455b1274e4bc48223cc957
   react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-safe-area-context: e22a8ca00f758273d2408953965cb8db67da7925
