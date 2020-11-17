@@ -64,7 +64,9 @@
     "location": "packages/env-tests",
     "dependencies": [
       "@celo/base",
+      "@celo/connect",
       "@celo/contractkit",
+      "@celo/identity",
       "@celo/utils"
     ]
   },

@@ -266,6 +266,10 @@ export class ContractKit {
   // Next functions exists for backwards compatibility
   // These should be consumed via connection to avoid future deprecation issues
 
+  addAccount(privateKey: string) {
+    this.connection.addAccount(privateKey)
+  }
+
   set defaultAccount(address: Address | undefined) {
     this.connection.defaultAccount = address
   }

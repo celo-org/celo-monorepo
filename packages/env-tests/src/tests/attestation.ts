@@ -50,12 +50,12 @@ export function runAttestationTest(
     // TODO: Check for TWILIO ENV vars
     test('receive attestations for a phone number', async () => {
       const root = await getKey(context.mnemonic, TestAccounts.Root)
-      context.kit.addAccount(root.privateKey)
+      context.kit.connection.addAccount(root.privateKey)
 
       const mnemonic = await generateMnemonic()
       const attestationAccount = await generateKeys(mnemonic)
       const attestationAccountAddress = privateKeyToAddress(attestationAccount.privateKey)
-      context.kit.addAccount(attestationAccount.privateKey)
+      context.kit.connection.addAccount(attestationAccount.privateKey)
       context.kit.defaultAccount = attestationAccountAddress
       const stableToken = await context.kit.contracts.getStableToken()
 
