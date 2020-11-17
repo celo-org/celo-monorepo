@@ -18,6 +18,7 @@ import {
   DrawerActions,
   DrawerNavigationState,
   useLinkBuilder,
+  ParamListBase,
 } from '@react-navigation/native'
 import { TransitionPresets } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
@@ -71,7 +72,7 @@ const TAG = 'NavigationService'
 const Drawer = createDrawerNavigator()
 
 type CustomDrawerItemListProps = Omit<DrawerContentOptions, 'contentContainerStyle' | 'style'> & {
-  state: DrawerNavigationState<any>
+  state: DrawerNavigationState<ParamListBase>
   navigation: DrawerNavigationHelpers
   descriptors: DrawerDescriptorMap
   protectedRoutes: string[]
