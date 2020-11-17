@@ -5,6 +5,10 @@ export default HandleDeepLinkDappkit = () => {
   it('Launch app with dappkit deep link', async () => {
     await device.terminateApp()
     await device.launchApp({ url: DAPPKIT_URL, newInstance: true })
+
+    // press Allow button on DappKitSignTxScreen
+    await element(by.id('DappkitAllow')).tap()
+
     // Arrived at pin code enter screen
     await expect(element(by.id('digit1'))).toBeVisible()
   })
