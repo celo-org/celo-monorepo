@@ -1,6 +1,5 @@
 import dismissBanners from './utils/banners'
 import HandleDeepLinkSend from './usecases/HandleDeepLinkSend'
-import ResetAccount from './usecases/ResetAccount'
 import RestoreAccountOnboarding from './usecases/RestoreAccountOnboarding'
 import HandleDeepLinkDappkit from './usecases/HandleDeepLinkDappkit'
 
@@ -25,5 +24,4 @@ describe('Deep Link with account dappkit', () => {
   // so we should fix that also
   describe('Onboarding', RestoreAccountOnboarding)
   describe('HandleDeepLinkSend', HandleDeepLinkDappkit)
-  describe('Reset Account', ResetAccount)
 })
