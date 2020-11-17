@@ -63,7 +63,7 @@ onboarding:
   relayer:
     host: alfajores-relayer
     port: 3000
-    rpcTimeoutMs: 5000
+    rpcTimeoutMs: 7000
   db:
     host: komenci-komenci-postgresql
     port: 5432
