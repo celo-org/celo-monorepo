@@ -1,6 +1,7 @@
 pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
@@ -229,7 +230,7 @@ contract MetaTransactionWallet is
    * @param data The concatenated data to be sent in each transaction.
    * @param dataLengths The length of each transaction's data.
    * @return The return values of all transactions appended as bytes and an array of the length
-   *         of each transaction output which will be 0 if a transaction had no output 
+   *         of each transaction output which will be 0 if a transaction had no output
    */
   function executeTransactions(
     address[] calldata destinations,
@@ -258,6 +259,21 @@ contract MetaTransactionWallet is
 
     require(dataPosition == data.length, "data cannot have extra bytes appended");
     return (returnValues, returnLengths);
+  }
+
+  /**
+   * @notice Transfers an ERC20 balance to the `signer`.
+   * @dev Valora <= v1.2 ignores the `walletAddress` of the user, which may result in cUSD being
+   *   sent to users MetaTransactionWallets instead of their EOA. This function allows that cUSD
+   *   to be transferred to the EOA without requiring action by the user.
+   * @dev Expected to be deprecated once support for withdrawing from the MTW is supported in
+       Valora.
+   * @return Whether or not the token transfer succeeded.
+   */
+  function transferERC20ToSigner(address tokenAddress) external returns (bool) {
+    IERC20 token = IERC20(tokenAddress);
+    uint256 balance = token.balanceOf(address(this));
+    return token.transfer(signer, balance);
   }
 
   /**

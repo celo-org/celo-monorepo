@@ -97,7 +97,7 @@ export default class Show extends BaseCommand {
         },
         isApproved: await governance.isApproved(id),
         isProposalPassing: await governance.isProposalPassing(id),
-        secondsUntilStages: await governance.timeUntilStages(id),
+        timeUntilStages: await governance.humanReadableTimeUntilStages(id),
       })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer

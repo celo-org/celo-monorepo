@@ -29,6 +29,7 @@ import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
 
 const debug = debugFactory('kit:kit')
+const txDebug = debugFactory('kit:tx')
 
 /**
  * Creates a new instance of `ContractKit` give a nodeUrl
@@ -198,6 +199,54 @@ export class ContractKit {
     }
   }
 
+  async getHumanReadableNetworkConfig() {
+    const token1 = await this.registry.addressFor(CeloContract.GoldToken)
+    const token2 = await this.registry.addressFor(CeloContract.StableToken)
+    const promises: Array<Promise<any>> = [
+      this.contracts.getExchange(),
+      this.contracts.getElection(),
+      this.contracts.getAttestations(),
+      this.contracts.getGovernance(),
+      this.contracts.getLockedGold(),
+      this.contracts.getSortedOracles(),
+      this.contracts.getGasPriceMinimum(),
+      this.contracts.getReserve(),
+      this.contracts.getStableToken(),
+      this.contracts.getValidators(),
+      this.contracts.getDowntimeSlasher(),
+      this.contracts.getBlockchainParameters(),
+    ]
+    const contracts = await Promise.all(promises)
+    const res = await Promise.all([
+      contracts[0].getHumanReadableConfig(),
+      contracts[1].getConfig(),
+      contracts[2].getHumanReadableConfig([token1, token2]),
+      contracts[3].getHumanReadableConfig(),
+      contracts[4].getHumanReadableConfig(),
+      contracts[5].getHumanReadableConfig(),
+      contracts[6].getConfig(),
+      contracts[7].getConfig(),
+      contracts[8].getHumanReadableConfig(),
+      contracts[9].getHumanReadableConfig(),
+      contracts[10].getHumanReadableConfig(),
+      contracts[11].getConfig(),
+    ])
+    return {
+      exchange: res[0],
+      election: res[1],
+      attestations: res[2],
+      governance: res[3],
+      lockedGold: res[4],
+      sortedOracles: res[5],
+      gasPriceMinimum: res[6],
+      reserve: res[7],
+      stableToken: res[8],
+      validators: res[9],
+      downtimeSlasher: res[10],
+      blockchainParameters: res[11],
+    }
+  }
+
   /**
    * Set CeloToken to use to pay for gas fees
    * @param token cUSD (StableToken) or CELO (GoldToken)
@@ -338,6 +387,8 @@ export class ContractKit {
     if (gas == null) {
       const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
       const getCallTx = (_tx: Tx) => {
+        // @ts-ignore missing _parent property from TransactionObject type.
+        txDebug({ ..._tx, data: txObj.encodeABI(), to: txObj._parent._address })
         // @ts-ignore missing _parent property from TransactionObject type.
         return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
       }

@@ -72,7 +72,7 @@ describe('Blockchain parameters tests', function(this: any) {
     it('block limit should have been set using governance', async () => {
       this.timeout(0)
       const res = await parameters.getBlockGasLimit()
-      assert.equal(0, res.comparedTo(10000000))
+      assert.equal(0, res.comparedTo(13000000))
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)

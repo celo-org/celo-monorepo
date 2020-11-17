@@ -142,7 +142,15 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+    location ~ /admin/.* {
+      deny all;
+    }
+    location ~ /wobserver/.* {
+      deny all;
+    }
   labels:
     app: blockscout
     chart: blockscout
@@ -153,6 +161,14 @@ spec:
   - host: ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org
     http:
       paths:
+      - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        backend:
+          serviceName: ${ingressName}-web
+          servicePort: 4000
+      - path: /(graphql|graphiql|api)
+        backend:
+          serviceName: ${ingressName}-api
+          servicePort: 4000
       - backend:
           serviceName: ${ingressName}-web
           servicePort: 4000

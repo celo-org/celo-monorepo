@@ -773,6 +773,9 @@ export async function importPrivateKey(
 ) {
   const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
 
+  if (!instance.privateKey) {
+    throw new Error('Unexpected empty private key')
+  }
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
   if (verbose) {

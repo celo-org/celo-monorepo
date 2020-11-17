@@ -7,6 +7,7 @@ import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
+  secondsToDurationString,
   toTransactionObject,
   valueToBigNumber,
   valueToFrac,
@@ -179,6 +180,17 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async getConfig(): Promise<SortedOraclesConfig> {
     return {
       reportExpirySeconds: await this.reportExpirySeconds(),
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the sortedoracles contract
+   * @return SortedOraclesConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      reportExpiry: secondsToDurationString(config.reportExpirySeconds),
     }
   }
 

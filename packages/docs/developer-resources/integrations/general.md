@@ -12,16 +12,26 @@ To be completely independent and have a reliable view into the latest chain data
 
 You can just clone [`celo-blockchain`](https://github.com/celo-org/celo-blockchain) and then run `make geth` to receive the binary.
 
-By default, `geth` will use `/root/.celo` as the data dir, if you would like to change that specify the `--datadir` argument. For common testnets, we are hosting the genesis blocks under `https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${NETWORK_NAME}\?alt\=media`. To initiate your datadir, run `geth init genesis.json` to add the genesis block.
-
-cLabs generally hosts bootnodes to help nodes discover each other on the network. You can fetch those under `https://www.googleapis.com/storage/v1/b/env_bootnodes/o/${NETWORK_NAME}\?alt\=media`.
-
-The current network ID for the Alfajores testnet is `44787`, for the Baklava testnet it is `62320`.
+By default, `geth` will use `/root/.celo` as the data dir, if you would like to change that specify the `--datadir` argument.
 
 This is all you should need to connect to a network:
 
+For Mainnet:
+
 ```bash
-geth --networkid $NETWORK_ID --bootnodes $BOOTNODES
+geth
+```
+
+For Alfajores:
+
+```bash
+geth --alfajores
+```
+
+For Baklava:
+
+```bash
+geth --baklava
 ```
 
 For more command line options, please see [https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options](https://github.com/ethereum/go-ethereum/wiki/Command-Line-Options)

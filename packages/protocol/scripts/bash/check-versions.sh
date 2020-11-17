@@ -13,7 +13,7 @@ set -euo pipefail
 OLD_BRANCH=""
 NEW_BRANCH=""
 REPORT=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-check-versions.log"
 
 while getopts 'a:b:r:l:' flag; do
   case "${flag}" in
