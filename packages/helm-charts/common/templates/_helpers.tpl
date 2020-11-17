@@ -52,8 +52,8 @@ release: {{ .Release.Name }}
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
-        wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
-        wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
+        wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/rc1?alt=media"
+        wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/rc1
       fi
       geth init /root/.celo/genesis.json
   volumeMounts:
@@ -444,9 +444,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
       # TODO(joshua): Check age of block w/ geth.
       # stat -f "%Y", date +%s get unix timesampts of mtime and current time. Maybe modify date to compare if mtime is older than a day
       # If older than upload period, remove the chain data dir.
-     [ -f /root/.celo/celo ] && exit 0
+     [ -d /root/.celo/celo ] && exit 0
      mkdir -p /root/.celo/celo
-     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/celo/chaindata /root/.celo/celo/
+     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata.tar .
+     tar -xf chaindata.tar -C /root/.celo/celo/chaindata
   volumeMounts:
   - name: data
     mountPath: /root/.celo
@@ -461,9 +462,13 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - /bin/sh
   - -c
   args:
-  - |
-     [ -f /root/.celo/celo ] || exit 0
-     gsutil -m cp -r /root/.celo/celo gs://{{ .Values.geth.gstorage_data_bucket }}/celo/chaindata 
+  - 
+     if [ ! -d /root/.celo/celo ]; then
+       exit 0
+     fi
+     cd /root/.celo/celo
+     tar -cvf chaindata.tar chaindata/
+     gsutil -m cp chaindata.tar gs://{{ .Values.geth.gstorage_data_bucket }}
   volumeMounts:
   - name: data
     mountPath: /root/.celo
