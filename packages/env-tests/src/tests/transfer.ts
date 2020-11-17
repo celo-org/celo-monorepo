@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals'
-import { Context } from '../context'
+import { EnvTestContext } from '../context'
 import { fundAccount, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runTransfercUSDTest(context: Context) {
+export function runTransfercUSDTest(context: EnvTestContext) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
     beforeAll(async () => {
@@ -18,22 +18,28 @@ export function runTransfercUSDTest(context: Context) {
       context.kit.connection.defaultFeeCurrency = stableToken.address
 
       const toBalanceBefore = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance Before', {
-        balance: toBalanceBefore.toString(),
-        account: to.address,
-      })
+      logger.debug(
+        {
+          balance: toBalanceBefore.toString(),
+          account: to.address,
+        },
+        'Get Balance Before'
+      )
 
       const receipt = await stableToken
         .transfer(to.address, ONE.toString())
         .sendAndWaitForReceipt({ from: from.address })
 
-      logger.debug('Transferred', { receipt })
+      logger.debug({ receipt }, 'Transferred')
 
       const toBalanceAfter = await stableToken.balanceOf(to.address)
-      logger.debug('Get Balance After', {
-        balance: toBalanceAfter.toString(),
-        account: to.address,
-      })
+      logger.debug(
+        {
+          balance: toBalanceAfter.toString(),
+          account: to.address,
+        },
+        'Get Balance After'
+      )
 
       expect(toBalanceAfter.minus(toBalanceBefore).isEqualTo(ONE)).toBeTruthy()
     })

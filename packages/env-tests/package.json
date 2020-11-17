@@ -13,6 +13,8 @@
     "bunyan-debug-stream": "2.0.0",
     "dotenv": "8.2.0",
     "jest": "26.4.2",
+    "moment": "^2.22.1",
+    "twilio": "^3.23.2",
     "web3": "1.2.11"
   },
 
