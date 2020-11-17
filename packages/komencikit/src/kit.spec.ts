@@ -1,5 +1,6 @@
 import { normalizeAddressWith0x } from '@celo/base'
 import { Err, Ok } from '@celo/base/lib/result'
+import { Connection } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import Web3 from 'web3'
@@ -8,6 +9,7 @@ import { AuthenticationFailed, KomenciErrorTypes, ServiceUnavailable, Unauthoris
 import { KomenciKit, KomenciOptionsInput } from './kit'
 
 jest.mock('@celo/contractkit')
+jest.mock('@celo/connect')
 jest.mock('./verifyWallet', () => ({
   verifyWallet: () => Promise.resolve(Ok(true)),
 }))
@@ -20,8 +22,10 @@ const ODIS_PUB_KEY =
   '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA'
 // @ts-ignore mocked by jest
 const contractKit = new ContractKit()
+// @ts-ignore mocked by jest
+contractKit.connection = new Connection()
 // @ts-ignore
-contractKit.web3 = { eth: { sign: jest.fn() } }
+contractKit.connection.web3 = { eth: { sign: jest.fn() } }
 
 jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
