@@ -2,9 +2,15 @@ import { concurrentMap } from '@celo/base'
 import { generateKeys } from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { Context } from './context'
+import { EnvTestContext } from './context'
 
-export async function fundAccount(context: Context, account: TestAccounts, value: BigNumber) {
+BigNumber.config({ EXPONENTIAL_AT: 1e9 })
+
+export async function fundAccount(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber
+) {
   const root = await getKey(context.mnemonic, TestAccounts.Root)
   const recipient = await getKey(context.mnemonic, account)
   const logger = context.logger.child({
@@ -19,7 +25,7 @@ export async function fundAccount(context: Context, account: TestAccounts, value
 
   const rootBalance = await stableToken.balanceOf(root.address)
   if (rootBalance.lte(value)) {
-    logger.error('error funding test account', { rootBalance: rootBalance.toString() })
+    logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
     throw new Error(
       `Root account ${root.address}'s balance (${rootBalance.toPrecision(
         4
@@ -30,7 +36,7 @@ export async function fundAccount(context: Context, account: TestAccounts, value
     .transfer(recipient.address, value.toString())
     .sendAndWaitForReceipt({ from: root.address })
 
-  logger.debug('funded test account', { receipt })
+  logger.debug({ receipt }, 'funded test account')
 }
 
 export async function getKey(mnemonic: string, account: TestAccounts) {
@@ -43,17 +49,21 @@ export enum TestAccounts {
   TransferFrom,
   TransferTo,
   Exchange,
+  Oracle,
+  GovernanceApprover,
+  ReserveSpender,
+  ReserveCustodian,
 }
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(context: Context) {
+export async function clearAllFundsToRoot(context: EnvTestContext) {
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
   )
   const root = await getKey(context.mnemonic, TestAccounts.Root)
-  context.logger.debug('clear test fund accounts', { account: root.address })
+  context.logger.debug({ account: root.address }, 'clear test fund accounts')
   const stableToken = await context.kit.contracts.getStableToken()
   const goldToken = await context.kit.contracts.getGoldToken()
   await concurrentMap(5, accounts, async (_val, index) => {
@@ -74,11 +84,14 @@ export async function clearAllFundsToRoot(context: Context) {
             .toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
-      context.logger.debug('cleared CELO', {
-        index,
-        value: celoBalance.toString(),
-        address: account.address,
-      })
+      context.logger.debug(
+        {
+          index,
+          value: celoBalance.toString(),
+          address: account.address,
+        },
+        'cleared CELO'
+      )
     }
 
     const balance = await stableToken.balanceOf(account.address)
@@ -92,11 +105,14 @@ export async function clearAllFundsToRoot(context: Context) {
             .toString()
         )
         .sendAndWaitForReceipt({ feeCurrency: stableToken.address, from: account.address })
-      context.logger.debug('cleared cUSD', {
-        index,
-        value: balance.toString(),
-        address: account.address,
-      })
+      context.logger.debug(
+        {
+          index,
+          value: balance.toString(),
+          address: account.address,
+        },
+        'cleared cUSD'
+      )
     }
   })
 }
