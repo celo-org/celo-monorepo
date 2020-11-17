@@ -56,19 +56,9 @@ function decodeTransferLog(log: Log): Transfer | null {
     return null
   }
 
-  /**
-   * Decode using the parameter signature for an ERC20 Transfer event
-   * For unknown reasons, blockscout includes an extra unknown param in the log's topics list
-   * Including this unknown param in the input list or decoding won't work
-   */
   try {
     const decodedLog = abiCoder.decodeLog(
       [
-        {
-          indexed: true,
-          name: 'unknown',
-          type: 'address',
-        },
         {
           indexed: true,
           name: 'from',
@@ -86,7 +76,8 @@ function decodeTransferLog(log: Log): Transfer | null {
         },
       ],
       log.data,
-      log.topics.filter(notEmpty)
+      // Docs: An array with the index parameter topics of the log, without the topic[0] if its a non-anonymous event.
+      log.topics.slice(1).filter(notEmpty)
     )
 
     return {
