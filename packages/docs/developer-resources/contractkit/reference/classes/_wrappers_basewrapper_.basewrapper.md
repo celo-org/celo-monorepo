@@ -18,9 +18,7 @@ Base ContractWrapper
 
   ↳ [BlockchainParametersWrapper](_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
 
-  ↳ [DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)
-
-  ↳ [DowntimeSlasherWrapper](_wrappers_downtimeslasher_.downtimeslasherwrapper.md)
+  ↳ [BaseSlasher](_wrappers_baseslasher_.baseslasher.md)
 
   ↳ [ElectionWrapper](_wrappers_election_.electionwrapper.md)
 

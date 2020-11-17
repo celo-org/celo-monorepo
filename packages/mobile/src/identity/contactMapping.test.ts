@@ -1,5 +1,5 @@
 import { eqAddress, NULL_ADDRESS } from '@celo/base'
-import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationStat } from '@celo/contractkit/lib/wrappers/Attestations'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
@@ -83,12 +83,16 @@ describe('Fetch Addresses Saga', () => {
       [mockE164Number]: [mockAccount.toLowerCase()],
     }
 
-    const mockPhoneNumberLookup: IdentifierLookupResult = {
-      [mockE164NumberHash]: { [mockAccount]: { completed: 3, total: 3 } },
+    const mockAccountsForIdentifier: string[] = [mockAccount]
+
+    const mockStats: AttestationStat = {
+      completed: 3,
+      total: 3,
     }
 
     const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+      lookupAccountsForIdentifier: jest.fn(() => mockAccountsForIdentifier),
+      getAttestationStat: jest.fn(() => mockStats),
     }
 
     const mockAccountsWrapper = {
@@ -133,12 +137,16 @@ describe('Fetch Addresses Saga', () => {
       [mockE164Number]: [mockAccount.toLowerCase()],
     }
 
-    const mockPhoneNumberLookup: IdentifierLookupResult = {
-      [mockE164NumberHash]: { [mockAccount]: { completed: 3, total: 3 } },
+    const mockAccountsForIdentifier: string[] = [mockAccount]
+
+    const mockStats: AttestationStat = {
+      completed: 3,
+      total: 3,
     }
 
     const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+      lookupAccountsForIdentifier: jest.fn(() => mockAccountsForIdentifier),
+      getAttestationStat: jest.fn(() => mockStats),
     }
 
     const mockAccountsWrapper = {
@@ -181,12 +189,16 @@ describe('Fetch Addresses Saga', () => {
       [mockE164Number]: [mockAccount.toLowerCase()],
     }
 
-    const mockPhoneNumberLookup: IdentifierLookupResult = {
-      [mockE164NumberHash]: { [mockAccount]: { completed: 3, total: 3 } },
+    const mockAccountsForIdentifier: string[] = [mockAccount]
+
+    const mockStats: AttestationStat = {
+      completed: 3,
+      total: 3,
     }
 
     const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+      lookupAccountsForIdentifier: jest.fn(() => mockAccountsForIdentifier),
+      getAttestationStat: jest.fn(() => mockStats),
     }
 
     const mockAccountsWrapper = {
@@ -228,15 +240,16 @@ describe('Fetch Addresses Saga', () => {
     const mockWallet = mockAccount
     const mockWallet2 = mockAccount2
 
-    const mockPhoneNumberLookup: IdentifierLookupResult = {
-      [mockE164NumberHash]: {
-        [mockAccount]: { completed: 3, total: 3 },
-        [mockAccount2]: { completed: 3, total: 3 },
-      },
+    const mockAccountsForIdentifier: string[] = [mockAccount, mockAccount2]
+
+    const mockStats: AttestationStat = {
+      completed: 3,
+      total: 3,
     }
 
     const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+      lookupAccountsForIdentifier: jest.fn(() => mockAccountsForIdentifier),
+      getAttestationStat: jest.fn(() => mockStats),
     }
 
     const mockAccountsWrapper = {
@@ -295,15 +308,16 @@ describe('Fetch Addresses Saga', () => {
     const mockWallet = mockAccount
     const mockWallet3 = mockAccount3
 
-    const mockPhoneNumberLookup: IdentifierLookupResult = {
-      [mockE164NumberHash]: {
-        [mockAccount]: { completed: 3, total: 3 },
-        [mockAccount3]: { completed: 3, total: 3 },
-      },
+    const mockAccountsForIdentifier: string[] = [mockAccount, mockAccount3]
+
+    const mockStats: AttestationStat = {
+      completed: 3,
+      total: 3,
     }
 
     const mockAttestationsWrapper = {
-      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+      lookupAccountsForIdentifier: jest.fn(() => mockAccountsForIdentifier),
+      getAttestationStat: jest.fn(() => mockStats),
     }
 
     const mockAccountsWrapper = {
