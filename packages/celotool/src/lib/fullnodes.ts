@@ -1,6 +1,6 @@
 import stringHash from 'string-hash'
 import { getAksClusterConfig, getAwsClusterConfig, getCloudProviderFromContext, getContextDynamicEnvVarValues, getGCPClusterConfig, readableContext } from './context-utils'
-import { DynamicEnvVar, envVar, fetchEnv } from './env-utils'
+import { DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from './env-utils'
 import { CloudProvider } from './k8s-cluster/base'
 import { AksFullNodeDeploymentConfig } from './k8s-fullnode/aks'
 import { AwsFullNodeDeploymentConfig } from './k8s-fullnode/aws'
@@ -43,7 +43,7 @@ export function getFullNodeDeployerForContext(celoEnv: string, context: string, 
       ...deploymentConfig,
       nodeKeyGenerationInfo: {
         mnemonic: fetchEnv(envVar.MNEMONIC),
-        derivationIndex: stringHash(context),
+        derivationIndex: stringHash(getNodeKeyDerivationString(context)),
       }
     }
   }
@@ -101,6 +101,12 @@ function uploadStaticNodeEnodes(celoEnv: string, context: string, enodes: string
     `${env}.${readableContext(context)}`,
     enodes
   )
+}
+
+function getNodeKeyDerivationString(context: string) {
+  return getDynamicEnvVarValue(DynamicEnvVar.FULL_NODES_NODEKEY_DERIVATION_STRING, {
+    context
+  })
 }
 
 /**
