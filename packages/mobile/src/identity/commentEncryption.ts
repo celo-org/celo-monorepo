@@ -2,8 +2,9 @@
 // Use these instead of the functions in @celo/utils/src/commentEncryption
 // because these manage comment metadata
 
+import { Address } from '@celo/base'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
-import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import {
   decryptComment as decryptCommentRaw,
@@ -11,15 +12,15 @@ import {
 } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { memoize, values } from 'lodash'
-import { call, put, select } from 'redux-saga/effects'
+import { all, call, put, select } from 'redux-saga/effects'
 import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { features } from 'src/flags'
 import i18n from 'src/i18n'
 import { updateE164PhoneNumberAddresses, updateE164PhoneNumberSalts } from 'src/identity/actions'
 import {
-  getAddressesFromLookupResult,
-  lookupAttestationIdentifiers,
+  filterNonVerifiedAddresses,
+  lookupAccountAddressesForIdentifier,
 } from 'src/identity/contactMapping'
 import { getUserSelfPhoneHashDetails } from 'src/identity/privateHashing'
 import {
@@ -31,6 +32,7 @@ import {
 } from 'src/identity/reducer'
 import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { getContractKit } from 'src/web3/contracts'
 import { doFetchDataEncryptionKey } from 'src/web3/dataEncryptionKey'
 import { dataEncryptionKeySelector } from 'src/web3/selectors'
 
@@ -221,42 +223,52 @@ function* verifyIdentityMetadata(data: IdentityMetadataInTx[]) {
   // 2. Some duped phone hashes could be true, others false
   // 3. And a given phoneHash could legitimately have multiple addresses
 
+  const contractKit = yield call(getContractKit)
+  const accountsWrapper: AccountsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAccounts,
+  ])
+
   if (!data || !data.length) {
     return []
   }
 
-  const phoneHashes = new Set<string>()
-  data.map((d) => {
-    const phoneHash = getPhoneHash(d.e164Number, d.salt)
-    phoneHashes.add(phoneHash)
-    d.phoneHash = phoneHash
-  })
+  const verifiedTx = []
+  for (const metadata of data) {
+    const phoneHash = getPhoneHash(metadata.e164Number, metadata.salt)
+    metadata.phoneHash = phoneHash
+    const accountAddresses: Address[] = yield call(lookupAccountAddressesForIdentifier, phoneHash)
 
-  const lookupResult: IdentifierLookupResult = yield call(
-    lookupAttestationIdentifiers,
-    Array.from(phoneHashes)
-  )
-
-  return data.filter((d) => {
-    const onChainAddresses = getAddressesFromLookupResult(lookupResult, d.phoneHash!)
-    if (!onChainAddresses || !onChainAddresses.length) {
+    // Check that there are verified addresses.
+    const verifiedAccountAddresses: Address[] = yield call(
+      filterNonVerifiedAddresses,
+      accountAddresses,
+      phoneHash
+    )
+    if (verifiedAccountAddresses.length === 0) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
-        `Phone number and/or salt claimed by address ${d.address} is not verified. Values are incorrect or sender is impersonating another number`
+        `Phone number and/or salt claimed by address ${metadata.address} is not verified. Values are incorrect or sender is impersonating another number`
       )
-      return false
+      continue
     }
-
-    if (!onChainAddresses.find((a) => eqAddress(a, d.address))) {
+    const walletAddresses: Address[] = yield all(
+      verifiedAccountAddresses.map((accountAddress) =>
+        call(accountsWrapper.getWalletAddress, accountAddress)
+      )
+    )
+    if (!walletAddresses.some((walletAddress) => eqAddress(walletAddress, metadata.address))) {
       Logger.warn(
         TAG + 'verifyIdentityMetadata',
-        `Phone number and/or salt claimed by address ${d.address} does not match any on-chain addresses. Values are incorrect or sender is impersonating another number`
+        `Phone number and/or salt claimed by address ${metadata.address} does not match any on-chain addresses. Values are incorrect or sender is impersonating another number`
       )
-      return false
+      continue
     }
 
-    return true
-  })
+    verifiedTx.push(metadata)
+  }
+
+  return verifiedTx
 }
 
 // Dispatch updates to store with the new information
