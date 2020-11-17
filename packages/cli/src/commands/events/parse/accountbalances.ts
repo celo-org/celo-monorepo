@@ -30,14 +30,17 @@ export default class AccountBalances extends BaseCommand {
     const outputJson = res.flags.outputJson
     const filter = res.flags.filter
     const filterByAddrs = filter ? JSON.parse(fs.readFileSync(filter, 'utf8')) : undefined
+
     // parse multiple Json events input files
     const events = res.flags.eventsJson.reduce((arr: EventLog[], eventsArr): EventLog[] => {
       const events = JSON.parse(fs.readFileSync(eventsArr, 'utf8'))
       return arr.concat(events)
     }, [])
+
+    // calculate balances
     const balances = await accountBalances(events, filterByAddrs)
 
-    // Output results to a JSON file if set
+    // Output results
     if (outputJson) {
       const fileName = `balances${filter ? '-filtered' : ''}.json`
       fs.writeFile(fileName, JSON.stringify(balances, null, 2), (err) => {

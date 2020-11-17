@@ -15,8 +15,6 @@ export default class TransferEventscUSD extends BaseCommand {
     }),
   }
 
-  static examples = ['status']
-
   async run() {
     const res = this.parse(TransferEventscUSD)
     const fromBlock = res.flags.fromBlock

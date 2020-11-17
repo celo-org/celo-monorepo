@@ -15,8 +15,6 @@ export default class AttestationCompletedEvents extends BaseCommand {
     }),
   }
 
-  static examples = ['status']
-
   async run() {
     const res = this.parse(AttestationCompletedEvents)
     const fromBlock = res.flags.fromBlock

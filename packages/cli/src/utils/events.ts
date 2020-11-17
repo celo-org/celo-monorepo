@@ -1,6 +1,27 @@
 import { BigNumber } from 'bignumber.js'
 import { EventLog } from 'web3-core'
 
+export async function attestedAccounts(events: EventLog[], minimum: number): Promise<string[]> {
+  let verifiedAccounts: string[] = []
+  let issuers: { [account: string]: string[] } = {}
+
+  events.forEach(function(eventlog: EventLog) {
+    checkEventType(eventlog, 'AttestationCompleted')
+    const account: string = eventlog.returnValues.account
+    const issuer: string = eventlog.returnValues.issuer
+    if (!issuers[account]) {
+      issuers[account] = [issuer]
+    } else if (issuers[account].indexOf(issuer) === -1) {
+      issuers[account].push(issuer)
+    }
+    if (issuers[account].length === minimum) {
+      verifiedAccounts.push(account)
+    }
+  })
+  // filter repeat accounts (which would have had multiple attatestioncompleted from the final issuer)
+  return verifiedAccounts.filter((acct, index) => verifiedAccounts.indexOf(acct) == index)
+}
+
 export async function accountBalances(
   events: EventLog[],
   addressFilter: string[] | undefined
@@ -65,27 +86,6 @@ export async function accountBalancesTWA(
   return calculateTimeWeightedAverage(balancesByBlock, fromBlock, toBlock)
 }
 
-export async function attestedAccounts(events: EventLog[], minimum: number): Promise<string[]> {
-  let verifiedAccounts: string[] = []
-  let issuers: { [account: string]: string[] } = {}
-
-  events.forEach(function(eventlog: EventLog) {
-    checkEventType(eventlog, 'AttestationCompleted')
-    const account: string = eventlog.returnValues.account
-    const issuer: string = eventlog.returnValues.issuer
-    if (!issuers[account]) {
-      issuers[account] = [issuer]
-    } else if (issuers[account].indexOf(issuer) === -1) {
-      issuers[account].push(issuer)
-    }
-    if (issuers[account].length === minimum) {
-      verifiedAccounts.push(account)
-    }
-  })
-  // filter repeat accounts (which would have had multiple attatestioncompleted from the final issuer)
-  return verifiedAccounts.filter((acct, index) => verifiedAccounts.indexOf(acct) == index)
-}
-
 function checkEventType(event: EventLog, eventType: string) {
   if (event.event !== eventType) {
     const err = `Event mismatch: expected ${eventType} but received ${event.event}`
@@ -110,7 +110,7 @@ function calculateTimeWeightedAverage(
   fromBlock: number,
   toBlock: number
 ): { [address: string]: BigNumber } {
-  let averagedBalances: { [key: string]: any } = {}
+  let averagedBalances: { [key: string]: BigNumber } = {}
   Object.keys(balancesTWA).forEach((address) => {
     const balances = balancesTWA[address].balances
     const blocks = balancesTWA[address].blocks
