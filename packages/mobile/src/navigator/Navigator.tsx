@@ -112,6 +112,7 @@ export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
       gestureEnabled: true,
       cardOverlayEnabled: true,
       headerStatusBarHeight:
+        // @ts-ignore
         navigation.dangerouslyGetState().routes.indexOf(route) > 0 ? 0 : undefined,
       ...TransitionPresets.ModalPresentationIOS,
     },

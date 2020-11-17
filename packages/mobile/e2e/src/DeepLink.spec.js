@@ -2,8 +2,9 @@ import dismissBanners from './utils/banners'
 import HandleDeepLinkSend from './usecases/HandleDeepLinkSend'
 import ResetAccount from './usecases/ResetAccount'
 import RestoreAccountOnboarding from './usecases/RestoreAccountOnboarding'
+import HandleDeepLinkDappkit from './usecases/HandleDeepLinkDappkit'
 
-describe('Deep link without account', () => {
+describe('Deep link without account send', () => {
   beforeEach(dismissBanners)
 
   // The behavior for this case is not really specified yet
@@ -17,10 +18,12 @@ describe('Deep link without account', () => {
   describe('HandleDeepLinkSend', HandleDeepLinkSend)
 })
 
-//describe('Deep Link with account', () => {
-//  beforeEach(dismissBanners)
-
-//  describe('Onboarding', RestoreAccountOnboarding)
-//  describe('HandleDeepLinkSend', HandleDeepLinkSend)
-//  describe('Reset Account', ResetAccount)
-//})
+describe('Deep Link with account dappkit', () => {
+  beforeEach(dismissBanners)
+  // actually if the account is not setup the experience is bad
+  // because we don't check anything and obviously things fail
+  // so we should fix that also
+  describe('Onboarding', RestoreAccountOnboarding)
+  describe('HandleDeepLinkSend', HandleDeepLinkDappkit)
+  describe('Reset Account', ResetAccount)
+})
