@@ -185,9 +185,7 @@ describe('slashing tests', function(this: any) {
     it('should parse blockNumber from test header', async () => {
       this.timeout(0)
       const contract = await kit._web3Contracts.getElection()
-      const header = kit.connection.web3.utils.hexToBytes(headerHex)
-
-      const blockNumber = await contract.methods.getBlockNumberFromHeader(header).call()
+      const blockNumber = await contract.methods.getBlockNumberFromHeader(headerHex).call()
       assert.equal(blockNumber, '1')
     })
 
@@ -202,8 +200,7 @@ describe('slashing tests', function(this: any) {
 
     it('should hash test header correctly', async () => {
       const contract = await kit._web3Contracts.getElection()
-      const header = kit.connection.web3.utils.hexToBytes(headerHex)
-      const hash = await contract.methods.hashHeader(header).call()
+      const hash = await contract.methods.hashHeader(headerHex).call()
       assert.equal(hash, '0x2e14ef428293e41c5f81a108b5d36f892b2bee3e34aec4223474c4a31618ea69')
     })
 
