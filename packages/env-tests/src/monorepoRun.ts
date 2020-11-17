@@ -3,7 +3,10 @@ import { describe } from '@jest/globals'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot } from './scaffold'
+import { runAttestationTest } from './tests/attestation'
 import { runExchangeTest } from './tests/exchange'
+import { runOracleTest } from './tests/oracle'
+import { runReserveTest } from './tests/reserve'
 import { runTransfercUSDTest } from './tests/transfer'
 
 jest.setTimeout(120000)
@@ -17,9 +20,16 @@ function runTests() {
   const mnemonic = process.env.MNEMONIC!
 
   describe('Run tests in context of monorepo', () => {
+    const context = { kit, mnemonic, logger: rootLogger }
     // TODO: Assert maximum loss after test
-    runTransfercUSDTest({ kit, mnemonic, logger: rootLogger })
-    runExchangeTest({ kit, mnemonic, logger: rootLogger })
+    runTransfercUSDTest(context)
+    runExchangeTest(context)
+    runOracleTest(context)
+    runReserveTest(context)
+    runAttestationTest(context)
+
+    // TODO: Governance Proposals
+    // TODO: Validator election + Slashing
 
     afterAll(async () => {
       await clearAllFundsToRoot({ kit, mnemonic, logger: rootLogger })
