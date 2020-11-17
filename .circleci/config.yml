@@ -405,7 +405,15 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli --ignore @celo/env-tests run test
+            yarn run lerna \
+              --ignore @celo/contractkit \
+              --ignore @celo/mobile \
+              --ignore @celo/protocol \
+              --ignore @celo/celotool \
+              --ignore @celo/celocli \
+              --ignore @celo/env-tests \
+              --ignore '@celo/wallet-*' \
+              run test
 
       - store_test_results:
           path: test-results
@@ -626,6 +634,15 @@ jobs:
               echo "There are git differences after generating contractkit docs"
               exit 1
             fi
+  
+  wallets-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn run lerna --scope '@celo/wallet-*' run test
 
   cli-test:
     <<: *defaults
@@ -1001,6 +1018,9 @@ workflows:
           requires:
             - install_dependencies
       - contractkit-test:
+          requires:
+            - install_dependencies
+      - wallets-test:
           requires:
             - install_dependencies
       - mobile-test:
