@@ -1,7 +1,7 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { assignRoleIdempotent, createIdentityIdempotent, deleteIdentity, getAKSManagedServiceIdentityObjectId, getAKSServicePrincipalObjectId, getIdentity } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl, getRelayerHttpRpcInternalUrl } from 'src/lib/endpoints'
+import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
@@ -150,7 +150,6 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     },
     context
   )
-  const clusterIP = getRelayerHttpRpcInternalUrl(celoEnv)
   const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
     : getFullNodeHttpRpcInternalUrl(celoEnv)
@@ -170,7 +169,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set komenci.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set onboarding.recaptchaToken=${recaptchaToken}`,
     `--set onboarding.replicas=${replicas}`,
-    `--set onboarding.relayerUrls=${clusterIP}`,
+    `--set onboarding.relayer.host=${celoEnv + "-relayer"}`,
     `--set onboarding.db.host=${databaseConfig.host}`,
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
@@ -185,7 +184,6 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
-    `--set relayer.host=${celoEnv + "-relayer"}`,
     `--set relayer.onchain.network=${vars.network}`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
