@@ -1,4 +1,4 @@
-import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName, getDynamicEnvVarValue } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from 'src/lib/env-utils'
 import { Argv } from 'yargs'
 import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
