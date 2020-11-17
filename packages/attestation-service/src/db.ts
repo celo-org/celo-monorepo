@@ -19,6 +19,8 @@ export let sequelize: Sequelize | undefined
 
 let dbRecordExpiryMins: number | null
 
+const maxAgeLatestBlock: number = parseInt(fetchEnvOrDefault('MAX_AGE_LATEST_BLOCK_SECS', '20'), 10)
+
 export type SequelizeLogger = boolean | ((sql: string, timing?: number) => void)
 
 export function makeSequelizeLogger(logger: Logger): SequelizeLogger {
@@ -270,7 +272,7 @@ export async function doHealthCheck(): Promise<string | null> {
     }
 
     const { ageOfLatestBlock } = await getAgeOfLatestBlock()
-    if (ageOfLatestBlock > 15) {
+    if (ageOfLatestBlock > maxAgeLatestBlock) {
       Gauges.healthy.set(0)
       return ErrorMessages.NODE_IS_STUCK
     }

@@ -12,6 +12,8 @@ import { sample } from 'lodash'
 import moment from 'moment'
 import { Twilio } from 'twilio'
 
+const DUMMY_SMS_URL = 'https://enzyutth0wxme.x.pipedream.net/'
+
 // Use the supplied salt, or if none supplied, go to ODIS and retrieve a pepper
 export async function getIdentifierAndPepper(kit : ContractKit, context : string, account : string, phoneNumber : string, salt : string | null) {
   if (salt) {
@@ -87,13 +89,19 @@ export async function requestAttestationsFromIssuers(
           text: await response.text(),
           issuer: attestation.issuer,
           name: attestation.name,
+          url: attestation.attestationServiceURL,
           known: true,
         }
       }
 
       return
     } catch (error) {
-      return { error, issuer: attestation.issuer, known: false }
+      return {
+        error,
+        issuer: attestation.issuer,
+        url: attestation.attestationServiceURL,
+        known: false,
+      }
     }
   })
 }
@@ -165,7 +173,6 @@ export async function findValidCode(
 export async function getPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
-  addressSid: string,
   maximumNumberOfAttestations: number,
   salt: string
 ) {
@@ -180,7 +187,7 @@ export async function getPhoneNumber(
     return phoneNumber
   }
 
-  return createPhoneNumber(attestations, twilioClient, addressSid, maximumNumberOfAttestations, salt)
+  return createPhoneNumber(attestations, twilioClient, maximumNumberOfAttestations, salt)
 }
 
 export async function chooseFromAvailablePhoneNumbers(
@@ -189,7 +196,13 @@ export async function chooseFromAvailablePhoneNumbers(
   maximumNumberOfAttestations: number,
   salt: string,
 ) {
-  const availableNumbers = await twilioClient.incomingPhoneNumbers.list()
+  const availableNumbers = (await twilioClient.incomingPhoneNumbers.list()).filter(
+    (number) => number.smsUrl === DUMMY_SMS_URL
+  )
+  if (!availableNumbers?.length) {
+    return undefined
+  }
+
   const usableNumber = await findSuitableNumber(
     attestations,
     availableNumbers.map((number) => number.phoneNumber),
@@ -227,7 +240,6 @@ async function findSuitableNumber(
 export async function createPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
-  addressSid: string,
   maximumNumberOfAttestations: number,
   salt: string
 ) {
@@ -236,7 +248,14 @@ export async function createPhoneNumber(
   while (true) {
     const countryCode = sample(countryCodes)
     const context = await twilioClient.availablePhoneNumbers.get(countryCode!)
-    const numbers = await context.mobile.list({ limit: 100 })
+    let numbers
+    try {
+      numbers = await context.mobile.list({ limit: 100 })
+    }
+    catch {
+      // Some geos inc US appear to have no 'mobile' subcategory.
+      numbers = await context.local.list({ limit: 100 })
+    }
 
     const usableNumber = await findSuitableNumber(
       attestations,
@@ -257,9 +276,8 @@ export async function createPhoneNumber(
 
     await twilioClient.incomingPhoneNumbers.create({
       phoneNumber: usableNumber,
-      addressSid,
       // Just an requestbin.com endpoint to avoid errors
-      smsUrl: 'https://enzyutth0wxme.x.pipedream.net/',
+      smsUrl: DUMMY_SMS_URL,
     })
 
     return usableNumber

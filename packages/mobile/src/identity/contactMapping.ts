@@ -238,7 +238,7 @@ function* fetchWalletAddresses(e164Number: string) {
     accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
   )
 
-  const possibleUserAddresses: string[] = []
+  const possibleUserAddresses: Set<string> = new Set()
   const walletToAccountAddress: WalletToAccountAddressType = {}
   for (const [i, address] of walletAddresses.entries()) {
     const accountAddress = normalizeAddressWith0x(accountAddresses[i])
@@ -248,15 +248,15 @@ function* fetchWalletAddresses(e164Number: string) {
     // once I've built from the monorepo
     if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
       walletToAccountAddress[walletAddress] = accountAddress
-      possibleUserAddresses.push(walletAddress)
+      possibleUserAddresses.add(walletAddress)
     } else {
       // NOTE: Only need this else block if we are not confident all wallets are registered
       walletToAccountAddress[accountAddress] = accountAddress
-      possibleUserAddresses.push(accountAddress)
+      possibleUserAddresses.add(accountAddress)
     }
   }
   yield put(updateWalletToAccountAddress(walletToAccountAddress))
-  return possibleUserAddresses
+  return Array.from(possibleUserAddresses)
 }
 
 // Returns a list of account addresses for the identifier received.
