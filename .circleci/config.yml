@@ -412,8 +412,23 @@ jobs:
               --ignore @celo/celotool \
               --ignore @celo/celocli \
               --ignore @celo/env-tests \
-              --ignore '@celo/wallet-*' \
+              --ignore @celo/web \
               run test
+
+      - store_test_results:
+          path: test-results
+
+  web-test: 
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: jest tests
+          command: |
+            mkdir -p test-results/jest
+            yarn --cwd=packages/web run test
 
       - store_test_results:
           path: test-results
@@ -1015,6 +1030,9 @@ workflows:
           requires:
             - install_dependencies
       - cli-test:
+          requires:
+            - install_dependencies
+      - web-test:
           requires:
             - install_dependencies
       - contractkit-test:
