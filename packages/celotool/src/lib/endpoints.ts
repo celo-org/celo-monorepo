@@ -37,10 +37,6 @@ export function getFullNodeHttpRpcInternalUrl(celoEnv: string) {
   return `http://${celoEnv}-fullnodes-rpc.${celoEnv}.svc.cluster.local:8545`
 }
 
-export function getRelayerHttpRpcInternalUrl(celoEnv: string) {
-  return `http://${celoEnv}-relayers.${celoEnv}.svc.cluster.local:8545`
-}
-
 export function getFullNodeWebSocketRpcInternalUrl(celoEnv: string) {
   return `ws://${celoEnv}-fullnodes-rpc.${celoEnv}.svc.cluster.local:8546`
 }
