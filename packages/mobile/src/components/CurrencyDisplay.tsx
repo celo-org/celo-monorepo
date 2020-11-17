@@ -14,6 +14,7 @@ import {
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
 import { CurrencyInfo } from 'src/send/SendConfirmation'
+import { VALORA_BALANCE_UPPER_BOUND } from 'src/tokens/saga'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
   getCentAwareMoneyDisplay,
@@ -180,7 +181,9 @@ export default function CurrencyDisplay({
   const sign = value?.isNegative() ? '-' : showExplicitPositiveSign ? '+' : ''
   const formatAmount = getFormatFunction(formatType)
   const formattedValue =
-    value && displayCurrency ? formatAmount(value.absoluteValue(), displayCurrency) : '-'
+    value && displayCurrency && value.lt(VALORA_BALANCE_UPPER_BOUND)
+      ? formatAmount(value.absoluteValue(), displayCurrency)
+      : '-'
   const code = displayAmount?.currencyCode
   const fullCurrencyName = getFullCurrencyName(displayCurrency)
 

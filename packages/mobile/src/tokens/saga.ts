@@ -18,6 +18,10 @@ import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
 
+// We can safely assume that any balance query returning a number
+// higher than this is incorrect (currently set to 10M)
+export const VALORA_BALANCE_UPPER_BOUND = new BigNumber('1e10')
+
 // The number of wei that represent one unit in a contract
 const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.GOLD]: null,
@@ -73,15 +77,19 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
-      ValoraAnalytics.track(
-        AppEvents.fetch_balance,
-        token === CURRENCY_ENUM.DOLLAR
-          ? {
-              dollarBalance: balance.toString(),
-            }
-          : { goldBalance: balance.toString() }
-      )
+
       yield put(actionCreator(balance.toString()))
+      // Only log balances less than the upper bound
+      if (balance.lt(VALORA_BALANCE_UPPER_BOUND)) {
+        ValoraAnalytics.track(
+          AppEvents.fetch_balance,
+          token === CURRENCY_ENUM.DOLLAR
+            ? {
+                dollarBalance: balance.toString(),
+              }
+            : { goldBalance: balance.toString() }
+        )
+      }
     } catch (error) {
       Logger.error(tag, 'Error fetching balance', error)
     }
