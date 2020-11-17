@@ -12,6 +12,6 @@ module.exports = {
   // TODO: Need ganache?
   // globalSetup: '<rootDir>/src/test-utils/setup.global.ts',
   // globalTeardown: '<rootDir>/src/test-utils/teardown.global.ts',
-  testSequencer: '<rootDir>/../contractkit/src/test-utils/AlphabeticSequencer.js',
+  testSequencer: '<rootDir>/../sdk/contractkit/src/test-utils/AlphabeticSequencer.js',
   verbose: true,
 }
