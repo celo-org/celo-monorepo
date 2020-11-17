@@ -30,10 +30,6 @@ export interface StableTokenConfig {
   inflationParameters: InflationParameters
 }
 
-interface BalanceMap {
-  [key: string]: BigNumber
-}
-
 /**
  * Stable token with variable supply (cUSD)
  */
@@ -209,11 +205,23 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param to The address to transfer to.
    * @param value The amount to be transferred.
    */
-
   transfer: (to: string, value: string | number) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.transfer
   )
+
+  /**
+   * Transfers StableToken from one address to another on behalf of a user.
+   * @param from The address to transfer StableToken from.
+   * @param to The address to transfer StableToken to.
+   * @param value The amount of StableToken to transfer.
+   * @return True if the transaction succeeds.
+   */
+  transferFrom: (
+    from: string,
+    to: string,
+    value: string | number
+  ) => CeloTransactionObject<boolean> = proxySend(this.kit, this.contract.methods.transferFrom)
 
   async getTransferEvents(
     fromBlock: number,

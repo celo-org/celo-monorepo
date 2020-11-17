@@ -28,16 +28,14 @@ export default class AttestedAccounts extends BaseCommand {
 
     // Output results to a JSON file if set
     if (outputJson) {
-      fs.writeFile(
-        `accounts-${minimum}-attestations.json`,
-        JSON.stringify(verifiedAccounts, null, 2),
-        (err) => {
-          if (err) throw err
-        }
-      )
+      const fileName = `accounts-${minimum}-attestations.json`
+      fs.writeFile(fileName, JSON.stringify(verifiedAccounts, null, 2), (err) => {
+        if (err) throw err
+      })
+      console.log(`Results output to: ${fileName}`)
+    } else {
+      printValueMapRecursive(verifiedAccounts)
     }
-
-    printValueMapRecursive(verifiedAccounts)
     console.log('Total verified accounts reported:', verifiedAccounts.length)
   }
 }

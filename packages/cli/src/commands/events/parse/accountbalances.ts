@@ -12,8 +12,9 @@ export default class AccountBalances extends BaseCommand {
     ...BaseCommand.flags,
     eventsJson: flags.string({
       required: true,
+      // since the number of events can be large, you may be splitting them over several files
       multiple: true,
-      description: 'file containing transfer events',
+      description: 'files containing transfer events',
     }),
     filter: flags.string({
       required: false,
@@ -38,16 +39,14 @@ export default class AccountBalances extends BaseCommand {
 
     // Output results to a JSON file if set
     if (outputJson) {
-      fs.writeFile(
-        `balances${filter ? '-filtered' : ''}.json`,
-        JSON.stringify(balances, null, 2),
-        (err) => {
-          if (err) throw err
-        }
-      )
+      const fileName = `balances${filter ? '-filtered' : ''}.json`
+      fs.writeFile(fileName, JSON.stringify(balances, null, 2), (err) => {
+        if (err) throw err
+      })
+      console.log(`Results output to: ${fileName}`)
+    } else {
+      printValueMapRecursive(balances)
     }
-
-    printValueMapRecursive(balances)
     console.log('Total accounts reported:', Object.keys(balances).length)
   }
 }

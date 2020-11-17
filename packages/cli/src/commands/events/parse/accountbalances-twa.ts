@@ -1,4 +1,5 @@
 import { flags } from '@oclif/command'
+import { BigNumber } from 'bignumber.js'
 import fs from 'fs'
 import { EventLog } from 'web3-core'
 import { BaseCommand } from '../../../base'
@@ -6,20 +7,22 @@ import { printValueMapRecursive } from '../../../utils/cli'
 import { accountBalancesTWA } from '../../../utils/events'
 
 export default class AccountBalancesTWA extends BaseCommand {
-  static description = 'Parses Events for data'
+  static description = 'Parses events data to find the time-weighted balance over a range of blocks'
 
   static flags = {
     ...BaseCommand.flags,
+    fromBlock: flags.integer({ required: true, description: 'starting block' }),
+    toBlock: flags.integer({ required: true, description: 'ending block' }),
     initialBalances: flags.string({
       required: true,
       description:
-        'file containing initial balances at the beginning of time-weighted average calculations',
+        'json file containing initial balances at the start of time-weighted average calculations',
     }),
     eventsJson: flags.string({
       required: true,
       multiple: true,
       description:
-        'file containing transfer events during period of time-weighted average calculations',
+        'json file containing transfer events during period of time-weighted average calculations',
     }),
     outputJson: flags.boolean({
       description: 'Write to json file titled with blocknumbers: balances-twa-50000-10000.json',
@@ -30,21 +33,26 @@ export default class AccountBalancesTWA extends BaseCommand {
     const res = this.parse(AccountBalancesTWA)
     const outputJson = res.flags.outputJson
     const initialBalances = JSON.parse(fs.readFileSync(res.flags.initialBalances, 'utf8'))
-    // parse multiple Json events input files
-    const events = res.flags.eventsJson.reduce((arr: EventLog[], eventsArr): EventLog[] => {
-      const events = JSON.parse(fs.readFileSync(eventsArr, 'utf8'))
-      return arr.concat(events)
+    const fromBlock = res.flags.fromBlock
+    const toBlock = res.flags.toBlock
+    const events = res.flags.eventsJson.reduce((arr: EventLog[], events): EventLog[] => {
+      const eventsArr = JSON.parse(fs.readFileSync(events, 'utf8'))
+      return arr.concat(eventsArr)
     }, [])
-    const balancesTWA = await accountBalancesTWA(events, initialBalances)
+    Object.keys(initialBalances).forEach(
+      (acct) => (initialBalances[acct] = new BigNumber(initialBalances[acct]))
+    )
+    const balancesTWA = await accountBalancesTWA(events, initialBalances, fromBlock, toBlock)
 
-    // Output results to a JSON file if set
     if (outputJson) {
-      fs.writeFile('balances-twa.json', JSON.stringify(balancesTWA, null, 2), (err) => {
+      const fileName = 'balances-twa.json'
+      fs.writeFile(fileName, JSON.stringify(balancesTWA, null, 2), (err) => {
         if (err) throw err
       })
+      console.log(`Results output to: ${fileName}`)
+    } else {
+      printValueMapRecursive(balancesTWA)
     }
-
-    printValueMapRecursive(balancesTWA)
     console.log('Total accounts reported:', Object.keys(balancesTWA).length)
   }
 }
