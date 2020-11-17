@@ -11,13 +11,13 @@ export default class BuildProposal extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    jsonTransactions: flags.string({
+    output: flags.string({
       required: true,
-      description: 'Path to json transactions (as input or as output when specifying --interactive',
+      description: 'Path to output',
     }),
   }
 
-  static examples = ['build-proposal --jsonTransactions ./transactions.json']
+  static examples = ['build-proposal --output ./transactions.json']
 
   async run() {
     const res = this.parse(BuildProposal)
@@ -27,8 +27,8 @@ export default class BuildProposal extends BaseCommand {
     // TODO: optimize builder redundancies
 
     const promptBuilder = new InteractiveProposalBuilder(builder)
-    const jsonTransactions = await promptBuilder.promptTransactions()
-    console.info(`Outputting proposal to ${res.flags.jsonTransactions}`)
-    writeFileSync(res.flags.jsonTransactions!, JSON.stringify(jsonTransactions))
+    const output = await promptBuilder.promptTransactions()
+    console.info(`Outputting proposal to ${res.flags.output}`)
+    writeFileSync(res.flags.output!, JSON.stringify(output))
   }
 }
