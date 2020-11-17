@@ -14,7 +14,7 @@ set -euo pipefail
 BRANCH=""
 NETWORK=""
 FORNO=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-verify-deployed.log"
 
 while getopts 'b:n:rfl:' flag; do
   case "${flag}" in
@@ -44,7 +44,7 @@ echo "- Return to original git commit"
 git checkout - >> $LOG_FILE
 
 echo "- Build verification script"
-yarn build >> $LOG_FILE
+yarn build:ts >> $LOG_FILE
 
 echo "- Run verification script"
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts $FORNO

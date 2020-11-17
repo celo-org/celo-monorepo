@@ -76,4 +76,5 @@ export enum ErrorMessages {
   GETH_ACCOUNT_ALREADY_EXISTS = 'gethAccountAlreadyExists',
   GETH_UNEXPECTED_ADDRESS_ON_ADD = 'gethUnexpectedAddressOnAdd',
   COUNTRY_NOT_AVAILABLE = 'countryNotAvailable',
+  MAX_ESCROW_TRANSFER_EXCEEDED = 'maxEscrowTransferExceeded',
 }

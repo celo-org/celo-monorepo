@@ -9,5 +9,6 @@ In this section you will find information about:
 - [Securing Celo Nodes and Services](securing-nodes-and-services.md)
 - [Monitoring](monitoring.md) Celo nodes
 - [Upgrading a Node](node-upgrades.md)
+- [Running Proxies](proxy.md)
 - [Validator Explorer](validator-explorer.md)
 - Information about the [Celo Foundation Voting Policy](celo-foundation-voting-policy.md)

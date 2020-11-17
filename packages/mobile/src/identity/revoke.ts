@@ -1,19 +1,21 @@
-import { CeloTransactionObject } from '@celo/contractkit'
+import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { AttestationsStatus } from '@celo/utils/src/attestations'
-import { call, put, select } from 'redux-saga/effects'
+import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+import { eqAddress } from '@celo/utils/src/address'
+import { all, call, put, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
-import { resetVerification } from 'src/identity/actions'
+import { feelessRevokeVerificationState, revokeVerificationState } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
-import { getAttestationsStatus } from 'src/identity/verification'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
+import { setMtwAddress } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { getAccountAddress, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { mtwAddressSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/revoke'
 
@@ -21,18 +23,27 @@ const TAG = 'identity/revoke'
 // i.e. accounts with 1-2 attestations but not 3+
 export function* revokeVerificationSaga() {
   Logger.debug(TAG + '@revokeVerification', 'Revoking previous verification')
+  let mtwAddress: string | null = null
   try {
-    const account: string | null = yield select(currentAccountSelector)
+    mtwAddress = yield select(mtwAddressSelector)
+    ValoraAnalytics.track(VerificationEvents.verification_revoke_start, { feeless: !!mtwAddress })
+    const walletAddress: string | null = yield call(getConnectedUnlockedAccount)
     const e164Number: string | null = yield select(e164NumberSelector)
-    if (!account) {
-      throw new Error('account not set')
+
+    if (!walletAddress) {
+      throw new Error('walletAddress not set')
     }
     if (!e164Number) {
       throw new Error('e164 number not set')
     }
 
-    ValoraAnalytics.track(VerificationEvents.verification_revoke_start)
-    const contractKit = yield call(getContractKit)
+    const accountAddress: string = yield call(getAccountAddress)
+    Logger.debug(
+      TAG + '@revokeVerification',
+      `Checking for attestaions on ${mtwAddress ? 'MTW' : 'EOA'} account address ${accountAddress}`
+    )
+
+    const contractKit: ContractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
@@ -40,41 +51,91 @@ export function* revokeVerificationSaga() {
     const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
     const phoneHash = phoneHashDetails.phoneHash
 
-    const status: AttestationsStatus = yield call(
-      getAttestationsStatus,
-      attestationsWrapper,
-      account,
+    // Check that the account is currently associated with the identifier.
+    const accounts: string[] = yield call(
+      [attestationsWrapper, attestationsWrapper.lookupAccountsForIdentifier],
       phoneHash
     )
+    const associated = accounts.some((acc) => eqAddress(acc, accountAddress))
 
-    if (status.isVerified) {
-      const tx: CeloTransactionObject<void> = yield call(
-        [attestationsWrapper, attestationsWrapper.revoke],
-        phoneHash,
-        account
+    if (associated) {
+      const tx: CeloTransactionObject<void> = mtwAddress
+        ? yield call(createRevokeTxForMTW, contractKit, attestationsWrapper, phoneHash, mtwAddress)
+        : yield call(createRevokeTxForEOA, attestationsWrapper, phoneHash, walletAddress)
+
+      Logger.debug(
+        TAG + '@revokeVerification',
+        'Account associated with our phone identifier, sending revoke trasaction'
       )
       yield call(
         sendTransaction,
         tx.txo,
-        account,
+        walletAddress,
         newTransactionContext(TAG, 'Revoke verification')
       )
 
       // TODO clear old mapping from the contact maps (e164ToAddress, etc.) to prevent stale values there
     } else {
-      Logger.debug(TAG + '@revokeVerification', 'Account not verified, skipping actual revoke call')
+      Logger.debug(
+        TAG + '@revokeVerification',
+        'Account is not associated with our phone identifier, skipping revoke transaction'
+      )
     }
-    yield put(resetVerification())
-    yield put(setNumberVerified(false))
 
-    ValoraAnalytics.track(VerificationEvents.verification_revoke_finish)
+    const relevantStateRevoke = mtwAddress
+      ? () => feelessRevokeVerificationState(walletAddress)
+      : () => revokeVerificationState()
+
+    yield all([put(relevantStateRevoke()), put(setNumberVerified(false)), put(setMtwAddress(null))])
+    ValoraAnalytics.track(VerificationEvents.verification_revoke_finish, { feeless: !!mtwAddress })
+    Logger.showMessage('Address revoke was successful')
   } catch (err) {
     Logger.error(TAG + '@revokeVerification', 'Error revoking verification', err)
     ValoraAnalytics.track(VerificationEvents.verification_revoke_error, {
       error: err.message,
+      feeless: !!mtwAddress,
     })
 
     // TODO i18n and use showError banner
     Logger.showError('Failed to revoke verification')
   }
+}
+
+function* createRevokeTxForEOA(
+  attestationsWrapper: AttestationsWrapper,
+  phoneHash: string,
+  accountAddress: string
+) {
+  const tx: CeloTransactionObject<void> = yield call(
+    [attestationsWrapper, attestationsWrapper.revoke],
+    phoneHash,
+    accountAddress
+  )
+
+  return tx
+}
+
+function* createRevokeTxForMTW(
+  contractKit: ContractKit,
+  attestationsWrapper: AttestationsWrapper,
+  phoneHash: string,
+  mtwAddress: string
+) {
+  const mtwWrapper: MetaTransactionWalletWrapper = yield call(
+    [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
+    mtwAddress
+  )
+
+  const revokeTx: CeloTransactionObject<void> = yield call(
+    [attestationsWrapper, attestationsWrapper.revoke],
+    phoneHash,
+    mtwAddress
+  )
+
+  const revokeTxViaMTW: CeloTransactionObject<string> = yield call(
+    [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
+    revokeTx.txo
+  )
+
+  return revokeTxViaMTW
 }

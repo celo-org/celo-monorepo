@@ -21,7 +21,6 @@ Use these instructions to update non-validating nodes, such as your account node
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-org/geth:baklava
-export NETWORK_ID=200110 # Baklava testnet phases 2 and 3
 docker pull $CELO_IMAGE
 ```
 
@@ -68,10 +67,15 @@ Validators can be configured as primaries or replicas. By default validators sta
 #### Geth Flags
 * `--istanbul.replica` flag which starts a validator in replica mode.
 
+On startup, nodes will look to see if there is a `replicastate` folder inside it's data directory. If that folder exists the node will configure itself as a validator or replica depending on the previous stored state. The stored state will take precedence over the command line flags. If the folder does not exists the node will stored it's state as configured by the command line. When RPC calls are made to start or stop validating, those changes will be persisted to the `replicastate` folder.
+
+{% hint style="warning" %} If reconfiguring a node to be a replica or reusing a data directory, make sure that the node was previously configured as replica or that the `replicastate` folder is removed. If there is an existing `replicastate` folder from a node that was not configured as a replica the node will attempt to start validating. {% endhint %}
+
 #### Steps to upgrade
 1. Pull the latest docker image.
 2. Start a new validator node on a second host in replica mode (`--istanbul.replica` flag). It should be otherwise configured exactly the same as the existing validator.
     * It needs to connect to the exisiting proxies and the validator signing key to connect to other validators in listen mode.
+    * If reconfiguring a node to be a replica or reusing a data directory, make sure that the node was previously configured as replica or that the `replicastate` folder is removed.
 3. Once the replica is synced and has validator enode urls for all validators, it is ready to swapped in.
     * Check validator enode urls with `istanbul.valEnodeTableInfo` in the geth console. The field `enode` should be filled in for each validator peer.
 4. In the geth console on the primary run `istanbul.stopAtBlock(xxxx)`

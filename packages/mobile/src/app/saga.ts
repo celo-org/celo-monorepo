@@ -20,12 +20,14 @@ import {
   OpenUrlAction,
   SetAppState,
   setAppState,
+  setKotaniFeatureFlag,
   setLanguage,
+  setPontoFeatureFlag,
 } from 'src/app/actions'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getLastTimeBackgrounded, getRequirePinOnAppOpen } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
-import { appVersionDeprecationChannel } from 'src/firebase/firebase'
+import { appRemoteFeatureFlagChannel, appVersionDeprecationChannel } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
@@ -78,6 +80,35 @@ export function* appVersionSaga() {
   } finally {
     if (yield cancelled()) {
       appVersionChannel.close()
+    }
+  }
+}
+
+interface RemoteFeatureFlags {
+  kotaniEnabled: boolean
+  pontoEnabled: boolean
+}
+
+export function* appRemoteFeatureFlagSaga() {
+  const remoteFeatureFlagChannel = yield call(appRemoteFeatureFlagChannel)
+  if (!remoteFeatureFlagChannel) {
+    return
+  }
+  try {
+    while (true) {
+      const flags: RemoteFeatureFlags = yield take(remoteFeatureFlagChannel)
+      Logger.info(
+        TAG,
+        `Updated flags to ponto: ${flags.pontoEnabled} and kotani: ${flags.kotaniEnabled}`
+      )
+      yield put(setPontoFeatureFlag(flags.pontoEnabled))
+      yield put(setKotaniFeatureFlag(flags.kotaniEnabled))
+    }
+  } catch (error) {
+    Logger.error(`${TAG}@appRemoteFeatureFlagSaga`, error)
+  } finally {
+    if (yield cancelled()) {
+      remoteFeatureFlagChannel.close()
     }
   }
 }
