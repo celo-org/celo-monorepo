@@ -1,4 +1,4 @@
-# External module: "wrappers/DoubleSigningSlasher"
+# Module: "wrappers/DoubleSigningSlasher"
 
 ## Index
 

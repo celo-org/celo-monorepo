@@ -16,8 +16,8 @@
 
 ### Properties
 
-* [defaultParams](_wrappers_basewrapper_.celotransactionobject.md#optional-defaultparams)
-* [txo](_wrappers_basewrapper_.celotransactionobject.md#txo)
+* [defaultParams](_wrappers_basewrapper_.celotransactionobject.md#optional-readonly-defaultparams)
+* [txo](_wrappers_basewrapper_.celotransactionobject.md#readonly-txo)
 
 ### Methods
 
@@ -44,7 +44,7 @@ Name | Type |
 
 ## Properties
 
-### `Optional` defaultParams
+### `Optional` `Readonly` defaultParams
 
 • **defaultParams**? : *[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)*
 
@@ -52,7 +52,7 @@ Name | Type |
 
 ___
 
-###  txo
+### `Readonly` txo
 
 • **txo**: *TransactionObject‹O›*
 
