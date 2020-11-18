@@ -34,7 +34,7 @@ export async function fundAccount(
   }
   const receipt = await stableToken
     .transfer(recipient.address, value.toString())
-    .sendAndWaitForReceipt({ from: root.address })
+    .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableToken.address })
 
   logger.debug({ receipt }, 'funded test account')
 }
