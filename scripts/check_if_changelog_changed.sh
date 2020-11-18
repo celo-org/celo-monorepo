@@ -1,6 +1,6 @@
 set -euo pipefail
 
-# get package to check and move its directory
+# get package to check and move into its directory
 PACKAGE=${1}
 cd packages/${PACKAGE}
 
