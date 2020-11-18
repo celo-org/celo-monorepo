@@ -432,6 +432,43 @@ contract('Accounts', (accounts: string[]) => {
     })
   })
 
+  describe.only('general authorization', () => {
+    const authorized = accounts[1]
+    const role = 'Test Role'
+
+    beforeEach(async () => {
+      // await accountsInstance.createAccount({ from: authorized })
+      await accountsInstance.createAccount()
+    })
+
+    it('should set the authorized signer as a smart contract', async () => {
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      await accountsInstance.authorizeSigner(authorized, role)
+      await accountsInstance.completeSignerAuthorization(account, role, { from: authorized })
+
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+
+      assert.equal(await accountsInstance.authorizedBy(authorized), account)
+      // assert.equal(await accountsInstance.getAuthorizedFromAccount(account), authorizedAddress)
+      // assert.equal(await accountsInstance.authorizedSignerToAccount(authorized), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+    })
+
+    it('should set the authorized signer in one step', async () => {
+      const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+
+      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.equal(await accountsInstance.authorizedBy(authorized), account)
+      // assert.equal(await accountsInstance.getAuthorizedFromAccount(account), authorizedAddress)
+      // assert.equal(await accountsInstance.authorizedSignerToAccount(authorized), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+    })
+
+    describe.skip('when a previous authorization has been made', () => {})
+  })
+
   Object.keys(authorizationTestDescriptions).forEach((key) => {
     describe('authorization tests:', () => {
       let authorizationTest: any

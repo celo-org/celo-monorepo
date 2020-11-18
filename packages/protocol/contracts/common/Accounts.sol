@@ -35,12 +35,18 @@ contract Accounts is
     address attestation;
   }
 
+  struct SignerAuthorization {
+    bool completed;
+    bool deleted;
+  }
+
   struct Account {
     bool exists;
     // Each account may authorize signing keys to use for voting, valdiating or attestation.
     // These keys may not be keys of other accounts, and may not be authorized by any other
     // account for any purpose.
     Signers signers;
+    mapping(string => mapping(address => SignerAuthorization)) signerAuthorizations;
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
     address walletAddress;
@@ -59,9 +65,11 @@ contract Accounts is
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidatorSignerAuthorized(address indexed account, address signer);
+  event SignerAuthorized(address indexed account, address signer, string role);
   event AttestationSignerRemoved(address indexed account, address oldSigner);
   event VoteSignerRemoved(address indexed account, address oldSigner);
   event ValidatorSignerRemoved(address indexed account, address oldSigner);
+  event SignerRemoved(address indexed account, address oldSigner, string role);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountNameSet(address indexed account, string name);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
@@ -288,6 +296,61 @@ contract Accounts is
     authorize(signer, v, r, s);
     account.signers.attestation = signer;
     emit AttestationSignerAuthorized(msg.sender, signer);
+  }
+
+  function authorizeSigner(address signer, string memory role) public {
+    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isNotAccount(signer) && isNotAuthorizedSigner(signer),
+      "Cannot re-authorize address signer"
+    );
+
+    authorizedBy[signer] = msg.sender;
+    accounts[msg.sender].signerAuthorizations[role][signer] = SignerAuthorization({
+      completed: false,
+      deleted: false
+    });
+  }
+
+  function authorizeSignerWithSignature(
+    address account,
+    string memory role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public {
+    authorize(account, v, r, s);
+    accounts[msg.sender].signerAuthorizations[role][account].completed = true;
+    emit SignerAuthorized(msg.sender, account, role);
+  }
+
+  function completeSignerAuthorization(address account, string memory role) public {
+    require(authorizedBy[msg.sender] == account);
+
+    SignerAuthorization storage signer = accounts[account].signerAuthorizations[role][msg.sender];
+    require(!signer.completed, "Signer already authorized");
+    require(!signer.deleted, "Signer has been removed");
+
+    signer.completed = true;
+    emit SignerAuthorized(account, msg.sender, role);
+  }
+
+  function isSigner(address account, address signer, string memory role)
+    public
+    view
+    returns (bool)
+  {
+    require(isAccount(account), "Unknown account");
+
+    SignerAuthorization storage authorization = accounts[account]
+      .signerAuthorizations[role][signer];
+    return (authorization.completed && !authorization.deleted);
+  }
+
+  function removeSigner(address signer, string memory role) public {
+    Account storage account = accounts[msg.sender];
+    account.signerAuthorizations[role][signer].deleted = true;
+    emit SignerRemoved(msg.sender, signer, role);
   }
 
   /**
