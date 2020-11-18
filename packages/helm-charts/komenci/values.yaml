@@ -1,0 +1,75 @@
+# This file is intended to show the expected value structure with placeholder values.
+# Many values are optional, and the defaults are left up to the client.
+# These values are commented out in this file, but show the correct structure
+# if they were to be specified.
+
+environment:
+  name: test
+
+kubectl:
+  image:
+    repository: bitnami/kubectl
+    tag: 1.17.4
+
+
+relayer:
+  node_env: production
+  image:
+    repository: celotestnet.azurecr.io/komenci/relayer
+    tag: dae43ddce108a73da07dce73875b980ff077c7d4
+  replicas: 2
+  port: 3000
+  identities:
+  - address: 0x00454cac6dae53f8800f71395b9a174f07a784b1
+    privateKey: 0x000
+    azure:
+      id: defaultId
+      clientId: defaultClientId
+      keyVaultName: staging-komenci-eus
+  - address: 0xc6f0f9bfb1aed83620ece3eac0add98a65a8574e
+    privateKey: 0x001
+    azure:
+      id: defaultId1
+      clientId: defaultClientId1
+      keyVaultName: staging-komenci-eus
+  azureHsm:
+    initTryCount: 5
+    initMaxRetryBackoffMs: 30000
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  onchain:
+    network: alfajores
+    walletType: azure-hsm
+
+onboarding:
+  node_env: production
+  image:
+    repository: celotestnet.azurecr.io/komenci/onboarding
+    tag: dae43ddce108a73da07dce73875b980ff077c7d4
+  replicas: 2
+  ruleEnabled:
+    signature: true
+    captcha: true
+  ruleConfig:
+    captcha:
+      bypassEnabled: false
+      bypassToken: "special-bypass-captcha-token"
+  recaptchaToken: 'from-secret'
+  quota:
+    distributedBlindePepper: 1
+    requestSubsidisedAttestation: 10
+    submitMetaTransaction: 20
+  relayer:
+    host: alfajores-relayer
+    port: 3000
+    rpcTimeoutMs: 7000
+  db:
+    host: komenci-komenci-postgresql
+    port: 5432
+    username: 'postgres'
+    database: 'postgres'
+    synchronize: true
+    ssl: true
+  onchain:
+    network: alfajores
