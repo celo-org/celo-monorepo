@@ -17,6 +17,7 @@ using a Constant Product Market Maker Model
 
 ### Properties
 
+* [buy](_wrappers_exchange_.exchangewrapper.md#buy)
 * [eventTypes](_wrappers_exchange_.exchangewrapper.md#eventtypes)
 * [events](_wrappers_exchange_.exchangewrapper.md#events)
 * [exchange](_wrappers_exchange_.exchangewrapper.md#exchange)
@@ -25,6 +26,7 @@ using a Constant Product Market Maker Model
 * [methodIds](_wrappers_exchange_.exchangewrapper.md#methodids)
 * [minimumReports](_wrappers_exchange_.exchangewrapper.md#minimumreports)
 * [reserveFraction](_wrappers_exchange_.exchangewrapper.md#reservefraction)
+* [sell](_wrappers_exchange_.exchangewrapper.md#sell)
 * [spread](_wrappers_exchange_.exchangewrapper.md#spread)
 * [updateFrequency](_wrappers_exchange_.exchangewrapper.md#updatefrequency)
 
@@ -34,6 +36,8 @@ using a Constant Product Market Maker Model
 
 ### Methods
 
+* [buyDollar](_wrappers_exchange_.exchangewrapper.md#buydollar)
+* [buyGold](_wrappers_exchange_.exchangewrapper.md#buygold)
 * [getBuyTokenAmount](_wrappers_exchange_.exchangewrapper.md#getbuytokenamount)
 * [getConfig](_wrappers_exchange_.exchangewrapper.md#getconfig)
 * [getExchangeRate](_wrappers_exchange_.exchangewrapper.md#getexchangerate)
@@ -70,6 +74,42 @@ Name | Type |
 
 ## Properties
 
+###  buy
+
+• **buy**: *function* = proxySend(
+    this.kit,
+    this.contract.methods.buy,
+    tupleParser(valueToString, valueToString, identity)
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L112)*
+
+Sells sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+Requires the sellAmount to have been approved to the exchange
+
+**`param`** The amount of sellToken the user is selling to the exchange
+
+**`param`** The maximum amount of sellToken the user will sell for this
+transaction to succeed
+
+**`param`** `true` if gold is the buy token
+
+**`returns`** The amount of buyToken that was transfered
+
+#### Type declaration:
+
+▸ (`buyAmount`: BigNumber.Value, `maxSellAmount`: BigNumber.Value, `buyGold`: boolean): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`buyAmount` | BigNumber.Value |
+`maxSellAmount` | BigNumber.Value |
+`buyGold` | boolean |
+
+___
+
 ###  eventTypes
 
 • **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
@@ -103,8 +143,9 @@ ___
     tupleParser(valueToString, valueToString, identity)
   )
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L117)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L74)*
 
+DEPRECATED: use function sell
 Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
 Requires the sellAmount to have been approved to the exchange
 
@@ -140,7 +181,7 @@ ___
       [valueToBigNumber(callRes[0]), valueToBigNumber(callRes[1])] as [BigNumber, BigNumber]
   )
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L101)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:159](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L159)*
 
 Returns the buy token and sell token bucket sizes, in order. The ratio of
 the two also represents the exchange rate between the two.
@@ -255,6 +296,42 @@ Name | Type |
 
 ___
 
+###  sell
+
+• **sell**: *function* = proxySend(
+    this.kit,
+    this.contract.methods.sell,
+    tupleParser(valueToString, valueToString, identity)
+  )
+
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L93)*
+
+Sells sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+Requires the sellAmount to have been approved to the exchange
+
+**`param`** The amount of sellToken the user is selling to the exchange
+
+**`param`** The minimum amount of buyToken the user has to receive for this
+transaction to succeed
+
+**`param`** `true` if gold is the sell token
+
+**`returns`** The amount of buyToken that was transfered
+
+#### Type declaration:
+
+▸ (`sellAmount`: BigNumber.Value, `minBuyAmount`: BigNumber.Value, `sellGold`: boolean): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`sellAmount` | BigNumber.Value |
+`minBuyAmount` | BigNumber.Value |
+`sellGold` | boolean |
+
+___
+
 ###  spread
 
 • **spread**: *function* = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
@@ -314,11 +391,51 @@ Contract address
 
 ## Methods
 
+###  buyDollar
+
+▸ **buyDollar**(`amount`: BigNumber.Value, `maxGoldAmount`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:203](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L203)*
+
+Buy amount of cUsd in exchange for at least minGoldAmount of CELO
+Requires the amount to have been approved to the exchange
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`amount` | BigNumber.Value | The amount of cUsd the user is selling to the exchange |
+`maxGoldAmount` | BigNumber.Value | The maximum amount of CELO the user will pay for this transaction to succeed  |
+
+**Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+___
+
+###  buyGold
+
+▸ **buyGold**(`amount`: BigNumber.Value, `maxUSDAmount`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:193](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L193)*
+
+Buy amount of CELO in exchange for at most maxUsdAmount of cUsd
+Requires the amount to have been approved to the exchange
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`amount` | BigNumber.Value | The amount of CELO the user is buying from the exchange |
+`maxUSDAmount` | BigNumber.Value | - |
+
+**Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+___
+
 ###  getBuyTokenAmount
 
 ▸ **getBuyTokenAmount**(`sellAmount`: BigNumber.Value, `sellGold`: boolean): *Promise‹BigNumber›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L70)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L128)*
 
 **`dev`** Returns the amount of buyToken a user would get for sellAmount of sellToken
 
@@ -339,7 +456,7 @@ ___
 
 ▸ **getConfig**(): *Promise‹[ExchangeConfig](../interfaces/_wrappers_exchange_.exchangeconfig.md)›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L181)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:240](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L240)*
 
 **`dev`** Returns the current configuration of the exchange contract
 
@@ -353,7 +470,7 @@ ___
 
 ▸ **getExchangeRate**(`buyAmount`: BigNumber.Value, `sellGold`: boolean): *Promise‹BigNumber›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:217](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L217)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:276](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L276)*
 
 Returns the exchange rate estimated at buyAmount.
 
@@ -374,7 +491,7 @@ ___
 
 ▸ **getGoldExchangeRate**(`buyAmount`: BigNumber.Value): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L234)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:293](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L293)*
 
 Returns the exchange rate for CELO estimated at the buyAmount
 
@@ -394,7 +511,7 @@ ___
 
 ▸ **getHumanReadableConfig**(): *Promise‹object›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:202](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L202)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:261](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L261)*
 
 **`dev`** Returns human readable configuration of the exchange contract
 
@@ -429,7 +546,7 @@ ___
 
 ▸ **getSellTokenAmount**(`buyAmount`: BigNumber.Value, `sellGold`: boolean): *Promise‹BigNumber›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L86)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:144](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L144)*
 
 Returns the amount of sellToken a user would need to exchange to receive buyAmount of
 buyToken.
@@ -451,7 +568,7 @@ ___
 
 ▸ **getUsdExchangeRate**(`buyAmount`: BigNumber.Value): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:227](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L227)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:286](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L286)*
 
 Returns the exchange rate for cUsd estimated at the buyAmount
 
@@ -471,7 +588,7 @@ ___
 
 ▸ **quoteGoldBuy**(`buyAmount`: BigNumber.Value): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L175)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:234](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L234)*
 
 Returns the amount of cUsd a user would need to exchange to receive buyAmount of
 CELO.
@@ -492,7 +609,7 @@ ___
 
 ▸ **quoteGoldSell**(`sellAmount`: BigNumber.Value): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:159](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L159)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:218](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L218)*
 
 Returns the amount of cUsd a user would get for sellAmount of CELO
 
@@ -512,7 +629,7 @@ ___
 
 ▸ **quoteUsdBuy**(`buyAmount`: BigNumber.Value): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L167)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L226)*
 
 Returns the amount of CELO a user would need to exchange to receive buyAmount of
 cUsd.
@@ -533,7 +650,7 @@ ___
 
 ▸ **quoteUsdSell**(`sellAmount`: BigNumber.Value): *Promise‹BigNumber‹››*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L152)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:211](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L211)*
 
 Returns the amount of CELO a user would get for sellAmount of cUsd
 
@@ -553,9 +670,9 @@ ___
 
 ▸ **sellDollar**(`amount`: BigNumber.Value, `minGoldAmount`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:144](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L144)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:183](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L183)*
 
-Exchanges amount of cUsd in exchange for at least minGoldAmount of CELO
+Sell amount of cUsd in exchange for at least minGoldAmount of CELO
 Requires the amount to have been approved to the exchange
 
 **Parameters:**
@@ -573,9 +690,9 @@ ___
 
 ▸ **sellGold**(`amount`: BigNumber.Value, `minUSDAmount`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
 
-*Defined in [packages/contractkit/src/wrappers/Exchange.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L134)*
+*Defined in [packages/contractkit/src/wrappers/Exchange.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L173)*
 
-Exchanges amount of CELO in exchange for at least minUsdAmount of cUsd
+Sell amount of CELO in exchange for at least minUsdAmount of cUsd
 Requires the amount to have been approved to the exchange
 
 **Parameters:**

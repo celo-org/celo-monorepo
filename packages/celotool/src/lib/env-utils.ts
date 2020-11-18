@@ -155,6 +155,8 @@ export enum DynamicEnvVar {
   AZURE_TENANT_ID = '{{ context }}_AZURE_TENANT_ID',
   FULL_NODES_COUNT = '{{ context }}_FULL_NODES_COUNT',
   FULL_NODES_DISK_SIZE = '{{ context }}_FULL_NODES_DISK_SIZE',
+  FULL_NODES_NODEKEY_DERIVATION_STRING = '{{ context }}_FULL_NODES_NODEKEY_DERIVATION_STRING',
+  FULL_NODES_STATIC_NODES_FILE_SUFFIX = '{{ context }}_FULL_NODES_STATIC_NODES_FILE_SUFFIX',
   GCP_PROJECT_NAME = '{{ context }}_GCP_PROJECT_NAME',
   GCP_ZONE = '{{ context }}_GCP_ZONE',
   KUBERNETES_CLUSTER_NAME = '{{ context }}_KUBERNETES_CLUSTER_NAME',
@@ -241,6 +243,11 @@ export function isProduction() {
 
 export function isValidCeloEnv(celoEnv: string) {
   return new RegExp('^[a-z][a-z0-9]*$').test(celoEnv)
+}
+
+export function getDynamicEnvVarValue(dynamicEnvVar: DynamicEnvVar, templateValues: any, defaultValue?: string) {
+  const envVarName = getDynamicEnvVarName(dynamicEnvVar, templateValues)
+  return defaultValue !== undefined ? fetchEnvOrFallback(envVarName, defaultValue) : fetchEnv(envVarName)
 }
 
 /**
