@@ -1,6 +1,6 @@
 export default HandleDeepLinkSend = () => {
   const PAY_URL =
-    '"celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229&displayName=Crypto4BlackLives&e164PhoneNumber=%2B14046251530"'
+    '"celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229\\&displayName=Crypto4BlackLives\\&e164PhoneNumber=%2B14046251530"'
 
   it('Launch app cold with url', async () => {
     await device.terminateApp()
