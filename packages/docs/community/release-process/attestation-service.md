@@ -1,20 +1,16 @@
 # Attestation Service Release Process
 
+This release process will be adopted from Attestation Service v1.2.0 onwards.
+
 ## Versioning
 
-Releases of Attestation Service are numbered according to semantic versioning, as described at [semver.org](https://semver.org).
-
-New releases can be expected as follows:
-
-* Major releases: approximately yearly
-* Minor releases: approximately 4 times a year
-* Patch releases: as needed
+Releases of Attestation Service are made as needed. Releases are numbered according to semantic versioning, as described at [semver.org](https://semver.org).
 
 All builds are identified as `unstable` (a development build) or `stable` (a commit released as a particular version number). There should only ever exist one commit with a version `x.y.z` for any `(x, y, z)`.
 
 ## Documentation
 
-Documentation is maintained under `packages/docs` directory and is hosted on [docs.celo.org](https://docs.celo.org/celo-codebase/protocol).
+Documentation is maintained under `packages/docs` directory and is hosted on [docs.celo.org](https://docs.celo.org/validator-guide/attestation-service).
 
 ## Identifying releases
 
@@ -26,7 +22,7 @@ Development is done on the `master` branch, which corresponds to the next major 
 
 ### Git tags
 
-All releases should be tagged with the version number, e.g. `attestation-service-vX.Y.Z`. Each release should include a summary of the release contents, including links to pull requests and issues with detailed description of any notable changes.
+Each release should be [created on Github](https://github.com/celo-org/celo-monorepo/releases) and tagged with the version number, e.g. `attestation-service-vX.Y.Z`. Each release should include a summary of the release contents, including links to pull requests and issues with detailed description of any notable changes.
 
 Tags should be signed and can be verified with the following command.
 
@@ -38,13 +34,29 @@ On Github, each release tag should have attached signatures that can be used to 
 
 ### Docker tags
 
-Each released Docker image should be tagged with `attestation-service-vx.y.z`. Just as a Git tag immutably points to a commit hash, the Docker tag should immutably point to an image hash.
+Each Docker image is tagged with `attestation-service-<commithash>`. Just as a Git tag immutably points to a commit hash, the Docker tag should immutably point to an image hash.
 
-The latest image qualified for deployment to various networks are tagged as follows:
+In addition, each Docker image correspinding to a released version should be tagged with `attestation-service-vx.y.z`.
+
+The latest image qualified for deployment to various networks are also tagged as follows:
 
 * Alfajores: `attestation-service-alfajores`
 * Baklava: `attestation-service-baklava`
 * Mainnet: `attestation-service-mainnet`
+
+### Signatures
+
+Artifacts produced by this build process (e.g. tags, Docker images) will be signed. Signatures are produced using any one of the core developer keys listed below.
+
+Public keys for corek developers are hosted on celo.org and can be imported to `gpg` with the following command:
+
+```bash
+gpg --auto-key-locate wkd --locate-keys $EMAIL
+```
+
+Currently hosted core developer keys include:
+
+* tim@clabs.co
 
 ## Build process
 
@@ -64,7 +76,7 @@ docker save $(docker image inspect us.gcr.io/celo-testnet/celo-monorepo:attestat
 
 As well as monorepo CI tests, all releases are expected to go through manual testing as needed to verify security properties, accuracy of documentation, and compatibility with deployed and anticipated versions of `celocli` and wallets including Valora.
 
-This testing should include running the Valora e2e tests:
+This testing should include running the Valora e2e tests. Currently, these expect access to cLabs provisioned credentials for SMS providers. Follow the [Valora mobile build instructions](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/README.md#setup). Then run:
 
 ```bash
 git checkout verification-e2e-tests
@@ -80,7 +92,7 @@ Patch releases should be constructed by cherry-picking all included commits from
 
 Major and minor releases should be constructed by pushing a commit to the `master` branch to change the encoded version number from `x.y.z-unstable` to `x.y.z`. A `release/attestation-service/x.y` branch should be created from this commit.  The next commit must change the version number from `x.y.z-stable` to `x.y+1.0-unstable`, or `x+1.0.0-unstable` if the next planned release is a major release.
 
-Only one commit should ever have a “stable” tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or changes.
+Only one commit should ever have a "stable" tag at any given version number. When that commit is created, a tag should be added along with release notes. Once the tag is published it should not be reused for any further release or changes.
 
 ### Distribution
 
@@ -95,7 +107,7 @@ Distribution of an image should occur along the following schedule:
     <td>T-1w</td>
     <td>
       <ol>
-        <li>Deploy release candidate build to alfajoresstaging and alfajores testnets</li>
+        <li>Deploy release candidate build to Alfajores testnet</li>
       </ol>
     </td>
   </tr>  
