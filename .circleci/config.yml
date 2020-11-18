@@ -709,6 +709,10 @@ jobs:
             yarn pack
             cd /tmp
             npm install ~/app/packages/base/*.tgz
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh base
 
   utils-test:
     <<: *defaults
@@ -730,6 +734,10 @@ jobs:
             cd /tmp
             npm install ~/app/packages/base/*.tgz
             npm install ~/app/packages/utils/*.tgz
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh utils
 
   end-to-end-geth-transfer-test:
     <<: *e2e-defaults
