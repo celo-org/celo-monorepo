@@ -46,15 +46,15 @@ The latest image qualified for deployment to various networks are also tagged as
 
 ### Signatures
 
-Artifacts produced by this build process (e.g. tags, Docker images) will be signed. Signatures are produced using any one of the core developer keys listed below.
+Artifacts produced by this build process (e.g. tags, Docker images) will be signed by a [core developer key](https://github.com/celo-org/celo-monorepo/blob/master/developer_key_publishing.md).
 
-Public keys for corek developers are hosted on celo.org and can be imported to `gpg` with the following command:
+Public keys for core developers are hosted on celo.org and can be imported to `gpg` with the following command:
 
 ```bash
 gpg --auto-key-locate wkd --locate-keys $EMAIL
 ```
 
-Currently hosted core developer keys include:
+Currently hosted core developer keys used for Attestation Service releases include:
 
 * tim@clabs.co
 
