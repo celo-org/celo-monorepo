@@ -281,24 +281,9 @@ export class Connection {
 
   async estimateGas(
     tx: CeloTx,
-    gasEstimator?: (tx: CeloTx) => Promise<number>,
-    caller?: (tx: CeloTx) => Promise<string>
+    gasEstimator: (tx: CeloTx) => Promise<number> = this.web3.eth.estimateGas,
+    caller: (tx: CeloTx) => Promise<string> = this.web3.eth.call
   ): Promise<number> {
-    if (!gasEstimator) {
-      gasEstimator = async (_tx: CeloTx) => {
-        // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
-        const gasResult = await this.rpcCaller.call('eth_estimateGas', [_tx])
-        return gasResult.result as number
-      }
-    }
-
-    if (!caller) {
-      caller = async (_tx: CeloTx) => {
-        const callResult = await this.rpcCaller.call('eth_call', [_tx])
-        return callResult.result as string
-      }
-    }
-
     try {
       const gas = await gasEstimator({ ...tx })
       debugGasEstimation('estimatedGas: %s', gas.toString())
