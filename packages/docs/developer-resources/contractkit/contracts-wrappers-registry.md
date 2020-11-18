@@ -99,42 +99,6 @@ The complete list is:
 - StableToken
 - Validators
 
-## Sending Custom Transactions
-
-Celo transaction object is not the same as Ethereum's. There are three new fields present:
-
-- feeCurrency (address of the ERC20 contract to use to pay for gas and the gateway fee)
-- gatewayFeeRecipient (coinbase address of the full serving the light client's trasactions)
-- gatewayFee (value paid to the gateway fee recipient, denominated in the fee currency)
-
-This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be **avoided**.
-
-Instead, `kit` provides an utility method to send transaction in both scenarios. **If you use contract wrappers, there is no need to use this.**
-
-For a raw transaction:
-
-```ts
-const tx = kit.sendTransaction({
-  from: myAddress,
-  to: someAddress,
-  value: oneGold,
-})
-const hash = await tx.getHash()
-const receipt = await tx.waitReceipt()
-```
-
-When interacting with a web3 contract object:
-
-```ts
-const goldtoken = await kit._web3Contracts.getGoldToken()
-const oneGold = kit.web3.utils.toWei('1', 'ether')
-
-const txo = await goldtoken.methods.transfer(someAddress, oneGold)
-const tx = await kit.sendTransactionObject(txo, { from: myAddress })
-const hash = await tx.getHash()
-const receipt = await tx.waitReceipt()
-```
-
 ## Debugging
 
 If you need to debug `kit`, we use the well known [debug](https://github.com/visionmedia/debug) node library.

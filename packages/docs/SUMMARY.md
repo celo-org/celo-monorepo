@@ -708,6 +708,8 @@
     - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
     - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
     - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
+    - [wrappers/BaseSlasher](developer-resources/contractkit/reference/modules/_wrappers_baseslasher_.md)
+    - [BaseSlasher](developer-resources/contractkit/reference/classes/_wrappers_baseslasher_.baseslasher.md)
     - [wrappers/BaseWrapper](developer-resources/contractkit/reference/modules/_wrappers_basewrapper_.md)
     - [BaseWrapper](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.basewrapper.md)
     - [CeloTransactionObject](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.celotransactionobject.md)
@@ -721,7 +723,7 @@
     - [wrappers/DowntimeSlasher](developer-resources/contractkit/reference/modules/_wrappers_downtimeslasher_.md)
     - [DowntimeSlasherWrapper](developer-resources/contractkit/reference/classes/_wrappers_downtimeslasher_.downtimeslasherwrapper.md)
     - [DowntimeSlasherConfig](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)
-    - [DowntimeWindow](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimewindow.md)
+    - [Interval](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.interval.md)
     - [wrappers/Election](developer-resources/contractkit/reference/modules/_wrappers_election_.md)
     - [ElectionWrapper](developer-resources/contractkit/reference/classes/_wrappers_election_.electionwrapper.md)
     - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
@@ -854,6 +856,7 @@
     - [Web3ContractCache](developer-resources/contractkit/reference/classes/_web3_contract_cache_.web3contractcache.md)
     - [AccountsWrapper](developer-resources/contractkit/reference/classes/_wrappers_accounts_.accountswrapper.md)
     - [AttestationsWrapper](developer-resources/contractkit/reference/classes/_wrappers_attestations_.attestationswrapper.md)
+    - [BaseSlasher](developer-resources/contractkit/reference/classes/_wrappers_baseslasher_.baseslasher.md)
     - [BaseWrapper](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.basewrapper.md)
     - [CeloTransactionObject](developer-resources/contractkit/reference/classes/_wrappers_basewrapper_.celotransactionobject.md)
     - [BlockchainParametersWrapper](developer-resources/contractkit/reference/classes/_wrappers_blockchainparameters_.blockchainparameterswrapper.md)
@@ -932,7 +935,7 @@
     - [BlockchainParametersConfig](developer-resources/contractkit/reference/interfaces/_wrappers_blockchainparameters_.blockchainparametersconfig.md)
     - [ClientVersion](developer-resources/contractkit/reference/interfaces/_wrappers_blockchainparameters_.clientversion.md)
     - [DowntimeSlasherConfig](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)
-    - [DowntimeWindow](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimewindow.md)
+    - [Interval](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.interval.md)
     - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
     - [ElectionConfig](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electionconfig.md)
     - [GroupVote](developer-resources/contractkit/reference/interfaces/_wrappers_election_.groupvote.md)
@@ -1053,6 +1056,7 @@
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
   - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
+  - [Attestation Service](community/release-process/attestation-service.md)
 
 ## Important Information
 

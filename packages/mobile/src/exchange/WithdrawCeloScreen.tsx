@@ -41,8 +41,8 @@ const { decimalSeparator } = getNumberFormatSettings()
 const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
 
 function WithdrawCeloScreen({ route }: Props) {
-  const [accountAddress, setAccountAddress] = useState('')
-  const [celoInput, setCeloToTransfer] = useState('')
+  const [accountAddress, setAccountAddress] = useState(route.params?.recipientAddress ?? '')
+  const [celoInput, setCeloToTransfer] = useState(route.params?.amount?.toString() ?? '')
   const celoToTransfer = parseInputAmount(celoInput, decimalSeparator)
 
   const goldBalance = useSelector((state) => state.goldToken.balance)

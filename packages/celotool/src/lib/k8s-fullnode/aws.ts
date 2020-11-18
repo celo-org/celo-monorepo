@@ -1,10 +1,10 @@
 import { authorizeSecurityGroupIngress, getClusterSharedNodeSecurityGroup, revokeSecurityGroupIngress } from '../aws'
-import { AWSClusterConfig } from '../k8s-cluster/aws'
+import { AwsClusterConfig } from '../k8s-cluster/aws'
 import { BaseFullNodeDeploymentConfig } from './base'
 import { BaseNodePortFullNodeDeployer } from './base-nodeport'
 
-export interface AWSFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
-  clusterConfig: AWSClusterConfig
+export interface AwsFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfig {
+  clusterConfig: AwsClusterConfig
 }
 
 enum Protocols {
@@ -17,7 +17,7 @@ enum Protocols {
  * with ingress TCP & UDP traffic on the same port. Instead, we use NodePort
  * services.
  */
-export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
+export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
   /**
    * Gets AWS-specific helm parameters.
    */
@@ -26,6 +26,8 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
       ...(await super.additionalHelmParameters()),
       `--set aws=true`,
       `--set storage.storageClass=gp2`,
+      // A single element because we will be using tcp and udp on a single service
+      `--set geth.service_protocols='{tcp-and-udp}'`
     ]
   }
 
@@ -96,7 +98,7 @@ export class AWSFullNodeDeployer extends BaseNodePortFullNodeDeployer {
     }
   }
 
-  get deploymentConfig(): AWSFullNodeDeploymentConfig {
-    return this._deploymentConfig as AWSFullNodeDeploymentConfig
+  get deploymentConfig(): AwsFullNodeDeploymentConfig {
+    return this._deploymentConfig as AwsFullNodeDeploymentConfig
   }
 }
