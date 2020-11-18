@@ -1,5 +1,6 @@
 import { PincodeType } from 'src/account/reducer'
 import { AppState } from 'src/app/actions'
+import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
@@ -393,7 +394,7 @@ export const v5Schema = {
       actionableAttestations: [],
       status: {
         isVerified: false,
-        numAttestationsRemaining: 3,
+        numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
         total: 0,
         completed: 0,
       },
@@ -429,6 +430,46 @@ export const v6Schema = {
   },
 }
 
+export const v7Schema = {
+  ...v6Schema,
+  identity: {
+    ...v6Schema.identity,
+    feelessAttestationCodes: [],
+    feelessProcessingInputCode: false,
+    feelessAcceptedAttestationCodes: [],
+    feelessNumCompleteAttestations: 0,
+    feelessVerificationStatus: 0,
+    feelessVerificationState: {
+      isLoading: false,
+      isActive: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+      komenci: {
+        errorTimestamps: [],
+        unverifiedMtwAddress: null,
+        serviceAvailable: false,
+        sessionActive: false,
+        sessionToken: '',
+        callbackUrl: undefined,
+        captchaToken: '',
+        pepperFetchedByKomenci: false,
+      },
+    },
+    feelessLastRevealAttempt: null,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v6Schema as Partial<RootState>
+  return v7Schema as Partial<RootState>
 }
