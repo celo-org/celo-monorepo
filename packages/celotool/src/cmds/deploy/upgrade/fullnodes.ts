@@ -1,10 +1,5 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
-import {
-  addContextMiddleware,
-  ContextArgv,
-  serviceName,
-  switchToContextCluster,
-} from 'src/lib/context-utils'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { upgradeFullNodeChart } from 'src/lib/fullnodes'
 import yargs from 'yargs'
 
@@ -41,7 +36,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: FullNodeUpgradeArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context, serviceName.Fullnode)
+  await switchToContextCluster(argv.celoEnv, argv.context)
   await upgradeFullNodeChart(
     argv.celoEnv,
     argv.context,
