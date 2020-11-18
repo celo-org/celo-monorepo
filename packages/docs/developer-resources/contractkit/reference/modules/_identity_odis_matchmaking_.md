@@ -1,4 +1,4 @@
-# External module: "identity/odis/matchmaking"
+# Module: "identity/odis/matchmaking"
 
 ## Index
 
