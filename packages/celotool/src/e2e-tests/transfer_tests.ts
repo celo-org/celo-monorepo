@@ -672,10 +672,7 @@ describe('Transfer tests', function(this: any) {
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
                             } catch (error) {
-                              assert.include(
-                                error.toString(),
-                                `Returned error: no suitable peers available`
-                              )
+                              assert.include(error.toString(), `Error: no suitable peers available`)
                             }
                           })
                         } else {
@@ -723,7 +720,7 @@ describe('Transfer tests', function(this: any) {
                     await res.getHash()
                     assert.fail('no error was thrown')
                   } catch (error) {
-                    assert.include(error.toString(), 'Returned error: intrinsic gas too low')
+                    assert.include(error.toString(), 'Error: intrinsic gas too low')
                   }
                 })
               })
@@ -792,7 +789,7 @@ describe('Transfer tests', function(this: any) {
                 testTxPoolFiltering({
                   gas: intrinsicGas - 1,
                   feeToken: CeloContract.StableToken,
-                  expectedError: 'Returned error: intrinsic gas too low',
+                  expectedError: 'Error: intrinsic gas too low',
                 })
               })
             })
@@ -930,7 +927,7 @@ describe('Transfer tests', function(this: any) {
             testTxPoolFiltering({
               gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
               feeToken: CeloContract.StableToken,
-              expectedError: 'Returned error: transfers are currently frozen',
+              expectedError: 'Error: transfers are currently frozen',
             })
           })
           describe('when receiver is whitelisted', () => {
@@ -963,7 +960,7 @@ describe('Transfer tests', function(this: any) {
               testTxPoolFiltering({
                 gas: INTRINSIC_TX_GAS_COST + ADDITIONAL_INTRINSIC_TX_GAS_COST,
                 feeToken: CeloContract.GoldToken,
-                expectedError: 'Returned error: transfers are currently frozen',
+                expectedError: 'Error: transfers are currently frozen',
               })
             })
           })
