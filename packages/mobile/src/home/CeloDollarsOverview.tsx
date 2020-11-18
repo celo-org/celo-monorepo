@@ -5,7 +5,6 @@ import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -28,12 +27,12 @@ function CeloDollarsOverview({ t }: Props) {
   return (
     <View style={styles.container}>
       {dollarBalanceAmount && (
-        <Text style={styles.balance}>
-          <CurrencyDisplay style={fontStyles.semiBold} amount={dollarBalanceAmount} />
+        <Text style={styles.balance} testID="DollarBalance">
+          <CurrencyDisplay style={fontStyles.regular500} amount={dollarBalanceAmount} />
         </Text>
       )}
       {!isUsdLocalCurrency && dollarBalanceAmount && (
-        <Text style={styles.dollarBalance}>
+        <Text style={styles.dollarBalance} testID="GoldBalance">
           <Trans i18nKey="dollarBalance" ns={Namespaces.walletFlow5}>
             <CurrencyDisplay
               amount={dollarBalanceAmount}
@@ -53,10 +52,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: variables.contentPadding,
     paddingVertical: 20,
   },
-  label: {
-    fontSize: 18,
-    color: colors.dark,
-  },
   balance: {
     fontSize: 44,
     // TODO: figure out why specifying the lineHeight with the font we're using
@@ -66,10 +61,9 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   dollarBalance: {
-    ...fontStyles.light,
-    fontSize: 18,
-    color: '#B0B5B9',
+    ...fontStyles.large,
+    color: colors.gray5,
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.walletFlow5)(CeloDollarsOverview))
+export default withTranslation<Props>(Namespaces.walletFlow5)(CeloDollarsOverview)

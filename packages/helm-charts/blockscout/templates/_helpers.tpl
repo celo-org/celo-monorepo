@@ -1,9 +1,14 @@
 {{- define "celo.blockscout-db-sidecar" -}}
 - name: cloudsql-proxy
-  image: gcr.io/cloudsql-docker/gce-proxy:1.11
+  image: gcr.io/cloudsql-docker/gce-proxy:1.16
   command: ["/cloud_sql_proxy",
-            "-instances={{ .Values.blockscout.db.connection_name }}=tcp:5432",
-            "-credential_file=/secrets/cloudsql/credentials.json"]
+            "-instances={{ .Values.blockscout.db.connection_name }}{{ .DbSuffix | default "" }}=tcp:5432",
+            "-credential_file=/secrets/cloudsql/credentials.json",
+            "-term_timeout=30s"]
+  resources:
+    requests:
+      memory: 500Mi
+      cpu: 200m
   securityContext:
     runAsUser: 2  # non-root user
     allowPrivilegeEscalation: false
@@ -50,38 +55,14 @@ volumes:
   value: "127.0.0.1"
 - name: DATABASE_PORT
   value: "5432"
+- name: WOBSERVER_ENABLED
+  value: "false"
+- name: HEALTHY_BLOCKS_PERIOD
+  value: {{ .Values.blockscout.healthy_blocks_period | quote }}
 - name: MIX_ENV
   value: prod
 - name: LOGO
   value: /images/celo_logo.svg
-{{- end -}}
-
-{{- define "celo.prom-to-sd-container" -}}
-- name: prom-to-sd
-  image: "{{ .Values.promtosd.image.repository }}:{{ .Values.promtosd.image.tag }}"
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
-  ports:
-    - name: profiler
-      containerPort: {{ .Values.promtosd.port }}
-  command:
-    - /monitor
-    - --stackdriver-prefix=custom.googleapis.com
-    - --source={{ .component }}:http://localhost:{{ .metricsPort }}/{{ .metricsPath | default "metrics" }}?containerNameLabel={{ .containerNameLabel }}
-    - --pod-id=$(POD_NAME)
-    - --namespace-id=$(POD_NAMESPACE)
-    - --scrape-interval={{ .Values.promtosd.scrape_interval }}
-    - --export-interval={{ .Values.promtosd.export_interval }}
-  resources:
-    requests:
-      memory: 50M
-      cpu: 50m
-  env:
-    - name: POD_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.name
-    - name: POD_NAMESPACE
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.namespace
+- name: BLOCKSCOUT_VERSION
+  value: {{ .Values.blockscout.image.tag }}
 {{- end -}}

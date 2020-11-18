@@ -1,17 +1,20 @@
-import { eqAddress, findAddressIndex } from '@celo/utils/lib/address'
-import { concurrentMap } from '@celo/utils/lib/async'
-import { zip } from '@celo/utils/lib/collections'
+import { eqAddress, findAddressIndex } from '@celo/base/lib/address'
+import { concurrentMap } from '@celo/base/lib/async'
+import { zip } from '@celo/base/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/Validators'
+import { zeroRange } from '../utils/array'
 import {
   BaseWrapper,
+  blocksToDurationString,
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  stringToBytes,
+  secondsToDurationString,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -173,6 +176,29 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
+   * @dev Returns human readable configuration of the validators contract
+   * @return ValidatorsConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    const validatorLockedGoldRequirements = {
+      ...config.validatorLockedGoldRequirements,
+      duration: secondsToDurationString(config.validatorLockedGoldRequirements.duration),
+    }
+    const groupLockedGoldRequirements = {
+      ...config.groupLockedGoldRequirements,
+      duration: secondsToDurationString(config.groupLockedGoldRequirements.duration),
+    }
+    return {
+      ...config,
+      slashingMultiplierResetPeriod: secondsToDurationString(config.slashingMultiplierResetPeriod),
+      commissionUpdateDelay: blocksToDurationString(config.commissionUpdateDelay),
+      validatorLockedGoldRequirements,
+      groupLockedGoldRequirements,
+    }
+  }
+
+  /**
    * Returns the account associated with `signer`.
    * @param signer The address of an account or currently authorized validator signer.
    * @dev Fails if the `signer` is not an account or currently authorized validator.
@@ -189,9 +215,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  async signerToAccount(signerAddress: Address, blockNumber?: number) {
+  async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.signerToAccount(signerAddress, blockNumber)
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -208,7 +234,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.updateBlsPublicKey,
-    tupleParser(stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -269,7 +295,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
-    const account = await this.signerToAccount(address, blockNumber)
+    const account = await this.signerToAccount(address)
     if (eqAddress(account, NULL_ADDRESS) || !(await this.isValidator(account))) {
       return {
         name: 'Unregistered validator',
@@ -399,7 +425,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   ) => CeloTransactionObject<boolean> = proxySend(
     this.kit,
     this.contract.methods.registerValidator,
-    tupleParser(stringToBytes, stringToBytes, stringToBytes)
+    tupleParser(stringToSolidityBytes, stringToSolidityBytes, stringToSolidityBytes)
   )
 
   /**
@@ -552,10 +578,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       toBlock: blockNumber,
     })
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidator(e.returnValues.validator, blockNumber)
+      this.getValidator(e.returnValues.validator)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
@@ -573,7 +599,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentSignerSet(): Promise<Address[]> {
     const n = valueToInt(await this.contract.methods.numberValidatorsInCurrentSet().call())
-    return concurrentMap(5, Array.from(Array(n).keys()), (idx) =>
+    return concurrentMap(5, zeroRange(n), (idx) =>
       this.contract.methods.validatorSignerAddressFromCurrentSet(idx).call()
     )
   }
@@ -590,19 +616,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   /**
-   * Returns the group membership for `validator`.
-   * @param validator Address of validator to retrieve group membership for.
+   * Returns the group membership for validator account.
+   * @param account Address of validator account to retrieve group membership for.
    * @param blockNumber Block number to retrieve group membership at.
    * @return Group and membership history index for `validator`.
    */
   async getValidatorMembershipHistoryIndex(
-    validator: Validator,
+    account: Address,
     blockNumber?: number
   ): Promise<{ group: Address; historyIndex: number }> {
     const blockEpoch = await this.kit.getEpochNumberOfBlock(
       blockNumber || (await this.kit.web3.eth.getBlockNumber())
     )
-    const account = await this.validatorSignerToAccount(validator.signer)
     const membershipHistory = await this.getValidatorMembershipHistory(account)
     const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
     const group = membershipHistory[historyIndex].group

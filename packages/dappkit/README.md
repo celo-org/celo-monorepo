@@ -14,15 +14,15 @@ DAppKit is currently built with the excellent [Expo framework](https://expo.io) 
 
 This section walks you through the main functionalities of DAppKit. You can also find the result of this walkthrough on the [expo base template](https://github.com/celo-org/dappkit-base) on branch [`dappkit-usage`](https://github.com/celo-org/dappkit-base/tree/dappkit-usage).
 
-DAppKit uses deeplinks to communicate between your DApp and the Celo Wallt. All "requests" that your DApp makes to the Wallet needs to contain the follwing meta payload:
+DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the following meta payload:
 
-- `requestId` A string you can pass to DAppKit, that you can use to listen to the resopnse for that request
+- `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
 - `callback` The deeplink that the Celo Wallet will use to redirect the user back to the DApp with the appropriate payload. If you want the user to be directed to a particular page in your DApp. With Expo, it's as simple as `Linking.makeUrl('/my/path')`
 
 ## Requesting Account Address
 
-One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant informtion to them. It can be done as simply as:
+One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant information to them. It can be done as simply as:
 
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/9ef5d8916018a1f7b09d062fdd601b851fb4bf79))
 
@@ -64,34 +64,6 @@ Once you have the account address, you can make calls against your own smart con
   const cUSDBalance = this.convertToContractDecimals(cUSDBalanceBig, cUSDDecimals)
 
   this.setState({ cUSDBalance, isLoadingBalance: false })
-```
-
-## Get Contact List Addresses
-
-For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a user's contact list.
-
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/ea99ff02009de806c0e248eb7aec617c14223fa5))
-
-```javascript
-import { fetchContacts } from "@celo/dappkit";
-import * as Permissions from "expo-permissions";
-
-const { status } = await Permissions.askAsync(Permissions.CONTACTS);
-
-if (status != Permissions.PermissionStatus.GRANTED) {
-  return
-}
-
-const { rawContacts, phoneNumbersByAddress } = await fetchContacts(kit.web3)
-
-this.setState({ rawContacts, phoneNumbersByAddress })
-
-Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
-  const contact = this.state.rawContacts[entry.id]
-  return (
-    <Button key={address} title={contact.name} onPress={() => {}} />
-  )
-})
 ```
 
 ## Signing Transactions

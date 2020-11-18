@@ -1,43 +1,41 @@
 import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
-import '@react-native-firebase/database'
+import '@react-native-firebase/auth'
+import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 // We can't combine the 2 imports otherwise it only imports the type and fails at runtime
 // tslint:disable-next-line: no-duplicate-imports
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
-import * as Sentry from '@sentry/react-native'
-import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
-import { call, put, select, spawn, take } from 'redux-saga/effects'
-import { NotificationReceiveState } from 'src/account/types'
-import { showError } from 'src/alert/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { call, select, spawn, take } from 'redux-saga/effects'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
-import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { NotificationReceiveState } from 'src/notifications/types'
 import Logger from 'src/utils/Logger'
+import { Awaited } from 'src/utils/typescript'
 
 const TAG = 'firebase/firebase'
 
+interface NotificationChannelEvent {
+  message: FirebaseMessagingTypes.RemoteMessage
+  stateType: NotificationReceiveState
+}
+
 // only exported for testing
-export function* watchFirebaseNotificationChannel(
-  channel: EventChannel<{
-    message: FirebaseMessagingTypes.RemoteMessage
-    stateType: NotificationReceiveState
-  }>
-) {
+export function* watchFirebaseNotificationChannel(channel: EventChannel<NotificationChannelEvent>) {
   try {
-    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
+    Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
     while (true) {
-      const data = yield take(channel)
-      if (!data) {
-        Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
+      const event: NotificationChannelEvent = yield take(channel)
+      if (!event) {
+        Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
         continue
       }
-      Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification received in the channel')
-      yield call(handleNotification, data.message, data.stateType)
+      Logger.debug(
+        `${TAG}/watchFirebaseNotificationChannel`,
+        'Notification received in the channel'
+      )
+      yield call(handleNotification, event.message, event.stateType)
     }
   } catch (error) {
     Logger.error(
@@ -46,7 +44,7 @@ export function* watchFirebaseNotificationChannel(
       error
     )
   } finally {
-    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
+    Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
   }
 }
 
@@ -65,18 +63,29 @@ export const initializeAuth = async (app: ReactNativeFirebase.Module, address: s
     } else if (userData.address !== undefined && userData.address !== address) {
       // This shouldn't happen! If this is thrown it means the firebase user is reused
       // with different addresses (which we don't want) or the db was incorrectly changed remotely!
-      throw new Error("User address in the db doesn't match persisted address")
+      Logger.debug("User address in the db doesn't match persisted address - updating address")
+      return {
+        address,
+      }
     }
   })
   Logger.info(TAG, 'Firebase Auth initialized successfully')
+}
+
+export const firebaseSignOut = async (app: ReactNativeFirebase.FirebaseApp) => {
+  await app.auth().signOut()
 }
 
 export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, address: string) {
   Logger.info(TAG, 'Initializing Firebase Cloud Messaging')
 
   // this call needs to include context: https://github.com/redux-saga/redux-saga/issues/27
-  const enabled = yield call([app.messaging(), 'hasPermission'])
-  if (!enabled) {
+  // Manual type checking because yield calls can't infer return type yet :'(
+  const authStatus: Awaited<ReturnType<
+    FirebaseMessagingTypes.Module['hasPermission']
+  >> = yield call([app.messaging(), 'hasPermission'])
+  Logger.info(TAG, 'Current messaging authorization status', authStatus.toString())
+  if (authStatus === firebase.messaging.AuthorizationStatus.NOT_DETERMINED) {
     try {
       yield call([app.messaging(), 'requestPermission'])
     } catch (error) {
@@ -102,12 +111,9 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   })
 
   // Listen for notification messages while the app is open
-  const channelOnNotification: EventChannel<{
-    message: FirebaseMessagingTypes.RemoteMessage
-    stateType: NotificationReceiveState
-  }> = eventChannel((emitter) => {
-    const unsuscribe = () => {
-      Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
+  const channelOnNotification: EventChannel<NotificationChannelEvent> = eventChannel((emitter) => {
+    const unsubscribe = () => {
+      Logger.info(TAG, 'Notification channel closed, resetting callbacks. This is likely an error.')
       app.messaging().onMessage(() => null)
       app.messaging().onNotificationOpenedApp(() => null)
     }
@@ -127,25 +133,22 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
         stateType: NotificationReceiveState.APP_FOREGROUNDED,
       })
     })
-    return unsuscribe
+    return unsubscribe
   })
   yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
-  const initialNotification = yield call([app.messaging(), 'getInitialNotification'])
+  // Manual type checking because yield calls can't infer return type yet :'(
+  const initialNotification: Awaited<ReturnType<
+    FirebaseMessagingTypes.Module['getInitialNotification']
+  >> = yield call([app.messaging(), 'getInitialNotification'])
   if (initialNotification) {
-    Logger.info(TAG, 'App opened fresh via a notification')
-    yield call(
-      handleNotification,
-      initialNotification.notification,
-      NotificationReceiveState.APP_OPENED_FRESH
-    )
+    Logger.info(TAG, 'App opened fresh via a notification', JSON.stringify(initialNotification))
+    yield call(handleNotification, initialNotification, NotificationReceiveState.APP_OPENED_FRESH)
   }
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
     Logger.info(TAG, 'received Notification while app in Background')
-    Sentry.captureMessage(
-      `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
-    )
+    // Nothing to do while app is in background
     return Promise.resolve() // need to return a resolved promise so native code releases the JS context
   })
 }
@@ -167,19 +170,6 @@ export const registerTokenToDb = async (
   }
 }
 
-export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
-  try {
-    Logger.info(TAG, `Writing pending request to database`)
-    const pendingRequestRef = firebase.database().ref(`pendingRequests`)
-    yield call(() => pendingRequestRef.push(paymentInfo))
-
-    navigate(Screens.WalletHome)
-  } catch (error) {
-    Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
-    yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
-  }
-}
-
 export function isVersionBelowMinimum(version: string, minVersion: string): boolean {
   const minVersionArray = minVersion.split('.')
   const versionArray = version.split('.')
@@ -197,30 +187,73 @@ export function isVersionBelowMinimum(version: string, minVersion: string): bool
   return false
 }
 
+const VALUE_CHANGE_HOOK = 'value'
+
 /*
 Get the Version deprecation information.
-Firebase DB Format: 
+Firebase DB Format:
   (New) Add minVersion child to versions category with a string of the mininum version as string
 */
-export async function isAppVersionDeprecated() {
+export function appVersionDeprecationChannel() {
   if (!FIREBASE_ENABLED) {
-    return false
+    return null
   }
 
-  Logger.info(TAG, 'Checking version info')
-  const version = DeviceInfo.getVersion()
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
 
-  const versionsInfo = (
-    await firebase
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const minVersion = snapshot.val().minVersion
+      emit(minVersion)
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref('versions')
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
       .database()
       .ref('versions')
-      .once('value')
-  ).val()
-  if (!versionsInfo || !versionsInfo.minVersion) {
-    return false
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+    return cancel
+  })
+}
+
+export function appRemoteFeatureFlagChannel() {
+  if (!FIREBASE_ENABLED) {
+    return null
   }
-  const minVersion: string = versionsInfo.minVersion
-  return isVersionBelowMinimum(version, minVersion)
+
+  const errorCallback = (error: Error) => {
+    Logger.warn(TAG, error.toString())
+  }
+
+  return eventChannel((emit: any) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
+      const flags = snapshot.val()
+      Logger.debug(`Updated feature flags: ${JSON.stringify(flags)}`)
+      emit({
+        kotaniEnabled: flags?.kotaniEnabled || false,
+        pontoEnabled: flags?.pontoEnabled || false,
+      })
+    }
+    const cancel = () => {
+      firebase
+        .database()
+        .ref('versions/flags')
+        .off(VALUE_CHANGE_HOOK, emitter)
+    }
+
+    firebase
+      .database()
+      .ref('versions/flags')
+      .on(VALUE_CHANGE_HOOK, emitter, errorCallback)
+    return cancel
+  })
 }
 
 export async function setUserLanguage(address: string, language: string) {

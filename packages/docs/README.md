@@ -5,9 +5,22 @@ Welcome to the technical documentation site for the Celo project!
 In this documentation you’ll find information on:
 
 - An [overview](overview.md) of the high-level architecture of Celo
-- Tutorials to get you started with the Celo codebase and the [Celo networks](getting-started/choosing-a-network.md)
+- Tutorials to get you started with the [Celo SDK](developer-resources/start.md) and the [Celo networks](getting-started/choosing-a-network.md)
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
+
+## Quick Reference
+
+- CELO Owners
+  - [Start here](celo-holder-guide/quick-start.md) to find out how to access your account and earn rewards for participating in the network.
+- Validator & Node Operators
+  - Check out the [Validator overview page](validator-guide/overview.md).
+  - Consider running a node on the [Baklava testnet](getting-started/baklava-testnet.md) before getting started on Mainnet.
+  - Learn more about running nodes on [Mainnet](getting-started/mainnet.md).
+- Developers
+  - Start at the [developer tools page](developer-resources/overview.md) for help building a DApp or service on the Celo network.
+- Integration Guide
+  - [This section](developer-resources/integrations/integrations.md) includes guides on common ways for integrating Celo into your service. This may be relevant for custodians, exchanges or other services that intend to custody Celo assets like CELO and cUSD.
 
 ### About Celo
 
@@ -69,7 +82,7 @@ The [Alfajores Testnet](getting-started/alfajores-testnet.md) is the first of se
 The Alfajores Testnet’s tokens hold no real world economic value. The entirety of the testnet’s data will be reset on a regular basis. This will erase your accounts, their balance and your transaction history. Your use of the Alfajores Tesnet is subject to the [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md).
 {% endhint %}
 
-The [Baklava Testnet](getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
+The [Baklava Testnet](getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive CELO at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
 
 The Celo community's work is focused on the path to a production Celo network that holds economic value. This means testing, running security audits, and building broader involvement around a longer-term roadmap. The project also continues to remain focused on user experience.
 
@@ -86,7 +99,7 @@ Celo is a project with a mission of financial inclusion that consists entirely o
 Learn more about Celo:
 
 - [Overview of Celo’s architecture ](overview.md)
-- [Technical blog posts](https://medium.com/celohq/technical/home)
+- [Technical blog posts](https://medium.com/celoorg/technology/home)
 
 Browse the code, raise an issue, or contribute a PR:
 
@@ -102,8 +115,8 @@ Try Celo out:
 
 Read the Whitepapers:
 
-- [Main Celo Whitepaper](https://storage.googleapis.com/celo_whitepapers/Celo__A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf) and [introductory blog post](https://medium.com/celohq/a-look-at-the-celo-whitepaper-c0061118ffd4)
-- [Stability Analysis Whitepaper](https://storage.googleapis.com/celo_whitepapers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5)
+- [Main Celo Whitepaper](https://celo.org/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf) and [introductory blog post](https://medium.com/celohq/a-look-at-the-celo-whitepaper-c0061118ffd4)
+- [Stability Analysis Whitepaper](https://celo.org/papers/Celo_Stability_Analysis.pdf) and [blog post](https://medium.com/celohq/a-look-at-the-celo-stability-analysis-white-paper-part-1-23edd5ef8b5)
 - [BFTree \(Longer Term Consensus Plan\)](https://storage.googleapis.com/celo_whitepapers/BFTree%20-%20Scaling%20HotStuff%20to%20Millions%20of%20Validators.pdf)
 
 Alfajores Testnet links:
@@ -117,7 +130,7 @@ Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
 - [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
-- [Celo Subreddit](https://www.reddit.com/r/CeloHQ/)
+- [Celo Subreddit](https://www.reddit.com/r/celo/)
 - [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)
 

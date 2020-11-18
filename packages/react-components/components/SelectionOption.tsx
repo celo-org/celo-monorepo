@@ -1,63 +1,65 @@
+import Touchable from '@celo/react-components/components/Touchable'
 import CheckCircle from '@celo/react-components/icons/CheckCircle'
 import colors from '@celo/react-components/styles/colors'
-import variables from '@celo/react-components/styles/variables'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 interface Props {
-  word: string
-  selected: boolean
-  onSelectAnswer: (word: string, data: any) => void
+  text: string
+  isSelected: boolean
+  onSelect: (word: string, data: any) => void
+  hideCheckboxes?: boolean
   data?: any
   testID?: string
 }
 
-class SelectionOption extends React.Component<Props> {
-  onPress = () => {
-    this.props.onSelectAnswer(this.props.word, this.props.data)
+export default function SelectionOption({
+  text,
+  isSelected,
+  data,
+  onSelect,
+  testID,
+  hideCheckboxes,
+}: Props) {
+  function onPress() {
+    onSelect(text, data)
   }
 
-  render() {
-    return (
-      <TouchableOpacity onPress={this.onPress} testID={this.props.testID}>
-        <View
-          style={[
-            styles.answerContainer,
-            this.props.selected && { backgroundColor: colors.altDarkBg },
-          ]}
-        >
+  return (
+    <Touchable onPress={onPress} testID={testID}>
+      <View style={styles.contentContainer}>
+        {!hideCheckboxes && (
           <View style={styles.iconContainer}>
-            {!this.props.selected && <View style={styles.circle} />}
-            {this.props.selected && <CheckCircle />}
+            {/* TODO: make proper checkbox */}
+            {!isSelected && <View style={styles.circle} />}
+            {isSelected && <CheckCircle />}
           </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.answerText}>{this.props.word}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    )
-  }
+        )}
+        <Text style={styles.text} numberOfLines={1}>
+          {text}
+        </Text>
+      </View>
+    </Touchable>
+  )
 }
 
 const styles = StyleSheet.create({
-  answerContainer: {
+  contentContainer: {
     flexDirection: 'row',
-    height: 60,
     alignItems: 'center',
-  },
-  textContainer: {
+    marginLeft: 16,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderColor: colors.darkLightest,
-    justifyContent: 'center',
-    height: 60,
-    width: variables.width - (12 * 2 + 24), // entire screen minus selection circle and padding around the circle
+    borderColor: colors.gray2,
   },
-  answerText: {
-    fontSize: 16,
-    color: colors.dark,
+  text: {
+    ...fontStyles.regular,
+    flex: 1,
+    marginRight: 16,
   },
   iconContainer: {
-    marginHorizontal: 12,
+    marginRight: 16,
   },
   circle: {
     paddingTop: 2,
@@ -65,8 +67,6 @@ const styles = StyleSheet.create({
     width: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.inactive,
+    borderColor: colors.gray4,
   },
 })
-
-export default SelectionOption

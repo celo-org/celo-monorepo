@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
+	<desc>Symbol for the Celo Dollar currency</desc>
+	<path id="symbol-celo-dollar" fill="#FFF" d="M479 760c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm92-206h52v-12l-4-26c56-6 91-37 91-82 0-106-180-63-180-117 0-19 22-31 60-31 30 0 62 8 92 21v-52c-21-6-44-10-68-11l4-26v-12h-52v12l4 26c-59 6-94 34-94 75 0 110 180 60 180 119 0 20-24 33-59 33-36 0-73-11-118-32v54c30 14 62 21 96 23l-4 26v12z"/>
+	<use xlink:href="#symbol-celo-dollar" fill-opacity=".5"></use>
+</svg>

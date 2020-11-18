@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { filterCommitment, filterDept, filterLocation, LeverJob } from 'src/jobs/lever'
 import JobsTable from 'src/jobs/version3/JobTable'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import Fade from 'src/shared/AwesomeFade'
 import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
 import { hashNav } from 'src/shared/menu-items'
@@ -46,7 +46,9 @@ const MAIN_LOCATIONS = [
 function getWorldWideLocations(jobs: LeverJob[]) {
   return jobs.reduce((collection, current) => {
     if (
-      ![Locations.SF.toString(), Locations.BER.toString()].includes(current.categories.location)
+      ![Locations.SF.toString(), Locations.BER.toString(), Locations.BA.toString()].includes(
+        current.categories.location
+      )
     ) {
       return collection.add(current.categories.location)
     } else {
@@ -152,7 +154,7 @@ class Jobs extends React.Component<Props, State> {
           >
             <Cell span={Spans.fourth}>
               <View>
-                <Fade bottom={true} distance="40px" wait={200}>
+                <Fade distance="40px" delay={200}>
                   <View>
                     <Text style={[fonts.h3Mobile, textStyles.heading]}>
                       {t('careerOpportunities')}

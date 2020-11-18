@@ -51,6 +51,8 @@ spec:
               trap "touch /tmp/pod/main-terminated" EXIT
               node lib/crawler.js
             env:
+            - name: LOG_FORMAT
+              value: stackdriver
             - name: PGHOST
               value: "127.0.0.1"
             - name: PGPORT
@@ -69,6 +71,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}
                   key: DATABASE_PASSWORD
+            - name: DISCORD_WEBHOOK_URL
+              value: {{ .Values.blockscout.metadata_crawler.discord_webhook_url }}
+            - name: CLUSTER_NAME
+              value: {{ .Values.blockscout.metadata_crawler.discord_cluster_name }}
             volumeMounts:
             - mountPath: /tmp/pod
               name: tmp-pod

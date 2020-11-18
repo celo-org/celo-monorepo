@@ -1,29 +1,27 @@
-import * as dotProp from 'dot-prop-immutable'
-import { Actions, ActionTypes, Invitees } from 'src/invite/actions'
+import { Actions as AccountActions, ActionTypes as AccountActionTypes } from 'src/account/actions'
+import { Actions, ActionTypes, InviteDetails } from 'src/invite/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
   isSendingInvite: boolean
   isRedeemingInvite: boolean
-  isSkippingInvite: boolean
-  invitees: Invitees
+  invitees: InviteDetails[]
   redeemComplete: boolean
-  redeemedInviteCode: string
+  redeemedTempAccountPrivateKey: string | null
 }
 
 export const initialState: State = {
   isSendingInvite: false,
   isRedeemingInvite: false,
-  isSkippingInvite: false,
-  invitees: {},
+  invitees: [],
   redeemComplete: false,
-  redeemedInviteCode: '',
+  redeemedTempAccountPrivateKey: null,
 }
 
 export const inviteReducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | AccountActionTypes | RehydrateAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -33,7 +31,6 @@ export const inviteReducer = (
         ...getRehydratePayload(action, 'invite'),
         isSendingInvite: false,
         isRedeemingInvite: false,
-        isSkippingInvite: false,
       }
     }
     case Actions.SEND_INVITE:
@@ -47,13 +44,15 @@ export const inviteReducer = (
         isSendingInvite: false,
       }
     case Actions.STORE_INVITEE_DATA:
-      // TODO(Rossy) refactor the invitees structure to also save invite code and
-      // decide on UI for showing users those invite codes, see #2639
-      return dotProp.merge(state, 'invitees', { [action.address]: action.e164Number })
+      // TODO(Rossy / Tarik) decide on UI for showing users the invite codes they've sent, see #2639
+      return {
+        ...state,
+        invitees: [...state.invitees, action.inviteDetails],
+      }
     case Actions.REDEEM_INVITE:
       return {
         ...state,
-        redeemedInviteCode: action.inviteCode,
+        redeemedTempAccountPrivateKey: action.tempAccountPrivateKey,
         isRedeemingInvite: true,
       }
     case Actions.REDEEM_INVITE_SUCCESS:
@@ -68,22 +67,21 @@ export const inviteReducer = (
         redeemComplete: false,
         isRedeemingInvite: false,
       }
-    case Actions.SKIP_INVITE:
-      return {
-        ...state,
-        isSkippingInvite: true,
-      }
-    case Actions.SKIP_INVITE_SUCCESS:
-      return {
-        ...state,
-        redeemComplete: true,
-        isSkippingInvite: false,
-      }
-    case Actions.SKIP_INVITE_FAILURE:
+    case AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
       return {
         ...state,
         redeemComplete: false,
-        isSkippingInvite: false,
+        isRedeemingInvite: false,
+      }
+    case AccountActions.INITIALIZE_ACCOUNT_SUCCESS:
+      return {
+        ...state,
+        redeemComplete: true,
+      }
+    case AccountActions.INITIALIZE_ACCOUNT_FAILURE:
+      return {
+        ...state,
+        redeemComplete: false,
       }
     default:
       return state

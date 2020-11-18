@@ -19,7 +19,7 @@
 
 ▸ **compareLedgerAppVersions**(`version1`: string, `version2`: string): *number*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L33)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L33)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ ___
 
 ▸ **list**(): *[TokenInfo](../interfaces/_wallets_ledger_utils_tokens_.tokeninfo.md)[]*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L16)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L16)*
 
 list all the ERC20 tokens informations
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **tokenInfoByAddressAndChainId**(`contract`: [Address](_base_.md#address), `chainId`: number): *[TokenInfo](../interfaces/_wallets_ledger_utils_tokens_.tokeninfo.md) | null | undefined*
 
-*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L8)*
+*Defined in [packages/contractkit/src/wallets/ledger-utils/tokens.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L8)*
 
 Retrieve the token information by a given contract address and chainId if any
 

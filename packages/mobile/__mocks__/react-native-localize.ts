@@ -11,6 +11,7 @@ NativeModules.RNLocalize = {
       },
     ],
     currencies: ['MXN', 'USD'],
+    country: 'US',
   },
 }
 
@@ -20,4 +21,5 @@ module.exports = {
     decimalSeparator: '.',
     groupingSeparator: ',',
   })),
+  getTimeZone: jest.fn(() => 'America/New_York'),
 }

@@ -1,15 +1,24 @@
-import Button from '@celo/react-components/components/Button'
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
-import { componentStyles } from '@celo/react-components/styles/styles'
-import { shallow } from 'enzyme'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
+
+const styles = StyleSheet.create({
+  errorMessage: {
+    ...fontStyles.regular,
+    fontSize: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(238, 238, 238, 0.75)',
+    padding: 15,
+  },
+})
 
 function FullscreenCTAContentMaker(errorMessage: string) {
   return (
     <View>
-      <Text style={componentStyles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
+      <Text style={styles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
         {errorMessage}
       </Text>
     </View>
@@ -33,7 +42,7 @@ describe('FullscreenCTA', () => {
   describe('when press the button', () => {
     it('calls the restart prop', () => {
       const restartApp = jest.fn()
-      const contactCircle = shallow(
+      const { getByName } = render(
         <FullscreenCTA
           title={'Opps'}
           subtitle={'Something went wrong'}
@@ -43,7 +52,7 @@ describe('FullscreenCTA', () => {
           {FullscreenCTAContentMaker('There was an unexpected error')}
         </FullscreenCTA>
       )
-      contactCircle.find(Button).simulate('press')
+      fireEvent.press(getByName('Button'))
       expect(restartApp).toHaveBeenCalled()
     })
   })

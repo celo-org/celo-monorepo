@@ -1,16 +1,17 @@
 import sleep from 'sleep-promise'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
+  checkHelmVersion,
   createAndUploadBackupSecretIfNotExists,
   getServiceAccountName,
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
-  redeployTiller,
-  uploadStorageClass,
+  installGCPSSDStorageClass
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = [
@@ -24,6 +25,7 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
+  await checkHelmVersion()
 
   await switchToProjectFromEnv()
 
@@ -87,6 +89,8 @@ export async function createNamespaceIfNotExists(namespace: string) {
 export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   const envType = fetchEnv(envVar.ENV_TYPE)
 
+  await checkHelmVersion()
+
   await createNamespaceIfNotExists(celoEnv)
 
   const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
@@ -108,17 +112,17 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
     await pollForRunningCluster()
   }
 
-  console.info('Deploying Tiller and Helm chart...')
+  console.info('Deploying Tiller and Cert Manager Helm chart...')
 
-  await uploadStorageClass()
-  await redeployTiller()
+  await installGCPSSDStorageClass()
 
   await installCertManagerAndNginx()
 
   if (envType !== EnvTypes.DEVELOPMENT) {
+    console.info('Installing metric tools installation')
     await installAndEnableMetricsDeps(true)
   } else {
-    console.info('Skipping metrics installation for this development env.')
+    console.info('Skipping metric tools installation for this development env')
   }
 
   await setClusterLabels(celoEnv)
@@ -180,8 +184,10 @@ export async function setClusterLabels(celoEnv: string) {
   await labelfn('envinstance', celoEnv)
 }
 
-export function getKubernetesClusterRegion(): string {
-  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+export function getKubernetesClusterRegion(zone?: string): string {
+  if (!zone) {
+    zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  }
   const matches = zone.match('^[a-z]+-[a-z]+[0-9]')
   if (matches) {
     return matches[0]
@@ -201,7 +207,7 @@ export interface HelmRelease {
 }
 
 export async function getNonSystemHelmReleases(): Promise<HelmRelease[]> {
-  const [json] = await execCmdWithExitOnFailure(`helm list --output json`)
+  const [json] = await execCmdWithExitOnFailure(`helm list -A --output json`)
   const releases: HelmRelease[] = JSON.parse(json).Releases
   return releases.filter((release) => !SYSTEM_HELM_RELEASES.includes(release.Name))
 }

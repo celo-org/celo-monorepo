@@ -1,151 +1,220 @@
-import { clusterName, createIdentityIfNotExists, resourceGroup } from 'src/lib/azure'
-import { getFornoUrl } from 'src/lib/endpoints'
-import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { ensureLeading0x } from '@celo/utils/src/address'
+import { DynamicEnvVar, envVar, fetchEnv } from 'src/lib/env-utils'
+import { getCloudProviderFromContext, getContextDynamicEnvVarValues } from './context-utils'
+import { AccountType, getPrivateKeysFor, privateKeyToAddress } from './generate_utils'
+import { AksClusterConfig } from './k8s-cluster/aks'
+import { AwsClusterConfig } from './k8s-cluster/aws'
+import { BaseClusterManager, CloudProvider } from './k8s-cluster/base'
+import { AksHsmOracleDeployer, AksHsmOracleDeploymentConfig, AksHsmOracleIdentity } from './k8s-oracle/aks-hsm'
+import { AwsHsmOracleDeployer, AwsHsmOracleDeploymentConfig, AwsHsmOracleIdentity } from './k8s-oracle/aws-hsm'
+import { BaseOracleDeployer } from './k8s-oracle/base'
+import { PrivateKeyOracleDeployer, PrivateKeyOracleDeploymentConfig, PrivateKeyOracleIdentity } from './k8s-oracle/pkey'
 
-const helmChartPath = '../helm-charts/oracle'
-const rbacHelmChartPath = '../helm-charts/oracle-rbac'
+/**
+ * Maps each cloud provider to the correct function to get the appropriate
+ * HSM-based oracle deployer.
+ */
+const hsmOracleDeployerGetterByCloudProvider: {
+  [key in CloudProvider]?: (celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) => BaseOracleDeployer
+} = {
+  [CloudProvider.AWS]: getAwsHsmOracleDeployer,
+  [CloudProvider.AZURE]: getAksHsmOracleDeployer,
+}
 
-export async function installHelmChart(celoEnv: string) {
-  // First install the oracle-rbac helm chart.
-  // This must be deployed before so we can use a resulting auth token so that
-  // oracle pods can reach the K8s API server to change their aad labels
-  await installOracleRBACHelmChart(celoEnv)
-  // Then install the oracle helm chart
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    await helmParameters(celoEnv)
+/**
+ * Gets the appropriate oracle deployer for the given context. If the env vars
+ * specify that the oracle addresses should be generated from the mnemonic,
+ * then the cloud-provider agnostic deployer PrivateKeyOracleDeployer is used.
+ */
+export function getOracleDeployerForContext(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  // If the mnemonic-based oracle address env var has a value, we should be using
+  // the private key oracle deployer
+  const { addressesFromMnemonicCount } = getContextDynamicEnvVarValues(
+    mnemonicBasedOracleIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressesFromMnemonicCount: '',
+    }
   )
-}
-
-export async function removeHelmRelease(celoEnv: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
-  await removeOracleRBACHelmRelease(celoEnv)
-}
-
-async function helmParameters(celoEnv: string) {
-  const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
-  const replicas = oracleAddressesAndVaults().length
-  return [
-    `--set environment.name=${celoEnv}`,
-    `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
-    `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    `--set kube.authTokenName=${kubeAuthTokenName}`,
-    `--set oracle.replicas=${replicas}`,
-    `--set oracle.rpcProviderUrl=${getFornoUrl(celoEnv)}`,
-  ].concat(await oracleIdentityHelmParameters(celoEnv))
-}
-
-async function oracleIdentityHelmParameters(celoEnv: string) {
-  const addressesAndVaults = oracleAddressesAndVaults()
-  const replicas = addressesAndVaults.length
-  let params: string[] = []
-  for (let i = 0; i < replicas; i++) {
-    const identity = await createOracleIdentityIfNotExists(celoEnv, i)
-    const { address, keyVaultName: vaultName } = addressesAndVaults[i]
-    const prefix = `--set oracle.identities[${i}]`
-    params = params.concat([
-      `${prefix}.address=${address}`,
-      `${prefix}.azure.id=${identity.id}`,
-      `${prefix}.azure.clientId=${identity.clientId}`,
-      `${prefix}.azure.keyVaultName=${vaultName}`,
-    ])
+  if (addressesFromMnemonicCount) {
+    const addressesFromMnemonicCountNum = parseInt(addressesFromMnemonicCount, 10)
+    // This is a cloud-provider agnostic deployer because it doesn't rely
+    // on cloud-specific HSMs
+    return getPrivateKeyOracleDeployer(celoEnv, context, useForno, addressesFromMnemonicCountNum)
   }
-  return params
+  // If we've gotten this far, we should be using an HSM-based oracle deployer
+  const cloudProvider: CloudProvider = getCloudProviderFromContext(context)
+  return hsmOracleDeployerGetterByCloudProvider[cloudProvider]!(celoEnv, context, useForno, clusterManager)
 }
 
-function releaseName(celoEnv: string) {
-  return `${celoEnv}-oracle`
-}
+/**
+ * ----------- AksHsmOracleDeployer helpers -----------
+ */
 
-async function createOracleIdentityIfNotExists(celoEnv: string, index: number) {
-  const identity = await createIdentityIfNotExists(oracleIdentityName(celoEnv, index))
-
-  // Grant the service principal permission to manage the oracle identity.
-  // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
-  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
-    `az aks show -n ${clusterName()} --query servicePrincipalProfile.clientId -g ${resourceGroup()} -o tsv`
+/**
+ * Gets an AksHsmOracleDeployer by looking at env var values
+ */
+function getAksHsmOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  const { addressKeyVaults } = getContextDynamicEnvVarValues(
+    aksHsmOracleIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressKeyVaults: '',
+    }
   )
-  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
-  await execCmdWithExitOnFailure(
-    `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
-  )
-  // Allow the oracle identity to access the correct key vault
-  await execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultName(
-      index
-    )} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${resourceGroup()}`
-  )
-  return identity
+  const aksClusterConfig = clusterManager.clusterConfig as AksClusterConfig
+  const identities = getAksHsmOracleIdentities(addressKeyVaults, aksClusterConfig.resourceGroup)
+  const deploymentConfig: AksHsmOracleDeploymentConfig = {
+    context,
+    clusterConfig: aksClusterConfig,
+    identities,
+    useForno,
+  }
+  return new AksHsmOracleDeployer(deploymentConfig, celoEnv)
 }
 
-function oracleIdentityName(celoEnv: string, index: number) {
-  return `${celoEnv}-oracle-${index}`
-}
-
-function keyVaultName(oracleIndex: number) {
-  return oracleAddressesAndVaults()[oracleIndex].keyVaultName
-}
-
-// Decodes the env variable ORACLE_ADDRESS_KEY_VAULTS of the form:
-//   <address>:<keyVaultName>,<address>:<keyVaultName>
-//   eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
-// into an array in the same order
-function oracleAddressesAndVaults(): Array<{
-  address: string
-  keyVaultName: string
-}> {
-  const vaultNamesAndAddresses = fetchEnv(envVar.ORACLE_ADDRESS_KEY_VAULTS).split(',')
-  const addressesAndVaults = []
-  for (const nameAndAddress of vaultNamesAndAddresses) {
-    const [address, vaultName] = nameAndAddress.split(':')
-    if (!address || !vaultName) {
+/**
+ * Given a string addressAzureKeyVaults containing comma separated info of the form:
+ * <address>:<keyVaultName>:<resourceGroup (optional)>
+ * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1:resourceGroup1
+ * returns an array of AksHsmOracleIdentity in the same order
+ */
+export function getAksHsmOracleIdentities(addressAzureKeyVaults: string, defaultResourceGroup: string): AksHsmOracleIdentity[] {
+  const identityStrings = addressAzureKeyVaults.split(',')
+  const identities = []
+  for (const identityStr of identityStrings) {
+    const [address, keyVaultName, resourceGroup] = identityStr.split(':')
+    // resourceGroup can be undefined
+    if (!address || !keyVaultName) {
       throw Error(
-        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${vaultName}`
+        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
       )
     }
-    addressesAndVaults.push({
+    identities.push({
       address,
-      keyVaultName: vaultName,
+      keyVaultName,
+      resourceGroup: resourceGroup || defaultResourceGroup
     })
   }
-  return addressesAndVaults
+  return identities
 }
 
-// Oracle RBAC------
-// We need the oracle pods to be able to change their label to accommodate
-// limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
-// To do this, we use an auth token that we get using the resources in the `oracle-rbac` chart
+/**
+ * Config values pulled from env vars used for generating an AksHsmOracleIdentity
+ */
+interface AksHsmOracleIdentityConfig {
+  addressKeyVaults: string
+}
 
-async function installOracleRBACHelmChart(celoEnv: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    rbacReleaseName(celoEnv),
-    rbacHelmChartPath,
-    rbacHelmParameters(celoEnv)
+/**
+ * Env vars corresponding to each value for the AksHsmOracleIdentityConfig for a particular context
+ */
+const aksHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AksHsmOracleIdentityConfig]: DynamicEnvVar } = {
+  addressKeyVaults: DynamicEnvVar.ORACLE_ADDRESS_AZURE_KEY_VAULTS,
+}
+
+/**
+ * ----------- AwsHsmOracleDeployer helpers -----------
+ */
+
+/**
+ * Gets an AwsHsmOracleDeployer by looking at env var values
+ */
+function getAwsHsmOracleDeployer(celoEnv: string, context: string, useForno: boolean, clusterManager: BaseClusterManager) {
+  const { addressKeyAliases } = getContextDynamicEnvVarValues(
+    awsHsmOracleIdentityConfigDynamicEnvVars,
+    context,
+    {
+      addressKeyAliases: '',
+    }
   )
+
+  const identities = getAwsHsmOracleIdentities(addressKeyAliases)
+  const deploymentConfig: AwsHsmOracleDeploymentConfig = {
+    context,
+    identities,
+    useForno,
+    clusterConfig: clusterManager.clusterConfig as AwsClusterConfig
+  }
+  return new AwsHsmOracleDeployer(deploymentConfig, celoEnv)
 }
 
-function removeOracleRBACHelmRelease(celoEnv: string) {
-  return removeGenericHelmChart(rbacReleaseName(celoEnv))
+/**
+ * Given a string addressKeyAliases containing comma separated info of the form:
+ * <address>:<keyAlias>:<region (optional)>
+ * eg: 0x0000000000000000000000000000000000000000:keyAlias0,0x0000000000000000000000000000000000000001:keyAlias1:region1
+ * returns an array of AwsHsmOracleIdentity in the same order
+ */
+export function getAwsHsmOracleIdentities(addressKeyAliases: string): AwsHsmOracleIdentity[] {
+  const identityStrings = addressKeyAliases.split(',')
+  const identities = []
+  for (const identityStr of identityStrings) {
+    const [address, keyAlias, region] = identityStr.split(':')
+    // region can be undefined
+    if (!address || !keyAlias) {
+      throw Error(
+        `Address or key alias is invalid. Address: ${address} Key Alias: ${keyAlias}`
+      )
+    }
+    identities.push({
+      address,
+      keyAlias,
+      region
+    })
+  }
+  return identities
 }
 
-function rbacHelmParameters(celoEnv: string) {
-  return [`--set environment.name=${celoEnv}`]
+/**
+ * Config values pulled from env vars used for generating an AwsHsmOracleIdentity
+ */
+interface AwsHsmOracleIdentityConfig {
+  addressKeyAliases: string
 }
 
-function rbacReleaseName(celoEnv: string) {
-  return `${celoEnv}-oracle-rbac`
+/**
+ * Env vars corresponding to each value for the AwsHsmOracleIdentityConfig for a particular context
+ */
+const awsHsmOracleIdentityConfigDynamicEnvVars: { [k in keyof AwsHsmOracleIdentityConfig]: DynamicEnvVar } = {
+  addressKeyAliases: DynamicEnvVar.ORACLE_ADDRESS_AWS_KEY_ALIASES,
 }
 
-async function rbacAuthTokenName(celoEnv: string) {
-  const [tokenName] = await execCmdWithExitOnFailure(
-    `kubectl get serviceaccount --namespace=${celoEnv} ${rbacReleaseName(
-      celoEnv
-    )} -o=jsonpath="{.secrets[0]['name']}"`
-  )
-  return tokenName.trim()
+/**
+ * ----------- PrivateKeyOracleDeployer helpers -----------
+ */
+
+/**
+ * Gets an AwsHsmOracleDeployer by looking at env var values and generating private keys
+ * from the mnemonic
+ */
+function getPrivateKeyOracleDeployer(celoEnv: string, context: string, useForno: boolean, count: number): PrivateKeyOracleDeployer {
+  const identities: PrivateKeyOracleIdentity[] = getPrivateKeysFor(
+    AccountType.PRICE_ORACLE,
+    fetchEnv(envVar.MNEMONIC),
+    count
+  ).map((pkey) => ({
+    address: privateKeyToAddress(pkey),
+    privateKey: ensureLeading0x(pkey)
+  }))
+  const deploymentConfig: PrivateKeyOracleDeploymentConfig = {
+    context,
+    identities,
+    useForno
+  }
+  return new PrivateKeyOracleDeployer(deploymentConfig, celoEnv)
+}
+
+/**
+ * Config values pulled from env vars used for generating a PrivateKeyOracleIdentity
+ * from a mnemonic
+ */
+interface MnemonicBasedOracleIdentityConfig {
+  addressesFromMnemonicCount: string
+}
+
+/**
+ * Env vars corresponding to each value for the MnemonicBasedOracleIdentityConfig for a particular context
+ */
+const mnemonicBasedOracleIdentityConfigDynamicEnvVars: { [k in keyof MnemonicBasedOracleIdentityConfig]: DynamicEnvVar } = {
+  addressesFromMnemonicCount: DynamicEnvVar.ORACLE_ADDRESSES_FROM_MNEMONIC_COUNT,
 }

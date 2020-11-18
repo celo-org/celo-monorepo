@@ -82,7 +82,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rateText: {
-    ...fontStyles.bodySecondary,
+    ...fontStyles.regular,
+    color: colors.gray3,
     textAlign: 'center',
   },
   ratio: {
@@ -92,6 +93,6 @@ const styles = StyleSheet.create({
   finePrint: {
     textAlign: 'center',
     fontSize: 12,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
 })

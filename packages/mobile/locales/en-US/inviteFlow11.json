@@ -1,32 +1,32 @@
 {
   "cancel": "Cancel",
-  "needMoreFundsToInvite": "Need More Funds To Invite",
   "inviteWithWhatsapp": "Invite with WhatsApp",
   "inviteWithSMS": "Invite with SMS",
-  "reviewInvite": "Review Invite",
   "inviteFee": "Invite Fee",
   "whySendFees": "This fee covers costs for the new user to verify their phone number",
   "whyReceiveFees": "You were sent some money to verify your account",
   "edit": "Edit",
   "to": "To",
   "inviteSent": "Invite Sent",
-  "noResults": "No Results For",
   "searchForSomeone": "Search for someone using their name or phone number",
-  "redeemSuccess": "Successfully redeemed invite code.",
   "redeemFailed": "Failure redeeming code ",
   "redeemInviteTimeout": "Redeem Invite Timed out",
   "accountSetupFailed": "Failed to create your wallet",
   "emptyInviteCode": "Invite code has no funds",
-  "withdrawGoldFromEscrow": "Withdrawing gold from escrow...",
-  "transferGoldToAccount": "Gold transferred to your account!",
-  "withdrawDollarsFromEscrow": "Withdrawing {{dollars}} from escrow...",
   "transferDollarsToAccount": "{{Dollars}} transferred to your account!",
-  "inviteFriendsToCelo": "Invite Friends to Celo",
-  "inviteAnyone": "Invite Anyone in your address book to send and receive value",
-  "inviteComplete": "Invite Complete",
+  "inviteFriendsToCelo": "Invite Friends to {{appName}}",
+  "inviteAnyone": "Send easily to your friends by adding your contacts",
   "inviteReceived": "Invite Received",
-  "escrowPaymentNotificationTitle": "Invited and paid {{mobile}} (<3></3>)",
-  "escrowPaymentNotificationLine": "<0>{{recipientPhone}} for</0> <1></1>",
-  "escrowPaymentNotificationLine_missingRecipientPhone": "<0>Unknown for</0> <1></1>",
-  "defaultComment": "Invited and sent payment"
+  "escrowPaymentNotificationTitle": "Invited {{mobile}}",
+  "inviteDialog": {
+    "title": "Invite a Friend",
+    "body": "Connect and share value with your friends and family on Valora.",
+    "button": "Invite"
+  },
+  "sendAndInvite": "Send & Invite",
+  "inviteAndSendDialog": {
+    "title": "Invite and Send",
+    "body": "Your payment to {{name}} will be waiting for them once they verify their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
+    "button": "Invite"
+  }
 }

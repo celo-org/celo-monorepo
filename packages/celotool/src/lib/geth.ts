@@ -16,6 +16,7 @@ import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -28,7 +29,7 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(
@@ -772,6 +773,9 @@ export async function importPrivateKey(
 ) {
   const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
 
+  if (!instance.privateKey) {
+    throw new Error('Unexpected empty private key')
+  }
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
   if (verbose) {
@@ -872,6 +876,7 @@ export async function startGeth(
     rpcport,
     wsport,
     validating,
+    replica,
     validatingGasPrice,
     bootnodeEnode,
     isProxy,
@@ -914,6 +919,8 @@ export async function startGeth(
     'extip:127.0.0.1',
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
+    '--istanbul.blockperiod',
+    blocktime.toString(),
   ]
 
   if (rpcport) {
@@ -952,16 +959,20 @@ export async function startGeth(
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine', '--minerthreads=10')
+    if (!replica) {
+      gethArgs.push(`--nodekeyhex=${privateKey}`)
+    }
 
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
     }
 
-    gethArgs.push(`--istanbul.blockperiod`, blocktime.toString())
-
     if (isProxied) {
       gethArgs.push('--proxy.proxied')
+    }
+    if (replica) {
+      gethArgs.push('--istanbul.replica')
     }
   } else if (isProxy) {
     gethArgs.push('--proxy.proxy')
@@ -969,7 +980,7 @@ export async function startGeth(
       gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
     gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    // gethArgs.push(`--nodekeyhex=${privateKey}`)
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {
@@ -982,7 +993,7 @@ export async function startGeth(
     if (proxyAllowPrivateIp) {
       gethArgs.push('--proxy.allowprivateip=true')
     }
-    gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
+    gethArgs.push(`--proxy.proxyenodeurlpairs=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
   if (privateKey || ethstats) {
@@ -1168,7 +1179,7 @@ export async function connectPeers(instances: GethInstanceConfig[], verbose: boo
 // Add validator 0 as a peer of each other validator.
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
   await connectPeers(
-    instances.filter(({ wsport, rpcport, validating }) => validating && (wsport || rpcport))
+    instances.filter(({ wsport, rpcport, validating, isProxy, isProxied }) => ((validating && !isProxied) || isProxy)  && (wsport || rpcport))
   )
 }
 

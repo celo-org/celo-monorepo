@@ -3,6 +3,11 @@
 exports[`DevelopersPage renders 1`] = `
 <div
   className="css-view-1dbjc4n"
+  style={
+    Object {
+      "scrollPadding": "20px",
+    }
+  }
 >
   <div
     className="css-view-1dbjc4n"
@@ -180,6 +185,7 @@ exports[`DevelopersPage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexPack": "center",
+          "msGridRowAlign": "center",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "width": "100%",
@@ -217,6 +223,7 @@ exports[`DevelopersPage renders 1`] = `
           aria-level="1"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -238,6 +245,7 @@ exports[`DevelopersPage renders 1`] = `
           aria-level="4"
           className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           role="heading"
           style={
             Object {
@@ -256,12 +264,7 @@ exports[`DevelopersPage renders 1`] = `
       </div>
     </div>
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": 0,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -288,6 +291,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
               "msFlexPack": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -392,6 +396,7 @@ exports[`DevelopersPage renders 1`] = `
                   aria-level="3"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -411,6 +416,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -432,8 +438,6 @@ exports[`DevelopersPage renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -469,7 +473,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/overview/introduction"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -590,6 +593,7 @@ exports[`DevelopersPage renders 1`] = `
                   aria-level="3"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -609,6 +613,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -630,8 +635,6 @@ exports[`DevelopersPage renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -667,7 +670,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://docs.celo.org/v/master/developer-guide/start"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -788,6 +790,7 @@ exports[`DevelopersPage renders 1`] = `
                   aria-level="3"
                   className="css-reset-4rbku5 css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   role="heading"
                   style={
                     Object {
@@ -807,6 +810,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -828,8 +832,6 @@ exports[`DevelopersPage renders 1`] = `
                 onMouseEnter={[Function]}
                 onMouseLeave={[Function]}
                 onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
               >
                 <div
                   className="css-view-1dbjc4n"
@@ -865,7 +867,6 @@ exports[`DevelopersPage renders 1`] = `
                     dir="auto"
                     href="https://github.com/celo-org"
                     onClick={[Function]}
-                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -937,1231 +938,6 @@ exports[`DevelopersPage renders 1`] = `
         Object {
           "WebkitAlignSelf": "center",
           "WebkitBoxDirection": "normal",
-          "WebkitBoxOrient": "vertical",
-          "WebkitFlexDirection": "column",
-          "alignSelf": "center",
-          "flexDirection": "column",
-          "marginTop": "50px",
-          "maxWidth": "100vw",
-          "msFlexDirection": "column",
-          "msFlexItemAlign": "center",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxFlex": 0,
-            "WebkitFlexGrow": 0,
-            "WebkitFlexShrink": 0,
-            "flexGrow": 0,
-            "flexShrink": 0,
-            "msFlexNegative": 0,
-            "msFlexPositive": 0,
-            "paddingBottom": "10px",
-            "paddingLeft": "10px",
-            "paddingRight": "10px",
-            "paddingTop": "10px",
-            "width": "100%",
-          }
-        }
-      >
-        <h3
-          aria-level="3"
-          className="css-reset-4rbku5 css-text-901oao"
-          dir="auto"
-          role="heading"
-          style={
-            Object {
-              "color": "rgba(255,255,255,1.00)",
-              "fontFamily": "Jost, futura-pt, futura, sans-serif",
-              "fontSize": "24px",
-              "lineHeight": "32px",
-              "textRendering": "geometricPrecision",
-              "textTransform": "none",
-            }
-          }
-        >
-          Try it Out
-        </h3>
-        <h2
-          aria-level="2"
-          className="css-reset-4rbku5 css-text-901oao"
-          dir="auto"
-          role="heading"
-          style={
-            Object {
-              "color": "rgba(255,255,255,1.00)",
-              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-              "fontSize": "28px",
-              "lineHeight": "32px",
-              "marginBottom": "20px",
-              "marginTop": "20px",
-              "textRendering": "geometricPrecision",
-              "textTransform": "none",
-            }
-          }
-        >
-          Sample Celo Integration
-        </h2>
-        <div
-          className="css-text-901oao"
-          dir="auto"
-          style={
-            Object {
-              "color": "rgba(255,255,255,1.00)",
-              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-              "fontSize": "20px",
-              "lineHeight": "28px",
-              "textRendering": "geometricPrecision",
-            }
-          }
-        >
-          This code snippet uses an account to transfer cUSD.
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
-              "WebkitBoxPack": "center",
-              "WebkitJustifyContent": "center",
-              "alignItems": "center",
-              "justifyContent": "center",
-              "marginBottom": "40px",
-              "marginTop": "40px",
-              "msFlexAlign": "center",
-              "msFlexPack": "center",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "height": "100%",
-                "marginBottom": "30px",
-                "marginTop": "30px",
-                "maxHeight": "80vh",
-                "width": "100%",
-              }
-            }
-          >
-            <svg
-              fill="none"
-              style={Object {}}
-              viewBox="0 0 716 430"
-            >
-              <g
-                opacity="0.1"
-                style={
-                  Object {
-                    "mixBlendMode": "screen",
-                  }
-                }
-              >
-                <rect
-                  fill="#2E3338"
-                  height="428"
-                  rx="2"
-                  stroke="#2E3338"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="714"
-                  x="1"
-                  y="1"
-                />
-                <path
-                  d="M0 2.99999C0 1.34314 1.34315 0 3 0H358V430H3C1.34314 430 0 428.657 0 427V2.99999Z"
-                  fill="#57616B"
-                />
-              </g>
-              <g
-                opacity="0.4"
-                style={
-                  Object {
-                    "mixBlendMode": "screen",
-                  }
-                }
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="6"
-                    rx="3"
-                    stroke="#BF97FF"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="152"
-                    x="490"
-                    y="172"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#BF97FF"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="152"
-                    x="537"
-                    y="191"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#BF97FF"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="26"
-                    x="532"
-                    y="211"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#BF97FF"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="30"
-                    x="508"
-                    y="231"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#BF97FF"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="29"
-                    x="516"
-                    y="251"
-                  />
-                </g>
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#45D68A"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="7"
-                  x="472"
-                  y="152"
-                />
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#FB7C6D"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="243"
-                    x="425"
-                    y="33"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#FB7C6D"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="168"
-                    x="469"
-                    y="53"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#FB7C6D"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="168"
-                    x="469"
-                    y="73"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#FB7C6D"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="48"
-                    x="440"
-                    y="93"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="7"
-                    rx="3.5"
-                    stroke="#FB7C6D"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="27"
-                    x="440"
-                    y="132"
-                  />
-                </g>
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "screen",
-                    }
-                  }
-                >
-                  <rect
-                    height="6"
-                    rx="3"
-                    stroke="#FB7C6D"
-                    strokeWidth="2"
-                    style={Object {}}
-                    width="61"
-                    x="440"
-                    y="113"
-                  />
-                </g>
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="22"
-                  x="388"
-                  y="33"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="69"
-                  x="388"
-                  y="53"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="69"
-                  x="388"
-                  y="73"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="35"
-                  x="388"
-                  y="93"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="35"
-                  x="388"
-                  y="113"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="35"
-                  x="388"
-                  y="132"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="69"
-                  x="388"
-                  y="152"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="87"
-                  x="388"
-                  y="172"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="131"
-                  x="388"
-                  y="191"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="126"
-                  x="388"
-                  y="211"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="105"
-                  x="388"
-                  y="231"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="113"
-                  x="388"
-                  y="251"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="33"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="33"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#45D68A"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="101"
-                  y="33"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="145"
-                  y="33"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="182"
-                  y="53"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#3C9BF4"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="155"
-                  y="152"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#3C9BF4"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="192"
-                  y="192"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#3C9BF4"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="164"
-                  y="211"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="292"
-                  y="152"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="133"
-                  x="47"
-                  y="171"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="179"
-                  x="47"
-                  y="269"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="179"
-                  x="164"
-                  y="290"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="89"
-                  x="192"
-                  y="152"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="62"
-                  x="164"
-                  y="330"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="62"
-                  x="164"
-                  y="370"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="62"
-                  x="101"
-                  y="350"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#9557FF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="28"
-                  x="198"
-                  y="211"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="26"
-                  x="182"
-                  y="33"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="85"
-                  x="219"
-                  y="53"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#FF6553"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="85"
-                  x="182"
-                  y="93"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#45D68A"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="70"
-                  x="101"
-                  y="53"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#45D68A"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="70"
-                  x="101"
-                  y="93"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="53"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="53"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="73"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="93"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="93"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="113"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="113"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="101"
-                  y="113"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="101"
-                  y="152"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="79"
-                  x="101"
-                  y="192"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="79"
-                  x="101"
-                  y="251"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="52"
-                  x="101"
-                  y="212"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="52"
-                  x="101"
-                  y="291"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="52"
-                  x="234"
-                  y="212"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="52"
-                  x="238"
-                  y="330"
-                />
-                <rect
-                  height="6"
-                  rx="3"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="155"
-                  y="113"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="132"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="152"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="152"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="191"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="191"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="211"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="290"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="350"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="211"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="290"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="350"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="106"
-                  x="47"
-                  y="370"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#3C9BF4"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="53"
-                  x="237"
-                  y="370"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#3C9BF4"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="68"
-                  x="174"
-                  y="350"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="231"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="310"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="370"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="251"
-                />
-                <rect
-                  height="8"
-                  rx="4"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="8"
-                  x="28"
-                  y="330"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#73DDFF"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="43"
-                  x="47"
-                  y="251"
-                />
-                <rect
-                  height="7"
-                  rx="3.5"
-                  stroke="#333333"
-                  strokeWidth="2"
-                  style={Object {}}
-                  width="106"
-                  x="47"
-                  y="330"
-                />
-              </g>
-              <g
-                filter="url(#filter0_f)"
-                opacity="0.7"
-                style={
-                  Object {
-                    "mixBlendMode": "darken",
-                  }
-                }
-              >
-                <ellipse
-                  cx="358"
-                  cy="201.5"
-                  fill="#2E3338"
-                  rx="155"
-                  ry="60.5"
-                  style={Object {}}
-                />
-              </g>
-              <defs>
-                <filter
-                  colorInterpolationFilters="sRGB"
-                  filterUnits="userSpaceOnUse"
-                  height="241"
-                  id="filter0_f"
-                  width="430"
-                  x="143"
-                  y="81"
-                >
-                  <feFlood
-                    floodOpacity="0"
-                    result="BackgroundImageFix"
-                  />
-                  <feBlend
-                    in="SourceGraphic"
-                    in2="BackgroundImageFix"
-                    mode="normal"
-                    result="shape"
-                  />
-                  <feGaussianBlur
-                    result="effect1_foregroundBlur"
-                    stdDeviation="30"
-                  />
-                </filter>
-              </defs>
-            </svg>
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "WebkitBoxPack": "center",
-                  "WebkitJustifyContent": "center",
-                  "alignItems": "center",
-                  "bottom": "0px",
-                  "justifyContent": "center",
-                  "left": "0px",
-                  "msFlexAlign": "center",
-                  "msFlexPack": "center",
-                  "position": "absolute",
-                  "right": "0px",
-                  "top": "0px",
-                }
-              }
-            >
-              <div
-                className="css-view-1dbjc4n"
-                onClick={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
-              >
-                <a
-                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                  data-focusable={true}
-                  dir="auto"
-                  href="https://repl.it/@celoOrg/contractkit"
-                  onClick={[Function]}
-                  onMouseEnter={[Function]}
-                  rel=" noopener noreferrer"
-                  role="link"
-                  style={
-                    Object {
-                      "WebkitAlignItems": "center",
-                      "WebkitBoxAlign": "center",
-                      "WebkitBoxFlex": 0,
-                      "WebkitBoxPack": "center",
-                      "WebkitFlexGrow": 0,
-                      "WebkitJustifyContent": "center",
-                      "alignItems": "center",
-                      "backgroundColor": "rgba(53,208,127,1.00)",
-                      "borderBottomColor": "rgba(53,208,127,1.00)",
-                      "borderBottomLeftRadius": "3px",
-                      "borderBottomRightRadius": "3px",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(53,208,127,1.00)",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(53,208,127,1.00)",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(53,208,127,1.00)",
-                      "borderTopLeftRadius": "3px",
-                      "borderTopRightRadius": "3px",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(255,255,255,1.00)",
-                      "cursor": "pointer",
-                      "display": "inline-flex",
-                      "flexGrow": 0,
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "20px",
-                      "fontWeight": "500",
-                      "justifyContent": "center",
-                      "lineHeight": "16px",
-                      "minWidth": "200px",
-                      "msFlexAlign": "center",
-                      "msFlexPack": "center",
-                      "msFlexPositive": 0,
-                      "opacity": 1,
-                      "paddingBottom": "20px",
-                      "paddingLeft": "30px",
-                      "paddingRight": "30px",
-                      "paddingTop": "20px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "width": "fit-content",
-                    }
-                  }
-                  target="_blank"
-                >
-                  Try out the Code
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "backgroundColor": "rgba(46,51,56,1.00)",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitAlignSelf": "center",
-          "WebkitBoxDirection": "normal",
           "WebkitBoxLines": "multiple",
           "WebkitBoxOrient": "vertical",
           "WebkitFlexDirection": "column",
@@ -2174,6 +950,7 @@ exports[`DevelopersPage renders 1`] = `
           "msFlexDirection": "column",
           "msFlexItemAlign": "center",
           "msFlexWrap": "wrap",
+          "msGridRowAlign": "center",
           "overflowX": "hidden",
           "overflowY": "hidden",
           "paddingLeft": "10px",
@@ -2217,6 +994,7 @@ exports[`DevelopersPage renders 1`] = `
               aria-level="2"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2235,6 +1013,7 @@ exports[`DevelopersPage renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -2254,6 +1033,7 @@ exports[`DevelopersPage renders 1`] = `
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2345,10 +1125,8 @@ exports[`DevelopersPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2361,13 +1139,13 @@ exports[`DevelopersPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Applications
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2385,6 +1163,7 @@ exports[`DevelopersPage renders 1`] = `
               role="list"
               style={
                 Object {
+                  "listStyle": "disc",
                   "marginLeft": "10px",
                   "marginTop": "20px",
                   "paddingLeft": "20px",
@@ -2394,6 +1173,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2402,7 +1182,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2413,6 +1193,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2421,7 +1202,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2432,6 +1213,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2440,17 +1222,18 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
                 }
               >
-                Exchange between cUSD and cGLD
+                Exchange between cUSD and CELO
               </li>
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2459,7 +1242,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2470,6 +1253,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2478,7 +1262,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2505,8 +1289,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2514,7 +1296,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2582,8 +1363,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -2619,7 +1398,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -2717,10 +1495,8 @@ exports[`DevelopersPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2733,13 +1509,13 @@ exports[`DevelopersPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Core Contracts
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -2757,6 +1533,7 @@ exports[`DevelopersPage renders 1`] = `
               role="list"
               style={
                 Object {
+                  "listStyle": "disc",
                   "marginLeft": "10px",
                   "marginTop": "20px",
                   "paddingLeft": "20px",
@@ -2766,6 +1543,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2774,7 +1552,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2785,6 +1563,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2793,7 +1572,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2804,6 +1583,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -2812,7 +1592,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2839,8 +1619,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -2848,7 +1626,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -2916,8 +1693,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -2953,7 +1728,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-monorepo"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -3051,10 +1825,8 @@ exports[`DevelopersPage renders 1`] = `
           >
             <div
               className="css-text-901oao"
-              data-focusable={true}
               dir="auto"
               onClick={[Function]}
-              onKeyDown={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3067,13 +1839,13 @@ exports[`DevelopersPage renders 1`] = `
                   "textRendering": "geometricPrecision",
                 }
               }
-              tabIndex="0"
             >
               Blockchain
             </div>
             <div
               className="css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               style={
                 Object {
                   "color": "rgba(255,255,255,1.00)",
@@ -3091,6 +1863,7 @@ exports[`DevelopersPage renders 1`] = `
               role="list"
               style={
                 Object {
+                  "listStyle": "disc",
                   "marginLeft": "10px",
                   "marginTop": "20px",
                   "paddingLeft": "20px",
@@ -3100,6 +1873,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -3108,7 +1882,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -3119,6 +1893,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -3127,7 +1902,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -3138,6 +1913,7 @@ exports[`DevelopersPage renders 1`] = `
               <li
                 className="css-reset-4rbku5 css-text-901oao"
                 dir="auto"
+                onClick={[Function]}
                 role="listitem"
                 style={
                   Object {
@@ -3146,7 +1922,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -3173,8 +1949,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3182,7 +1956,6 @@ exports[`DevelopersPage renders 1`] = `
                 dir="auto"
                 href="https://docs.celo.org/overview"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -3250,8 +2023,6 @@ exports[`DevelopersPage renders 1`] = `
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
               style={
                 Object {
                   "WebkitAlignItems": "flex-start",
@@ -3287,7 +2058,6 @@ exports[`DevelopersPage renders 1`] = `
                   dir="auto"
                   href="https://github.com/celo-org/celo-blockchain"
                   onClick={[Function]}
-                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -3354,6 +2124,7 @@ exports[`DevelopersPage renders 1`] = `
             aria-level="4"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             role="heading"
             style={
               Object {
@@ -3372,6 +2143,7 @@ exports[`DevelopersPage renders 1`] = `
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(255,255,255,1.00)",
@@ -3394,8 +2166,6 @@ exports[`DevelopersPage renders 1`] = `
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <a
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -3403,7 +2173,6 @@ exports[`DevelopersPage renders 1`] = `
               dir="auto"
               href="https://github.com/celo-org"
               onClick={[Function]}
-              onMouseEnter={[Function]}
               rel=" noopener noreferrer"
               role="link"
               style={
@@ -3497,12 +2266,7 @@ exports[`DevelopersPage renders 1`] = `
     }
   >
     <div
-      className="react-reveal"
-      style={
-        Object {
-          "opacity": undefined,
-        }
-      }
+      className="css-q7lffx"
     >
       <div
         className="css-view-1dbjc4n"
@@ -3522,6 +2286,7 @@ exports[`DevelopersPage renders 1`] = `
               "maxWidth": "100vw",
               "msFlexDirection": "column",
               "msFlexItemAlign": "center",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -3551,6 +2316,7 @@ exports[`DevelopersPage renders 1`] = `
               aria-level="3"
               className="css-reset-4rbku5 css-text-901oao"
               dir="auto"
+              onClick={[Function]}
               role="heading"
               style={
                 Object {
@@ -3585,6 +2351,7 @@ exports[`DevelopersPage renders 1`] = `
               "msFlexDirection": "row",
               "msFlexItemAlign": "center",
               "msFlexWrap": "wrap",
+              "msGridRowAlign": "center",
               "paddingLeft": "10px",
               "paddingRight": "10px",
               "width": "100%",
@@ -3694,6 +2461,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3712,6 +2480,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3830,6 +2599,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3848,6 +2618,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -3966,6 +2737,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3984,6 +2756,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -4102,6 +2875,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -4120,6 +2894,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -4238,6 +3013,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -4256,6 +3032,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -4374,6 +3151,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -4392,6 +3170,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -4510,6 +3289,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -4528,6 +3308,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -4646,6 +3427,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -4664,6 +3446,7 @@ exports[`DevelopersPage renders 1`] = `
                 <div
                   className="css-text-901oao"
                   dir="auto"
+                  onClick={[Function]}
                   style={
                     Object {
                       "color": "rgba(221,221,221,1.00)",
@@ -4701,6 +3484,7 @@ exports[`DevelopersPage renders 1`] = `
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "justify",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -4730,6 +3514,7 @@ exports[`DevelopersPage renders 1`] = `
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -4749,6 +3534,7 @@ exports[`DevelopersPage renders 1`] = `
         aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -4775,6 +3561,7 @@ exports[`DevelopersPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -4789,12 +3576,7 @@ exports[`DevelopersPage renders 1`] = `
           Alfajores Testnet
         </div>
         <div
-          className="react-reveal"
-          style={
-            Object {
-              "opacity": undefined,
-            }
-          }
+          className="css-q7lffx"
         >
           <div
             className="css-view-1dbjc4n"
@@ -4870,6 +3652,7 @@ exports[`DevelopersPage renders 1`] = `
         <div
           className="css-text-901oao"
           dir="auto"
+          onClick={[Function]}
           style={
             Object {
               "color": "rgba(46,51,56,1.00)",
@@ -4916,8 +3699,6 @@ Build dApps for the Celo platform.
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
               onMouseUp={[Function]}
-              onResponderGrant={[Function]}
-              onResponderRelease={[Function]}
             >
               <a
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -4925,7 +3706,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="/developers/wallet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5029,12 +3809,7 @@ Build dApps for the Celo platform.
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -5133,6 +3908,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5149,6 +3925,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5169,8 +3946,6 @@ Build dApps for the Celo platform.
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -5206,7 +3981,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="/developers/faucet"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5286,12 +4060,7 @@ Build dApps for the Celo platform.
           }
         >
           <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
+            className="css-q7lffx"
           >
             <div
               className="css-view-1dbjc4n"
@@ -5390,6 +4159,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5406,6 +4176,7 @@ Build dApps for the Celo platform.
           <div
             className="css-text-901oao"
             dir="auto"
+            onClick={[Function]}
             style={
               Object {
                 "color": "rgba(46,51,56,1.00)",
@@ -5426,8 +4197,6 @@ Build dApps for the Celo platform.
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
             onMouseUp={[Function]}
-            onResponderGrant={[Function]}
-            onResponderRelease={[Function]}
           >
             <div
               className="css-view-1dbjc4n"
@@ -5463,7 +4232,6 @@ Build dApps for the Celo platform.
                 dir="auto"
                 href="https://docs.celo.org/"
                 onClick={[Function]}
-                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -5538,6 +4306,7 @@ Build dApps for the Celo platform.
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
         "msFlexPack": "justify",
+        "msGridRowAlign": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
         "width": "100%",
@@ -5571,6 +4340,7 @@ Build dApps for the Celo platform.
         aria-level="3"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         role="heading"
         style={
           Object {
@@ -5588,6 +4358,7 @@ Build dApps for the Celo platform.
       <div
         className="css-text-901oao"
         dir="auto"
+        onClick={[Function]}
         style={
           Object {
             "color": "rgba(46,51,56,1.00)",
@@ -5609,8 +4380,6 @@ Build dApps for the Celo platform.
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
         onMouseUp={[Function]}
-        onResponderGrant={[Function]}
-        onResponderRelease={[Function]}
       >
         <a
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
@@ -5618,7 +4387,6 @@ Build dApps for the Celo platform.
           dir="auto"
           href="https://c-labs.typeform.com/to/gj9aUp"
           onClick={[Function]}
-          onMouseEnter={[Function]}
           role="link"
           style={
             Object {

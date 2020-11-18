@@ -10,9 +10,9 @@ import {
   UserTransactionsQuery,
 } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
-import { TransactionFeed } from 'src/transactions/TransactionFeed'
+import TransactionFeed from 'src/transactions/TransactionFeed'
 import TransactionsList, { TRANSACTIONS_QUERY } from 'src/transactions/TransactionsList'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import { createMockStore } from 'test/utils'
 
 jest.unmock('react-apollo')
@@ -25,7 +25,7 @@ const mockCache = new InMemoryCache({ fragmentMatcher: newFragmentMatcher })
 
 const standbyTransactions: StandbyTransaction[] = [
   {
-    id: 'a-standby-tx-id',
+    context: { id: 'a-standby-tx-id' },
     type: TokenTransactionType.Sent,
     comment: 'Eye for an Eye',
     status: TransactionStatus.Pending,
@@ -35,7 +35,7 @@ const standbyTransactions: StandbyTransaction[] = [
     address: '0072bvy2o23u',
   },
   {
-    id: 'a-cusd-cgld-standby-exchange-id',
+    context: { id: 'a-cusd-cgld-standby-exchange-id' },
     type: TokenTransactionType.Exchange,
     status: TransactionStatus.Pending,
     inSymbol: CURRENCY_ENUM.DOLLAR,
@@ -45,7 +45,7 @@ const standbyTransactions: StandbyTransaction[] = [
     timestamp: 1542409112,
   },
   {
-    id: 'a-cgld-cusd-standby-exchange-id',
+    context: { id: 'a-cgld-cusd-standby-exchange-id' },
     type: TokenTransactionType.Exchange,
     status: TransactionStatus.Pending,
     inSymbol: CURRENCY_ENUM.GOLD,
@@ -58,6 +58,7 @@ const standbyTransactions: StandbyTransaction[] = [
 
 const failedStandbyTransactions: StandbyTransaction[] = [
   {
+    context: { id: '0x00000000000000000001' },
     type: TokenTransactionType.Exchange,
     status: TransactionStatus.Failed,
     inSymbol: CURRENCY_ENUM.DOLLAR,
@@ -65,13 +66,12 @@ const failedStandbyTransactions: StandbyTransaction[] = [
     outSymbol: CURRENCY_ENUM.GOLD,
     outValue: '30',
     timestamp: 1542409112,
-    id: '0x00000000000000000001',
   },
 ]
 
 const pendingStandbyTransactions: StandbyTransaction[] = [
   {
-    id: 'a-standby-tx-id',
+    context: { id: 'a-standby-tx-id' },
     hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
     type: TokenTransactionType.Sent,
     comment: 'Hi',
@@ -276,7 +276,7 @@ it('renders the received data along with the standby transactions', async () => 
   expect(toJSON()).toMatchSnapshot()
 })
 
-it('ignores pending standby transactions that are completed in the response and removes them', async () => {
+it('ignores pending standby transactions that are completed in the response', async () => {
   const store = createMockStore({
     transactions: { standbyTransactions: pendingStandbyTransactions },
   })
@@ -294,11 +294,6 @@ it('ignores pending standby transactions that are completed in the response and 
   const feed = await waitForElement(() => getByType(TransactionFeed))
   expect(feed.props.data.length).toEqual(2)
   expect(toJSON()).toMatchSnapshot()
-
-  expect(store.getActions()).toEqual([
-    { type: 'HOME/REFRESH_BALANCES' },
-    { type: 'TRANSACTIONS/REMOVE_STANDBY_TRANSACTION', idx: 'a-standby-tx-id' },
-  ])
 })
 
 it('ignores failed standby transactions', async () => {

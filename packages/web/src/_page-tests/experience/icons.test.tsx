@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import { IconData } from 'src/brandkit/IconsPage'
+import { TestProvider } from 'src/_page-tests/test-utils'
+import { IconData } from 'src/experience/brandkit/IconsPage'
 import Icons from '../../../pages/experience/brand/icons'
 
 const ICONS: IconData[] = [
@@ -24,7 +25,13 @@ const ICONS: IconData[] = [
 
 describe('Experience/Icons', () => {
   it('renders', () => {
-    const tree = renderer.create(<Icons icons={ICONS} />).toJSON()
+    const tree = renderer
+      .create(
+        <TestProvider>
+          <Icons icons={ICONS} />
+        </TestProvider>
+      )
+      .toJSON()
     expect(tree).toMatchSnapshot()
   })
 })

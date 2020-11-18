@@ -6,8 +6,12 @@ export interface State {
   syncProgress: Web3SyncProgress
   latestBlockNumber: number
   account: string | null
+  mtwAddress: string | null
   accountInWeb3Keystore: string | null
-  commentKey: string | null
+  // The DEK private key
+  dataEncryptionKey: string | null
+  // Has the data encryption key been registered in the Accounts contract
+  isDekRegistered: boolean | undefined
   fornoMode: boolean
 }
 
@@ -19,8 +23,10 @@ const initialState: State = {
   },
   latestBlockNumber: 0,
   account: null,
+  mtwAddress: null,
   accountInWeb3Keystore: null,
-  commentKey: null,
+  dataEncryptionKey: null,
+  isDekRegistered: false,
   fornoMode: networkConfig.initiallyForno,
 }
 
@@ -40,12 +46,20 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
+        contractKitReady: false,
+        // False to lock ContractKit upon every app reopen, until
+        // store is persisted and forno mode known
       }
     }
     case Actions.SET_ACCOUNT:
       return {
         ...state,
         account: action.address.toLowerCase(),
+      }
+    case Actions.SET_MTW_ADDRESS:
+      return {
+        ...state,
+        mtwAddress: action.address,
       }
     case Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE:
       return {
@@ -57,10 +71,15 @@ export const reducer = (
         ...state,
         fornoMode: action.fornoMode,
       }
-    case Actions.SET_COMMENT_KEY:
+    case Actions.SET_DATA_ENCRYPTION_KEY:
       return {
         ...state,
-        commentKey: action.commentKey,
+        dataEncryptionKey: action.key,
+      }
+    case Actions.REGISTER_DATA_ENCRYPTION_KEY:
+      return {
+        ...state,
+        isDekRegistered: true,
       }
     case Actions.COMPLETE_WEB3_SYNC:
       return {

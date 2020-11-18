@@ -1,4 +1,9 @@
-import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
+import {
+  AddressListItem as ALI,
+  Comparator,
+  linkedListChanges as baseLinkedListChanges,
+  zip,
+} from '@celo/base/lib/collections'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
 import { Address } from '../base'
@@ -8,10 +13,20 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   tupleParser,
   valueToBigNumber,
   valueToString,
 } from '../wrappers/BaseWrapper'
+
+type AddressListItem = ALI<BigNumber>
+const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
+function linkedListChanges(
+  groups: AddressListItem[],
+  changed: AddressListItem[]
+): { lessers: string[]; greaters: string[]; list: AddressListItem[] } {
+  return baseLinkedListChanges(groups, changed, bigNumberComparator)
+}
 
 export interface VotingDetails {
   accountAddress: Address
@@ -174,6 +189,18 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     return {
       unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
       totalLockedGold: await this.getTotalLockedGold(),
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the lockedgold contract
+   * @return LockedGoldConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      unlockingPeriod: secondsToDurationString(config.unlockingPeriod),
     }
   }
 

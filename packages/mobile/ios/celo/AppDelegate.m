@@ -19,6 +19,25 @@
 #import "RNSplashScreen.h"
 #import "ReactNativeConfig.h"
 
+//#if DEBUG
+//#import <FlipperKit/FlipperClient.h>
+//#import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
+//#import <FlipperKitUserDefaultsPlugin/FKUserDefaultsPlugin.h>
+//#import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
+//#import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
+//#import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
+//
+//static void InitializeFlipper(UIApplication *application) {
+//  FlipperClient *client = [FlipperClient sharedClient];
+//  SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
+//  [client addPlugin:[[FlipperKitLayoutPlugin alloc] initWithRootNode:application withDescriptorMapper:layoutDescriptorMapper]];
+//  [client addPlugin:[[FKUserDefaultsPlugin alloc] initWithSuiteName:nil]];
+//  [client addPlugin:[FlipperKitReactPlugin new]];
+//  [client addPlugin:[[FlipperKitNetworkPlugin alloc] initWithNetworkAdapter:[SKIOSNetworkAdapter new]]];
+//  [client start];
+//}
+//#endif
+
 // Use same key as react-native-secure-key-store
 // so we don't reset already working installs
 static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
@@ -33,6 +52,9 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+//  #if DEBUG
+//    InitializeFlipper(application);
+//  #endif
   // Reset keychain on first run to clear existing Firebase credentials
   // Note: react-native-secure-key-store also does that but is run too late
   // and hence can't clear Firebase credentials
@@ -43,9 +65,15 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
     [FIRApp configure];
   }
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+
+  NSDate *now = [NSDate date];
+  NSTimeInterval nowEpochSeconds = [now timeIntervalSince1970];
+  long long nowEpochMs = (long long)(nowEpochSeconds * 1000);
+  NSDictionary *props = @{@"appStartedMillis" : @(nowEpochMs)};
+
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"celo"
-                                            initialProperties:nil];
+                                            initialProperties:props];
   
   [RNSplashScreen showSplash:@"LaunchScreen" inRootView:rootView];
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
@@ -55,6 +83,7 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
   return YES;
 }
 

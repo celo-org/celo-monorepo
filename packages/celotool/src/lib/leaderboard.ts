@@ -1,6 +1,6 @@
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
 const yaml = require('js-yaml')
 const helmChartPath = '../helm-charts/leaderboard'
 
@@ -14,7 +14,7 @@ export async function installHelmChart(celoEnv: string) {
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
 }
 
 export async function upgradeHelmChart(celoEnv: string) {

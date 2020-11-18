@@ -10,6 +10,7 @@ resource "aws_instance" "celo_validator" {
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [var.security_group_id]
   key_name               = var.key_pair_name
+  iam_instance_profile   = var.iam_instance_profile
 
   root_block_device {
     volume_size = var.volume_size
@@ -17,6 +18,7 @@ resource "aws_instance" "celo_validator" {
 
   user_data = join("\n", [
     file("${path.module}/../startup-scripts/install-base.sh"),
+    var.cloudwatch_collect_disk_and_memory_usage ? file("${path.module}/../startup-scripts/install-cloudwatch-agent.sh") : "",
     file("${path.module}/../startup-scripts/install-docker.sh"),
     file("${path.module}/../startup-scripts/install-chrony.sh"),
     templatefile("${path.module}/../startup-scripts/run-validator-node.sh", {
@@ -31,11 +33,20 @@ resource "aws_instance" "celo_validator" {
       proxy_enode                                = each.value.proxy_enode
       proxy_internal_ip                          = each.value.proxy_private_ip
       proxy_external_ip                          = each.value.proxy_public_ip
+      cloudwatch_log_group_name                  = var.cloudwatch_log_group_name
+      cloudwatch_log_stream_name                 = "celo_validator_${each.key}"
     }),
     file("${path.module}/../startup-scripts/final-hardening.sh")
   ])
 
   tags = {
     Name = "celo-validator-${each.value.name}"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      ami,
+      user_data
+    ]
   }
 }

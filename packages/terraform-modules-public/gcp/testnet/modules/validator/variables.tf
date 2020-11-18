@@ -8,6 +8,11 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project to use"
+}
+
 variable instance_type {
   description = "The instance type"
   type        = string
@@ -112,7 +117,7 @@ variable proxy_external_ips {
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
-  default     = false
+  default     = true
 }
 
 variable validator_name {
@@ -124,4 +129,9 @@ variable validator_max_peers {
   type        = number
   description = "Max number of peers to connect with"
   default     = 120
+}
+
+variable "service_account_scopes" {
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
+  type        = list(string)
 }

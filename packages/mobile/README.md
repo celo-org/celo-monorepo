@@ -1,12 +1,12 @@
 # Mobile (Celo Wallet)
 
-- [Mobile (Celo Wallet)](#mobile-(celo-wallet))
+- [Mobile (Celo Wallet)](<#mobile-(celo-wallet)>)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [Setup](#setup)
     - [iOS](#ios)
       - [Enroll in the Apple Developer Program](#enroll-in-the-apple-developer-program)
-      - [Install XCode](#install-xcode)
+      - [Install Xcode](#install-xcode)
       - [Install Cocopods, Bundler, and download project dependencies](#install-cocopods-bundler-and-download-project-dependencies)
     - [Android](#android)
       - [Install Java](#install-java)
@@ -15,7 +15,7 @@
   - [Running the mobile wallet](#running-the-mobile-wallet)
     - [iOS](#ios-1)
     - [Android](#android-1)
-    - [Running in forno (data saver) mode](#running-in-forno-(data-saver)-mode)
+    - [Running in forno (data saver) mode](<#running-in-forno-(data-saver)-mode>)
   - [Debugging & App Profiling](#debugging-&-app-profiling)
     - [Debugging](#debugging)
       - [Optional: Install React Native Debugger](#optional-install-react-native-debugger)
@@ -32,9 +32,9 @@
     - [Configuring the SMS Retriever](#configuring-the-sms-retriever)
     - [Generating GraphQL Types](#generating-graphql-types)
     - [How we handle Geth crashes in wallet app on Android](#how-we-handle-geth-crashes-in-wallet-app-on-android)
-    - [Why do we use http(s) provider?](#why-do-we-use-http(s)-provider?)
+    - [Why do we use http(s) provider?](<#why-do-we-use-http(s)-provider?>)
     - [Troubleshooting](#troubleshooting)
-
+      - [`Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`](#activity-class-orgcelomobilestagingorgcelomobilemainactivity-does-not-exist)
 
 ## Overview
 
@@ -43,17 +43,22 @@ It's a self-soverign wallet that enables anyone to onboard onto the Celo network
 
 ![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
 
-
 ## Architecture
 
 The app uses [React Native][react native] and a geth [light node][light node].
 
-
 ## Setup
 
-__You must have the [celo-monorepo] successfully set up and built before setting up and running the mobile wallet.__
+**You must have the [celo-monorepo] successfully set up and built before setting up and running the mobile wallet.**
 
 To do this, follow the [setup instructions][setup].
+
+Next, install [watchman][watchman].
+
+```bash
+# On a mac
+brew install watchman
+```
 
 ### iOS
 
@@ -63,15 +68,15 @@ In order to successfully set up your iOS development environment you will need t
 
 _If you are a cLabs employee, please ask to be added to the cLabs iOS development team._
 
-#### Install XCode
+#### Install Xcode
 
-XCode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
+Xcode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
 
 Install [Xcode 11.4](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
 
 We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects.
 
-Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of XCode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
+Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of Xcode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
 
 #### Install Cocopods, Bundler, and download project dependencies
 
@@ -88,7 +93,6 @@ bundle exec pod install
 ```
 
 If your machine does not recognize the `gem` command, you may need to [download Ruby](https://rubyinstaller.org/) first.
-
 
 ### Android
 
@@ -135,7 +139,9 @@ brew cask install android-platform-tools
 
 Next install [Android Studio][android studio] and add the [Android NDK][android ndk].
 
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
+Execute the following (and make sure the lines are in your `~/.bash_profile`).
+
+_Note that these paths may differ on your machine. You can find the path to the SDK and NDK via the [Android Studio menu](https://stackoverflow.com/questions/40520324/how-to-find-the-path-to-ndk)._
 
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
@@ -145,10 +151,10 @@ export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
 export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
 ```
 
-Then install the Android 28 platform:
+Then install the Android 29 platform:
 
 ```bash
-sdkmanager 'platforms;android-28'
+sdkmanager 'platforms;android-29'
 ```
 
 ##### Linux
@@ -173,11 +179,11 @@ You can find the complete instructions about how to install the tools in Linux e
 
 ##### Configure an emulator using the Android SDK Manager
 
-Install the Android 28 system image and create an Android Virtual Device:
+Install the Android 29 system image and create an Android Virtual Device:
 
 ```bash
-sdkmanager "system-images;android-28;google_apis;x86"
-avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+sdkmanager "system-images;android-29;default;x86_64"
+avdmanager create avd --force --name Pixel_API_29_AOSP_x86_64 --device pixel -k "system-images;android-29;default;x86_64"
 ```
 
 Execute the following and add it to your `~/.bash_profile`:
@@ -189,7 +195,7 @@ export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
 Run the emulator with:
 
 ```bash
-emulator -avd Nexus_5X_API_28_x86
+emulator -avd Pixel_API_29_AOSP_x86_64
 ```
 
 ##### Install Genymotion Emulator Manager
@@ -221,12 +227,11 @@ After having the binary you only need to run the installer:
 sudo ./genymotion-3.0.2-linux_x64.bin
 ```
 
-
 ## Running the mobile wallet
 
 The below steps should help you successfully run the mobile wallet on either a USB connected or emulated device. For additional information and troublshooting see the [React Native docs][rn running on device].
 
- **Note:** We've seen some issues running the metro bundler from iTerm
+**Note:** We've seen some issues running the metro bundler from iTerm
 
 1. If you haven't already, run `yarn` from the monorepo root to install dependencies.
 
@@ -234,9 +239,9 @@ The below steps should help you successfully run the mobile wallet on either a U
 
 ### iOS
 
-3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by XCode.
+3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by Xcode.
 
-4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the XCode menu bar.
+4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the Xcode menu bar.
 
 5. From the `mobile` directory run `yarn run dev:ios`.
 
@@ -258,7 +263,6 @@ To run the wallet in forno (Data Saver) mode, using a trusted node rather than t
 
 To debug network requests in forno mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
-
 ## Debugging & App Profiling
 
 ### Debugging
@@ -268,7 +272,7 @@ _To avoid debugging errors, ensure your device and laptop are connected to the s
 1. Either shake the device or run `yarn run dev:show-menu` (only for Android) to open up the developer menu.
 
 2. Select `Debug` (iOS) or `Start Remote JS Debugging` (Android). This should open a new tab in your browser with React Native logger in the console. In order to get a full picture, the console's filter should be set to
-`All levels`.
+   `All levels`.
 
 3. For the fastest development experience, you likely want to open the developer menu again and ensure `Fast Reloading` (iOS) or `Live Reloading` and `Hot Reloading` (Android) is enabled.
 
@@ -281,7 +285,6 @@ The [React Native Debugger][rn debugger] bundles together the Redux and Chrome d
 Run `yarn run react-devtools`. It should automatically connect to the running app, and includes a profiler (second tab). Start recording with the profiler, use the app, and then stop recording.
 
 The flame graph provides a view of each component and sub-component. The width is proportional to how long it took to load. If it is grey, it was not re-rendered at that 'commit' or DOM change. Details on the react native profiler are [here][rn profiler]. The biggest thing to look for are large number of renders when no state has changed. Reducing renders can be done via pure components in React or overloading the should component update method [example here][rn optimize example].
-
 
 ## Testing
 
@@ -310,10 +313,9 @@ See [`src/identity/verification.test.ts`] for an example.
 ### End-to-End testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
-must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
+must have the proper emulator set up. Follow the instructions in [e2e/README.md][e2e readme].
 
-Once setup is done, you can run the tests with `yarn test:e2e:android`
-
+Once setup is done, you can run the tests with `yarn test:e2e:android` or `yarn test:e2e:ios`.
 
 ## Building APKs / Bundles
 
@@ -335,7 +337,7 @@ export CELO_RELEASE_KEY_PASSWORD=celoFakeReleaseKeyPass
 ```sh
 # With fastlane:
 bundle install
-bundle exec fastlane android build_apk env:YOUR_BUILDING_VARIANT sdkEnv:YOUR_SDK_ENV
+bundle exec fastlane android build_apk env:YOUR_BUILDING_VARIANT
 
 # Or, manually
 cd android/
@@ -348,7 +350,6 @@ cd android/
 ```
 
 Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug or release.
-
 
 ## Other
 
@@ -388,11 +389,31 @@ Relevant code references:
 There are two major differences in Forno mode:
 
 1.  Geth won't run at all. Instead, web3 connects to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
-2. Transactions will be signed locally by contractkit.
+2.  Transactions will be signed locally by contractkit.
 
 ### Why do we use http(s) provider?
 
 Websockets (`ws`) would have been a better choice but we cannot use unencrypted `ws` provider since it would be bad to send plain-text data from a privacy perspective. Geth does not support `wss` by [default](https://github.com/ethereum/go-ethereum/issues/16423). And Kubernetes does not support it either. This forced us to use https provider.
+
+### Attaching to the geth instance
+
+#### Android
+
+1. Start geth's HTTP RPC server by setting the config variable `GETH_START_HTTP_RPC_SERVER` to true. This is meant for development purposes only and can be a serious vulnerability if used in production.
+2. Forward traffic from your computer's port 8545 to the android device's: `adb forward tcp:8545 tcp:8545`
+3. Using a geth binary on your computer, run `geth attach http://localhost:8545`
+
+#### iOS
+
+We need the IP address of the iOS device. If it is being run in a simulator, the IP address is `127.0.0.1`. If not running in a simulator:
+
+1. Ensure the iOS device is on the same network as your computer.
+2. Find the device's local IP address by going to the Settings app, Wi-Fi, and tapping the 'i' next to the network.
+
+To attach:
+
+1. Start geth's HTTP RPC server by setting the config variable `GETH_START_HTTP_RPC_SERVER` to true. This is meant for development purposes only and can be a serious vulnerability if used in production.
+2. Using a geth binary on your computer, run `geth attach http://<DEVICE_IP_ADDRESS>:8545`
 
 ### Troubleshooting
 
@@ -417,15 +438,14 @@ $ adb kill-server && adb start-server
 * daemon started successfully
 ```
 
-[Celo platform]: https://celo.org
+[celo platform]: https://celo.org
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
-[Apple Developer Program]: https://developer.apple.com/programs/
+[apple developer program]: https://developer.apple.com/programs/
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md
-[enzyme]: https://airbnb.io/enzyme/docs/guides/react-native.html
 [graphql code generator]: https://github.com/dotansimha/graphql-code-generator
-[light node]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
+[light node]: https://docs.celo.org/overview#ultralight-synchronization
 [protocol readme]: ../protocol/README.md
 [react native]: https://facebook.github.io/react-native/
 [rn debugger]: https://github.com/jhen0409/react-native-debugger
@@ -444,3 +464,4 @@ $ adb kill-server && adb start-server
 [approve kernel extension]: https://developer.apple.com/library/content/technotes/tn2459/_index.html
 [oracle being oracle]: https://github.com/Homebrew/homebrew-cask-versions/issues/7253
 [device unauthorized]: https://stackoverflow.com/questions/23081263/adb-android-device-unauthorized
+[watchman]: https://facebook.github.io/watchman/docs/install/

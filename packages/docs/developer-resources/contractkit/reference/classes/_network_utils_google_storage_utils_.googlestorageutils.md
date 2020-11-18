@@ -16,7 +16,7 @@
 
 ▸ **fetchFileFromGoogleStorage**(`bucketName`: string, `fileName`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/network-utils/google-storage-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/google-storage-utils.ts#L9)*
+*Defined in [packages/contractkit/src/network-utils/google-storage-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/network-utils/google-storage-utils.ts#L9)*
 
 **Parameters:**
 

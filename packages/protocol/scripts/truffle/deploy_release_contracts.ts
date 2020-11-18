@@ -1,5 +1,6 @@
 import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
+import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs = require('fs')
@@ -24,32 +25,104 @@ let ReleaseGoldProxy: ReleaseGoldProxyContract
 const ONE_CGLD = web3.utils.toWei('1', 'ether')
 const TWO_CGLD = web3.utils.toWei('2', 'ether')
 const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
+const ZERO_ADDRESS: Address = '0x0000000000000000000000000000000000000000'
 
-async function handleGrant(releaseGoldConfig: any, currGrant: number) {
+interface ReleaseGoldConfig {
+  identifier: string
+  releaseStartTime: string
+  releaseCliffTime: number
+  numReleasePeriods: number
+  releasePeriod: number
+  amountReleasedPerPeriod: number
+  revocable: boolean
+  beneficiary: Address
+  releaseOwner: Address
+  refundAddress: Address
+  subjectToLiquidityProvision: boolean
+  initialDistributionRatio: number
+  canValidate: boolean
+  canVote: boolean
+}
+
+type ReleaseGoldTemplate = Partial<ReleaseGoldConfig>
+
+async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
   // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
-  const releaseStartTime = releaseGoldConfig.releaseStartTime.startsWith('MAINNET')
+  const releaseStartTime = config.releaseStartTime.startsWith('MAINNET')
     ? MAINNET_START_TIME
-    : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+    : new Date(config.releaseStartTime).getTime() / 1000
+
+  const weiAmountReleasedPerPeriod = new BigNumber(
+    web3.utils.toWei(config.amountReleasedPerPeriod.toString())
+  )
+
+  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
+  if (totalValue.lt(startGold)) {
+    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    return
+  }
+
+  const adjustedAmountPerPeriod = totalValue
+    .minus(startGold)
+    .div(config.numReleasePeriods)
+    .dp(0)
+
+  // Reflect any rounding changes from the division above
+  totalValue = adjustedAmountPerPeriod.multipliedBy(config.numReleasePeriods)
+
+  const contractInitializationArgs = [
+    Math.round(releaseStartTime),
+    config.releaseCliffTime,
+    config.numReleasePeriods,
+    config.releasePeriod,
+    adjustedAmountPerPeriod.toFixed(),
+    config.revocable,
+    config.beneficiary,
+    config.releaseOwner,
+    config.refundAddress,
+    config.subjectToLiquidityProvision,
+    config.initialDistributionRatio,
+    config.canValidate,
+    config.canVote,
+    '0x000000000000000000000000000000000000ce10',
+  ]
+
+  const bytecode = await web3.eth.getCode(config.beneficiary)
+  if (bytecode !== '0x') {
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message: `Beneficiary ${config.beneficiary} is a smart contract which might cause loss of funds if not properly configured. Are you sure you want to continue? (y/n)`,
+    })
+
+    if (!response.confirmation) {
+      console.info(chalk.yellow('Skipping grant due to user response'))
+      return
+    }
+  }
 
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
-    Number(releaseGoldConfig.numReleasePeriods) *
-      Number(releaseGoldConfig.amountReleasedPerPeriod) +
+    Number(config.numReleasePeriods) * Number(config.amountReleasedPerPeriod) +
     '\n\tGrant Recipient ID: ' +
-    releaseGoldConfig.identifier +
+    config.identifier +
     '\n\tGrant Beneficiary address: ' +
-    releaseGoldConfig.beneficiary +
+    config.beneficiary +
     '\n\tGrant Start Date (Unix timestamp): ' +
     Math.floor(releaseStartTime) +
     '\n\tGrant Cliff time (in seconds): ' +
-    releaseGoldConfig.releaseCliffTime +
+    config.releaseCliffTime +
     '\n\tGrant num periods: ' +
-    releaseGoldConfig.numReleasePeriods +
+    config.numReleasePeriods +
     '\n\tRelease Period length: ' +
-    releaseGoldConfig.releasePeriod +
+    config.releasePeriod +
+    (argv.debug
+      ? '\n\tDebug: Contract init args: ' + JSON.stringify(contractInitializationArgs)
+      : '') +
     '\n\tDeploy this grant? (y/n)'
+
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
@@ -62,9 +135,11 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
+  console.info('  Deploying ReleaseGoldMultiSigProxy...')
   const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
     { from: fromAddress },
   ])
+  console.info('  Deploying ReleaseGoldMultiSig...')
   const releaseGoldMultiSigInstance = await retryTx(ReleaseGoldMultiSig.new, [
     { from: fromAddress },
   ])
@@ -77,7 +152,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       from: fromAddress,
       value: null,
     },
-    [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
+    [config.releaseOwner, config.beneficiary],
     2,
     2
   )
@@ -87,25 +162,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       from: fromAddress,
     },
   ])
+  console.info('  Deploying ReleaseGoldProxy...')
   const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
+  console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
-
-  const weiAmountReleasedPerPeriod = new BigNumber(
-    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
-  )
-
-  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
-  if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than cGLD for beneficiary addreess')
-    process.exit(0)
-  }
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(releaseGoldConfig.numReleasePeriods)
-    .dp(0)
-
-  // Reflect any rounding changes from the division above
-  totalValue = adjustedAmountPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -116,20 +176,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       from: fromAddress,
       value: totalValue.toFixed(),
     },
-    Math.round(releaseStartTime),
-    releaseGoldConfig.releaseCliffTime,
-    releaseGoldConfig.numReleasePeriods,
-    releaseGoldConfig.releasePeriod,
-    adjustedAmountPerPeriod.toFixed(),
-    releaseGoldConfig.revocable,
-    releaseGoldConfig.beneficiary,
-    releaseGoldConfig.releaseOwner,
-    releaseGoldConfig.refundAddress,
-    releaseGoldConfig.subjectToLiquidityProvision,
-    releaseGoldConfig.initialDistributionRatio,
-    releaseGoldConfig.canValidate,
-    releaseGoldConfig.canVote,
-    '0x000000000000000000000000000000000000ce10'
+    ...contractInitializationArgs
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await retryTx(proxiedReleaseGold.transferOwnership, [
@@ -142,26 +189,28 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldMultiSigProxy.address,
     { from: fromAddress },
   ])
+
   // Send starting gold amount to the beneficiary so they can perform transactions.
+  console.info('  Sending beneficiary starting gold...')
   await retryTx(web3.eth.sendTransaction, [
     {
       from: fromAddress,
-      to: releaseGoldConfig.beneficiary,
+      to: config.beneficiary,
       value: startGold,
     },
   ])
 
   const record = {
     GrantNumber: currGrant,
-    Identifier: releaseGoldConfig.identifier,
-    Beneficiary: releaseGoldConfig.beneficiary,
+    Identifier: config.identifier,
+    Beneficiary: config.beneficiary,
     ContractAddress: releaseGoldProxy.address,
     MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
     MultiSigTxHash: multiSigTxHash,
     ReleaseGoldTxHash: releaseGoldTxHash,
   }
 
-  deployedGrants.push(releaseGoldConfig.identifier)
+  deployedGrants.push(config.identifier)
   releases.push(record)
   console.info('Deployed grant', record)
   // Must write to file after every grant to avoid losing info on crash.
@@ -169,12 +218,12 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
 }
 
-async function checkBalance(releaseGoldConfig: any) {
+async function checkBalance(config: ReleaseGoldConfig) {
   const weiAmountReleasedPerPeriod = new BigNumber(
-    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
+    web3.utils.toWei(config.amountReleasedPerPeriod.toString())
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
-    .multipliedBy(releaseGoldConfig.numReleasePeriods)
+    .multipliedBy(config.numReleasePeriods)
     .plus(ONE_CGLD) // Tx Fees
     .toFixed()
   while (true) {
@@ -186,7 +235,7 @@ async function checkBalance(releaseGoldConfig: any) {
       chalk.yellow(
         fromAddress +
           "'s balance will not cover the next grant with identifier " +
-          releaseGoldConfig.identifier +
+          config.identifier +
           '.'
       )
     )
@@ -263,11 +312,159 @@ async function checkBalance(releaseGoldConfig: any) {
   }
 }
 
-async function handleJSONFile(err, data) {
-  if (err) {
-    throw err
+async function compile(template: ReleaseGoldTemplate): Promise<ReleaseGoldConfig> {
+  const isUnspecified = (value: any): boolean => {
+    return value === undefined || value === null
   }
-  const grants = JSON.parse(data)
+
+  const questions = []
+  if (isUnspecified(template.identifier)) {
+    questions.push({
+      type: 'text',
+      name: 'identifier',
+      message: 'Identifier',
+    })
+  }
+  if (isUnspecified(template.releaseStartTime)) {
+    questions.push({
+      type: 'text',
+      name: 'releaseStartTime',
+      inital: 'MAINNET+0',
+      message: 'Release start time',
+    })
+  }
+  if (isUnspecified(template.releaseCliffTime)) {
+    questions.push({
+      type: 'number',
+      name: 'releaseCliffTime',
+      message: 'Release cliff time',
+      min: 0,
+    })
+  }
+  if (isUnspecified(template.numReleasePeriods)) {
+    questions.push({
+      type: 'number',
+      name: 'numReleasePeriods',
+      message: 'Number of release periods',
+      min: 1,
+    })
+  }
+  if (isUnspecified(template.releasePeriod)) {
+    questions.push({
+      type: 'number',
+      name: 'releasePeriod',
+      message: 'Release period time',
+      min: 1,
+    })
+  }
+  if (isUnspecified(template.amountReleasedPerPeriod)) {
+    questions.push({
+      type: 'number',
+      name: 'amountReleasedPerPeriod',
+      message: 'Amount released per period',
+      min: 0,
+    })
+  }
+  if (isUnspecified(template.revocable)) {
+    questions.push({
+      type: 'toggle',
+      name: 'revocable',
+      message: 'Revocable?',
+    })
+  }
+  if (isUnspecified(template.beneficiary)) {
+    questions.push({
+      type: 'text',
+      name: 'beneficiary',
+      message: 'Beneficiary',
+      initial: (_, { identifier }) =>
+        isValidAddress(identifier ?? template.identifier) ? identifier : null,
+      validate: (value) =>
+        isValidAddress(value) && value !== ZERO_ADDRESS
+          ? true
+          : 'Please enter a valid non-zero Celo address.',
+    })
+  }
+  if (isUnspecified(template.releaseOwner)) {
+    questions.push({
+      type: 'text',
+      name: 'releaseOwner',
+      message: 'Release owner',
+      validate: (value) =>
+        isValidAddress(value) && value !== ZERO_ADDRESS
+          ? true
+          : 'Please enter a valid non-zero Celo address.',
+    })
+  }
+  if (isUnspecified(template.refundAddress)) {
+    questions.push({
+      type: 'text',
+      name: 'refundAddress',
+      message: 'Refund address',
+      initial: ZERO_ADDRESS,
+      validate: (value) => (isValidAddress(value) ? true : 'Please enter a valid Celo address.'),
+    })
+  }
+  if (isUnspecified(template.subjectToLiquidityProvision)) {
+    questions.push({
+      type: 'toggle',
+      name: 'subjectToLiquidityProvision',
+      message: 'Subject to liquidity provision?',
+    })
+  }
+  if (isUnspecified(template.initialDistributionRatio)) {
+    questions.push({
+      type: 'number',
+      name: 'initialDistributionRatio',
+      message: 'Initial distribution ratio',
+      initial: 1000,
+      min: 0,
+      max: 1000,
+    })
+  }
+  if (isUnspecified(template.canValidate)) {
+    questions.push({
+      type: 'toggle',
+      name: 'canValidate',
+      message: 'Can validate?',
+    })
+  }
+  if (isUnspecified(template.canVote)) {
+    questions.push({
+      type: 'toggle',
+      name: 'canVote',
+      message: 'Can vote?',
+    })
+  }
+
+  if (questions.length === 0) {
+    return template as ReleaseGoldConfig
+  }
+
+  const onCancel = () => {
+    console.error('Exiting because input canceled.')
+    process.exit(0)
+  }
+
+  console.info(
+    `\nGrant: ${JSON.stringify(template, undefined, 2)}\nUnspecified: ${questions
+      .map((q) => q.name)
+      .join(', ')}`
+  )
+  const config: ReleaseGoldConfig = {
+    ...template,
+    // @ts-ignore: onSubmit is erroneously required in the type.
+    ...(await prompts(questions, { onCancel })),
+  }
+  return config
+}
+
+async function handleJSONFile(data) {
+  const templates: ReleaseGoldTemplate[] = JSON.parse(data)
+  const grants: ReleaseGoldConfig[] = []
+  for (const t of templates) {
+    grants.push(await compile(t))
+  }
 
   if (grants.length === 0) {
     console.error(
@@ -375,12 +572,12 @@ async function handleJSONFile(err, data) {
     }
   }
   let currGrant = 1
-  for (const releaseGoldConfig of grants) {
+  for (const config of grants) {
     // Trim whitespace in case of bad copy/paste in provided json.
-    releaseGoldConfig.beneficiary = releaseGoldConfig.beneficiary.trim()
-    releaseGoldConfig.identifier = releaseGoldConfig.identifier.trim()
-    await checkBalance(releaseGoldConfig)
-    await handleGrant(releaseGoldConfig, currGrant)
+    config.beneficiary = config.beneficiary.trim()
+    config.identifier = config.identifier.trim()
+    await checkBalance(config)
+    await handleGrant(config, currGrant)
     currGrant++
   }
   console.info(chalk.green('Grants deployed successfully.'))
@@ -397,6 +594,7 @@ module.exports = async (callback: (error?: any) => number) => {
         'deployed_grants',
         'output_file',
         'really',
+        'debug',
       ],
     })
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
@@ -445,7 +643,14 @@ module.exports = async (callback: (error?: any) => number) => {
       })
       releases = []
     }
-    fs.readFile(argv.grants, handleJSONFile)
+    fs.readFile(argv.grants, async (err, data) => {
+      if (err) {
+        throw err
+      }
+      await handleJSONFile(data)
+      // Indicate success and exit.
+      callback()
+    })
   } catch (error) {
     callback(error)
   }

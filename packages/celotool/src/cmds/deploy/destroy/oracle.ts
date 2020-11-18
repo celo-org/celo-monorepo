@@ -1,15 +1,22 @@
-import { switchToClusterFromEnv } from 'src/lib/azure'
-import { removeHelmRelease } from 'src/lib/oracle'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { getOracleDeployerForContext } from 'src/lib/oracle'
 import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'oracle'
 
 export const describe = 'destroy the oracle package'
 
-export const builder = {}
+type OracleDestroyArgv = DestroyArgv & ContextArgv
 
-export const handler = async (argv: DestroyArgv) => {
-  await switchToClusterFromEnv(argv.celoEnv)
+export const builder = addContextMiddleware
 
-  await removeHelmRelease(argv.celoEnv)
+export const handler = async (argv: OracleDestroyArgv) => {
+  const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
+  const deployer = getOracleDeployerForContext(
+    argv.celoEnv,
+    argv.context,
+    false, // doesn't matter if we are using forno as we are just going to remove the chart
+    clusterManager
+  )
+  await deployer.removeChart()
 }

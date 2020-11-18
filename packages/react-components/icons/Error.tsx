@@ -11,7 +11,7 @@ interface Props {
 
 export default class Error extends React.PureComponent<Props> {
   static defaultProps = {
-    color: colors.white,
+    color: colors.light,
     width: 16,
     style: {},
   }

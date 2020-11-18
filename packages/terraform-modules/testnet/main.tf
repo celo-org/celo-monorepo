@@ -158,18 +158,19 @@ module "tx_node" {
   gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
   genesis_content_base64                = var.genesis_content_base64
-  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_metrics                          = var.geth_metrics
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
   geth_node_docker_image_tag            = var.geth_node_docker_image_tag
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node]
+  max_peers                             = 500
   name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   gcmode                                = "full"
   node_count                            = var.tx_node_count
+  node_disk_size_gb                     = var.node_disk_size_gb
   rpc_apis                              = "eth,net,web3"
 }
 
@@ -184,19 +185,20 @@ module "tx_node_private" {
   gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
   genesis_content_base64                = var.genesis_content_base64
-  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_metrics                          = var.geth_metrics
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
   geth_node_docker_image_tag            = var.geth_node_docker_image_tag
   geth_verbosity                        = var.geth_verbosity
   in_memory_discovery_table             = var.in_memory_discovery_table
   instance_tags                         = [local.target_tag_tx_node_private]
+  max_peers                             = 500
   name                                  = "tx-node-private"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   gcmode                                = "archive"
   node_count                            = var.private_tx_node_count
   rpc_apis                              = "eth,net,web3,debug,txpool"
+  node_disk_size_gb                     = var.node_disk_size_gb
 }
 
 # used for access by blockscout
@@ -226,8 +228,7 @@ module "validator" {
   gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
   genesis_content_base64                = var.genesis_content_base64
-  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
-  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_metrics                          = var.geth_metrics
   geth_node_docker_image_repository     = var.geth_node_docker_image_repository
   geth_node_docker_image_tag            = var.geth_node_docker_image_tag
   geth_verbosity                        = var.geth_verbosity
@@ -235,6 +236,7 @@ module "validator" {
   istanbul_request_timeout_ms           = var.istanbul_request_timeout_ms
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
-  proxied_validator_count               = var.proxied_validator_count
+  node_disk_size_gb                     = var.node_disk_size_gb
+  proxies_per_validator                 = var.proxies_per_validator
   validator_count                       = var.validator_count
 }

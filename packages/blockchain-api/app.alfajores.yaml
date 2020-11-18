@@ -1,12 +1,12 @@
 runtime: nodejs10
-service: alfajores
+service: blockchain-api
 env_variables:
-  NODE_ENV: "production"
-  DEPLOY_ENV: "alfajores"
-  EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://alfajores-blockscout.celo-testnet.org/graphql"
-  FIREBASE_DB: "https://celo-org-mobile-alfajores.firebaseio.com"
+  NODE_ENV: 'production'
+  DEPLOY_ENV: 'alfajores'
+  EXCHANGE_RATES_API: 'https://apilayer.net/api'
+  BLOCKSCOUT_API: 'https://alfajores-blockscout.celo-testnet.org/graphql'
+  FIREBASE_PROJECT_ID: 'celo-mobile-alfajores'
   # TODO Pull addresses from the build artifacts of the network in protocol/build
-  FAUCET_ADDRESS: "0x456f41406B32c45D59E539e4BBA3D7898c3584dA"
-  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
-  WEB3_PROVIDER_URL: "https://alfajores-forno.celo-testnet.org"
+  FAUCET_ADDRESS: '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
+  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
+  WEB3_PROVIDER_URL: 'https://alfajores-forno.celo-testnet.org'

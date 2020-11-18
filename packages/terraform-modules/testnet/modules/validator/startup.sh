@@ -175,15 +175,39 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 PROXIED_FLAGS=""
 PROXY_ENODE=""
 if [[ ${proxied} == "true" ]]; then
-  # $PROXY_ENODE_ADDRESS is from the secrets pulled from google cloud
-  PROXY_INTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_internal_ip_address}:30503"
-  PROXY_EXTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@${proxy_external_ip_address}:30303"
 
-  echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
-  echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
+  PROXY_COUNT=${length(proxy_internal_ip_addresses)}
+  PROXY_INTERNAL_IP_ADDRESSES=${join(",", proxy_internal_ip_addresses)}
+  PROXY_EXTERNAL_IP_ADDRESSES=${join(",", proxy_external_ip_addresses)}
 
-  PROXIED_FLAGS="--proxy.proxied --nodiscover --proxy.proxyenodeurlpair=\"$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE\""
+  PROXY_ENODE_URL_PAIRS=""
 
+  PROXY_INDEX=0
+  while [ $PROXY_INDEX -lt $PROXY_COUNT ]; do
+    PROXY_INTERNAL_IP_ADDRESS=`echo -n $PROXY_INTERNAL_IP_ADDRESSES | cut -d ',' -f $(($PROXY_INDEX + 1))`
+    PROXY_EXTERNAL_IP_ADDRESS=`echo -n $PROXY_EXTERNAL_IP_ADDRESSES | cut -d ',' -f $(($PROXY_INDEX + 1))`
+    # $PROXY_ENODE_ADDRESSES is from the secrets pulled from google cloud
+    PROXY_ENODE_ADDRESS=`echo -n $PROXY_ENODE_ADDRESSES | cut -d ',' -f $(($PROXY_INDEX + 1))`
+
+    PROXY_INTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@$PROXY_INTERNAL_IP_ADDRESS:30503"
+    PROXY_EXTERNAL_ENODE="enode://$PROXY_ENODE_ADDRESS@$PROXY_EXTERNAL_IP_ADDRESS:30303"
+
+    echo "Proxy $PROXY_INDEX internal enode: $PROXY_INTERNAL_ENODE"
+    echo "Proxy $PROXY_INDEX external enode: $PROXY_EXTERNAL_ENODE"
+
+    if [ $PROXY_INDEX -gt 0 ]; then
+      PROXY_ENODE_URL_PAIRS="$PROXY_ENODE_URL_PAIRS,"
+    fi
+    PROXY_ENODE_URL_PAIRS="$PROXY_ENODE_URL_PAIRS$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
+
+    PROXY_INDEX=$(($PROXY_INDEX + 1))
+  done
+  if docker run --rm --entrypoint=geth $GETH_NODE_DOCKER_IMAGE --help | grep -q 'proxy.proxyenodeurlpairs'; then
+    PROXY_FLAG_NAME="--proxy.proxyenodeurlpairs"
+  else
+    PROXY_FLAG_NAME="--proxy.proxyenodeurlpair"
+  fi
+  PROXIED_FLAGS="--proxy.proxied --nodiscover $PROXY_FLAG_NAME=\"$PROXY_ENODE_URL_PAIRS\""
 
   # if this validator is proxied, cut it off from the external internet after
   # we've downloaded everything
@@ -193,6 +217,11 @@ if [[ ${proxied} == "true" ]]; then
   # instance cannot reach the external internet so the success ack from the server
   # is never received
   timeout 20 gcloud compute instances delete-access-config ${validator_name} --zone=$GCLOUD_ZONE
+fi
+
+METRICS_FLAGS=""
+if [[ ${geth_metrics} == "true" ]]; then
+  METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
 fi
 
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
@@ -205,8 +234,17 @@ echo -n "$ACCOUNT_ADDRESS" > $DATA_DIR/address
 echo -n "$BOOTNODE_ENODE_ADDRESS" > $DATA_DIR/bootnodeEnodeAddress
 echo -n "$BOOTNODE_ENODE" > $DATA_DIR/bootnodeEnode
 echo -n "$GETH_ACCOUNT_SECRET" > $DATA_DIR/account/accountSecret
+
+NAT_FLAG=""
 if [ "${ip_address}" ]; then
   echo -n "${ip_address}" > $DATA_DIR/ipAddress
+  NAT_FLAG="--nat=extip:${ip_address}"
+fi
+
+if [[ "${network_name}" == "alfajores" || "${network_name}" == "baklava" ]]; then
+  BOOTNODE_FLAG="--${network_name}"
+else
+  BOOTNODE_FLAG="--bootnodes=enode://$BOOTNODE_ENODE"
 fi
 
 echo "Starting geth..."
@@ -230,7 +268,9 @@ docker run \
   geth account import --password $DATA_DIR/account/accountSecret \$TMP_PRIVATE_KEY_FILE ; \
   rm \$TMP_PRIVATE_KEY_FILE ; \
   geth \
-    --bootnodes=enode://$BOOTNODE_ENODE \
+    --$BOOTNODE_FLAG \
+    --datadir $DATA_DIR \
+    --nousb \
     --password=$DATA_DIR/account/accountSecret \
     --unlock=$ACCOUNT_ADDRESS \
     --mine \
@@ -253,20 +293,9 @@ docker run \
     --istanbul.blockperiod=${block_time} \
     --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
-    --metrics \
-    --pprof \
     --allow-insecure-unlock \
+    $METRICS_FLAGS \
+    $NAT_FLAG \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 
-# ---- Set Up and Run Geth Exporter ----
-
-GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
-
-echo "Pulling geth exporter..."
-docker pull $GETH_EXPORTER_DOCKER_IMAGE
-
-docker run -v $DATA_DIR:$DATA_DIR --name geth-exporter --restart=always --net=host -d $GETH_EXPORTER_DOCKER_IMAGE \
-  /usr/local/bin/geth_exporter \
-    -ipc $DATA_DIR/geth.ipc \
-    -filter "(.*overall|percentiles_95)"

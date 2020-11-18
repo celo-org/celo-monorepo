@@ -1,5 +1,5 @@
-import { eqAddress } from '@celo/utils/lib/address'
-import { isValidUrl } from '@celo/utils/lib/io'
+import { eqAddress } from '@celo/base/lib/address'
+import { isValidUrl } from '@celo/base/lib/io'
 import { resolveTxt } from 'dns'
 import { promisify } from 'util'
 import { ContractKit } from '../..'
@@ -16,12 +16,12 @@ import { ClaimTypes } from './types'
  * @param address The address that is making the claim
  * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
  */
-export async function verifyClaim(kit: ContractKit, claim: Claim, address: string) {
+export async function verifyClaim(kit: ContractKit, claim: Claim, address: string, tries = 3) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
       return verifyKeybaseClaim(kit, claim, address)
     case ClaimTypes.ACCOUNT:
-      return verifyAccountClaim(kit, claim, address)
+      return verifyAccountClaim(kit, claim, address, tries)
     case ClaimTypes.DOMAIN:
       return verifyDomainRecord(kit, claim, address)
     default:
@@ -33,18 +33,18 @@ export async function verifyClaim(kit: ContractKit, claim: Claim, address: strin
 export const verifyAccountClaim = async (
   kit: ContractKit,
   claim: AccountClaim,
-  address: string
+  address: string,
+  tries = 3
 ) => {
   const metadataURL = await (await kit.contracts.getAccounts()).getMetadataURL(claim.address)
 
-  console.info('metadataURL ' + JSON.stringify(metadataURL))
   if (!isValidUrl(metadataURL)) {
     return `Metadata URL of ${claim.address} could not be retrieved`
   }
 
   let metadata: IdentityMetadataWrapper
   try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL)
+    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL, tries)
   } catch (error) {
     return `Metadata could not be fetched for ${
       claim.address
@@ -81,7 +81,6 @@ export const verifyDomainRecord = async (
     for (const record of domainRecords) {
       for (const entry of record) {
         if (entry.startsWith(DOMAIN_TXT_HEADER)) {
-          console.debug(`TXT Record celo-site-verification found`)
           const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
           const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
           if (
@@ -92,16 +91,13 @@ export const verifyDomainRecord = async (
               address
             )
           ) {
-            console.debug(`Signature verified successfully`)
             return
           }
         }
       }
     }
-    console.debug(`Domain not validated correctly`)
     return `Unable to verify domain claim with address ${address}`
   } catch (error) {
-    console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
     return `Unable to fetch domain TXT records: ${error.toString()}`
   }
 }

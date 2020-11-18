@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 
 export default class RemoveExpiredReports extends BaseCommand {
   static description =
-    'Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")'
+    'Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")'
 
   static args = [
     {
@@ -31,7 +31,7 @@ export default class RemoveExpiredReports extends BaseCommand {
 
   async run() {
     const res = this.parse(RemoveExpiredReports)
-    this.kit.defaultAccount = res.flags.from
+
     const sortedOracles = await this.kit.contracts.getSortedOracles()
     const txo = await sortedOracles.removeExpiredReports(res.args.token)
     await displaySendTx('removeExpiredReports', txo)

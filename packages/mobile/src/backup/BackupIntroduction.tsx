@@ -1,55 +1,60 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button from '@celo/react-components/components/Button'
+import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
+import { Spacing } from '@celo/react-components/styles/styles'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
-import { setBackupDelayed } from 'src/account/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import { OnboardingEvents } from 'src/analytics/Events'
+import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
-import { Namespaces, withTranslation } from 'src/i18n'
-import BackupIntroIcon from 'src/icons/BackupIntroIcon'
-import BackupKeyIcon from 'src/icons/BackupKeyIcon'
-import SafeguardsIcon from 'src/icons/SafeguardsIcon'
-import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate, navigateBack, navigateProtected } from 'src/navigator/NavigationService'
+import DelayButton from 'src/backup/DelayButton'
+import { useAccountKey } from 'src/backup/utils'
+import { Namespaces } from 'src/i18n'
+import Logo from 'src/icons/Logo'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
+import { emptyHeader, headerWithBackButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
-import { isBackupTooLate } from 'src/redux/selectors'
 
 interface StateProps {
   backupCompleted: boolean
-  socialBackupCompleted: boolean
-  backupTooLate: boolean
-  backupDelayedTime: number
 }
 
 interface DispatchProps {
-  setBackupDelayed: typeof setBackupDelayed
   enterBackupFlow: typeof enterBackupFlow
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = WithTranslation & StateProps & DispatchProps
+type NavigationProps = StackScreenProps<StackParamList, Screens.BackupIntroduction>
+
+type Props = StateProps & DispatchProps & NavigationProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     backupCompleted: state.account.backupCompleted,
-    socialBackupCompleted: state.account.socialBackupCompleted,
-    backupTooLate: isBackupTooLate(state),
-    backupDelayedTime: state.account.backupDelayedTime,
+  }
+}
+
+export const navOptionsForAccount = ({ route }: NavigationProps) => {
+  if (route.params?.navigatedFromSettings) {
+    return headerWithBackButton
+  }
+
+  return {
+    ...emptyHeader,
+    headerTitle: '',
+    headerRight: () => <DelayButton />,
   }
 }
 
 class BackupIntroduction extends React.Component<Props> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-  })
-
   componentDidMount() {
     this.props.enterBackupFlow()
   }
@@ -58,170 +63,107 @@ class BackupIntroduction extends React.Component<Props> {
     this.props.exitBackupFlow()
   }
 
-  onPressViewBackupKey = () => {
-    CeloAnalytics.track(CustomEventNames.view_backup_phrase)
-    navigateProtected(Screens.BackupPhrase)
-  }
-
   onPressBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    navigateProtected(Screens.BackupPhrase)
-  }
-
-  onPressSetupSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_social_backup)
-    navigate(Screens.BackupSocialIntro)
-  }
-
-  onPressViewSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.view_social_backup)
-    navigateProtected(Screens.BackupSocial)
-  }
-
-  onPressDelay = () => {
-    this.props.setBackupDelayed()
-    CeloAnalytics.track(CustomEventNames.delay_backup)
-    navigateBack()
+    ValoraAnalytics.track(OnboardingEvents.backup_start)
+    navigate(Screens.AccountKeyEducation)
   }
 
   render() {
-    const {
-      t,
-      backupDelayedTime,
-      backupTooLate,
-      backupCompleted,
-      socialBackupCompleted,
-    } = this.props
+    const { backupCompleted, route } = this.props
+    const navigatedFromSettings = route.params?.navigatedFromSettings
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {!backupCompleted && (
-            <>
-              <BackupIntroIcon style={styles.logo} width={180} height={138} />
-              <Text style={styles.h1}>{t('setUpBackupKey')}</Text>
-              <Text style={styles.body}>{t('backupKeyIntro.0')}</Text>
-              <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.1')}</Text>
-              <Text style={styles.body}>{t('backupKeyIntro.7')}</Text>
-            </>
-          )}
-          {backupCompleted && !socialBackupCompleted && (
-            <>
-              <SafeguardsIcon style={styles.logo} width={210} height={90} />
-              <Text style={styles.h1}>{t('setUpSocialBackup')}</Text>
-              <Text style={styles.body}>
-                {t('backupKeyIntro.2')}
-                <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
-              </Text>
-              <Text style={styles.body}>{t('backupKeyIntro.4')}</Text>
-            </>
-          )}
-          {backupCompleted && socialBackupCompleted && (
-            <>
-              <BackupKeyIcon style={styles.logo} width={170} height={125} />
-              <Text style={styles.h1}>{t('backupComplete.header')}</Text>
-              <Text style={styles.body}>
-                {t('backupKeyIntro.2')}
-                <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.3')}</Text>
-              </Text>
-              <Text style={styles.body}>
-                {t('backupKeyIntro.5')}
-                <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyIntro.6')}</Text>
-              </Text>
-            </>
-          )}
-        </ScrollView>
-        <View>
-          {!backupCompleted && (
-            <>
-              <Button
-                onPress={this.onPressBackup}
-                text={t('getYourKey')}
-                standard={false}
-                type={BtnTypes.PRIMARY}
-              />
-              {backupTooLate && !backupDelayedTime && (
-                <Button
-                  onPress={this.onPressDelay}
-                  text={t('delayBackup')}
-                  standard={false}
-                  type={BtnTypes.SECONDARY}
-                />
-              )}
-            </>
-          )}
-
-          {backupCompleted && !socialBackupCompleted && (
-            <>
-              <Button
-                onPress={this.onPressSetupSocialBackup}
-                text={t('setUpSocialBackup')}
-                standard={false}
-                type={BtnTypes.PRIMARY}
-              />
-              <Button
-                onPress={this.onPressViewBackupKey}
-                text={t('viewBackupKey')}
-                standard={false}
-                type={BtnTypes.SECONDARY}
-              />
-            </>
-          )}
-
-          {backupCompleted && socialBackupCompleted && (
-            <>
-              <Button
-                onPress={this.onPressBackup}
-                text={t('viewBackupKey')}
-                standard={false}
-                type={BtnTypes.SECONDARY}
-              />
-              <Button
-                onPress={this.onPressViewSocialBackup}
-                text={t('viewSafeguards')}
-                standard={false}
-                type={BtnTypes.SECONDARY}
-              />
-            </>
-          )}
-        </View>
+        {!navigatedFromSettings && <DrawerTopBar />}
+        {backupCompleted ? (
+          <AccountKeyPostSetup />
+        ) : (
+          <AccountKeyIntro onPrimaryPress={this.onPressBackup} />
+        )}
       </SafeAreaView>
     )
   }
 }
 
+interface AccountKeyStartProps {
+  onPrimaryPress: () => void
+}
+
+function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
+  return (
+    <ScrollView contentContainerStyle={styles.introContainer}>
+      <Logo height={32} />
+      <Text style={styles.h1}>{t('introTitle')}</Text>
+      <Text style={styles.body}>{t('introBody')}</Text>
+      <Button text={t('introPrimaryAction')} onPress={onPrimaryPress} testID="SetUpAccountKey" />
+    </ScrollView>
+  )
+}
+
+function AccountKeyPostSetup() {
+  const accountKey = useAccountKey()
+
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
+
+  return (
+    <ScrollView contentContainerStyle={styles.postSetupContainer}>
+      <View>
+        <Text style={fontStyles.h2}>{t('postSetupTitle')}</Text>
+        <View style={styles.keyArea}>
+          <Text style={fontStyles.large}>{accountKey}</Text>
+        </View>
+        <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
+      </View>
+      <View style={styles.postSetupCTA}>
+        <TextButton onPress={goToAccountKeyGuide}>{t('postSetupCTA')}</TextButton>
+      </View>
+    </ScrollView>
+  )
+}
+
+function goToAccountKeyGuide() {
+  navigate(Screens.AccountKeyEducation, { nextScreen: Screens.BackupIntroduction })
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
+    backgroundColor: colors.light,
   },
-  scrollContainer: {
+  introContainer: {
     flex: 1,
-    paddingHorizontal: 30,
-    paddingBottom: 30,
+    paddingHorizontal: Spacing.Thick24,
     justifyContent: 'center',
   },
-  logo: {
-    alignSelf: 'center',
-    marginBottom: 30,
+  postSetupContainer: {
+    paddingTop: Spacing.Thick24,
+    paddingHorizontal: Spacing.Regular16,
   },
   h1: {
     ...fontStyles.h1,
+    paddingBottom: Spacing.Regular16,
+    paddingTop: Spacing.Regular16,
   },
   body: {
-    ...fontStyles.body,
-    textAlign: 'center',
-    paddingBottom: 15,
+    ...fontStyles.large,
+    paddingBottom: Spacing.Regular16,
   },
-  loader: {
-    marginBottom: 20,
+  keyArea: {
+    padding: Spacing.Regular16,
+    backgroundColor: colors.beige,
+    marginTop: Spacing.Regular16,
+  },
+  postSetupBody: {
+    ...fontStyles.regular,
+    marginVertical: Spacing.Regular16,
+  },
+  postSetupCTA: {
+    alignSelf: 'center',
+    paddingVertical: Spacing.Regular16,
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    setBackupDelayed,
-    enterBackupFlow,
-    exitBackupFlow,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupIntroduction))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  enterBackupFlow,
+  exitBackupFlow,
+})(BackupIntroduction)

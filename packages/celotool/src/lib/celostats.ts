@@ -1,5 +1,5 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { getBlockscoutUrl, getFornoUrl } from './endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { AccountType, getAddressesFor } from './generate_utils'
@@ -16,7 +16,7 @@ export async function installHelmChart(celoEnv: string) {
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
 }
 
 export async function upgradeHelmChart(celoEnv: string) {

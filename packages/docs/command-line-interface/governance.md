@@ -4,6 +4,36 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
+### Build-proposal
+
+Interactively build a governance proposal
+
+```
+USAGE
+  $ celocli governance:build-proposal
+
+OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --output=output                                (required) Path to output
+
+  --useLedger                                    Set it to use a ledger wallet
+
+EXAMPLE
+  build-proposal --output ./transactions.json
+```
+
+_See code: [packages/cli/src/commands/governance/build-proposal.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/build-proposal.ts)_
+
 ### Dequeue
 
 Try to dequeue governance proposal
@@ -13,6 +43,7 @@ USAGE
   $ celocli governance:dequeue
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) From address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -42,6 +73,7 @@ USAGE
   $ celocli governance:execute
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -73,6 +105,7 @@ USAGE
   $ celocli governance:executehotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
@@ -106,6 +139,7 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
   --jsonTransactions=jsonTransactions            (required) Path to json transactions of the hotfix
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
@@ -136,6 +170,16 @@ List live governance proposals (queued and ongoing)
 USAGE
   $ celocli governance:list
 
+OPTIONS
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
+
 EXAMPLE
   list
 ```
@@ -151,6 +195,7 @@ USAGE
   $ celocli governance:preparehotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Preparer's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -182,6 +227,7 @@ USAGE
   $ celocli governance:propose
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --deposit=deposit                                  (required) Amount of Gold to attach to proposal
 
   --descriptionURL=descriptionURL                    (required) A URL where further information about the proposal can
@@ -219,6 +265,7 @@ USAGE
   $ celocli governance:revokeupvote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -239,6 +286,35 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/governance/revokeupvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/revokeupvote.ts)_
 
+### Show
+
+Show information about a governance proposal, hotfix, or account.
+
+```
+USAGE
+  $ celocli governance:show
+
+OPTIONS
+  --account=account                    Address of account or voter
+  --hotfix=hotfix                      Hash of hotfix proposal
+  --jsonTransactions=jsonTransactions  Output proposal JSON to provided file
+  --nonwhitelisters                    If set, displays validators that have not whitelisted the hotfix.
+  --notwhitelisted                     List validators who have not whitelisted the specified hotfix
+  --proposalID=proposalID              UUID of proposal to view
+  --raw                                Display proposal in raw bytes format
+  --whitelisters                       If set, displays validators that have whitelisted the hotfix.
+
+EXAMPLES
+  show --proposalID 99
+  show --proposalID 99 --raw
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --whitelisters
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --nonwhitelisters
+  show --account 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
+```
+
+_See code: [packages/cli/src/commands/governance/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/show.ts)_
+
 ### Upvote
 
 Upvote a queued governance proposal
@@ -248,6 +324,7 @@ USAGE
   $ celocli governance:upvote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -319,6 +396,7 @@ USAGE
   $ celocli governance:vote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -352,6 +430,7 @@ USAGE
   $ celocli governance:whitelisthotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Whitelister's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -373,3 +452,33 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/whitelisthotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/whitelisthotfix.ts)_
+
+### Withdraw
+
+Withdraw refunded governance proposal deposits.
+
+```
+USAGE
+  $ celocli governance:withdraw
+
+OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  withdraw --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/governance/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/withdraw.ts)_
