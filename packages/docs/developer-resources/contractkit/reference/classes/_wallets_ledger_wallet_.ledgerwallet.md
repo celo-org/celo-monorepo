@@ -20,10 +20,10 @@
 
 ### Properties
 
-* [baseDerivationPath](_wallets_ledger_wallet_.ledgerwallet.md#basederivationpath)
-* [derivationPathIndexes](_wallets_ledger_wallet_.ledgerwallet.md#derivationpathindexes)
-* [ledgerAddressValidation](_wallets_ledger_wallet_.ledgerwallet.md#ledgeraddressvalidation)
-* [transport](_wallets_ledger_wallet_.ledgerwallet.md#transport)
+* [baseDerivationPath](_wallets_ledger_wallet_.ledgerwallet.md#readonly-basederivationpath)
+* [derivationPathIndexes](_wallets_ledger_wallet_.ledgerwallet.md#readonly-derivationpathindexes)
+* [ledgerAddressValidation](_wallets_ledger_wallet_.ledgerwallet.md#readonly-ledgeraddressvalidation)
+* [transport](_wallets_ledger_wallet_.ledgerwallet.md#readonly-transport)
 
 ### Methods
 
@@ -59,7 +59,7 @@ Name | Type | Default | Description |
 
 ## Properties
 
-###  baseDerivationPath
+### `Readonly` baseDerivationPath
 
 • **baseDerivationPath**: *string*
 
@@ -69,7 +69,7 @@ base derivation path. Default: "44'/52752'/0'/0"
 
 ___
 
-###  derivationPathIndexes
+### `Readonly` derivationPathIndexes
 
 • **derivationPathIndexes**: *number[]*
 
@@ -82,7 +82,7 @@ Example: [3, 99, 53] will retrieve the derivation paths of
 
 ___
 
-###  ledgerAddressValidation
+### `Readonly` ledgerAddressValidation
 
 • **ledgerAddressValidation**: *[AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)*
 
@@ -90,7 +90,7 @@ ___
 
 ___
 
-###  transport
+### `Readonly` transport
 
 • **transport**: *any*
 

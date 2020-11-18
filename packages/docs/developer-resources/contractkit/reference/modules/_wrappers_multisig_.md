@@ -1,4 +1,4 @@
-# External module: "wrappers/MultiSig"
+# Module: "wrappers/MultiSig"
 
 ## Index
 
