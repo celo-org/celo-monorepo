@@ -34,19 +34,18 @@ import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
 import ExternalExchanges, {
   externalExchangesScreenOptions,
 } from 'src/fiatExchanges/ExternalExchanges'
-import FiatExchangeAmount, {
-  fiatExchangesAmountScreenOptions,
-} from 'src/fiatExchanges/FiatExchangeAmount'
 import FiatExchangeOptions, {
   fiatExchangesOptionsScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeOptions'
+import LocalProviderCashOut, {
+  localProviderCashOutOptions,
+} from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
-import Simplex, { simplexOptions } from 'src/fiatExchanges/Simplex'
+import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import DrawerNavigator from 'src/navigator/DrawerNavigator'
@@ -220,11 +219,6 @@ const nuxScreens = (Navigator: typeof Stack) => (
       name={Screens.PincodeSet}
       component={PincodeSet}
       options={pincodeSetScreenOptions}
-    />
-    <Navigator.Screen
-      name={Screens.EnterInviteCode}
-      component={EnterInviteCode}
-      options={EnterInviteCode.navigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportWallet}
@@ -418,22 +412,22 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={SupportContact}
     />
     <Navigator.Screen
-      options={fiatExchangesAmountScreenOptions}
-      name={Screens.FiatExchangeAmount}
-      component={FiatExchangeAmount}
-    />
-    <Navigator.Screen
       options={externalExchangesScreenOptions}
       name={Screens.ExternalExchanges}
       component={ExternalExchanges}
     />
+    <Navigator.Screen options={spendScreenOptions} name={Screens.Spend} component={Spend} />
     <Navigator.Screen
       options={fiatExchangesOptionsScreenOptions}
       name={Screens.FiatExchangeOptions}
       component={FiatExchangeOptions}
     />
+    <Navigator.Screen
+      options={localProviderCashOutOptions}
+      name={Screens.LocalProviderCashOut}
+      component={LocalProviderCashOut}
+    />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
-    <Navigator.Screen options={simplexOptions} name={Screens.Simplex} component={Simplex} />
   </>
 )
 
@@ -502,7 +496,9 @@ export function MainStackScreen() {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
     } else if (!redeemComplete) {
-      initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
+      initialRoute = choseToRestoreAccount
+        ? Screens.ImportWallet
+        : Screens.OnboardingEducationScreen
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {

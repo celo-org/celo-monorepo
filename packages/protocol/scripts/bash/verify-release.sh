@@ -19,14 +19,14 @@ NETWORK=""
 PROPOSAL=""
 FORNO=""
 INITIALIZE_DATA=""
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/celo-verify-release.log"
 
 while getopts 'b:n:p:fl:i:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
-    i) INITIALIZE_DATA="--initialize_data ../../${OPTARG}" ;;
-    p) PROPOSAL="${OPTARG}" ;;
+    i) INITIALIZE_DATA="--initialize_data $(realpath $OPTARG)" ;;
+    p) PROPOSAL="$(realpath $OPTARG)" ;;
     f) FORNO="--forno" ;;
     l) LOG_FILE="${OPTARG}" ;;
     *) error "Unexpected option ${flag}" ;;
@@ -55,4 +55,4 @@ git checkout - > $LOG_FILE
 echo " - Build verification script ..."
 yarn build > $LOG_FILE
 echo " - Run verification script ..."
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal "../../$PROPOSAL" $FORNO $INITIALIZE_DATA
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network $NETWORK --build_artifacts $BUILD_DIR/contracts --proposal $PROPOSAL $FORNO $INITIALIZE_DATA

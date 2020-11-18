@@ -16,12 +16,12 @@ import { ClaimTypes } from './types'
  * @param address The address that is making the claim
  * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
  */
-export async function verifyClaim(kit: ContractKit, claim: Claim, address: string) {
+export async function verifyClaim(kit: ContractKit, claim: Claim, address: string, tries = 3) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
       return verifyKeybaseClaim(kit, claim, address)
     case ClaimTypes.ACCOUNT:
-      return verifyAccountClaim(kit, claim, address)
+      return verifyAccountClaim(kit, claim, address, tries)
     case ClaimTypes.DOMAIN:
       return verifyDomainRecord(kit, claim, address)
     default:
@@ -33,7 +33,8 @@ export async function verifyClaim(kit: ContractKit, claim: Claim, address: strin
 export const verifyAccountClaim = async (
   kit: ContractKit,
   claim: AccountClaim,
-  address: string
+  address: string,
+  tries = 3
 ) => {
   const metadataURL = await (await kit.contracts.getAccounts()).getMetadataURL(claim.address)
 
@@ -43,7 +44,7 @@ export const verifyAccountClaim = async (
 
   let metadata: IdentityMetadataWrapper
   try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL)
+    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL, tries)
   } catch (error) {
     return `Metadata could not be fetched for ${
       claim.address

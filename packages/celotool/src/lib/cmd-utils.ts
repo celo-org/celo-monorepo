@@ -1,5 +1,15 @@
 import { exec, spawn, SpawnOptions } from 'child_process'
 
+export async function execCmdAndParseJson(
+  cmd: string,
+  execOptions: any = {},
+  rejectWithOutput = false,
+  pipeOutput = false
+) {
+  const [output] = await execCmd(cmd, execOptions, rejectWithOutput, pipeOutput)
+  return JSON.parse(output)
+}
+
 // Returns a Promise which resolves to [stdout, stderr] array
 export function execCmd(
   cmd: string,

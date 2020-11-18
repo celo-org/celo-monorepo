@@ -42,6 +42,7 @@
     "express-request-id": "1.4.1",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
+    "lodash": "^4.17.14",
     "messagebird": "^3.5.0",
     "mysql2": "^2.1.0",
     "nexmo": "2.4.2",
@@ -50,7 +51,7 @@
     "prom-client": "11.2.0",
     "sequelize": "5.21.5",
     "sqlite3": "4.0.9",
-    "twilio": "^3.23.2",
+    "twilio": "^3.51.0",
     "web3": "1.2.4",
     "yargs": "13.3.0"
   },
