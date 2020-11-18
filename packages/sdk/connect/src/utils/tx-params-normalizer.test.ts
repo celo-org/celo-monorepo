@@ -7,6 +7,7 @@ import { TxParamsNormalizer } from './tx-params-normalizer'
 describe('TxParamsNormalizer class', () => {
   let populator: TxParamsNormalizer
   let mockRpcCall: any
+  let mockGasEstimation: any
   const completeCeloTx: CeloTx = {
     nonce: 1,
     chainId: 1,
@@ -40,6 +41,16 @@ describe('TxParamsNormalizer class', () => {
     }
     const connection = new Connection(new Web3('http://localhost:8545'))
     connection.rpcCaller = rpcMock
+    mockGasEstimation = jest.fn(
+      (
+        _tx: CeloTx,
+        _gasEstimator?: (tx: CeloTx) => Promise<number>,
+        _caller?: (tx: CeloTx) => Promise<string>
+      ): Promise<number> => {
+        return Promise.resolve(27)
+      }
+    )
+    connection.estimateGas = mockGasEstimation
     populator = new TxParamsNormalizer(connection)
   })
 
@@ -79,9 +90,8 @@ describe('TxParamsNormalizer class', () => {
       const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gas = undefined
       const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gas).toBe('27')
-      expect(mockRpcCall.mock.calls.length).toBe(1)
-      expect(mockRpcCall.mock.calls[0][0]).toBe('eth_estimateGas')
+      expect(newCeloTx.gas).toBe(27)
+      expect(mockGasEstimation.mock.calls.length).toBe(1)
     })
 
     /* Disabled till the coinbase issue is fixed
