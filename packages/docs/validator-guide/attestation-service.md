@@ -22,6 +22,7 @@ This guide steps you through setting up an Attestation Service:
 
 ## Recent releases
 
+* Attestation Service v1.2.0 - forthcoming
 * [Attestation Service v1.1.0](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-v1.1.0) (latest production release)
 * [Attestation Service v1.0.5](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-5)
 * [Attestation Service v1.0.4](https://github.com/celo-org/celo-monorepo/releases/tag/attestation-service-1-0-4)
@@ -49,7 +50,7 @@ Currently the Attestation Service supports three SMS providers:
 
 * [Twilio](https://www.twilio.com/try-twilio)
 * [Nexmo](https://dashboard.nexmo.com/sign-up)
-* [MessageBird](https://messagebird.com/en/)
+* [MessageBird](https://messagebird.com/en/) (from version 1.2.0 and later)
 
 It is recommended that you sign up with all three.
 
@@ -79,7 +80,7 @@ Note that Attestation Service from version 1.2.0 no longer requires callback URL
 
 ### MessageBird
 
-After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and approval to send SMS to certain countries that validators must support including the USA, Canada and others. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
+MessageBird support is introduced in version 1.2.0 and later. After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and approval to send SMS to certain countries that validators must support including the USA, Canada and others. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
 
 Unlike Twilio and Nexmo, you will need to enter the callback URL for [delivery receipts](#delivery-receipts) in the MessageBird dashboard.
 
@@ -163,19 +164,22 @@ Required options:
 | `CELO_PROVIDER`                  | The node URL for your local full node at which your attestation signer key is unlocked. e.g. `http://localhost:8545`. Do not expose this port to the public internet! |
 | `CELO_VALIDATOR_ADDRESS`         | Address of the Validator account. If Validator is deployed via a `ReleaseGold` contract, this is the contract's address (i.e. `$CELO_VALIDATOR_RG_ADDRESS`), not the beneficiary. |
 | `ATTESTATION_SIGNER_ADDRESS`     | Address of the Validator's attestation signer key  |
-| `SMS_PROVIDERS`                  | Comma-separated list of all enabled SMS providers, by order of preference. Can include `twilio`, `nexmo` |
+| `SMS_PROVIDERS`                  | Comma-separated list of all enabled SMS providers. Can include `twilio`, `nexmo`. From v1.2.0, can include `messagebird`. Providers are tried from first to last, unless `SMS_PROVIDERS_RANDOMIZED` is set to `1`, in which case they are tried in a random order. |
+ |
 
 Optional environment variables:
 
 | Variable                       | Explanation    |
 |--------------------------------|-------------------------------------------------------------------------------------------------|
 | `PORT`                           | Port to listen on. Default `3000`. |
-| `RATE_LIMIT_REQS_PER_MIN`        | Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
+| `RATE_LIMIT_REQS_PER_MIN`        | (v1.2.0+) Requests per minute over all endpoints before new requests are rate limited. Default `100`. |
 | `SMS_PROVIDERS_<country>`        | Override to set SMS providers and order for a specific country code (e.g `SMS_PROVIDERS_MX=nexmo,twilio`) |
+| `SMS_PROVIDERS_RANDOMIZED`       | (v1.2.0+) If set to `1` and no country-specific providers are configured for the country of the number being requested, randomize the order of the default providers. Default `0`. |
 | `MAX_DELIVERY_ATTEMPTS`          | Number of total delivery attempts when sending SMS. Each attempt tries the next available provider in the order specified. If omitted, the deprecated `MAX_PROVIDER_RETRIES` option will be used. Default value is `3`.  |
 | `MAX_REREQUEST_MINS`       | Number of minutes during which the client can rerequest the same attestation. Default value is `55`.
 | `EXTERNAL_CALLBACK_HOSTPORT`     | Provide the full external URL at which the service can be reached, usually the same as the value of the `ATTESTATION_SERVICE_URL` claim in your metadata. This value, plus a suffix e.g. `/delivery_status_twilio` will be the URL at which service can receive delivery receipt callbacks. If this value is not set, and `VERIFY_CONFIG_ON_STARTUP=1` (the default), the URL will be taken from the validator metadata. Otherwise, it must be supplied. |
 | `VERIFY_CONFIG_ON_STARTUP`       | Refuse to start if signer or metadata is misconfigured. Default `1`. If you disable this, you must specify `EXTERNAL_CALLBACK_HOSTPORT`. |
+| `MAX_AGE_LATEST_BLOCK_SECS`      | (v1.2.0+) Maximum age of the latest received block, in seconds, before the health check reports failure. Default is `20`. |
 | `DB_RECORD_EXPIRY_MINS`          | Time in minutes before a record of an attestation in the database may be deleted. Default 60 minutes. |
 | `LOG_LEVEL`                      | One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_FORMAT`                     | One of `json`, `human`, `stackdriver`  |
@@ -200,7 +204,7 @@ Nexmo configuration options:
 | `NEXMO_UNSUPPORTED_REGIONS` | Optional. A comma-separated list of country codes to not serve, e.g `US,MX`  |
 | `NEXMO_ACCOUNT_BALANCE_METRIC` | Optional. Disabled by default. If set to `1`, Nexmo balances will be published under the `attestation_provider_balance` metric. |
 
-MessageBird configuration options:
+MessageBird configuration options (v1.2.0+):
 
 | Variable                    | Explanation                                                     |
 | --------------------------- | --------------------------------------------------------------- |

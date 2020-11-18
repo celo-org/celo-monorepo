@@ -55,8 +55,8 @@ let coverageProvider = null
 const fornoUrls = {
   alfajores: 'https://alfajores-forno.celo-testnet.org',
   baklava: 'https://baklava-forno.celo-testnet.org',
-  rc1: 'https://rc1-forno.celo-testnet.org',
-  mainnet: 'https://rc1-forno.celo-testnet.org',
+  rc1: 'https://forno.celo.org',
+  mainnet: 'https://forno.celo.org',
 }
 
 const networks = {

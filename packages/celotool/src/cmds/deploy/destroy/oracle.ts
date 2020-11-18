@@ -1,9 +1,4 @@
-import {
-  addContextMiddleware,
-  ContextArgv,
-  serviceName,
-  switchToContextCluster,
-} from 'src/lib/context-utils'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { getOracleDeployerForContext } from 'src/lib/oracle'
 import { DestroyArgv } from '../../deploy/destroy'
 
@@ -16,11 +11,7 @@ type OracleDestroyArgv = DestroyArgv & ContextArgv
 export const builder = addContextMiddleware
 
 export const handler = async (argv: OracleDestroyArgv) => {
-  const clusterManager = await switchToContextCluster(
-    argv.celoEnv,
-    argv.context,
-    serviceName.Oracle
-  )
+  const clusterManager = await switchToContextCluster(argv.celoEnv, argv.context)
   const deployer = getOracleDeployerForContext(
     argv.celoEnv,
     argv.context,
