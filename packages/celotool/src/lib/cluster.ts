@@ -116,7 +116,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
 
   await installGCPSSDStorageClass()
 
-  await installCertManagerAndNginx()
+  await installCertManagerAndNginx(celoEnv)
 
   if (envType !== EnvTypes.DEVELOPMENT) {
     console.info('Installing metric tools installation')

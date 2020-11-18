@@ -17,11 +17,7 @@ kind: ConfigMap
 metadata:
   name: prometheus-server-conf
   labels:
-    name: prometheus-server-conf
-    chart: prometheus-stackdriver
-    release: prometheus-stackdriver
-    heritage: prometheus-stackdriver
-    component: prometheus-stackdriver
+{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
   namespace: {{ .Values.namespace }}
 data:
   prometheus.yml: |-
@@ -169,3 +165,34 @@ data:
           regex: .*
           replacement: '{{ .Values.cluster }}'
           target_label: cluster_name
+{{- range .Values.gcloud.gceScrapeZones }}
+      - job_name: 'gce-instances-{{ . }}'
+
+        gce_sd_configs:
+        - project: {{ $.Values.gcloud.project }}
+          zone: {{ . }}
+          filter: '(status="RUNNING") AND (labels.prometheus_cluster="{{ $.Values.cluster }}")'
+          refresh_interval: 60s
+          port: 6060
+
+        relabel_configs:
+          - source_labels: [__meta_gce_zone]
+            target_label: cloud_zone
+          - source_labels: [__meta_gce_network]
+            target_label: cloud_network
+          - source_labels: [__meta_gce_instance_name]
+            target_label: node_name
+          - source_labels: [__meta_gce_private_ip, __meta_gce_metadata_prometheus_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - source_labels: [__meta_gce_metadata_prometheus_path]
+            action: replace
+            regex: (.+)
+            target_label: __metrics_path__
+          - source_labels: [__name__]
+            regex: .*
+            replacement: '{{ $.Values.cluster }}'
+            target_label: cluster_name
+{{ end }}

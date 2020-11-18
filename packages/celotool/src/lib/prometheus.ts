@@ -18,12 +18,13 @@ import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } f
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
 const kubeNamespace = 'prometheus'
+const kubeServiceAccountName = releaseName
 // stackdriver-prometheus-sidecar relevant links:
 // GitHub: https://github.com/Stackdriver/stackdriver-prometheus-sidecar
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
-const sidecarImageTag = '0.7.3'
+const sidecarImageTag = '0.8.0'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.17.0'
+const prometheusImageTag = 'v2.22.2'
 
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
@@ -61,6 +62,7 @@ export async function upgradePrometheus() {
 
 async function helmParameters(clusterConfig?: BaseClusterConfig) {
   // To save $, don't send metrics to SD that probably won't be used
+  // nginx metrics currently breaks sidecar
   const exclusions = [
     '__name__!~"kube_.+_labels"',
     '__name__!~"apiserver_.+"',
@@ -89,16 +91,19 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     '__name__!~"kube_volumeattachment_.+"',
     '__name__!~"kubelet_.+"',
     '__name__!~"phoenix_.+"',
-    '__name__!~"workqueue_.+"'
+    '__name__!~"workqueue_.+"',
+    '__name__!~"nginx_.+"'
   ]
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
     `--set cluster=${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`,
     `--set gcloud.region=${fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)}`,
+    `--set gcloud.gceScrapeZones={${fetchEnv(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS)}}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set stackdriver_metrics_prefix=${prometheusImageTag}`,
+    `--set serviceAccount.name=${kubeServiceAccountName}`,
     // Stackdriver allows a maximum of 10 custom labels. kube-state-metrics
     // has some metrics of the form "kube_.+_labels" that provides the labels
     // of k8s resources as metric labels. If some k8s resources have too many labels,
@@ -106,28 +111,46 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
   ]
   if (clusterConfig) {
+    const clusterName = clusterConfig.clusterName
+    const cloudProvider = getCloudProviderPrefix(clusterConfig)
     params.push(
       `--set cluster=${clusterConfig.clusterName}`,
       `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterConfig.clusterName}`,
       `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-        clusterConfig
+        clusterName, cloudProvider
       )}`
     )
+    if (clusterConfig.cloudProvider === CloudProvider.GCP) {
+      const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
+      const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+      params.push(
+        `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
+      )
+    }
   } else {
     const clusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
+    const cloudProvider = 'gcp'
+    await createPrometheusGcloudServiceAccount(clusterName, cloudProvider)
+    const serviceAccountName = `prometheus-gcp-${clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     params.push(
       `--set cluster=${clusterName}`,
-      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`
+      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
+      `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
     )
   }
   return params
 }
 
-async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: BaseClusterConfig) {
+async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, cloudProvider: string) {
   await switchToGCPProjectFromEnv()
+  const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
 
-  const serviceAccountName = getServiceAccountName(clusterConfig)
-  await createPrometheusGcloudServiceAccount(serviceAccountName)
+  await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
+
+  // Setup workload identity IAM permissions
+  await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
 
   const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
   const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
@@ -137,8 +160,7 @@ async function getPrometheusGcloudServiceAccountKeyBase64(clusterConfig: BaseClu
 
 // createPrometheusGcloudServiceAccount creates a gcloud service account with a given
 // name and the proper permissions for writing metrics to stackdriver
-async function createPrometheusGcloudServiceAccount(serviceAccountName: string) {
-  const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+async function createPrometheusGcloudServiceAccount(serviceAccountName: string, gcloudProjectName: string) {
   await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
   const accountCreated = await createServiceAccountIfNotExists(serviceAccountName)
   if (accountCreated) {
@@ -149,16 +171,19 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string) 
   }
 }
 
-function getServiceAccountName(clusterConfig: BaseClusterConfig) {
+function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
   const prefixByCloudProvider: { [key in CloudProvider]: string } = {
     [CloudProvider.AWS]: 'aws',
     [CloudProvider.AZURE]: 'aks',
     [CloudProvider.GCP]: 'gcp',
   }
-  const prefix = prefixByCloudProvider[clusterConfig.cloudProvider]
+  return prefixByCloudProvider[clusterConfig.cloudProvider]
+}
+
+function getServiceAccountName(clusterName: string, cloudProvider: string) {
   // Ensure the service account name is within the length restriction
   // and ends with an alphanumeric character
-  return `prometheus-${prefix}-${clusterConfig.clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+  return `prometheus-${cloudProvider}-${clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
 export async function installGrafanaIfNotExists() {
@@ -204,4 +229,26 @@ export async function removeGrafanaHelmRelease() {
     console.info('Removing grafana')
     await removeGenericHelmChart(releaseName, kubeNamespace)
   }
+}
+
+async function setupWorkloadIdentities(serviceAccountName: string, gcloudProjectName: string) {
+  // https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+  // Only grant access to GCE API to Prometheus SA deployed in GKE
+  if (!serviceAccountName.includes('gcp')) {
+    return
+  }
+
+  // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
+  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+  await execCmdWithExitOnFailure(
+    `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
+  )
+
+  // Allow the Kubernetes service account to impersonate the Google service account
+  await execCmdWithExitOnFailure(
+    `gcloud iam --project ${gcloudProjectName} service-accounts add-iam-policy-binding \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
+    ${serviceAccountEmail}`
+  )
 }

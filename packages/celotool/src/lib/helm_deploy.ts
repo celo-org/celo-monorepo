@@ -180,7 +180,10 @@ export async function installGCPSSDStorageClass() {
   }
 }
 
-export async function installCertManagerAndNginx() {
+export async function installCertManagerAndNginx(celoEnv: string) {
+  const nginxChartVersion = '3.9.0'
+  const nginxChartNamespace = 'default'
+
   // Cert Manager is the newer version of lego
   const certManagerExists = await outputIncludes(
     `helm list -A`,
@@ -196,16 +199,20 @@ export async function installCertManagerAndNginx() {
     `nginx-ingress-release exists, skipping install`
   )
   if (!nginxIngressReleaseExists) {
-    const valueFilePath = `/tmp/nginx-testnet-values.yaml`
-    nginxHelmParameters(valueFilePath)
-    await execCmdWithExitOnFailure(`helm install -n default \
-    nginx-ingress-release ingress-nginx/ingress-nginx \
-    -f ${valueFilePath}
+    const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
+    nginxHelmParameters(valueFilePath, celoEnv)
+
+    await helmUpdateNginxRepo()
+    await execCmdWithExitOnFailure(`helm install \
+      -n ${nginxChartNamespace} \
+      --version ${nginxChartVersion} \
+      nginx-ingress-release ingress-nginx/ingress-nginx \
+      -f ${valueFilePath}
     `)
   }
 }
 
-function nginxHelmParameters(valueFilePath: string) {
+function nginxHelmParameters(valueFilePath: string, celoEnv: string) {
   const logFormat = `{"timestamp": "$time_iso8601", "requestID": "$req_id", "proxyUpstreamName":
   "$proxy_upstream_name", "proxyAlternativeUpstreamName": "$proxy_alternative_upstream_name","upstreamStatus":
   "$upstream_status", "upstreamAddr": "$upstream_addr","httpRequest":{"requestMethod":
@@ -213,6 +220,7 @@ function nginxHelmParameters(valueFilePath: string) {
   "$request_length", "responseSize": "$upstream_response_length", "userAgent":
   "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
   "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
+  const loadBalancerIP = getOrCreateNginxStaticIp(celoEnv)
 
   const valueFileContent = `
 controller:
@@ -227,8 +235,32 @@ controller:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"
+  service:
+    loadBalancerIP: ${loadBalancerIP}
 `
   fs.writeFileSync(valueFilePath, valueFileContent)
+}
+
+export async function getOrCreateNginxStaticIp(celoEnv: string) {
+  const staticIpName = `${celoEnv}-nginx`
+  let staticIpAddress = await retrieveIPAddress(staticIpName)
+  if (!staticIpName) {
+    await registerIPAddress(staticIpName)
+    staticIpAddress = await retrieveIPAddress(staticIpName)
+  }
+  return staticIpAddress
+}
+
+export async function helmUpdateNginxRepo() {
+  await execCmdWithExitOnFailure(
+    `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
+  )
+  await execCmdWithExitOnFailure(
+    `helm repo add stable https://charts.helm.sh/stable`
+  )
+  await execCmdWithExitOnFailure(
+    `helm repo update`
+  )
 }
 
 export async function installCertManager() {
