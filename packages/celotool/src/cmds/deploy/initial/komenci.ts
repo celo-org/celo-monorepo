@@ -1,10 +1,5 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import {
-  addContextMiddleware,
-  ContextArgv,
-  serviceName,
-  switchToContextCluster,
-} from 'src/lib/context-utils'
+import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
 import { installHelmChart } from 'src/lib/komenci'
 import yargs from 'yargs'
 
@@ -26,6 +21,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: KomenciInitialArgv) => {
-  await switchToContextCluster(argv.celoEnv, argv.context, serviceName.Komenci)
+  await switchToContextCluster(argv.celoEnv, argv.context)
   await installHelmChart(argv.celoEnv, argv.context, argv.useForno)
 }
