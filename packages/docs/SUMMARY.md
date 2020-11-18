@@ -101,7 +101,7 @@
 - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
   <!-- contractkit-reference-start -->
   - [Globals](developer-resources/contractkit/reference/globals.md)
-  - [External Modules]()
+  - [Modules]()
     - [address-registry](developer-resources/contractkit/reference/modules/_address_registry_.md)
     - [AddressRegistry](developer-resources/contractkit/reference/classes/_address_registry_.addressregistry.md)
     - [base](developer-resources/contractkit/reference/modules/_base_.md)

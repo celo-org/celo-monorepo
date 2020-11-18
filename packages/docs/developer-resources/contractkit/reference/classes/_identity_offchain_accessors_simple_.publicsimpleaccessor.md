@@ -25,10 +25,10 @@ in a type parameter is supported for runtime type safety.
 
 ### Properties
 
-* [dataPath](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#datapath)
+* [dataPath](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-datapath)
 * [read](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#read)
-* [type](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#type)
-* [wrapper](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#wrapper)
+* [type](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-type)
+* [wrapper](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-wrapper)
 
 ### Methods
 
@@ -55,7 +55,7 @@ Name | Type |
 
 ## Properties
 
-###  dataPath
+### `Readonly` dataPath
 
 • **dataPath**: *string*
 
@@ -83,7 +83,7 @@ Name | Type |
 
 ___
 
-###  type
+### `Readonly` type
 
 • **type**: *Type‹DataType›*
 
@@ -91,7 +91,7 @@ ___
 
 ___
 
-###  wrapper
+### `Readonly` wrapper
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
