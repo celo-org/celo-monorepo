@@ -624,6 +624,10 @@ jobs:
               echo "There are git differences after generating contractkit docs"
               exit 1
             fi
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh contractkit
 
   cli-test:
     <<: *defaults
@@ -653,8 +657,7 @@ jobs:
       - run: 
           name: Fail if someone forgot to add to CHANGELOG.md 
           command: |
-            ./scripts/check_if_changelog_changed.sh cli
-
+           ./scripts/check_if_changelog_changed.sh cli
       - run:
           name: Verify that a new account can be created
           command: |
