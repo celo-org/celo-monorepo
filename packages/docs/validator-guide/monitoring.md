@@ -26,7 +26,7 @@ Celo Blockchain inherits [go-ethereum's metrics](https://github.com/ethereum/go-
 
 Metrics reporting is enabled with the `--metrics` flag.
 
-Pull-based metrics are available using the ` --pprof` flag. This enables the `pprof` debugging HTTP server, by default on `http://localhost:6060`. The `--pprofaddr` and `--pprofport` options can be used to configure the interface and port respectively. If the node is running inside a Docker container, you will need to set `--pprofaddr 0.0.0.0`, then on your Docker command line add `-p 6060:localhost:6060`.
+Pull-based metrics are available using the ` --pprof` flag. This enables the `pprof` debugging HTTP server, by default on `http://localhost:6060`. The `--pprofaddr` and `--pprofport` options can be used to configure the interface and port respectively. If the node is running inside a Docker container, you will need to set `--pprofaddr 0.0.0.0`, then on your Docker command line add `-p 127.0.0.1:6060:6060`.
 
 {% hint style="warning" %}
 Be sure never to expose the `pprof` service to the public internet.
