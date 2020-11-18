@@ -3,7 +3,7 @@ import Logger from 'bunyan'
 import express from 'express'
 import fetch from 'node-fetch'
 import { receivedDeliveryReport } from '.'
-import { fetchEnv } from '../env'
+import { fetchEnv, fetchEnvOrDefault } from '../env'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 
@@ -12,6 +12,7 @@ export class TelekomSmsProvider extends SmsProvider {
     return new TelekomSmsProvider(
       fetchEnv('TELEKOM_API_KEY'),
       fetchEnv('TELEKOM_FROM'),
+      fetchEnvOrDefault('TELEKOM_URL', 'https://developer-api.telekom.com/vms/Messages.json'),
       readUnsupportedRegionsFromEnv('TELEKOM_UNSUPPORTED_REGIONS')
     )
   }
@@ -20,11 +21,18 @@ export class TelekomSmsProvider extends SmsProvider {
   apiKey: string
   deliveryStatusURL: string | undefined
   fromNumber: string
+  serviceURL: string
 
-  constructor(apiKey: string, fromNumber: string, unsupportedRegionCodes: string[]) {
+  constructor(
+    apiKey: string,
+    fromNumber: string,
+    serviceURL: string,
+    unsupportedRegionCodes: string[]
+  ) {
     super()
     this.apiKey = apiKey
     this.fromNumber = fromNumber
+    this.serviceURL = serviceURL
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
@@ -64,7 +72,7 @@ export class TelekomSmsProvider extends SmsProvider {
   }
 
   async sendSms(attestation: AttestationModel) {
-    const response = await fetch('https://developer-api.telekom.com/vms/Messages.json', {
+    const response = await fetch(this.serviceURL, {
       method: 'POST',
       headers: {
         accept: 'application/json',
