@@ -32,7 +32,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app indexer iex -S mix
+           exec mix cmd --app indexer "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix"
         ports:
         - name: http
           containerPort: 4000
