@@ -1,18 +1,46 @@
 {
   "addFunds": "Añadir Fondos",
+  "addFundsSubtitle": "Compra cUSD o CELO",
   "exchanges": "Intercambiar",
   "buySellOnExchanges": "Comprar/Vender en Intercambios",
   "cashOut": "Retirar",
+  "cashOutSubtitle": "Intercambia cUSD o CELO por otra moneda",
   "cashOutComingSoon": "Retirar (Muy Pronto)",
+  "spend": "Usar",
+  "spendSubtitle": "Usa tu balance con comercios asociados",
   "celoDollarsAt": "Celo Dollars @ <1></1>",
   "amountCelo": "Monto (CELO)",
-  "disclaimerCeloDollars": "Los valores del dólar celo son estimados.",
+  "onlyCeloDollars": "Solo cUSD",
+  "onlyCelo": "Solo CELO",
+  "celoDollar": "Celo Dólar",
+  "celoDollars": "Celo Dólares",
+  "tapToCopyCeloDollarsAddress": "`Toca para copiar tu dirección de {{appName}} cUSD",
+  "disclaimerCeloDollars": "Los valores del Celo Dólar son estimados.",
   "dollarsNotYetEnabledNote": "Los Celo Dólares aún no están disponibles en ningún proveedor. Para obtener Celo Dólares, compra CELO y cámbialos por Celo Dólares dentro de Valora, bajo la pestaña CELO.",
-  "pleaseSelectProvider": "Selecciona un proveedor a continuación. Estos enlaces te conectan a un servicio de terceros.",
+  "selectDigitalCurrency": "Selecciona una moneda digital",
+  "selectPaymentMethod": "Pague con:",
+  "payWithFiat": "Tarjeta de débito o cuenta bancaria",
+  "payWithExchange": "Exchange de criptomonedas",
+  "selectCashOutMethod": "Recibe los fondos en:",
+  "receiveOnAddress": "Dirección de cUSD/CELO",
+  "receiveWithPonto": "GCash (con Ponto)",
+  "receiveWithKotani": "M-PESA (con Kotani Pay)",
+  "fundingEducationDialog": {
+    "title": "Fondeando {{appName}}",
+    "body": "{{appName}} corre sobre la Red Celo. {{appName}} funciona con Celo Dólares (cUSD), una moneda digital estable vinculada al dólar estadounidense.\n\nPara agregar fondos a {{appName}}, compra cUSD de uno de los proveedores disponibles en tu ubicación. Para más información por favor visita <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
+  "cashOutEducationDialog": {
+    "title": "Retira de {{appName}}",
+    "body": "{{appName}} corre sobre la Red Celo. {{appName}} funciona con Celo Dólares (cUSD), una moneda digital estable vinculada al dólar estadounidense.\n\nPara retirar tu balance de {{appName}}, vende cUSD en uno de los proveedores disponibles en tu ubicación. Para más información por favor visita <0>{{link}}</0>",
+    "dismiss": "OK"
+  },
   "explanationModal": {
     "title": "Sobre proveedores",
-    "body": "Los proveedores le permiten agregar fondos o retirar dinero de tu cuenta. Determinan tus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visite el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
+    "body": "Los proveedores le permiten agregar fondos o retirar dinero de tu cuenta. Determinan tus propias tarifas y restricciones según la ubicación, la cantidad y otros factores. Visita el sitio web del proveedor para obtener ayuda específica. Visita las preguntas frecuentes para obtener más información."
   },
-  "otherFundingOptions": "Para conocer más formas de agregar y retirar fondos, visite <0>Cómo depositar fondos en mi cuenta</0>",
-  "youCanTransfer": "Puedes transferir CELO y Celo Dólares desde/hacia los siguientes exchanges utilizando tu Número de Cuenta (también conocido como dirección de Celo) - toque abajo para copiar."
+  "otherFundingOptions": "Para conocer más formas de agregar y retirar fondos, a <0>Cómo depositar fondos en mi cuenta</0>",
+  "youCanTransfer": "Puedes transferir {{currency}} desde/hacia los siguientes exchanges utilizando tu Número de Cuenta (también conocido como dirección de Celo) - toca abajo para copiar.",
+  "useBalanceWithMerchants": "Usa tu balance con comercios asociados",
+  "findMerchants": "Encuentra comercios asociados cerca de ti"
 }

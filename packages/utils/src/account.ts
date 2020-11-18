@@ -9,6 +9,7 @@ import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import { keccak256 } from 'ethereumjs-util'
 import randomBytes from 'randombytes'
+import { privateKeyToAddress } from './address'
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
 export {
@@ -68,18 +69,19 @@ export async function generateKeys(
   addressIndex: number = 0,
   bip39ToUse: Bip39 = bip39Wrapper,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
-): Promise<{ privateKey: string; publicKey: string }> {
+): Promise<{ privateKey: string; publicKey: string; address: string }> {
   const seed: Buffer = await generateSeed(mnemonic, password, bip39ToUse)
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 
 export function generateDeterministicInviteCode(
-  pepper: string,
-  changeIndex: number = 0,
+  recipientPhoneHash: string,
+  recipientPepper: string,
   addressIndex: number = 0,
+  changeIndex: number = 0,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): { privateKey: string; publicKey: string } {
-  const seed = keccak256(pepper) as Buffer
+  const seed = keccak256(recipientPhoneHash + recipientPepper) as Buffer
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 
@@ -105,7 +107,7 @@ export function generateKeysFromSeed(
   changeIndex: number = 0,
   addressIndex: number = 0,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
-): { privateKey: string; publicKey: string } {
+): { privateKey: string; publicKey: string; address: string } {
   const node = bip32.fromSeed(seed)
   const newNode = node.derivePath(`${derivationPath}/${changeIndex}/${addressIndex}`)
   if (!newNode.privateKey) {
@@ -115,6 +117,7 @@ export function generateKeysFromSeed(
   return {
     privateKey: newNode.privateKey.toString('hex'),
     publicKey: newNode.publicKey.toString('hex'),
+    address: privateKeyToAddress(newNode.privateKey.toString('hex')),
   }
 }
 

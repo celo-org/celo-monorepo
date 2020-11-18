@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
-    "lint": "yarn lerna run lint && yarn run --silent lint:do-not-merge",
+    "lint": "yarn lerna run lint --concurrency 4 && yarn run --silent lint:do-not-merge",
     "lint:do-not-merge": "! git grep -E 'DO[ _]*NOT[ _]*MERGE'",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
@@ -15,8 +15,8 @@
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
     "reset-rn": "watchman watch-del-all; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/haste-map-*; rm -rf $TMPDIR/metro-symbolicate*",
     "reset-yarn": "yarn cache clean",
-    "test": "yarn run lerna run test",
-    "build": "yarn run lerna run build",
+    "test": "yarn run lerna run test --concurrency 4",
+    "build": "yarn run lerna run build --concurrency 4",
     "build:wallet": "yarn build --scope @celo/mobile --include-filtered-dependencies",
     "docs": "yarn run lerna run docs",
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
@@ -103,6 +103,9 @@
     "websocket-extensions": "^0.1.4",
     "elliptic": "^6.5.3",
     "dot-prop": "^5.2.0",
-    "bl": "^4.0.3"
+    "bl": "^4.0.3",
+    "node-libs-react-native": "^1.2.0",
+    "object-path": "^0.11.5",
+    "node-forge": "^0.10.0"
   }
 }

@@ -2,16 +2,22 @@ import colors from '@celo/react-components/styles/colors'
 import AsyncStorage from '@react-native-community/async-storage'
 import { DefaultTheme, NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import RNShake from 'react-native-shake'
 import AlertBanner from 'src/alert/AlertBanner'
+import { InviteEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { isVersionBelowMinimum } from 'src/firebase/firebase'
-import { navigationRef } from 'src/navigator/NavigationService'
+import i18n from 'src/i18n'
+import InviteFriendModal from 'src/invite/InviteFriendModal'
+import { generateInviteLink } from 'src/invite/saga'
+import { navigate, navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
 import useTypedSelector from 'src/redux/useSelector'
 import BackupPrompt from 'src/shared/BackupPrompt'
@@ -50,6 +56,7 @@ export const NavigatorWrapper = () => {
   const [initialState, setInitialState] = React.useState()
   const appLocked = useTypedSelector(getAppLocked)
   const minRequiredVersion = useTypedSelector((state) => state.app.minVersion)
+  const isInviteModalVisible = useTypedSelector((state) => state.app.inviteModalVisible)
   const routeNameRef = React.useRef()
 
   const updateRequired = React.useMemo(() => {
@@ -97,6 +104,15 @@ export const NavigatorWrapper = () => {
     }
   }, [isReady])
 
+  React.useEffect(() => {
+    RNShake.addEventListener('ShakeEvent', () => {
+      navigate(Screens.SupportContact)
+    })
+    return () => {
+      RNShake.removeEventListener('ShakeEvent')
+    }
+  }, [])
+
   if (!isReady) {
     return null
   }
@@ -128,6 +144,14 @@ export const NavigatorWrapper = () => {
     routeNameRef.current = currentRouteName
   }
 
+  const onInvite = async () => {
+    const message = i18n.t('sendFlow7:inviteWithoutPayment', {
+      link: await generateInviteLink(),
+    })
+    ValoraAnalytics.track(InviteEvents.invite_from_menu)
+    await Share.share({ message })
+  }
+
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -143,6 +167,7 @@ export const NavigatorWrapper = () => {
         <View style={styles.floating}>
           {!appLocked && !updateRequired && <BackupPrompt />}
           <AlertBanner />
+          <InviteFriendModal isVisible={isInviteModalVisible} onInvite={onInvite} />
         </View>
       </View>
     </NavigationContainer>

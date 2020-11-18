@@ -4,9 +4,13 @@
  * but keeping it here for now since that's where other account state is
  */
 
-import { OdisUtils } from '@celo/contractkit'
+import { Result } from '@celo/base'
+import { CeloTransactionObject, ContractKit, OdisUtils } from '@celo/contractkit'
 import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+import { FetchError, TxError } from '@celo/komencikit/src/errors'
+import { KomenciKit } from '@celo/komencikit/src/kit'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { compressedPubKey, deriveDek } from '@celo/utils/src/dataEncryptionKey'
@@ -16,16 +20,26 @@ import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { features } from 'src/flags'
-import { FetchDataEncryptionKeyAction, updateAddressDekMap } from 'src/identity/actions'
+import {
+  FetchDataEncryptionKeyAction,
+  updateAddressDekMap,
+  updateWalletToAccountAddress,
+} from 'src/identity/actions'
+import { walletToAccountAddressSelector, WalletToAccountAddressType } from 'src/identity/reducer'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { registerDataEncryptionKey, setDataEncryptionKey } from 'src/web3/actions'
 import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { dataEncryptionKeySelector, isDekRegisteredSelector } from 'src/web3/selectors'
+import { getAccountAddress, getConnectedUnlockedAccount } from 'src/web3/saga'
+import {
+  dataEncryptionKeySelector,
+  isDekRegisteredSelector,
+  mtwAddressSelector,
+} from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
+import { TransactionReceipt } from 'web3-core'
 
 const TAG = 'web3/dataEncryptionKey'
 const PLACEHOLDER_DEK = '0x02c9cacca8c5c5ebb24dc6080a933f6d52a072136a069083438293d71da36049dc'
@@ -34,7 +48,7 @@ export function* fetchDataEncryptionKeyWrapper({ address }: FetchDataEncryptionK
   yield call(doFetchDataEncryptionKey, address)
 }
 
-export function* doFetchDataEncryptionKey(address: string) {
+export function* doFetchDataEncryptionKey(walletAddress: string) {
   // TODO consider caching here
   // We could use the values in the DekMap instead of looking up each time
   // But Deks can change, how should we invalidate the cache?
@@ -44,8 +58,12 @@ export function* doFetchDataEncryptionKey(address: string) {
     contractKit.contracts,
     contractKit.contracts.getAccounts,
   ])
-  const dek: string = yield call(accountsWrapper.getDataEncryptionKey, address)
-  yield put(updateAddressDekMap(address, dek || null))
+  const walletToAccountAddress: WalletToAccountAddressType = yield select(
+    walletToAccountAddressSelector
+  )
+  const accountAddress = walletToAccountAddress[walletAddress] ?? walletAddress
+  const dek: string = yield call(accountsWrapper.getDataEncryptionKey, accountAddress)
+  yield put(updateAddressDekMap(accountAddress, dek || null))
   return !dek ? null : hexToBuffer(dek)
 }
 
@@ -59,9 +77,52 @@ export function* createAccountDek(mnemonic: string) {
   return newDek
 }
 
+function* sendUserFundedSetAccountTx(
+  contractKit: ContractKit,
+  accountsWrapper: AccountsWrapper,
+  publicDataKey: string,
+  accountAddress: string,
+  walletAddress: string
+) {
+  const mtwAddressCreated: boolean = !!(yield select(mtwAddressSelector))
+  // Generate and send a transaction to set the DEK on-chain.
+  let setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress)
+  const context = newTransactionContext(TAG, 'Set wallet address & DEK')
+  // If MTW has been created, route the user's DEK/wallet registration through it
+  // because accountAddress is determined by msg.sender. Else, do it normally
+  if (mtwAddressCreated) {
+    const mtwWrapper: MetaTransactionWalletWrapper = yield call(
+      [contractKit.contracts, contractKit.contracts.getMetaTransactionWallet],
+      accountAddress
+    )
+
+    const proofOfPossession: {
+      v: number
+      r: string
+      s: string
+    } = yield call(
+      [accountsWrapper, accountsWrapper.generateProofOfKeyPossession],
+      accountAddress,
+      walletAddress
+    )
+
+    setAccountTx = accountsWrapper.setAccount('', publicDataKey, walletAddress, proofOfPossession)
+
+    const setAccountTxViaMTW: CeloTransactionObject<string> = yield call(
+      [mtwWrapper, mtwWrapper.signAndExecuteMetaTransaction],
+      setAccountTx.txo
+    )
+    yield call(sendTransaction, setAccountTxViaMTW.txo, walletAddress, context)
+  } else {
+    yield call(sendTransaction, setAccountTx.txo, walletAddress, context)
+  }
+  yield put(updateWalletToAccountAddress({ [walletAddress]: accountAddress }))
+}
+
 // Register the address and DEK with the Accounts contract
 // A no-op if registration has already been done
-export function* registerAccountDek(account: string) {
+// pendingMtwAddress is only passed during feeless verification flow
+export function* registerAccountDek(walletAddress: string) {
   try {
     const isAlreadyRegistered = yield select(isDekRegisteredSelector)
     if (isAlreadyRegistered) {
@@ -90,7 +151,15 @@ export function* registerAccountDek(account: string) {
       contractKit.contracts.getAccounts,
     ])
 
-    const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, account, publicDataKey)
+    const accountAddress: string = yield call(getAccountAddress)
+
+    const upToDate: boolean = yield call(
+      isAccountUpToDate,
+      accountsWrapper,
+      accountAddress,
+      walletAddress,
+      publicDataKey
+    )
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked)
 
     if (upToDate) {
@@ -102,11 +171,17 @@ export function* registerAccountDek(account: string) {
       return
     }
 
-    // Generate and send a transaction to set the DEK on-chain.
-    const setAccountTx = accountsWrapper.setAccount('', publicDataKey, account)
-    const context = newTransactionContext(TAG, 'Set wallet address & DEK')
-    yield call(sendTransaction, setAccountTx.txo, account, context)
+    yield call(
+      sendUserFundedSetAccountTx,
+      contractKit,
+      accountsWrapper,
+      publicDataKey,
+      accountAddress,
+      walletAddress
+    )
 
+    // TODO: Make sure this action is also triggered after the DEK registration
+    // that will happen via Komenci
     yield put(registerDataEncryptionKey())
     ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
       newRegistration: true,
@@ -118,23 +193,110 @@ export function* registerAccountDek(account: string) {
   }
 }
 
+// Unlike normal DEK registration, registration via Komenci should be considered fatal. If there
+// is no on-chain mapping of accountAddresss => walletAddress, then senders will erroneously
+// send to MTW instead of EOA. A no-op if registration has already been done
+export function* registerWalletAndDekViaKomenci(
+  komenciKit: KomenciKit,
+  accountAddress: string,
+  walletAddress: string
+) {
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_start, { feeless: true })
+
+  Logger.debug(
+    `${TAG}@registerAccountDekViaKomenci`,
+    'Setting wallet address and public data encryption key'
+  )
+
+  yield call(getConnectedUnlockedAccount)
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_unlocked, { feeless: true })
+
+  const privateDataKey: string | null = yield select(dataEncryptionKeySelector)
+  if (!privateDataKey) {
+    throw new Error('No data key in store. Should never happen.')
+  }
+
+  const publicDataKey = compressedPubKey(hexToBuffer(privateDataKey))
+
+  const contractKit = yield call(getContractKit)
+  const accountsWrapper: AccountsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAccounts,
+  ])
+
+  const upToDate: boolean = yield call(
+    isAccountUpToDate,
+    accountsWrapper,
+    accountAddress,
+    walletAddress,
+    publicDataKey
+  )
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_account_checked, { feeless: true })
+
+  if (upToDate) {
+    Logger.debug(`${TAG}@registerAccountDekViaKomenci`, 'Address and DEK up to date, skipping.')
+    yield put(registerDataEncryptionKey())
+    ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+      newRegistration: false,
+      feeless: true,
+    })
+    return
+  }
+
+  const accountName = ''
+
+  Logger.debug(
+    TAG,
+    '@registerAccountDekViaKomenci Passed params:',
+    accountAddress,
+    walletAddress,
+    publicDataKey
+  )
+
+  const setAccountResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+    [komenciKit, komenciKit.setAccount],
+    accountAddress,
+    accountName,
+    publicDataKey,
+    walletAddress
+  )
+
+  if (!setAccountResult.ok) {
+    Logger.debug(TAG, '@registerAccountDekViaKomenci Error:', setAccountResult.error.message)
+    throw setAccountResult.error
+  }
+
+  yield put(updateWalletToAccountAddress({ [walletAddress.toLowerCase()]: accountAddress }))
+  yield put(registerDataEncryptionKey())
+  ValoraAnalytics.track(OnboardingEvents.account_dek_register_complete, {
+    newRegistration: true,
+    feeless: true,
+  })
+}
+
 // Check if account address and DEK match what's in
 // the Accounts contract
 export async function isAccountUpToDate(
   accountsWrapper: AccountsWrapper,
-  address: string,
+  accountAddress: string,
+  walletAddress: string,
   dataKey: string
 ) {
-  if (!address || !dataKey) {
+  if (!accountAddress || !dataKey) {
     return false
   }
 
-  const [currentWalletAddress, currentDEK] = await Promise.all([
-    accountsWrapper.getWalletAddress(address),
-    accountsWrapper.getDataEncryptionKey(address),
+  const [onchainWalletAddress, onchainDEK] = await Promise.all([
+    accountsWrapper.getWalletAddress(accountAddress),
+    accountsWrapper.getDataEncryptionKey(accountAddress),
   ])
-  Logger.debug(`${TAG}/isAccountUpToDate`, `DEK associated with account ${currentDEK}`)
-  return eqAddress(currentWalletAddress, address) && currentDEK && eqAddress(currentDEK, dataKey)
+  Logger.debug(`${TAG}/isAccountUpToDate`, `DEK associated with account ${onchainDEK}`)
+  return (
+    onchainWalletAddress &&
+    onchainDEK &&
+    eqAddress(onchainWalletAddress, walletAddress) &&
+    eqAddress(onchainDEK, dataKey)
+  )
 }
 
 export async function getRegisterDekTxGas(account: string, currency: CURRENCY_ENUM) {
@@ -153,7 +315,7 @@ export async function getRegisterDekTxGas(account: string, currency: CURRENCY_EN
   }
 }
 
-export function* getAuthSignerForAccount(account: string) {
+export function* getAuthSignerForAccount(accountAddress: string, walletAddress: string) {
   const contractKit = yield call(getContractKit)
 
   if (features.PNP_USE_DEK_FOR_AUTH) {
@@ -170,7 +332,8 @@ export function* getAuthSignerForAccount(account: string) {
       const upToDate: boolean = yield call(
         isAccountUpToDate,
         accountsWrapper,
-        account,
+        accountAddress,
+        walletAddress,
         publicDataKey
       )
       if (!upToDate) {

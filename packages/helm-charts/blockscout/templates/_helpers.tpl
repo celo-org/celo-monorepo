@@ -1,9 +1,14 @@
 {{- define "celo.blockscout-db-sidecar" -}}
 - name: cloudsql-proxy
-  image: gcr.io/cloudsql-docker/gce-proxy:1.11
+  image: gcr.io/cloudsql-docker/gce-proxy:1.16
   command: ["/cloud_sql_proxy",
-            "-instances={{ .Values.blockscout.db.connection_name }}=tcp:5432",
-            "-credential_file=/secrets/cloudsql/credentials.json"]
+            "-instances={{ .Values.blockscout.db.connection_name }}{{ .DbSuffix | default "" }}=tcp:5432",
+            "-credential_file=/secrets/cloudsql/credentials.json",
+            "-term_timeout=30s"]
+  resources:
+    requests:
+      memory: 500Mi
+      cpu: 200m
   securityContext:
     runAsUser: 2  # non-root user
     allowPrivilegeEscalation: false
@@ -50,6 +55,10 @@ volumes:
   value: "127.0.0.1"
 - name: DATABASE_PORT
   value: "5432"
+- name: WOBSERVER_ENABLED
+  value: "false"
+- name: HEALTHY_BLOCKS_PERIOD
+  value: {{ .Values.blockscout.healthy_blocks_period | quote }}
 - name: MIX_ENV
   value: prod
 - name: LOGO

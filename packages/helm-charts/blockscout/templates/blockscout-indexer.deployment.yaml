@@ -22,6 +22,7 @@ spec:
         release: {{ .Release.Name }}
         component: blockscout-indexer
     spec:
+      terminationGracePeriodSeconds: 60
       containers:
       - name: blockscout-indexer
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
@@ -31,11 +32,24 @@ spec:
         - -c
         args:
         - |
-           sleep 5
-           exec mix cmd --app indexer iex -S mix | sed 's/^iex(1)> //'
+           exec mix cmd --app indexer "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix"
         ports:
         - name: http
           containerPort: 4000
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: http
+          initialDelaySeconds: 5
+          failureThreshold: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: http
+          initialDelaySeconds: 5
+          failureThreshold: 3
+          periodSeconds: 5
         resources:
           requests:
             memory: 500Mi
@@ -43,6 +57,8 @@ spec:
         env:
         - name: DISABLE_WEBAPP
           value: "true"
+        - name: POOL_SIZE
+          value: {{ .Values.blockscout.indexer.pool_size | quote }}
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
     {{- with .Values.nodeSelector }}

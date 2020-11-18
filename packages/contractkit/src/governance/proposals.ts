@@ -1,19 +1,26 @@
-import { Address, isHexString } from '@celo/utils/lib/address'
+import { Address, isHexString, trimLeading0x } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
+import debugFactory from 'debug'
 import { isValidAddress, keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
-import { ABIDefinition } from 'web3-eth-abi'
+import abi, { ABIDefinition } from 'web3-eth-abi'
 import { Contract } from 'web3-eth-contract'
 import { CeloContract, RegisteredContracts } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
 import { ABI as GovernanceABI } from '../generated/Governance'
 import { ContractKit } from '../kit'
-import { getAbiTypes } from '../utils/web3-utils'
+import { getAbiTypes, parseDecodedParams } from '../utils/web3-utils'
 import { CeloTransactionObject, valueToString } from '../wrappers/BaseWrapper'
 import { hotfixToParams, Proposal, ProposalTransaction } from '../wrappers/Governance'
-import { getInitializeAbiOfImplementation, SET_AND_INITIALIZE_IMPLEMENTATION_ABI } from './proxy'
+import {
+  getInitializeAbiOfImplementation,
+  SET_AND_INITIALIZE_IMPLEMENTATION_ABI,
+  SET_IMPLEMENTATION_ABI,
+} from './proxy'
+
+const debug = debugFactory('kit:governance:proposals')
 
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
@@ -47,6 +54,12 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
+  tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
+
+const isProxySetFunction = (tx: ProposalTransactionJSON) =>
+  tx.function === SET_IMPLEMENTATION_ABI.name!
+
 /**
  * Convert a compiled proposal to a human-readable JSON form using network information.
  * @param kit Contract kit instance used to resolve addresses to contract names.
@@ -59,6 +72,7 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
 
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
+    debug(`decoding tx ${tx}`)
     const parsedTx = blockExplorer.tryParseTx(tx as Transaction)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${tx} with block explorer`)
@@ -75,6 +89,22 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
     if (isRegistryRepoint(jsonTx)) {
       const [name, address] = jsonTx.args
       await blockExplorer.updateContractDetailsMapping(name, address)
+    } else if (isProxySetFunction(jsonTx)) {
+      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+    } else if (isProxySetAndInitFunction(jsonTx)) {
+      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+
+      // Transform delegate call initialize args into a readable params map
+      const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
+
+      // 8 bytes for function sig
+      const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
+      const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
+
+      const { params: initParams } = parseDecodedParams(
+        abi.decodeParameters(initAbi.inputs!, initArgs)
+      )
+      jsonTx.params![`initialize@${initSig}`] = initParams
     }
 
     proposalJson.push(jsonTx)
@@ -161,7 +191,7 @@ export class ProposalBuilder {
     ) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.web3.eth.abi.encodeFunctionCall(
-        getInitializeAbiOfImplementation(tx.contract),
+        getInitializeAbiOfImplementation(tx.contract as any),
         tx.args[1]
       )
     }
@@ -258,7 +288,12 @@ export class InteractiveProposalBuilder {
             }
           },
         })
-        args.push(inputAnswer[functionInput.name])
+
+        // @ts-ignore
+        const answer: string = inputAnswer[functionInput.name]
+        const transformedValue =
+          functionInput.type === 'uint256' ? new BigNumber(answer).toString() : answer
+        args.push(transformedValue)
       }
 
       // prompt for value only when tx is payable

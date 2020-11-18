@@ -1,12 +1,10 @@
 import { CeloTransactionObject } from '@celo/contractkit'
 import { UnlockableWallet } from '@celo/contractkit/lib/wallets/wallet'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import Clipboard from '@react-native-community/clipboard'
 import BigNumber from 'bignumber.js'
-import { Linking, Platform } from 'react-native'
+import { Platform, Share } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { asyncRandomBytes } from 'react-native-secure-randombytes'
+import { generateSecureRandom } from 'react-native-securerandom'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import {
@@ -25,7 +23,8 @@ import { showError, showMessage } from 'src/alert/actions'
 import { InviteEvents, OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, APP_STORE_ID } from 'src/config'
+import { WEB_LINK } from 'src/brandingConfig'
+import { APP_STORE_ID } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
@@ -33,7 +32,7 @@ import { features } from 'src/flags'
 import { CURRENCY_ENUM, UNLOCK_DURATION } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
-import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   Actions,
@@ -46,8 +45,6 @@ import {
   sendInviteFailure,
   sendInviteSuccess,
   SENTINEL_INVITE_COMMENT,
-  skipInviteFailure,
-  skipInviteSuccess,
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
@@ -109,20 +106,22 @@ export async function getInviteFee(
 }
 
 export function getInvitationVerificationFeeInDollars() {
-  return new BigNumber(INVITE_FEE)
+  const inviteFee = features.ESCROW_WITHOUT_CODE ? 0 : INVITE_FEE
+  return new BigNumber(inviteFee)
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(INVITE_FEE).multipliedBy(1e18)
+  const inviteFee = features.ESCROW_WITHOUT_CODE ? 0 : INVITE_FEE
+  return new BigNumber(inviteFee).multipliedBy(1e18)
 }
 
-export async function generateInviteLink(inviteCode: string) {
+export async function generateInviteLink(inviteCode?: string) {
   let bundleId = DeviceInfo.getBundleId()
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
 
   // trying to fetch appStoreId needed to build a dynamic link
   const shortUrl = await generateShortInviteLink({
-    link: `https://valoraapp.com/?invite-code=${inviteCode}`,
+    link: `https://valoraapp.com/${inviteCode ? `?invite-code=${inviteCode}` : ''}`,
     appStoreId: APP_STORE_ID,
     bundleId,
   })
@@ -167,22 +166,39 @@ export function* sendInvite(
   currency?: CURRENCY_ENUM
 ) {
   const escrowIncluded = !!amount
+
   try {
-    ValoraAnalytics.track(InviteEvents.invite_tx_start, { escrowIncluded })
+    ValoraAnalytics.track(
+      features.KOMENCI ? InviteEvents.invite_start : InviteEvents.invite_tx_start,
+      { escrowIncluded, amount: amount?.toString() }
+    )
     const web3 = yield call(getWeb3)
-    const randomness = yield call(asyncRandomBytes, 64)
-    const temporaryWalletAccount = web3.eth.accounts.create(randomness.toString('ascii'))
+    const randomness: Uint8Array = yield call(generateSecureRandom, 64)
+    const temporaryWalletAccount = web3.eth.accounts.create(
+      Buffer.from(randomness).toString('ascii')
+    )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
-    const link = yield call(generateInviteLink, inviteCode)
-    const message = i18n.t(
-      amount ? 'sendFlow7:inviteSMSWithEscrowedPayment' : 'sendFlow7:inviteSMS',
-      {
-        code: inviteCode,
-        link,
+    const link = features.ESCROW_WITHOUT_CODE
+      ? WEB_LINK
+      : yield call(generateInviteLink, inviteCode)
+
+    const messageProp = amount
+      ? 'sendFlow7:inviteWithEscrowedPayment'
+      : 'sendFlow7:inviteWithoutPayment'
+    const message = i18n.t(messageProp, {
+      amount: amount?.toString(),
+      link,
+    })
+
+    if (features.ESCROW_WITHOUT_CODE) {
+      if (amount) {
+        yield call(initiateEscrowTransfer, e164Number, amount)
       }
-    )
+      yield call(Share.share, { message })
+      return
+    }
 
     const inviteDetails: InviteDetails = {
       timestamp: Date.now(),
@@ -197,48 +213,58 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
-    const context = newTransactionContext(TAG, 'Transfer to invite address')
-    yield put(
-      transferStableToken({
-        recipientAddress: temporaryAddress,
-        amount: INVITE_FEE,
-        comment: SENTINEL_INVITE_COMMENT,
-        context,
-      })
-    )
-
-    yield call(waitForTransactionWithId, context.id)
-    ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
-    Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
+    if (!features.KOMENCI) {
+      const context = newTransactionContext(TAG, 'Transfer to invite address')
+      yield put(
+        transferStableToken({
+          recipientAddress: temporaryAddress,
+          amount: INVITE_FEE,
+          comment: SENTINEL_INVITE_COMMENT,
+          context,
+        })
+      )
+      yield call(waitForTransactionWithId, context.id)
+      ValoraAnalytics.track(InviteEvents.invite_tx_complete, { escrowIncluded })
+      Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
+    }
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
+      yield call(initiateEscrowTransfer, e164Number, amount, temporaryAddress)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
 
     const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
     yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
-    yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
+    if (features.KOMENCI) {
+      yield call(Share.share, { message })
+      ValoraAnalytics.track(InviteEvents.invite_complete, {
+        escrowIncluded,
+        amount: amount?.toString(),
+      })
+    } else {
+      yield call(Share.share, { message })
+    }
   } catch (e) {
-    ValoraAnalytics.track(InviteEvents.invite_tx_error, { escrowIncluded, error: e.message })
+    ValoraAnalytics.track(
+      features.KOMENCI ? InviteEvents.invite_error : InviteEvents.invite_tx_error,
+      { escrowIncluded, error: e.message, amount: amount?.toString() }
+    )
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
   }
 }
 
-function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+export function* initiateEscrowTransfer(
+  e164Number: string,
+  amount: BigNumber,
+  temporaryAddress?: string
+) {
   const context = newTransactionContext(TAG, 'Escrow funds')
   try {
-    let phoneHash: string
-    if (features.USE_PHONE_NUMBER_PRIVACY) {
-      const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-      phoneHash = phoneHashDetails.phoneHash
-    } else {
-      phoneHash = getPhoneHash(e164Number)
-    }
-    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, context))
+    const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+    yield put(transferEscrowedPayment(phoneHashDetails, amount, context, temporaryAddress))
     yield call(waitForTransactionWithId, context.id)
     Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
   } catch (e) {
@@ -247,36 +273,37 @@ function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, a
   }
 }
 
-function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
-  try {
-    switch (inviteMode) {
-      case InviteBy.SMS: {
-        ValoraAnalytics.track(InviteEvents.invite_method_sms)
-        yield call(sendSms, e164Number, message)
-        break
-      }
-      case InviteBy.WhatsApp: {
-        ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
-        yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
-        break
-      }
-      default:
-        throw new Error('Unsupported invite mode type: ' + inviteMode)
-    }
+// TODO: Delete this if we don't decide to use it again
+// function* navigateToInviteMessageApp(e164Number: string, inviteMode: InviteBy, message: string) {
+//   try {
+//     switch (inviteMode) {
+//       case InviteBy.SMS: {
+//         ValoraAnalytics.track(InviteEvents.invite_method_sms)
+//         yield call(sendSms, e164Number, message)
+//         break
+//       }
+//       case InviteBy.WhatsApp: {
+//         ValoraAnalytics.track(InviteEvents.invite_method_whatsapp)
+//         yield Linking.openURL(`https://wa.me/${e164Number}?text=${encodeURIComponent(message)}`)
+//         break
+//       }
+//       default:
+//         throw new Error('Unsupported invite mode type: ' + inviteMode)
+//     }
 
-    // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
-    yield delay(100)
-  } catch (error) {
-    // Not a critical error, allow saga to proceed
-    Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
-    ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
-    yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
-    // TODO(Rossy): We need a UI for users to review their sent invite codes and
-    // redeem them in case they are unused or unsent like this case, see #2639
-    // For now just copying the code to the clipboard and notifying user
-    Clipboard.setString(message)
-  }
-}
+//     // Wait a little bit so it has time to switch to Sms/WhatsApp before updating the UI
+//     yield delay(100)
+//   } catch (error) {
+//     // Not a critical error, allow saga to proceed
+//     Logger.error(TAG + '@navigateToInviteMessageApp', `Failed to launch message app ${inviteMode}`)
+//     ValoraAnalytics.track(InviteEvents.invite_method_error, { error: error.message })
+//     yield put(showError(ErrorMessages.INVITE_OPEN_APP_FAILED, ALERT_BANNER_DURATION * 1.5))
+//     // TODO(Rossy): We need a UI for users to review their sent invite codes and
+//     // redeem them in case they are unused or unsent like this case, see #2639
+//     // For now just copying the code to the clipboard and notifying user
+//     Clipboard.setString(message)
+//   }
+// }
 
 function* sendInviteSaga(action: SendInviteAction) {
   const { e164Number, inviteMode, amount, currency } = action
@@ -380,29 +407,6 @@ export function* doRedeemInvite(tempAccountPrivateKey: string) {
   }
 }
 
-export function* skipInvite() {
-  yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
-  try {
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_start)
-    yield call(getOrCreateAccount)
-    // TODO: refactor this, the multiple dispatch calls are somewhat confusing
-    // (`setHasSeenVerificationNux` though the user hasn't seen it),
-    // we should prefer a more atomic approach with a meaningful action type
-    yield put(refreshAllBalances())
-    yield put(setHasSeenVerificationNux(true))
-    Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_complete)
-    navigateHome()
-    yield put(skipInviteSuccess())
-  } catch (e) {
-    Logger.error(TAG, 'Failed to skip invite', e)
-    ValoraAnalytics.track(OnboardingEvents.invite_redeem_skip_error, { error: e.message })
-    yield put(showError(ErrorMessages.ACCOUNT_SETUP_FAILED))
-    yield put(skipInviteFailure())
-  }
-}
-
 function* addTempAccountToWallet(tempAccountPrivateKey: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
@@ -490,5 +494,4 @@ export function* watchRedeemInvite() {
 export function* inviteSaga() {
   yield spawn(watchSendInvite)
   yield spawn(watchRedeemInvite)
-  yield spawn(skipInvite)
 }
