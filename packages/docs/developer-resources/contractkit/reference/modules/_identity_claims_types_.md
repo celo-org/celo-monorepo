@@ -1,4 +1,4 @@
-# External module: "identity/claims/types"
+# Module: "identity/claims/types"
 
 ## Index
 

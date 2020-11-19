@@ -1,4 +1,4 @@
-# External module: "wrappers/Attestations"
+# Module: "wrappers/Attestations"
 
 ## Index
 
@@ -32,4 +32,4 @@
 
 Ƭ **IdentifierLookupResult**: *Record‹string, Record‹[Address](_base_.md#address), [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L78)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L79)*

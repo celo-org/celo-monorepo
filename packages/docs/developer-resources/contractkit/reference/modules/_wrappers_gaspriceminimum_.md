@@ -1,4 +1,4 @@
-# External module: "wrappers/GasPriceMinimum"
+# Module: "wrappers/GasPriceMinimum"
 
 ## Index
 

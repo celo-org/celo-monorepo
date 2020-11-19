@@ -1,4 +1,4 @@
-# External module: "governance/proxy"
+# Module: "governance/proxy"
 
 ## Index
 
