@@ -8,7 +8,7 @@ import {
   AttestationIssuers,
   calculateTimeWeightedAverage,
   initializeBalancesByBlock,
-  mergeTwo,
+  mergeEvents,
   processAttestationCompletion,
   processTransfer,
   RewardsCalculationState,
@@ -25,6 +25,7 @@ export default class CalculateRewards extends BaseCommand {
     }),
     transferEvents: flags.string({
       required: true,
+      multiple: true,
       description: 'File containing Transfer events',
     }),
   }
@@ -32,8 +33,16 @@ export default class CalculateRewards extends BaseCommand {
   async run() {
     const res = this.parse(CalculateRewards)
     const attestationEvents = JSON.parse(fs.readFileSync(res.flags.attestationEvents, 'utf8'))
-    const transferEvents = JSON.parse(fs.readFileSync(res.flags.transferEvents, 'utf8'))
-    const allEvents: EventLog[] = mergeTwo(attestationEvents, transferEvents)
+    // parse multiple Json events input files
+    const transferEvents = res.flags.transferEvents.reduce(
+      (arr: EventLog[], eventsArr): EventLog[] => {
+        const events = JSON.parse(fs.readFileSync(eventsArr, 'utf8'))
+        return arr.concat(events)
+      },
+      []
+    )
+    // const transferEvents = JSON.parse(fs.readFileSync(res.flags.transferEvents, 'utf8'))
+    const allEvents: EventLog[] = mergeEvents(attestationEvents, transferEvents)
 
     // State over time
     const trackIssuers: AttestationIssuers = {}
@@ -45,8 +54,8 @@ export default class CalculateRewards extends BaseCommand {
       balances,
       balancesByBlock,
       // TODO: Move these into cmd args
-      blockNumberToStartTracking: 1000000,
-      blockNumberToFinishTracking: 3000000,
+      blockNumberToStartTracking: 0,
+      blockNumberToFinishTracking: 3500000,
       startedBlockBalanceTracking: false,
     }
 

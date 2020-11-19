@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js'
 import { EventLog } from 'web3-core'
 
-export function mergeTwo<T>(arr1: T[], arr2: T[]) {
+export function mergeEvents(arr1: EventLog[], arr2: EventLog[]) {
   const merged = []
   let index1 = 0
   let index2 = 0
@@ -11,7 +11,7 @@ export function mergeTwo<T>(arr1: T[], arr2: T[]) {
     const isArr1Depleted = index1 >= arr1.length
     const isArr2Depleted = index2 >= arr2.length
 
-    if (!isArr1Depleted && (isArr2Depleted || arr1[index1] < arr2[index2])) {
+    if (!isArr1Depleted && (isArr2Depleted || isPrecedingEvent(arr1[index1], arr2[index2]))) {
       merged[current] = arr1[index1]
       index1++
     } else {
@@ -23,6 +23,16 @@ export function mergeTwo<T>(arr1: T[], arr2: T[]) {
   }
 
   return merged
+}
+
+export function isPrecedingEvent(event1: EventLog, event2: EventLog) {
+  if (event1.blockNumber < event2.blockNumber) {
+    return true
+  } else if (event2.blockNumber < event1.blockNumber) {
+    return false
+  } else {
+    return event1.transactionIndex < event2.transactionIndex ? true : false
+  }
 }
 
 export function initializeBalancesByBlock(state: RewardsCalculationState) {
