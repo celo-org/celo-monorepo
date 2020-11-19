@@ -73,8 +73,11 @@ const getProposedProxyAddress = (contract: string, context: VerificationContext)
   return relevantTx.args[1]
 }
 
+const getSourceBytecodeFromArtifacts = (contract: string, artifacts: BuildArtifacts): string =>
+  stripMetadata(artifacts.getArtifactByName(contract).deployedBytecode)
+
 const getSourceBytecode = (contract: string, context: VerificationContext): string =>
-  stripMetadata(context.artifacts.getArtifactByName(contract).deployedBytecode)
+  getSourceBytecodeFromArtifacts(contract, context.artifacts)
 
 const getOnchainBytecode = async (address: string, context: VerificationContext) =>
   stripMetadata(await context.web3.eth.getCode(address))
@@ -99,7 +102,7 @@ const dfsStep = async (queue: string[], visited: Set<string>, context: Verificat
     }
 
     const onchainProxyBytecode = await getOnchainBytecode(proxyAddress, context)
-    const sourceProxyBytecode = getSourceBytecode(`Proxy`, context)
+    const sourceProxyBytecode = getSourceBytecode(`${contract}Proxy`, context)
     if (onchainProxyBytecode !== sourceProxyBytecode) {
       throw new Error(`Proposed ${contract}Proxy does not match compiled proxy bytecode`)
     }

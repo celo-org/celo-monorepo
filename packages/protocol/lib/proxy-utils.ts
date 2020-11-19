@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x, hexToBuffer } from '@celo/base/lib/address'
+import { Address, bufferToHex, hexToBuffer } from '@celo/base/lib/address'
 import { SecureTrie } from 'merkle-patricia-tree'
 import prompts from 'prompts'
 import { encode as rlpEncode } from 'rlp'
@@ -29,7 +29,7 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
   // for future use
   // await trie.put(hexToBuffer(IMPLEMENTATION_POSITION), rlpEncode(implementation))
 
-  return proof.storageHash === ensureLeading0x(trie.root.toString('hex'))
+  return proof.storageHash === bufferToHex(trie.root)
 }
 
 export async function retryTx(fn: any, args: any[]) {
