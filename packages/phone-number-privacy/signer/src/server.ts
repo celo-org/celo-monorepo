@@ -1,5 +1,5 @@
 import { loggerMiddleware, rootLogger as logger } from '@celo/phone-number-privacy-common'
-import express from 'express'
+import express, { Request, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import * as PromClient from 'prom-client'
@@ -30,19 +30,18 @@ export function createServer() {
     res.send(PromClient.register.metrics())
   })
 
+  const addMeteredEndpoint = (
+    endpoint: Endpoints,
+    handler: (req: Request, res: Response) => Promise<void>
+  ) => {
+    app.post(endpoint, async (req, res) => {
+      await callAndMeasureLatency(endpoint, handler, req, res)
+    })
+  }
+
   // EG. curl -v "http://localhost:8080/getBlindedMessagePartialSig" -H "Authorization: 0xdaf63ea42a092e69b2001db3826bc81dc859bffa4d51ce8943fddc8ccfcf6b2b1f55d64e4612e7c028791528796f5a62c1d2865b184b664589696a08c83fc62a00" -d '{"hashedPhoneNumber":"0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96","blindedQueryPhoneNumber":"n/I9srniwEHm5o6t3y0tTUB5fn7xjxRrLP1F/i8ORCdqV++WWiaAzUo3GA2UNHiB","account":"0x588e4b68193001e4d10928660aB4165b813717C0"}' -H 'Content-Type: application/json'
-  app.post(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, async (_req, res) => {
-    const end = Histograms.responseLatency
-      .labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG)
-      .startTimer()
-    await handleGetBlindedMessagePartialSig(_req, res)
-    end()
-  })
-  app.post(Endpoints.GET_QUOTA, async (_req, res) => {
-    const end = Histograms.responseLatency.labels(Endpoints.GET_QUOTA).startTimer()
-    await handleGetQuota(_req, res)
-    end()
-  })
+  addMeteredEndpoint(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, handleGetBlindedMessagePartialSig)
+  addMeteredEndpoint(Endpoints.GET_QUOTA, handleGetQuota)
 
   const sslOptions = getSslOptions()
   if (sslOptions) {
@@ -50,6 +49,16 @@ export function createServer() {
   } else {
     return app
   }
+}
+
+async function callAndMeasureLatency(
+  endpoint: Endpoints,
+  handler: (req: Request, res: Response) => Promise<void>,
+  req: Request,
+  res: Response
+) {
+  const end = Histograms.responseLatency.labels(endpoint).startTimer()
+  await handler(req, res).finally(end)
 }
 
 function getSslOptions() {
