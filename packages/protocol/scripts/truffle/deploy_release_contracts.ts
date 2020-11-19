@@ -3,14 +3,53 @@ import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs from 'fs'
-import prompts from 'prompts'
+import * as fs from 'fs'
+import * as prompts from 'prompts'
 import {
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+
+async function recoverCelo(proxyAddress: Address, from: Address) {
+  const ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
+  // const ReleaseGold = artifacts.require('ReleaseGold')
+  const ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
+
+  const releaseGoldProxy = await ReleaseGoldProxy.at(proxyAddress)
+
+  const balance = await web3.eth.getBalance(releaseGoldProxy.address)
+
+  const recoveryMultiSig = await retryTx(ReleaseGoldMultiSig.new, [{ from }])
+  await _setInitialProxyImplementation(
+    web3,
+    recoveryMultiSig,
+    releaseGoldProxy,
+    'ReleaseGoldMultiSig',
+    {
+      from,
+      value: null,
+    },
+    [from],
+    1,
+    1
+  )
+  const releaseGold = await ReleaseGold.at(recoveryMultiSig.address)
+
+  await retryTx(releaseGold.transfer, [
+    from,
+    new BigNumber(balance).minus(new BigNumber(0.001)).dp(0),
+    {
+      from: fromAddress,
+    },
+  ])
+  // await releaseGold.transfer(from, new BigNumber(balance).minus(new BigNumber(0.001)).dp(0), {
+  //   from,
+  // })
+  console.log('Funds recovered!')
+  return
+}
 
 let argv: any
 let releases: any
@@ -167,17 +206,23 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
 
-  const releaseGoldTxHash = await _setInitialProxyImplementation(
-    web3,
-    releaseGoldInstance,
-    releaseGoldProxy,
-    'ReleaseGold',
-    {
-      from: fromAddress,
-      value: totalValue.toFixed(),
-    },
-    ...contractInitializationArgs
-  )
+  let releaseGoldTxHash
+  try {
+    releaseGoldTxHash = await _setInitialProxyImplementation(
+      web3,
+      releaseGoldInstance,
+      releaseGoldProxy,
+      'ReleaseGold',
+      {
+        from: fromAddress,
+        value: totalValue.toFixed(),
+      },
+      ...contractInitializationArgs
+    )
+  } catch (e) {
+    console.log('Something went wrong! Recovering CELO to', fromAddress)
+    return recoverCelo(releaseGoldProxy.address, fromAddress)
+  }
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await retryTx(proxiedReleaseGold.transferOwnership, [
     releaseGoldMultiSigProxy.address,
