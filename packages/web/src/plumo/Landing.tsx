@@ -8,6 +8,9 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import FeatureTriangle from 'src/plumo/feather-triangle.svg'
+import Feather1 from 'src/plumo/feather1.svg'
+import Feather2 from 'src/plumo/feather2.svg'
+import Feather3 from 'src/plumo/feather3.svg'
 import Outline from 'src/plumo/phone-outline.svg'
 import OpenGraphic from 'src/plumo/plumo-open-graph.jpg'
 import SkyMobile from 'src/plumo/plumo-sky-mobile.svg'
@@ -96,13 +99,22 @@ export default function PlumoLanding() {
         >
           <Cell span={Spans.full} style={isDesktop && standardStyles.centered}>
             {isDesktop && <Image source={Outline} style={styles.phoneOutline} />}
-            <FeatherPoint title={t('figureHeading1')} text={t('figureSubheading1')} />
+            <FeatherPoint
+              title={t('figureHeading1')}
+              text={t('figureSubheading1')}
+              src={Feather1}
+            />
             <FeatherPoint
               title={t('figureHeading2')}
               text={t('figureSubheading2')}
               leftWard={true}
+              src={Feather2}
             />
-            <FeatherPoint title={t('figureHeading3')} text={t('figureSubheading3')} />
+            <FeatherPoint
+              title={t('figureHeading3')}
+              text={t('figureSubheading3')}
+              src={Feather3}
+            />
           </Cell>
         </GridRow>
         <GridRow>

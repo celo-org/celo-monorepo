@@ -7,19 +7,20 @@ interface Props {
   title: string
   text: string
   leftWard?: boolean
+  src: string
 }
 
-export default function FeatherPoint({ text, title, leftWard }: Props) {
+export default function FeatherPoint({ text, title, leftWard, src }: Props) {
   const { isDesktop } = useScreenSize()
   return (
     <View style={[styles.root, isDesktop && leftWard && styles.leftward]}>
-      <Image style={styles.image} source={{ uri: 'x.jpg' }} />
+      <Image style={styles.image} source={{ uri: src }} resizeMode="contain" />
       <View
         style={[
           standardStyles.row,
           styles.box,
           isDesktop && styles.float,
-          isDesktop && leftWard && styles.leftward,
+          isDesktop && leftWard && styles.leftwardInner,
         ]}
       >
         {isDesktop && <View style={styles.line} />}
@@ -42,7 +43,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   image: {
-    backgroundColor: colors.white,
     height: 100,
     width: 35,
   },
@@ -69,5 +69,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
   },
-  leftward: { flexDirection: 'row-reverse' },
+  leftward: { flexDirection: 'row' },
+  leftwardInner: { flexDirection: 'row-reverse', transform: [{ translateX: -470 }] },
 })
