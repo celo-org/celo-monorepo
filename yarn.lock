@@ -6246,6 +6246,11 @@
     glob "^7.1.6"
     supports-color "^7.1.0"
 
+"@types/abstract-leveldown@*":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/abstract-leveldown/-/abstract-leveldown-5.0.1.tgz#3c7750d0186b954c7f2d2f6acc8c3c7ba0c3412e"
+  integrity sha512-wYxU3kp5zItbxKmeRYCEplS2MW7DzyBnxPGj+GJVHZEUZiK/nn5Ei1sUFgURDh+X051+zsGe28iud3oHjrYWQQ==
+
 "@types/accepts@*", "@types/accepts@^1.3.5":
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/@types/accepts/-/accepts-1.3.5.tgz#c34bec115cfc746e04fe5a059df4ce7e7b391575"
@@ -6734,6 +6739,14 @@
     "@types/koa-compose" "*"
     "@types/node" "*"
 
+"@types/levelup@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@types/levelup/-/levelup-3.1.1.tgz#f7cc08f248f14cb6c92914e91bceb8761020e8f0"
+  integrity sha512-LjvlfctJYj23Xuqq3jCT8ZPSUSSgDcRJg8+XFDBasoYzefFbB4cHzlDmBVjc2rBOYvklpYHJRayD0jBsbJLD9w==
+  dependencies:
+    "@types/abstract-leveldown" "*"
+    "@types/node" "*"
+
 "@types/lodash.zipobject@^4.1.4":
   version "4.1.6"
   resolved "https://registry.yarnpkg.com/@types/lodash.zipobject/-/lodash.zipobject-4.1.6.tgz#75e140f44ac7d7682a18d3aae8ee4594fad094d7"
@@ -6890,6 +6903,13 @@
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
+
+"@types/pbkdf2@^3.0.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@types/pbkdf2/-/pbkdf2-3.1.0.tgz#039a0e9b67da0cdc4ee5dab865caa6b267bb66b1"
+  integrity sha512-Cf63Rv7jCQ0LaL8tNXmEyqTHuIJxRdlS5vMh1mj5voN4+QFhVZnlZruezqpWYDiJ8UTzhP0VmeLXCmBk66YrMQ==
+  dependencies:
+    "@types/node" "*"
 
 "@types/pg-types@*":
   version "1.11.5"
@@ -7081,6 +7101,13 @@
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/@types/secp256k1/-/secp256k1-3.5.3.tgz#57ebfdd19d476de3ff13758cf7b6d9e420d54c19"
   integrity sha512-NGcsPDR0P+Q71O63e2ayshmiZGAwCOa/cLJzOIuhOiDvmbvrCIiVtEpqdCJGogG92Bnr6tw/6lqVBsRMEl15OQ==
+  dependencies:
+    "@types/node" "*"
+
+"@types/secp256k1@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/secp256k1/-/secp256k1-4.0.1.tgz#fb3aa61a1848ad97d7425ff9dcba784549fca5a4"
+  integrity sha512-+ZjSA8ELlOp8SlKi0YLB2tz9d5iPNEmOBd+8Rz21wTMdaXQIa9b6TEnD6l5qKOCypE7FSyPyck12qZJxSDNoog==
   dependencies:
     "@types/node" "*"
 
@@ -7778,11 +7805,33 @@ abstract-leveldown@^5.0.0, abstract-leveldown@~5.0.0:
   dependencies:
     xtend "~4.0.0"
 
+abstract-leveldown@^6.2.1:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.3.0.tgz#d25221d1e6612f820c35963ba4bd739928f6026a"
+  integrity sha512-TU5nlYgta8YrBMNpc9FwQzRbiXsj49gsALsXadbGHt9CROPzX5fB0rWDR5mtdpOOKa5XqRFpbj1QroPAoPzVjQ==
+  dependencies:
+    buffer "^5.5.0"
+    immediate "^3.2.3"
+    level-concat-iterator "~2.0.0"
+    level-supports "~1.0.0"
+    xtend "~4.0.0"
+
 abstract-leveldown@~2.6.0:
   version "2.6.3"
   resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-2.6.3.tgz#1c5e8c6a5ef965ae8c35dfb3a8770c476b82c4b8"
   integrity sha512-2++wDf/DYqkPR3o5tbfdhF96EfMApo1GpPfzOsR/ZYXdkSmELlvOOEAl9iKkRsktMPHdGjO4rtkBpf2I7TiTeA==
   dependencies:
+    xtend "~4.0.0"
+
+abstract-leveldown@~6.2.1:
+  version "6.2.3"
+  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.2.3.tgz#036543d87e3710f2528e47040bc3261b77a9a8eb"
+  integrity sha512-BsLm5vFMRUrrLeCcRc+G0t2qOaTzpoJQLOubq2XM72eNpjF5UdU5o/5NvlNhx95XHcAvcl8OMXr4mlg/fRgUXQ==
+  dependencies:
+    buffer "^5.5.0"
+    immediate "^3.2.3"
+    level-concat-iterator "~2.0.0"
+    level-supports "~1.0.0"
     xtend "~4.0.0"
 
 accepts@^1.3.5, accepts@~1.3.3, accepts@~1.3.5, accepts@~1.3.7:
@@ -10298,6 +10347,11 @@ bl@^1.0.0, bl@^3.0.0, bl@^4.0.1, bl@^4.0.3:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
+blakejs@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.1.0.tgz#69df92ef953aa88ca51a32df6ab1c54a155fc7a5"
+  integrity sha1-ad+S75U6qIylGjLfarHFShVfx6U=
+
 "blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a":
   version "0.1.0"
   resolved "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
@@ -10365,6 +10419,11 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.10.0, bn.js@^4.11.0, bn.js@^4
   version "4.11.9"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.9.tgz#26d556829458f9d1e81fc48952493d0ba3507828"
   integrity sha512-E6QoYqCKZfgatHTdHzs1RRKP7ip4vvm+EyRUeE2RF0NblwVvb0p6jSVeNTOFxPn26QXN2o6SMfNxKp6kU8zQaw==
+
+bn.js@^5.1.2:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.1.3.tgz#beca005408f642ebebea80b042b4d18d2ac0ee6b"
+  integrity sha512-GkTiFpjFtUzU9CbMeJ5iazkCzGL3jrhzerzZIuqLABjbwRaFt33I9tUdSNryIptM+RxDet6OKm2WnLXzW51KsQ==
 
 body-parser@1.19.0, body-parser@^1.16.0, body-parser@^1.18.3, body-parser@^1.19.0:
   version "1.19.0"
@@ -10493,7 +10552,7 @@ browser-stdout@1.3.1:
   resolved "https://registry.yarnpkg.com/browser-stdout/-/browser-stdout-1.3.1.tgz#baa559ee14ced73452229bad7326467c61fabd60"
   integrity sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==
 
-browserify-aes@^1.0.0, browserify-aes@^1.0.4, browserify-aes@^1.0.6:
+browserify-aes@^1.0.0, browserify-aes@^1.0.4, browserify-aes@^1.0.6, browserify-aes@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/browserify-aes/-/browserify-aes-1.2.0.tgz#326734642f403dabc3003209853bb70ad428ef48"
   integrity sha512-+7CHXqGuspUn/Sl5aO7Ea0xWGAtETPXNSAjHo48JfLdPWcMng33Xe4znFvQweqc/uzk5zSOI3H52CYnjCfb5hA==
@@ -13480,6 +13539,14 @@ deferred-leveldown@~4.0.0:
     abstract-leveldown "~5.0.0"
     inherits "^2.0.3"
 
+deferred-leveldown@~5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/deferred-leveldown/-/deferred-leveldown-5.3.0.tgz#27a997ad95408b61161aa69bd489b86c71b78058"
+  integrity sha512-a59VOT+oDy7vtAbLRCZwWgxu2BaCfd5Hk7wxJd48ei7I+nsg8Orlb9CLG0PMZienk9BSUKgeAqkO2+Lw+1+Ukw==
+  dependencies:
+    abstract-leveldown "~6.2.1"
+    inherits "^2.0.3"
+
 define-properties@^1.1.2, define-properties@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/define-properties/-/define-properties-1.1.3.tgz#cf88da6cbee26fe6db7094f61d870cbd84cee9f1"
@@ -14165,6 +14232,16 @@ encoding-down@5.0.4, encoding-down@~5.0.0:
     level-codec "^9.0.0"
     level-errors "^2.0.0"
     xtend "^4.0.1"
+
+encoding-down@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/encoding-down/-/encoding-down-6.3.0.tgz#b1c4eb0e1728c146ecaef8e32963c549e76d082b"
+  integrity sha512-QKrV0iKR6MZVJV08QY0wp1e7vF6QbhnbQhb07bwpEyuz4uZiZgPlEGdkCROuFkUwdxlFaiPIhjyarH1ee/3vhw==
+  dependencies:
+    abstract-leveldown "^6.2.1"
+    inherits "^2.0.3"
+    level-codec "^9.0.0"
+    level-errors "^2.0.0"
 
 encoding@^0.1.11:
   version "0.1.12"
@@ -14953,6 +15030,27 @@ ethereum-common@^0.0.18:
   resolved "https://registry.yarnpkg.com/ethereum-common/-/ethereum-common-0.0.18.tgz#2fdc3576f232903358976eb39da783213ff9523f"
   integrity sha1-L9w1dvIykDNYl26znaeDIT/5Uj8=
 
+ethereum-cryptography@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/ethereum-cryptography/-/ethereum-cryptography-0.1.3.tgz#8d6143cfc3d74bf79bbd8edecdf29e4ae20dd191"
+  integrity sha512-w8/4x1SGGzc+tO97TASLja6SLd3fRIK2tLVcV2Gx4IB21hE19atll5Cq9o3d0ZmAYC/8aw0ipieTSiekAea4SQ==
+  dependencies:
+    "@types/pbkdf2" "^3.0.0"
+    "@types/secp256k1" "^4.0.1"
+    blakejs "^1.1.0"
+    browserify-aes "^1.2.0"
+    bs58check "^2.1.2"
+    create-hash "^1.2.0"
+    create-hmac "^1.1.7"
+    hash.js "^1.1.7"
+    keccak "^3.0.0"
+    pbkdf2 "^3.0.17"
+    randombytes "^2.1.0"
+    safe-buffer "^5.1.2"
+    scrypt-js "^3.0.0"
+    secp256k1 "^4.0.1"
+    setimmediate "^1.0.5"
+
 ethereum-ens@^0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/ethereum-ens/-/ethereum-ens-0.8.0.tgz#6d0f79acaa61fdbc87d2821779c4e550243d4c57"
@@ -15138,6 +15236,18 @@ ethereumjs-util@^5.0.0, ethereumjs-util@^5.0.1, ethereumjs-util@^5.1.1, ethereum
     rlp "^2.0.0"
     safe-buffer "^5.1.1"
     secp256k1 "^3.0.1"
+
+ethereumjs-util@^7.0.2:
+  version "7.0.7"
+  resolved "https://registry.yarnpkg.com/ethereumjs-util/-/ethereumjs-util-7.0.7.tgz#484fb9c03b766b2ee64821281070616562fb5a59"
+  integrity sha512-vU5rtZBlZsgkTw3o6PDKyB8li2EgLavnAbsKcfsH2YhHH1Le+PP8vEiMnAnvgc1B6uMoaM5GDCrVztBw0Q5K9g==
+  dependencies:
+    "@types/bn.js" "^4.11.3"
+    bn.js "^5.1.2"
+    create-hash "^1.1.2"
+    ethereum-cryptography "^0.1.3"
+    ethjs-util "0.1.6"
+    rlp "^2.2.4"
 
 ethereumjs-util@~6.0.0:
   version "6.0.0"
@@ -18459,6 +18569,14 @@ hash.js@1.1.3, hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.0"
 
+hash.js@^1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/hash.js/-/hash.js-1.1.7.tgz#0babca538e8d4ee4a0f8988d68866537a003cf42"
+  integrity sha512-taOaskGt4z4SOANNseOviYDvjEJinIkRgmp7LbKP2YTTmVxWBl87s/uzK9r+44BclBSp2X7K1hqeNfz9JbBeXA==
+  dependencies:
+    inherits "^2.0.3"
+    minimalistic-assert "^1.0.1"
+
 hasha@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/hasha/-/hasha-3.0.0.tgz#52a32fab8569d41ca69a61ff1a214f8eb7c8bd39"
@@ -21663,6 +21781,14 @@ keccak@^2.0.0:
     nan "^2.14.0"
     safe-buffer "^5.2.0"
 
+keccak@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/keccak/-/keccak-3.0.1.tgz#ae30a0e94dbe43414f741375cff6d64c8bea0bff"
+  integrity sha512-epq90L9jlFWCW7+pQa6JOnKn2Xgl2mtI664seYR6MHskvI9agt7AnDqmAlp9TqU4/caMYbA08Hi5DMZAl5zdkA==
+  dependencies:
+    node-addon-api "^2.0.0"
+    node-gyp-build "^4.2.0"
+
 keccakjs@^0.2.0, keccakjs@^0.2.1:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/keccakjs/-/keccakjs-0.2.3.tgz#5e4e969ce39689a3861f445d7752ee3477f9fe72"
@@ -21891,6 +22017,11 @@ level-codec@~7.0.0:
   resolved "https://registry.yarnpkg.com/level-codec/-/level-codec-7.0.1.tgz#341f22f907ce0f16763f24bddd681e395a0fb8a7"
   integrity sha512-Ua/R9B9r3RasXdRmOtd+t9TCOEIIlts+TN/7XTT2unhDaL6sJn83S3rUyljbr6lVtw49N3/yA0HHjpV6Kzb2aQ==
 
+level-concat-iterator@~2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/level-concat-iterator/-/level-concat-iterator-2.0.1.tgz#1d1009cf108340252cb38c51f9727311193e6263"
+  integrity sha512-OTKKOqeav2QWcERMJR7IS9CUo1sHnke2C0gkSmcR7QuEtFNLLzHQAvnMw8ykvEcv0Qtkg0p7FOwP1v9e5Smdcw==
+
 level-errors@^1.0.3:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/level-errors/-/level-errors-1.1.2.tgz#4399c2f3d3ab87d0625f7e3676e2d807deff404d"
@@ -21940,6 +22071,15 @@ level-iterator-stream@~3.0.0:
     readable-stream "^2.3.6"
     xtend "^4.0.0"
 
+level-iterator-stream@~4.0.0:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/level-iterator-stream/-/level-iterator-stream-4.0.2.tgz#7ceba69b713b0d7e22fcc0d1f128ccdc8a24f79c"
+  integrity sha512-ZSthfEqzGSOMWoUGhTXdX9jv26d32XJuHz/5YnuHZzH6wldfWMOVwI9TBtKcya4BKTyTt3XVA0A3cF3q5CY30Q==
+  dependencies:
+    inherits "^2.0.4"
+    readable-stream "^3.4.0"
+    xtend "^4.0.2"
+
 level-mem@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/level-mem/-/level-mem-3.0.1.tgz#7ce8cf256eac40f716eb6489654726247f5a89e5"
@@ -21947,6 +22087,22 @@ level-mem@^3.0.1:
   dependencies:
     level-packager "~4.0.0"
     memdown "~3.0.0"
+
+level-mem@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/level-mem/-/level-mem-5.0.1.tgz#c345126b74f5b8aa376dc77d36813a177ef8251d"
+  integrity sha512-qd+qUJHXsGSFoHTziptAKXoLX87QjR7v2KMbqncDXPxQuCdsQlzmyX+gwrEHhlzn08vkf8TyipYyMmiC6Gobzg==
+  dependencies:
+    level-packager "^5.0.3"
+    memdown "^5.0.0"
+
+level-packager@^5.0.3:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/level-packager/-/level-packager-5.1.1.tgz#323ec842d6babe7336f70299c14df2e329c18939"
+  integrity sha512-HMwMaQPlTC1IlcwT3+swhqf/NUO+ZhXVz6TY1zZIIZlIR0YSn8GtAAWmIvKjNY16ZkEg/JcpAuQskxsXqC0yOQ==
+  dependencies:
+    encoding-down "^6.3.0"
+    levelup "^4.3.2"
 
 level-packager@~4.0.0:
   version "4.0.1"
@@ -21979,6 +22135,13 @@ level-sublevel@6.6.4:
     typewiselite "~1.0.0"
     xtend "~4.0.0"
 
+level-supports@~1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/level-supports/-/level-supports-1.0.1.tgz#2f530a596834c7301622521988e2c36bb77d122d"
+  integrity sha512-rXM7GYnW8gsl1vedTJIbzOrRv85c/2uCMpiiCzO2fndd06U/kUXEEU9evYn4zFggBOg36IsBW8LzqIpETwwQzg==
+  dependencies:
+    xtend "^4.0.2"
+
 level-ws@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/level-ws/-/level-ws-0.0.0.tgz#372e512177924a00424b0b43aef2bb42496d228b"
@@ -21986,6 +22149,15 @@ level-ws@0.0.0:
   dependencies:
     readable-stream "~1.0.15"
     xtend "~2.1.1"
+
+level-ws@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/level-ws/-/level-ws-2.0.0.tgz#207a07bcd0164a0ec5d62c304b4615c54436d339"
+  integrity sha512-1iv7VXx0G9ec1isqQZ7y5LmoZo/ewAsyDHNA8EFDW5hqH2Kqovm33nSFkSdnLLAK+I5FlT+lo5Cw9itGe+CpQA==
+  dependencies:
+    inherits "^2.0.3"
+    readable-stream "^3.1.0"
+    xtend "^4.0.1"
 
 levelup@3.1.1, levelup@^3.0.0:
   version "3.1.1"
@@ -22008,6 +22180,17 @@ levelup@^1.2.1:
     level-iterator-stream "~1.3.0"
     prr "~1.0.1"
     semver "~5.4.1"
+    xtend "~4.0.0"
+
+levelup@^4.3.2:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/levelup/-/levelup-4.4.0.tgz#f89da3a228c38deb49c48f88a70fb71f01cafed6"
+  integrity sha512-94++VFO3qN95cM/d6eBXvd894oJE0w3cInq9USsyQzzoJxmiYzPAocNcuGCPGGjoXqDVJcr3C1jzt1TSjyaiLQ==
+  dependencies:
+    deferred-leveldown "~5.3.0"
+    level-errors "~2.0.0"
+    level-iterator-stream "~4.0.0"
+    level-supports "~1.0.0"
     xtend "~4.0.0"
 
 leven@^3.1.0:
@@ -23245,6 +23428,18 @@ memdown@^1.0.0:
     ltgt "~2.2.0"
     safe-buffer "~5.1.1"
 
+memdown@^5.0.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/memdown/-/memdown-5.1.0.tgz#608e91a9f10f37f5b5fe767667a8674129a833cb"
+  integrity sha512-B3J+UizMRAlEArDjWHTMmadet+UKwHd3UjMgGBkZcKAxAYVPS9o0Yeiha4qvz7iGiL2Sb3igUft6p7nbFWctpw==
+  dependencies:
+    abstract-leveldown "~6.2.1"
+    functional-red-black-tree "~1.0.1"
+    immediate "~3.2.3"
+    inherits "~2.0.1"
+    ltgt "~2.2.0"
+    safe-buffer "~5.2.0"
+
 memdown@~3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/memdown/-/memdown-3.0.0.tgz#93aca055d743b20efc37492e9e399784f2958309"
@@ -23385,6 +23580,19 @@ merkle-patricia-tree@2.3.2, merkle-patricia-tree@^2.1.2, merkle-patricia-tree@^2
     readable-stream "^2.0.0"
     rlp "^2.0.0"
     semaphore ">=1.0.1"
+
+merkle-patricia-tree@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/merkle-patricia-tree/-/merkle-patricia-tree-4.0.0.tgz#b95500a2a188a813eae18b175b34d9f439b92a62"
+  integrity sha512-OnI0iUvc5G66ZJgSB7PnuU6Pnk9QADMcBgua7YhNm8gbQJq5Hbiv9U9hQRe3mEM1KEfbqrdTC+x33bTewF+oCA==
+  dependencies:
+    "@types/levelup" "^3.1.1"
+    ethereumjs-util "^7.0.2"
+    level-mem "^5.0.1"
+    level-ws "^2.0.0"
+    readable-stream "^3.6.0"
+    rlp "^2.2.4"
+    semaphore-async-await "^1.5.1"
 
 messagebird@^3.5.0:
   version "3.5.0"
@@ -23812,7 +24020,7 @@ mini-css-extract-plugin@0.8.0:
     schema-utils "^1.0.0"
     webpack-sources "^1.1.0"
 
-minimalistic-assert@^1.0.0:
+minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/minimalistic-assert/-/minimalistic-assert-1.0.1.tgz#2e194de044626d4a10e7f7fbc00ce73e83e4d5c7"
   integrity sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==
@@ -26591,6 +26799,17 @@ pbkdf2@3.0.8:
   dependencies:
     create-hmac "^1.1.2"
 
+pbkdf2@^3.0.17:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/pbkdf2/-/pbkdf2-3.1.1.tgz#cb8724b0fada984596856d1a6ebafd3584654b94"
+  integrity sha512-4Ejy1OPxi9f2tt1rRV7Go7zmfDQ+ZectEQz3VGUQhgq62HtIRPDyG/JtnwIxs6x3uNMwo2V7q1fMvKjb+Tnpqg==
+  dependencies:
+    create-hash "^1.1.2"
+    create-hmac "^1.1.4"
+    ripemd160 "^2.0.1"
+    safe-buffer "^5.0.1"
+    sha.js "^2.4.8"
+
 pbkdf2@^3.0.3, pbkdf2@^3.0.9:
   version "3.0.17"
   resolved "https://registry.yarnpkg.com/pbkdf2/-/pbkdf2-3.0.17.tgz#976c206530617b14ebb32114239f7b09336e93a6"
@@ -28743,7 +28962,7 @@ readable-stream@1.1.x, readable-stream@^1.0.33, readable-stream@~1.1.10:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
-"readable-stream@2 || 3", readable-stream@3, readable-stream@^3.0.2, readable-stream@^3.1.1, readable-stream@^3.4.0, readable-stream@^3.5.0:
+"readable-stream@2 || 3", readable-stream@3, readable-stream@^3.0.2, readable-stream@^3.1.0, readable-stream@^3.1.1, readable-stream@^3.4.0, readable-stream@^3.5.0, readable-stream@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.6.0.tgz#337bbda3adc0706bd3e024426a286d4b4b2c9198"
   integrity sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA==
@@ -29704,6 +29923,13 @@ rlp@^2.0.0, rlp@^2.2.1, rlp@^2.2.2, rlp@^2.2.3:
   dependencies:
     bn.js "^4.11.1"
 
+rlp@^2.2.4:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/rlp/-/rlp-2.2.6.tgz#c80ba6266ac7a483ef1e69e8e2f056656de2fb2c"
+  integrity sha512-HAfAmL6SDYNWPUOJNrM500x4Thn4PZsEy5pijPh40U9WfNk0z15hUYzO9xVIMAdIHdFtD8CBDHd75Td1g36Mjg==
+  dependencies:
+    bn.js "^4.11.1"
+
 rn-host-detect@^1.0.1:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/rn-host-detect/-/rn-host-detect-1.1.3.tgz#242d76e2fa485c48d751416e65b7cce596969e91"
@@ -29785,7 +30011,7 @@ rxjs@^6.3.3, rxjs@^6.4.0, rxjs@^6.5.2, rxjs@^6.5.3, rxjs@^6.5.4, rxjs@^6.6.0:
   dependencies:
     tslib "^1.9.0"
 
-safe-buffer@*, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0:
+safe-buffer@*, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1, safe-buffer@^5.1.2, safe-buffer@^5.2.0, safe-buffer@~5.2.0:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
   integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
@@ -29974,7 +30200,7 @@ scrypt-js@2.0.4:
   resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.4.tgz#32f8c5149f0797672e551c07e230f834b6af5f16"
   integrity sha512-4KsaGcPnuhtCZQCxFxN3GVYIhKFPTdLd8PLC552XwbMndtD0cjRFAhDuuydXQ0h08ZfPgzqe6EKHozpuH74iDw==
 
-scrypt-js@^3.0.1:
+scrypt-js@^3.0.0, scrypt-js@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-3.0.1.tgz#d314a57c2aef69d1ad98a138a21fe9eafa9ee312"
   integrity sha512-cdwTTnqPu0Hyvf5in5asVdZocVDTNRmR7XEcJuIzMjJeSHybHl7vpB66AzwTaIg6CLSbtjcxc8fqcySfnTkccA==
@@ -30037,6 +30263,15 @@ secp256k1@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/secp256k1/-/secp256k1-4.0.0.tgz#1c5def3be9f86c679839110fd6be30d53f34f1a9"
   integrity sha512-0w0zse+Iku13O58SVE9/DhyCKWNsKb+n/vMqLOGICgSqxWuXZs+eajBf9uVOgk5QfNvTY/mx0QSqYxkcz802dw==
+  dependencies:
+    elliptic "^6.5.2"
+    node-addon-api "^2.0.0"
+    node-gyp-build "^4.2.0"
+
+secp256k1@^4.0.1:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/secp256k1/-/secp256k1-4.0.2.tgz#15dd57d0f0b9fdb54ac1fa1694f40e5e9a54f4a1"
+  integrity sha512-UDar4sKvWAksIlfX3xIaQReADn+WFnHvbVujpcbr+9Sf/69odMwy2MUsz5CKLQgX9nsIyrjuxL2imVyoNHa3fg==
   dependencies:
     elliptic "^6.5.2"
     node-addon-api "^2.0.0"
@@ -34574,18 +34809,6 @@ web3-bzz@1.2.4:
     swarm-js "0.1.39"
     underscore "1.9.1"
 
-<<<<<<< HEAD
-=======
-web3-bzz@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-bzz/-/web3-bzz-1.2.5.tgz#0372788cee131da6d87f307fc8641f834ff7ca27"
-  integrity sha512-PuC56cp6qe3P4/zrwhot9bxuxp53l79OpHd8xmcpULPaDBlINrC/om2GHfe2DfFyZWB2Tcn1mp1obhY+a/4B6w==
-  dependencies:
-    "@types/node" "^10.12.18"
-    got "9.6.0"
-    swarm-js "0.1.39"
-    underscore "1.9.1"
-
 web3-bzz@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-bzz/-/web3-bzz-1.2.6.tgz#0b88c0b96029eaf01b10cb47c4d5f79db4668883"
@@ -34596,7 +34819,6 @@ web3-bzz@1.2.6:
     swarm-js "0.1.39"
     underscore "1.9.1"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-bzz@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-bzz/-/web3-bzz-1.3.0.tgz#83dfd77fa8a64bbb660462dffd0fee2a02ef1051"
@@ -34645,17 +34867,6 @@ web3-core-helpers@1.2.4:
     web3-eth-iban "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-core-helpers@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-core-helpers/-/web3-core-helpers-1.2.5.tgz#8f963d70409bf5911cd874aad283604b32d8d4cd"
-  integrity sha512-lC11Zgud+epxqcjLocx7PXGkEUhymXFrQDxAAVAu5V1GrIpvX6RBDR30QKVkZ3kuhq0PRMPeIb5wbLBEpji2qw==
-  dependencies:
-    underscore "1.9.1"
-    web3-eth-iban "1.2.5"
-    web3-utils "1.2.5"
-
 web3-core-helpers@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core-helpers/-/web3-core-helpers-1.2.6.tgz#7aacd25bf8015adcdfc0f3243d0dcfdff0373f7d"
@@ -34665,7 +34876,6 @@ web3-core-helpers@1.2.6:
     web3-eth-iban "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-core-helpers@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-core-helpers/-/web3-core-helpers-1.3.0.tgz#697cc3246a7eaaaac64ea506828d861c981c3f31"
@@ -34722,19 +34932,6 @@ web3-core-method@1.2.4:
     web3-core-subscriptions "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-core-method@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-core-method/-/web3-core-method-1.2.5.tgz#c59632d87c35ee38acc27eb0dc7539331c97cd6b"
-  integrity sha512-hipYsQ+MitW9Vn7tA4/rJLjGg4LhnyN/ecCykGkucOoJcobjollV3pUkRExgyVeJLtyS+qlhuyOzwfAQpvIfvg==
-  dependencies:
-    underscore "1.9.1"
-    web3-core-helpers "1.2.5"
-    web3-core-promievent "1.2.5"
-    web3-core-subscriptions "1.2.5"
-    web3-utils "1.2.5"
-
 web3-core-method@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core-method/-/web3-core-method-1.2.6.tgz#f5a3e4d304abaf382923c8ab88ec8eeef45c1b3b"
@@ -34746,7 +34943,6 @@ web3-core-method@1.2.6:
     web3-core-subscriptions "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-core-method@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-core-method/-/web3-core-method-1.3.0.tgz#a71387af842aec7dbad5dbbd1130c14cc6c8beb3"
@@ -34783,16 +34979,6 @@ web3-core-promievent@1.2.4:
     any-promise "1.3.0"
     eventemitter3 "3.1.2"
 
-<<<<<<< HEAD
-=======
-web3-core-promievent@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-core-promievent/-/web3-core-promievent-1.2.5.tgz#8ca3791afe0f6ea86da3f0644743dcf3dfa9883a"
-  integrity sha512-IlrmWl3piOCPJC9IiP1Z1BC9Be4GiNTKw9MfgWL1ZnyQ+GSFHwW2TjDlZbV4IaoCr4K/RvHpxUxd/txrPLI8QQ==
-  dependencies:
-    any-promise "1.3.0"
-    eventemitter3 "3.1.2"
-
 web3-core-promievent@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core-promievent/-/web3-core-promievent-1.2.6.tgz#b1550a3a4163e48b8b704c1fe4b0084fc2dad8f5"
@@ -34801,7 +34987,6 @@ web3-core-promievent@1.2.6:
     any-promise "1.3.0"
     eventemitter3 "3.1.2"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-core-promievent@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-core-promievent/-/web3-core-promievent-1.3.0.tgz#e0442dd0a8989b6bdce09293976cee6d9237a484"
@@ -34842,19 +35027,6 @@ web3-core-requestmanager@1.2.4:
     web3-providers-ipc "1.2.4"
     web3-providers-ws "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-core-requestmanager@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-core-requestmanager/-/web3-core-requestmanager-1.2.5.tgz#be0b2eb627368fe7921092749ff6d665190eaa44"
-  integrity sha512-DmVKuQjjt2Os7YEJ9TKAptCReH4g1nMvPrNS8VvsWRcVHBV0/iN1owv31/t+FA+2hJgN/zQ/gEJ0AikhDk9D0A==
-  dependencies:
-    underscore "1.9.1"
-    web3-core-helpers "1.2.5"
-    web3-providers-http "1.2.5"
-    web3-providers-ipc "1.2.5"
-    web3-providers-ws "1.2.5"
-
 web3-core-requestmanager@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core-requestmanager/-/web3-core-requestmanager-1.2.6.tgz#5808c0edc0d6e2991a87b65508b3a1ab065b68ec"
@@ -34866,7 +35038,6 @@ web3-core-requestmanager@1.2.6:
     web3-providers-ipc "1.2.6"
     web3-providers-ws "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-core-requestmanager@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-core-requestmanager/-/web3-core-requestmanager-1.3.0.tgz#c5b9a0304504c0e6cce6c90bc1a3bff82732aa1f"
@@ -34914,17 +35085,6 @@ web3-core-subscriptions@1.2.4:
     underscore "1.9.1"
     web3-core-helpers "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-core-subscriptions@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-core-subscriptions/-/web3-core-subscriptions-1.2.5.tgz#1f20a0e095147da9c3cbd358c37a4f040040cab9"
-  integrity sha512-JQiOgQHqX0Nn8XSyUhLPtO7tfSmDpAZhClkr6bmcwpv7oeLplMWgXIDBiLG4JtrgkxCBzbFEWqBpicHejJ/Vaw==
-  dependencies:
-    eventemitter3 "3.1.2"
-    underscore "1.9.1"
-    web3-core-helpers "1.2.5"
-
 web3-core-subscriptions@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core-subscriptions/-/web3-core-subscriptions-1.2.6.tgz#9d44189e2321f8f1abc31f6c09103b5283461b57"
@@ -34934,7 +35094,6 @@ web3-core-subscriptions@1.2.6:
     underscore "1.9.1"
     web3-core-helpers "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-core-subscriptions@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-core-subscriptions/-/web3-core-subscriptions-1.3.0.tgz#c2622ccd2b84f4687475398ff966b579dba0847e"
@@ -34992,20 +35151,6 @@ web3-core@1.2.4:
     web3-core-requestmanager "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-core@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-core/-/web3-core-1.2.5.tgz#ae46a51924b212355ee25fb6a9291442eaf2f55b"
-  integrity sha512-86/GlTVlbVWasBidn4dYU9Nmjgj1HtbTxKYB9uu8VfiVKZZziuan3znjk4vS7WqwEJKYF7U/uMaOUg//kekhxg==
-  dependencies:
-    "@types/bn.js" "^4.11.4"
-    "@types/node" "^12.6.1"
-    web3-core-helpers "1.2.5"
-    web3-core-method "1.2.5"
-    web3-core-requestmanager "1.2.5"
-    web3-utils "1.2.5"
-
 web3-core@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core/-/web3-core-1.2.6.tgz#bb42a1d7ae49a7258460f0d95ddb00906f59ef92"
@@ -35018,7 +35163,6 @@ web3-core@1.2.6:
     web3-core-requestmanager "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-core@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-core/-/web3-core-1.3.0.tgz#b818903738461c1cca0163339e1d6d3fa51242cf"
@@ -35059,17 +35203,6 @@ web3-eth-abi@1.2.4:
     underscore "1.9.1"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth-abi@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth-abi/-/web3-eth-abi-1.2.5.tgz#7ffddd3a3e7bacd66a2186e5e388310786b9b548"
-  integrity sha512-Tz6AjGTlgZVpv01h2YgotoXoQAQgWacx82Zh72ZlZ4iBCs4SoiYvq6tfbW9pquylK2Egm23bELsrSSENz0204w==
-  dependencies:
-    ethers "4.0.0-beta.3"
-    underscore "1.9.1"
-    web3-utils "1.2.5"
-
 web3-eth-abi@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth-abi/-/web3-eth-abi-1.2.6.tgz#b495383cc5c0d8e2857b26e7fe25606685983b25"
@@ -35079,7 +35212,6 @@ web3-eth-abi@1.2.6:
     underscore "1.9.1"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth-abi@1.3.0, web3-eth-abi@^1.0.0-beta.24:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth-abi/-/web3-eth-abi-1.3.0.tgz#387b7ea9b38be69ad8856bc7b4e9a6a69bb4d22b"
@@ -35142,26 +35274,6 @@ web3-eth-accounts@1.2.4:
     web3-core-method "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth-accounts@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth-accounts/-/web3-eth-accounts-1.2.5.tgz#5d26e4aa76d9cbe252fd7bf06d83247f908db828"
-  integrity sha512-k06CblUZq15zJMwsmr/EO4YJ+P8h2U4/DqZPdOmFTM19v/7l3EFw+mosx8MpPMHf5P8f/QMnHJpGTUOD1hMN7g==
-  dependencies:
-    "@web3-js/scrypt-shim" "^0.1.0"
-    any-promise "1.3.0"
-    crypto-browserify "3.12.0"
-    eth-lib "^0.2.8"
-    ethereumjs-common "^1.3.2"
-    ethereumjs-tx "^2.1.1"
-    underscore "1.9.1"
-    uuid "3.3.2"
-    web3-core "1.2.5"
-    web3-core-helpers "1.2.5"
-    web3-core-method "1.2.5"
-    web3-utils "1.2.5"
-
 web3-eth-accounts@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth-accounts/-/web3-eth-accounts-1.2.6.tgz#a1ba4bf75fa8102a3ec6cddd0eccd72462262720"
@@ -35180,7 +35292,6 @@ web3-eth-accounts@1.2.6:
     web3-core-method "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth-accounts@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth-accounts/-/web3-eth-accounts-1.3.0.tgz#010acf389b2bee6d5e1aecb2fe78bfa5c8f26c7a"
@@ -35255,23 +35366,6 @@ web3-eth-contract@1.2.4:
     web3-eth-abi "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth-contract@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth-contract/-/web3-eth-contract-1.2.5.tgz#38628c3ccec39f59739059aaf99e1a76a17251c1"
-  integrity sha512-Sghx+USpxr2qGDgz1C7caqK00fw8EvEaXSVUcHLLwtnK+xw5Vg+eQx0Bbqu0bTERT/WmT2DgULKLFMsfLcNUAw==
-  dependencies:
-    "@types/bn.js" "^4.11.4"
-    underscore "1.9.1"
-    web3-core "1.2.5"
-    web3-core-helpers "1.2.5"
-    web3-core-method "1.2.5"
-    web3-core-promievent "1.2.5"
-    web3-core-subscriptions "1.2.5"
-    web3-eth-abi "1.2.5"
-    web3-utils "1.2.5"
-
 web3-eth-contract@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth-contract/-/web3-eth-contract-1.2.6.tgz#39111543960035ed94c597a239cf5aa1da796741"
@@ -35287,7 +35381,6 @@ web3-eth-contract@1.2.6:
     web3-eth-abi "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth-contract@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth-contract/-/web3-eth-contract-1.3.0.tgz#c758340ac800788e29fa29edc8b0c0ac957b741c"
@@ -35345,22 +35438,6 @@ web3-eth-ens@1.2.4:
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth-ens@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth-ens/-/web3-eth-ens-1.2.5.tgz#5ac8153f3ffa75fe24d963893284fad5916c870b"
-  integrity sha512-ITfeU3e5t1ABboLNK6Ymox3k+FMb+qkAyovFp6DWAwD0eKv24br91qWjVnHZNxuYLEsSjeWFP+AxRAULUqNUmw==
-  dependencies:
-    eth-ens-namehash "2.0.8"
-    underscore "1.9.1"
-    web3-core "1.2.5"
-    web3-core-helpers "1.2.5"
-    web3-core-promievent "1.2.5"
-    web3-eth-abi "1.2.5"
-    web3-eth-contract "1.2.5"
-    web3-utils "1.2.5"
-
 web3-eth-ens@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth-ens/-/web3-eth-ens-1.2.6.tgz#bf86a624c4c72bc59913c2345180d3ea947e110d"
@@ -35375,7 +35452,6 @@ web3-eth-ens@1.2.6:
     web3-eth-contract "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth-ens@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth-ens/-/web3-eth-ens-1.3.0.tgz#0887ba38473c104cf5fb8a715828b3b354fa02a2"
@@ -35424,16 +35500,6 @@ web3-eth-iban@1.2.4:
     bn.js "4.11.8"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth-iban@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth-iban/-/web3-eth-iban-1.2.5.tgz#5c4e8fe65c874cee4052d66197b9da1b769a69ca"
-  integrity sha512-YtQ4e3npULfbTicF06c5/XzX0EVsIGQQHzqunmFxpDXmN8OYXFm+R/DZDbO+cLMt88Gu+8tEChRpiId3GahirA==
-  dependencies:
-    bn.js "4.11.8"
-    web3-utils "1.2.5"
-
 web3-eth-iban@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth-iban/-/web3-eth-iban-1.2.6.tgz#0b22191fd1aa6e27f7ef0820df75820bfb4ed46b"
@@ -35442,7 +35508,6 @@ web3-eth-iban@1.2.6:
     bn.js "4.11.8"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth-iban@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth-iban/-/web3-eth-iban-1.3.0.tgz#15b782dfaf273ebc4e3f389f1367f4e88ddce4a5"
@@ -35486,20 +35551,6 @@ web3-eth-personal@1.2.4:
     web3-net "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth-personal@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth-personal/-/web3-eth-personal-1.2.5.tgz#e528c6e96e46d546576889754c688a9107593606"
-  integrity sha512-N8I2Klk4D0TA2bZCmbr60qras8VbRdtGFc5oFeY6kX6pcw1lf9kcvoWa8QdTvkkrASwzmMZ471HcDspQlAidxw==
-  dependencies:
-    "@types/node" "^12.6.1"
-    web3-core "1.2.5"
-    web3-core-helpers "1.2.5"
-    web3-core-method "1.2.5"
-    web3-net "1.2.5"
-    web3-utils "1.2.5"
-
 web3-eth-personal@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth-personal/-/web3-eth-personal-1.2.6.tgz#47a0a0657ec04dd77f95451a6869d4751d324b6b"
@@ -35512,7 +35563,6 @@ web3-eth-personal@1.2.6:
     web3-net "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth-personal@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth-personal/-/web3-eth-personal-1.3.0.tgz#d376e03dc737d961ff1f8d1aca866efad8477135"
@@ -35582,27 +35632,6 @@ web3-eth@1.2.4:
     web3-net "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-eth@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-eth/-/web3-eth-1.2.5.tgz#f643c7f8e08af5f2cbc65edd59b275fd74a2ad20"
-  integrity sha512-39BBB/K3v5E7H8A3ZW9XDaIHPozaQjA/CibXKGxFgoufnUgprU/3RsVH9L6ja1yxQOk6fr4OydfY8bpgXxYxjw==
-  dependencies:
-    underscore "1.9.1"
-    web3-core "1.2.5"
-    web3-core-helpers "1.2.5"
-    web3-core-method "1.2.5"
-    web3-core-subscriptions "1.2.5"
-    web3-eth-abi "1.2.5"
-    web3-eth-accounts "1.2.5"
-    web3-eth-contract "1.2.5"
-    web3-eth-ens "1.2.5"
-    web3-eth-iban "1.2.5"
-    web3-eth-personal "1.2.5"
-    web3-net "1.2.5"
-    web3-utils "1.2.5"
-
 web3-eth@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-eth/-/web3-eth-1.2.6.tgz#15a8c65fdde0727872848cae506758d302d8d046"
@@ -35622,7 +35651,6 @@ web3-eth@1.2.6:
     web3-net "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-eth@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-eth/-/web3-eth-1.3.0.tgz#898e5f5a8827f9bc6844e267a52eb388916a6771"
@@ -35682,17 +35710,6 @@ web3-net@1.2.4:
     web3-core-method "1.2.4"
     web3-utils "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-net@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-net/-/web3-net-1.2.5.tgz#a94cd784d6157e5c9397e5d1f473c076ae957708"
-  integrity sha512-koNrXdRPN8dc2znbbtaqi85cjgsdL02KKeEq099+ZJeafhRY8dXj8L30zOjHwDPtd3VQdQ4Ibwi/0Z9ceUp8Qg==
-  dependencies:
-    web3-core "1.2.5"
-    web3-core-method "1.2.5"
-    web3-utils "1.2.5"
-
 web3-net@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-net/-/web3-net-1.2.6.tgz#035ca0fbe55282fda848ca17ebb4c8966147e5ea"
@@ -35702,7 +35719,6 @@ web3-net@1.2.6:
     web3-core-method "1.2.6"
     web3-utils "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-net@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-net/-/web3-net-1.3.0.tgz#b69068cccffab58911c2f08ca4abfbefb0f948c6"
@@ -35837,16 +35853,6 @@ web3-providers-http@1.2.4:
     web3-core-helpers "1.2.4"
     xhr2-cookies "1.1.0"
 
-<<<<<<< HEAD
-=======
-web3-providers-http@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-providers-http/-/web3-providers-http-1.2.5.tgz#97b20569f7bde5295dc5311c3c7b7de6c9dbb2ef"
-  integrity sha512-cmZqHYhV3a1ZQUDAWCR3xtGjAo7zYds9fza5M90CHINoDLOlXYWoaBeoMTnLm3bydF8Sc22BQhGdrzPZTIiGqQ==
-  dependencies:
-    web3-core-helpers "1.2.5"
-    xhr2-cookies "1.1.0"
-
 web3-providers-http@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-providers-http/-/web3-providers-http-1.2.6.tgz#3c7b1252751fb37e53b873fce9dbb6340f5e31d9"
@@ -35855,7 +35861,6 @@ web3-providers-http@1.2.6:
     web3-core-helpers "1.2.6"
     xhr2-cookies "1.1.0"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-providers-http@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-providers-http/-/web3-providers-http-1.3.0.tgz#88227f64c88b32abed4359383c2663616e0dc531"
@@ -35891,17 +35896,6 @@ web3-providers-ipc@1.2.4:
     underscore "1.9.1"
     web3-core-helpers "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-providers-ipc@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-providers-ipc/-/web3-providers-ipc-1.2.5.tgz#e14b9af40715f9203a67f9730adcfa21c22cb728"
-  integrity sha512-xIDqR5c2p5T2T/792ZE288lbBcAjEu5Bb86+VoWuRvdjnRlqMSo/0n9/P2360zSvHXftjpN5uSzBNal01zmwYw==
-  dependencies:
-    oboe "2.1.4"
-    underscore "1.9.1"
-    web3-core-helpers "1.2.5"
-
 web3-providers-ipc@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-providers-ipc/-/web3-providers-ipc-1.2.6.tgz#adabab5ac66b3ff8a26c7dc97af3f1a6a7609701"
@@ -35911,7 +35905,6 @@ web3-providers-ipc@1.2.6:
     underscore "1.9.1"
     web3-core-helpers "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-providers-ipc@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-providers-ipc/-/web3-providers-ipc-1.3.0.tgz#d7c2b203733b46f7b4e7b15633d891648cf9a293"
@@ -35948,17 +35941,6 @@ web3-providers-ws@1.2.4:
     underscore "1.9.1"
     web3-core-helpers "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-providers-ws@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-providers-ws/-/web3-providers-ws-1.2.5.tgz#82764a38e588f9785139c658e139a6a713ade365"
-  integrity sha512-o4R0HgvHc2K6YdlwHiexL6j65FsA48/0ygmLKs87jRdOFO36g7kFRLp5IBElRbu9YPRInk90He0a5Me7VCHUvw==
-  dependencies:
-    "@web3-js/websocket" "^1.0.29"
-    underscore "1.9.1"
-    web3-core-helpers "1.2.5"
-
 web3-providers-ws@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-providers-ws/-/web3-providers-ws-1.2.6.tgz#3cecc49f7c99f07a75076d3c54247050bc4f7e11"
@@ -35968,7 +35950,6 @@ web3-providers-ws@1.2.6:
     underscore "1.9.1"
     web3-core-helpers "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-providers-ws@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-providers-ws/-/web3-providers-ws-1.3.0.tgz#84adeff65acd4624d7f5bb43c5b2b22d8f0f63a4"
@@ -36026,18 +36007,6 @@ web3-shh@1.2.4:
     web3-core-subscriptions "1.2.4"
     web3-net "1.2.4"
 
-<<<<<<< HEAD
-=======
-web3-shh@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-shh/-/web3-shh-1.2.5.tgz#9ef8bae2f9c534bd5bd22c6010702094373dfe0c"
-  integrity sha512-p273jalarNw0LjlQMlPdVFEiNPRPt5tz1a+N7LZ68uLDwFQ6PD672Jk4hIteY/20oWGur1SYKQO9v8p9h0DZ7g==
-  dependencies:
-    web3-core "1.2.5"
-    web3-core-method "1.2.5"
-    web3-core-subscriptions "1.2.5"
-    web3-net "1.2.5"
-
 web3-shh@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-shh/-/web3-shh-1.2.6.tgz#2492616da4cac32d4c7534b890f43bac63190c14"
@@ -36048,7 +36017,6 @@ web3-shh@1.2.6:
     web3-core-subscriptions "1.2.6"
     web3-net "1.2.6"
 
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
 web3-shh@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-shh/-/web3-shh-1.3.0.tgz#62d15297da8fb5f733dd1b98f9ade300590f4d49"
@@ -36130,23 +36098,6 @@ web3-utils@1.2.4:
     underscore "1.9.1"
     utf8 "3.0.0"
 
-<<<<<<< HEAD
-web3-utils@1.3.0, web3-utils@^1.3.0:
-=======
-web3-utils@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.2.5.tgz#7691f981ce11dc919e123edbde159dce061a5a53"
-  integrity sha512-U0tNfB4Hep5ouzvNZ+Hr8I8kIftiHiDhwg+Eoh2Nvr5lLOPEH14B2exkRSARLXGY9xl2p3ykJWBCKoG1oCadug==
-  dependencies:
-    bn.js "4.11.8"
-    eth-lib "0.2.7"
-    ethereum-bloom-filters "^1.0.6"
-    ethjs-unit "0.1.6"
-    number-to-bn "1.7.0"
-    randombytes "^2.1.0"
-    underscore "1.9.1"
-    utf8 "3.0.0"
-
 web3-utils@1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.2.6.tgz#b9a25432da00976457fcc1094c4af8ac6d486db9"
@@ -36161,8 +36112,7 @@ web3-utils@1.2.6:
     underscore "1.9.1"
     utf8 "3.0.0"
 
-web3-utils@1.3.0:
->>>>>>> Upgrade web3 to 1.2.6 and enable esModuleInterop
+web3-utils@1.3.0, web3-utils@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-1.3.0.tgz#5bac16e5e0ec9fe7bdcfadb621655e8aa3cf14e1"
   integrity sha512-2mS5axFCbkhicmoDRuJeuo0TVGQDgC2sPi/5dblfVC+PMtX0efrb8Xlttv/eGkq7X4E83Pds34FH98TP2WOUZA==
@@ -36241,19 +36191,19 @@ web3@1.2.4:
     web3-shh "1.2.4"
     web3-utils "1.2.4"
 
-web3@1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/web3/-/web3-1.2.5.tgz#86e2f3d9aa5aa8013d436097805243f94b76d14f"
-  integrity sha512-diHCkn3x2wCG8xl4funRihWw0oJP6xRchU8ke5S8hxnSdDjtieg0L2zzW1xPnEt5FWEHUPdzBdkH3kiPkD/OYg==
+web3@1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/web3/-/web3-1.2.6.tgz#c497dcb14cdd8d6d9fb6b445b3b68ff83f8ccf68"
+  integrity sha512-tpu9fLIComgxGrFsD8LUtA4s4aCZk7px8UfcdEy6kS2uDi/ZfR07KJqpXZMij7Jvlq+cQrTAhsPSiBVvoMaivA==
   dependencies:
     "@types/node" "^12.6.1"
-    web3-bzz "1.2.5"
-    web3-core "1.2.5"
-    web3-eth "1.2.5"
-    web3-eth-personal "1.2.5"
-    web3-net "1.2.5"
-    web3-shh "1.2.5"
-    web3-utils "1.2.5"
+    web3-bzz "1.2.6"
+    web3-core "1.2.6"
+    web3-eth "1.2.6"
+    web3-eth-personal "1.2.6"
+    web3-net "1.2.6"
+    web3-shh "1.2.6"
+    web3-utils "1.2.6"
 
 web3@^0.16.0:
   version "0.16.0"
@@ -37031,7 +36981,7 @@ xregexp@^4.3.0:
   dependencies:
     "@babel/runtime-corejs3" "^7.8.3"
 
-"xtend@>=4.0.0 <4.1.0-0", xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.0, xtend@~4.0.1:
+"xtend@>=4.0.0 <4.1.0-0", xtend@^4.0.0, xtend@^4.0.1, xtend@^4.0.2, xtend@~4.0.0, xtend@~4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
