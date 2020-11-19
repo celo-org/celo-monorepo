@@ -72,7 +72,7 @@ _If you are a cLabs employee, please ask to be added to the cLabs iOS developmen
 
 Xcode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
 
-Install [Xcode 11.4](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
+Install [Xcode 12.2](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
 
 We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects.
 
