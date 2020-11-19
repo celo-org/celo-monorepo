@@ -13,9 +13,10 @@ export function respondWithError(
 ) {
   if (err in WarningMessage) {
     logger.info('Responding with warning')
+    logger.warn({ err, statusCode })
   } else {
     logger.info('Responding with error')
+    logger.error({ err, statusCode })
   }
-  logger.error({ err, statusCode })
   res.status(statusCode).json({ success: false, err, version: VERSION })
 }

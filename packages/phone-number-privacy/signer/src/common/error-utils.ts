@@ -6,10 +6,12 @@ import {
 import Logger from 'bunyan'
 import { Response } from 'express'
 import { getVersion } from '../config'
+import { Counters } from './metrics'
 
 export type ErrorType = ErrorMessage | WarningMessage
 
 export function respondWithError(
+  endpoint: string,
   res: Response,
   statusCode: number,
   err: ErrorType,
@@ -21,11 +23,13 @@ export function respondWithError(
   const logger: Logger = res.locals.logger
   if (err in WarningMessage) {
     logger.info('Responding with warning')
-    logger.warn({ err })
+    logger.warn({ err, statusCode })
   } else {
     logger.info('Responding with error')
-    logger.error({ err })
+    logger.error({ err, statusCode })
   }
+  Counters.responses.labels(endpoint, statusCode.toString()).inc()
+
   const response: SignMessageResponseFailure = {
     success: false,
     version: getVersion(),

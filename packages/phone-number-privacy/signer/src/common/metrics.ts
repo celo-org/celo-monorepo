@@ -3,12 +3,11 @@ const { Counter, Histogram } = client
 
 client.collectDefaultMetrics()
 
+// This is just so autocomplete will remind devs what the options are.
 export const Labels = {
   read: 'read',
   update: 'update',
   insert: 'insert',
-  sigEndpoint: 'getBlindedMessagePartialSig',
-  quotaEndpoint: 'getQuota',
 }
 
 export const Counters = {

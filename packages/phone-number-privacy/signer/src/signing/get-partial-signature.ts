@@ -19,6 +19,7 @@ import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
+import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
@@ -34,7 +35,7 @@ export async function handleGetBlindedMessagePartialSig(
   request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,
   response: Response
 ) {
-  Counters.requests.labels(Labels.sigEndpoint).inc()
+  Counters.requests.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG).inc()
 
   const logger: Logger = response.locals.logger
   logger.info('Begin handleGetBlindedMessagePartialSig request')
@@ -45,13 +46,21 @@ export async function handleGetBlindedMessagePartialSig(
 
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      Counters.responses.labels(Labels.sigEndpoint, '400').inc()
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
+      respondWithError(
+        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+        response,
+        400,
+        WarningMessage.INVALID_INPUT
+      )
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
-      Counters.responses.labels(Labels.sigEndpoint, '401').inc()
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
+      respondWithError(
+        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+        response,
+        401,
+        WarningMessage.UNAUTHENTICATED_USER
+      )
       return
     }
 
@@ -84,9 +93,9 @@ export async function handleGetBlindedMessagePartialSig(
     }
 
     if (errorMsg !== ErrorMessage.DATABASE_GET_FAILURE && performedQueryCount >= totalQuota) {
-      Counters.responses.labels(Labels.sigEndpoint, '403')
       logger.debug('No remaining query count')
       respondWithError(
+        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
         response,
         403,
         WarningMessage.EXCEEDED_QUOTA,
@@ -136,14 +145,17 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       signMessageResponse = signMessageResponseSuccess
     }
-    Counters.responses.labels(Labels.sigEndpoint, '200').inc()
     logger.debug('Signature retrieval success')
     response.json(signMessageResponse)
   } catch (err) {
-    Counters.responses.labels(Labels.sigEndpoint, '500').inc()
     logger.error('Failed to get signature')
     logger.error({ err })
-    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR)
+    respondWithError(
+      Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+      response,
+      500,
+      ErrorMessage.UNKNOWN_ERROR
+    )
   }
 }
 

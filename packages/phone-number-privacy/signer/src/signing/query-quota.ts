@@ -15,9 +15,10 @@ import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { respondWithError } from '../common/error-utils'
-import { Counters, Histograms, Labels } from '../common/metrics'
+import { Counters, Histograms } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
+import { Endpoints } from '../server'
 import { getContractKit } from '../web3/contracts'
 
 export interface GetQuotaRequest {
@@ -37,18 +38,16 @@ export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,
   response: Response
 ) {
-  Counters.requests.labels(Labels.quotaEndpoint).inc()
+  Counters.requests.labels(Endpoints.GET_QUOTA).inc()
   const logger: Logger = response.locals.logger
   logger.info('Begin getQuota request')
   try {
     if (!isValidGetQuotaInput(request.body)) {
-      Counters.responses.labels(Labels.quotaEndpoint, '400').inc()
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT)
+      respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
-      Counters.responses.labels(Labels.quotaEndpoint, '401').inc()
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER)
+      respondWithError(Endpoints.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
 
@@ -56,7 +55,7 @@ export async function handleGetQuota(
 
     const queryCount = await getRemainingQueryCount(logger, account, hashedPhoneNumber)
 
-    Counters.responses.labels(Labels.quotaEndpoint, '200').inc()
+    Counters.responses.labels(Endpoints.GET_QUOTA, '200').inc()
 
     response.status(200).json({
       success: true,
@@ -65,10 +64,9 @@ export async function handleGetQuota(
       totalQuota: queryCount.totalQuota,
     })
   } catch (err) {
-    Counters.responses.labels(Labels.quotaEndpoint, '500').inc()
     logger.error('Failed to get user quota')
     logger.error({ err })
-    respondWithError(response, 500, ErrorMessage.DATABASE_GET_FAILURE)
+    respondWithError(Endpoints.GET_QUOTA, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
