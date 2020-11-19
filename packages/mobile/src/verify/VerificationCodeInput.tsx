@@ -3,7 +3,9 @@ import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import * as React from 'react'
 import { StyleProp, ViewStyle } from 'react-native'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
+import { features } from 'src/flags'
 import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
+import { extractShortSecurityCodeMessage } from 'src/identity/utils'
 import { AttestationCode } from 'src/identity/verification'
 import Logger from 'src/utils/Logger'
 
@@ -64,6 +66,9 @@ function getRecodedAttestationValue(attestationCode: AttestationCode) {
     if (!attestationCode.code || attestationCode.code === ATTESTATION_CODE_PLACEHOLDER) {
       return ''
     }
+    if (features.SHORT_VERIFICATION_CODES && attestationCode.shortCode) {
+      return attestationCode.shortCode
+    }
     return hexToBuffer(attestationCode.code).toString('base64')
   } catch (error) {
     Logger.warn('VerificationCodeRow', 'Could not recode verification code to base64')
@@ -73,8 +78,15 @@ function getRecodedAttestationValue(attestationCode: AttestationCode) {
 
 function shouldShowClipboard(attestationCodes: AttestationCode[]) {
   return (value: string) => {
-    const extractedCode = extractAttestationCodeFromMessage(value)
-    return !!extractedCode && !attestationCodes.find((c) => c.code === extractedCode)
+    const extractedCode = features.SHORT_VERIFICATION_CODES
+      ? extractShortSecurityCodeMessage(value)
+      : extractAttestationCodeFromMessage(value)
+    return (
+      !!extractedCode &&
+      !attestationCodes.find(
+        (c) => (features.SHORT_VERIFICATION_CODES ? c.shortCode : c.code) === extractedCode
+      )
+    )
   }
 }
 

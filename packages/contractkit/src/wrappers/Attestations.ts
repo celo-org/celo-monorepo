@@ -67,6 +67,16 @@ export interface AttesationServiceRevealRequest {
   salt?: string
   smsRetrieverAppSig?: string
   language?: string
+  securityCodePrefix?: string
+}
+
+export interface AttesationServiceCodeForSecurityRequest {
+  account: Address
+  phoneNumber: string
+  issuer: string
+  // TODO rename to pepper here and in Attesation Service
+  salt: string
+  securityCode: string
 }
 
 export interface UnselectedRequest {
@@ -525,28 +535,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   /**
    * Reveal phone number to issuer
-   * @param phoneNumber: attestation's phone number
-   * @param account: attestation's account
-   * @param issuer: validator's address
    * @param serviceURL: validator's attestation service URL
-   * @param pepper: phone number privacy pepper
-   * @param smsRetrieverAppSig?: Android app's hash
+   * @param body: AttesationServiceRevealRequest
    */
-  revealPhoneNumberToIssuer(
-    phoneNumber: string,
-    account: Address,
-    issuer: Address,
-    serviceURL: string,
-    pepper?: string,
-    smsRetrieverAppSig?: string
-  ) {
-    const body: AttesationServiceRevealRequest = {
-      account,
-      phoneNumber,
-      issuer,
-      salt: pepper,
-      smsRetrieverAppSig,
-    }
+  revealPhoneNumberToIssuer(serviceURL: string, body: AttesationServiceRevealRequest) {
     return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
@@ -577,6 +569,19 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       issuer,
       account,
     })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  /**
+   * Returns attestation code for provided security code from validator's attestation service
+   * @param serviceURL: validator's attestation service URL
+   * @param body: onServiceCodeForSecurityRequest
+   */
+  getAttestationForSecurityCode(serviceURL: string, body: AttesationServiceCodeForSecurityRequest) {
+    const urlParams = new URLSearchParams({ ...body })
     return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },

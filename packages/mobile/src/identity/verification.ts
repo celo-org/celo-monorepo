@@ -2,6 +2,7 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
+  AttesationServiceCodeForSecurityRequest,
   AttesationServiceRevealRequest,
   AttestationsWrapper,
   UnselectedRequest,
@@ -31,7 +32,9 @@ import { VerificationEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { currentLanguageSelector } from 'src/app/reducers'
 import { DEFAULT_TESTNET, SMS_RETRIEVER_APP_SIGNATURE } from 'src/config'
+import { features } from 'src/flags'
 import { celoTokenBalanceSelector } from 'src/goldToken/selectors'
 import { refreshAllBalances } from 'src/home/actions'
 import {
@@ -67,6 +70,7 @@ import {
 } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
+import { extractShortSecurityCodeMessage, hashAddressToSingleDigit } from 'src/identity/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
@@ -105,6 +109,7 @@ export enum CodeInputType {
 
 export interface AttestationCode {
   code: string
+  shortCode?: string | null
   issuer: string
 }
 
@@ -289,7 +294,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
       // Start listening for manual and/or auto message inputs
       receiveMessageTask = yield takeEvery(
         Actions.RECEIVE_ATTESTATION_MESSAGE,
-        attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+        attestationCodeReceiver(attestationsWrapper, phoneHashDetails, account, attestations)
       )
 
       if (!withoutRevealing) {
@@ -336,7 +341,7 @@ export function* doVerificationFlow(withoutRevealing: boolean = false) {
           issuers = attestations.map((a) => a.issuer)
           receiveMessageTask = yield takeEvery(
             Actions.RECEIVE_ATTESTATION_MESSAGE,
-            attestationCodeReceiver(attestationsWrapper, phoneHash, account, issuers)
+            attestationCodeReceiver(attestationsWrapper, phoneHashDetails, account, attestations)
           )
 
           // Request codes for the new list of attestations. We ignore unsuccessfull reveals here,
@@ -603,9 +608,9 @@ function* requestAttestations(
 
 export function attestationCodeReceiver(
   attestationsWrapper: AttestationsWrapper,
-  phoneHash: string,
+  phoneHashDetails: PhoneNumberHashDetails,
   account: string,
-  allIssuers: string[],
+  attestations: ActionableAttestation[],
   isFeelessVerification: boolean = false
 ) {
   return function*(action: ReceiveAttestationMessageAction) {
@@ -618,13 +623,55 @@ export function attestationCodeReceiver(
       return
     }
 
+    const allIssuers = attestations.map((a) => a.issuer)
+    let securityCode: string | null = null
+    let attestationCode
+
     try {
-      const code = extractAttestationCodeFromMessage(action.message)
-      if (!code) {
+      if (features.SHORT_VERIFICATION_CODES) {
+        securityCode = extractShortSecurityCodeMessage(action.message)
+        if (securityCode) {
+          const lookupHash = parseInt(securityCode[0], 10)
+          const lookupAttestations = attestations.filter(
+            (attestation) => hashAddressToSingleDigit(attestation.issuer) === lookupHash
+          )
+
+          for (const attestation of lookupAttestations) {
+            // Try to recover the full attestation code from the matching issuer's attestation service
+            try {
+              const message = yield call(
+                getAttestationCodeFromSecurityCode,
+                attestationsWrapper,
+                account,
+                phoneHashDetails,
+                attestation,
+                securityCode.substr(1)
+              )
+              attestationCode = extractAttestationCodeFromMessage(message)
+              break
+            } catch (e) {
+              Logger.warn(
+                TAG + '@attestationCodeReceiver',
+                'Getting attestation code for security code error: ',
+                e
+              )
+              continue
+            }
+          }
+        }
+      } else {
+        attestationCode = extractAttestationCodeFromMessage(action.message)
+      }
+
+      if (!attestationCode) {
         throw new Error('No code extracted from message')
       }
 
-      const existingCode: string = yield call(isCodeAlreadyAccepted, code, isFeelessVerification)
+      const existingCode: string = yield call(
+        isCodeAlreadyAccepted,
+        attestationCode,
+        isFeelessVerification
+      )
 
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists in store, skipping.')
@@ -645,9 +692,9 @@ export function attestationCodeReceiver(
       })
       const issuer = yield call(
         [attestationsWrapper, attestationsWrapper.findMatchingIssuer],
-        phoneHash,
+        phoneHashDetails.phoneHash,
         account,
-        code,
+        attestationCode,
         allIssuers
       )
       if (!issuer) {
@@ -662,10 +709,10 @@ export function attestationCodeReceiver(
       })
       const isValidRequest = yield call(
         [attestationsWrapper, attestationsWrapper.validateAttestationCode],
-        phoneHash,
+        phoneHashDetails.phoneHash,
         account,
         issuer,
-        code
+        attestationCode
       )
       ValoraAnalytics.track(VerificationEvents.verification_code_validate_complete, {
         issuer,
@@ -677,9 +724,11 @@ export function attestationCodeReceiver(
       }
 
       if (isFeelessVerification) {
-        yield put(feelessInputAttestationCode({ code, issuer }))
+        yield put(
+          feelessInputAttestationCode({ code: attestationCode, shortCode: securityCode, issuer })
+        )
       } else {
-        yield put(inputAttestationCode({ code, issuer }))
+        yield put(inputAttestationCode({ code: attestationCode, shortCode: securityCode, issuer }))
       }
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
@@ -838,6 +887,53 @@ function* completeAttestation(
   yield put(completeAttestationCode(code))
 }
 
+function* getAttestationCodeFromSecurityCode(
+  attestationsWrapper: AttestationsWrapper,
+  account: string,
+  phoneHashDetails: PhoneNumberHashDetails,
+  attestation: ActionableAttestation,
+  securityCode: string
+) {
+  const issuer = attestation.issuer
+  Logger.debug(
+    TAG + '@getAttestationCodeFromSecurityCode',
+    `Revealing an attestation for issuer: ${issuer}`
+  )
+  if (shouldUseProxy()) {
+    throw new Error('Short codes can not be used with proxy enabled')
+  }
+  try {
+    const requestBody: AttesationServiceCodeForSecurityRequest = {
+      account,
+      issuer: attestation.issuer,
+      phoneNumber: phoneHashDetails.e164Number,
+      salt: phoneHashDetails.pepper,
+      securityCode,
+    }
+
+    const response = yield call(
+      attestationsWrapper.getAttestationForSecurityCode,
+      attestation.attestationServiceURL,
+      requestBody
+    )
+    const { ok, status } = response
+    const body = yield call(response.json.bind(response))
+
+    if (ok && body.attestationCode) {
+      return body.attestationCode
+    }
+
+    throw new Error(`Error submitting security code for ${issuer}. Status code: ${status}`)
+  } catch (error) {
+    Logger.error(
+      TAG + '@getAttestationCodeFromSecurityCode',
+      `get for issuer ${issuer} failed`,
+      error
+    )
+    return false
+  }
+}
+
 export function* tryRevealPhoneNumber(
   attestationsWrapper: AttestationsWrapper,
   account: string,
@@ -855,12 +951,18 @@ export function* tryRevealPhoneNumber(
     // Proxy required for any network where attestation service domains are not static
     // This works around TLS issues
 
+    const language = yield select(currentLanguageSelector)
     const revealRequestBody: AttesationServiceRevealRequest = {
       account,
       issuer,
       phoneNumber: phoneHashDetails.e164Number,
       salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
+      language,
+    }
+
+    if (features.SHORT_VERIFICATION_CODES) {
+      revealRequestBody.securityCodePrefix = `${hashAddressToSingleDigit(issuer)}`
     }
 
     const { ok, status, body } = yield call(
@@ -970,12 +1072,8 @@ async function postToAttestationService(
       `Revealing with contract kit for service url ${attestationServiceUrl}`
     )
     const response = await attestationsWrapper.revealPhoneNumberToIssuer(
-      revealRequestBody.phoneNumber,
-      revealRequestBody.account,
-      revealRequestBody.issuer,
       attestationServiceUrl,
-      revealRequestBody.salt,
-      revealRequestBody.smsRetrieverAppSig
+      revealRequestBody
     )
     const body = await response.json()
     return { ok: response.ok, status: response.status, body }

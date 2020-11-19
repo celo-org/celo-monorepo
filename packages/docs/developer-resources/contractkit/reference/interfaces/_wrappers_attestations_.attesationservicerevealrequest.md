@@ -13,6 +13,7 @@
 * [language](_wrappers_attestations_.attesationservicerevealrequest.md#optional-language)
 * [phoneNumber](_wrappers_attestations_.attesationservicerevealrequest.md#phonenumber)
 * [salt](_wrappers_attestations_.attesationservicerevealrequest.md#optional-salt)
+* [securityCodePrefix](_wrappers_attestations_.attesationservicerevealrequest.md#optional-securitycodeprefix)
 * [smsRetrieverAppSig](_wrappers_attestations_.attesationservicerevealrequest.md#optional-smsretrieverappsig)
 
 ## Properties
@@ -54,6 +55,14 @@ ___
 • **salt**? : *undefined | string*
 
 *Defined in [packages/contractkit/src/wrappers/Attestations.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L67)*
+
+___
+
+### `Optional` securityCodePrefix
+
+• **securityCodePrefix**? : *undefined | string*
+
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L70)*
 
 ___
 
