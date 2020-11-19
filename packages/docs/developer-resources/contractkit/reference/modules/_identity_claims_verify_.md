@@ -1,4 +1,4 @@
-# External module: "identity/claims/verify"
+# Module: "identity/claims/verify"
 
 ## Index
 

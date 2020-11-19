@@ -1,4 +1,4 @@
-# External module: "identity/offchain/storage-writers"
+# Module: "identity/offchain/storage-writers"
 
 ## Index
 
