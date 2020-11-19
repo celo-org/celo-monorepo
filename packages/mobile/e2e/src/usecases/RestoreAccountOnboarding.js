@@ -78,11 +78,6 @@ export default RestoreAccountOnboarding = () => {
     await sleep(5000)
   })
 
-  it('Pin', async () => {
-    // Enter pin before verification starts
-    await enterPinUi()
-  })
-
   it('VerifyEducation', async () => {
     await waitForElementId('VerificationEducationSkipHeader')
 
@@ -90,11 +85,6 @@ export default RestoreAccountOnboarding = () => {
     await element(by.id('VerificationEducationSkipHeader')).tap()
     // confirmation popup skip
     await element(by.id('VerificationSkipDialog/PrimaryAction')).tap()
-  })
-
-  it.skip('Verify', async () => {
-    // skipping for now
-    // TODO(erdal): implement
   })
 
   it('Wallet Home', async () => {

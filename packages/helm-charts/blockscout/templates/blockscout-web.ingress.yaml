@@ -13,10 +13,14 @@ metadata:
     heritage: {{ .Release.Service }}
     component: blockscout-web-ingress
   annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/configuration-snippet: |
       location ~ /admin/.* {
+        deny all;
+      }
+      location ~ /wobserver/.* {
         deny all;
       }
 spec:
@@ -28,6 +32,14 @@ spec:
   - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
     http:
       paths:
+      - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        backend:
+          serviceName: {{ .Release.Name }}-web
+          servicePort: 4000
+      - path: /(graphql|graphiql|api)
+        backend:
+          serviceName: {{ .Release.Name }}-api
+          servicePort: 4000
       - path: /
         backend:
           serviceName: {{ .Release.Name }}-web

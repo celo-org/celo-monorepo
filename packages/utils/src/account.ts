@@ -56,10 +56,20 @@ export async function generateMnemonic(
 
 export function validateMnemonic(
   mnemonic: string,
-  language?: MnemonicLanguages,
+  defaultLanguage?: MnemonicLanguages,
   bip39ToUse: Bip39 = bip39Wrapper
 ) {
-  return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
+  const mnemonicWords = mnemonic.trim().split(' ')
+  const languages = defaultLanguage
+    ? [defaultLanguage]
+    : getAllLanguages().filter((lang) => lang !== defaultLanguage)
+  for (const language of languages) {
+    const wordList = getWordList(language)
+    if (mnemonicWords.every((word) => wordList.includes(word))) {
+      return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
+    }
+  }
+  return false
 }
 
 export async function generateKeys(
@@ -75,12 +85,13 @@ export async function generateKeys(
 }
 
 export function generateDeterministicInviteCode(
-  pepper: string,
-  changeIndex: number = 0,
+  recipientPhoneHash: string,
+  recipientPepper: string,
   addressIndex: number = 0,
+  changeIndex: number = 0,
   derivationPath: string = CELO_DERIVATION_PATH_BASE
 ): { privateKey: string; publicKey: string } {
-  const seed = keccak256(pepper) as Buffer
+  const seed = keccak256(recipientPhoneHash + recipientPepper) as Buffer
   return generateKeysFromSeed(seed, changeIndex, addressIndex, derivationPath)
 }
 
@@ -142,6 +153,19 @@ function getWordList(language?: MnemonicLanguages) {
     default:
       return bip39.wordlists.english
   }
+}
+
+function getAllLanguages() {
+  return [
+    MnemonicLanguages.chinese_simplified,
+    MnemonicLanguages.chinese_traditional,
+    MnemonicLanguages.english,
+    MnemonicLanguages.french,
+    MnemonicLanguages.italian,
+    MnemonicLanguages.japanese,
+    MnemonicLanguages.korean,
+    MnemonicLanguages.spanish,
+  ]
 }
 
 export const AccountUtils = {

@@ -20,7 +20,7 @@
 
 ### Properties
 
-* [root](_identity_offchain_storage_writers_.localstoragewriter.md#root)
+* [root](_identity_offchain_storage_writers_.localstoragewriter.md#readonly-root)
 
 ### Methods
 
@@ -44,7 +44,7 @@ Name | Type |
 
 ## Properties
 
-###  root
+### `Readonly` root
 
 • **root**: *string*
 

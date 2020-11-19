@@ -11,7 +11,9 @@ import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
+  blocksToDurationString,
   proxyCall,
+  proxySend,
   toTransactionObject,
   valueToBigNumber,
   valueToInt,
@@ -269,7 +271,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    */
   async getActionableAttestations(
     identifier: string,
-    account: Address
+    account: Address,
+    tries = 3
   ): Promise<ActionableAttestation[]> {
     const result = await this.contract.methods
       .getCompletableAttestations(identifier, account)
@@ -278,7 +281,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const results = await concurrentMap(
       5,
       parseGetCompletableAttestations(result),
-      this.isIssuerRunningAttestationService
+      this.makeIsIssuerRunningAttestationService(tries)
     )
 
     return results.map((_) => (_.isValid ? _.result : null)).filter(notEmpty)
@@ -289,7 +292,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
    */
-  async getNonCompliantIssuers(identifier: string, account: Address): Promise<Address[]> {
+  async getNonCompliantIssuers(
+    identifier: string,
+    account: Address,
+    tries = 3
+  ): Promise<Address[]> {
     const result = await this.contract.methods
       .getCompletableAttestations(identifier, account)
       .call()
@@ -297,40 +304,46 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const withAttestationServiceURLs = await concurrentMap(
       5,
       parseGetCompletableAttestations(result),
-      this.isIssuerRunningAttestationService
+      this.makeIsIssuerRunningAttestationService(tries)
     )
 
     return withAttestationServiceURLs.map((_) => (_.isValid ? null : _.issuer)).filter(notEmpty)
   }
 
-  private isIssuerRunningAttestationService = async (arg: {
-    blockNumber: number
-    issuer: string
-    metadataURL: string
-  }): Promise<AttestationServiceRunningCheckResult> => {
-    try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, arg.metadataURL)
-      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+  private makeIsIssuerRunningAttestationService = (tries = 3) => {
+    return async (arg: {
+      blockNumber: number
+      issuer: string
+      metadataURL: string
+    }): Promise<AttestationServiceRunningCheckResult> => {
+      try {
+        const metadata = await IdentityMetadataWrapper.fetchFromURL(
+          this.kit,
+          arg.metadataURL,
+          tries
+        )
+        const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
-      if (attestationServiceURLClaim === undefined) {
-        throw new Error(`No attestation service URL registered for ${arg.issuer}`)
+        if (attestationServiceURLClaim === undefined) {
+          throw new Error(`No attestation service URL registered for ${arg.issuer}`)
+        }
+
+        const nameClaim = metadata.findClaim(ClaimTypes.NAME)
+
+        // TODO: Once we have status indicators, we should check if service is up
+        // https://github.com/celo-org/celo-monorepo/issues/1586
+        return {
+          isValid: true,
+          result: {
+            blockNumber: arg.blockNumber,
+            issuer: arg.issuer,
+            attestationServiceURL: attestationServiceURLClaim.url,
+            name: nameClaim ? nameClaim.name : undefined,
+          },
+        }
+      } catch (error) {
+        return { isValid: false, issuer: arg.issuer }
       }
-
-      const nameClaim = metadata.findClaim(ClaimTypes.NAME)
-
-      // TODO: Once we have status indicators, we should check if service is up
-      // https://github.com/celo-org/celo-monorepo/issues/1586
-      return {
-        isValid: true,
-        result: {
-          blockNumber: arg.blockNumber,
-          issuer: arg.issuer,
-          attestationServiceURL: attestationServiceURLClaim.url,
-          name: nameClaim ? nameClaim.name : undefined,
-        },
-      }
-    } catch (error) {
-      return { isValid: false, issuer: arg.issuer }
     }
   }
 
@@ -390,6 +403,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees.
+   * @return AttestationsConfig object
    */
   async getConfig(tokens: string[]): Promise<AttestationsConfig> {
     const fees = await Promise.all(
@@ -403,6 +417,24 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationRequestFees: fees,
     }
   }
+
+  /**
+   * @dev Returns human readable configuration of the attestations contract
+   * @return AttestationsConfig object
+   */
+  async getHumanReadableConfig(tokens: string[]) {
+    const config = await this.getConfig(tokens)
+    return {
+      attestationRequestFees: config.attestationRequestFees,
+      attestationExpiry: blocksToDurationString(config.attestationExpiryBlocks),
+    }
+  }
+
+  /**
+   * Returns the list of accounts associated with an identifier.
+   * @param identifier Attestation identifier (e.g. phone hash)
+   */
+  lookupAccountsForIdentifier = proxyCall(this.contract.methods.lookupAccountsForIdentifier)
 
   /**
    * Lookup mapped wallet addresses for a given list of identifiers
@@ -456,6 +488,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       this.contract.methods.request(identifier, attestationsRequested, tokenAddress)
     )
   }
+
+  /**
+   * Updates sender's approval status on whether to allow an attestation identifier
+   * mapping to be transfered from one address to another.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  approveTransfer = proxySend(this.kit, this.contract.methods.approveTransfer)
 
   /**
    * Selects the issuers for previously requested attestations for a phone number
@@ -687,7 +730,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   async revoke(identifer: string, account: Address) {
-    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const accounts = await this.lookupAccountsForIdentifier(identifer)
     const idx = accounts.findIndex((acc) => eqAddress(acc, account))
     if (idx < 0) {
       throw new Error("Account not found in identifier's accounts")

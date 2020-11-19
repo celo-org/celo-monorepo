@@ -16,6 +16,9 @@ export interface State {
   lastTimeBackgrounded: number
   sessionId: string
   minVersion: string | null
+  pontoEnabled: boolean
+  kotaniEnabled: boolean
+  inviteModalVisible: boolean
 }
 
 const initialState = {
@@ -31,6 +34,9 @@ const initialState = {
   lastTimeBackgrounded: 0,
   sessionId: '',
   minVersion: null,
+  pontoEnabled: false,
+  kotaniEnabled: false,
+  inviteModalVisible: false,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language || i18n.language
@@ -134,6 +140,21 @@ export const appReducer = (
       return {
         ...state,
         minVersion: action.minVersion,
+      }
+    case Actions.SET_PONTO_FEATURE_FLAG:
+      return {
+        ...state,
+        pontoEnabled: action.enabled,
+      }
+    case Actions.SET_KOTANI_FEATURE_FLAG:
+      return {
+        ...state,
+        kotaniEnabled: action.enabled,
+      }
+    case Actions.TOGGLE_INVITE_MODAL:
+      return {
+        ...state,
+        inviteModalVisible: action.inviteModalVisible,
       }
     default:
       return state

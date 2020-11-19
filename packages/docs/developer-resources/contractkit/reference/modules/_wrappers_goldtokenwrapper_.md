@@ -1,4 +1,4 @@
-# External module: "wrappers/GoldTokenWrapper"
+# Module: "wrappers/GoldTokenWrapper"
 
 ## Index
 

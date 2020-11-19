@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { fireEvent, render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { features } from 'src/flags'
 import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -12,6 +13,7 @@ import {
   mockAccount2Invite,
   mockAccountInvite,
   mockE164NumberInvite,
+  mockInviteTransactionData,
   mockTransactionData,
 } from 'test/values'
 
@@ -25,9 +27,20 @@ const mockScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
   transactionData: mockTransactionData,
 })
 
+const mockInviteScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
+  transactionData: mockInviteTransactionData,
+})
+
 describe('SendConfirmation', () => {
+  const komenciEnabled = features.KOMENCI
+
   beforeAll(() => {
+    features.KOMENCI = false
     jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
   })
 
   beforeEach(() => {
@@ -214,5 +227,43 @@ describe('SendConfirmation', () => {
     )
 
     expect(tree.queryByTestId('accountEditButton')).toBeNull()
+  })
+})
+
+describe('SendConfirmation with Komenci enabled', () => {
+  const komenciEnabled = features.KOMENCI
+
+  beforeAll(() => {
+    features.KOMENCI = true
+    jest.useRealTimers()
+  })
+
+  afterAll(() => {
+    features.KOMENCI = komenciEnabled
+  })
+
+  beforeEach(() => {
+    mockedGetSendFee.mockClear()
+  })
+
+  it('renders correct modal for invitations', async () => {
+    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
+
+    const store = createMockStore({
+      stableToken: {
+        balance: '200',
+      },
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <SendConfirmation {...mockInviteScreenProps} />
+      </Provider>
+    )
+
+    expect(tree).toMatchSnapshot()
+    expect(tree.queryByTestId('InviteAndSendModal')?.props.isVisible).toBe(false)
+    fireEvent.press(tree.getByTestId('ConfirmButton'))
+    expect(tree.queryByTestId('InviteAndSendModal')?.props.isVisible).toBe(true)
   })
 })

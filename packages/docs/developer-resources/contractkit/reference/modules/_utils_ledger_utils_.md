@@ -1,4 +1,4 @@
-# External module: "utils/ledger-utils"
+# Module: "utils/ledger-utils"
 
 ## Index
 

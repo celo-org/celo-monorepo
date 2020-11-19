@@ -84,7 +84,7 @@ commands:
 
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
-            yarn install || yarn install
+            yarn install || yarn install || yarn install
       - run:
           name: Fail if someone forgot to commit "yarn.lock"
           command: |
@@ -277,7 +277,7 @@ jobs:
 
   end-to-end-mobile-test-ios:
     macos:
-      xcode: '11.5.0'
+      xcode: '12.2.0'
     working_directory: ~/app_osx
     steps:
       - checkout
@@ -479,7 +479,7 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against first commit to contain version numbers"
-            yarn --cwd packages/protocol test:devchain-release -b celo-core-contracts-v2.pre-audit
+            yarn --cwd packages/protocol test:devchain-release -b celo-core-contracts-v1.rc1
 
   protocol-test-common:
     <<: *defaults
