@@ -89,14 +89,16 @@ export interface RewardsCalculationState {
   blockNumberToStartTracking: number
   blockNumberToFinishTracking: number
 }
+
+export interface AttestationIssuers {
+  [account: string]: string[]
+}
 export interface AttestationCompletions {
   [account: string]: number
 }
-
 export interface Balances {
   [account: string]: BigNumber
 }
-
 export interface BalancesByBlockState {
   [account: string]: BalancesByBlock
 }
@@ -105,11 +107,21 @@ export interface BalancesByBlock {
   blocks: number[]
 }
 
-export function processAttestationCompletion(state: RewardsCalculationState, event: EventLog) {
+export function processAttestationCompletion(
+  state: RewardsCalculationState,
+  issuers: AttestationIssuers,
+  event: EventLog
+) {
   const account = event.returnValues.account
-  state.attestationCompletions[account] = state.attestationCompletions[account]
-    ? state.attestationCompletions[account] + 1
-    : 1
+  const issuer = event.returnValues.issuer
+
+  if (!issuers[account]) {
+    issuers[account] = [issuer]
+    state.attestationCompletions[account] = 1
+  } else if (issuers[account].indexOf(issuer) === -1) {
+    issuers[account].push(issuer)
+    state.attestationCompletions[account] += 1
+  }
 
   if (state.startedBlockBalanceTracking && state.attestationCompletions[account] === 3) {
     // Just completed

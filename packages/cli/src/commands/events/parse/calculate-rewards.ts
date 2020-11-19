@@ -5,6 +5,7 @@ import { writeFileSync } from 'fs-extra'
 import { EventLog } from 'web3-core'
 import { BaseCommand } from '../../../base'
 import {
+  AttestationIssuers,
   calculateTimeWeightedAverage,
   initializeBalancesByBlock,
   mergeTwo,
@@ -35,6 +36,7 @@ export default class CalculateRewards extends BaseCommand {
     const allEvents: EventLog[] = mergeTwo(attestationEvents, transferEvents)
 
     // State over time
+    const trackIssuers: AttestationIssuers = {}
     const attestationCompletions = {}
     const balances = {}
     const balancesByBlock = {}
@@ -63,7 +65,7 @@ export default class CalculateRewards extends BaseCommand {
 
       switch (event.event) {
         case 'AttestationCompleted':
-          processAttestationCompletion(state, event)
+          processAttestationCompletion(state, trackIssuers, event)
           break
         case 'Transfer':
           processTransfer(state, event)
@@ -81,10 +83,12 @@ export default class CalculateRewards extends BaseCommand {
           balancesByBlock,
           state.blockNumberToStartTracking,
           state.blockNumberToFinishTracking
-        )
+        ),
+        null,
+        2
       )
     )
-    writeFileSync('rewardsCalculationState.json', JSON.stringify(state))
+    writeFileSync('rewardsCalculationState.json', JSON.stringify(state, null, 2))
 
     console.info('Done')
   }
