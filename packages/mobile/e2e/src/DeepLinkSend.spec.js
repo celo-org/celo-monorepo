@@ -1,9 +1,7 @@
 import dismissBanners from './utils/banners'
 import HandleDeepLinkSend from './usecases/HandleDeepLinkSend'
-import ResetAccount from './usecases/ResetAccount'
-import RestoreAccountOnboarding from './usecases/RestoreAccountOnboarding'
 
-describe('Deep link without account', () => {
+describe('Deep link without account send', () => {
   beforeEach(dismissBanners)
 
   // The behavior for this case is not really specified yet
@@ -16,11 +14,3 @@ describe('Deep link without account', () => {
 
   describe('HandleDeepLinkSend', HandleDeepLinkSend)
 })
-
-//describe('Deep Link with account', () => {
-//  beforeEach(dismissBanners)
-
-//  describe('Onboarding', RestoreAccountOnboarding)
-//  describe('HandleDeepLinkSend', HandleDeepLinkSend)
-//  describe('Reset Account', ResetAccount)
-//})
