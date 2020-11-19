@@ -1,6 +1,7 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
+import { Address } from '@celo/base'
 import 'bignumber.js'
 import { GoldToken } from '../generated/GoldToken'
 import {
@@ -48,13 +49,6 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @returns Total supply.
    */
   totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
-
-  /**
-   * Gets the balance of the specified address.
-   * @param owner The address to query the balance of.
-   * @return The balance of the specified address.
-   */
-  balanceOf = proxyCall(this.contract.methods.balanceOf, undefined, valueToBigNumber)
 
   /**
    * Approve a user to transfer CELO on behalf of another user.
@@ -107,4 +101,16 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @return True if the transaction succeeds.
    */
   transferFrom = proxySend(this.kit, this.contract.methods.transferFrom)
+
+  /**
+   * Gets the balance of the specified address.
+   * @param owner The address to query the balance of.
+   * @return The balance of the specified address.
+   */
+  balanceOf = (account: Address) =>
+    this.kit.connection.web3.eth.getBalance(account).then(valueToBigNumber)
+  /* WARNING: The actual call to the Gold contract of the balanceOf:
+   * `balanceOf = proxyCall(this.contract.methods.balanceOf, undefined, valueToBigNumber)`
+   * has issues with web3. Keep the one calling getBalance
+   */
 }
