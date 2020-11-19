@@ -1,4 +1,4 @@
-# Module: "network-utils/google-storage-utils"
+# External module: "network-utils/google-storage-utils"
 
 ## Index
 

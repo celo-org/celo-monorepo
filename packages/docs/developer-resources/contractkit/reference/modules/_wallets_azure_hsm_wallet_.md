@@ -1,4 +1,4 @@
-# Module: "wallets/azure-hsm-wallet"
+# External module: "wallets/azure-hsm-wallet"
 
 ## Index
 

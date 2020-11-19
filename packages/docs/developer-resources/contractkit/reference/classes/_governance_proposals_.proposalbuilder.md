@@ -97,13 +97,13 @@ ___
 
 ###  build
 
-▸ **build**(): *Promise‹Pick‹Transaction, "to" | "value" | "input"›[]›*
+▸ **build**(): *Promise‹object[]›*
 
 *Defined in [packages/contractkit/src/governance/proposals.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L134)*
 
 Build calls all of the added build steps and returns the final proposal.
 
-**Returns:** *Promise‹Pick‹Transaction, "to" | "value" | "input"›[]›*
+**Returns:** *Promise‹object[]›*
 
 A constructed Proposal object (i.e. a list of ProposalTransaction)
 
@@ -111,7 +111,7 @@ ___
 
 ###  fromJsonTx
 
-▸ **fromJsonTx**(`tx`: [ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)): *Promise‹Pick‹Transaction, "to" | "value" | "input"››*
+▸ **fromJsonTx**(`tx`: [ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)): *Promise‹object›*
 
 *Defined in [packages/contractkit/src/governance/proposals.ts:176](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L176)*
 
@@ -121,7 +121,7 @@ Name | Type |
 ------ | ------ |
 `tx` | [ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md) |
 
-**Returns:** *Promise‹Pick‹Transaction, "to" | "value" | "input"››*
+**Returns:** *Promise‹object›*
 
 ___
 

@@ -1,3 +1,3 @@
-# Module: "wallets/ledger-utils/data"
+# External module: "wallets/ledger-utils/data"
 
 

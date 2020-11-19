@@ -1,4 +1,4 @@
-# Module: "address-registry"
+# External module: "address-registry"
 
 ## Index
 

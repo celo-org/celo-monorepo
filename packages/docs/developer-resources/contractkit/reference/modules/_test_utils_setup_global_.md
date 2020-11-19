@@ -1,4 +1,4 @@
-# Module: "test-utils/setup.global"
+# External module: "test-utils/setup.global"
 
 ## Index
 

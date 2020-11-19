@@ -1,4 +1,4 @@
-# Module: "identity/metadata"
+# External module: "identity/metadata"
 
 ## Index
 

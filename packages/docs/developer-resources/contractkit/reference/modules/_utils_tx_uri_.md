@@ -1,4 +1,4 @@
-# Module: "utils/tx-uri"
+# External module: "utils/tx-uri"
 
 ## Index
 

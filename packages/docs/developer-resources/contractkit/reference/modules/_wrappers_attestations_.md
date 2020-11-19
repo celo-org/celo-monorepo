@@ -1,4 +1,4 @@
-# Module: "wrappers/Attestations"
+# External module: "wrappers/Attestations"
 
 ## Index
 

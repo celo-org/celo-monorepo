@@ -1,4 +1,4 @@
-# Module: "test-utils/teardown.global"
+# External module: "test-utils/teardown.global"
 
 ## Index
 

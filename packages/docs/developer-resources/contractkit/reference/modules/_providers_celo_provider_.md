@@ -1,4 +1,4 @@
-# Module: "providers/celo-provider"
+# External module: "providers/celo-provider"
 
 ## Index
 

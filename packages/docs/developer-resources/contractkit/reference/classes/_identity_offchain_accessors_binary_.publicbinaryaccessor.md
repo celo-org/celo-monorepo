@@ -20,9 +20,9 @@ Schema for writing any generic binary data
 
 ### Properties
 
-* [dataPath](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-datapath)
+* [dataPath](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#datapath)
 * [read](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#read)
-* [wrapper](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-wrapper)
+* [wrapper](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#wrapper)
 
 ### Methods
 
@@ -48,7 +48,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` dataPath
+###  dataPath
 
 • **dataPath**: *string*
 
@@ -76,7 +76,7 @@ Name | Type |
 
 ___
 
-### `Readonly` wrapper
+###  wrapper
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 

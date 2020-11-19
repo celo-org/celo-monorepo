@@ -18,8 +18,8 @@
 
 ### Properties
 
-* [error](_identity_offchain_accessors_errors_.offchainerror.md#readonly-error)
-* [errorType](_identity_offchain_accessors_errors_.offchainerror.md#readonly-errortype)
+* [error](_identity_offchain_accessors_errors_.offchainerror.md#error)
+* [errorType](_identity_offchain_accessors_errors_.offchainerror.md#errortype)
 * [message](_identity_offchain_accessors_errors_.offchainerror.md#message)
 * [name](_identity_offchain_accessors_errors_.offchainerror.md#name)
 * [stack](_identity_offchain_accessors_errors_.offchainerror.md#optional-stack)
@@ -44,7 +44,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` error
+###  error
 
 • **error**: *[OffchainErrors](../modules/_identity_offchain_data_wrapper_.md#offchainerrors)*
 
@@ -52,11 +52,11 @@ Name | Type |
 
 ___
 
-### `Readonly` errorType
+###  errorType
 
 • **errorType**: *[OffchainError](../enums/_identity_offchain_accessors_errors_.schemaerrortypes.md#offchainerror)*
 
-*Inherited from [InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md).[errorType](_identity_offchain_accessors_errors_.invaliddataerror.md#readonly-errortype)*
+*Inherited from [InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md).[errorType](_identity_offchain_accessors_errors_.invaliddataerror.md#errortype)*
 
 Defined in packages/base/lib/result.d.ts:19
 
@@ -68,7 +68,7 @@ ___
 
 *Inherited from [InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md).[message](_identity_offchain_accessors_errors_.invaliddataerror.md#message)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:974
+Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:974
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 *Inherited from [InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md).[name](_identity_offchain_accessors_errors_.invaliddataerror.md#name)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:973
+Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:973
 
 ___
 
@@ -88,4 +88,4 @@ ___
 
 *Inherited from [InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md).[stack](_identity_offchain_accessors_errors_.invaliddataerror.md#optional-stack)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:975
+Defined in node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts:975

@@ -1,4 +1,4 @@
-# Module: "explorer/base"
+# External module: "explorer/base"
 
 ## Index
 

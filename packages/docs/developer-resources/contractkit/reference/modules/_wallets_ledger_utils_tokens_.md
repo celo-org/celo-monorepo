@@ -1,4 +1,4 @@
-# Module: "wallets/ledger-utils/tokens"
+# External module: "wallets/ledger-utils/tokens"
 
 ## Index
 

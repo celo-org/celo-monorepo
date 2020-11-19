@@ -1,4 +1,4 @@
-# Module: "identity/claims/keybase"
+# External module: "identity/claims/keybase"
 
 ## Index
 

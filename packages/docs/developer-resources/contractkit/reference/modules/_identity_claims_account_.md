@@ -1,4 +1,4 @@
-# Module: "identity/claims/account"
+# External module: "identity/claims/account"
 
 ## Index
 

@@ -1,4 +1,4 @@
-# Module: "utils/timezone"
+# External module: "utils/timezone"
 
 ## Index
 

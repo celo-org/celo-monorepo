@@ -1,4 +1,4 @@
-# Module: "kit"
+# External module: "kit"
 
 ## Index
 

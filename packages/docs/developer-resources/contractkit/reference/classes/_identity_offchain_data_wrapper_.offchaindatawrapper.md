@@ -12,9 +12,9 @@
 
 ### Properties
 
-* [kit](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readonly-kit)
+* [kit](_identity_offchain_data_wrapper_.offchaindatawrapper.md#kit)
 * [readDataFrom](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readdatafrom)
-* [self](_identity_offchain_data_wrapper_.offchaindatawrapper.md#readonly-self)
+* [self](_identity_offchain_data_wrapper_.offchaindatawrapper.md#self)
 * [signer](_identity_offchain_data_wrapper_.offchaindatawrapper.md#signer)
 * [storageWriter](_identity_offchain_data_wrapper_.offchaindatawrapper.md#storagewriter)
 
@@ -43,7 +43,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` kit
+###  kit
 
 • **kit**: *[ContractKit](_kit_.contractkit.md)*
 
@@ -59,7 +59,7 @@ ___
 
 ___
 
-### `Readonly` self
+###  self
 
 • **self**: *string*
 

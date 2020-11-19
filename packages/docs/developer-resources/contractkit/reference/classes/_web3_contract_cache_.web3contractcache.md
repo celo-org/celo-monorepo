@@ -19,7 +19,7 @@ a contract wrapper
 
 ### Properties
 
-* [kit](_web3_contract_cache_.web3contractcache.md#readonly-kit)
+* [kit](_web3_contract_cache_.web3contractcache.md#kit)
 
 ### Methods
 
@@ -68,7 +68,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` kit
+###  kit
 
 • **kit**: *[ContractKit](_kit_.contractkit.md)*
 
@@ -108,7 +108,7 @@ ___
 
 ###  getContract
 
-▸ **getContract**<**C**>(`contract`: C, `address?`: undefined | string): *Promise‹NonNullable‹ContractCacheMap[C]››*
+▸ **getContract**<**C**>(`contract`: C, `address?`: undefined | string): *Promise‹ContractCacheMap[C] extends undefined | null ? never : ContractCacheMap[C]›*
 
 *Defined in [packages/contractkit/src/web3-contract-cache.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L155)*
 
@@ -125,7 +125,7 @@ Name | Type |
 `contract` | C |
 `address?` | undefined &#124; string |
 
-**Returns:** *Promise‹NonNullable‹ContractCacheMap[C]››*
+**Returns:** *Promise‹ContractCacheMap[C] extends undefined | null ? never : ContractCacheMap[C]›*
 
 ___
 

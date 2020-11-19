@@ -1,4 +1,4 @@
-# Module: "wallets/aws-hsm-wallet"
+# External module: "wallets/aws-hsm-wallet"
 
 ## Index
 

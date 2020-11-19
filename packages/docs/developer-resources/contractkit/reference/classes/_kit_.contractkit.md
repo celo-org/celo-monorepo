@@ -12,10 +12,10 @@
 
 ### Properties
 
-* [_web3Contracts](_kit_.contractkit.md#readonly-_web3contracts)
-* [contracts](_kit_.contractkit.md#readonly-contracts)
-* [registry](_kit_.contractkit.md#readonly-registry)
-* [web3](_kit_.contractkit.md#readonly-web3)
+* [_web3Contracts](_kit_.contractkit.md#_web3contracts)
+* [contracts](_kit_.contractkit.md#contracts)
+* [registry](_kit_.contractkit.md#registry)
+* [web3](_kit_.contractkit.md#web3)
 
 ### Accessors
 
@@ -63,7 +63,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` _web3Contracts
+###  _web3Contracts
 
 • **_web3Contracts**: *[Web3ContractCache](_web3_contract_cache_.web3contractcache.md)*
 
@@ -73,7 +73,7 @@ factory for core contract's native web3 wrappers
 
 ___
 
-### `Readonly` contracts
+###  contracts
 
 • **contracts**: *[WrapperCache](_contract_cache_.wrappercache.md)*
 
@@ -83,7 +83,7 @@ factory for core contract's kit wrappers
 
 ___
 
-### `Readonly` registry
+###  registry
 
 • **registry**: *[AddressRegistry](_address_registry_.addressregistry.md)*
 
@@ -93,7 +93,7 @@ core contract's address registry
 
 ___
 
-### `Readonly` web3
+###  web3
 
 • **web3**: *Web3*
 

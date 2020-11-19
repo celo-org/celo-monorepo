@@ -1,4 +1,4 @@
-# Module: "contract-cache"
+# External module: "contract-cache"
 
 ## Index
 

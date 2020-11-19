@@ -1,4 +1,4 @@
-# Module: "utils/signing-utils"
+# External module: "utils/signing-utils"
 
 ## Index
 

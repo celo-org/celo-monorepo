@@ -14,9 +14,9 @@
 
 ### Properties
 
-* [fetchMock](_identity_offchain_storage_writers_.mockstoragewriter.md#readonly-fetchmock)
-* [mockedStorageRoot](_identity_offchain_storage_writers_.mockstoragewriter.md#readonly-mockedstorageroot)
-* [root](_identity_offchain_storage_writers_.mockstoragewriter.md#readonly-root)
+* [fetchMock](_identity_offchain_storage_writers_.mockstoragewriter.md#fetchmock)
+* [mockedStorageRoot](_identity_offchain_storage_writers_.mockstoragewriter.md#mockedstorageroot)
+* [root](_identity_offchain_storage_writers_.mockstoragewriter.md#root)
 
 ### Methods
 
@@ -44,7 +44,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` fetchMock
+###  fetchMock
 
 • **fetchMock**: *any*
 
@@ -52,7 +52,7 @@ Name | Type |
 
 ___
 
-### `Readonly` mockedStorageRoot
+###  mockedStorageRoot
 
 • **mockedStorageRoot**: *string*
 
@@ -60,11 +60,11 @@ ___
 
 ___
 
-### `Readonly` root
+###  root
 
 • **root**: *string*
 
-*Overrides [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[root](_identity_offchain_storage_writers_.localstoragewriter.md#readonly-root)*
+*Overrides [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[root](_identity_offchain_storage_writers_.localstoragewriter.md#root)*
 
 *Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L56)*
 

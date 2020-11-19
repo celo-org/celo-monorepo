@@ -1,4 +1,4 @@
-# Module: "test-utils/PromiEventStub"
+# External module: "test-utils/PromiEventStub"
 
 ## Index
 

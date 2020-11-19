@@ -1,4 +1,4 @@
-# Module: "identity/claims/attestation-service-url"
+# External module: "identity/claims/attestation-service-url"
 
 ## Index
 

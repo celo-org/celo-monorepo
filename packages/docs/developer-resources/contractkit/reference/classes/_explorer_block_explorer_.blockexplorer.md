@@ -12,7 +12,7 @@
 
 ### Properties
 
-* [contractDetails](_explorer_block_explorer_.blockexplorer.md#readonly-contractdetails)
+* [contractDetails](_explorer_block_explorer_.blockexplorer.md#contractdetails)
 
 ### Methods
 
@@ -43,7 +43,7 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` contractDetails
+###  contractDetails
 
 • **contractDetails**: *[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]*
 

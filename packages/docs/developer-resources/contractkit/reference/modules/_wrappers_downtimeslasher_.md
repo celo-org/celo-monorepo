@@ -1,4 +1,4 @@
-# Module: "wrappers/DowntimeSlasher"
+# External module: "wrappers/DowntimeSlasher"
 
 ## Index
 

@@ -1,4 +1,4 @@
-# Module: "wallets/test-utils"
+# External module: "wallets/test-utils"
 
 ## Index
 

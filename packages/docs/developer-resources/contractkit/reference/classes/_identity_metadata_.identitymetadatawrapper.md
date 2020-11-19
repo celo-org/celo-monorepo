@@ -93,7 +93,7 @@ ___
 
 **Type parameters:**
 
-▪ **K**: *[ClaimTypes](../modules/_identity_metadata_.md#claimtypes)*
+▪ **K**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)*
 
 **Parameters:**
 
@@ -113,7 +113,7 @@ ___
 
 **Type parameters:**
 
-▪ **K**: *[ClaimTypes](../modules/_identity_metadata_.md#claimtypes)*
+▪ **K**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)*
 
 **Parameters:**
 

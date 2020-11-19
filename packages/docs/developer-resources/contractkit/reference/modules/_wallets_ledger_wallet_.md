@@ -1,4 +1,4 @@
-# Module: "wallets/ledger-wallet"
+# External module: "wallets/ledger-wallet"
 
 ## Index
 

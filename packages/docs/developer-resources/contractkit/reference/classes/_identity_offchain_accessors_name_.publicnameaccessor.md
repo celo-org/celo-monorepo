@@ -18,10 +18,10 @@
 
 ### Properties
 
-* [dataPath](_identity_offchain_accessors_name_.publicnameaccessor.md#readonly-datapath)
+* [dataPath](_identity_offchain_accessors_name_.publicnameaccessor.md#datapath)
 * [read](_identity_offchain_accessors_name_.publicnameaccessor.md#read)
-* [type](_identity_offchain_accessors_name_.publicnameaccessor.md#readonly-type)
-* [wrapper](_identity_offchain_accessors_name_.publicnameaccessor.md#readonly-wrapper)
+* [type](_identity_offchain_accessors_name_.publicnameaccessor.md#type)
+* [wrapper](_identity_offchain_accessors_name_.publicnameaccessor.md#wrapper)
 
 ### Methods
 
@@ -48,11 +48,11 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` dataPath
+###  dataPath
 
 • **dataPath**: *string*
 
-*Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[dataPath](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-datapath)*
+*Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[dataPath](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#datapath)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L21)*
 
@@ -80,21 +80,21 @@ Name | Type |
 
 ___
 
-### `Readonly` type
+###  type
 
 • **type**: *Type‹[NameType](../modules/_identity_offchain_accessors_name_.md#nametype)›*
 
-*Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[type](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-type)*
+*Inherited from [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[type](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#type)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/simple.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/simple.ts#L20)*
 
 ___
 
-### `Readonly` wrapper
+###  wrapper
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Overrides [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[wrapper](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#readonly-wrapper)*
+*Overrides [PublicSimpleAccessor](_identity_offchain_accessors_simple_.publicsimpleaccessor.md).[wrapper](_identity_offchain_accessors_simple_.publicsimpleaccessor.md#wrapper)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/name.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/name.ts#L12)*
 

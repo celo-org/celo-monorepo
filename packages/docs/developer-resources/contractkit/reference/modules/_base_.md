@@ -1,4 +1,4 @@
-# Module: "base"
+# External module: "base"
 
 ## Index
 

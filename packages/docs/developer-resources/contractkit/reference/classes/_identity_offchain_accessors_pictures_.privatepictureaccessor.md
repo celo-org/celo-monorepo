@@ -18,9 +18,9 @@
 
 ### Properties
 
-* [dataPath](_identity_offchain_accessors_pictures_.privatepictureaccessor.md#readonly-datapath)
+* [dataPath](_identity_offchain_accessors_pictures_.privatepictureaccessor.md#datapath)
 * [read](_identity_offchain_accessors_pictures_.privatepictureaccessor.md#read)
-* [wrapper](_identity_offchain_accessors_pictures_.privatepictureaccessor.md#readonly-wrapper)
+* [wrapper](_identity_offchain_accessors_pictures_.privatepictureaccessor.md#wrapper)
 
 ### Methods
 
@@ -47,11 +47,11 @@ Name | Type |
 
 ## Properties
 
-### `Readonly` dataPath
+###  dataPath
 
 • **dataPath**: *string*
 
-*Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[dataPath](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#readonly-datapath)*
+*Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[dataPath](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#datapath)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L42)*
 
@@ -79,11 +79,11 @@ Name | Type |
 
 ___
 
-### `Readonly` wrapper
+###  wrapper
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Overrides [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[wrapper](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#readonly-wrapper)*
+*Overrides [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[wrapper](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#wrapper)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/pictures.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L11)*
 
@@ -91,7 +91,7 @@ ___
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹Result‹Buffer‹›, [SchemaErrors](../modules/_identity_offchain_accessors_errors_.md#schemaerrors)››*
+▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address)): *Promise‹OkResult‹Buffer‹›› | ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›››*
 
 *Inherited from [PrivateBinaryAccessor](_identity_offchain_accessors_binary_.privatebinaryaccessor.md).[readAsResult](_identity_offchain_accessors_binary_.privatebinaryaccessor.md#readasresult)*
 
@@ -103,7 +103,7 @@ Name | Type |
 ------ | ------ |
 `account` | [Address](../modules/_base_.md#address) |
 
-**Returns:** *Promise‹Result‹Buffer‹›, [SchemaErrors](../modules/_identity_offchain_accessors_errors_.md#schemaerrors)››*
+**Returns:** *Promise‹OkResult‹Buffer‹›› | ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›››*
 
 ___
 

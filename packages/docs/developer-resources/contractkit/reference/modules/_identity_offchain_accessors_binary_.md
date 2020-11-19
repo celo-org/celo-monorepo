@@ -1,4 +1,4 @@
-# Module: "identity/offchain/accessors/binary"
+# External module: "identity/offchain/accessors/binary"
 
 ## Index
 

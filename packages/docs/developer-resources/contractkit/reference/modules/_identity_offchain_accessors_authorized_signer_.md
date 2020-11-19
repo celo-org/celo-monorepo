@@ -1,4 +1,4 @@
-# Module: "identity/offchain/accessors/authorized-signer"
+# External module: "identity/offchain/accessors/authorized-signer"
 
 ## Index
 

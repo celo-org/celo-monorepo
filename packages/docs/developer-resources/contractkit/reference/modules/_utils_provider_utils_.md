@@ -1,4 +1,4 @@
-# Module: "utils/provider-utils"
+# External module: "utils/provider-utils"
 
 ## Index
 

@@ -1,4 +1,4 @@
-# Module: "wallets/remote-wallet"
+# External module: "wallets/remote-wallet"
 
 ## Index
 

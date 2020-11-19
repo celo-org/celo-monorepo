@@ -1,4 +1,4 @@
-# Module: "utils/azure-key-vault-client"
+# External module: "utils/azure-key-vault-client"
 
 ## Index
 

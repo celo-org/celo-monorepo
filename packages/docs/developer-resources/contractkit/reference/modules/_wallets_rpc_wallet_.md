@@ -1,4 +1,4 @@
-# Module: "wallets/rpc-wallet"
+# External module: "wallets/rpc-wallet"
 
 ## Index
 
