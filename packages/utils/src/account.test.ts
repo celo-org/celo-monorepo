@@ -1,4 +1,10 @@
-import { generateKeys, generateMnemonic, MnemonicStrength, validateMnemonic } from './account'
+import {
+  generateKeys,
+  generateMnemonic,
+  MnemonicLanguages,
+  MnemonicStrength,
+  validateMnemonic,
+} from './account'
 
 describe('Mnemonic validation', () => {
   it('should generate 24 word mnemonic', async () => {
@@ -25,6 +31,8 @@ describe('Mnemonic validation', () => {
       'love regular blood road latin uncle shuffle hill aerobic cushion robust million elder gather clip unique pupil escape frost myth glove gadget pitch february',
       'gasp eyebrow sibling dash armed guess excuse ball whip thunder insane pause lizard excuse air catalog tail control raise test dutch permit magic under',
     ]
+    const spanishMnemonic =
+      'avance colmo poema momia cofre pata res verso secta cinco tubería yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín'
     const expectedPrivateKeys = [
       {
         derivation0: {
@@ -205,5 +213,7 @@ describe('Mnemonic validation', () => {
       const password = await generateKeys(mnemonics[i], 'password')
       expect({ derivation0, derivation1, password }).toEqual(expectedPrivateKeys[i])
     }
+    expect(validateMnemonic(spanishMnemonic, MnemonicLanguages.english)).toBeFalsy()
+    expect(validateMnemonic(spanishMnemonic)).toBeTruthy()
   })
 })

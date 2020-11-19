@@ -1,4 +1,4 @@
-# External module: "utils/tx-params-normalizer"
+# Module: "utils/tx-params-normalizer"
 
 ## Index
 
