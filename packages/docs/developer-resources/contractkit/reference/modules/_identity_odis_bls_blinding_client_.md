@@ -1,4 +1,4 @@
-# External module: "identity/odis/bls-blinding-client"
+# Module: "identity/odis/bls-blinding-client"
 
 ## Index
 
