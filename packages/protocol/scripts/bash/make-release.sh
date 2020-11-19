@@ -52,7 +52,6 @@ git checkout -
 cp $BUILD_DIR/migrationsConfig.js ./
 yarn build:ts
 
-
 yarn run truffle exec ./scripts/truffle/make-release.js \
   --network $NETWORK \
   --build_directory $BUILD_DIR \
