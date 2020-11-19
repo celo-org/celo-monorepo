@@ -279,7 +279,7 @@ jobs:
 
   end-to-end-mobile-test-ios:
     macos:
-      xcode: '11.5.0'
+      xcode: '12.2.0'
     working_directory: ~/app_osx
     steps:
       - checkout

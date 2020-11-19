@@ -14,6 +14,7 @@ import {
   BaseWrapper,
   blocksToDurationString,
   proxyCall,
+  proxySend,
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
@@ -490,6 +491,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       this.contract.methods.request(identifier, attestationsRequested, tokenAddress)
     )
   }
+
+  /**
+   * Updates sender's approval status on whether to allow an attestation identifier
+   * mapping to be transfered from one address to another.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  approveTransfer = proxySend(this.kit, this.contract.methods.approveTransfer)
 
   /**
    * Selects the issuers for previously requested attestations for a phone number

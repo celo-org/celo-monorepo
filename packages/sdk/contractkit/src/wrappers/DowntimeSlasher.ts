@@ -158,7 +158,7 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
     const downArray = await Promise.all(
       intervals.map((interval) => this.wasValidatorDownForInterval(address, interval))
     )
-    return downArray.some((down) => !down)
+    return downArray.every((down) => down)
   }
 
   /**

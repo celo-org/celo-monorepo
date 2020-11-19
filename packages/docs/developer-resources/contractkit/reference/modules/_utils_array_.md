@@ -1,4 +1,4 @@
-# External module: "utils/array"
+# Module: "utils/array"
 
 ## Index
 
