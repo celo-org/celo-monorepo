@@ -1,4 +1,5 @@
 import * as React from 'react'
+import FadeIn from 'react-lazyload-fadein'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
@@ -9,11 +10,11 @@ import LogoDarkBg from 'src/logos/LogoDarkBg'
 import FeatureTriangle from 'src/plumo/feather-triangle.svg'
 import Outline from 'src/plumo/phone-outline.svg'
 import OpenGraphic from 'src/plumo/plumo-open-graph.jpg'
+import SkyMobile from 'src/plumo/plumo-sky-mobile.svg'
+import Sky from 'src/plumo/plumo-sky.svg'
 import Button, { BTN } from 'src/shared/Button.3'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import FeatherPoint from './FeatherPoint'
-import SkyMobile from 'src/plumo/plumo-sky-mobile.svg'
-import Sky from 'src/plumo/plumo-sky.svg'
 
 const PLUMO_FORM =
   'https://docs.google.com/forms/d/e/1FAIpQLScZswraVVC91RwToo_9qm-1QzGrxp7yjVeM2wzdTbL5T_lAgQ/viewform'
@@ -38,11 +39,18 @@ export default function PlumoLanding() {
             isMobile && styles.coverContainerMobile,
           ]}
         >
-          <Image
-            source={isMobile ? SkyMobile : Sky}
-            style={styles.coverBackgroundImage}
-            resizeMode="cover"
-          />
+          <View style={isMobile ? styles.backgroundFramerMobile : styles.backgroundFramer}>
+            <FadeIn>
+              {(onLoad) => (
+                <Image
+                  onLoadEnd={onLoad}
+                  source={isMobile ? SkyMobile : Sky}
+                  style={isMobile ? styles.coverBackgroundImageMobile : styles.coverBackgroundImage}
+                  resizeMode="cover"
+                />
+              )}
+            </FadeIn>
+          </View>
           <GridRow allStyle={standardStyles.centered}>
             <Cell span={Spans.full} style={[styles.cover, isMobile && styles.coverMobile]}>
               <Image
@@ -133,7 +141,7 @@ export default function PlumoLanding() {
 }
 
 const gradient = {
-  background: `linear-gradient(104deg, #1AB062 -10%, #272A2E 15.16%, #272A2E 75.47%, #42D689 110.15%)`,
+  background: `linear-gradient(120deg, #1AB062 -10%, #272A2E 28.16%, #272A2E 78.47%, #42D689 110.15%)`,
 }
 
 const gradientMobile = {
@@ -161,19 +169,41 @@ const styles = StyleSheet.create({
     backdropFilter: 'blur(5px)',
     zIndex: 100,
   },
-  coverBackgroundImage: {
+  backgroundFramer: {
     position: 'absolute',
+    height: 590,
     width: '100%',
-    height: '100%',
+    zIndex: -1,
+    overflow: 'hidden',
+  },
+  backgroundFramerMobile: {
+    position: 'absolute',
+    height: 620,
+    width: '100%',
+    zIndex: -1,
+    overflow: 'hidden',
+  },
+  coverBackgroundImage: {
+    width: '100%',
+    height: 610,
+    zIndex: -1,
+  },
+  coverBackgroundImageMobile: {
+    width: '100%',
+    height: 640,
+    zIndex: -1,
   },
   coverContainer: {
     justifyContent: 'center',
     backgroundColor: 'black',
     width: '100vw',
     height: 590,
+    zIndex: -1,
   },
   coverContainerMobile: {
-    minHeight: 660,
+    minHeight: 640,
+    justifyContent: 'flex-end',
+    zIndex: -1,
   },
   cover: {
     marginRight: 15,
@@ -207,6 +237,7 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
   },
   coverContentMobile: {
+    paddingBottom: 30,
     alignItems: 'center',
     maxWidth: 340,
   },
