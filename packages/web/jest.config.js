@@ -10,7 +10,7 @@ module.exports = {
     },
   },
   moduleNameMapper: {
-    '\\.(png|jpg|jpeg|gif)$': '<rootDir>/__mocks__/ImageStub.ts',
+    '\\.(png|jpg|jpeg|gif|svg)$': '<rootDir>/__mocks__/ImageStub.ts',
     '\\.(css|scss)$': '<rootDir>/__mocks__/ImageStub.ts',
     '\\.(md)$': '<rootDir>/__mocks__/MarkdownStub.ts',
     'pages/(.*)$': '<rootDir>/pages/$1',

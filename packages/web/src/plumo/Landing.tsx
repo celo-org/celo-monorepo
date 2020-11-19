@@ -5,18 +5,22 @@ import OpenGraph from 'src/header/OpenGraph'
 import { useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import LogoDarkBg from 'src/logos/LogoDarkBg'
 import FeatureTriangle from 'src/plumo/feather-triangle.svg'
 import Outline from 'src/plumo/phone-outline.svg'
 import OpenGraphic from 'src/plumo/plumo-open-graph.jpg'
 import Button, { BTN } from 'src/shared/Button.3'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import FeatherPoint from './FeatherPoint'
+import SkyMobile from 'src/plumo/plumo-sky-mobile.svg'
+import Sky from 'src/plumo/plumo-sky.svg'
 
-const PLUMO_FORM = 'https://plumo.example'
+const PLUMO_FORM =
+  'https://docs.google.com/forms/d/e/1FAIpQLScZswraVVC91RwToo_9qm-1QzGrxp7yjVeM2wzdTbL5T_lAgQ/viewform'
 
 export default function PlumoLanding() {
   const { t } = useTranslation('plumo')
-  const { isDesktop, isMobile } = useScreenSize()
+  const { isDesktop, isTablet, isMobile } = useScreenSize()
   return (
     <>
       <OpenGraph
@@ -28,19 +32,38 @@ export default function PlumoLanding() {
       <View style={styles.root}>
         <View
           style={[
-            styles.coverContainer,
             // @ts-ignore
-            gradient,
+            isMobile ? gradientMobile : gradient,
+            styles.coverContainer,
             isMobile && styles.coverContainerMobile,
           ]}
         >
+          <Image
+            source={isMobile ? SkyMobile : Sky}
+            style={styles.coverBackgroundImage}
+            resizeMode="cover"
+          />
           <GridRow allStyle={standardStyles.centered}>
             <Cell span={Spans.full} style={[styles.cover, isMobile && styles.coverMobile]}>
               <Image
                 source={FeatureTriangle}
-                style={isMobile ? styles.coverImageMobile : styles.coverImage}
+                style={
+                  isMobile
+                    ? styles.coverImageMobile
+                    : isTablet
+                    ? styles.coverImageTablet
+                    : styles.coverImage
+                }
               />
-              <View style={isMobile ? styles.coverContentMobile : styles.coverContent}>
+              <View
+                style={
+                  isMobile
+                    ? styles.coverContentMobile
+                    : isTablet
+                    ? styles.coverContentTablet
+                    : styles.coverContent
+                }
+              >
                 <Text style={[fonts.h2, textStyles.invert, isMobile && textStyles.center]}>
                   {t('coverTitle')}
                 </Text>
@@ -100,13 +123,21 @@ export default function PlumoLanding() {
             <Button kind={BTN.PRIMARY} href={PLUMO_FORM} text={t('ctaBtn')} />
           </Cell>
         </GridRow>
+        <View style={styles.navbar}>
+          <LogoDarkBg height={30} />
+          <Button href={PLUMO_FORM} text={t('navSignup')} kind={BTN.DARKNAV} />
+        </View>
       </View>
     </>
   )
 }
 
 const gradient = {
-  background: `linear-gradient(104deg, #1AB062 -10%, #272A2E 20.16%, #272A2E 80.47%, #42D689 110.15%)`,
+  background: `linear-gradient(104deg, #1AB062 -10%, #272A2E 15.16%, #272A2E 75.47%, #42D689 110.15%)`,
+}
+
+const gradientMobile = {
+  background: `linear-gradient(104deg, #1AB062 -10%, #272A2E 38.16%)`,
 }
 
 const styles = StyleSheet.create({
@@ -114,16 +145,38 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
     minHeight: '100vh',
   },
+  navbar: {
+    top: 0,
+    left: 0,
+    right: 0,
+    position: 'fixed',
+    width: '100%',
+    height: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingLeft: 24,
+    paddingRight: 40,
+    backgroundColor: 'rgba(46, 51, 56, 0.95)',
+    backdropFilter: 'blur(5px)',
+    zIndex: 100,
+  },
+  coverBackgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
   coverContainer: {
     justifyContent: 'center',
     backgroundColor: 'black',
     width: '100vw',
-    height: 520,
+    height: 590,
   },
   coverContainerMobile: {
-    minHeight: 600,
+    minHeight: 660,
   },
   cover: {
+    marginRight: 15,
     justifyContent: 'center',
     flexDirection: 'row',
     alignitems: 'center',
@@ -137,10 +190,21 @@ const styles = StyleSheet.create({
   },
   coverImage: { width: 300, height: 300 },
   coverImageMobile: { width: 200, height: 200, alignSelf: 'center', marginBottom: 30 },
+  coverImageTablet: {
+    width: 250,
+    height: 250,
+    alignSelf: 'center',
+    marginBottom: 30,
+  },
   coverContent: {
     maxWidth: 340,
     justifyContent: 'center',
     marginLeft: 38,
+  },
+  coverContentTablet: {
+    justifyContent: 'center',
+    maxWidth: 320,
+    paddingLeft: 30,
   },
   coverContentMobile: {
     alignItems: 'center',

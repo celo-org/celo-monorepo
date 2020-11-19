@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import { colors, fonts, standardStyles } from 'src/styles'
 
