@@ -466,7 +466,175 @@ contract('Accounts', (accounts: string[]) => {
       assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
     })
 
+    it('should remove the authorized signer', async () => {
+      const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+
+      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.equal(await accountsInstance.authorizedBy(authorized), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+
+      await accountsInstance.removeSigner(authorized, role)
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      assert.isFalse(await accountsInstance.isAuthorizedSigner(authorized))
+    })
+
     describe.skip('when a previous authorization has been made', () => {})
+
+    Object.keys(authorizationTestDescriptions).forEach((key) => {
+      describe.skip('authorization tests:', () => {
+        let authorizationTest: any
+        beforeEach(async () => {
+          authorizationTest = authorizationTests[key]
+          await accountsInstance.createAccount()
+        })
+
+        describe(`#authorize${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+          const authorized = accounts[1]
+          let sig
+
+          beforeEach(async () => {
+            sig = await getParsedSignatureOfAddress(web3, account, authorized)
+          })
+
+          it(`should set the authorized ${authorizationTestDescriptions[key].me}`, async () => {
+            assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            assert.equal(await accountsInstance.authorizedBy(authorized), account)
+            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+            assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
+            assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
+          })
+
+          it(`should emit the right event`, async () => {
+            const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            const expected = { account, signer: authorized }
+            assertLogMatches(log, authorizationTest.eventName, expected)
+          })
+
+          it(`should revert if the ${authorizationTestDescriptions[key].me} is an account`, async () => {
+            await accountsInstance.createAccount({ from: authorized })
+            await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
+          })
+
+          it(`should revert if the ${authorizationTestDescriptions[key].me} is already authorized`, async () => {
+            const otherAccount = accounts[2]
+            const otherSig = await getParsedSignatureOfAddress(web3, otherAccount, authorized)
+            await accountsInstance.createAccount({ from: otherAccount })
+            await authorizationTest.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
+              from: otherAccount,
+            })
+            await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
+          })
+
+          it('should revert if the signature is incorrect', async () => {
+            const nonVoter = accounts[3]
+            const incorrectSig = await getParsedSignatureOfAddress(web3, account, nonVoter)
+            await assertRevert(
+              authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
+            )
+          })
+
+          describe('when a previous authorization has been made', () => {
+            const newAuthorized = accounts[2]
+            let newSig
+            beforeEach(async () => {
+              await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+              newSig = await getParsedSignatureOfAddress(web3, account, newAuthorized)
+              await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
+            })
+
+            it(`should set the new authorized ${authorizationTestDescriptions[key].me}`, async () => {
+              assert.equal(await accountsInstance.authorizedBy(newAuthorized), account)
+              assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
+              assert.equal(
+                await authorizationTest.authorizedSignerToAccount(newAuthorized),
+                account
+              )
+            })
+
+            it('should preserve the previous authorization', async () => {
+              assert.equal(await accountsInstance.authorizedBy(authorized), account)
+            })
+          })
+        })
+
+        describe(`#getAccountFrom${upperFirst(
+          authorizationTestDescriptions[key].subject
+        )}()`, () => {
+          describe(`when the account has not authorized a ${authorizationTestDescriptions[key].me}`, () => {
+            it('should return the account when passed the account', async () => {
+              assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
+            })
+
+            it('should revert when passed an address that is not an account', async () => {
+              await assertRevert(authorizationTest.authorizedSignerToAccount(accounts[1]))
+            })
+          })
+
+          describe(`when the account has authorized a ${authorizationTestDescriptions[key].me}`, () => {
+            const authorized = accounts[1]
+            beforeEach(async () => {
+              const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+              await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            })
+
+            it('should return the account when passed the account', async () => {
+              assert.equal(await authorizationTest.authorizedSignerToAccount(account), account)
+            })
+
+            it(`should return the account when passed the ${authorizationTestDescriptions[key].me}`, async () => {
+              assert.equal(await authorizationTest.authorizedSignerToAccount(authorized), account)
+            })
+          })
+        })
+
+        describe(`#get${upperFirst(
+          authorizationTestDescriptions[key].subject
+        )}FromAccount()`, () => {
+          describe(`when the account has not authorized a ${authorizationTestDescriptions[key].me}`, () => {
+            it('should return the account when passed the account', async () => {
+              assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
+            })
+
+            it('should revert when not passed an account', async () => {
+              await assertRevert(authorizationTest.getAuthorizedFromAccount(accounts[1]), account)
+            })
+          })
+
+          describe(`when the account has authorized a ${authorizationTestDescriptions[key].me}`, () => {
+            const authorized = accounts[1]
+
+            beforeEach(async () => {
+              const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+              await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            })
+
+            it(`should return the ${key} when passed the account`, async () => {
+              assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+            })
+          })
+        })
+
+        describe(`#remove${upperFirst(authorizationTestDescriptions[key].subject)}()`, () => {
+          it(`should be able to remove the ${key} signer after authorizing`, async () => {
+            const authorized = accounts[1]
+            const sig = await getParsedSignatureOfAddress(web3, account, authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+
+            assert.isTrue(await authorizationTest.hasAuthorizedSigner(account))
+            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+
+            await authorizationTest.removeSigner()
+            assert.isFalse(await authorizationTest.hasAuthorizedSigner(account))
+            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
+          })
+        })
+      })
+    })
   })
 
   Object.keys(authorizationTestDescriptions).forEach((key) => {
