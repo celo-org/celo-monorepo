@@ -1,7 +1,7 @@
 {
   "name": "@celo/identity",
   "version": "0.0.1-dev",
-  "description": "Celo's identity protocol",
+  "description": "Utilities for interacting with Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "author": "Celo",
