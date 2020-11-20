@@ -3,6 +3,7 @@ import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import initMB, { MessageBird } from 'messagebird'
+import fetch from 'node-fetch'
 import util from 'util'
 import { fetchEnv } from '../env'
 import { AttestationModel, AttestationStatus } from '../models/attestation'
@@ -20,9 +21,11 @@ export class MessageBirdSmsProvider extends SmsProvider {
   messagebird: MessageBird
   type = SmsProviderType.MESSAGEBIRD
   deliveryStatusURL: string | undefined
+  apiKey: string
 
   constructor(apiKey: string, unsupportedRegionCodes: string[]) {
     super()
+    this.apiKey = apiKey
     this.messagebird = initMB(apiKey)
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
@@ -61,12 +64,36 @@ export class MessageBirdSmsProvider extends SmsProvider {
     return [bodyParser.urlencoded({ extended: false })]
   }
 
+  async getUSNumbers(): Promise<string[]> {
+    const response = await fetch('https://numbers.messagebird.com/v1/phone-numbers?features=sms', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `AccessKey ${this.apiKey}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Could not list numbers! ' + response.status)
+    }
+    const body = JSON.parse(await response.text())
+    return body.items
+      ? body.items
+          .filter((n: any) => n.country === 'US' && n.kycStatus === 'ok')
+          .map((n: any) => n.number)
+      : []
+  }
+
   async initialize(deliveryStatusURL: string) {
-    // Ensure the messaging service exists
+    this.deliveryStatusURL = deliveryStatusURL
+    let numbers
     try {
-      this.deliveryStatusURL = deliveryStatusURL
+      // Ensure at least one KYC-ed US based sms number is available for SMS.
+      numbers = await this.getUSNumbers()
     } catch (error) {
-      throw new Error(`Twilio Messaging Service could not be fetched: ${error}`)
+      throw new Error(`MessageBird: could not access numbers: ${error}`)
+    }
+    if (numbers.length === 0) {
+      throw new Error('MessageBird: complete KYC and purchase a US-based number enabled for SMS')
     }
   }
 
