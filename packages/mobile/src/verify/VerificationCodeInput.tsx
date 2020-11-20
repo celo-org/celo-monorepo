@@ -5,7 +5,7 @@ import { StyleProp, ViewStyle } from 'react-native'
 import CodeInput, { CodeInputStatus } from 'src/components/CodeInput'
 import { features } from 'src/flags'
 import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
-import { extractShortSecurityCodeMessage } from 'src/identity/utils'
+import { extractSecurityCodeWithPrefix } from 'src/identity/securityCode'
 import { AttestationCode } from 'src/identity/verification'
 import Logger from 'src/utils/Logger'
 
@@ -79,7 +79,7 @@ function getRecodedAttestationValue(attestationCode: AttestationCode) {
 function shouldShowClipboard(attestationCodes: AttestationCode[]) {
   return (value: string) => {
     const extractedCode = features.SHORT_VERIFICATION_CODES
-      ? extractShortSecurityCodeMessage(value)
+      ? extractSecurityCodeWithPrefix(value)
       : extractAttestationCodeFromMessage(value)
     return (
       !!extractedCode &&

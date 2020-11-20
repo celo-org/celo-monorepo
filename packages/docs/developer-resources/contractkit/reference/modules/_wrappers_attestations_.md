@@ -14,8 +14,8 @@
 ### Interfaces
 
 * [ActionableAttestation](../interfaces/_wrappers_attestations_.actionableattestation.md)
-* [AttesationServiceCodeForSecurityRequest](../interfaces/_wrappers_attestations_.attesationservicecodeforsecurityrequest.md)
 * [AttesationServiceRevealRequest](../interfaces/_wrappers_attestations_.attesationservicerevealrequest.md)
+* [AttestationServiceSecurityCodeRequest](../interfaces/_wrappers_attestations_.attestationservicesecuritycoderequest.md)
 * [AttestationServiceStatusResponse](../interfaces/_wrappers_attestations_.attestationservicestatusresponse.md)
 * [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md)
 * [AttestationStateForIssuer](../interfaces/_wrappers_attestations_.attestationstateforissuer.md)

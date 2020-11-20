@@ -477,7 +477,7 @@ ___
 
 ###  getAttestationForSecurityCode
 
-▸ **getAttestationForSecurityCode**(`serviceURL`: string, `body`: [AttesationServiceCodeForSecurityRequest](../interfaces/_wrappers_attestations_.attesationservicecodeforsecurityrequest.md)): *Promise‹Response›*
+▸ **getAttestationForSecurityCode**(`serviceURL`: string, `body`: [AttestationServiceSecurityCodeRequest](../interfaces/_wrappers_attestations_.attestationservicesecuritycoderequest.md)): *Promise‹Response›*
 
 *Defined in [packages/contractkit/src/wrappers/Attestations.ts:583](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L583)*
 
@@ -488,7 +488,7 @@ Returns attestation code for provided security code from validator's attestation
 Name | Type |
 ------ | ------ |
 `serviceURL` | string |
-`body` | [AttesationServiceCodeForSecurityRequest](../interfaces/_wrappers_attestations_.attesationservicecodeforsecurityrequest.md) |
+`body` | [AttestationServiceSecurityCodeRequest](../interfaces/_wrappers_attestations_.attestationservicesecuritycoderequest.md) |
 
 **Returns:** *Promise‹Response›*
 

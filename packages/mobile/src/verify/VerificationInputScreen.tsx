@@ -26,8 +26,8 @@ import {
   receiveAttestationMessage,
   resendAttestations,
 } from 'src/identity/actions'
+import { extractSecurityCodeWithPrefix } from 'src/identity/securityCode'
 import { VerificationStatus } from 'src/identity/types'
-import { extractShortSecurityCodeMessage } from 'src/identity/utils'
 import {
   AttestationCode,
   CodeInputType,
@@ -211,7 +211,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
       // TODO(Rossy) Add test this of typing codes gradually
       this.setState((state) => dotProp.set(state, `codeInputValues.${index}`, value))
       if (
-        (features.SHORT_VERIFICATION_CODES && extractShortSecurityCodeMessage(value)) ||
+        (features.SHORT_VERIFICATION_CODES && extractSecurityCodeWithPrefix(value)) ||
         extractAttestationCodeFromMessage(value)
       ) {
         this.setState((state) => dotProp.set(state, `codeSubmittingStatuses.${index}`, true))

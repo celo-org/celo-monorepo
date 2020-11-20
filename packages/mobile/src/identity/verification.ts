@@ -2,7 +2,6 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
-  AttesationServiceCodeForSecurityRequest,
   AttesationServiceRevealRequest,
   AttestationsWrapper,
   UnselectedRequest,
@@ -68,9 +67,13 @@ import {
   VerificationState,
   verificationStateSelector,
 } from 'src/identity/reducer'
+import {
+  extractSecurityCodeWithPrefix,
+  getAttestationCodeForSecurityCode,
+  getSecurityCodePrefix,
+} from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'
-import { extractShortSecurityCodeMessage, hashAddressToSingleDigit } from 'src/identity/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { clearPasswordCaches } from 'src/pincode/PasswordCache'
@@ -624,44 +627,27 @@ export function attestationCodeReceiver(
     }
 
     const allIssuers = attestations.map((a) => a.issuer)
-    let securityCode: string | null = null
-    let attestationCode
+    let securityCodeWithPrefix: string | null = null
+    let message = action.message
 
     try {
       if (features.SHORT_VERIFICATION_CODES) {
-        securityCode = extractShortSecurityCodeMessage(action.message)
-        if (securityCode) {
-          const lookupHash = parseInt(securityCode[0], 10)
-          const lookupAttestations = attestations.filter(
-            (attestation) => hashAddressToSingleDigit(attestation.issuer) === lookupHash
+        securityCodeWithPrefix = extractSecurityCodeWithPrefix(message)
+        if (securityCodeWithPrefix) {
+          message = yield call(
+            getAttestationCodeForSecurityCode,
+            attestationsWrapper,
+            phoneHashDetails,
+            account,
+            attestations,
+            securityCodeWithPrefix
           )
-
-          for (const attestation of lookupAttestations) {
-            // Try to recover the full attestation code from the matching issuer's attestation service
-            try {
-              const message = yield call(
-                getAttestationCodeFromSecurityCode,
-                attestationsWrapper,
-                account,
-                phoneHashDetails,
-                attestation,
-                securityCode.substr(1)
-              )
-              attestationCode = extractAttestationCodeFromMessage(message)
-              break
-            } catch (e) {
-              Logger.warn(
-                TAG + '@attestationCodeReceiver',
-                'Getting attestation code for security code error: ',
-                e
-              )
-              continue
-            }
-          }
+        } else {
+          Logger.error(TAG + '@attestationCodeReceiver', 'No security code in received message')
         }
-      } else {
-        attestationCode = extractAttestationCodeFromMessage(action.message)
       }
+
+      const attestationCode = extractAttestationCodeFromMessage(message)
 
       if (!attestationCode) {
         throw new Error('No code extracted from message')
@@ -725,10 +711,16 @@ export function attestationCodeReceiver(
 
       if (isFeelessVerification) {
         yield put(
-          feelessInputAttestationCode({ code: attestationCode, shortCode: securityCode, issuer })
+          feelessInputAttestationCode({
+            code: attestationCode,
+            shortCode: securityCodeWithPrefix,
+            issuer,
+          })
         )
       } else {
-        yield put(inputAttestationCode({ code: attestationCode, shortCode: securityCode, issuer }))
+        yield put(
+          inputAttestationCode({ code: attestationCode, shortCode: securityCodeWithPrefix, issuer })
+        )
       }
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
@@ -887,53 +879,6 @@ function* completeAttestation(
   yield put(completeAttestationCode(code))
 }
 
-function* getAttestationCodeFromSecurityCode(
-  attestationsWrapper: AttestationsWrapper,
-  account: string,
-  phoneHashDetails: PhoneNumberHashDetails,
-  attestation: ActionableAttestation,
-  securityCode: string
-) {
-  const issuer = attestation.issuer
-  Logger.debug(
-    TAG + '@getAttestationCodeFromSecurityCode',
-    `Revealing an attestation for issuer: ${issuer}`
-  )
-  if (shouldUseProxy()) {
-    throw new Error('Short codes can not be used with proxy enabled')
-  }
-  try {
-    const requestBody: AttesationServiceCodeForSecurityRequest = {
-      account,
-      issuer: attestation.issuer,
-      phoneNumber: phoneHashDetails.e164Number,
-      salt: phoneHashDetails.pepper,
-      securityCode,
-    }
-
-    const response = yield call(
-      attestationsWrapper.getAttestationForSecurityCode,
-      attestation.attestationServiceURL,
-      requestBody
-    )
-    const { ok, status } = response
-    const body = yield call(response.json.bind(response))
-
-    if (ok && body.attestationCode) {
-      return body.attestationCode
-    }
-
-    throw new Error(`Error submitting security code for ${issuer}. Status code: ${status}`)
-  } catch (error) {
-    Logger.error(
-      TAG + '@getAttestationCodeFromSecurityCode',
-      `get for issuer ${issuer} failed`,
-      error
-    )
-    return false
-  }
-}
-
 export function* tryRevealPhoneNumber(
   attestationsWrapper: AttestationsWrapper,
   account: string,
@@ -952,7 +897,7 @@ export function* tryRevealPhoneNumber(
     // This works around TLS issues
 
     const language = yield select(currentLanguageSelector)
-    const revealRequestBody: AttesationServiceRevealRequest = {
+    const revealRequest: AttesationServiceRevealRequest = {
       account,
       issuer,
       phoneNumber: phoneHashDetails.e164Number,
@@ -962,14 +907,14 @@ export function* tryRevealPhoneNumber(
     }
 
     if (features.SHORT_VERIFICATION_CODES) {
-      revealRequestBody.securityCodePrefix = `${hashAddressToSingleDigit(issuer)}`
+      revealRequest.securityCodePrefix = getSecurityCodePrefix(issuer)
     }
 
     const { ok, status, body } = yield call(
       postToAttestationService,
       attestationsWrapper,
       attestation.attestationServiceURL,
-      revealRequestBody
+      revealRequest
     )
 
     if (ok) {
@@ -992,7 +937,7 @@ export function* tryRevealPhoneNumber(
         postToAttestationService,
         attestationsWrapper,
         attestation.attestationServiceURL,
-        revealRequestBody
+        revealRequest
       )
 
       if (retryOk) {

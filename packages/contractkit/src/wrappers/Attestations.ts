@@ -70,7 +70,7 @@ export interface AttesationServiceRevealRequest {
   securityCodePrefix?: string
 }
 
-export interface AttesationServiceCodeForSecurityRequest {
+export interface AttestationServiceSecurityCodeRequest {
   account: Address
   phoneNumber: string
   issuer: string
@@ -578,9 +578,9 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Returns attestation code for provided security code from validator's attestation service
    * @param serviceURL: validator's attestation service URL
-   * @param body: onServiceCodeForSecurityRequest
+   * @param body: AttestationServiceCodeForSecurityRequest
    */
-  getAttestationForSecurityCode(serviceURL: string, body: AttesationServiceCodeForSecurityRequest) {
+  getAttestationForSecurityCode(serviceURL: string, body: AttestationServiceSecurityCodeRequest) {
     const urlParams = new URLSearchParams({ ...body })
     return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
