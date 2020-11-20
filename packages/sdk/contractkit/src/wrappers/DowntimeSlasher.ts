@@ -208,7 +208,7 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
     if (!endBlock) {
       endBlock = startBlock
         ? startBlock + length - 1
-        : (await this.kit.web3.eth.getBlockNumber()) - 2 // latest grandparent
+        : (await this.kit.connection.getBlockNumber()) - 2 // latest grandparent
     }
 
     return {

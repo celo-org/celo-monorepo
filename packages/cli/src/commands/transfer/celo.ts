@@ -2,6 +2,7 @@ import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
+import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class TransferCelo extends BaseCommand {
@@ -28,19 +29,19 @@ export default class TransferCelo extends BaseCommand {
     const value = new BigNumber(res.flags.value)
 
     this.kit.defaultAccount = from
-    const usdToken = await this.kit.contracts.getStableToken()
+    const celoToken = await this.kit.contracts.getGoldToken()
 
     await newCheckBuilder(this)
       .hasEnoughCelo(from, value)
       .runChecks()
 
-    await this.kit.connection
-      .sendTransaction({
-        from,
-        to,
-        value: value.toString(),
-        feeCurrency: usdToken.address,
-      })
-      .then((result) => result.waitReceipt())
+    if (res.flags.comment) {
+      await displaySendTx(
+        'transferWithComment',
+        celoToken.transferWithComment(to, value.toFixed(), res.flags.comment)
+      )
+    } else {
+      await displaySendTx('transfer', celoToken.transfer(to, value.toFixed()))
+    }
   }
 }

@@ -60,7 +60,6 @@ async function main() {
   // )
 
   // console.log(JSON.stringify(genEvents, null, 2))
-  // ;(kit.connection.web3.currentProvider as any).disconnect()
   kit.connection.stop()
 }
 

@@ -1043,10 +1043,10 @@ describe('governance tests', () => {
       await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
       const freezer = await kit._web3Contracts.getFreezer()
       await freezer.methods.freeze(epochRewards.options.address).send({ from: validator })
-      blockFrozen = await web3.eth.getBlockNumber()
+      blockFrozen = await kit.connection.getBlockNumber()
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       await waitForBlock(kit.connection.web3, blockFrozen + epoch * 2)
-      latestBlock = await web3.eth.getBlockNumber()
+      latestBlock = await kit.connection.getBlockNumber()
     })
 
     it('should not update the target voing yield', async () => {
