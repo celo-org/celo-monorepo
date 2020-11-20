@@ -153,7 +153,7 @@ export class CeloProvider implements Provider {
   }
 
   private async handleAccounts(_payload: JsonRpcPayload): Promise<any> {
-    return this.getAccounts()
+    return this.connection.getAccounts()
   }
 
   private async handleSignTypedData(payload: JsonRpcPayload): Promise<any> {

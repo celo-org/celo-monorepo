@@ -92,7 +92,11 @@ export class DefaultRpcCaller implements RpcCaller {
       error: Error | null,
       result?: JsonRpcResponse
     ): void => {
-      let err: Error | null = error
+      let err: Error | null = null
+      // error could be false
+      if (error) {
+        err = error
+      }
       debugRpcResponse('%O', result)
       // The provider send call will not provide an error to the callback if
       // the result itself specifies an error. Here, we extract the error in the
