@@ -9,8 +9,7 @@ export class CeloAdapter {
 
   constructor({ pk, nodeUrl }: { pk: string; nodeUrl: string }) {
     // To add more logging:
-    // Uncomment when in need for debug
-    // injectDebugProvider(this.kit.web3)
+    // Use the debug of the contractkit. Run it with DEBUG=* (or the options)
 
     this.kit = newKitFromWeb3(new Web3(nodeUrl))
     console.info(`New kit from url: ${nodeUrl}`)

@@ -73,7 +73,6 @@
   "@celo/faucet-app": {
     "location": "packages/faucet",
     "dependencies": [
-      "@celo/connect",
       "@celo/contractkit",
       "@celo/utils"
     ]
