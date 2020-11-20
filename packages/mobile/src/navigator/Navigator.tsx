@@ -103,7 +103,7 @@ import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
 
-type NavigationOptions = StackScreenProps<StackParamList>
+type NavigationOptions = StackScreenProps<StackParamList, keyof StackParamList>
 
 export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
   Platform.select({

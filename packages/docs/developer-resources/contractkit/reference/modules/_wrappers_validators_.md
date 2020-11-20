@@ -1,4 +1,4 @@
-# External module: "wrappers/Validators"
+# Module: "wrappers/Validators"
 
 ## Index
 
