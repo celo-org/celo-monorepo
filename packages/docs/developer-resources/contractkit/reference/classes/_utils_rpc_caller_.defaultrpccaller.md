@@ -16,8 +16,8 @@
 
 ### Properties
 
-* [defaultProvider](_utils_rpc_caller_.defaultrpccaller.md#defaultprovider)
-* [jsonrpcVersion](_utils_rpc_caller_.defaultrpccaller.md#jsonrpcversion)
+* [defaultProvider](_utils_rpc_caller_.defaultrpccaller.md#readonly-defaultprovider)
+* [jsonrpcVersion](_utils_rpc_caller_.defaultrpccaller.md#readonly-jsonrpcversion)
 
 ### Methods
 
@@ -43,7 +43,7 @@ Name | Type | Default |
 
 ## Properties
 
-###  defaultProvider
+### `Readonly` defaultProvider
 
 • **defaultProvider**: *provider*
 
@@ -51,7 +51,7 @@ Name | Type | Default |
 
 ___
 
-###  jsonrpcVersion
+### `Readonly` jsonrpcVersion
 
 • **jsonrpcVersion**: *string*
 
