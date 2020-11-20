@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native'
 import { MoneyAmount } from 'src/apollo/types'
+import { WALLET_BALANCE_UPPER_BOUND } from 'src/config'
 import { useExchangeRate as useGoldToDollarRate } from 'src/exchange/hooks'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -14,7 +15,6 @@ import {
   useLocalCurrencyCode,
 } from 'src/localCurrency/hooks'
 import { CurrencyInfo } from 'src/send/SendConfirmation'
-import { VALORA_BALANCE_UPPER_BOUND } from 'src/tokens/saga'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import {
   getCentAwareMoneyDisplay,
@@ -181,7 +181,7 @@ export default function CurrencyDisplay({
   const sign = value?.isNegative() ? '-' : showExplicitPositiveSign ? '+' : ''
   const formatAmount = getFormatFunction(formatType)
   const formattedValue =
-    value && displayCurrency && value.lt(VALORA_BALANCE_UPPER_BOUND)
+    value && displayCurrency && value.lt(WALLET_BALANCE_UPPER_BOUND)
       ? formatAmount(value.absoluteValue(), displayCurrency)
       : '-'
   const code = displayAmount?.currencyCode

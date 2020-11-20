@@ -7,6 +7,7 @@ import { AppEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { WALLET_BALANCE_UPPER_BOUND } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
@@ -17,10 +18,6 @@ import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
 const TAG = 'tokens/saga'
-
-// We can safely assume that any balance query returning a number
-// higher than this is incorrect (currently set to 10M)
-export const VALORA_BALANCE_UPPER_BOUND = new BigNumber('1e10')
 
 // The number of wei that represent one unit in a contract
 const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
@@ -77,18 +74,19 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
       const tokenContract = yield call(getTokenContract, token)
       const balanceInWei: BigNumber = yield call([tokenContract, tokenContract.balanceOf], account)
       const balance: BigNumber = yield call(convertFromContractDecimals, balanceInWei, token)
+      const balanceLogObject =
+        token === CURRENCY_ENUM.DOLLAR
+          ? {
+              dollarBalance: balance.toString(),
+            }
+          : { goldBalance: balance.toString() }
 
-      yield put(actionCreator(balance.toString()))
-      // Only log balances less than the upper bound
-      if (balance.lt(VALORA_BALANCE_UPPER_BOUND)) {
-        ValoraAnalytics.track(
-          AppEvents.fetch_balance,
-          token === CURRENCY_ENUM.DOLLAR
-            ? {
-                dollarBalance: balance.toString(),
-              }
-            : { goldBalance: balance.toString() }
-        )
+      // Only update balances when it's less than the upper bound
+      if (balance.lt(WALLET_BALANCE_UPPER_BOUND)) {
+        yield put(actionCreator(balance.toString()))
+        ValoraAnalytics.track(AppEvents.fetch_balance, balanceLogObject)
+      } else {
+        ValoraAnalytics.track(AppEvents.fetch_balance_error, balanceLogObject)
       }
     } catch (error) {
       Logger.error(tag, 'Error fetching balance', error)

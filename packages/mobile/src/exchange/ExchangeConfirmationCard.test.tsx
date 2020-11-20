@@ -24,19 +24,7 @@ it('renders correctly with no exchange rate', () => {
   expect(tree).toMatchSnapshot()
 })
 
-it('renders correctly with larger numbers', () => {
-  const tree = renderer.create(
-    <Provider store={store}>
-      <ExchangeConfirmationCard
-        makerAmount={{ value: '240000.00', currencyCode: 'cUSD', localAmount }}
-        takerAmount={{ value: '180000000', currencyCode: 'cGLD', localAmount }}
-      />
-    </Provider>
-  )
-  expect(tree).toMatchSnapshot()
-})
-
-it('renders correctly with numbers that are over the balance limit', () => {
+it('renders correctly with giant numbers', () => {
   const tree = renderer.create(
     <Provider store={store}>
       <ExchangeConfirmationCard
