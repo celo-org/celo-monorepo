@@ -8,7 +8,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {
   FreezerContract,
   FreezerInstance,
