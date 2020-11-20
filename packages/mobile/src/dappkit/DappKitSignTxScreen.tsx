@@ -100,6 +100,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
             size={BtnSizes.MEDIUM}
             text={t('allow')}
             onPress={this.linkBack}
+            testID="DappkitAllow"
           />
         </ScrollView>
       </SafeAreaView>
