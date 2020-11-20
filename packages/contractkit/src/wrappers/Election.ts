@@ -89,6 +89,17 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
+   * Gets a validator BLS public key from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return BLS public key of validator at the requested index.
+   */
+  validatorBLSPublicKeyFromSet: (
+    signerIndex: number,
+    blockNumber: number
+  ) => Promise<string> = proxyCall(this.contract.methods.validatorBLSPublicKeyFromSet)
+
+  /**
    * Gets a validator address from the validator set at the given block number.
    * @param index Index of requested validator in the validator set.
    * @param blockNumber Block number to retrieve the validator set from.
