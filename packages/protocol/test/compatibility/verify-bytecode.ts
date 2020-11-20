@@ -296,6 +296,7 @@ contract('', (accounts) => {
           TestContractUpgraded.link('LinkedLibrary1', library1.address)
           TestContractUpgraded.link('LinkedLibrary2', library2.address)
           testContract = await deployProxiedContract(TestContractUpgraded, accounts[0])
+          await registry.setAddressFor('TestContract', testContract.address)
         })
 
         it(`doesn't throw on matching contracts`, async () => {
@@ -346,21 +347,6 @@ contract('', (accounts) => {
 
           await assertThrowsAsync(
             verifyBytecodes(['TestContract'], buildArtifacts, registry, proposal, Proxy, web3)
-          )
-        })
-
-        it(`throws when there is no proposal`, async () => {
-          const proposal = []
-
-          await assertThrowsAsync(
-            verifyBytecodes(
-              ['TestContract'],
-              upgradedContractBuildArtifacts,
-              registry,
-              proposal,
-              Proxy,
-              web3
-            )
           )
         })
       })

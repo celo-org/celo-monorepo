@@ -5,7 +5,7 @@ import {
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import { parseMultiSigTransaction } from '@celo/protocol/lib/web3-utils'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { MultiSigContract, MultiSigInstance } from 'types'
 
 const MultiSig: MultiSigContract = artifacts.require('MultiSig')

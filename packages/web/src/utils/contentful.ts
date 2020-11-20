@@ -1,17 +1,17 @@
 import { Document } from '@contentful/rich-text-types'
-import { Asset, createClient, Entry } from 'contentful'
+import { Asset, createClient, Entry, EntryCollection } from 'contentful'
 import getConfig from 'next/config'
 import { Page as SideBarEntry } from 'src/experience/common/Sidebar'
 
-function intialize(preview: boolean) {
-  const { serverRuntimeConfig } = getConfig()
-
+function intialize() {
+  const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+  const isPreview = publicRuntimeConfig.ENV === 'development'
   return createClient({
     space: serverRuntimeConfig.CONTENTFUL_SPACE_ID,
-    accessToken: preview
+    accessToken: isPreview
       ? serverRuntimeConfig.CONTENTFUL_PREVIEW_ACCESS_TOKEN
       : serverRuntimeConfig.CONTENTFUL_ACCESS_TOKEN,
-    host: preview ? 'preview.contentful.com' : undefined,
+    host: isPreview ? 'preview.contentful.com' : undefined,
   })
 }
 
@@ -31,12 +31,8 @@ interface InternalKit {
   sidebar: SideBarEntry[]
 }
 
-export async function getKit(
-  kitSlug: string,
-  pageSlug: string,
-  { preview, locale }
-): Promise<InternalKit> {
-  const kit = await intialize(preview).getEntries<Kit>({
+export async function getKit(kitSlug: string, pageSlug: string, { locale }): Promise<InternalKit> {
+  const kit = await intialize().getEntries<Kit>({
     content_type: 'kit',
     'fields.slug': kitSlug,
     locale,
@@ -73,17 +69,30 @@ interface ContentFulPage {
   sections: Array<Entry<{ name: string; contentField: Document; slug: string }>>
 }
 
-export async function getPage(id: string, { preview, locale }) {
-  const pages = await intialize(preview).getEntries<ContentFulPage>({
+export async function getPageBySlug(slug: string, { locale }) {
+  const pages = await intialize().getEntries<ContentFulPage>({
+    content_type: 'page',
+    'fields.slug': slug,
+    include: 3,
+    locale,
+  })
+  return processPages(pages)
+}
+
+export async function getPageById(id: string, { locale }) {
+  const pages = await intialize().getEntries<ContentFulPage>({
     content_type: 'page',
     'sys.id': id,
     include: 3,
     locale,
   })
-  const data = pages.items[0].fields
+  return processPages(pages)
+}
 
+function processPages(pages: EntryCollection<ContentFulPage>) {
+  const data = pages.items[0].fields
   const sections = (data.sections || []).map((section) => section.fields)
-  return { ...data, sections }
+  return { ...data, sections, updatedAt: pages.items[0].sys.updatedAt }
 }
 
 export function addLocale(locale) {
@@ -104,8 +113,8 @@ interface FAQcollection {
   list: Array<Entry<FAQItem>>
 }
 
-export async function getFAQ({ preview = true, locale }) {
-  const result = await intialize(preview).getEntries<FAQcollection>({
+export async function getFAQ({ locale }) {
+  const result = await intialize().getEntries<FAQcollection>({
     locale,
     content_type: 'faq',
     include: 3,
