@@ -1,4 +1,4 @@
-# External module: "utils/tx-result"
+# Module: "utils/tx-result"
 
 ## Index
 

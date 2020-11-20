@@ -6,7 +6,7 @@ import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import { RouteProp } from '@react-navigation/native'
+import { NavigationProp, RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,7 +23,12 @@ import WithdrawCeloSummary from 'src/exchange/WithdrawCeloSummary'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import {
+  navigate,
+  navigateBack,
+  navigateToExchangeHome,
+  replace,
+} from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
@@ -76,17 +81,35 @@ function WithdrawCeloReviewScreen({ route }: Props) {
 }
 
 WithdrawCeloReviewScreen.navigationOptions = ({
+  navigation,
   route,
 }: {
+  navigation: NavigationProp<StackParamList, Screens.WithdrawCeloReviewScreen>
   route: RouteProp<StackParamList, Screens.WithdrawCeloReviewScreen>
 }) => {
+  const isCashOut = !!route.params?.isCashOut
   const onCancel = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_cancel)
-    navigate(route.params?.isCashOut ? Screens.FiatExchangeOptions : Screens.ExchangeHomeScreen)
+    if (isCashOut) {
+      navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
+    } else {
+      navigateToExchangeHome()
+    }
   }
   const onEdit = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_edit)
-    navigateBack()
+    const canGoBack = navigation
+      .dangerouslyGetState()
+      .routes.some((screen) => screen.name === Screens.WithdrawCeloScreen)
+    if (canGoBack) {
+      navigateBack()
+    } else {
+      replace(Screens.WithdrawCeloScreen, {
+        isCashOut,
+        amount: route.params?.amount,
+        recipientAddress: route.params?.recipientAddress,
+      })
+    }
   }
   return {
     ...emptyHeader,
