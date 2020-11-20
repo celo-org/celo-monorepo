@@ -1100,7 +1100,7 @@ contract('Governance', (accounts: string[]) => {
         const [proposalIds] = await governance.getQueue()
         assert.notInclude(
           proposalIds.map((x) => x.toNumber()),
-          proposalId
+          proposalId.toNumber()
         )
       })
 

@@ -82,6 +82,7 @@
     "twilio": "^3.23.2",
     "weak-map": "^1.0.5",
     "web3": "1.2.11",
+    "web3-core": "1.2.11",
     "web3-core-helpers": "1.2.11",
     "web3-provider-engine": "^15.0.0",
     "web3-utils": "1.2.11"
@@ -108,6 +109,7 @@
     "truffle-typings": "^1.0.6",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
-    "yargs": "^14.0.0"
+    "yargs": "^14.0.0",
+    "merkle-patricia-tree": "4.0.0"
   }
 }
