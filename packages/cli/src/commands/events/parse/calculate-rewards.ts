@@ -6,7 +6,7 @@ import { EventLog } from 'web3-core'
 import { BaseCommand } from '../../../base'
 import {
   AttestationIssuers,
-  calculateTimeWeightedAverage,
+  calculateRewards,
   initializeBalancesByBlock,
   mergeEvents,
   processAttestationCompletion,
@@ -57,6 +57,7 @@ export default class CalculateRewards extends BaseCommand {
       blockNumberToStartTracking: 0,
       blockNumberToFinishTracking: 3500000,
       startedBlockBalanceTracking: false,
+      rewardPercentage: 0.06,
     }
 
     const progressBar = cli.progress()
@@ -88,10 +89,11 @@ export default class CalculateRewards extends BaseCommand {
     writeFileSync(
       'rewardsBalances.json',
       JSON.stringify(
-        calculateTimeWeightedAverage(
+        calculateRewards(
           balancesByBlock,
           state.blockNumberToStartTracking,
-          state.blockNumberToFinishTracking
+          state.blockNumberToFinishTracking,
+          state.rewardPercentage
         ),
         null,
         2

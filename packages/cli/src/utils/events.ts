@@ -98,6 +98,7 @@ export interface RewardsCalculationState {
   startedBlockBalanceTracking: boolean
   blockNumberToStartTracking: number
   blockNumberToFinishTracking: number
+  rewardPercentage: number
 }
 
 export interface AttestationIssuers {
@@ -170,12 +171,12 @@ function updateBalanceByBlock(
   }
 }
 
-export async function accountBalancesTWA(
+export async function accountRewards(
   events: EventLog[],
   initialBalances: { [acct: string]: BigNumber },
   fromBlock: number,
   toBlock: number
-): Promise<{ [address: string]: BigNumber }> {
+): Promise<{ [address: string]: number }> {
   let balancesByBlock: { [address: string]: BalancesByBlock } = {}
   Object.keys(initialBalances).forEach((acct) => {
     balancesByBlock[acct] = {
@@ -205,7 +206,7 @@ export async function accountBalancesTWA(
       balancesByBlock[from].blocks.push(block)
     }
   })
-  return calculateTimeWeightedAverage(balancesByBlock, fromBlock, toBlock)
+  return calculateRewards(balancesByBlock, fromBlock, toBlock, 0.06)
 }
 
 function checkEventType(event: EventLog, eventType: string) {
@@ -227,12 +228,13 @@ function filterObject(
   }, obj)
 }
 
-export function calculateTimeWeightedAverage(
+export function calculateRewards(
   balancesTWA: { [address: string]: BalancesByBlock },
   fromBlock: number,
-  toBlock: number
-): { [address: string]: BigNumber } {
-  let averagedBalances: { [key: string]: BigNumber } = {}
+  toBlock: number,
+  rewardPercentage: number
+): { [address: string]: number } {
+  let rewards: { [key: string]: number } = {}
   Object.keys(balancesTWA).forEach((address) => {
     const balances = balancesTWA[address].balances
     const blocks = balancesTWA[address].blocks
@@ -243,7 +245,7 @@ export function calculateTimeWeightedAverage(
       return prevWeightedBalance.plus(weightedBalance)
     }, new BigNumber(0))
     const weightedAverage = weightedSum.dividedBy(new BigNumber(toBlock - fromBlock))
-    averagedBalances[address] = weightedAverage
+    rewards[address] = Math.floor(weightedAverage.toNumber() * rewardPercentage)
   })
-  return averagedBalances
+  return rewards
 }
