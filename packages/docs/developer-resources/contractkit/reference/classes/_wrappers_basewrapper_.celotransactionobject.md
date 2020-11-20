@@ -62,7 +62,7 @@ ___
 
 ###  send
 
-▸ **send**(`params?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
+▸ **send**(`params?`: Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)›): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:329](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L329)*
 
@@ -72,7 +72,7 @@ send the transaction to the chain
 
 Name | Type |
 ------ | ------ |
-`params?` | [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams) |
+`params?` | Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)› |
 
 **Returns:** *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
@@ -80,7 +80,7 @@ ___
 
 ###  sendAndWaitForReceipt
 
-▸ **sendAndWaitForReceipt**(`params?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *Promise‹TransactionReceipt›*
+▸ **sendAndWaitForReceipt**(`params?`: Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)›): *Promise‹TransactionReceipt›*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:334](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L334)*
 
@@ -90,6 +90,6 @@ send the transaction and waits for the receipt
 
 Name | Type |
 ------ | ------ |
-`params?` | [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams) |
+`params?` | Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)› |
 
 **Returns:** *Promise‹TransactionReceipt›*
