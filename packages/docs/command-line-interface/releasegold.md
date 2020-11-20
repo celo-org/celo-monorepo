@@ -13,6 +13,8 @@ USAGE
   $ celocli releasegold:authorize
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
+
   --blsKey=0x                                            The BLS public key that the validator is using for consensus,
                                                          should pass proof of possession. 96 bytes.
 
@@ -20,9 +22,6 @@ OPTIONS
                                                          signature on the account address. 48 bytes.
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -70,10 +69,8 @@ USAGE
   $ celocli releasegold:create-account
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -103,10 +100,8 @@ USAGE
 
 OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on contract's gold
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -141,10 +136,8 @@ USAGE
   $ celocli releasegold:refund-and-finalize
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -173,10 +166,8 @@ USAGE
   $ celocli releasegold:revoke
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -207,11 +198,8 @@ USAGE
   $ celocli releasegold:revoke-votes
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
-
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group to revoke votes from
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -244,12 +232,10 @@ USAGE
   $ celocli releasegold:set-account
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   -p, --property=name|dataEncryptionKey|metaURL          (required) Property type to set
   -v, --value=value                                      (required) Property value to set
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -282,10 +268,8 @@ USAGE
   $ celocli releasegold:set-account-wallet-address
 
 OPTIONS
+  -k, --privateKey=privateKey                                 Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)               Use a specific gas currency for transaction fees (defaults
-                                                              to 'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                           [default: 1] If --useLedger is set, this will get the
                                                               first N addresses for local signing
@@ -323,14 +307,12 @@ USAGE
   $ celocli releasegold:set-beneficiary
 
 OPTIONS
+  -k, --privateKey=privateKey                               Use a private key to sign local transactions with
   --beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the ReleaseGold Contract
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address to submit multisig transaction from (one
                                                             of the owners)
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)             Use a specific gas currency for transaction fees (defaults
-                                                            to 'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                         [default: 1] If --useLedger is set, this will get the first
                                                             N addresses for local signing
@@ -362,10 +344,8 @@ USAGE
   $ celocli releasegold:set-can-expire
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -398,10 +378,8 @@ USAGE
   $ celocli releasegold:set-liquidity-provision
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -432,13 +410,11 @@ USAGE
   $ celocli releasegold:set-max-distribution
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
                                                          indicating % of total balance available for distribution.
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -469,10 +445,8 @@ USAGE
   $ celocli releasegold:show
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -501,10 +475,8 @@ USAGE
   $ celocli releasegold:transfer-dollars
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
@@ -538,10 +510,8 @@ USAGE
   $ celocli releasegold:withdraw
 
 OPTIONS
+  -k, --privateKey=privateKey                            Use a private key to sign local transactions with
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
-
-  --gasCurrency=(celo|CELO|cusd|cUSD|auto|Auto)          Use a specific gas currency for transaction fees (defaults to
-                                                         'auto' which uses whatever feeCurrency is available)
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing

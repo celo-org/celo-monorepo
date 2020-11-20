@@ -55,7 +55,8 @@ let coverageProvider = null
 const fornoUrls = {
   alfajores: 'https://alfajores-forno.celo-testnet.org',
   baklava: 'https://baklava-forno.celo-testnet.org',
-  rc1: 'https://rc1-forno.celo-testnet.org',
+  rc1: 'https://forno.celo.org',
+  mainnet: 'https://forno.celo.org',
 }
 
 const networks = {
@@ -177,6 +178,9 @@ const networks = {
     network_id: BAKLAVASTAGING_NETWORKID,
   },
 }
+// Equivalent
+networks.mainnet = networks.rc1
+
 // If an override was provided, apply it.
 // If the network is missing from networks, start with the default config.
 if (argv.truffle_override || !(argv.network in networks)) {

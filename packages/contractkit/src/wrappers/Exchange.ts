@@ -7,7 +7,9 @@ import {
   identity,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   tupleParser,
+  unixSecondsTimestampToDateString,
   valueToBigNumber,
   valueToFrac,
   valueToString,
@@ -60,6 +62,64 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   lastBucketUpdate = proxyCall(this.contract.methods.lastBucketUpdate, undefined, valueToBigNumber)
 
   /**
+   * DEPRECATED: use function sell
+   * Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param sellAmount The amount of sellToken the user is selling to the exchange
+   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
+   * transaction to succeed
+   * @param sellGold `true` if gold is the sell token
+   * @return The amount of buyToken that was transfered
+   */
+  exchange: (
+    sellAmount: BigNumber.Value,
+    minBuyAmount: BigNumber.Value,
+    sellGold: boolean
+  ) => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.exchange,
+    tupleParser(valueToString, valueToString, identity)
+  )
+
+  /**
+   * Sells sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param sellAmount The amount of sellToken the user is selling to the exchange
+   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
+   * transaction to succeed
+   * @param sellGold `true` if gold is the sell token
+   * @return The amount of buyToken that was transfered
+   */
+  sell: (
+    sellAmount: BigNumber.Value,
+    minBuyAmount: BigNumber.Value,
+    sellGold: boolean
+  ) => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.sell,
+    tupleParser(valueToString, valueToString, identity)
+  )
+
+  /**
+   * Sells sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
+   * Requires the sellAmount to have been approved to the exchange
+   * @param buyAmount The amount of sellToken the user is selling to the exchange
+   * @param maxSellAmount The maximum amount of sellToken the user will sell for this
+   * transaction to succeed
+   * @param buyGold `true` if gold is the buy token
+   * @return The amount of buyToken that was transfered
+   */
+  buy: (
+    buyAmount: BigNumber.Value,
+    maxSellAmount: BigNumber.Value,
+    buyGold: boolean
+  ) => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.buy,
+    tupleParser(valueToString, valueToString, identity)
+  )
+
+  /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param sellGold `true` if gold is the sell token
@@ -104,43 +164,44 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   )
 
   /**
-   * Exchanges sellAmount of sellToken in exchange for at least minBuyAmount of buyToken
-   * Requires the sellAmount to have been approved to the exchange
-   * @param sellAmount The amount of sellToken the user is selling to the exchange
-   * @param minBuyAmount The minimum amount of buyToken the user has to receive for this
-   * transaction to succeed
-   * @param sellGold `true` if gold is the sell token
-   * @return The amount of buyToken that was transfered
-   */
-  exchange: (
-    sellAmount: BigNumber.Value,
-    minBuyAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
-    this.contract.methods.exchange,
-    tupleParser(valueToString, valueToString, identity)
-  )
-
-  /**
-   * Exchanges amount of CELO in exchange for at least minUsdAmount of cUsd
+   * Sell amount of CELO in exchange for at least minUsdAmount of cUsd
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of CELO the user is selling to the exchange
    * @param minUsdAmount The minimum amount of cUsd the user has to receive for this
    * transaction to succeed
    */
   sellGold = (amount: BigNumber.Value, minUSDAmount: BigNumber.Value) =>
-    this.exchange(amount, minUSDAmount, true)
+    this.sell(amount, minUSDAmount, true)
 
   /**
-   * Exchanges amount of cUsd in exchange for at least minGoldAmount of CELO
+   * Sell amount of cUsd in exchange for at least minGoldAmount of CELO
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of cUsd the user is selling to the exchange
    * @param minGoldAmount The minimum amount of CELO the user has to receive for this
    * transaction to succeed
    */
   sellDollar = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
-    this.exchange(amount, minGoldAmount, false)
+    this.sell(amount, minGoldAmount, false)
+
+  /**
+   * Buy amount of CELO in exchange for at most maxUsdAmount of cUsd
+   * Requires the amount to have been approved to the exchange
+   * @param amount The amount of CELO the user is buying from the exchange
+   * @param maxUsdAmount The maximum amount of cUsd the user will pay for this
+   * transaction to succeed
+   */
+  buyGold = (amount: BigNumber.Value, maxUSDAmount: BigNumber.Value) =>
+    this.buy(amount, maxUSDAmount, true)
+
+  /**
+   * Buy amount of cUsd in exchange for at least minGoldAmount of CELO
+   * Requires the amount to have been approved to the exchange
+   * @param amount The amount of cUsd the user is selling to the exchange
+   * @param maxGoldAmount The maximum amount of CELO the user will pay for this
+   * transaction to succeed
+   */
+  buyDollar = (amount: BigNumber.Value, maxGoldAmount: BigNumber.Value) =>
+    this.buy(amount, maxGoldAmount, false)
 
   /**
    * Returns the amount of CELO a user would get for sellAmount of cUsd
@@ -192,6 +253,20 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       lastBucketUpdate: res[4],
     }
   }
+
+  /**
+   * @dev Returns human readable configuration of the exchange contract
+   * @return ExchangeConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      updateFrequency: secondsToDurationString(config.updateFrequency),
+      lastBucketUpdate: unixSecondsTimestampToDateString(config.lastBucketUpdate),
+    }
+  }
+
   /**
    * Returns the exchange rate estimated at buyAmount.
    * @param buyAmount The amount of buyToken in wei to estimate the exchange rate at

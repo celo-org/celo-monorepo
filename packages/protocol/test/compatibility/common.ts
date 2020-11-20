@@ -1,7 +1,7 @@
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 import { execSync } from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
+import fs from 'fs'
+import path from 'path'
 
 // Measured in millis
 const recompileThresholdTime = 1000 * 60 * 60 * 24 // One day

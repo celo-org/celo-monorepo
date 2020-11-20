@@ -17,5 +17,16 @@
   "inviteFriendsToCelo": "Invite Friends to {{appName}}",
   "inviteAnyone": "Send easily to your friends by adding your contacts",
   "inviteReceived": "Invite Received",
-  "escrowPaymentNotificationTitle": "Invited {{mobile}}"
+  "escrowPaymentNotificationTitle": "Invited {{mobile}}",
+  "inviteDialog": {
+    "title": "Invite a Friend",
+    "body": "Connect and share value with your friends and family on Valora.",
+    "button": "Invite"
+  },
+  "sendAndInvite": "Send & Invite",
+  "inviteAndSendDialog": {
+    "title": "Invite and Send",
+    "body": "Your payment to {{name}} will be waiting for them once they verify their phone number. Share an invitation message with them to join {{appName}} and redeem your payment!",
+    "button": "Invite"
+  }
 }

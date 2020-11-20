@@ -23,12 +23,11 @@ const mockValidSpanishPhrase =
   'tajo fiera asunto tono aroma palma toro caos lobo espada número rato hacha largo pedir cemento urbe tejado volcán mimo grueso juvenil pueblo desvío'
 
 describe('Import wallet saga', () => {
-  const expectSuccessfulSagaWithPhrase = async (phrase: string, language: string) => {
+  const expectSuccessfulSagaWithPhrase = async (phrase: string) => {
     // @ts-ignore
     await expectSaga(importBackupPhraseSaga, { phrase, useEmptyWallet: false })
       .provide([
         [call(waitWeb3LastBlock), true],
-        [select(currentLanguageSelector), language],
         [matchers.call.fn(fetchTokenBalanceInWeiWithRetry), new BigNumber(10)],
         [matchers.call.fn(assignAccountFromPrivateKey), mockAccount],
         [call(storeMnemonic, phrase, mockAccount), true],
@@ -41,11 +40,11 @@ describe('Import wallet saga', () => {
   }
 
   it('imports a valid phrase', async () => {
-    await expectSuccessfulSagaWithPhrase(mockPhraseValid, 'english')
+    await expectSuccessfulSagaWithPhrase(mockPhraseValid)
   })
 
   it('imports a valid spanish phrase', async () => {
-    await expectSuccessfulSagaWithPhrase(mockValidSpanishPhrase, 'español')
+    await expectSuccessfulSagaWithPhrase(mockValidSpanishPhrase)
   })
 
   const expectFailedSagaWithPhrase = async (phrase: string) => {
@@ -62,10 +61,6 @@ describe('Import wallet saga', () => {
 
   it('fails for an invalid phrase', async () => {
     await expectFailedSagaWithPhrase(mockPhraseInvalid)
-  })
-
-  it('fails for a phrase in another language', async () => {
-    await expectFailedSagaWithPhrase(mockValidSpanishPhrase)
   })
 
   it('prevents import of an empty phrase', async () => {
