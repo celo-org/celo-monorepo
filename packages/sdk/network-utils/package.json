@@ -1,7 +1,7 @@
 {
   "name": "@celo/network-utils",
   "version": "0.0.1-dev",
-  "description": "Celo's network utils",
+  "description": "Utilities for fetching static information about the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "author": "Celo",
