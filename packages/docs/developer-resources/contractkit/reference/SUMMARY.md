@@ -1,5 +1,5 @@
 * [Globals](globals.md)
-* [External Modules]()
+* [Modules]()
   * [address-registry](modules/_address_registry_.md)
   * [AddressRegistry](classes/_address_registry_.addressregistry.md)
   * [base](modules/_base_.md)
