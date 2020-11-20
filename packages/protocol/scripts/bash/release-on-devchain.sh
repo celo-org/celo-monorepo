@@ -45,6 +45,7 @@ startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.g
 git checkout -
 yarn build >> $LOG_FILE
 
+GANACHE_PID=
 if command -v lsof; then
     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
     echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
