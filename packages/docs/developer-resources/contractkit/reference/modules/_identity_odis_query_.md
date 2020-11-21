@@ -1,4 +1,4 @@
-# External module: "identity/odis/query"
+# Module: "identity/odis/query"
 
 ## Index
 
