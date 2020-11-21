@@ -41,7 +41,6 @@ import LocalProviderCashOut, {
   localProviderCashOutOptions,
 } from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
-import Simplex, { simplexOptions } from 'src/fiatExchanges/Simplex'
 import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -104,7 +103,7 @@ import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
 
-type NavigationOptions = StackScreenProps<StackParamList>
+type NavigationOptions = StackScreenProps<StackParamList, keyof StackParamList>
 
 export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
   Platform.select({
@@ -429,7 +428,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={LocalProviderCashOut}
     />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
-    <Navigator.Screen options={simplexOptions} name={Screens.Simplex} component={Simplex} />
   </>
 )
 

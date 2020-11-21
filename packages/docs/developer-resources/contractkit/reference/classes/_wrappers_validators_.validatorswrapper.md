@@ -142,7 +142,7 @@ ___
 
 ###  eventTypes
 
-• **eventTypes**: *object* = Object.keys(this.events).reduce<EventsEnum<T>>(
+• **eventTypes**: *EventsEnum‹T›* = Object.keys(this.events).reduce<EventsEnum<T>>(
     (acc, key) => ({ ...acc, [key]: key }),
     {} as any
   )
@@ -150,8 +150,6 @@ ___
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L42)*
-
-#### Type declaration:
 
 ___
 
@@ -462,7 +460,7 @@ ___
 
 ###  methodIds
 
-• **methodIds**: *object* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
+• **methodIds**: *Record‹keyof T["methods"], string›* = Object.keys(this.contract.methods).reduce<Record<Methods<T>, string>>(
     (acc, method: Methods<T>) => {
       const methodABI = this.contract.options.jsonInterface.find((item) => item.name === method)
 
@@ -477,8 +475,6 @@ ___
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
 *Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L47)*
-
-#### Type declaration:
 
 ___
 
@@ -725,7 +721,7 @@ ___
 
 ▸ **findValidatorMembershipHistoryIndex**(`epoch`: number, `history`: [GroupMembership](../interfaces/_wrappers_validators_.groupmembership.md)[]): *number*
 
-*Defined in [packages/contractkit/src/wrappers/Validators.ts:644](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L644)*
+*Defined in [packages/contractkit/src/wrappers/Validators.ts:643](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L643)*
 
 Returns the index into `history` for `epoch`.
 
@@ -923,17 +919,17 @@ ___
 
 ###  getValidatorMembershipHistoryIndex
 
-▸ **getValidatorMembershipHistoryIndex**(`validator`: [Validator](../interfaces/_wrappers_validators_.validator.md), `blockNumber?`: undefined | number): *Promise‹object›*
+▸ **getValidatorMembershipHistoryIndex**(`account`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹object›*
 
 *Defined in [packages/contractkit/src/wrappers/Validators.ts:624](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L624)*
 
-Returns the group membership for `validator`.
+Returns the group membership for validator account.
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`validator` | [Validator](../interfaces/_wrappers_validators_.validator.md) | Address of validator to retrieve group membership for. |
+`account` | [Address](../modules/_base_.md#address) | Address of validator account to retrieve group membership for. |
 `blockNumber?` | undefined &#124; number | Block number to retrieve group membership at. |
 
 **Returns:** *Promise‹object›*

@@ -48,7 +48,7 @@
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#e933297",
-    "@celo/utils": "0.1.23-dev",
+    "@celo/utils": "0.1.22",
     "@openzeppelin/upgrades": "^2.8.0",
     "apollo-client": "^2.4.13",
     "bip39": "^3.0.2",
@@ -80,10 +80,11 @@
     "truffle-security": "^1.7.1",
     "twilio": "^3.23.2",
     "weak-map": "^1.0.5",
-    "web3": "1.2.4",
-    "web3-core-helpers": "1.2.4",
+    "web3": "1.2.6",
+    "web3-core": "1.2.6",
+    "web3-core-helpers": "1.2.6",
     "web3-provider-engine": "^15.0.0",
-    "web3-utils": "1.2.4"
+    "web3-utils": "1.2.6"
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
@@ -107,6 +108,7 @@
     "truffle-typings": "^1.0.6",
     "typechain": "1.0.5",
     "typechain-target-truffle": "1.0.2",
-    "yargs": "^14.0.0"
+    "yargs": "^14.0.0",
+    "merkle-patricia-tree": "4.0.0"
   }
 }

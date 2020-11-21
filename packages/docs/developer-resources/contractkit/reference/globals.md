@@ -2,7 +2,7 @@
 
 ## Index
 
-### External modules
+### Modules
 
 * ["address-registry"](modules/_address_registry_.md)
 * ["base"](modules/_base_.md)
@@ -73,6 +73,7 @@
 * ["web3-contract-cache"](modules/_web3_contract_cache_.md)
 * ["wrappers/Accounts"](modules/_wrappers_accounts_.md)
 * ["wrappers/Attestations"](modules/_wrappers_attestations_.md)
+* ["wrappers/BaseSlasher"](modules/_wrappers_baseslasher_.md)
 * ["wrappers/BaseWrapper"](modules/_wrappers_basewrapper_.md)
 * ["wrappers/BlockchainParameters"](modules/_wrappers_blockchainparameters_.md)
 * ["wrappers/DoubleSigningSlasher"](modules/_wrappers_doublesigningslasher_.md)

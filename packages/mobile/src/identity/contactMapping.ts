@@ -1,9 +1,7 @@
+import { Address } from '@celo/base'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
-import {
-  AttestationsWrapper,
-  IdentifierLookupResult,
-} from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationStat, AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { isValidAddress, normalizeAddress, normalizeAddressWith0x } from '@celo/utils/src/address'
 import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import BigNumber from 'bignumber.js'
@@ -224,8 +222,8 @@ export function* fetchAddressesAndValidateSaga({
 function* getAccountAddresses(e164Number: string) {
   const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
   const phoneHash = phoneHashDetails.phoneHash
-  const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
-  return getAddressesFromLookupResult(lookupResult, phoneHash) || []
+  const accountAddresses: Address[] = yield call(lookupAccountAddressesForIdentifier, phoneHash)
+  return yield call(filterNonVerifiedAddresses, accountAddresses, phoneHash)
 }
 
 function* fetchWalletAddresses(e164Number: string) {
@@ -235,12 +233,12 @@ function* fetchWalletAddresses(e164Number: string) {
     contractKit.contracts.getAccounts,
   ])
 
-  const accountAddresses: string[] = yield call(getAccountAddresses, e164Number)
-  const walletAddresses: string[] = yield all(
+  const accountAddresses: Address[] = yield call(getAccountAddresses, e164Number)
+  const walletAddresses: Address[] = yield all(
     accountAddresses.map((accountAddress) => call(accountsWrapper.getWalletAddress, accountAddress))
   )
 
-  const possibleUserAddresses: string[] = []
+  const possibleUserAddresses: Set<string> = new Set()
   const walletToAccountAddress: WalletToAccountAddressType = {}
   for (const [i, address] of walletAddresses.entries()) {
     const accountAddress = normalizeAddressWith0x(accountAddresses[i])
@@ -250,47 +248,54 @@ function* fetchWalletAddresses(e164Number: string) {
     // once I've built from the monorepo
     if (!new BigNumber(normalizeAddress(walletAddress)).isZero()) {
       walletToAccountAddress[walletAddress] = accountAddress
-      possibleUserAddresses.push(walletAddress)
+      possibleUserAddresses.add(walletAddress)
     } else {
       // NOTE: Only need this else block if we are not confident all wallets are registered
       walletToAccountAddress[accountAddress] = accountAddress
-      possibleUserAddresses.push(accountAddress)
+      possibleUserAddresses.add(accountAddress)
     }
   }
   yield put(updateWalletToAccountAddress(walletToAccountAddress))
-  return possibleUserAddresses
+  return Array.from(possibleUserAddresses)
 }
 
-// Returns IdentifierLookupResult
-// which is Map of identifier -> (Map of address -> AttestationStat)
-export function* lookupAttestationIdentifiers(ids: string[]) {
+// Returns a list of account addresses for the identifier received.
+export function* lookupAccountAddressesForIdentifier(id: string) {
   const contractKit = yield call(getContractKit)
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
     contractKit.contracts.getAttestations,
   ])
 
-  return yield call([attestationsWrapper, attestationsWrapper.lookupIdentifiers], ids)
+  return yield call([attestationsWrapper, attestationsWrapper.lookupAccountsForIdentifier], id)
 }
 
 // Deconstruct the lookup result and return
 // any addresess that are considered verified
-export function getAddressesFromLookupResult(
-  lookupResult: IdentifierLookupResult,
-  phoneHash: string
-) {
-  if (!lookupResult || !lookupResult[phoneHash]) {
-    return null
+export function* filterNonVerifiedAddresses(accountAddresses: Address[], phoneHash: string) {
+  if (!accountAddresses) {
+    return []
   }
 
-  const addressToStats = lookupResult[phoneHash]!
-  const verifiedAddresses: string[] = []
-  for (const address of Object.keys(addressToStats)) {
+  const contractKit = yield call(getContractKit)
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  const verifiedAccountAddresses: Address[] = []
+  for (const address of accountAddresses) {
     if (!isValidNon0Address(address)) {
       continue
     }
+    // Get stats for the address
+    const stats: AttestationStat = yield call(
+      [attestationsWrapper, attestationsWrapper.getAttestationStat],
+      phoneHash,
+      address
+    )
     // Check if result for given hash is considered 'verified'
-    const { isVerified } = isAccountConsideredVerified(addressToStats[address])
+    const { isVerified } = isAccountConsideredVerified(stats)
     if (!isVerified) {
       Logger.debug(
         TAG + 'getAddressesFromLookupResult',
@@ -298,10 +303,10 @@ export function getAddressesFromLookupResult(
       )
       continue
     }
-    verifiedAddresses.push(address.toLowerCase())
+    verifiedAccountAddresses.push(address.toLowerCase())
   }
 
-  return verifiedAddresses.length ? verifiedAddresses : null
+  return verifiedAccountAddresses
 }
 
 const isValidNon0Address = (address: string) =>
