@@ -16,7 +16,7 @@ variable replicas {
   type        = map(number)
 
   default = {
-    validator           = 0 # Each validator will create a dedicated proxy that is exposed to the Internet
+    validator           = 1 # Each validator will create a dedicated proxy that is exposed to the Internet
     txnode              = 1 
     backup_node         = 1 
     attestation_service = 1 # Attestation service requires >= 1 txnode
@@ -28,8 +28,8 @@ variable instance_types {
   type        = map(string)
 
   default = {
-    validator           = "n1-standard-1"   #use n1-standard-2 or better for production
-    proxy               = "n1-standard-1"   #use n1-standard-2 or better for production
+    validator           = "n1-standard-2"   #use n1-standard-2 or better for production
+    proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
     backup_node         = "n1-standard-1"
     attestation_service = "n1-standard-1"

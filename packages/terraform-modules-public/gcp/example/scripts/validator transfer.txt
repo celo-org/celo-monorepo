@@ -5,12 +5,12 @@ test small
 celocli transfer:gold 
 
 USAGE
-  $ celocli transfer:gold --from 0xD4A6dd7e815175fd5232dC32CF1c0dD926D81255 --to $CELO_VALIDATOR_GROUP_RG_ADDRESS --value=1e18 --useLedger --ledgerCustomAddresses=[0]
+  $ celocli transfer:gold --from $FROM_GROUP_ADDR --to $CELO_VALIDATOR_GROUP_RG_ADDRESS --value=1e18 --useLedger --ledgerCustomAddresses=[0]
 
-celocli transfer:gold --from 0xD4A6dd7e815175fd5232dC32CF1c0dD926D81255 --to $CELO_VALIDATOR_GROUP_RG_ADDRESS --value=9999e18 --useLedger --ledgerCustomAddresses=[0]
+celocli transfer:gold --from $TO_GROUP_ADDR --to $CELO_VALIDATOR_GROUP_RG_ADDRESS --value=9999e18 --useLedger --ledgerCustomAddresses=[0]
 
 
-export CELO_VALIDATOR_GROUP_RG_ADDRESS='0x8eB004daD9397B8f23E1279905c584920000756D'
+export CELO_VALIDATOR_GROUP_RG_ADDRESS='FIXME'
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
