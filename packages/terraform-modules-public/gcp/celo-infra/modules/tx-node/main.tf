@@ -40,12 +40,12 @@ resource "google_compute_instance" "tx_node" {
 
   boot_disk {
     initialize_params {
-      #image = "debian-cloud/debian-9"
       image = "debian-cloud/debian-10"
+      size = 12
     }
   }
 
-  #375G local SSD is overkill for the txnode.  TODO: add a persistent disk large enough for full chain
+  #375G local SSD is overkill for the txnode.
   #scratch_disk {
   #  interface = "SCSI"
   #}
@@ -68,7 +68,6 @@ resource "google_compute_instance" "tx_node" {
       attached_disk_name : local.attached_disk_name,
       block_time : var.block_time,
       ethstats_host : var.ethstats_host,
-      genesis_content_base64 : var.genesis_content_base64,
       geth_exporter_docker_image_repository : var.geth_exporter_docker_image_repository,
       geth_exporter_docker_image_tag : var.geth_exporter_docker_image_tag,
       geth_node_docker_image_repository : var.geth_node_docker_image_repository,
@@ -79,7 +78,6 @@ resource "google_compute_instance" "tx_node" {
       max_peers : var.txnode_max_peers,
       network_id : var.network_id,
       gcloud_project : var.gcloud_project,
-      bootnodes_base64 : var.bootnodes_base64,
       reset_geth_data : var.reset_geth_data,
       rid : count.index,
       attestation_signer_address : var.attestation_signer_addresses[count.index],

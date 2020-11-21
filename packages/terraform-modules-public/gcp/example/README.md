@@ -55,6 +55,8 @@
     source gcloud.env
     ```
 
+    ** If storing terraform (tfstate) on GCS, now is a good time to browse to that bucket and remove permissions to the tfstate bucket for 'viewers' and 'editors' of the proejct.  This will prevent an attacker who gets code execution on the proxy or validator or txnode or attestation service node from pulling the tfstate from gcs, which is important because the tfstate contains sensitive data such as signing keys ** 
+
 
 6. Update terraform.tfvars with the following critical and environment sensitive values:
 

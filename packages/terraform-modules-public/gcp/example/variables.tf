@@ -16,9 +16,10 @@ variable replicas {
   type        = map(number)
 
   default = {
-    validator           = 1 # Also used for proxy
-    txnode              = 1
-    attestation_service = 1
+    validator           = 0 # Each validator will create a dedicated proxy that is exposed to the Internet
+    txnode              = 1 
+    backup_node         = 1 
+    attestation_service = 1 # Attestation service requires >= 1 txnode
   }
 }
 
@@ -27,9 +28,10 @@ variable instance_types {
   type        = map(string)
 
   default = {
-    validator           = "n1-standard-2"   #use n1-standard-2 or better for production
-    proxy               = "n1-standard-2"   #use n1-standard-2 or better for production
+    validator           = "n1-standard-1"   #use n1-standard-2 or better for production
+    proxy               = "n1-standard-1"   #use n1-standard-2 or better for production
     txnode              = "n1-standard-1"
+    backup_node         = "n1-standard-1"
     attestation_service = "n1-standard-1"
   }
 }
@@ -45,7 +47,7 @@ variable celo_env {
   description = "The celo network to connect with"
   type        = string
 
-  default = "rc1"
+  default = "mainnet"
 }
 
 variable network_id {
@@ -66,7 +68,7 @@ variable geth_node_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-org/geth"
-    tag        = "1.1.0"
+    tag        = "1.1.1"
   }
 }
 
@@ -169,7 +171,7 @@ variable attestation_service_docker_image {
 
   default = {
     repository = "us.gcr.io/celo-testnet/celo-monorepo"
-    tag        = "attestation-service-1-0-3"
+    tag        = "attestation-service-1-1-0"
   }
 }
 

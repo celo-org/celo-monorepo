@@ -323,7 +323,7 @@ cat <<'EOF' > '/etc/docker/daemon.json'
   "log-opts": {
     "max-size": "10m",
     "max-file": "3",
-    "mode": "non-blocking" 
+    "mode": "non-blocking"  
   }
 }
 EOF
@@ -335,9 +335,19 @@ systemctl restart docker
 
 echo "Configuring Geth" | logger
 
-DATA_DIR=/root/.celo
-
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
+
+ACCOUNT_ADDRESS=${validator_account_address}
+echo "Address: $ACCOUNT_ADDRESS"
+
+echo "Proxy enode address: ${proxy_enode}"
+echo "Proxy internal ip address: ${proxy_internal_ip}"
+echo "Proxy external ip address: ${proxy_external_ip}"
+PROXY_INTERNAL_ENODE="enode://${proxy_enode}@${proxy_internal_ip}:30503"
+PROXY_EXTERNAL_ENODE="enode://${proxy_enode}@${proxy_external_ip}:30303"
+
+PROXY_URL="$PROXY_INTERNAL_ENODE;$PROXY_EXTERNAL_ENODE"
+echo "Proxy URL: $PROXY_URL"
 
 echo "Pulling geth..." | logger
 docker pull $GETH_NODE_DOCKER_IMAGE
@@ -346,15 +356,15 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
 # Load configuration to files
-mkdir -p $DATA_DIR/account
-# note that since v1.1.0, genesis block and bootnodes are derived dynamically based on --baklava flag being passed to geth
-# leaving the genesis and bootnodes commands below as comments until the questions around how to best handle these for testnets are resolved
-#echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-#echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
-echo -n '${proxy_private_key}' > $DATA_DIR/pkey
-echo -h '${proxy_geth_account_secret}' > $DATA_DIR/account/accountSecret
+echo -n '${validator_private_key}' > $DATA_DIR/pkey
+echo -n '${validator_account_address}' > $DATA_DIR/address
+echo -n '${proxy_enode}' > $DATA_DIR/proxyEnodeAddress
+echo -n '$PROXY_URL' > $DATA_DIR/proxyURL
+echo -n '${validator_geth_account_secret}' > $DATA_DIR/account/accountSecret
+echo -n $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode
+echo -n $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode
 
 echo "Starting geth..." | logger
 # We need to override the entrypoint in the geth image (which is originally `geth`).
@@ -385,11 +395,12 @@ ExecStart=/usr/bin/docker run \\
   --entrypoint /bin/sh \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
-      --etherbase ${proxy_address} \\
-      --unlock ${proxy_address} \\
-      --password $DATA_DIR/account/accountSecret \\
+      --etherbase=$ACCOUNT_ADDRESS \\
+      --password=$DATA_DIR/account/accountSecret \\
+      --unlock=$ACCOUNT_ADDRESS \\
       --allow-insecure-unlock \\
       --nousb \\
+      --mine \\
       --rpc \\
       --rpcaddr 0.0.0.0 \\
       --rpcapi=eth,net,web3 \\
@@ -399,13 +410,12 @@ ExecStart=/usr/bin/docker run \\
       --wsaddr 0.0.0.0 \\
       --wsorigins=* \\
       --wsapi=eth,net,web3 \\
-      --nodekey=$DATA_DIR/pkey \\
       --networkid=${network_id} \\
       --syncmode=full \\
       --consoleformat=json \\
       --consoleoutput=stdout \\
       --verbosity=${geth_verbosity} \\
-      --ethstats=${proxy_name}@${ethstats_host} \\
+      --ethstats=${validator_name}@${ethstats_host} \\
       --istanbul.blockperiod=${block_time} \\
       --istanbul.requesttimeout=${istanbul_request_timeout_ms} \\
       --maxpeers=${max_peers} \\
@@ -413,9 +423,10 @@ ExecStart=/usr/bin/docker run \\
       --metrics \\
       --pprof \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
-      --proxy.proxy \\
-      --proxy.proxiedvalidatoraddress ${validator_account_address} \\
-      --proxy.internalendpoint :30503 \\
+      --nodiscover \\
+      --proxy.proxied \\
+      --proxy.proxyenodeurlpair=\\"$PROXY_URL\\" \\
+      --light.serve 0 \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
 

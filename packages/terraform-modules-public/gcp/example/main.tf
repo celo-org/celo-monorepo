@@ -55,7 +55,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 module "celo_cluster" {
-  source             = "../testnet"
+  source             = "../celo-infra"
   network_depends_on = [google_compute_network.celo_network]
 
   gcloud_project          = var.google["project"]
@@ -70,8 +70,9 @@ module "celo_cluster" {
   stackdriver_logging_metrics    = var.stackdriver_logging_metrics
   
 
-  tx_node_count   = var.replicas["txnode"]
-  validator_count = var.replicas["validator"]
+  tx_node_count       = var.replicas["txnode"]
+  backup_node_count   = var.replicas["backup_node"]
+  validator_count     = var.replicas["validator"]
 
   validator_signer_account_addresses = var.validator_signer_accounts["account_addresses"]
   validator_signer_private_keys      = var.validator_signer_accounts["private_keys"]
@@ -171,7 +172,7 @@ resource "google_storage_bucket" "chaindata_bucket" {
 
   lifecycle_rule {
     condition {
-      num_newer_versions = 2
+      num_newer_versions = 10  # keep 10 copies of chaindata backups (use `gsutil ls -la $bucket` to see versioned objects)
     }
     action {
       type = "Delete"
@@ -220,6 +221,9 @@ resource "google_storage_bucket_iam_binding" "chaindata_rsync_binding_read" {
     "serviceAccount:${var.GCP_DEFAULT_SERVICE_ACCOUNT}",
   ]
 }
+
+# validators need to expose metadata publicly
+# uncomment the following two blocks if you would like to use GCS for this purpose
 
 #resource "google_storage_bucket" "public_www_bucket" {
 #  name = var.public_www_fqdn

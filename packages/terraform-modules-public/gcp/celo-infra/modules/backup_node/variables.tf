@@ -24,11 +24,6 @@ variable ethstats_host {
   description = "Ethstats url or IP address"
 }
 
-variable genesis_content_base64 {
-  type        = string
-  description = "Content of the genesis file encoded in base64"
-}
-
 variable geth_exporter_docker_image_repository {
   type        = string
   description = "Repository of the geth exporter docker image"
@@ -69,14 +64,9 @@ variable network_name {
   description = "Name of the GCP network the tx-node VM is in"
 }
 
-variable tx_node_count {
+variable backup_node_count {
   type        = number
-  description = "Number of tx-nodes to create"
-}
-
-variable bootnodes_base64 {
-  type        = string
-  description = "Bootnodes ethereum address encoded as base64"
+  description = "Number of backup_nodes to create"
 }
 
 variable reset_geth_data {
@@ -85,25 +75,10 @@ variable reset_geth_data {
   default     = true
 }
 
-variable txnode_max_peers {
+variable backup_node_max_peers {
   type        = number
   description = "Max number of peers to connect with"
   default     = 120
-}
-
-variable attestation_signer_addresses {
-  type        = list(string)
-  description = "The address to use for signing attestation requests"
-}
-
-variable attestation_signer_account_passwords {
-  type        = list(string)
-  description = "Array with the attestation_signer account passwords"
-}
-
-variable attestation_signer_private_keys {
-  type        = list(string)
-  description = "Array with the attestation_signer private keys"
 }
 
 variable service_account_scopes {

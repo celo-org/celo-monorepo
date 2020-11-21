@@ -369,8 +369,7 @@ IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 
 # Load configuration to files
 mkdir -p $DATA_DIR/account
-#echo -n '${genesis_content_base64}' | base64 -d > $DATA_DIR/genesis.json
-#echo -n '${bootnodes_base64}' | base64 -d > $DATA_DIR/bootnodes
+
 echo -n '${rid}' > $DATA_DIR/replica_id
 echo -n '${ip_address}' > $DATA_DIR/ipAddress
 echo -n '${attestation_signer_geth_account_secret}' > $DATA_DIR/account/accountSecret
@@ -396,8 +395,6 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-#--light.serve ${max_peers} \\
-#--light.maxpeers ${max_peers} \\
 Restart=always
 ExecStart=/usr/bin/docker run \\
   --rm \\
@@ -432,6 +429,7 @@ ExecStart=/usr/bin/docker run \\
       --metrics \\
       --pprof \\
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \\
+      --light.serve 0 \\
   "
 ExecStop=/usr/bin/docker stop -t 60 %N
 
