@@ -82,7 +82,12 @@ async function requestSignatures(request: Request, response: Response) {
       controller.abort()
     }, config.odisServices.timeoutMilliSeconds)
 
-    return meteredRequestSignature(service, request, controller, logger)
+    const startMark = `Begin requestSignature ${service.url}`
+    const endMark = `End requestSignature ${service.url}`
+    const entryName = `requestSignature latency ${service.url}`
+    performance.mark(startMark)
+
+    return requestSignature(service, request, controller, logger)
       .then(async (res: FetchResponse) => {
         logger.info({ signer: service, res }, 'received requestSignature response from signer')
         if (res.ok) {
@@ -110,9 +115,10 @@ async function requestSignatures(request: Request, response: Response) {
         }
       })
       .finally(() => {
-        const entries = performance.getEntries()
-        const measure = entries[entries.length - 1]
-        logger.info({ latency: measure.duration, signer: service })
+        performance.mark(endMark)
+        performance.measure(entryName, startMark, endMark)
+        const entries = performance.getEntriesByName(entryName)
+        logger.info({ latency: entries[entries.length - 1].duration, signer: service })
         clearTimeout(timeout)
       })
   })
@@ -223,8 +229,8 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
+  logger.debug({ signer: service.url }, `Requesting partial sig`)
   const url = service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT
-  logger.debug({ signer: url }, `Requesting partial sig`)
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -236,8 +242,6 @@ function requestSignature(
     signal: controller.signal,
   })
 }
-
-const meteredRequestSignature = performance.timerify(requestSignature)
 
 function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   if (errorCodes.size > 1) {
