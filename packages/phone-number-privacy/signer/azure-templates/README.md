@@ -100,6 +100,6 @@ az deployment group create \
 The logs from the container should flow automatically into the configured Log Analytics workspace.
 
 To see errors, execute a query like the following, which you can save for convinient use in creating alerts:
-`ContainerInstanceLog_CL | where Message contains "celo_pnp_err"`
+`ContainerInstanceLog_CL | where Message contains "celo_odis_err"`
 
 Once you've saved the desired searches, create alerts to notify when errors occur or system resources drop too low (e.g. high CPU usage).

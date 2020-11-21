@@ -34,7 +34,10 @@ export function loggerMiddleware(req: Request, res: Response, next?: NextFunctio
   })
 
   res.locals.logger = requestLogger
-  requestLogger.info({ req })
+  requestLogger.info({ req }, 'Request received')
+  if (!req.body.sessionID) {
+    requestLogger.warn({ req }, 'Request does not have sessionID')
+  }
   if (next) {
     next()
   }

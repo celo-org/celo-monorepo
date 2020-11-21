@@ -57,6 +57,9 @@ export async function handleGetContactMatches(
     const matchedContacts: ContactMatch[] = (
       await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
     ).map((numberPair) => ({ phoneNumber: numberPair }))
+    logger.info({
+      percentageOfContactsCoveredByMatchmaking: matchedContacts.length / contactPhoneNumbers.length,
+    })
     await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
     await setDidMatchmaking(account, logger)
     response.json({ success: true, matchedContacts, version: VERSION })

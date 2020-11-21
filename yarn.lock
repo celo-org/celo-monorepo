@@ -2316,10 +2316,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.17.tgz#690f0a9e87738d135fcdedde8ebd88a4090672dd"
-  integrity sha512-m9laINU62I6QIn8NkybxK82jrg5LnYe/OmcCJKsHlnFjKJmTTTQZaoPng6IOJ3dm2diTbRBWw5TkPnbHWU+Afg==
+"@celo/phone-number-privacy-common@1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.18.tgz#eb564bfee5f3076b37ad058732cfad9a9449f9e4"
+  integrity sha512-9OTQm6Nyxq+8LbhkBTVhLhg+FpUPbMwVl3Dm/QAn0GoGWQSx26+GQV7144TFZThCrDetfr4BrShqq5sW0AS6mA==
   dependencies:
     "@celo/contractkit" "0.4.17"
     "@celo/utils" "0.1.21"

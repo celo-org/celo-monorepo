@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.4.17",
-    "@celo/phone-number-privacy-common": "1.0.17",
+    "@celo/phone-number-privacy-common": "1.0.18",
     "@celo/utils": "0.1.21",
     "@types/bunyan": "^1.8.6",
     "firebase-admin": "^8.10.0",

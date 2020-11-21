@@ -95,4 +95,4 @@ Then check on the service to make sure its running:
 
 ### Logs
 
-Error logs will be prefixed with `CELO_PNP_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
+Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).

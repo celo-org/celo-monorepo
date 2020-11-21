@@ -16,6 +16,7 @@ import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
+import { performance } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
@@ -49,6 +50,7 @@ export async function handleGetBlindedMessageSig(
   response: Response
 ) {
   const logger: Logger = response.locals.logger
+
   try {
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
@@ -80,7 +82,7 @@ async function requestSignatures(request: Request, response: Response) {
       controller.abort()
     }, config.odisServices.timeoutMilliSeconds)
 
-    return requestSignature(service, request, controller, logger)
+    return meteredRequestSignature(service, request, controller, logger)
       .then(async (res: FetchResponse) => {
         logger.info({ signer: service, res }, 'received requestSignature response from signer')
         if (res.ok) {
@@ -108,6 +110,9 @@ async function requestSignatures(request: Request, response: Response) {
         }
       })
       .finally(() => {
+        const entries = performance.getEntries()
+        const measure = entries[entries.length - 1]
+        logger.info({ latency: measure.duration, signer: service })
         clearTimeout(timeout)
       })
   })
@@ -190,7 +195,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Lo
           totalQuota: response.signMessageResponse.totalQuota,
         }
       })
-      logger.error({ values }, `Discrepancy found in signers' measured quota values`)
+      logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
       discrepancyFound = true
     }
     if (
@@ -203,10 +208,7 @@ function logResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Lo
           blockNumber: response.signMessageResponse.blockNumber,
         }
       })
-      logger.error(
-        { values },
-        `Discrepancy found in signers' latest block number that exceeds threshold`
-      )
+      logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
       discrepancyFound = true
     }
     if (discrepancyFound) {
@@ -234,6 +236,8 @@ function requestSignature(
     signal: controller.signal,
   })
 }
+
+const meteredRequestSignature = performance.timerify(requestSignature)
 
 function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   if (errorCodes.size > 1) {
