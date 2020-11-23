@@ -25,7 +25,7 @@ export function mergeEvents(arr1: EventLog[], arr2: EventLog[]) {
   return merged
 }
 
-export function isPrecedingEvent(event1: EventLog, event2: EventLog) {
+function isPrecedingEvent(event1: EventLog, event2: EventLog) {
   if (event1.blockNumber < event2.blockNumber) {
     return true
   } else if (event2.blockNumber < event1.blockNumber) {
@@ -45,39 +45,6 @@ export function initializeBalancesByBlock(state: RewardsCalculationState) {
       blocks: [state.blockNumberToStartTracking],
     }
   })
-}
-export function attestedAccounts(events: EventLog[], minimum: number): string[] {
-  let verifiedAccounts: string[] = []
-  let issuers: { [account: string]: string[] } = {}
-
-  events.forEach(function(eventlog: EventLog) {
-    checkEventType(eventlog, 'AttestationCompleted')
-    const account: string = eventlog.returnValues.account
-    const issuer: string = eventlog.returnValues.issuer
-    if (!issuers[account]) {
-      issuers[account] = [issuer]
-    } else if (issuers[account].indexOf(issuer) === -1) {
-      issuers[account].push(issuer)
-    }
-    if (issuers[account].length === minimum) {
-      verifiedAccounts.push(account)
-    }
-  })
-  // filter repeat accounts (which would have had multiple attatestioncompleted from the final issuer)
-  return verifiedAccounts.filter((acct, index) => verifiedAccounts.indexOf(acct) == index)
-}
-
-export function accountBalances(
-  events: EventLog[],
-  addressFilter: string[] | undefined
-): { [address: string]: BigNumber } {
-  let balances: { [address: string]: BigNumber } = {}
-
-  events.forEach(function(eventlog: EventLog) {
-    checkEventType(eventlog, 'Transfer')
-    updateBalance(balances, eventlog)
-  })
-  return addressFilter ? filterObject(balances, addressFilter) : balances
 }
 
 function updateBalance(balances: Balances, eventLog: EventLog) {
@@ -169,63 +136,6 @@ function updateBalanceByBlock(
       }
     }
   }
-}
-
-export async function accountRewards(
-  events: EventLog[],
-  initialBalances: { [acct: string]: BigNumber },
-  fromBlock: number,
-  toBlock: number
-): Promise<{ [address: string]: number }> {
-  let balancesByBlock: { [address: string]: BalancesByBlock } = {}
-  Object.keys(initialBalances).forEach((acct) => {
-    balancesByBlock[acct] = {
-      balances: [initialBalances[acct]],
-      blocks: [fromBlock],
-    }
-  })
-
-  events.forEach(function(eventlog: EventLog) {
-    checkEventType(eventlog, 'Transfer')
-    let amount = eventlog.returnValues.value
-    let to = eventlog.returnValues.to
-    let from = eventlog.returnValues.from
-    let block = eventlog.blockNumber
-    if (balancesByBlock[to]) {
-      let balances = balancesByBlock[to]
-      let prevBalance = balances.balances[balances.balances.length - 1]
-      let newBalance = prevBalance.plus(amount)
-      balancesByBlock[to].balances.push(newBalance)
-      balancesByBlock[to].blocks.push(block)
-    }
-    if (balancesByBlock[from]) {
-      let balances = balancesByBlock[from]
-      let prevBalance = balances.balances[balances.balances.length - 1]
-      let newBalance = prevBalance.minus(amount)
-      balancesByBlock[from].balances.push(newBalance)
-      balancesByBlock[from].blocks.push(block)
-    }
-  })
-  return calculateRewards(balancesByBlock, fromBlock, toBlock, 0.06)
-}
-
-function checkEventType(event: EventLog, eventType: string) {
-  if (event.event !== eventType) {
-    const err = `Event mismatch: expected ${eventType} but received ${event.event}`
-    console.error(err)
-    throw err
-  }
-}
-
-function filterObject(
-  unfilteredObj: { [key: string]: any },
-  filter: string[]
-): { [key: string]: any } {
-  let obj: { [key: string]: any } = {}
-  return filter.reduce((filteredObj, key) => {
-    filteredObj[key] = unfilteredObj[key]
-    return filteredObj
-  }, obj)
 }
 
 export function calculateRewards(
