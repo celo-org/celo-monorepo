@@ -44,6 +44,7 @@ async function getDeviceInfo() {
 const SEGMENT_OPTIONS: analytics.Configuration = {
   using: [Firebase],
   flushAt: 20,
+  trackAttributionData: false,
   debug: __DEV__,
   trackAppLifecycleEvents: true,
   recordScreenViews: true,
