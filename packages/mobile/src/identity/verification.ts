@@ -2,11 +2,11 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
 import {
   ActionableAttestation,
-  AttesationServiceRevealRequest,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { KomenciKit } from '@celo/komencikit/src/kit'
+import { AttestationRequest } from '@celo/utils/lib/io'
 import { retryAsync } from '@celo/utils/src/async'
 import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import functions from '@react-native-firebase/functions'
@@ -897,13 +897,14 @@ export function* tryRevealPhoneNumber(
     // This works around TLS issues
 
     const language = yield select(currentLanguageSelector)
-    const revealRequest: AttesationServiceRevealRequest = {
+    const revealRequest: AttestationRequest = {
       account,
       issuer,
       phoneNumber: phoneHashDetails.e164Number,
       salt: phoneHashDetails.pepper,
       smsRetrieverAppSig,
       language,
+      securityCodePrefix: undefined,
     }
 
     if (features.SHORT_VERIFICATION_CODES) {
@@ -987,7 +988,7 @@ export function* tryRevealPhoneNumber(
 async function postToAttestationService(
   attestationsWrapper: AttestationsWrapper,
   attestationServiceUrl: string,
-  revealRequestBody: AttesationServiceRevealRequest
+  revealRequestBody: AttestationRequest
 ): Promise<{ ok: boolean; status: number; body: any }> {
   if (shouldUseProxy()) {
     Logger.debug(
