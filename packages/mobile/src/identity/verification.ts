@@ -647,7 +647,7 @@ export function attestationCodeReceiver(
         }
       }
 
-      const attestationCode = extractAttestationCodeFromMessage(message)
+      const attestationCode = message && extractAttestationCodeFromMessage(message)
 
       if (!attestationCode) {
         throw new Error('No code extracted from message')

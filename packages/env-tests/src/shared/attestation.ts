@@ -3,7 +3,6 @@ import { Address, CeloTransactionParams, ContractKit, OdisUtils } from '@celo/co
 import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
 import {
   ActionableAttestation,
-  AttesationServiceRevealRequest,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
@@ -86,15 +85,12 @@ export async function requestAttestationsFromIssuers(
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
-      const revealRequest: AttesationServiceRevealRequest = {
-        account,
-        issuer: account,
-        phoneNumber,
-        salt: pepper,
-      }
       const response = await attestations.revealPhoneNumberToIssuer(
+        phoneNumber,
+        account,
+        attestation.issuer,
         attestation.attestationServiceURL,
-        revealRequest
+        pepper
       )
       if (!response.ok) {
         return {

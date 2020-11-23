@@ -1,21 +1,26 @@
 import {
   ActionableAttestation,
-  AttestationServiceSecurityCodeRequest,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { PhoneNumberHashDetails } from '@celo/contractkit/src/identity/odis/phone-number-identifier'
+import { GetAttestationRequest } from '@celo/utils/lib/io'
 import { Address } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/securityCode'
 
+const cache: { [key: string]: string } = {}
+
 function hashAddressToSingleDigit(address: Address): number {
   return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
 }
 
 export function getSecurityCodePrefix(issuerAddress: Address) {
-  return `${hashAddressToSingleDigit(issuerAddress)}`
+  if (!cache[issuerAddress]) {
+    cache[issuerAddress] = `${hashAddressToSingleDigit(issuerAddress)}`
+  }
+  return cache[issuerAddress]
 }
 
 export function extractSecurityCodeWithPrefix(message: string) {
@@ -24,6 +29,24 @@ export function extractSecurityCodeWithPrefix(message: string) {
     return matches[1]
   }
   return null
+}
+
+// We look for the case, where all the promises fail or the first one to succeed.
+// Promise.all looks for all the values or the first error, so we can switch roles
+// for reject and resolve to achieve what we need
+async function raceUntilSuccess<T>(promises: Array<Promise<T>>) {
+  try {
+    const errors = await Promise.all(
+      promises.map((promise) => {
+        return new Promise((resolve, reject) => {
+          promise.then(reject).catch(resolve)
+        })
+      })
+    )
+    return Promise.reject(errors)
+  } catch (firstValue) {
+    return Promise.resolve(firstValue)
+  }
 }
 
 export async function getAttestationCodeForSecurityCode(
@@ -38,26 +61,18 @@ export async function getAttestationCodeForSecurityCode(
     (attestation) => hashAddressToSingleDigit(attestation.issuer) === securityCodePrefix
   )
 
-  for (const attestation of lookupAttestations) {
-    // Try to recover the full attestation code from the matching issuer's attestation service
-    try {
-      const message = await requestValidator(
+  // Recover the full attestation code from the matching issuer's attestation services
+  return raceUntilSuccess(
+    lookupAttestations.map(async (attestation: ActionableAttestation) =>
+      requestValidator(
         attestationsWrapper,
         account,
         phoneHashDetails,
         attestation,
         securityCodeWithPrefix.substr(1) // remove prefix
       )
-      return message
-    } catch (e) {
-      Logger.warn(
-        TAG + '@getAttestationCodeForSecurityCode',
-        'Getting attestation code for security code error: ',
-        e
-      )
-      continue
-    }
-  }
+    )
+  )
 }
 
 async function requestValidator(
@@ -66,14 +81,14 @@ async function requestValidator(
   phoneHashDetails: PhoneNumberHashDetails,
   attestation: ActionableAttestation,
   securityCode: string
-) {
+): Promise<string> {
   const issuer = attestation.issuer
   Logger.debug(
     TAG + '@getAttestationCodeFromSecurityCode',
     `Revealing an attestation for issuer: ${issuer}`
   )
   try {
-    const requestBody: AttestationServiceSecurityCodeRequest = {
+    const requestBody: GetAttestationRequest = {
       account,
       issuer: attestation.issuer,
       phoneNumber: phoneHashDetails.e164Number,
@@ -86,11 +101,12 @@ async function requestValidator(
       requestBody
     )
     const { ok, status } = response
-    const body = await response.json()
-    if (ok && body.attestationCode) {
-      return body.attestationCode
+    if (ok) {
+      const body = await response.json()
+      if (body.attestationCode) {
+        return body.attestationCode
+      }
     }
-
     throw new Error(`Error getting security code for ${issuer}. Status code: ${status}`)
   } catch (error) {
     Logger.error(
@@ -98,6 +114,6 @@ async function requestValidator(
       `get for issuer ${issuer} failed`,
       error
     )
-    return false
+    throw error
   }
 }

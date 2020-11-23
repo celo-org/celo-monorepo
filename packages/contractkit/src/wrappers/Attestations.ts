@@ -4,6 +4,7 @@ import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
+import { AttestationRequest, GetAttestationRequest } from '@celo/utils/lib/io'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -58,26 +59,6 @@ export interface ActionableAttestation {
 type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
-
-export interface AttesationServiceRevealRequest {
-  account: Address
-  phoneNumber: string
-  issuer: string
-  // TODO rename to pepper here and in Attesation Service
-  salt?: string
-  smsRetrieverAppSig?: string
-  language?: string
-  securityCodePrefix?: string
-}
-
-export interface AttestationServiceSecurityCodeRequest {
-  account: Address
-  phoneNumber: string
-  issuer: string
-  // TODO rename to pepper here and in Attesation Service
-  salt: string
-  securityCode: string
-}
 
 export interface UnselectedRequest {
   blockNumber: number
@@ -536,15 +517,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Reveal phone number to issuer
    * @param serviceURL: validator's attestation service URL
-   * @param body: AttesationServiceRevealRequest
+   * @param body
    */
-  revealPhoneNumberToIssuer(serviceURL: string, body: AttesationServiceRevealRequest) {
+  revealPhoneNumberToIssuer(serviceURL: string, requestBody: AttestationRequest) {
     return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(requestBody),
     })
   }
 
@@ -578,10 +559,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Returns attestation code for provided security code from validator's attestation service
    * @param serviceURL: validator's attestation service URL
-   * @param body: AttestationServiceCodeForSecurityRequest
+   * @param body
    */
-  getAttestationForSecurityCode(serviceURL: string, body: AttestationServiceSecurityCodeRequest) {
-    const urlParams = new URLSearchParams({ ...body })
+  getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
+    const urlParams = new URLSearchParams({
+      phoneNumber: requestBody.phoneNumber,
+      account: requestBody.account,
+      issuer: requestBody.issuer,
+    })
+    if (requestBody.salt) {
+      urlParams.set('salt', requestBody.salt)
+    }
+    if (requestBody.securityCode) {
+      urlParams.set('securityCode', requestBody.securityCode)
+    }
     return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
