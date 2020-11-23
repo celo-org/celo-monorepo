@@ -162,6 +162,9 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
+    `--set environment.network=${vars.network}`,
+    `--set environment.cluster.name=${clusterConfig.clusterName}`,
+    `--set environment.cluster.location=${clusterConfig.regionName}`,
     `--set image.repository=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_TAG)}`,
     `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
@@ -174,7 +177,6 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
-    `--set onboarding.onchain.network=${vars.network}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
@@ -184,7 +186,6 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
-    `--set relayer.onchain.network=${vars.network}`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }
