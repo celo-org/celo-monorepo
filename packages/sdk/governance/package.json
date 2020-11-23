@@ -24,10 +24,12 @@
     "@celo/connect": "1.0.0-dev",
     "@celo/contractkit": "1.0.0-dev",
     "@celo/explorer": "1.0.0-dev",
-    "ethereumjs-util": "^5.2.0"
+    "ethereumjs-util": "^5.2.0",
+    "inquirer": "^7.0.5"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
+    "@types/inquirer": "^6.5.0",
     "@types/ethereumjs-util": "^5.2.0"
   },
   "engines": {
