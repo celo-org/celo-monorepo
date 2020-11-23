@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-hsm",
-  "version": "0.0.1-dev",
+  "version": "1.0.0-dev",
   "description": "HSM wallet implementation utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -18,7 +18,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "0.0.5-dev",
+    "@celo/base": "1.0.0-dev",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
     "asn1js": "^2.0.26",
@@ -26,7 +26,7 @@
     "secp256k1": "^4.0.0"
   },
   "devDependencies": {
-    "@celo/connect": "0.0.2-dev",
+    "@celo/connect": "1.0.0-dev",
     "@types/asn1js": "^0.0.2"
   },
   "engines": {

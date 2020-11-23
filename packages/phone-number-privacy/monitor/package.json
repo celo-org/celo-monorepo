@@ -20,11 +20,11 @@
     "lint": "tslint --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.19-dev",
-    "@celo/identity": "0.0.1-dev",
-    "@celo/wallet-local": "0.0.1-dev",
+    "@celo/contractkit": "1.0.0-dev",
+    "@celo/identity": "1.0.0-dev",
+    "@celo/wallet-local": "1.0.0-dev",
     "@celo/phone-number-privacy-common": "1.0.15-dev",
-    "@celo/utils": "0.1.23-dev",
+    "@celo/utils": "1.0.0-dev",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",
     "web3": "1.2.11"

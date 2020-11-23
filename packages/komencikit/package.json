@@ -23,11 +23,11 @@
     "proxy:sha3": "node ./scripts/proxy-bytecode-sha3"
   },
   "dependencies": {
-    "@celo/base": "0.0.5-dev",
-    "@celo/connect": "0.0.2-dev",
-    "@celo/contractkit": "0.4.19-dev",
-    "@celo/identity": "0.0.1-dev",
-    "@celo/utils": "0.1.23-dev",
+    "@celo/base": "1.0.0-dev",
+    "@celo/connect": "1.0.0-dev",
+    "@celo/contractkit": "1.0.0-dev",
+    "@celo/identity": "1.0.0-dev",
+    "@celo/utils": "1.0.0-dev",
     "cross-fetch": "^3.0.6",
     "fp-ts": "^2.8.4",
     "io-ts": "^2.2.11",

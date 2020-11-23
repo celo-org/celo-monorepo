@@ -1,6 +1,6 @@
 {
   "name": "@celo/connect",
-  "version": "0.0.2-dev",
+  "version": "1.0.0-dev",
   "description": "Toolkit for connecting with the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -19,7 +19,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/utils": "0.1.23-dev",
+    "@celo/utils": "1.0.0-dev",
     "debug": "^4.1.1"
   },
   "devDependencies": {
