@@ -1,8 +1,8 @@
 /* tslint:disable no-console */
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
+import fs from 'fs'
+import path from 'path'
 import { tsGenerator } from 'ts-generator'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
@@ -25,12 +25,13 @@ export const ProxyContracts = [
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
   'LockedGoldProxy',
+  'MetaTransactionWalletProxy',
+  'MetaTransactionWalletDeployerProxy',
+  'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
-  'RegistryProxy',
-  'BlockchainParametersProxy',
 ]
 export const CoreContracts = [
   // common
@@ -38,9 +39,12 @@ export const CoreContracts = [
   'GasPriceMinimum',
   'FeeCurrencyWhitelist',
   'GoldToken',
+  'MetaTransactionWallet',
+  'MetaTransactionWalletDeployer',
   'MultiSig',
   'Registry',
   'Freezer',
+  'MetaTransactionWallet',
   'TransferWhitelist',
 
   // governance

@@ -91,7 +91,7 @@ export const handler = async (argv: ContractsArgv) => {
     await execCmd(
       `yarn --cwd ../protocol run init-network -n ${argv.celoEnv} -c '${JSON.stringify(
         truffleOverrides()
-      )}' -m '${JSON.stringify(migrationOverrides(!argv.skipFaucetting))}'`
+      )}' -m '${JSON.stringify(await migrationOverrides(!argv.skipFaucetting))}'`
     )
 
     console.info('Register Metadata for Clabs validators')

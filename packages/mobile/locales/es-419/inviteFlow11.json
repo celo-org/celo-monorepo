@@ -1,29 +1,32 @@
 {
   "cancel": "Cancelar",
-  "needMoreFundsToInvite": "Necesita más fondos para invitar",
   "inviteWithWhatsapp": "Invitar con WhatsApp",
   "inviteWithSMS": "Invitar con SMS",
-  "reviewInvite": "Revisar invitación",
   "inviteFee": "Comisión de invitación",
   "whySendFees": "Esta comisión cubre los costos de verificar el n.º de teléfono del usuario nuevo",
   "whyReceiveFees": "Te enviaron dinero para verificar tu cuenta",
   "edit": "Editar",
   "to": "Para",
   "inviteSent": "Invitación enviada",
-  "noResults": "Sin resultados para",
   "searchForSomeone": "Busque a alguien según el nombre o el número de teléfono",
-  "redeemSuccess": "Código de invitación validado de forma exitosa.",
   "redeemFailed": "No pudimos validar el código de invitación",
   "redeemInviteTimeout": "Canjear invitación agotada",
   "accountSetupFailed": "No se pudo crear tu monedero",
   "emptyInviteCode": "El código de invitación no tiene fondos",
-  "withdrawGoldFromEscrow": "Retirarndo CELO de la cuenta...",
-  "transferGoldToAccount": "CELO transferido a tu cuenta!",
-  "withdrawDollarsFromEscrow": "Retirando los {{dollars}} de tu cuenta...",
   "transferDollarsToAccount": "{{Dollars}} transferidos a tu cuenta!",
   "inviteFriendsToCelo": "Invitar amigos a {{appName}}",
   "inviteAnyone": "Envía fácilmente a tus amigos agregando tus contactos",
-  "inviteComplete": "Invitación completa",
   "inviteReceived": "Invitación recibida",
-  "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)"
+  "escrowPaymentNotificationTitle": "Invitado y pagado {{mobile}} (<3></3>)",
+  "inviteDialog": {
+    "title": "Invita a un amigo",
+    "body": "Conecta y comparte valor con tus amigos y familia en {{appName}}.",
+    "button": "Invitar"
+  },
+  "sendAndInvite": "Envía e invita",
+  "inviteAndSendDialog": {
+    "title": "Invita y envía",
+    "body": "Tu pago estará esperando hasta que {{name}} verifique su número de teléfono. ¡Envíale una invitación para que se registre en {{appName}} y reciba tu pago!",
+    "button": "Invitar"
+  }
 }

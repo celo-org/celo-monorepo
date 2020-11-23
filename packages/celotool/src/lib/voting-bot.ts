@@ -17,7 +17,7 @@ export async function installHelmChart(celoEnv: string, excludedGroups?: string[
   return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
 }
 export async function removeHelmRelease(celoEnv: string) {
-  await removeGenericHelmChart(releaseName(celoEnv))
+  await removeGenericHelmChart(releaseName(celoEnv), celoEnv)
 }
 
 export async function setupVotingBotAccounts(celoEnv: string) {

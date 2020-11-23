@@ -35,8 +35,8 @@ export async function installHelmChart(
   )
 }
 
-export async function removeHelmRelease(helmReleaseName: string) {
-  await removeGenericHelmChart(helmReleaseName)
+export async function removeHelmRelease(helmReleaseName: string, celoEnv: string) {
+  await removeGenericHelmChart(helmReleaseName, celoEnv)
 }
 
 export async function upgradeHelmChart(
@@ -101,8 +101,16 @@ async function helmParameters(
     `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
     )}`,
-    `--set blockscout.metadata_crawler.schedule=${fetchEnv(
+    `--set blockscout.metadata_crawler.schedule="${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+    )}"`,
+    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+      ''
+    )}`,
+    `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
+      celoEnv
     )}`,
     )
   }
@@ -134,7 +142,15 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+    location ~ /admin/.* {
+      deny all;
+    }
+    location ~ /wobserver/.* {
+      deny all;
+    }
   labels:
     app: blockscout
     chart: blockscout
@@ -145,6 +161,14 @@ spec:
   - host: ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org
     http:
       paths:
+      - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        backend:
+          serviceName: ${ingressName}-web
+          servicePort: 4000
+      - path: /(graphql|graphiql|api)
+        backend:
+          serviceName: ${ingressName}-api
+          servicePort: 4000
       - backend:
           serviceName: ${ingressName}-web
           servicePort: 4000

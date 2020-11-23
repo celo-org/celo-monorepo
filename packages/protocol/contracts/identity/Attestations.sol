@@ -1,4 +1,4 @@
-pragma solidity ^0.5.3;
+pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,7 +6,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/utils/SafeCast.sol";
 
 import "./interfaces/IAttestations.sol";
-import "./interfaces/IRandom.sol";
 import "../common/interfaces/IAccounts.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
@@ -14,7 +13,6 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 import "../common/UsingPrecompiles.sol";
-import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
 /**
@@ -173,7 +171,7 @@ contract Attestations is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -182,7 +180,7 @@ contract Attestations is
    * @param attestationsRequested The number of requested attestations for this request.
    * @param attestationRequestFeeToken The address of the token with which the attestation fee will
    * be paid.
-   * @dev Note that if an attestion expires before it is completed, the fee is forfeited. This is
+   * @dev Note that if an attestation expires before it is completed, the fee is forfeited. This is
    * to prevent folks from attacking validators by requesting attestations that they do not
    * complete, and to increase the cost of validators attempting to manipulate the attestations
    * protocol.
@@ -555,6 +553,7 @@ contract Attestations is
   /**
    * @notice Validates the given attestation code.
    * @param identifier The hash of the identifier to be attested.
+   * @param account Address of the account. 
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
@@ -629,7 +628,7 @@ contract Attestations is
     for (uint256 i = 0; i < identifiersToLookup.length; i = i.add(1)) {
       uint256 count = identifiers[identifiersToLookup[i]].accounts.length;
 
-      totalAddresses = totalAddresses + count;
+      totalAddresses = totalAddresses.add(count);
       matches[i] = count;
     }
 
@@ -651,7 +650,7 @@ contract Attestations is
     IAccounts accounts = getAccounts();
     uint256 issuersLength = numberValidatorsInCurrentSet();
     uint256[] memory issuers = new uint256[](issuersLength);
-    for (uint256 i = 0; i < issuersLength; i++) issuers[i] = i;
+    for (uint256 i = 0; i < issuersLength; i = i.add(1)) issuers[i] = i;
 
     require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
 
@@ -699,6 +698,7 @@ contract Attestations is
    * addresses must both approve.  If the other has already approved, then the transfer
    * is executed.
    * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
    * @param from The current attestation address to which the identifier is mapped.
    * @param to The new address to map to identifier.
    * @param status The approval status
@@ -706,7 +706,10 @@ contract Attestations is
   function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
     external
   {
-    require(msg.sender == from || msg.sender == to);
+    require(
+      msg.sender == from || msg.sender == to,
+      "Approver must be sender or recipient of transfer"
+    );
     bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
     address other = msg.sender == from ? to : from;
     if (status && transferApprovals[other][key]) {
@@ -747,8 +750,7 @@ contract Attestations is
     emit AttestationsTransferred(identifier, from, to);
   }
 
-  // TODO(@i1skn): make this method external, so we can check it from outside
-  function isAttestationExpired(uint128 attestationRequestBlock) internal view returns (bool) {
+  function isAttestationExpired(uint32 attestationRequestBlock) internal view returns (bool) {
     return block.number >= uint256(attestationRequestBlock).add(attestationExpiryBlocks);
   }
 

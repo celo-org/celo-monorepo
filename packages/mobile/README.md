@@ -6,7 +6,7 @@
   - [Setup](#setup)
     - [iOS](#ios)
       - [Enroll in the Apple Developer Program](#enroll-in-the-apple-developer-program)
-      - [Install XCode](#install-xcode)
+      - [Install Xcode](#install-xcode)
       - [Install Cocopods, Bundler, and download project dependencies](#install-cocopods-bundler-and-download-project-dependencies)
     - [Android](#android)
       - [Install Java](#install-java)
@@ -68,15 +68,15 @@ In order to successfully set up your iOS development environment you will need t
 
 _If you are a cLabs employee, please ask to be added to the cLabs iOS development team._
 
-#### Install XCode
+#### Install Xcode
 
-XCode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
+Xcode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
 
-Install [Xcode 11.4](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
+Install [Xcode 12.2](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
 
 We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects.
 
-Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of XCode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
+Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of Xcode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
 
 #### Install Cocopods, Bundler, and download project dependencies
 
@@ -239,9 +239,9 @@ The below steps should help you successfully run the mobile wallet on either a U
 
 ### iOS
 
-3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by XCode.
+3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by Xcode.
 
-4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the XCode menu bar.
+4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the Xcode menu bar.
 
 5. From the `mobile` directory run `yarn run dev:ios`.
 

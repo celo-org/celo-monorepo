@@ -1,6 +1,6 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -9,10 +9,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { noHeader } from 'src/navigator/Headers.v2'
+import { noHeader } from 'src/navigator/Headers'
 import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import Logger from 'src/utils/Logger'
 
@@ -100,6 +100,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
             size={BtnSizes.MEDIUM}
             text={t('allow')}
             onPress={this.linkBack}
+            testID="DappkitAllow"
           />
         </ScrollView>
       </SafeAreaView>
@@ -126,9 +127,6 @@ const styles = StyleSheet.create({
     ...fontStyles.regular,
     color: colors.gray4,
     textAlign: 'center',
-  },
-  space: {
-    paddingHorizontal: 5,
   },
   sectionDivider: {
     alignItems: 'center',

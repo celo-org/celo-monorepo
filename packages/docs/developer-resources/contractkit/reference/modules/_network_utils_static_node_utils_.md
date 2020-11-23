@@ -1,4 +1,4 @@
-# External module: "network-utils/static-node-utils"
+# Module: "network-utils/static-node-utils"
 
 ## Index
 

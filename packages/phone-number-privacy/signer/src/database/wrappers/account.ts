@@ -1,5 +1,4 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
-import logger from '../../common/logger'
+import { DB_TIMEOUT, ErrorMessage, logger } from '@celo/phone-number-privacy-common'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
@@ -11,15 +10,16 @@ function accounts() {
  * Returns how many queries the account has already performed.
  */
 export async function getPerformedQueryCount(account: string): Promise<number> {
-  logger.debug('Getting performed query count')
+  logger.debug({ account }, 'Getting performed query count')
   try {
     const queryCounts = await accounts()
       .select(ACCOUNTS_COLUMNS.numLookups)
       .where(ACCOUNTS_COLUMNS.address, account)
       .first()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
+    logger.error({ err })
     return 0
   }
 }
@@ -35,7 +35,7 @@ async function getAccountExists(account: string): Promise<boolean> {
  * Increments query count in database.  If record doesn't exist, create one.
  */
 export async function incrementQueryCount(account: string) {
-  logger.debug('Incrementing query count')
+  logger.debug({ account }, 'Incrementing query count')
   try {
     if (await getAccountExists(account)) {
       await accounts()
@@ -47,8 +47,9 @@ export async function incrementQueryCount(account: string) {
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
       return insertRecord(newAccount)
     }
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return null
   }
 }
@@ -66,8 +67,9 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
       return false
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return false
   }
 }
@@ -76,7 +78,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
 export async function setDidMatchmaking(account: string) {
-  logger.debug('Setting did matchmaking')
+  logger.debug({ account }, 'Setting did matchmaking')
   try {
     if (await getAccountExists(account)) {
       return accounts()
@@ -87,8 +89,9 @@ export async function setDidMatchmaking(account: string) {
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
       return insertRecord(newAccount)
     }
-  } catch (e) {
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE, e)
+  } catch (err) {
+    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
+    logger.error({ err })
     return null
   }
 }

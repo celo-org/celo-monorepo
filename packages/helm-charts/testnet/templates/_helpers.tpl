@@ -35,6 +35,7 @@ spec:
   selector:
     statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ .node_name }}-{{ .index }}
   type: {{ .service_type }}
+  publishNotReadyAddresses: true
   {{ if (eq .service_type "LoadBalancer") }}
   loadBalancerIP: {{ .load_balancer_ip }}
   {{ end }}
@@ -65,7 +66,7 @@ spec:
 {{- end }}
     component: {{ .component_label }}
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-{{ .name }}
@@ -121,6 +122,7 @@ spec:
 {{ end }}
       containers:
 {{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
+      terminationGracePeriodSeconds: 120 # 2 mins
       volumes:
       - name: data
         emptyDir: {}

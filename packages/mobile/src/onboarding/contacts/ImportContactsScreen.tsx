@@ -1,8 +1,8 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import Switch from '@celo/react-components/components/Switch.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
+import Switch from '@celo/react-components/components/Switch'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { StackScreenProps, useHeaderHeight } from '@react-navigation/stack'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -16,7 +16,7 @@ import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
 import { importContactsProgressSelector, matchedContactsSelector } from 'src/identity/reducer'
 import { ImportContactsStatus } from 'src/identity/types'
-import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithSubtitle, nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -28,11 +28,11 @@ type Props = ScreenProps
 
 function ImportContactsScreen({ route, navigation }: Props) {
   const [isFindMeSwitchChecked, setFindMeSwitch] = useState(true)
+  const [isFinishUnderway, setFinishUnderway] = useState(false)
   const { t } = useTranslation(Namespaces.onboarding)
   const importContactsProgress = useSelector(importContactsProgressSelector)
   const importStatus = importContactsProgress.status
   const totalContacts = importContactsProgress.total
-  const prevImportContactProgressRef = React.useRef(importContactsProgress)
   const matchedContacts = useSelector(matchedContactsSelector)
   const matchedContactsCount = Object.keys(matchedContacts).length
   const dispatch = useDispatch()
@@ -82,6 +82,7 @@ function ImportContactsScreen({ route, navigation }: Props) {
 
   const onFinish = () => {
     navigate(Screens.OnboardingSuccessScreen)
+    setFinishUnderway(false)
   }
 
   const onPressConnect = async () => {
@@ -107,15 +108,8 @@ function ImportContactsScreen({ route, navigation }: Props) {
   }, [])
 
   React.useEffect(() => {
-    navigation.setParams({ importStatus })
-    const prevImportContactProgress = prevImportContactProgressRef.current
-    const prevImportStatus = prevImportContactProgress.status
-    prevImportContactProgressRef.current = importContactsProgress
-
-    if (
-      prevImportStatus !== ImportContactsStatus.Done &&
-      importStatus === ImportContactsStatus.Done
-    ) {
+    if (importStatus === ImportContactsStatus.Done && !isFinishUnderway) {
+      setFinishUnderway(true)
       const onFinishTimeout = setTimeout(onFinish, 1500)
       return () => {
         clearTimeout(onFinishTimeout)
@@ -157,7 +151,6 @@ function ImportContactsScreen({ route, navigation }: Props) {
 
 ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
   const onPressSkip = route.params?.onPressSkip ? route.params.onPressSkip : () => null
-  const importDone = route.params?.importStatus === ImportContactsStatus.Done
   return {
     ...nuxNavigationOptionsNoBackButton,
     headerTitle: () => (
@@ -166,15 +159,13 @@ ImportContactsScreen.navigationOptions = ({ route }: ScreenProps) => {
         subTitle={i18n.t('onboarding:step', { step: '5' })}
       />
     ),
-    headerRight: !importDone
-      ? () => (
-          <TopBarTextButtonOnboarding
-            title={i18n.t('global:skip')}
-            testID="ImportContactsSkip"
-            onPress={onPressSkip}
-          />
-        )
-      : () => null,
+    headerRight: () => (
+      <TopBarTextButtonOnboarding
+        title={i18n.t('global:skip')}
+        testID="ImportContactsSkip"
+        onPress={onPressSkip}
+      />
+    ),
   }
 }
 

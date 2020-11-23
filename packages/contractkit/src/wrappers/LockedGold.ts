@@ -13,6 +13,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  secondsToDurationString,
   tupleParser,
   valueToBigNumber,
   valueToString,
@@ -188,6 +189,18 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     return {
       unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
       totalLockedGold: await this.getTotalLockedGold(),
+    }
+  }
+
+  /**
+   * @dev Returns human readable configuration of the lockedgold contract
+   * @return LockedGoldConfig object
+   */
+  async getHumanReadableConfig() {
+    const config = await this.getConfig()
+    return {
+      ...config,
+      unlockingPeriod: secondsToDurationString(config.unlockingPeriod),
     }
   }
 

@@ -1,17 +1,13 @@
 import bodyParser from 'body-parser'
+import Logger from 'bunyan'
 import express from 'express'
 import { PhoneNumberUtil } from 'google-libphonenumber'
 import Nexmo from 'nexmo'
 import { receivedDeliveryReport } from '.'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Gauges } from '../metrics'
-import {
-  DeliveryStatus,
-  readUnsupportedRegionsFromEnv,
-  SmsDelivery,
-  SmsProvider,
-  SmsProviderType,
-} from './base'
+import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 
@@ -32,6 +28,8 @@ export class NexmoSmsProvider extends SmsProvider {
     phoneNumber: string
   }> = []
   balanceMetric: boolean
+  deliveryStatusURL: string | undefined
+  applicationId: string | null = null
 
   constructor(
     apiKey: string,
@@ -41,6 +39,7 @@ export class NexmoSmsProvider extends SmsProvider {
     balanceMetric: boolean
   ) {
     super()
+    this.applicationId = applicationId
     if (applicationId) {
       this.client = new Nexmo({
         apiKey,
@@ -57,7 +56,9 @@ export class NexmoSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  initialize = async () => {
+  initialize = async (deliveryStatusURL: string) => {
+    this.deliveryStatusURL = deliveryStatusURL
+
     const availableNumbers = await this.getAvailableNumbers()
 
     if (!availableNumbers) {
@@ -71,39 +72,45 @@ export class NexmoSmsProvider extends SmsProvider {
     }))
   }
 
-  async receiveDeliveryStatusReport(req: express.Request) {
+  async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
     const errCode =
       req.body['err-code'] == null || req.body['err-code'] === '0' ? null : req.body['err-code']
-    receivedDeliveryReport(req.body.messageId, this.deliveryStatus(req.body.status), errCode)
+    await receivedDeliveryReport(
+      req.body.messageId,
+      this.deliveryStatus(req.body.status),
+      errCode,
+      logger
+    )
   }
 
-  deliveryStatus(messageStatus: string | null): DeliveryStatus {
+  deliveryStatus(messageStatus: string | null): AttestationStatus {
     switch (messageStatus) {
       case 'delivered':
-        return DeliveryStatus.Delivered
+        return AttestationStatus.Delivered
       case 'failed':
-        return DeliveryStatus.Failed
+        return AttestationStatus.Failed
       case 'rejected':
-        return DeliveryStatus.Failed
+        return AttestationStatus.Failed
       case 'accepted':
-        return DeliveryStatus.Upstream
+        return AttestationStatus.Upstream
       case 'buffered':
-        return DeliveryStatus.Queued
+        return AttestationStatus.Queued
     }
-    return DeliveryStatus.Other
+    return AttestationStatus.Other
   }
 
-  supportsDeliveryStatus = () => true
+  deliveryStatusMethod = () => 'POST'
 
   deliveryStatusHandlers = () => [bodyParser.json()]
 
-  async sendSms(delivery: SmsDelivery) {
-    const nexmoNumber = this.getMatchingNumber(delivery.countryCode)
+  async sendSms(attestation: AttestationModel) {
+    const nexmoNumber = this.getMatchingNumber(attestation.countryCode)
     return new Promise<string>((resolve, reject) => {
       this.client.message.sendSms(
         nexmoNumber,
-        delivery.phoneNumber,
-        delivery.message,
+        attestation.phoneNumber,
+        attestation.message,
+        { callback: this.deliveryStatusURL },
         (err: Error, responseData: any) => {
           if (err) {
             reject(err)
@@ -127,9 +134,14 @@ export class NexmoSmsProvider extends SmsProvider {
     })
   }
 
+  // The only effect of supplying an applicationId is to select from numbers linked to
+  // that application rather than the global pool.
   private getAvailableNumbers = async (): Promise<any> => {
     return new Promise((resolve, reject) => {
-      this.client.number.get(null, (err: Error, responseData: any) => {
+      const options = this.applicationId
+        ? { applicationId: this.applicationId, has_application: true }
+        : null
+      this.client.number.get(options, (err: Error, responseData: any) => {
         if (err) {
           reject(err)
         } else {

@@ -12,9 +12,7 @@ import { getInviteFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import Logger from 'src/utils/Logger'
 
-export type CalculateFeeChildren = (
-  asyncResult: UseAsyncReturn<BigNumber, never>
-) => React.ReactNode
+export type CalculateFeeChildren = (asyncResult: UseAsyncReturn<BigNumber, any>) => React.ReactNode
 
 interface CommonProps {
   children: CalculateFeeChildren
@@ -31,9 +29,10 @@ interface SendProps extends CommonProps {
   feeType: FeeType.SEND
   account: string
   recipientAddress: string
-  amount: BigNumber
+  amount: string
   comment?: string
   includeDekFee: boolean
+  currency?: CURRENCY_ENUM
 }
 
 interface ExchangeProps extends CommonProps {
@@ -88,27 +87,39 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   return props.children(asyncResult) as React.ReactElement
 }
 
-const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
-  const asyncResult = useAsyncShowError(
+export const useSendFee = (props: Omit<SendProps, 'children'>): UseAsyncReturn<BigNumber> => {
+  return useAsyncShowError(
     (
       account: string,
       recipientAddress: string,
-      amount: BigNumber,
+      amount: string,
       comment: string = MAX_PLACEHOLDER_COMMENT,
-      includeDekFee: boolean = false
+      includeDekFee: boolean = false,
+      currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
     ) =>
       getSendFee(
         account,
-        CURRENCY_ENUM.DOLLAR,
+        currency,
         {
           recipientAddress,
-          amount: amount.valueOf(),
+          amount,
           comment,
         },
         includeDekFee
       ),
-    [props.account, props.recipientAddress, props.amount, props.comment, props.includeDekFee]
+    [
+      props.account,
+      props.recipientAddress,
+      props.amount,
+      props.comment,
+      props.includeDekFee,
+      props.currency,
+    ]
   )
+}
+
+const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
+  const asyncResult = useSendFee(props)
   return props.children(asyncResult) as React.ReactElement
 }
 

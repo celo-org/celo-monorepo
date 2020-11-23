@@ -141,7 +141,7 @@ export async function deploy(
   await uploadTestnetInfoToGoogleStorage(celoEnv, !useExistingGenesis)
 }
 
-async function deployModule(
+export async function deployModule(
   celoEnv: string,
   terraformModule: string,
   vars: TerraformVars,
@@ -190,7 +190,7 @@ export async function destroy(celoEnv: string) {
   }
 }
 
-async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+export async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
   const envType = fetchEnv(envVar.ENV_TYPE)
@@ -260,8 +260,9 @@ export async function getTestnetOutputs(celoEnv: string) {
 }
 
 export async function getInternalTxNodeLoadBalancerIP(celoEnv: string) {
-  const outputs = await getTestnetOutputs(celoEnv)
-  return outputs.tx_node_lb_internal_ip_address.value
+  const fullCmd = getInternalTxNodeLoadBalancerIpCommand(celoEnv)
+  const [output] = await execCmd(fullCmd)
+  return output.trim()
 }
 
 export async function getInternalValidatorIPs(celoEnv: string) {
@@ -279,7 +280,7 @@ export async function getInternalTxNodeIPs(celoEnv: string) {
   return outputs.tx_node_internal_ip_addresses.value
 }
 
-function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
+export function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     bucket: stateBucketName(),
     prefix: `${celoEnv}/${terraformModule}`,
@@ -480,6 +481,11 @@ export function getVmSshCommand(instanceName: string) {
   const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
   const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   return `gcloud beta compute --project '${project}' ssh --zone '${zone}' ${instanceName} --tunnel-through-iap`
+}
+
+export function getInternalTxNodeLoadBalancerIpCommand(celoEnv: string) {
+  const project = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  return `gcloud compute forwarding-rules list --project '${project}' --filter="name~'${celoEnv}-tx-node-lb-internal-fwd-rule'" --format='get(IPAddress)'`
 }
 
 export async function getNodeVmName(

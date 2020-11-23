@@ -8,7 +8,7 @@ import {
 } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { AddressToDisplayNameType, AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { KnownFeedTransactionsType } from 'src/transactions/reducer'
@@ -75,6 +75,7 @@ export function getTransferFeedParams(
   recentTxRecipientsCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
+  addressToDisplayName: AddressToDisplayNameType,
   rawComment: string | null,
   commentKey: string | null,
   timestamp: number,
@@ -89,7 +90,7 @@ export function getTransferFeedParams(
     timestamp,
     invitees
   )
-  const nameOrNumber = recipient ? recipient.displayName : e164PhoneNumber
+  const nameOrNumber = recipient?.displayName || addressToDisplayName[address] || e164PhoneNumber
   const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info

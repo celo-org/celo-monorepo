@@ -1,6 +1,6 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { parseInputAmount } from '@celo/utils/src/parsing'
@@ -18,7 +18,7 @@ import { RequestEvents, SendEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton.v2'
+import BackButton from 'src/components/BackButton'
 import {
   ALERT_BANNER_DURATION,
   DAILY_PAYMENT_LIMIT_CUSD,
@@ -45,7 +45,7 @@ import {
   getLocalCurrencyExchangeRate,
   getLocalCurrencySymbol,
 } from 'src/localCurrency/selectors'
-import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
+import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -55,6 +55,8 @@ import { getFeeType, useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
+
+const MAX_ESCROW_VALUE = new BigNumber(20)
 
 export interface TransactionDataInput {
   recipient: Recipient
@@ -121,16 +123,6 @@ function SendAmount(props: Props) {
     dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
   }, [])
 
-  useEffect(() => {
-    if (
-      reviewButtonPressed &&
-      recipientVerificationStatus !== RecipientVerificationStatus.UNKNOWN
-    ) {
-      isOutgoingPaymentRequest ? onRequest() : onSend()
-      setReviewButtonPressed(false)
-    }
-  }, [reviewButtonPressed, recipientVerificationStatus])
-
   const maxLength = React.useMemo(() => {
     const decimalPos = amount.indexOf(decimalSeparator ?? '.')
     if (decimalPos === -1) {
@@ -188,6 +180,29 @@ function SendAmount(props: Props) {
     recipient,
     secureSendPhoneNumberMapping
   )
+
+  useEffect(() => {
+    if (reviewButtonPressed) {
+      if (recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN) {
+        // Wait until the recipient status is fetched.
+        return
+      } else if (
+        recipientVerificationStatus === RecipientVerificationStatus.UNVERIFIED &&
+        dollarAmount.isGreaterThan(MAX_ESCROW_VALUE)
+      ) {
+        const maxAmount = convertDollarsToLocalAmount(MAX_ESCROW_VALUE, localCurrencyExchangeRate)
+        dispatch(
+          showError(ErrorMessages.MAX_ESCROW_TRANSFER_EXCEEDED, ALERT_BANNER_DURATION, {
+            maxAmount: maxAmount?.toFixed(2),
+            symbol: localCurrencySymbol,
+          })
+        )
+      } else {
+        isOutgoingPaymentRequest ? onRequest() : onSend()
+      }
+      setReviewButtonPressed(false)
+    }
+  }, [reviewButtonPressed, recipientVerificationStatus])
 
   const getTransactionData = React.useCallback(
     (type: TokenTransactionType): TransactionDataInput => ({

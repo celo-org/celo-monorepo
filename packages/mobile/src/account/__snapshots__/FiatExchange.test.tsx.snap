@@ -5,6 +5,7 @@ exports[`FiatExchange renders correctly 1`] = `
   style={
     Object {
       "flex": 1,
+      "justifyContent": "center",
     }
   }
 >
@@ -90,76 +91,68 @@ exports[`FiatExchange renders correctly 1`] = `
   <View
     style={
       Object {
-        "height": 200,
-      }
-    }
-  />
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "height": 112,
-        "justifyContent": "flex-end",
-        "marginLeft": 16,
-        "paddingRight": 16,
-        "paddingVertical": 16,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
       }
     }
   >
-    <Text
+    <View
       style={
         Object {
-          "color": "#2E3338",
-          "fontFamily": "Jost-Medium",
-          "fontSize": 22,
-          "lineHeight": 28,
-          "marginBottom": 4,
+          "marginLeft": 16,
+          "paddingRight": 16,
+          "paddingVertical": 16,
         }
       }
     >
-      global:currentBalance
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 18,
-            "lineHeight": 24,
-            "marginBottom": 2,
-          },
-          Object {
-            "color": "#2E3338",
-          },
-        ]
-      }
-    >
-      
-      $
-      0.00
-    </Text>
-    <Text
-      numberOfLines={1}
-      style={
-        Array [
+      <Text
+        style={
           Object {
             "color": "#9CA4A9",
-            "fontFamily": "Inter-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "color": "#9CA4A9",
-          },
-        ]
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 16,
+            "marginBottom": 4,
+          }
+        }
+      >
+        global:currentBalance
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 18,
+              "lineHeight": 24,
+              "marginBottom": 2,
+            },
+            Object {
+              "color": "#2E3338",
+            },
+          ]
+        }
+      >
+        
+        $
+        0.00
+      </Text>
+    </View>
+    <Image
+      resizeMode="contain"
+      source={
+        Object {
+          "testUri": "../../../packages/mobile/src/images/fiat-exchange.png",
+        }
       }
-    >
-      
-      0.00
-       global:celoDollars
-    </Text>
+      style={
+        Object {
+          "marginRight": 16,
+        }
+      }
+    />
   </View>
   <View
     style={
@@ -206,13 +199,26 @@ exports[`FiatExchange renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Inter-Regular",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 16,
                 "lineHeight": 22,
               }
             }
           >
             fiatExchangeFlow:addFunds
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+                "marginTop": 2,
+              }
+            }
+          >
+            fiatExchangeFlow:addFundsSubtitle
           </Text>
         </View>
       </View>
@@ -225,27 +231,58 @@ exports[`FiatExchange renders correctly 1`] = `
       }
     >
       <View
-        style={
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
           Object {
-            "borderBottomColor": "#EDEEEF",
-            "borderBottomWidth": 1,
-            "marginLeft": 16,
-            "paddingVertical": 16,
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
       >
-        <Text
+        <View
           style={
             Object {
-              "color": "#B4B9BD",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "marginLeft": 16,
+              "paddingVertical": 16,
             }
           }
         >
-          fiatExchangeFlow:cashOutComingSoon
-        </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            fiatExchangeFlow:cashOut
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+                "marginTop": 2,
+              }
+            }
+          >
+            fiatExchangeFlow:cashOutSubtitle
+          </Text>
+        </View>
       </View>
     </View>
   </View>

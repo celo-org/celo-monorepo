@@ -64,7 +64,7 @@ export class PincodeSet extends React.Component<Props, State> {
       return Screens.ImportWallet
     }
 
-    return Screens.EnterInviteCode
+    return Screens.VerificationEducationScreen
   }
 
   onChangePin1 = (pin1: string) => {
@@ -120,7 +120,7 @@ export class PincodeSet extends React.Component<Props, State> {
     const { pin1, pin2, errorText } = this.state
 
     return (
-      <SafeAreaView style={style.container}>
+      <SafeAreaView style={styles.container}>
         <DevSkipButton nextScreen={this.getNextScreen()} />
         {isVerifying ? (
           // Verify
@@ -144,7 +144,7 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.onboardingBackground,

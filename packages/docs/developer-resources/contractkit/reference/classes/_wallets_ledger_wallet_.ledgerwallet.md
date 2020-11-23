@@ -20,18 +20,20 @@
 
 ### Properties
 
-* [baseDerivationPath](_wallets_ledger_wallet_.ledgerwallet.md#basederivationpath)
-* [derivationPathIndexes](_wallets_ledger_wallet_.ledgerwallet.md#derivationpathindexes)
-* [ledgerAddressValidation](_wallets_ledger_wallet_.ledgerwallet.md#ledgeraddressvalidation)
-* [transport](_wallets_ledger_wallet_.ledgerwallet.md#transport)
+* [baseDerivationPath](_wallets_ledger_wallet_.ledgerwallet.md#readonly-basederivationpath)
+* [derivationPathIndexes](_wallets_ledger_wallet_.ledgerwallet.md#readonly-derivationpathindexes)
+* [ledgerAddressValidation](_wallets_ledger_wallet_.ledgerwallet.md#readonly-ledgeraddressvalidation)
+* [transport](_wallets_ledger_wallet_.ledgerwallet.md#readonly-transport)
 
 ### Methods
 
+* [computeSharedSecret](_wallets_ledger_wallet_.ledgerwallet.md#computesharedsecret)
 * [decrypt](_wallets_ledger_wallet_.ledgerwallet.md#decrypt)
 * [getAccounts](_wallets_ledger_wallet_.ledgerwallet.md#getaccounts)
 * [hasAccount](_wallets_ledger_wallet_.ledgerwallet.md#hasaccount)
 * [init](_wallets_ledger_wallet_.ledgerwallet.md#init)
 * [isSetupFinished](_wallets_ledger_wallet_.ledgerwallet.md#issetupfinished)
+* [removeAccount](_wallets_ledger_wallet_.ledgerwallet.md#removeaccount)
 * [signPersonalMessage](_wallets_ledger_wallet_.ledgerwallet.md#signpersonalmessage)
 * [signTransaction](_wallets_ledger_wallet_.ledgerwallet.md#signtransaction)
 * [signTypedData](_wallets_ledger_wallet_.ledgerwallet.md#signtypeddata)
@@ -57,7 +59,7 @@ Name | Type | Default | Description |
 
 ## Properties
 
-###  baseDerivationPath
+### `Readonly` baseDerivationPath
 
 • **baseDerivationPath**: *string*
 
@@ -67,7 +69,7 @@ base derivation path. Default: "44'/52752'/0'/0"
 
 ___
 
-###  derivationPathIndexes
+### `Readonly` derivationPathIndexes
 
 • **derivationPathIndexes**: *number[]*
 
@@ -80,7 +82,7 @@ Example: [3, 99, 53] will retrieve the derivation paths of
 
 ___
 
-###  ledgerAddressValidation
+### `Readonly` ledgerAddressValidation
 
 • **ledgerAddressValidation**: *[AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)*
 
@@ -88,7 +90,7 @@ ___
 
 ___
 
-###  transport
+### `Readonly` transport
 
 • **transport**: *any*
 
@@ -98,13 +100,34 @@ Transport to connect the ledger device
 
 ## Methods
 
+###  computeSharedSecret
+
+▸ **computeSharedSecret**(`address`: [Address](../modules/_base_.md#address), `publicKey`: string): *Promise‹Buffer›*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[computeSharedSecret](_wallets_wallet_.walletbase.md#computesharedsecret)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:157](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L157)*
+
+Computes the shared secret (an ECDH key exchange object) between two accounts
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | [Address](../modules/_base_.md#address) |
+`publicKey` | string |
+
+**Returns:** *Promise‹Buffer›*
+
+___
+
 ###  decrypt
 
 ▸ **decrypt**(`address`: string, `ciphertext`: Buffer): *Promise‹Buffer‹››*
 
 *Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[decrypt](_wallets_wallet_.walletbase.md#decrypt)*
 
-*Defined in [packages/contractkit/src/wallets/wallet.ts:133](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L133)*
+*Defined in [packages/contractkit/src/wallets/wallet.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L149)*
 
 **Parameters:**
 
@@ -179,6 +202,26 @@ ___
 *Defined in [packages/contractkit/src/wallets/remote-wallet.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L111)*
 
 **Returns:** *boolean*
+
+___
+
+###  removeAccount
+
+▸ **removeAccount**(`_address`: string): *void*
+
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[removeAccount](_wallets_wallet_.walletbase.md#removeaccount)*
+
+*Defined in [packages/contractkit/src/wallets/wallet.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L52)*
+
+Removes the account with the given address. Needs to be implemented by subclass, otherwise throws error
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`_address` | string |
+
+**Returns:** *void*
 
 ___
 

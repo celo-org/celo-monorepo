@@ -1,6 +1,7 @@
 {
   "title": "Celo Terms of Use and FAQ",
-  "metaDescription": "",
+  "metaDescription": "Celo Terms, Privacy Policy & Frequently Asked Questions",
+  "updatedOn": "Updated {{date}}",
   "helpfulLinks": "Helpful Links",
   "privacy": "A Note on Privacy",
   "privacyNote":
@@ -10,7 +11,6 @@
   "userAgreementLink": "User Agreement",
   "faq": "FAQ",
   "disclaimer": "Disclaimer",
-  "agreementTitle": "User Agreement and Terms:\n Celo Platform",
   "gameOfStakesTermsTitle": "The Great Celo Stake Off",
   "gameOfStakesTermsMetaDescription": "Legal Terms and Conditions of The Great Celo Stake Off",
   "termsAndConditions": "Terms and Conditions"

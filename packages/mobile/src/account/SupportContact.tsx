@@ -1,9 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import Switch from '@celo/react-components/components/Switch'
-import TextInput from '@celo/react-components/components/TextInput.v2'
+import TextInput from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -27,11 +27,11 @@ interface Email {
   recipients: [string]
   body: string
   isHTML: boolean
-  attachment?: {
+  attachments?: Array<{
     path: string
     type: string
     name: string
-  }
+  }>
 }
 
 async function sendEmailWithNonNativeApp(
@@ -93,11 +93,13 @@ function SupportContact() {
     if (attachLogs) {
       combinedLogsPath = await Logger.createCombinedLogs()
       if (combinedLogsPath) {
-        email.attachment = {
-          path: combinedLogsPath, // The absolute path of the file from which to read data.
-          type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-          name: '', // Optional: Custom filename for attachment
-        }
+        email.attachments = [
+          {
+            path: combinedLogsPath, // The absolute path of the file from which to read data.
+            type: 'text', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+            name: '', // Optional: Custom filename for attachment
+          },
+        ]
         email.body += (email.body ? '<br/><br/>' : '') + '<b>Support logs are attached...</b>'
       }
     }
@@ -188,15 +190,6 @@ const styles = StyleSheet.create({
   innerContainer: {
     flexGrow: 1,
     padding: 16,
-  },
-  containerList: {
-    paddingLeft: 20,
-    borderTopWidth: 1,
-    borderColor: '#EEEEEE',
-  },
-  contactUs: {
-    marginTop: 30,
-    alignItems: 'center',
   },
   attachLogs: {
     flexShrink: 0,

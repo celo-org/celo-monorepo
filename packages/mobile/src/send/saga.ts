@@ -32,6 +32,7 @@ import {
 import { newTransactionContext } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getRegisterDekTxGas, registerAccountDek } from 'src/web3/dataEncryptionKey'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -45,12 +46,15 @@ export async function getSendTxGas(
   try {
     Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
     const tx = await createTokenTransferTransaction(currency, params)
-    const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
+    const txParams = {
+      from: account,
+      feeCurrency: currency === CURRENCY_ENUM.GOLD ? undefined : await getCurrencyAddress(currency),
+    }
     const gas = await estimateGas(tx.txo, txParams)
     Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
     return gas
   } catch (error) {
-    throw Error(ErrorMessages.INSUFFICIENT_BALANCE)
+    throw Error(ErrorMessages.CALCULATE_FEE_FAILED)
   }
 }
 
@@ -184,6 +188,8 @@ function* sendPaymentOrInviteSaga({
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
   try {
+    yield call(getConnectedUnlockedAccount)
+
     if (!recipient?.e164PhoneNumber && !recipient?.address) {
       throw new Error("Can't send to recipient without valid e164PhoneNumber or address")
     }

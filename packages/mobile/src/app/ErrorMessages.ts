@@ -27,6 +27,7 @@ export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
   SALT_FETCH_FAILURE = 'saltFetchFailure',
   SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
+  MAX_ACTIONABLE_ATTESTATIONS_EXCEEDED = 'maxActionableAttestationsExceededError',
   ODIS_INSUFFICIENT_BALANCE = 'odisInsufficientBalance',
   MATCHMAKING_QUOTA_EXCEEDED = 'matchmakingQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
@@ -74,4 +75,6 @@ export enum ErrorMessages {
   GETH_FETCH_ACCOUNTS = 'gethFetchAccounts',
   GETH_ACCOUNT_ALREADY_EXISTS = 'gethAccountAlreadyExists',
   GETH_UNEXPECTED_ADDRESS_ON_ADD = 'gethUnexpectedAddressOnAdd',
+  COUNTRY_NOT_AVAILABLE = 'countryNotAvailable',
+  MAX_ESCROW_TRANSFER_EXCEEDED = 'maxEscrowTransferExceeded',
 }

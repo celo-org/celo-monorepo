@@ -8,7 +8,6 @@
   "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and CELO. Nobody, not even {{appName}}, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
   "postSetupCTA": "Learn about Account Keys",
   "getBackupKey": "Get Backup Key",
-  "setUpSocialBackup": "Set Up Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Account Key",
   "backupAndRecovery": "Backup and Recovery",
   "writeDownKey": "Please write down your key",
@@ -29,18 +28,6 @@
     "0": "Success!",
     "1": "Next, you can set up Safeguards.",
     "2": "You’re all set!"
-  },
-  "socialBackupIntro": {
-    "header": "Introducing Safeguards",
-    "body": "Safeguards is an additional layer of protection for your account in case you lose your Backup Key. Once set up, you’ll be able to restore your account with the help of two friends or family members. ",
-    "warning": "NEVER TELL ANYONE YOUR SAFEGUARDS’ IDENTITIES.",
-    "skip": "Skip For Now"
-  },
-  "socialBackupPhraseHeader": "Safeguard Phrase {{index}}",
-  "socialBackup": {
-    "body": "Share each phrase below with a friend. Be sure to send only one phrase to each person.",
-    "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
-    "yourSafeguards": "Your Safeguards"
   },
   "cancelDialog": {
     "title": "Finish setting up your Account Account Key",

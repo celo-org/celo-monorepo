@@ -1,4 +1,4 @@
-# External module: "contract-cache"
+# Module: "contract-cache"
 
 ## Index
 
@@ -16,4 +16,4 @@
 
 Ƭ **ValidWrappers**: *keyof CFType*
 
-*Defined in [packages/contractkit/src/contract-cache.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L49)*
+*Defined in [packages/contractkit/src/contract-cache.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L53)*
