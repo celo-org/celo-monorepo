@@ -6,6 +6,12 @@ import BackupIntroduction from 'src/backup/BackupIntroduction'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
+const mockCurrentTime = 1552353116086
+
+jest.mock('src/utils/time', () => ({
+  getRemoteTime: () => mockCurrentTime,
+}))
+
 describe('BackupIntroduction', () => {
   it('renders correctly when backup not complete', () => {
     const tree = renderer.create(

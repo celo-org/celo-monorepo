@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { connect } from 'react-redux'
 import { OnboardingEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -19,14 +18,7 @@ interface StateProps {
   backupCompleted: boolean
 }
 
-interface DispatchProps {
-  exitBackupFlow: typeof exitBackupFlow
-}
-
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.BackupComplete>
+type Props = StateProps & WithTranslation & StackScreenProps<StackParamList, Screens.BackupComplete>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -82,6 +74,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  exitBackupFlow,
-})(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupComplete))
+export default connect<StateProps, {}, {}, RootState>(
+  mapStateToProps,
+  {}
+)(withTranslation<Props>(Namespaces.backupKeyFlow6)(BackupComplete))

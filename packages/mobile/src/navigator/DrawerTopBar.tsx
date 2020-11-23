@@ -2,17 +2,18 @@ import colors from '@celo/react-components/styles/colors'
 import { iconHitslop } from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { processColor, StyleSheet, TouchableOpacity } from 'react-native'
+import { processColor, StyleSheet, TouchableOpacity, View } from 'react-native'
 import Animated, { cond, greaterThan } from 'react-native-reanimated'
 import Hamburger from 'src/icons/Hamburger'
 
 interface Props {
   middleElement?: React.ReactNode
+  rightElement?: React.ReactNode
   scrollPosition?: Animated.Value<number>
   testID?: string
 }
 
-function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
+function DrawerTopBar({ middleElement, rightElement, scrollPosition, testID }: Props) {
   const navigation = useNavigation()
   const viewStyle = React.useMemo(
     () => ({
@@ -39,6 +40,7 @@ function DrawerTopBar({ middleElement, scrollPosition, testID }: Props) {
         <Hamburger />
       </TouchableOpacity>
       {middleElement}
+      {rightElement && <View style={styles.rightElement}>{rightElement}</View>}
     </Animated.View>
   )
 }
@@ -60,6 +62,13 @@ const styles = StyleSheet.create({
     left: 0,
     padding: 0,
     marginLeft: 16,
+    marginBottom: 0,
+  },
+  rightElement: {
+    position: 'absolute',
+    right: 0,
+    padding: 0,
+    marginRight: 16,
     marginBottom: 0,
   },
 })

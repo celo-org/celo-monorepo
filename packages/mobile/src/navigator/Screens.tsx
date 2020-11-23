@@ -4,6 +4,7 @@ export enum Screens {
   BackupComplete = 'BackupComplete',
   BackupIntroduction = 'BackupIntroduction',
   BackupPhrase = 'BackupPhrase',
+  BackupForceScreen = 'BackupForceScreen',
   BackupQuiz = 'BackupQuiz',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',

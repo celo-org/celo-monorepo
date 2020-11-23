@@ -3,37 +3,39 @@ import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import DelayButton from 'src/backup/DelayButton'
 import { createMockStore } from 'test/utils'
-const NOW = new Date().getTime()
 
 const TWO_DAYS = 60 * 60 * 24 * 2 * 1000
 
+const mockCurrentTime = 1552353116086
+
+jest.mock('src/utils/time', () => ({
+  getRemoteTime: () => mockCurrentTime,
+}))
+
 describe('DelayButton', () => {
-  it('renders button with text when backup too late and not delayed', () => {
-    const { toJSON, queryByText, debug } = render(
+  it('renders button with text when backup not completed and not delayed yet', () => {
+    const { toJSON, queryByText } = render(
       <Provider
         store={createMockStore({
           account: {
-            accountCreationTime: NOW - TWO_DAYS,
+            backupRequiredTime: null,
             backupCompleted: false,
-            backupDelayedTime: 0,
           },
         })}
       >
         <DelayButton />
       </Provider>
     )
-    debug()
     expect(queryByText('delayBackup')).toBeTruthy()
     expect(toJSON()).toMatchSnapshot()
   })
 
-  it('renders empty when backup too late and delayed', () => {
-    const { toJSON, queryByText } = render(
+  it('renders empty when backup was already delayed', () => {
+    const { queryByText } = render(
       <Provider
         store={createMockStore({
           account: {
-            accountCreationTime: NOW - TWO_DAYS,
-            backupDelayedTime: NOW,
+            backupRequiredTime: mockCurrentTime + TWO_DAYS,
             backupCompleted: false,
           },
         })}
@@ -42,6 +44,21 @@ describe('DelayButton', () => {
       </Provider>
     )
     expect(queryByText('delayBackup')).toBeFalsy()
-    expect(toJSON()).toMatchSnapshot()
+  })
+
+  it('renders empty when backup already completed', () => {
+    const { queryByText } = render(
+      <Provider
+        store={createMockStore({
+          account: {
+            backupRequiredTime: null,
+            backupCompleted: true,
+          },
+        })}
+      >
+        <DelayButton />
+      </Provider>
+    )
+    expect(queryByText('delayBackup')).toBeFalsy()
   })
 })

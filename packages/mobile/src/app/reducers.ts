@@ -8,7 +8,6 @@ export interface State {
   loggedIn: boolean
   numberVerified: boolean
   language: string | null
-  doingBackupFlow: boolean
   analyticsEnabled: boolean
   requirePinOnAppOpen: boolean
   appState: AppState
@@ -19,6 +18,7 @@ export interface State {
   pontoEnabled: boolean
   kotaniEnabled: boolean
   inviteModalVisible: boolean
+  activeScreen: string
 }
 
 const initialState = {
@@ -26,7 +26,6 @@ const initialState = {
   loggedIn: false,
   numberVerified: false,
   language: null,
-  doingBackupFlow: false,
   analyticsEnabled: true,
   requirePinOnAppOpen: false,
   appState: AppState.Active,
@@ -37,6 +36,7 @@ const initialState = {
   pontoEnabled: false,
   kotaniEnabled: false,
   inviteModalVisible: false,
+  activeScreen: '',
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language || i18n.language
@@ -101,16 +101,6 @@ export const appReducer = (
         numberVerified: false,
         language: null,
       }
-    case Actions.ENTER_BACKUP_FLOW:
-      return {
-        ...state,
-        doingBackupFlow: true,
-      }
-    case Actions.EXIT_BACKUP_FLOW:
-      return {
-        ...state,
-        doingBackupFlow: false,
-      }
     case Actions.SET_ANALYTICS_ENABLED:
       return {
         ...state,
@@ -155,6 +145,11 @@ export const appReducer = (
       return {
         ...state,
         inviteModalVisible: action.inviteModalVisible,
+      }
+    case Actions.ACTIVE_SCREEN_CHANGED:
+      return {
+        ...state,
+        activeScreen: action.activeScreen,
       }
     default:
       return state

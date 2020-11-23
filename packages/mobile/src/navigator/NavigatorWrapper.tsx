@@ -5,11 +5,14 @@ import * as React from 'react'
 import { Share, StyleSheet, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import RNShake from 'react-native-shake'
+import { useDispatch, useSelector } from 'react-redux'
 import AlertBanner from 'src/alert/AlertBanner'
 import { InviteEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
+import { activeScreenChanged } from 'src/app/actions'
 import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
+import { doingBackupFlowSelector, shouldForceBackupSelector } from 'src/backup/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { isVersionBelowMinimum } from 'src/firebase/firebase'
 import i18n from 'src/i18n'
@@ -20,7 +23,6 @@ import Navigator from 'src/navigator/Navigator'
 import { Screens } from 'src/navigator/Screens'
 import PincodeLock from 'src/pincode/PincodeLock'
 import useTypedSelector from 'src/redux/useSelector'
-import BackupPrompt from 'src/shared/BackupPrompt'
 import Logger from 'src/utils/Logger'
 
 // This uses RN Navigation's experimental nav state persistence
@@ -59,6 +61,8 @@ export const NavigatorWrapper = () => {
   const isInviteModalVisible = useTypedSelector((state) => state.app.inviteModalVisible)
   const routeNameRef = React.useRef()
 
+  const dispatch = useDispatch()
+
   const updateRequired = React.useMemo(() => {
     if (!minRequiredVersion) {
       return false
@@ -70,6 +74,15 @@ export const NavigatorWrapper = () => {
     )
     return isVersionBelowMinimum(version, minRequiredVersion)
   }, [minRequiredVersion])
+
+  const shouldForceBackup = useSelector(shouldForceBackupSelector)
+  const doingBackupFlow = useSelector(doingBackupFlowSelector)
+
+  React.useEffect(() => {
+    if (shouldForceBackup && !doingBackupFlow) {
+      navigate(Screens.BackupForceScreen)
+    }
+  }, [shouldForceBackup, doingBackupFlow])
 
   React.useEffect(() => {
     if (navigationRef && navigationRef.current) {
@@ -138,6 +151,7 @@ export const NavigatorWrapper = () => {
         previousScreen: previousRouteName,
         currentScreen: currentRouteName,
       })
+      dispatch(activeScreenChanged(currentRouteName))
     }
 
     // Save the current route name for later comparision
@@ -165,7 +179,6 @@ export const NavigatorWrapper = () => {
           <View style={styles.locked}>{updateRequired ? <UpgradeScreen /> : <PincodeLock />}</View>
         )}
         <View style={styles.floating}>
-          {!appLocked && !updateRequired && <BackupPrompt />}
           <AlertBanner />
           <InviteFriendModal isVisible={isInviteModalVisible} onInvite={onInvite} />
         </View>
