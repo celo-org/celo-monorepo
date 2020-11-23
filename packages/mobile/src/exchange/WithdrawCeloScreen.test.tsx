@@ -136,4 +136,22 @@ describe('WithdrawCeloScreen', () => {
     fireEvent.changeText(getByTestId('AccountAddress'), SAMPLE_ADDRESS)
     expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
   })
+
+  it('populates fields with values received in params', async () => {
+    const { getByTestId } = render(
+      <Provider store={store}>
+        <WithdrawCeloScreen
+          {...getMockStackScreenProps(Screens.WithdrawCeloScreen, {
+            isCashOut: false,
+            amount: new BigNumber(10.5),
+            recipientAddress: SAMPLE_ADDRESS,
+          })}
+        />
+      </Provider>
+    )
+
+    expect(getByTestId('CeloAmount').props.value).toBe('10.5')
+    expect(getByTestId('AccountAddress').props.value).toBe(SAMPLE_ADDRESS)
+    expect(getByTestId('WithdrawReviewButton').props.disabled).toBe(false)
+  })
 })
