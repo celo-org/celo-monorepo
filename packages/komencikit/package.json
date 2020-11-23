@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@celo/base": "0.0.5-dev",
+    "@celo/connect": "0.0.2-dev",
     "@celo/contractkit": "0.4.19-dev",
     "@celo/identity": "0.0.1-dev",
     "@celo/utils": "0.1.23-dev",
@@ -36,7 +37,6 @@
     "node": ">=8.13.0"
   },
   "devDependencies": {
-    "@celo/connect": "0.0.2-dev",
     "domexception": "^2.0.1",
     "jest-fetch-mock": "^3.0.3",
     "web3": "1.2.11"

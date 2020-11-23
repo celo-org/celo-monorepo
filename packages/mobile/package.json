@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@celo/client": "0.0.319",
+    "@celo/connect": "0.0.2-dev",
     "@celo/contractkit": "0.4.19-dev",
     "@celo/identity": "0.0.1-dev",
     "@celo/komencikit": "0.0.1-dev",
@@ -159,7 +160,6 @@
     "@babel/plugin-proposal-decorators": "^7.12.1",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1",
-    "@celo/connect": "0.0.2-dev",
     "@graphql-codegen/add": "^1.10.0",
     "@graphql-codegen/cli": "^1.10.0",
     "@graphql-codegen/fragment-matcher": "1.10.0",

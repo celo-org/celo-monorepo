@@ -5,14 +5,12 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@celo/connect": "0.0.2-dev",
     "@celo/contractkit": "0.4.19-dev",
     "@celo/utils": "0.1.23-dev",
     "expo": "^36.0.2",
     "expo-contacts": "8.0.0",
     "libphonenumber-js": "^1.7.22"
-  },
-  "devDependencies": {
-    "@celo/connect": "0.0.2-dev"
   },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
