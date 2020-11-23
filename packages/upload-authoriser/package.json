@@ -7,19 +7,17 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "functions-framework --target=authorize --signature-type=http --source=./dist",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "gcloud functions deploy valora-upload-authorizer --entry-point authorize --runtime nodejs10 --trigger-http --allow-unauthenticated",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project ."
   },
   "dependencies": {
-    "firebase-functions": "^3.6.0",
-    "node-fetch": "^2.6.0"
-  },
-  "devDependencies": {
+    "@celo/utils": "0.1.22",
+    "ethereumjs-util": "^6.2.0",
+    "node-fetch": "^2.6.0",
     "@google-cloud/functions-framework": "^1.7.1",
-    "firebase-admin": "^9.3.0",
-    "firebase-functions-test": "^0.2.0"
+    "@google-cloud/storage": "^5"
   },
   "engines": {
     "node": "10"

@@ -42,8 +42,10 @@ readerKit.addAccount(readerPrivate)
 readerKit.addAccount(readerEncryptionKeyPrivate)
 readerKit.defaultAccount = readerAddress
 
+const authorizerUrl = 'https://us-central1-celo-testnet.cloudfunctions.net/valora-upload-authorizer'
+
 async function call(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
-  const response = await fetch('http://localhost:8080', {
+  const response = await fetch(authorizerUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
