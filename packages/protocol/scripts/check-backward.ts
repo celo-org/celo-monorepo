@@ -2,9 +2,9 @@ import { ASTContractVersionsChecker } from '@celo/protocol/lib/compatibility/ast
 import { DefaultCategorizer } from '@celo/protocol/lib/compatibility/categorizer'
 import { ASTBackwardReport, instantiateArtifacts } from '@celo/protocol/lib/compatibility/utils'
 import { writeJsonSync } from 'fs-extra'
-import * as path from 'path'
-import * as tmp from 'tmp'
-import * as yargs from 'yargs'
+import path from 'path'
+import tmp from 'tmp'
+import yargs from 'yargs'
 
 const COMMAND_REPORT = 'report'
 const COMMAND_SEM_CHECK = 'sem_check'
