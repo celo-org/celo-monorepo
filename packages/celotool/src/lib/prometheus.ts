@@ -110,7 +110,7 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
     `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
   ]
-  if (clusterConfig) {
+  if ((clusterConfig) && (clusterConfig.cloudProvider) !== CloudProvider.GCP ) {
     const clusterName = clusterConfig.clusterName
     const cloudProvider = getCloudProviderPrefix(clusterConfig)
     params.push(
@@ -120,18 +120,13 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
         clusterName, cloudProvider
       )}`
     )
-    if (clusterConfig.cloudProvider === CloudProvider.GCP) {
-      const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
-      const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-      params.push(
-        `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
-      )
-    }
   } else {
     const clusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
+    const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     const cloudProvider = 'gcp'
-    await createPrometheusGcloudServiceAccount(clusterName, cloudProvider)
-    const serviceAccountName = `prometheus-gcp-${clusterName}`.substring(0, 30).replace(/[^a-zA-Z0-9]+$/g, '')
+    const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
+    await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
+    console.info(serviceAccountName)
     const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     params.push(
       `--set cluster=${clusterName}`,
@@ -149,9 +144,6 @@ async function getPrometheusGcloudServiceAccountKeyBase64(clusterName: string, c
 
   await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
 
-  // Setup workload identity IAM permissions
-  await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
-
   const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
   const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
   await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
@@ -164,10 +156,16 @@ async function createPrometheusGcloudServiceAccount(serviceAccountName: string, 
   await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
   const accountCreated = await createServiceAccountIfNotExists(serviceAccountName)
   if (accountCreated) {
-    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    let serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    while (!serviceAccountEmail) {
+      serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    }
+    serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
     await execCmdWithExitOnFailure(
       `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
     )
+    // Setup workload identity IAM permissions
+    await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
   }
 }
 

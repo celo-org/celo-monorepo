@@ -200,7 +200,7 @@ export async function installCertManagerAndNginx(celoEnv: string) {
   )
   if (!nginxIngressReleaseExists) {
     const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
-    nginxHelmParameters(valueFilePath, celoEnv)
+    await nginxHelmParameters(valueFilePath, celoEnv)
 
     await helmUpdateNginxRepo()
     await execCmdWithExitOnFailure(`helm install \
@@ -212,7 +212,7 @@ export async function installCertManagerAndNginx(celoEnv: string) {
   }
 }
 
-function nginxHelmParameters(valueFilePath: string, celoEnv: string) {
+async function nginxHelmParameters(valueFilePath: string, celoEnv: string) {
   const logFormat = `{"timestamp": "$time_iso8601", "requestID": "$req_id", "proxyUpstreamName":
   "$proxy_upstream_name", "proxyAlternativeUpstreamName": "$proxy_alternative_upstream_name","upstreamStatus":
   "$upstream_status", "upstreamAddr": "$upstream_addr","httpRequest":{"requestMethod":
@@ -220,12 +220,13 @@ function nginxHelmParameters(valueFilePath: string, celoEnv: string) {
   "$request_length", "responseSize": "$upstream_response_length", "userAgent":
   "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
   "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
-  const loadBalancerIP = getOrCreateNginxStaticIp(celoEnv)
+  const loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv)
 
   const valueFileContent = `
 controller:
   autoscaling:
     enabled: "true"
+    targetMemoryUtilizationPercentage: 85
   config:
     log-format-escape-json: "true"
     log-format-upstream: '${logFormat}'
@@ -237,17 +238,19 @@ controller:
         prometheus.io/port: "10254"
   service:
     loadBalancerIP: ${loadBalancerIP}
+  resources:
+    requests:
+      cpu: 200m
+      memory: 400Mi
 `
   fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
-export async function getOrCreateNginxStaticIp(celoEnv: string) {
+async function getOrCreateNginxStaticIp(celoEnv: string) {
   const staticIpName = `${celoEnv}-nginx`
-  let staticIpAddress = await retrieveIPAddress(staticIpName)
-  if (!staticIpName) {
-    await registerIPAddress(staticIpName)
-    staticIpAddress = await retrieveIPAddress(staticIpName)
-  }
+  await registerIPAddress(staticIpName)
+  const staticIpAddress = await retrieveIPAddress(staticIpName)
+  console.info(staticIpAddress)
   return staticIpAddress
 }
 
