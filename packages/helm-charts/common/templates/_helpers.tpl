@@ -462,13 +462,11 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - /bin/sh
   - -c
   args:
-  - 
-     if [ ! -d /root/.celo/celo ]; then
-       exit 0
-     fi
+  - |
+     [ ! -d /root/.celo/celo ] && exit 0
      cd /root/.celo/celo
      tar -cvf chaindata.tar chaindata/
-     gsutil -m cp chaindata.tar gs://{{ .Values.geth.gstorage_data_bucket }}
+     gsutil -m cp chaindata.tar gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata.tar
   volumeMounts:
   - name: data
     mountPath: /root/.celo
