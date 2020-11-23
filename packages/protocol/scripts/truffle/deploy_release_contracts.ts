@@ -12,45 +12,6 @@ import {
   ReleaseGoldProxyContract,
 } from 'types'
 
-async function recoverCelo(proxyAddress: Address, from: Address) {
-  const ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
-  // const ReleaseGold = artifacts.require('ReleaseGold')
-  const ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
-
-  const releaseGoldProxy = await ReleaseGoldProxy.at(proxyAddress)
-
-  const balance = await web3.eth.getBalance(releaseGoldProxy.address)
-
-  const recoveryMultiSig = await retryTx(ReleaseGoldMultiSig.new, [{ from }])
-  await _setInitialProxyImplementation(
-    web3,
-    recoveryMultiSig,
-    releaseGoldProxy,
-    'ReleaseGoldMultiSig',
-    {
-      from,
-      value: null,
-    },
-    [from],
-    1,
-    1
-  )
-  const releaseGold = await ReleaseGold.at(recoveryMultiSig.address)
-
-  await retryTx(releaseGold.transfer, [
-    from,
-    new BigNumber(balance).minus(new BigNumber(0.001)).dp(0),
-    {
-      from: fromAddress,
-    },
-  ])
-  // await releaseGold.transfer(from, new BigNumber(balance).minus(new BigNumber(0.001)).dp(0), {
-  //   from,
-  // })
-  console.log('Funds recovered!')
-  return
-}
-
 let argv: any
 let releases: any
 let startGold: any
@@ -220,8 +181,11 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       ...contractInitializationArgs
     )
   } catch (e) {
-    console.log('Something went wrong! Recovering CELO to', fromAddress)
-    return recoverCelo(releaseGoldProxy.address, fromAddress)
+    console.info(
+      'Something went wrong! Consider using the recover-funds.ts script with the below address'
+    )
+    console.info('ReleaseGoldProxy', releaseGoldProxy.address)
+    throw e
   }
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await retryTx(proxiedReleaseGold.transferOwnership, [
