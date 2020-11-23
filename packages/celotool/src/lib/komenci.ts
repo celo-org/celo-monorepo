@@ -125,10 +125,15 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   }
 }
 
-async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: string){
-  const [password] = await execCmdWithExitOnFailure(
+async function getKeyVaultSecret(vaultName: string, secretName: string) {
+  const [secret] = await execCmdWithExitOnFailure(
     `az keyvault secret show --name ${secretName} --vault-name ${vaultName} --query value`
   )
+  return secret
+}
+
+async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: string) {
+  const password = await getKeyVaultSecret(vaultName, secretName)
   return password.replace(/\n|"/g, '')
 }
 
@@ -145,7 +150,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const vars = getContextDynamicEnvVarValues(
     {
       network: DynamicEnvVar.KOMENCI_NETWORK,
-      reCaptchaKeyVault: DynamicEnvVar.KOMENCI_RECAPTCHA_SECRET_VAULT_NAME,
+      appSecretsKeyVault: DynamicEnvVar.KOMENCI_APP_SECRETS_VAULT_NAME,
       captchaBypassEnabled: DynamicEnvVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_ENABLED,
     },
     context
@@ -156,7 +161,8 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
-  const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.reCaptchaKeyVault, 'RECAPTCHA-SECRET-KEY')
+  const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.appSecretsKeyVault, 'RECAPTCHA-SECRET-KEY')
+  const loggerCredentials = await getPasswordFromKeyVaultSecret(vars.appSecretsKeyVault, 'LOGGER-SERVICE-ACCOUNT')
   const clusterConfig = getAksClusterConfig(context)
 
   return [
@@ -165,6 +171,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set environment.network=${vars.network}`,
     `--set environment.cluster.name=${clusterConfig.clusterName}`,
     `--set environment.cluster.location=${clusterConfig.regionName}`,
+    `--set loggingAgent.credentials=${loggerCredentials}`,
     `--set image.repository=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_TAG)}`,
     `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,

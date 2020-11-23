@@ -2,18 +2,18 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: logging-agent-config
-  namespace: fluentd
+  namespace: default
 data:
-  credentials.json: |
+  credentials-json: |
 {{ .Values.loggingAgent.credentials | b64dec | indent 4 }}
-  app.conf: |
+  app-conf: |
     # Tails the container logs into standard JSON
     <source>
       @type tail
       path /var/log/containers/*.log
       path_key file_path
-      pos_file /pos/test.containers.log.pos
-      tag komenci.{{ .Values.environment.network }}.app
+      pos_file /opt/containers.log.pos
+      tag komenci.app.{{ .Values.environment.network }}
       limit_recently_modified 1d
       <parse>
         @type multi_format
@@ -30,7 +30,7 @@ data:
     </source>
 
     # Parses the kubernetes context from the container log name
-    <filter *.app>
+    <filter komenci.app.**>
       @type parser
       format /var\/log\/containers\/(?<pod_name>[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)_(?<namespace>[^_]+)_(?<container_name>.+)-(?<container_id>[a-z0-9]{64})\.log$/
       reserve_data true
@@ -38,15 +38,15 @@ data:
       key_name file_path
     </filter>
 
-    <filter *.app>
+    <filter komenci.app.**>
       @type grep
-      <exclude>
+      <regexp>
         key namespace
         pattern /{{ .Values.environment.name }}/
       </regexp>
     </filter>
 
-    <filter *.app>
+    <filter komenci.app.**>
       @type parser
       key_name log
       reserve_time true
@@ -58,7 +58,7 @@ data:
     </filter>
 
     # Transforms the container log into a user friendly format
-    <filter *.app>
+    <filter komenci.app.**>
       @type record_transformer
       enable_ruby
       <record>
@@ -69,7 +69,7 @@ data:
       remove_keys stream,log,file_path,msg,namespace,pod_name,container_name
     </filter>
 
-  google-fluentd.conf:  |
+  google-fluentd-conf: |
     @include config.d/*.conf
 
     # Prometheus monitoring.

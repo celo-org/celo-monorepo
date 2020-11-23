@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: fluentd-log-agent
-  namespace: fluentd
+  namespace: default
 spec:
  selector:
    matchLabels:
@@ -35,13 +35,16 @@ spec:
              name: varlibdockercontainers
              readOnly: true
            - mountPath: /opt/credentials.json
-             name: credentials.json
+             name: credentials-json
+             subPath: credentials-json-path
              readOnly: true
            - mountPath: /etc/google-fluentd/google-fluentd.conf
-             name: google-fluentd.conf
+             name: google-fluentd-conf
+             subPath: google-fluentd-conf-path
              readOnly: true
            - mountPath: /etc/google-fluentd/config.d/app.conf
-             name: app.conf
+             name: app-conf
+             subPath: app-conf-path
              readOnly: true
          env:
            - name: GOOGLE_APPLICATION_CREDENTIALS
@@ -55,15 +58,24 @@ spec:
        - hostPath:
            path: /var/lib/docker/containers
          name: varlibdockercontainers
-       - name: credentials.json
+       - name: credentials-json
          configMap:
            name: logging-agent-config
-       - name: app.json
+           items:
+           -  key: credentials-json
+              path: credentials-json-path
+       - name: app-conf
          configMap:
            name: logging-agent-config
-       - name: google-fluentd.json
+           items:
+           -  key: app-conf
+              path: app-conf-path
+       - name: google-fluentd-conf
          configMap:
            name: logging-agent-config
+           items:
+           -  key: google-fluentd-conf
+              path: google-fluentd-conf-path
 
 
 
