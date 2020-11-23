@@ -576,6 +576,7 @@
     - [Phone Number Privacy](celo-codebase/protocol/identity/phone-number-privacy.md)
     - [Metadata](celo-codebase/protocol/identity/metadata.md)
     - [Randomness](celo-codebase/protocol/identity/randomness.md)
+  - [Plumo Ultralight Sync](celo-codebase/protocol/plumo.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
   - [Wallet Functionality](celo-codebase/wallet/how-the-wallet-works/README.md)
