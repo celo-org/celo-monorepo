@@ -43,16 +43,20 @@ readerKit.addAccount(readerEncryptionKeyPrivate)
 readerKit.defaultAccount = readerAddress
 
 async function call(data: any, signature: string): Promise<SignedPostPolicyV4Output[]> {
-  const { result } = await fetch('http://localhost:5001/celo-testnet/us-central1/authorize', {
+  const response = await fetch('http://localhost:8080', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Signature: signature,
     },
-    body: JSON.stringify({ data }),
-  }).then((x) => x.json())
+    body: JSON.stringify(data),
+  })
 
-  return result as SignedPostPolicyV4Output[]
+  if (response.status >= 400) {
+    throw new Error(await response.text())
+  }
+
+  return response.json()
 }
 
 const valoraMetadataUrl = 'https://storage.googleapis.com/celo-test-alexh-bucket'

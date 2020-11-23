@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "serve": "firebase serve --only functions",
+    "start": "functions-framework --target=authorize --signature-type=http --source=./dist",
     "deploy": "firebase deploy --only functions",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
@@ -17,6 +17,7 @@
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
+    "@google-cloud/functions-framework": "^1.7.1",
     "firebase-admin": "^9.3.0",
     "firebase-functions-test": "^0.2.0"
   },

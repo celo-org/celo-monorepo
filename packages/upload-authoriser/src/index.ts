@@ -1,7 +1,7 @@
 import { guessSigner } from '@celo/utils/lib/signatureUtils'
+import { HttpFunction } from '@google-cloud/functions-framework/build/src/functions'
 import { Storage } from '@google-cloud/storage'
 import { toChecksumAddress } from 'ethereumjs-util'
-import * as functions from 'firebase-functions'
 
 const storage = new Storage()
 const bucket = storage.bucket('celo-test-alexh-bucket')
@@ -32,30 +32,32 @@ const validators: UploadValidator[] = [
   },
 ]
 
-export const authorize = functions.https.onCall(async (payload, context) => {
-  const { rawRequest } = context
-
-  const signature = rawRequest.get('Signature')
+export const authorize: HttpFunction = async (req, res) => {
+  const signature = req.get('Signature')
   if (!signature) {
-    throw new functions.https.HttpsError('unauthenticated', 'Signature required')
+    res.status(401).send('Signature required')
   }
+
+  const { body: payload } = req
 
   let signer = ''
   try {
-    signer = guessSigner(JSON.stringify(payload), signature)
+    signer = guessSigner(JSON.stringify(payload), signature!)
   } catch (e) {
-    throw new functions.https.HttpsError('unauthenticated', 'Invalid signature provided')
+    res.status(401).send('Invalid signature provided')
+    return
   }
 
   if (!Array.isArray(payload)) {
-    throw new functions.https.HttpsError('failed-precondition', 'Request payload must be an array')
+    res.status(401).send('Request payload must be an array')
+    return
   }
 
   const signedUrls = await Promise.all(
     payload.map(({ path }) => {
       const validator = validators.find((v) => v.match(path))
       if (!validator) {
-        throw new functions.https.HttpsError('invalid-argument', 'Invalid upload path specified')
+        throw new Error('Invalid upload path specified')
       }
 
       const [min, max] = validator.range()
@@ -74,5 +76,5 @@ export const authorize = functions.https.onCall(async (payload, context) => {
     })
   )
 
-  return signedUrls
-})
+  res.json(signedUrls)
+}

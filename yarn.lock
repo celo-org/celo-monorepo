@@ -3138,6 +3138,16 @@
     functional-red-black-tree "^1.0.1"
     google-gax "^2.2.0"
 
+"@google-cloud/functions-framework@^1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@google-cloud/functions-framework/-/functions-framework-1.7.1.tgz#d29a27744a6eb2f95d840b86135b97b0d804a49e"
+  integrity sha512-jjG7nH94Thij97EPW2oQN28pVPRN3UEGcsCRi6RdaaiSyK32X40LN4WHntKVmQPBhqH+I0magHMk1pSb0McH2g==
+  dependencies:
+    body-parser "^1.18.3"
+    express "^4.16.4"
+    minimist "^1.2.0"
+    on-finished "^2.3.0"
+
 "@google-cloud/logging@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-7.1.0.tgz#79af14fe911c622eb60422bfdd3636d9bba46efc"
