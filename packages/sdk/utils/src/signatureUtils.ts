@@ -23,13 +23,13 @@ function messageLength(message: string) {
 }
 // Ethereum has a special signature format that requires a prefix
 // https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
-export function hashMessageWithPrefix(message: string) {
+export function hashMessageWithPrefix(message: string): string {
   const prefix = '\x19Ethereum Signed Message:\n' + messageLength(message)
-  return Web3Utils.soliditySha3(prefix, message)
+  return Web3Utils.soliditySha3(prefix, message)!
 }
 
 export function hashMessage(message: string): string {
-  return Web3Utils.soliditySha3({ type: 'string', value: message })
+  return Web3Utils.soliditySha3({ type: 'string', value: message })!
 }
 
 export async function addressToPublicKey(

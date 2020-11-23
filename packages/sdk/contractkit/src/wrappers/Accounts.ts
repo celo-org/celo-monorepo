@@ -206,8 +206,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       const message = this.kit.connection.web3.utils.soliditySha3({
         type: 'address',
         value: account,
-      })
-      const prefixedMsg = hashMessageWithPrefix(message!)
+      })!
+      const prefixedMsg = hashMessageWithPrefix(message)
       const pubKey = signedMessageToPublicKey(
         prefixedMsg!,
         proofOfSigningKeyPossession.v,
@@ -258,8 +258,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     const message = this.kit.connection.web3.utils.soliditySha3({
       type: 'address',
       value: account,
-    })
-    const prefixedMsg = hashMessageWithPrefix(message!)
+    })!
+    const prefixedMsg = hashMessageWithPrefix(message)
     const pubKey = signedMessageToPublicKey(
       prefixedMsg!,
       proofOfSigningKeyPossession.v,

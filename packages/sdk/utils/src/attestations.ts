@@ -34,7 +34,7 @@ export function getAttestationMessageToSignFromIdentifier(identifier: string, ac
   const messageHash: string = soliditySha3(
     { type: 'bytes32', value: identifier },
     { type: 'address', value: account }
-  )
+  )!
   return messageHash
 }
 
