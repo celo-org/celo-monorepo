@@ -51,6 +51,7 @@ relayer:
     enabled: true
     prometheusPort: 9090
   walletType: azure-hsm
+  gasPriceUpdateIntervalMs: "1200000"
 
 onboarding:
   node_env: production
