@@ -1,4 +1,4 @@
-# External module: "wrappers/MetaTransactionWalletDeployer"
+# Module: "wrappers/MetaTransactionWalletDeployer"
 
 ## Index
 
