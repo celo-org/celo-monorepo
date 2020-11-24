@@ -29,7 +29,7 @@
     "elliptic": "6.5.3",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "@types/btoa": "^1.2.3",
-    "web3": "1.2.11"
+    "web3": "1.3.0"
   },
   "devDependencies": {
     "@types/elliptic": "^6.4.12",
