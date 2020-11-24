@@ -14,6 +14,7 @@ import {
   getServiceAccountKey
 } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
+const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
@@ -206,12 +207,76 @@ async function installGrafana() {
   )
 }
 
+
 async function grafanaHelmParameters() {
+  const k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
+  const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
+  const values = {
+    annotations: {
+      "prometheus.io/scrape": "false",
+      "prometheus.io/path":  "/metrics",
+      "prometheus.io/port": "3000"
+    },
+    sidecar: {
+      dashboards: {
+        enabled: true
+      },
+      datasources: {
+        enabled: false
+      },
+      notifiers: {
+        enabled: false
+      }
+    },
+    ingress: {
+      enabled: true,
+      annotations: {
+        "kubernetes.io/ingress.class": "nginx",
+        "kubernetes.io/tls-acme": "true"
+      },
+      hosts: [
+        `${k8sClusterName}-grafana.${k8sDomainName}.org`
+      ],
+      path: '/',
+      tls: [
+        {
+          secretName: `${k8sClusterName}-grafana-tls`,
+          hosts: [
+            `${k8sClusterName}-grafana.${k8sDomainName}.org`
+          ]
+        }
+      ]
+    },
+    persistence: {
+      enabled: true,
+      size: '10Gi',
+      storageClassName: 'ssd',
+    },
+    datasources: {
+      'datasources.yaml': {
+        apiVersion: 1,
+        datasources: [
+          {
+            name: 'Prometheus',
+            type: 'prometheus',
+            url: 'http://prometheus-server.prometheus:9090',
+            access: 'proxy',
+            isDefault: true
+          }
+        ]
+      }
+    }
+  }
+
+  const valuesFile = "/tmp/grafana-values.yaml"
+  fs.writeFileSync(valuesFile, yaml.safeDump(values))
+
   const params = [
-    `--set namespace=${kubeNamespace}`,
+    `-f ${valuesFile}`
   ]
   return params
 }
+
 
 export async function upgradeGrafana() {
   await createNamespaceIfNotExists(kubeNamespace)
