@@ -1,0 +1,116 @@
+{
+  "education": {
+    "step1": "Envie e receba dinheiro instantaneamente",
+    "step2": "Pague qualquer pessoa, em qualquer lugar com taxas muito baixas",
+    "step3": "Use o {{appName}} com confiança e segurança"
+  },
+  "welcome": {
+    "title": "Seu valor,\n no seu celular",
+    "createAccount": "Criar uma conta",
+    "restoreAccount": "Eu tenho uma conta"
+  },
+  "contacts": {
+    "header": "Conectar Contatos",
+    "body": "Adicionar seus contatos facilita enviar e solicitar pagamentos dos seus amigos. A conexão não envia convites para seus contatos.",
+    "findSwitch": "Permita que seus contatos encontrem você",
+    "syncing": {
+      "loadingHeader": "Sincronizando...",
+      "loadingStatus0": "Importando contatos",
+      "loadingStatus1": "{{total}} contatos sendo processados",
+      "loadingStatus2": "Encontrar amigos",
+      "successHeader": "Finalizado",
+      "successWithMatches": "{{matches}} amigos no {{appName}} ",
+      "successWithoutMatches": "Sincronização concluída"
+    }
+  },
+  "accountInfo": "Informação da conta\n",
+  "step": "Passo {{step}} de 5",
+  "selectCountryCode": "Selecionar código do país",
+  "pincodeSet": {
+    "create": "Crie um PIN",
+    "verify": "Insira o PIN novamente",
+    "pinsDontMatch": "Os PINs não coincidem",
+    "invalidPin": "Use um PIN mais forte"
+  },
+  "inviteCode": {
+    "title": "Código de convite",
+    "body": "Você recebeu um pagamento ou um convite? Se sim, copie e cole o código de convite abaixo.",
+    "label": "Código de convite",
+    "codePlaceholder": "Insira seu Código de Convite",
+    "noCode": "Eu não tenho um código de convite",
+    "nodeCodeInviteLink": "Não tem um código de convite? Solicite um em <0>celo.org/developers/wallet</0> ou <1>continue sem</1>",
+    "loadingHeader": "Criando uma conta...",
+    "loadingBody": "Isso pode levar até 90 segundos"
+  },
+  "verificationEducation": {
+    "title": "Confirmar",
+    "header": "Confirme o número de telefone",
+    "body": "Para garantirmos que o seu número é realmente seu, enviaremos três mensagens de texto que custarão em torno de 0,05 cUSD cada.\n\nA confirmação do seu número levará cerca de três minutos.",
+    "start": "Iniciar",
+    "resume": "Retomar",
+    "doINeedToConfirm": "Eu preciso confirmar?",
+    "skipForNow": "Pular por agora",
+    "bodyInsufficientBalance": "Seu saldo atual não é alto o suficiente para concluir o processo de verificação.\n\nTente novamente quando tiver adicionado fundos ao seu aplicativo.",
+    "bodyAlreadyVerified": "Seu número já está confirmado!"
+  },
+  "verificationSkipDialog": {
+    "title": "Você está em segurança",
+    "body": "Confirmar permite que você envie e receba fundos facilmente pelo seu número de telefone.\n\nContas não confirmadas só podem enviar pagamentos usando endereços Celo ou códigos QR.",
+    "cancel": "Voltar",
+    "confirm": "Pular por agora"
+  },
+  "verificationPrematureRevealMessage": "Aguarde 1 minuto antes de reenviar",
+  "verificationLearnMoreDialog": {
+    "title": "Números de telefone e {{appName}} ",
+    "body": "Confirmar facilita conectar-se com seus amigos, permitindo que você envie e receba dinheiro usando seu número de telefone.\n\n<0>Posso fazer isso mais tarde?</0>\n\n Sim, mas contas não confirmadas só podem enviar dinheiro usando códigos QR ou números de conta (endereços).\n\n<1>Seguro e Confidencial</1>\n\nO Valora usa criptografia de ponta para manter seu número de telefone confidencial.",
+    "dismiss": "Descartar"
+  },
+  "importExistingKey": {
+    "explanation": "A chave da sua conta é uma frase de 24 palavras que você escreveu e salvou ao configurar sua conta. Insira-a aqui para restaurar sua conta.\n\nLembre-se de que sua escolha de idioma deve corresponder ao idioma usado ao criar a conta.",
+    "keyPlaceholder": "horse leopard dog monkey..."
+  },
+  "verificationInput": {
+    "title": "Confirmar",
+    "body": "We sent you three messages (SMS). Please copy and paste them below.",
+    "body_ios": "Enviamos três mensagens (SMS) para você. Copie e cole-os a seguir.",
+    "codeLabel1": "Primeiro código",
+    "codeLabel2": "Segundo código",
+    "codeLabel3": "Terceiro código",
+    "codePlaceholder1": "Copie a primeira mensagem",
+    "codePlaceholder1_ios": "Toque ou copie a primeira mensagem",
+    "codePlaceholder2": "Copie a segunda mensagem",
+    "codePlaceholder2_ios": "Toque ou copie a segunda mensagem",
+    "codePlaceholder3": "Copie a terceira mensagem",
+    "codePlaceholder3_ios": "Toque ou copie a terceira mensagem",
+    "codePlaceholderWithCodeInClipboard": "Excelente! Cole aqui",
+    "typingTip": "Digitando? Tente copiar e colar",
+    "resendMessages": "Reenviar a última mensagem",
+    "resendMessages_plural": "Reenviar {{count}} mensagens",
+    "resendMessages_all": "Encaminhar todas as mensagens"
+  },
+  "verificationInputHelpDialog": {
+    "title": "Ajuda",
+    "bodySection1": {
+      "title": "Você recebeu as três mensagens?",
+      "content": "Se as suas mensagens contiverem um link, basta tocar nos links para confirmar.\n\nSe não houver links, copie e cole as mensagens nos campos. Você pode colar a mensagem inteira."
+    },
+    "bodySection2": {
+      "title": "Algumas ou todas as mensagens estão faltando?",
+      "defaultContent": "Se você estiver encontrando problemas para receber mensagens, pode pular esta etapa por enquanto e tentar mais tarde. Às vezes, as mensagens podem demorar alguns minutos para chegar.",
+      "content": "$t(verificationInputHelpDialog.bodySection2.defaultContent)",
+      "content_countdown": "$t(verificationInputHelpDialog.bodySection2.defaultContent) A seguinte opção de ignorar estará disponível em {{count}} segundo.",
+      "content_countdown_plural": "$t(verificationInputHelpDialog.bodySection2.defaultContent) A seguinte opção de ignorar estará disponível em {{count}} segundos."
+    },
+    "body": "<0>$t(verificationInputHelpDialog.bodySection1.title)</0>\n\n$t(verificationInputHelpDialog.bodySection1.content)\n\n<1>$t(verificationInputHelpDialog.bodySection2.title)</1>\n\n$t(verificationInputHelpDialog.bodySection2.content)",
+    "skip": "Pular por agora",
+    "back": "Voltar"
+  },
+  "emptyAccount": {
+    "description": "Esta conta não tem fundos. Você ainda gostaria de usá-la?",
+    "useAccount": "Usar conta",
+    "title": "Saldo <0></0>"
+  },
+  "success": {
+    "message": "Está tudo pronto!"
+  }
+}

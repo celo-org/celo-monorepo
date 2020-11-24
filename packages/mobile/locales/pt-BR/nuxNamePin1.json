@@ -1,0 +1,42 @@
+{
+  "continue": "Continuar",
+  "welcomeCelo": "Seja bem-vindo(a) ao {{appName}} ",
+  "chooseCountryCode": "Código do país",
+  "chooseCountry": "País",
+  "joinText": "{{appName}} ajuda você a enviar, receber e economizar dinheiro na rede Celo.",
+  "terms": {
+    "title": "Termos e Condições",
+    "heading1": "Dados e Privacidade",
+    "heading2": "Ativos Celo e Conta {{appName}} ",
+    "privacy": "Ao aderir a esta rede, você nos dá permissão para coletar informações anônimas sobre o seu uso do aplicativo. Além disso, se você verificar o seu número de telefone, o resultado de uma função hash será armazenado na Rede Celo. Mais informações em <0>{{tosLink}}</0>",
+    "goldDisclaimer": "Quando você cria uma \"conta\" no {{appName}}, você está criando um aplicativo digital para o qual só você tem as chaves. Nenhuma outra pessoa ou entidade, incluindo o Valora, poderá recuperar suas chaves, alterar ou desfazer transações ou recuperar fundos perdidos. Lembre-se de que tanto o cUSD quanto o CELO fazem parte de uma nova classe de ativos e apresentam riscos de perdas financeiras. Considere cuidadosamente sua situação financeira e sua tolerância a riscos antes de comprar qualquer um deles. Você só pode enviar até 500 cUSD por dia via {{appName}} (\"Limite Diário\"). Você deve entrar em contato com support@cLabs.co e fornecer informações pessoais adicionais para aumentar este Limite Diário. Pode haver uma demora na conclusão da conformidade necessária."
+  },
+  "phoneNumber": "Número de telefone",
+  "fullName": "Nome completo",
+  "fullNamePlaceholder": "Sobrenome",
+  "importIt": "Restaurar a sua carteira existente",
+  "cancel": "Cancelar",
+  "important": "Importante",
+  "createPin": {
+    "title": "Criar um PIN de 6 dígitos",
+    "yourPin": "Seu PIN"
+  },
+  "verifyPin": {
+    "title": "Repetir o PIN"
+  },
+  "confirmPin": {
+    "title": "Insira seu PIN"
+  },
+  "goToSystemSecuritySettingsActionLabel": "Acessar a segurança",
+  "enableSystemScreenLockFailedMessage": "Erro ao tentar ativar o bloqueio de tela",
+  "initKeystoreFailureMessage": "Falha ao recuperar a chave",
+  "pinLostForeverMessage": "Você removeu o bloqueio de tela, o PIN foi perdido",
+  "enableScreenLockMessage": "Ative o bloqueio de tela para usar o {{appName}}. Se você desativar o bloqueio de tela no futuro, precisará da sua chave da conta para acessar sua conta",
+  "importContactsPermission": {
+    "title": "Importar contatos",
+    "0": "Conectar sua lista de contatos facilita o envio e a solicitação de pagamentos aos seus amigos. Caso contrário, você terá que inserir suas informações individualmente.",
+    "1": "Não se preocupe: conectar-se não envia convites aos seus contatos.",
+    "enable": "Permitir acesso aos contatos",
+    "loading": "Encontre amigos usando {{appName}}..."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "cancel": "Cancelar",
+  "inviteWithWhatsapp": "Convidar pelo WhatsApp",
+  "inviteWithSMS": "Convidar por SMS",
+  "inviteFee": "Comissão de convite",
+  "whySendFees": "Essa comissão cobre os custos de verificação do número de telefone do novo usuário",
+  "whyReceiveFees": "Foi enviado dinheiro para você verificar sua conta",
+  "edit": "Editar",
+  "to": "Para",
+  "inviteSent": "Convite enviado",
+  "searchForSomeone": "Pesquise alguém pelo nome ou número de telefone",
+  "redeemFailed": "Não foi possível validar o código do convite",
+  "redeemInviteTimeout": "Trocar convite esgotado",
+  "accountSetupFailed": "Não foi possível criar sua carteira",
+  "emptyInviteCode": "O código do convite está sem fundos",
+  "transferDollarsToAccount": "{{Dollars}} transferidos para a sua conta!",
+  "inviteFriendsToCelo": "Convide amigos para o {{appName}} ",
+  "inviteAnyone": "Envie facilmente para seus amigos adicionando seus contatos",
+  "inviteReceived": "Convite recebido",
+  "escrowPaymentNotificationTitle": "Convidado e pago {{mobile}} (<3></3>)"
+}

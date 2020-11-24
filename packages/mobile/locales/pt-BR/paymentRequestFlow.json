@@ -1,0 +1,17 @@
+{
+  "requests": "Solicitações",
+  "empty": "Você não tem solicitações de pagamento",
+  "celoDollarBalance": "Saldo de {{CeloDollar}} ",
+  "requestDeclined": "Solicitação rejeitada",
+  "requestPaid": "Solicitação paga",
+  "paymentRequestUpdateFailed": "Não foi possível atualizar a solicitação de pagamento",
+  "incomingPaymentRequestNotificationTitle": "{{name}} solicitado",
+  "outgoingPaymentRequestNotificationTitle": "Aguardando {{name}} ",
+  "requestUnavailableHeader": "A conta de {{displayName}} não foi verificada",
+  "requestUnavailableNoDisplayNameHeader": "A conta do seu contato não foi verificada",
+  "requestUnavailableBody": "O número {{e164PhoneNumber}} não tem uma conta ou ainda não foi verificado. As solicitações só podem ser enviadas para números verificados",
+  "requestUnavailableNoNumberBody": "Seu contato não tem uma conta ou ainda não a verificou. As solicitações só podem ser enviadas para números verificados.",
+  "requesting": "Solicitando",
+  "request": "Solicitar",
+  "requestSent": "Solicitação enviada"
+}

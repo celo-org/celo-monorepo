@@ -3,8 +3,8 @@ const momentTimezone = require('moment-timezone')
 import differenceInYears from 'date-fns/esm/differenceInYears'
 import format from 'date-fns/esm/format'
 import getYear from 'date-fns/esm/getYear'
-import { enUS, es } from 'date-fns/locale'
 import { i18n as i18nType } from 'i18next'
+import locales from 'locales'
 import _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
 import i18n from 'src/i18n'
@@ -338,6 +338,6 @@ function millisecondsSinceEpoch(timestamp: number) {
 
 function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
   return format(millisecondsSinceEpoch(timestamp), formatRule, {
-    locale: i18next?.language?.includes('es') ? es : enUS,
+    locale: locales[i18next?.language]?.dateFns ?? locales['en-US']?.dateFns,
   })
 }

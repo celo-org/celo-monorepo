@@ -1,0 +1,63 @@
+{
+  "invite": "Convidar",
+  "celoRewards": "Recompensas Celo",
+  "languageSettings": "Idioma",
+  "localCurrencySetting": "Moeda",
+  "licenses": "Licenças",
+  "removeAccountTitle": "Reiniciar o Valora",
+  "removeAccountDetails": "A reinicialização excluirá sua conta deste dispositivo. Sua conta manterá seus fundos, mas você só poderá recuperá-los com a Chave da Conta.",
+  "legal": "Legal",
+  "securityAndData": "Segurança e dados",
+  "requirePinOnAppOpen": "Exigir o PIN quando o aplicativo estiver aberto",
+  "analytics": "Estatísticas de uso",
+  "shareAnalytics": "Compartilhar estatísticas de uso",
+  "shareAnalytics_detail": "Coletamos dados anônimos sobre como você usa {{appName}} para melhorar o aplicativo para todos.",
+  "dataSaver": "Modo de Economia de Dados",
+  "enableDataSaver": "Ativar o Modo de Economia de Dados",
+  "dataSaverDetail": "O modo de Economia de Dados permite a comunicação com a Rede Celo por meio de um nó confiável. Você pode alterar este modo nas configurações do aplicativo.",
+  "restartModalSwitchOff": {
+    "header": "Reinicie o aplicativo para desativar o modo de Economia de Dados",
+    "body": "Para ativar e desativar o modo de Economia de Dados repetidamente, você precisará reiniciar o aplicativo e retornar a esta tela.",
+    "restart": "Reiniciar"
+  },
+  "addFunds": "Adicionar fundos",
+  "promptFornoModal": {
+    "header": "Você deseja alterar o modo de conexão?",
+    "body": "Percebemos que você está com problemas para se conectar. Recomendamos ativar o modo de economia de dados para que você possa continuar usando o {{appName}} com uma conexão intermitente.",
+    "switchToDataSaver": "Ativar o Modo de Economia de Dados"
+  },
+  "accountKeyModal": {
+    "header": "Sem a sua Chave da Conta, você perderá o acesso ao seu dinheiro para sempre",
+    "body1": "Para reinicializar o Valora, você deve confirmar que anotou a Chave da Conta.",
+    "body2": "Ninguém, nem mesmo o Valora, poderá recuperar sua conta sem a sua senha."
+  },
+  "promptConfirmRemovalModal": {
+    "header": "Tem certeza de que deseja redefinir o Valora?",
+    "body": "Você não poderá mais acessar seu dinheiro ou sua chave da Conta a partir deste dispositivo. Não há meios de recuperar sua Chave da Conta se você não a guardou.",
+    "resetNow": "Reiniciar Agora"
+  },
+  "testFaqLink": "Perguntas Frequentes do {{appName}} ",
+  "termsOfServiceLink": "Termos de Serviço",
+  "editProfile": "Editar perfil",
+  "confirmNumber": "Verifique o número de telefone",
+  "cancel": "Cancelar",
+  "changeProfilePhoto": "Alterar a foto do perfil",
+  "name": "Nome e sobrenome",
+  "editName": "Editar o nome",
+  "submit": "Enviar",
+  "selectLanguage": "Selecionar o idioma",
+  "selectCurrency": "Selecionar o tipo de moeda",
+  "continue": "Continuar",
+  "yourName": "Seu Nome",
+  "version": "Versão:",
+  "addressCopied": "Endereço copiado para a área de transferência",
+  "support": "Suporte",
+  "contact": "Contato",
+  "faq": "Perguntas frequentes",
+  "forum": "Fórum",
+  "contactText": "Você não está encontrando o que está procura?",
+  "contactMessagePlaceholder": "Insira sua mensagem aqui...",
+  "attachLogs": "Anexar registros",
+  "supportLegalCheckbox": "Ao enviar, concordo em compartilhar as informações acima e quaisquer dados de registro da transação anexada com o Suporte do {{appName}}.",
+  "contactSuccess": "Seu problema foi relatado com sucesso! Enviaremos uma resposta por e-mail em breve!"
+}

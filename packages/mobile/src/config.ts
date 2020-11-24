@@ -19,11 +19,6 @@ const keyOrUndefined = (file: any, secretsKey: any, attribute: any) => {
   return undefined
 }
 
-export const AVAILABLE_LANGUAGES = [
-  { name: 'English', code: 'en-US' },
-  { name: 'Español (América Latina)', code: 'es-419' },
-]
-
 // DEV only related settings
 export const isE2EEnv = stringToBoolean(Config.IS_E2E || 'false')
 export const DEV_RESTORE_NAV_STATE_ON_RELOAD = stringToBoolean(

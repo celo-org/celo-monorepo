@@ -34,14 +34,17 @@ export enum Namespaces {
   fiatExchangeFlow = 'fiatExchangeFlow',
 }
 
-const availableResources = {
-  'en-US': {
-    ...locales.enUS,
-  },
-  'es-419': {
-    ...locales.es_419,
-  },
+function getAvailableResources() {
+  const resources = {}
+  for (const [key, value] of Object.entries(locales)) {
+    Object.defineProperty(resources, key, {
+      get: () => value!.strings,
+    })
+  }
+  return resources
 }
+
+const availableResources = getAvailableResources()
 
 function getLanguage() {
   // We fallback to `undefined` to know we couldn't find the best language
@@ -89,7 +92,7 @@ i18n
     resources: availableResources,
     ns: ['common', ...Object.keys(Namespaces)],
     defaultNS: 'common',
-    debug: true,
+    debug: false, // Disable as it forces evaluation of all our lazy loaded locales
     interpolation: {
       escapeValue: false,
       defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK_DISPLAY },

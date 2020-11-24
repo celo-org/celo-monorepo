@@ -1,18 +1,23 @@
-import accountScreen10 from '@celo/mobile/locales/es-419/accountScreen10.json'
-import backupKeyFlow6 from '@celo/mobile/locales/es-419/backupKeyFlow6.json'
-import exchangeFlow9 from '@celo/mobile/locales/es-419/exchangeFlow9.json'
-import fiatExchangeFlow from '@celo/mobile/locales/es-419/fiatExchangeFlow.json'
-import global from '@celo/mobile/locales/es-419/global.json'
-import goldEducation from '@celo/mobile/locales/es-419/goldEducation.json'
-import inviteFlow11 from '@celo/mobile/locales/es-419/inviteFlow11.json'
-import nuxNamePin1 from '@celo/mobile/locales/es-419/nuxNamePin1.json'
-import nuxRestoreWallet3 from '@celo/mobile/locales/es-419/nuxRestoreWallet3.json'
-import nuxVerification2 from '@celo/mobile/locales/es-419/nuxVerification2.json'
-import onboarding from '@celo/mobile/locales/es-419/onboarding.json'
-import paymentRequestFlow from '@celo/mobile/locales/es-419/paymentRequestFlow.json'
-import receiveFlow8 from '@celo/mobile/locales/es-419/receiveFlow8.json'
-import sendFlow7 from '@celo/mobile/locales/es-419/sendFlow7.json'
-import walletFlow5 from '@celo/mobile/locales/es-419/walletFlow5.json'
+// tslint:disable: no-relative-imports
+import accountScreen10 from './accountScreen10.json'
+import backupKeyFlow6 from './backupKeyFlow6.json'
+import dappkit from './dappkit.json'
+import dev from './dev.json'
+import exchangeFlow9 from './exchangeFlow9.json'
+import fiatExchangeFlow from './fiatExchangeFlow.json'
+import global from './global.json'
+import goldEducation from './goldEducation.json'
+import inviteFlow11 from './inviteFlow11.json'
+import nuxNamePin1 from './nuxNamePin1.json'
+import nuxRestoreWallet3 from './nuxRestoreWallet3.json'
+import nuxVerification2 from './nuxVerification2.json'
+import onboarding from './onboarding.json'
+import paymentRequestFlow from './paymentRequestFlow.json'
+import receiveFlow8 from './receiveFlow8.json'
+import sendFlow7 from './sendFlow7.json'
+import walletFlow5 from './walletFlow5.json'
+
+console.log('===========LOADING ES-419')
 
 export default {
   accountScreen10,

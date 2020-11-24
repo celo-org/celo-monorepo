@@ -9,6 +9,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
+import locales from 'locales'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import {
@@ -36,7 +37,7 @@ import {
 import { sessionIdSelector, verificationPossibleSelector } from 'src/app/selectors'
 import Dialog from 'src/components/Dialog'
 import SessionId from 'src/components/SessionId'
-import { AVAILABLE_LANGUAGES, TOS_LINK } from 'src/config'
+import { TOS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
@@ -313,7 +314,7 @@ export class Account extends React.Component<Props, State> {
     const { t, i18n, numberVerified, verificationPossible } = this.props
     const promptFornoModal = this.props.route.params?.promptFornoModal ?? false
     const promptConfirmRemovalModal = this.props.route.params?.promptConfirmRemovalModal ?? false
-    const currentLanguage = AVAILABLE_LANGUAGES.find((l) => l.code === i18n.language)
+    const currentLanguage = locales[i18n.language]
     return (
       <SafeAreaView style={styles.container}>
         <DrawerTopBar />

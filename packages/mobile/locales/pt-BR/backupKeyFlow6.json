@@ -1,0 +1,57 @@
+{
+  "headerTitle": "Chave da conta",
+  "introTitle": "A Chave da Conta",
+  "introBody": "A sua Chave da Conta é a parte mais importante da sua conta. A configuração leva cinco minutos",
+  "introPrimaryAction": "Configurar Agora",
+  "delayBackup": "Espere uma hora",
+  "postSetupTitle": "A Chave da Conta",
+  "postSetupBody": "Se você perder a sua Chave de Conta, perderá o acesso a todos os seus Celo Dólares e CELO. Ninguém nem mesmo o {{appName}}, pode ajudar você a recuperar sua conta sem a sua chave. Guarde-a em um lugar seguro e não a compartilhe",
+  "postSetupCTA": "Saiba mais sobre a Chave da Conta",
+  "getBackupKey": "Obtenha a Chave da Conta",
+  "failedFetchMnemonic": "Não foi possível obter a sua Chave da Conta",
+  "backupAndRecovery": "Restaurar e recuperar",
+  "writeDownKey": "Anote a sua chave",
+  "completeEducation": "Entendi",
+  "yourAccountKey": "Esta é a sua Chave da Conta",
+  "moreInfo": "Mais Informações",
+  "backupKeyNotification": "A sua Chave da Conta é a parte mais importante da sua conta",
+  "backupKeySummary": "Encontre um local reservado e anote a sua Chave da Conta. Mantenha ela em um local seguro. Não a guarde no seu celular.",
+  "backupPrompt": "Para a segurança dos seus fundos, sua conta é bloqueada até que você obtenha a Chave da Conta.",
+  "copied": "Chave copiada para a área de transferência",
+  "savedConfirmation": "Sim, eu escrevi minha senha",
+  "invalidBackupPhrase": "Chave da conta inválida",
+  "importBackupFailed": "Não foi possível importar a carteira",
+  "backupQuizFailed": "A senha da conta que você digitou está incorreta. Tente novamente.",
+  "backupComplete": {
+    "header": "Backup Completo",
+    "0": "Correto!",
+    "1": "Agora você pode configurar as proteções.",
+    "2": "Tudo está configurado!"
+  },
+  "backupQuizWordCount": "Qual é a palavra <0>{{ordinal}}</0> da sua Chave da Conta?",
+  "cancelDialog": {
+    "title": "Termine a configuração da sua Chave da Conta",
+    "body": "As Chaves da Conta são extremamente importantes. Sem uma chave, você pode perder o acesso ao seu aplicativo para sempre. Você não poderá enviar qualquer transação até terminar de configurar sua Chave da Conta",
+    "action": "Completar agora",
+    "secondary": "Definir mais tarde"
+  },
+  "backupPhrasePlaceholder": "cavalo leopardo cachorro macaco tubarão tigre lêmure baleia lula lobo esquilo rato leão elefante gato camarão urso pinguim veado tartaruga raposa zebra cabra girafa",
+  "guide": [
+    {
+      "title": "A sua Chave da Conta é um tipo especial de senha",
+      "text": "A Chave da Conta é a única maneira de acessar sua conta"
+    },
+    {
+      "title": "Sem a sua chave, você pode perder o acesso para sempre",
+      "text": "Se você perder seu celular, você deverá ter a chave para recuperar sua conta. Ninguém, nem mesmo o {{appName}}, poderá recuperar os seus fundos sem ela"
+    },
+    {
+      "title": "Anote-a",
+      "text": "Escreva a sua Chave da Conta e mantenha-a em um lugar seguro. Não a guarde no seu celular."
+    },
+    {
+      "title": "Mantenha a sua Chave confidencial",
+      "text": "Qualquer pessoa que tiver a sua Chave terá acesso à sua conta e a todos os seus fundos. Não a compartilhe com outros"
+    }
+  ]
+}

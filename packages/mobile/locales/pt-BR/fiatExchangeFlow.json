@@ -1,0 +1,18 @@
+{
+  "addFunds": "Adicionar fundos",
+  "exchanges": "Fazer câmbio",
+  "buySellOnExchanges": "Comprar/Vender em Bolsas",
+  "cashOut": "Sacar",
+  "cashOutComingSoon": "Sacar (muito em breve)",
+  "celoDollarsAt": "Celo Dollars @ <1></1>",
+  "amountCelo": "Montante (CELO)",
+  "disclaimerCeloDollars": "Os valores em celo dólares são estimativas.",
+  "dollarsNotYetEnabledNote": "Os Celo Dólares ainda não estão disponíveis em nenhum provedor. Para adquirir Celo Dólares, compre CELO e troque-os por Celo Dólares no Valora, na guia CELO.",
+  "pleaseSelectProvider": "Selecione um provedor a seguir. Esses links conectam você a um serviço de terceiros.",
+  "explanationModal": {
+    "title": "Sobre os provedores",
+    "body": "Os provedores permitem que você adicione fundos ou saque dinheiro da sua conta. Eles determinam suas próprias taxas e restrições com base na localização, quantidade e outros fatores. Visite o site do provedor para ter suporte específico. Visite as perguntas frequentes para obter mais informações."
+  },
+  "otherFundingOptions": "Para descobrir mais maneiras de adicionar e sacar fundos, visite <0>Como depositar fundos na minha conta</0>",
+  "youCanTransfer": "Você pode transferir Celo Dólares e CELO de/para as seguintes bolsas usando o seu Número de Conta (também conhecido como endereço Celo) – toque abaixo para copiar."
+}

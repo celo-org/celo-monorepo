@@ -1,0 +1,72 @@
+{
+  "getVerified": "Verificar Telefone",
+  "notReadyForCode": "Ainda não está pronto para inserir o código",
+  "emptyVerificationCode": "Nenhum Código na Área de Transferência",
+  "invalidVerificationCode": "Código de Verificação Inválido",
+  "repeatVerificationCode": "Código de Verificação Repetido",
+  "revealAttestationFailure": "Erro ao solicitar mensagem SMS",
+  "verificationFailure": "Falha na Verificação",
+  "verificationTimeout": "A verificação não pôde ser concluída a tempo",
+  "errorRequestCode": "Erro ao solicitar os códigos.",
+  "errorRedeemingCode": "Erro ao resgatar o código.",
+  "pleaseRetry": "Reinicie a verificação.",
+  "retryVerification": "Reiniciar a verificação",
+  "education": {
+    "header": "Verificar o celular",
+    "body1": "Pedimos que você verifique o seu número de telefone.",
+    "body2": "Isso facilita enviar e receber valores entre amigos. Você pode pular esta etapa agora e fazê-la depois.",
+    "learnMore": "Mais informações sobre a verificação de telefone",
+    "start": "Iniciar a verificação",
+    "skip": "Pular por agora"
+  },
+  "learnMore": {
+    "header": "Verificação do celular",
+    "intro": "A verificação do número do telefone consiste em associar a carteira Celo ao seu celular.",
+    "section1Header": "Devo concluir esta etapa?",
+    "section1Body": "A verificação não é obrigatória. Sem verificar, só é possível enviar e receber valores usando códigos QR ou endereços.",
+    "section2Header": "Segurança e privacidade",
+    "section2Body": "Para proteger sua privacidade, apenas uma versão oculta do seu telefone é armazenada no blockchain do Celo."
+  },
+  "loading": {
+    "confirming": "Confirmando…",
+    "learnMore": "Saiba mais",
+    "card1": "Para garantirmos que o seu número é realmente seu, enviaremos três mensagens de texto.",
+    "card2": "Assim que o seu número for confirmado, você pode enviar e receber fundos facilmente para seu número de telefone.",
+    "card3": "Confirmar também permite que você veja quais de seus amigos estão no {{appName}}.",
+    "card4": "Exigimos três mensagens de confirmação para manter sua conta mais segura."
+  },
+  "skipModal": {
+    "header": "Pular a verificação?",
+    "body1": "A verificação permite que outras pessoas enviem valores para o seu número de telefone.",
+    "body2": "Sem a verificação, você ainda poderá receber pagamentos, mas apenas por meio de endereços de conta ou códigos QR."
+  },
+  "failModal": {
+    "header": "Erro de verificação",
+    "body1": "Ocorreu um problema ao verificar seu número de telefone.",
+    "body2": "Você pode pular a verificação e tentar novamente mais tarde.",
+    "body1InsufficientBalance": "Seu saldo atual não é alto o suficiente para concluir o processo de verificação.",
+    "body2InsufficientBalance": "Tente novamente quando tiver adicionado fundos ao seu aplicativo.",
+    "body1SaltQuotaExceeded": "Seu limite de pesquisas de número de telefone se esgotou",
+    "body2SaltQuotaExceeded": "Tente novamente quando você tiver comprado mais pesquisas",
+    "enterCodesBody": "Se você já recebeu três códigos por SMS, você ainda poderá inseri-los.",
+    "enterCodesButton": "Inserir códigos"
+  },
+  "retryWithFornoModal": {
+    "header": "Tentar verificar novamente com o modo de Economia de Dados?",
+    "body1": "Ocorreu um problema ao verificar seu número de telefone. Recomendamos tentar novamente com o modo de Economia de Dados ativado",
+    "body2": "O modo de Economia de Dados permite que você se comunique na rede Celo de forma mais consistente usando uma conexão confiável",
+    "retryButton": "Tentar novamente com o modo de Economia de Dados"
+  },
+  "congratsVerified": "Parabéns, seu usuário foi verificado!",
+  "notification": {
+    "title": "Confirme o Telefone",
+    "body": "Receba pagamentos diretamente no seu número de telefone",
+    "cta": "Confirme agora"
+  },
+  "quotaLookup": {
+    "title": "Limite de pesquisas excedido",
+    "body1": "Para manter seu número de telefone seguro e privado, o {{appName}} limita quantos números de telefone os usuários podem pesquisar.",
+    "body2": "Você pode comprar mais pesquisas por uma pequena taxa.",
+    "cta": "Comprar pesquisas (2)"
+  }
+}
