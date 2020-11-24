@@ -65,8 +65,8 @@ contract Reserve is
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event TobinTaxSet(uint256 value);
-  event TobinTaxReserveRatioSet(uint256 value);
+  event TobinTaxSet(uint256 factor);
+  event TobinTaxReserveRatioSet(uint256 ratio);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");

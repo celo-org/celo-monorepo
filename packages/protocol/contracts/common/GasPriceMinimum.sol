@@ -23,9 +23,9 @@ contract GasPriceMinimum is
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  event TargetDensitySet(uint256 targetDensity);
+  event TargetDensitySet(uint256 targetDensityFraction);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
-  event AdjustmentSpeedSet(uint256 adjustmentSpeed);
+  event AdjustmentSpeedSet(uint256 adjustmentSpeedFraction);
   event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
 
   uint256 public gasPriceMinimum;
@@ -49,43 +49,49 @@ contract GasPriceMinimum is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _registryAddress The address of the registry core smart contract.
    * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
-   * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
-   * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
+   * @param _targetDensityFraction The target gas fullness of blocks, expressed as a fixidity fraction.
+   * @param _adjustmentSpeedFraction How quickly the minimum changes, expressed as a fixidity fraction.
    */
   function initialize(
     address _registryAddress,
     uint256 _gasPriceMinimumFloor,
-    uint256 _targetDensity,
-    uint256 _adjustmentSpeed
+    uint256 _targetDensityFraction,
+    uint256 _adjustmentSpeedFraction
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     gasPriceMinimum = _gasPriceMinimumFloor;
     setGasPriceMinimumFloor(_gasPriceMinimumFloor);
-    setTargetDensity(_targetDensity);
-    setAdjustmentSpeed(_adjustmentSpeed);
+    setTargetDensity(_targetDensityFraction);
+    setAdjustmentSpeed(_adjustmentSpeedFraction);
   }
 
   /**
    * @notice Set a multiplier that impacts how quickly gas price minimum is adjusted.
-   * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
+   * @param _adjustmentSpeedFraction How quickly the minimum changes, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
-  function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
-    adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
-    require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
-    emit AdjustmentSpeedSet(_adjustmentSpeed);
+  function setAdjustmentSpeed(uint256 _adjustmentSpeedFraction) public onlyOwner {
+    adjustmentSpeedFraction = FixidityLib.wrap(_adjustmentSpeedFraction);
+    require(
+      adjustmentSpeedFraction.lt(FixidityLib.fixed1()),
+      "adjustment speed must be smaller than 1"
+    );
+    emit AdjustmentSpeedSet(_adjustmentSpeedFraction);
   }
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
-   * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
+   * @param _targetDensityFraction The target gas fullness of blocks, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
-  function setTargetDensity(uint256 _targetDensity) public onlyOwner {
-    targetDensity = FixidityLib.wrap(_targetDensity);
-    require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
-    emit TargetDensitySet(_targetDensity);
+  function setTargetDensity(uint256 _targetDensityFraction) public onlyOwner {
+    targetDensityFraction = FixidityLib.wrap(_targetDensityFraction);
+    require(
+      targetDensityFraction.lt(FixidityLib.fixed1()),
+      "target density must be smaller than 1"
+    );
+    emit TargetDensitySet(_targetDensityFraction);
   }
 
   /**
@@ -145,7 +151,7 @@ contract GasPriceMinimum is
    * @param blockGasLimit The maxBlockGasLimit of the past block.
    * @return result of the calculation (new gas price minimum)
    * @dev Calculate using the following formula:
-   * oldGasPriceMinimum * (1 + (adjustmentSpeed * (blockDensity - targetDensity))) + 1.
+   * oldGasPriceMinimum * (1 + (adjustmentSpeedFraction * (blockDensity - targetDensityFraction))) + 1.
    */
   function getUpdatedGasPriceMinimum(uint256 blockGasTotal, uint256 blockGasLimit)
     public
@@ -156,13 +162,13 @@ contract GasPriceMinimum is
       blockGasTotal,
       blockGasLimit
     );
-    bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
+    bool densityGreaterThanTarget = blockDensity.gt(targetDensityFraction);
     FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget
-      ? blockDensity.subtract(targetDensity)
-      : targetDensity.subtract(blockDensity);
+      ? blockDensity.subtract(targetDensityFraction)
+      : targetDensityFraction.subtract(blockDensity);
     FixidityLib.Fraction memory adjustment = densityGreaterThanTarget
-      ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
-      : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
+      ? FixidityLib.fixed1().add(adjustmentSpeedFraction.multiply(densityDelta))
+      : FixidityLib.fixed1().subtract(adjustmentSpeedFraction.multiply(densityDelta));
 
     uint256 newGasPriceMinimum = adjustment
       .multiply(FixidityLib.newFixed(gasPriceMinimum))

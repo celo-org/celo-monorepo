@@ -123,7 +123,7 @@ contract Validators is
 
   event MaxGroupSizeSet(uint256 size);
   event CommissionUpdateDelaySet(uint256 delay);
-  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeed);
+  event ValidatorScoreParametersSet(uint256 exponent, uint256 adjustmentSpeedFactor);
   event GroupLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event ValidatorLockedGoldRequirementsSet(uint256 value, uint256 duration);
   event MembershipHistoryLengthSet(uint256 length);
@@ -133,18 +133,22 @@ contract Validators is
   event ValidatorDeaffiliated(address indexed validator, address indexed group);
   event ValidatorEcdsaPublicKeyUpdated(address indexed validator, bytes ecdsaPublicKey);
   event ValidatorBlsPublicKeyUpdated(address indexed validator, bytes blsPublicKey);
-  event ValidatorScoreUpdated(address indexed validator, uint256 score, uint256 epochScore);
-  event ValidatorGroupRegistered(address indexed group, uint256 commission);
+  event ValidatorScoreUpdated(
+    address indexed validator,
+    uint256 scoreMultiplier,
+    uint256 epochScoreFraction
+  );
+  event ValidatorGroupRegistered(address indexed group, uint256 commissionFactor);
   event ValidatorGroupDeregistered(address indexed group);
   event ValidatorGroupMemberAdded(address indexed group, address indexed validator);
   event ValidatorGroupMemberRemoved(address indexed group, address indexed validator);
   event ValidatorGroupMemberReordered(address indexed group, address indexed validator);
   event ValidatorGroupCommissionUpdateQueued(
     address indexed group,
-    uint256 commission,
+    uint256 commissionFactor,
     uint256 activationBlock
   );
-  event ValidatorGroupCommissionUpdated(address indexed group, uint256 commission);
+  event ValidatorGroupCommissionUpdated(address indexed group, uint256 commissionFactor);
   event ValidatorEpochPaymentDistributed(
     address indexed validator,
     uint256 validatorPayment,
