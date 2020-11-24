@@ -90,6 +90,7 @@
 * ["wrappers/MultiSig"](modules/_wrappers_multisig_.md)
 * ["wrappers/ReleaseGold"](modules/_wrappers_releasegold_.md)
 * ["wrappers/Reserve"](modules/_wrappers_reserve_.md)
+* ["wrappers/SnarkEpochDataSlasher"](modules/_wrappers_snarkepochdataslasher_.md)
 * ["wrappers/SortedOracles"](modules/_wrappers_sortedoracles_.md)
 * ["wrappers/StableTokenWrapper"](modules/_wrappers_stabletokenwrapper_.md)
 * ["wrappers/Validators"](modules/_wrappers_validators_.md)

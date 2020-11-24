@@ -25,6 +25,7 @@
 * [Random](_base_.celocontract.md#random)
 * [Registry](_base_.celocontract.md#registry)
 * [Reserve](_base_.celocontract.md#reserve)
+* [SnarkEpochDataSlasher](_base_.celocontract.md#snarkepochdataslasher)
 * [SortedOracles](_base_.celocontract.md#sortedoracles)
 * [StableToken](_base_.celocontract.md#stabletoken)
 * [TransferWhitelist](_base_.celocontract.md#transferwhitelist)
@@ -200,11 +201,19 @@ ___
 
 ___
 
+###  SnarkEpochDataSlasher
+
+• **SnarkEpochDataSlasher**: = "SnarkEpochDataSlasher"
+
+*Defined in [packages/contractkit/src/base.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L25)*
+
+___
+
 ###  SortedOracles
 
 • **SortedOracles**: = "SortedOracles"
 
-*Defined in [packages/contractkit/src/base.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L25)*
+*Defined in [packages/contractkit/src/base.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L26)*
 
 ___
 
@@ -212,7 +221,7 @@ ___
 
 • **StableToken**: = "StableToken"
 
-*Defined in [packages/contractkit/src/base.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L26)*
+*Defined in [packages/contractkit/src/base.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L27)*
 
 ___
 
@@ -220,7 +229,7 @@ ___
 
 • **TransferWhitelist**: = "TransferWhitelist"
 
-*Defined in [packages/contractkit/src/base.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L27)*
+*Defined in [packages/contractkit/src/base.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L28)*
 
 ___
 
@@ -228,4 +237,4 @@ ___
 
 • **Validators**: = "Validators"
 
-*Defined in [packages/contractkit/src/base.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L28)*
+*Defined in [packages/contractkit/src/base.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L29)*

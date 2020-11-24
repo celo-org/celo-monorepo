@@ -46,6 +46,8 @@ Base ContractWrapper
 
   ↳ [ReserveWrapper](_wrappers_reserve_.reservewrapper.md)
 
+  ↳ [SnarkEpochDataSlasherWrapper](_wrappers_snarkepochdataslasher_.snarkepochdataslasherwrapper.md)
+
   ↳ [SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)
 
   ↳ [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)

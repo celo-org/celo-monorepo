@@ -32,7 +32,7 @@ ___
 
 Ƭ **CeloToken**: *[GoldToken](../enums/_base_.celocontract.md#goldtoken) | [StableToken](../enums/_base_.celocontract.md#stabletoken)*
 
-*Defined in [packages/contractkit/src/base.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L33)*
+*Defined in [packages/contractkit/src/base.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L34)*
 
 ## Variables
 
@@ -40,7 +40,7 @@ ___
 
 • **AllContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = Object.keys(CeloContract) as CeloContract[]
 
-*Defined in [packages/contractkit/src/base.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L35)*
+*Defined in [packages/contractkit/src/base.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L36)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **NULL_ADDRESS**: *string* = '0x0000000000000000000000000000000000000000' as Address
 
-*Defined in [packages/contractkit/src/base.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L43)*
+*Defined in [packages/contractkit/src/base.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L44)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **ProxyContracts**: *string[]* = Object.keys(CeloContract).map((c) => `${c}Proxy`)
 
-*Defined in [packages/contractkit/src/base.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L31)*
+*Defined in [packages/contractkit/src/base.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L32)*
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 • **RegisteredContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
-*Defined in [packages/contractkit/src/base.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L41)*
+*Defined in [packages/contractkit/src/base.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/base.ts#L42)*
