@@ -16,6 +16,16 @@ import {
   Provider,
 } from './types'
 import { decodeStringParameter } from './utils/abi-utils'
+import {
+  hexToNumber,
+  inputAddressFormatter,
+  inputBlockNumberFormatter,
+  inputDefaultBlockNumberFormatter,
+  outputBigNumberFormatter,
+  outputBlockFormatter,
+  outputCeloTxFormatter,
+  outputCeloTxReceiptFormatter,
+} from './utils/formatter'
 import { hasProperty } from './utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller } from './utils/rpc-caller'
 import { TxParamsNormalizer } from './utils/tx-params-normalizer'
@@ -327,17 +337,16 @@ export class Connection {
   }
 
   async chainId(): Promise<number> {
-    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
-    const result = await this.rpcCaller.call('net_version', [])
-    return parseInt(result.result.toString(), 10)
+    // Reference: https://eth.wiki/json-rpc/API#net_version
+    const response = await this.rpcCaller.call('net_version', [])
+    return parseInt(response.result.toString(), 10)
   }
 
   async getTransactionCount(address: Address): Promise<number> {
-    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactioncount
-    const result = await this.rpcCaller.call('eth_getTransactionCount', [address, 'pending'])
+    // Reference: https://eth.wiki/json-rpc/API#eth_gettransactioncount
+    const response = await this.rpcCaller.call('eth_getTransactionCount', [address, 'pending'])
 
-    const nonce = parseInt(result.result.toString(), 16)
-    return nonce
+    return hexToNumber(response.result)!
   }
 
   async nonce(address: Address): Promise<number> {
@@ -345,42 +354,69 @@ export class Connection {
   }
 
   async coinbase(): Promise<string> {
-    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_coinbase
-    const result = await this.rpcCaller.call('eth_coinbase', [])
-    return result.result.toString()
+    // Reference: https://eth.wiki/json-rpc/API#eth_coinbase
+    const response = await this.rpcCaller.call('eth_coinbase', [])
+    return response.result.toString()
   }
 
   async gasPrice(feeCurrency?: Address): Promise<string> {
     // Required otherwise is not backward compatible
     const parameter = feeCurrency ? [feeCurrency] : []
 
-    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice
+    // Reference: https://eth.wiki/json-rpc/API#eth_gasprice
     const response = await this.rpcCaller.call('eth_gasPrice', parameter)
     const gasPriceInHex = response.result.toString()
     return gasPriceInHex
   }
 
   async getBlockNumber(): Promise<number> {
-    return this.web3.eth.getBlockNumber()
+    const response = await this.rpcCaller.call('eth_blockNumber', [])
+
+    return hexToNumber(response.result)!
   }
 
-  async getBlock(blockHashOrBlockNumber: BlockNumber): Promise<Block> {
-    return this.web3.eth.getBlock(blockHashOrBlockNumber, true)
+  async getBlock(
+    blockHashOrBlockNumber: BlockNumber,
+    fullTxObjects: boolean = true
+  ): Promise<Block> {
+    // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
+    let fnCall = 'eth_getBlockByNumber'
+    if (blockHashOrBlockNumber instanceof String && blockHashOrBlockNumber.indexOf('0x') === 0) {
+      // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
+      fnCall = 'eth_getBlockByHash'
+    }
+
+    const response = await this.rpcCaller.call(fnCall, [
+      inputBlockNumberFormatter(blockHashOrBlockNumber),
+      fullTxObjects,
+    ])
+
+    return outputBlockFormatter(response.result)
   }
 
   async getBalance(address: Address, defaultBlock?: BlockNumber): Promise<string> {
-    if (defaultBlock) {
-      return this.web3.eth.getBalance(address, defaultBlock)
-    }
-    return this.web3.eth.getBalance(address)
+    // Reference: https://eth.wiki/json-rpc/API#eth_getBalance
+    const response = await this.rpcCaller.call('eth_getBalance', [
+      inputAddressFormatter(address),
+      inputDefaultBlockNumberFormatter(defaultBlock),
+    ])
+    return outputBigNumberFormatter(response.result)
   }
 
   async getTransaction(transactionHash: string): Promise<CeloTxPending> {
-    return this.web3.eth.getTransaction(transactionHash)
+    // Reference: https://eth.wiki/json-rpc/API#eth_getTransactionByHash
+    const response = await this.rpcCaller.call('eth_getTransactionByHash', [
+      ensureLeading0x(transactionHash),
+    ])
+    return outputCeloTxFormatter(response.result)
   }
 
   async getTransactionReceipt(txhash: string): Promise<CeloTxReceipt> {
-    return this.web3.eth.getTransactionReceipt(txhash)
+    // Reference: https://eth.wiki/json-rpc/API#eth_getTransactionReceipt
+    const response = await this.rpcCaller.call('eth_getTransactionReceipt', [
+      ensureLeading0x(txhash),
+    ])
+    return outputCeloTxReceiptFormatter(response.result)
   }
 
   private fillTxDefaults(tx?: CeloTx): CeloTx {

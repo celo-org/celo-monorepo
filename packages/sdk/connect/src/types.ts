@@ -6,7 +6,7 @@ export type Address = string
 export interface CeloParams {
   feeCurrency: string
   gatewayFeeRecipient: string
-  gatewayFee: string
+  gatewayFee: number | string
 }
 
 export type CeloTx = TransactionConfig & Partial<CeloParams>

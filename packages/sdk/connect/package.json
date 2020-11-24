@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@celo/utils": "1.0.0-dev",
+    "bignumber.js": "^9.0.0",
     "debug": "^4.1.1"
   },
   "devDependencies": {
