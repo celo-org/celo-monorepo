@@ -3,14 +3,6 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { getRemoteTime, ONE_DAY_IN_MILLIS } from 'src/utils/time'
 
-const accountKeyScreens: string[] = [
-  Screens.BackupIntroduction,
-  Screens.AccountKeyEducation,
-  Screens.PincodeEnter,
-  Screens.BackupPhrase,
-  Screens.BackupQuiz,
-]
-
 export const shouldForceBackupSelector = (state: RootState) => {
   if (state.account.backupCompleted) {
     return false
@@ -25,6 +17,14 @@ export const shouldForceBackupSelector = (state: RootState) => {
   }
   return time > state.account.backupRequiredTime
 }
+
+const accountKeyScreens: string[] = [
+  Screens.BackupIntroduction,
+  Screens.AccountKeyEducation,
+  Screens.PincodeEnter,
+  Screens.BackupPhrase,
+  Screens.BackupQuiz,
+]
 
 export const doingBackupFlowSelector = (state: RootState) => {
   return accountKeyScreens.indexOf(state.app.activeScreen) >= 0

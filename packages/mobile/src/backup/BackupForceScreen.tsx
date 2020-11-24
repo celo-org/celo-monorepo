@@ -29,8 +29,9 @@ function BackupForceScreen({ navigation }: Props) {
 
   // Prevent back button on Android
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', () => true)
-    return () => BackHandler.removeEventListener('hardwareBackPress', () => true)
+    const backPressListener = () => true
+    BackHandler.addEventListener('hardwareBackPress', backPressListener)
+    return () => BackHandler.removeEventListener('hardwareBackPress', backPressListener)
   }, [])
 
   return (

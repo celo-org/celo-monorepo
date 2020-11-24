@@ -60,7 +60,7 @@ interface AccountKeyStartProps {
   onPrimaryPress: () => void
 }
 
-export function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
+function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   return (
     <ScrollView contentContainerStyle={styles.introContainer}>
