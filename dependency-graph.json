@@ -54,9 +54,7 @@
   },
   "@celo/dev-utils": {
     "location": "packages/dev-utils",
-    "dependencies": [
-      "@celo/connect"
-    ]
+    "dependencies": []
   },
   "docs": {
     "location": "packages/docs",
