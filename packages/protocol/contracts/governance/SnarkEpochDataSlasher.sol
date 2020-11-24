@@ -295,7 +295,7 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
       }
       bitmap = bitmap >> 1;
     }
-    // TODO: check that there were enough signatures
+    require(num >= minQuorumSize(blockNumber), "not enough signature");
     B12.G1Point memory sig_point = B12.parseG1(sig, 0);
     B12.PairingArg[] memory args = new B12.PairingArg[](2);
     args[0] = B12.PairingArg(sig_point, negativeP2());
