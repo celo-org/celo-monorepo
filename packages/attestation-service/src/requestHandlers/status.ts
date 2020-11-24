@@ -20,7 +20,7 @@ function produceSignature(message: string | undefined) {
   }
 
   return useKit((kit) =>
-    kit.connection.web3.eth.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
+    kit.connection.sign(SIGNATURE_PREFIX + message, getAttestationSignerAddress())
   )
 }
 

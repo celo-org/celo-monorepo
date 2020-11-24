@@ -71,7 +71,7 @@ export default class TestAttestationService extends BaseCommand {
       return
     }
 
-    const signature = await this.kit.connection.web3.eth.sign(phoneNumber + message, address)
+    const signature = await this.kit.connection.sign(phoneNumber + message, address)
 
     try {
       const testUrl = appendPath(attestationServiceUrlClaim.url, 'test_attestations')

@@ -18,7 +18,7 @@ export default class Info extends BaseCommand {
   async run() {
     const res = this.parse(Info)
 
-    const blockNumber = await this.kit.web3.eth.getBlockNumber()
+    const blockNumber = await this.kit.connection.getBlockNumber()
     const latestEpochNumber = await this.kit.getEpochNumberOfBlock(blockNumber)
     const epochSize = await this.kit.getEpochSize()
 

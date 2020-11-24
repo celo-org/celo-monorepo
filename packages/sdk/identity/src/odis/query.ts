@@ -134,7 +134,7 @@ export async function queryOdis<ResponseType>(
     const validSignature: boolean = pubkey.verify(bodyString, JSON.parse(authHeader))
     debug(`Signature is valid: ${validSignature} signed by ${dek}`)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
-    authHeader = await signer.contractKit.connection.web3.eth.sign(bodyString, body.account)
+    authHeader = await signer.contractKit.connection.sign(bodyString, body.account)
   } else {
     authHeader = await signer.customSigner(bodyString)
   }

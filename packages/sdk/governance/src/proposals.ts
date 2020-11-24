@@ -36,10 +36,9 @@ const debug = debugFactory('governance:proposals')
 export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
 export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  kit.connection.web3.eth.abi.encodeParameters(
-    HOTFIX_PARAM_ABI_TYPES,
-    hotfixToParams(proposal, salt)
-  )
+  kit.connection
+    .getAbiCoder()
+    .encodeParameters(HOTFIX_PARAM_ABI_TYPES, hotfixToParams(proposal, salt))
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
   keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer
@@ -222,10 +221,9 @@ export class ProposalBuilder {
       Array.isArray(tx.args[1])
     ) {
       // Transform array of initialize arguments (if provided) into delegate call data
-      tx.args[1] = this.kit.connection.web3.eth.abi.encodeFunctionCall(
-        getInitializeAbiOfImplementation(tx.contract as any),
-        tx.args[1]
-      )
+      tx.args[1] = this.kit.connection
+        .getAbiCoder()
+        .encodeFunctionCall(getInitializeAbiOfImplementation(tx.contract as any), tx.args[1])
     }
 
     const contract = await this.kit._web3Contracts.getContract(tx.contract, address)

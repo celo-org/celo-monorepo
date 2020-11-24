@@ -165,7 +165,7 @@ class CheckBuilder {
     this.addCheck('Account can sign', async () => {
       try {
         const message = 'test'
-        const signature = await this.kit.connection.web3.eth.sign(message, account)
+        const signature = await this.kit.connection.sign(message, account)
         return verifySignature(message, signature, account)
       } catch (error) {
         console.error(error)

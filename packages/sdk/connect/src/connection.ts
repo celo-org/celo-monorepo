@@ -270,6 +270,13 @@ export class Connection {
     return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
+  async sign(dataToSign: string, address: Address | number): Promise<string> {
+    // Uses the Provider and not the RpcCaller, because this method should be intercepted
+    // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
+    // would just forward it to the node
+    return this.web3.eth.sign(dataToSign, address)
+  }
+
   async sendSignedTransaction(signedTransactionData: string): Promise<TransactionResult> {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
