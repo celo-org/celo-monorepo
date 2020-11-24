@@ -21,6 +21,7 @@ export enum CeloContractName {
   Random = 'Random',
   Reserve = 'Reserve',
   ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
+  SnarkEpochDataSlasher = 'SnarkEpochDataSlasher',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   TransferWhitelist = 'TransferWhitelist',
@@ -51,6 +52,7 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.GovernanceSlasher,
   CeloContractName.Random,
   CeloContractName.Reserve,
+  CeloContractName.SnarkEpochDataSlasher,
   CeloContractName.SortedOracles,
   CeloContractName.StableToken,
 ]

@@ -130,6 +130,10 @@ const DefaultConstitution = {
     addSpender: 0.9,
     removeSpender: 0.8,
   },
+  SnarkEpochDataSigningSlasher: {
+    default: 0.7,
+    setSlashingIncentives: 0.7,
+  },
   SortedOracles: {
     default: 0.7,
     setReportExpiry: 0.7,

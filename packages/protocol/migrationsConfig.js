@@ -162,6 +162,10 @@ const DefaultConfig = {
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 2,
   },
+  snarkEpochDataSlasher: {
+    reward: '1000000000000000000000', // 1000 cGLD
+    penalty: '9000000000000000000000', // 9000 cGLD
+  },
   stableToken: {
     decimals: 18,
     goldPrice: 1,

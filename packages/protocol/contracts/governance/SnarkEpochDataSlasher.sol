@@ -199,7 +199,8 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
   {
     B12.G1Point memory p = B12.mapToG1(x, hint1, hint2, !greatest);
     B12.G1Point memory q = CeloB12_377Lib.g1Mul(p, 30631250834960419227450344600217059328);
-    // TODO: check that q != 0
+    // The point iat infinity is represented as (0,0)
+    require(!(q.X.a == 0 && q.X.b == 0 && q.Y.a == 0 && q.Y.b == 0), "Point q cannot be zero");
     return q;
   }
 

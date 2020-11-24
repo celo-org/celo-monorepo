@@ -22,6 +22,7 @@ export enum CeloContract {
   Random = 'Random',
   Registry = 'Registry',
   Reserve = 'Reserve',
+  SnarkEpochDataSlasher = 'SnarkEpochDataSlasher',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   TransferWhitelist = 'TransferWhitelist',
