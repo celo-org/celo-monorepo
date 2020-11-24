@@ -1,5 +1,5 @@
 import { Result } from '@celo/base'
-import { CeloTransactionObject } from '@celo/connect'
+import { CeloTransactionObject, CeloTxReceipt, Sign } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
@@ -64,8 +64,6 @@ import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mtwAddressSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
-import { Sign } from 'web3-core'
-import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'escrow/saga'
 
@@ -340,7 +338,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs
           // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
           // there will be a service in place to transfer funds from MTW to EOA for users
-          const withdrawTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+          const withdrawTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
             withdrawTx
@@ -350,7 +348,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
             throw withdrawTxResult.error
           }
 
-          const transferTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+          const transferTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
             transferTx

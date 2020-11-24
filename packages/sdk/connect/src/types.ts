@@ -20,7 +20,7 @@ export interface CeloTxObject<T> {
   _parent: Contract
 }
 
-export { BlockNumber, EventLog, Log, PromiEvent } from 'web3-core'
+export { BlockNumber, EventLog, Log, PromiEvent, Sign } from 'web3-core'
 export { Block, BlockHeader } from 'web3-eth'
 export { Contract, ContractSendMethod, PastEventOptions } from 'web3-eth-contract'
 

@@ -1,4 +1,5 @@
-import { Artifact, TypeInfo } from '@celo/protocol/lib/compatibility/internal'
+import { Contract as Web3Contract } from '@celo/connect';
+import { Artifact, TypeInfo } from '@celo/protocol/lib/compatibility/internal';
 import {
   BuildArtifacts,
   compareStorageLayouts,
@@ -7,7 +8,6 @@ import {
   Operation,
   StorageLayoutInfo
 } from '@openzeppelin/upgrades';
-import { Contract as Web3Contract } from 'web3-eth-contract';
 const  Web3 = require('web3')
 
 const web3 = new Web3(null)

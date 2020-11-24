@@ -1,8 +1,8 @@
+import { Provider } from '@celo/connect'
 import * as net from 'react-native-tcp'
 import { IPC_PATH } from 'src/geth/geth'
 import Logger from 'src/utils/Logger'
 import Web3 from 'web3'
-import { provider } from 'web3-core'
 
 const TAG = 'web3/providers'
 
@@ -43,7 +43,7 @@ export function getIpcProvider() {
   return _ipcProvider
 }
 
-export function getHttpProvider(url: string): provider {
+export function getHttpProvider(url: string): Provider {
   Logger.debug(TAG, 'creating HttpProvider...')
   const httpProvider = new Web3.providers.HttpProvider(url)
   Logger.debug(TAG, 'created HttpProvider')

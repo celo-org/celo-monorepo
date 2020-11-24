@@ -1,8 +1,8 @@
 import { Address, normalizeAddress } from '@celo/base'
+import { CeloTxReceipt, EventLog } from '@celo/connect'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import MTWContract from '@celo/protocol/build/contracts/MetaTransactionWallet.json'
 import MTWDeployerContract from '@celo/protocol/build/contracts/MetaTransactionWalletDeployer.json'
-import { EventLog, TransactionReceipt } from 'web3-core'
 import { MetaTransactionWallet, newMetaTransactionWallet } from '../generated/MetaTransactionWallet'
 import { newProxy } from '../generated/Proxy'
 import { newKitFromWeb3 } from '../kit'
@@ -49,7 +49,7 @@ testWithGanache('MetaTransactionWallet Wrapper', (web3) => {
   })
 
   describe('#deploy', () => {
-    let result: TransactionReceipt
+    let result: CeloTxReceipt
     let walletDeployedEvent: EventLog | undefined
 
     beforeEach(async () => {
