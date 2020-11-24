@@ -38,7 +38,7 @@ contract MetaTransactionWalletDeployer is
      * @notice Returns the storage, major, minor, and patch version of the contract.
      * @return The storage, major, minor, and patch version of the contract.
      */
-  function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
   }
 

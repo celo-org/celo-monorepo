@@ -55,7 +55,7 @@ contract MetaTransactionWallet is
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
-  function getVersionNumber() public pure returns (uint256, uint256, uint256, uint256) {
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 1);
   }
 
@@ -146,9 +146,9 @@ contract MetaTransactionWallet is
   function getMetaTransactionDigest(
     address destination,
     uint256 value,
-    bytes memory data,
+    bytes calldata data,
     uint256 _nonce
-  ) public view returns (bytes32) {
+  ) external view returns (bytes32) {
     bytes32 structHash = _getMetaTransactionStructHash(destination, value, data, _nonce);
     return Signatures.toEthSignedTypedDataHash(eip712DomainSeparator, structHash);
   }
