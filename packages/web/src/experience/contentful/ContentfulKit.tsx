@@ -44,7 +44,7 @@ export default function ContentfulKit({
       sections={children}
       title={`${kitName}`}
       kitName={kitName}
-      path={path}
+      path={`/experience/${path}`}
       metaDescription={metaDescription}
       ogImage={ogImage}
     />

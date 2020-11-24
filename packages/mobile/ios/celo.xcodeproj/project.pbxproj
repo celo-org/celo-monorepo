@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* celoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* celoTests.m */; };
-		0317E786245B696200AAAC2E /* ../fonts/Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E783245B696200AAAC2E /* ../fonts/Inter-Regular.ttf */; };
-		0317E788245B696200AAAC2E /* ../fonts/Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */; };
-		0317E78A245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */; };
+		0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E783245B696200AAAC2E /* Inter-Regular.ttf */; };
+		0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E784245B696200AAAC2E /* Inter-Medium.ttf */; };
+		0317E78A245B696200AAAC2E /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */; };
 		0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */; };
 		0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */; };
 		0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */; };
@@ -53,9 +53,9 @@
 		00E356EE1AD99517003FC87E /* celoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = celoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* celoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = celoTests.m; sourceTree = "<group>"; };
-		0317E783245B696200AAAC2E /* ../fonts/Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
-		0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
-		0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		0317E783245B696200AAAC2E /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
+		0317E784245B696200AAAC2E /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
+		0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		0602B5AFC2AE93CFF1316467 /* Pods-celo-celoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.debug.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.debug.xcconfig"; sourceTree = "<group>"; };
 		0FE3DE8E2347740700EA87A0 /* celo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = celo.entitlements; path = celo/celo.entitlements; sourceTree = "<group>"; };
 		114969FB1F3AA04FFDC6831F /* Pods-celoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celoTests.debug.xcconfig"; path = "Target Support Files/Pods-celoTests/Pods-celoTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -213,9 +213,9 @@
 		E3041EF3155B4320B4CF8300 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0317E784245B696200AAAC2E /* ../fonts/Inter-Medium.ttf */,
-				0317E783245B696200AAAC2E /* ../fonts/Inter-Regular.ttf */,
-				0317E785245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf */,
+				0317E784245B696200AAAC2E /* Inter-Medium.ttf */,
+				0317E783245B696200AAAC2E /* Inter-Regular.ttf */,
+				0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */,
 				B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */,
 				95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */,
 				AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */,
@@ -379,15 +379,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0317E78A245B696200AAAC2E /* ../fonts/Inter-SemiBold.ttf in Resources */,
+				0317E78A245B696200AAAC2E /* Inter-SemiBold.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */,
 				0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */,
-				0317E786245B696200AAAC2E /* ../fonts/Inter-Regular.ttf in Resources */,
+				0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */,
 				0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */,
 				2CE54C7D16D44C5380C53609 /* Hind-Regular.ttf in Resources */,
-				0317E788245B696200AAAC2E /* ../fonts/Inter-Medium.ttf in Resources */,
+				0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */,
 				5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */,
 				EB3CF5B346854570A1EC69B3 /* Jost-Book.ttf in Resources */,
 				2E6B8DA1BF6440D89CB45CCA /* Jost-Medium.ttf in Resources */,
@@ -497,7 +497,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-celo/Pods-celo-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Analytics/Analytics.framework",
+				"${BUILT_PRODUCTS_DIR}/Analytics/Segment.framework",
 				"${BUILT_PRODUCTS_DIR}/CeloBlockchain/CeloBlockchain.framework",
 				"${BUILT_PRODUCTS_DIR}/DoubleConversion/DoubleConversion.framework",
 				"${BUILT_PRODUCTS_DIR}/FBReactNativeSpec/FBReactNativeSpec.framework",
@@ -508,6 +508,7 @@
 				"${BUILT_PRODUCTS_DIR}/Protobuf/protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCAsyncStorage/RNCAsyncStorage.framework",
+				"${BUILT_PRODUCTS_DIR}/RNCClipboard/RNCClipboard.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCMaskedView/RNCMaskedView.framework",
 				"${BUILT_PRODUCTS_DIR}/RNDeviceInfo/RNDeviceInfo.framework",
 				"${BUILT_PRODUCTS_DIR}/RNExitApp/RNExitApp.framework",
@@ -518,6 +519,7 @@
 				"${BUILT_PRODUCTS_DIR}/RNReanimated/RNReanimated.framework",
 				"${BUILT_PRODUCTS_DIR}/RNSVG/RNSVG.framework",
 				"${BUILT_PRODUCTS_DIR}/RNScreens/RNScreens.framework",
+				"${BUILT_PRODUCTS_DIR}/RNSecureRandom/RNSecureRandom.framework",
 				"${BUILT_PRODUCTS_DIR}/RNSentry/RNSentry.framework",
 				"${BUILT_PRODUCTS_DIR}/RNShare/RNShare.framework",
 				"${BUILT_PRODUCTS_DIR}/React-Core/React.framework",
@@ -552,8 +554,9 @@
 				"${BUILT_PRODUCTS_DIR}/react-native-keep-awake/react_native_keep_awake.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-mail/react_native_mail.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-netinfo/react_native_netinfo.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-randombytes/react_native_randombytes.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-safe-area-context/react_native_safe_area_context.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-secure-randombytes/react_native_secure_randombytes.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-shake/react_native_shake.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-simple-toast/react_native_simple_toast.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-sms/react_native_sms.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-splash-screen/react_native_splash_screen.framework",
@@ -563,7 +566,7 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Analytics.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Segment.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CeloBlockchain.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DoubleConversion.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBReactNativeSpec.framework",
@@ -574,6 +577,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCAsyncStorage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCClipboard.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCMaskedView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNDeviceInfo.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNExitApp.framework",
@@ -584,6 +588,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNReanimated.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSVG.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNScreens.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSecureRandom.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSentry.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNShare.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
@@ -618,8 +623,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_keep_awake.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_mail.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_netinfo.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_randombytes.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_safe_area_context.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_secure_randombytes.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_shake.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_simple_toast.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_sms.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_splash_screen.framework",
@@ -857,6 +863,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -889,6 +896,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1090,6 +1098,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1134,6 +1143,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

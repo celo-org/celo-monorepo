@@ -13,6 +13,7 @@ USAGE
   $ celocli lockedgold:lock
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
   --from=from                                    (required)
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
@@ -23,9 +24,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -45,9 +43,6 @@ Show Locked Gold information for a given account. This includes the total amount
 USAGE
   $ celocli lockedgold:show ACCOUNT
 
-OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
-
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -63,6 +58,7 @@ USAGE
   $ celocli lockedgold:unlock
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -74,9 +70,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -97,6 +90,7 @@ USAGE
   $ celocli lockedgold:withdraw
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -108,9 +102,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

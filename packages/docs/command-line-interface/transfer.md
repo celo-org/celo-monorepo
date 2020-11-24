@@ -13,6 +13,7 @@ USAGE
   $ celocli transfer:celo
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
@@ -27,9 +28,6 @@ OPTIONS
                                                      "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -51,6 +49,7 @@ USAGE
   $ celocli transfer:dollars
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
@@ -65,9 +64,6 @@ OPTIONS
                                                      "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -89,6 +85,7 @@ USAGE
   $ celocli transfer:gold
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
@@ -103,9 +100,6 @@ OPTIONS
                                                      "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

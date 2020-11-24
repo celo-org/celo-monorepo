@@ -1,4 +1,4 @@
-# External module: "explorer/log-explorer"
+# Module: "explorer/log-explorer"
 
 ## Index
 
@@ -16,7 +16,7 @@
 
 ▸ **newLogExplorer**(`kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹[LogExplorer](../classes/_explorer_log_explorer_.logexplorer.md)‹››*
 
-*Defined in [contractkit/src/explorer/log-explorer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L12)*
+*Defined in [packages/contractkit/src/explorer/log-explorer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/log-explorer.ts#L12)*
 
 **Parameters:**
 

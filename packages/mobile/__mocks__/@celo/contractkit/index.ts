@@ -24,6 +24,7 @@ const GoldToken = {
   balanceOf: jest.fn(async () => new BigNumber(1e18)),
   decimals: jest.fn(async () => '10'),
   transferWithComment: jest.fn(async () => ({ txo: txo() })),
+  approve: jest.fn(() => ({ txo: txo() })),
 }
 
 const Attestations = {
@@ -38,6 +39,11 @@ const Reserve = {
   getOrComputeTobinTax: jest.fn(() => ({ txo: txo(TOBIN_TAX) })),
 }
 
+const Exchange = {
+  getExchangeRate: jest.fn(() => new BigNumber(2)),
+  exchange: jest.fn(),
+}
+
 const web3 = new Web3()
 
 const kit = {
@@ -48,6 +54,7 @@ const kit = {
     getAttestations: jest.fn(async () => Attestations),
     getAccounts: jest.fn(async () => Accounts),
     getReserve: jest.fn(async () => Reserve),
+    getExchange: jest.fn(async () => Exchange),
   },
   registry: {
     addressFor: async (address: string) => 1000,
@@ -101,4 +108,31 @@ export function getPepperFromThresholdSignature(sigBuf: Buffer) {
 enum AuthenticationMethod {
   WALLET_KEY = 'wallet_key',
   ENCRYPTION_KEY = 'encryption_key',
+}
+
+export const GenesisBlockUtils = jest.fn()
+GenesisBlockUtils.getGenesisBlockAsync = jest.fn()
+GenesisBlockUtils.getChainIdFromGenesis = jest.fn()
+
+export const StaticNodeUtils = jest.fn().mockImplementation()
+StaticNodeUtils.getStaticNodesAsync = jest.fn()
+StaticNodeUtils.getStaticNodeRegion = jest.fn()
+StaticNodeUtils.getRegionalStaticNodesAsync = jest.fn()
+StaticNodeUtils.getStaticNodesGoogleStorageBucketName = jest.fn()
+
+export const OdisUtils = {
+  Query: {
+    ODIS_ALFAJORESSTAGING_CONTEXT: {
+      odisUrl: 'alfajoresstaging',
+      odisPubKey: 'alfajoresstaging',
+    },
+    ODIS_ALFAJORES_CONTEXT: {
+      odisUrl: 'alfajores',
+      odisPubKey: 'alfajores',
+    },
+    ODIS_MAINNET_CONTEXT: {
+      odisUrl: 'mainnet',
+      odisPubKey: 'mainnet',
+    },
+  },
 }

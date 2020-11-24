@@ -1,22 +1,33 @@
 ---
-description: Prints Celo contract addesses.
+description: View details about the network, like contracts and parameters
 ---
 
 ## Commands
 
 ### Contracts
 
-Prints Celo contract addesses.
+Lists Celo core contracts and their addesses.
 
 ```
 USAGE
   $ celocli network:contracts
-
-OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 ```
 
 _See code: [packages/cli/src/commands/network/contracts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/contracts.ts)_
+
+### Info
+
+View general network information such as the current block number
+
+```
+USAGE
+  $ celocli network:info
+
+OPTIONS
+  -n, --lastN=lastN  [default: 1] Fetch info about the last n epochs
+```
+
+_See code: [packages/cli/src/commands/network/info.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/info.ts)_
 
 ### Parameters
 
@@ -27,7 +38,7 @@ USAGE
   $ celocli network:parameters
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  --raw  Display raw numerical configuration
 ```
 
 _See code: [packages/cli/src/commands/network/parameters.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/network/parameters.ts)_

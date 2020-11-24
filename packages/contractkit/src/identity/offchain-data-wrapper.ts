@@ -1,20 +1,70 @@
-import { eqAddress } from '@celo/base/lib/address'
-import { NativeSigner } from '@celo/base/lib/signatureUtils'
-import { guessSigner } from '@celo/utils/lib/signatureUtils'
+import { Address, ensureLeading0x, eqAddress } from '@celo/base/lib/address'
+import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
+import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import fetch from 'cross-fetch'
 import debugFactory from 'debug'
-import { toChecksumAddress } from 'web3-utils'
+import * as t from 'io-ts'
 import { ContractKit } from '../kit'
 import { ClaimTypes } from './claims/types'
 import { IdentityMetadataWrapper } from './metadata'
+import { AuthorizedSignerAccessor } from './offchain/accessors/authorized-signer'
 import { StorageWriter } from './offchain/storage-writers'
+import { buildEIP712TypedData, resolvePath } from './offchain/utils'
+
 const debug = debugFactory('offchaindata')
+
+export enum OffchainErrorTypes {
+  FetchError = 'FetchError',
+  InvalidSignature = 'InvalidSignature',
+  NoStorageRootProvidedData = 'NoStorageRootProvidedData',
+  NoStorageProvider = 'NoStorageProvider',
+}
+
+class FetchError extends RootError<OffchainErrorTypes.FetchError> {
+  constructor(error: Error) {
+    super(OffchainErrorTypes.FetchError)
+    this.message = error.message
+  }
+}
+
+class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
+  constructor() {
+    super(OffchainErrorTypes.InvalidSignature)
+  }
+}
+
+class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
+  constructor() {
+    super(OffchainErrorTypes.NoStorageRootProvidedData)
+  }
+}
+
+class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
+  constructor() {
+    super(OffchainErrorTypes.NoStorageProvider)
+  }
+}
+
+export type OffchainErrors =
+  | FetchError
+  | InvalidSignature
+  | NoStorageRootProvidedData
+  | NoStorageProvider
 
 export default class OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
+  signer: string
 
-  constructor(readonly self: string, readonly kit: ContractKit) {}
+  constructor(readonly self: string, readonly kit: ContractKit, signer?: string) {
+    this.signer = signer || self
+  }
 
-  async readDataFrom(account: string, dataPath: string) {
+  async readDataFromAsResult<DataType>(
+    account: Address,
+    dataPath: string,
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
+  ): Promise<Result<Buffer, OffchainErrors>> {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
@@ -22,66 +72,113 @@ export default class OffchainDataWrapper {
     // TODO: Filter StorageRoots with the datapath glob
     const storageRoots = metadata
       .filterClaims(ClaimTypes.STORAGE)
-      .map((_) => new StorageRoot(account, _.address))
-    debug({ account, storageRoots })
-    const data = (await Promise.all(storageRoots.map((_) => _.read(dataPath)))).find((_) => _)
+      .map((_) => new StorageRoot(this, account, _.address))
 
-    if (data === undefined) {
-      return undefined
+    if (storageRoots.length === 0) {
+      return Err(new NoStorageRootProvidedData())
     }
 
-    const [actualData, error] = data
-    if (error) {
-      return undefined
+    const results = await Promise.all(
+      storageRoots.map(async (s) => s.readAndVerifySignature(dataPath, checkOffchainSigners, type))
+    )
+    const item = results.find((s) => s.ok)
+
+    if (item === undefined) {
+      return Err(new NoStorageRootProvidedData())
     }
 
-    return actualData
+    return item
   }
 
-  async writeDataTo(data: string, dataPath: string) {
+  readDataFrom = makeAsyncThrowable(this.readDataFromAsResult.bind(this))
+
+  async writeDataTo(
+    data: Buffer,
+    signature: Buffer,
+    dataPath: string
+  ): Promise<OffchainErrors | void> {
     if (this.storageWriter === undefined) {
-      throw new Error('no storage writer')
+      return new NoStorageProvider()
     }
-    await this.storageWriter.write(data, dataPath)
-    // TODO: Prefix signing abstraction
-    const sig = await NativeSigner(this.kit.web3.eth.sign, this.self).sign(data)
-    await this.storageWriter.write(sig, dataPath + '.signature')
+
+    try {
+      await Promise.all([
+        this.storageWriter.write(data, dataPath),
+        this.storageWriter.write(signature, `${dataPath}.signature`),
+      ])
+    } catch (e) {
+      return new FetchError(e)
+    }
   }
 }
 
 class StorageRoot {
-  constructor(readonly account: string, readonly address: string) {}
+  constructor(
+    readonly wrapper: OffchainDataWrapper,
+    readonly account: Address,
+    readonly root: string
+  ) {}
 
-  // TODO: Add decryption metadata (i.e. indicates ciphertext to be decrypted/which key to use)
-  async read(dataPath: string): Promise<[any, any]> {
-    const data = await fetch(this.address + dataPath)
-    if (!data.ok) {
-      return [null, 'No can do']
+  async readAndVerifySignature<DataType>(
+    dataPath: string,
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
+  ): Promise<Result<Buffer, OffchainErrors>> {
+    let dataResponse, signatureResponse
+
+    try {
+      ;[dataResponse, signatureResponse] = await Promise.all([
+        fetch(resolvePath(this.root, dataPath)),
+        fetch(resolvePath(this.root, `${dataPath}.signature`)),
+      ])
+    } catch (error) {
+      return Err(new FetchError(error))
     }
 
-    const body = await data.text()
-
-    const signature = await fetch(this.address + dataPath + '.signature')
-
-    if (!signature.ok) {
-      return [null, 'Signature could not be fetched']
+    if (!dataResponse.ok) {
+      return Err(new FetchError(new Error(dataResponse.statusText)))
+    }
+    if (!signatureResponse.ok) {
+      return Err(new FetchError(new Error(signatureResponse.statusText)))
     }
 
-    // TODO: Compare against registered on-chain signers or off-chain signers
-    const signer = guessSigner(body, await signature.text())
+    const [dataBody, signatureBody] = await Promise.all([
+      dataResponse.arrayBuffer(),
+      signatureResponse.arrayBuffer(),
+    ])
+    const body = Buffer.from(dataBody)
+    const signature = ensureLeading0x(Buffer.from(signatureBody).toString('hex'))
 
-    if (eqAddress(signer, this.account)) {
-      return [body, null]
+    const toParse = type ? JSON.parse(body.toString()) : body
+    const typedData = await buildEIP712TypedData(this.wrapper, dataPath, toParse, type)
+    const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
+    if (eqAddress(guessedSigner, this.account)) {
+      return Ok(body)
     }
 
-    // The signer might be authorized off-chain
-    // TODO: Only if the signer is authorized with an on-chain key
-    const [, err] = await this.read(`/account/authorizedSigners/${toChecksumAddress(signer)}`)
+    const accounts = await this.wrapper.kit.contracts.getAccounts()
+    if (await accounts.isAccount(this.account)) {
+      const signers = await Promise.all([
+        accounts.getVoteSigner(this.account),
+        accounts.getValidatorSigner(this.account),
+        accounts.getAttestationSigner(this.account),
+      ])
+      if (signers.some((signer) => signer === guessedSigner)) {
+        return Ok(body)
+      }
 
-    if (err) {
-      return [null, err]
+      if (checkOffchainSigners) {
+        const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
+        const authorizedSigner = await authorizedSignerAccessor.readAsResult(
+          this.account,
+          guessedSigner
+        )
+        if (authorizedSigner.ok) {
+          return Ok(body)
+        }
+      }
     }
 
-    return [body, null]
+    return Err(new InvalidSignature())
   }
 }

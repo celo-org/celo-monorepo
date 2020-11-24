@@ -8,6 +8,7 @@ export enum AppEvents {
   error_boundary = 'error_boundary',
   user_restart = 'user_restart',
   fetch_balance = 'fetch_balance',
+  fetch_balance_error = 'fetch_balance_error',
 }
 
 export enum HomeEvents {
@@ -88,18 +89,24 @@ export enum OnboardingEvents {
 
   invite_redeem_start = 'invite_redeem_start',
   invite_redeem_complete = 'invite_redeem_complete',
+  invite_redeem_cancel = 'invite_redeem_cancel',
   invite_redeem_timeout = 'invite_redeem_timeout',
   invite_redeem_error = 'invite_redeem_error',
+  invite_redeem_move_funds_start = 'invite_redeem_move_funds_start',
+  invite_redeem_move_funds_complete = 'invite_redeem_move_funds_complete',
 
-  invite_redeem_skip_start = 'invite_redeem_skip_start',
-  invite_redeem_skip_complete = 'invite_redeem_skip_complete',
-  invite_redeem_skip_error = 'invite_redeem_skip_error',
+  initialize_account_start = 'initialize_account_start',
+  initialize_account_complete = 'initialize_account_complete',
+  initialize_account_error = 'initialize_account_error',
 
   escrow_redeem_start = 'escrow_redeem_start', // when escrow redemption starts (only happens on user invite redeemption)
   escrow_redeem_complete = 'escrow_redeem_complete',
   escrow_redeem_error = 'escrow_redeem_error',
 
-  account_dek_set = 'account_dek_set',
+  account_dek_register_start = 'account_dek_register_start',
+  account_dek_register_account_unlocked = 'account_dek_register_account_unlocked',
+  account_dek_register_account_checked = 'account_dek_register_account_checked',
+  account_dek_register_complete = 'account_dek_register_complete',
 }
 
 export enum VerificationEvents {
@@ -140,10 +147,13 @@ export enum VerificationEvents {
   verification_reveal_attestation_await_code_complete = 'verification_reveal_attestation_await_code_complete',
   verification_reveal_attestation_complete = 'verification_reveal_attestation_complete',
   verification_reveal_attestation_error = 'verification_reveal_attestation_error',
+  verification_reveal_attestation_status = 'verification_reveal_attestation_status',
 
   verification_revoke_start = 'verification_revoke_start',
   verification_revoke_finish = 'verification_revoke_finish',
   verification_revoke_error = 'verification_revoke_error',
+
+  verification_resend_messages = 'verification_resend_messages',
 }
 
 export enum IdentityEvents {
@@ -168,9 +178,13 @@ export enum InviteEvents {
   invite_tx_start = 'invite_tx_start',
   invite_tx_complete = 'invite_tx_complete',
   invite_tx_error = 'invite_tx_error',
+  invite_start = 'invite_start',
+  invite_complete = 'invite_complete',
+  invite_error = 'invite_error',
   invite_method_sms = 'invite_method_sms',
   invite_method_whatsapp = 'invite_method_whatsapp',
   invite_method_error = 'invite_method_error',
+  invite_from_menu = 'invite_from_menu',
 }
 
 export enum EscrowEvents {
@@ -282,6 +296,11 @@ export enum CeloExchangeEvents {
   celo_withdraw_error = 'celo_withdraw_error', // when there's an error on the withdrawal transaction
 }
 
+export enum FiatExchangeEvents {
+  external_exchange_link = 'external_exchange_link',
+  spend_merchant_link = 'spend_merchant_link',
+}
+
 export enum GethEvents {
   blockchain_corruption = 'blockchain_corruption',
   geth_init_start = 'geth_init_start',
@@ -333,6 +352,7 @@ export type AnalyticsEventType =
   | IdentityEvents
   | InviteEvents
   | EscrowEvents
+  | FiatExchangeEvents
   | SendEvents
   | RequestEvents
   | FeeEvents

@@ -6,7 +6,6 @@ import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import GoldEducation from 'src/account/GoldEducation'
-import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
@@ -20,10 +19,8 @@ import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase'
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
-import BackupSocial from 'src/backup/BackupSocial'
-import BackupSocialIntro from 'src/backup/BackupSocialIntro'
-import BackButton from 'src/components/BackButton.v2'
-import CancelButton from 'src/components/CancelButton.v2'
+import BackButton from 'src/components/BackButton'
+import CancelButton from 'src/components/CancelButton'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -34,19 +31,21 @@ import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import WithdrawCeloQrScannerScreen from 'src/exchange/WithdrawCeloQrScannerScreen'
 import WithdrawCeloReviewScreen from 'src/exchange/WithdrawCeloReviewScreen'
 import WithdrawCeloScreen from 'src/exchange/WithdrawCeloScreen'
-import FiatExchangeAmount, {
-  fiatExchangesAmountScreenOptions,
-} from 'src/fiatExchanges/FiatExchangeAmount'
+import ExternalExchanges, {
+  externalExchangesScreenOptions,
+} from 'src/fiatExchanges/ExternalExchanges'
 import FiatExchangeOptions, {
   fiatExchangesOptionsScreenOptions,
 } from 'src/fiatExchanges/FiatExchangeOptions'
+import LocalProviderCashOut, {
+  localProviderCashOutOptions,
+} from 'src/fiatExchanges/LocalProviderCashOut'
 import MoonPay, { moonPayOptions } from 'src/fiatExchanges/MoonPay'
+import Spend, { spendScreenOptions } from 'src/fiatExchanges/Spend'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
-import ImportWalletSocial from 'src/import/ImportWalletSocial'
-import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import DrawerNavigator from 'src/navigator/DrawerNavigator'
@@ -59,11 +58,11 @@ import {
   noHeader,
   noHeaderGestureDisabled,
   nuxNavigationOptions,
-} from 'src/navigator/Headers.v2'
+} from 'src/navigator/Headers'
 import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingEducationScreen from 'src/onboarding/education/OnboardingEducationScreen'
@@ -104,7 +103,7 @@ import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 const Stack = createStackNavigator<StackParamList>()
 const RootStack = createStackNavigator<StackParamList>()
 
-type NavigationOptions = StackScreenProps<StackParamList>
+type NavigationOptions = StackScreenProps<StackParamList, keyof StackParamList>
 
 export const modalScreenOptions = ({ route, navigation }: NavigationOptions) =>
   Platform.select({
@@ -122,7 +121,11 @@ const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} options={noHeader} />
-      <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
+      <Navigator.Screen
+        name={Screens.UpgradeScreen}
+        component={UpgradeScreen}
+        options={UpgradeScreen.navigationOptions}
+      />
       <Navigator.Screen
         name={Screens.DappKitAccountAuth}
         component={DappKitAccountScreen}
@@ -218,19 +221,9 @@ const nuxScreens = (Navigator: typeof Stack) => (
       options={pincodeSetScreenOptions}
     />
     <Navigator.Screen
-      name={Screens.EnterInviteCode}
-      component={EnterInviteCode}
-      options={EnterInviteCode.navigationOptions}
-    />
-    <Navigator.Screen
       name={Screens.ImportWallet}
       component={ImportWallet}
       options={ImportWallet.navigationOptions}
-    />
-    <Navigator.Screen
-      name={Screens.ImportWalletSocial}
-      component={ImportWalletSocial}
-      options={nuxNavigationOptions}
     />
     <Navigator.Screen
       name={Screens.ImportContacts}
@@ -391,8 +384,6 @@ const backupScreens = (Navigator: typeof Stack) => (
       component={BackupQuiz}
       options={navOptionsForQuiz}
     />
-    <Navigator.Screen name={Screens.BackupSocialIntro} component={BackupSocialIntro} />
-    <Navigator.Screen name={Screens.BackupSocial} component={BackupSocial} />
     <Navigator.Screen name={Screens.BackupComplete} component={BackupComplete} options={noHeader} />
   </>
 )
@@ -411,11 +402,6 @@ const settingsScreens = (Navigator: typeof Stack) => (
       options={headerWithBackButton}
     />
     <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.InviteReview}
-      component={InviteReview}
-    />
-    <Navigator.Screen
       options={Licenses.navigationOptions}
       name={Screens.Licenses}
       component={Licenses}
@@ -426,14 +412,20 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={SupportContact}
     />
     <Navigator.Screen
-      options={fiatExchangesAmountScreenOptions}
-      name={Screens.FiatExchangeAmount}
-      component={FiatExchangeAmount}
+      options={externalExchangesScreenOptions}
+      name={Screens.ExternalExchanges}
+      component={ExternalExchanges}
     />
+    <Navigator.Screen options={spendScreenOptions} name={Screens.Spend} component={Spend} />
     <Navigator.Screen
       options={fiatExchangesOptionsScreenOptions}
       name={Screens.FiatExchangeOptions}
       component={FiatExchangeOptions}
+    />
+    <Navigator.Screen
+      options={localProviderCashOutOptions}
+      name={Screens.LocalProviderCashOut}
+      component={LocalProviderCashOut}
     />
     <Navigator.Screen options={moonPayOptions} name={Screens.MoonPay} component={MoonPay} />
   </>
@@ -493,7 +485,6 @@ export function MainStackScreen() {
       acceptedTerms,
       pincodeType,
       redeemComplete,
-      account,
       hasSeenVerificationNux,
     } = mapStateToProps(store.getState())
 
@@ -504,8 +495,10 @@ export function MainStackScreen() {
     } else if (!e164Number || !acceptedTerms || pincodeType === PincodeType.Unset) {
       // User didn't go far enough in onboarding, start again from education
       initialRoute = Screens.OnboardingEducationScreen
-    } else if (!redeemComplete && !account) {
-      initialRoute = choseToRestoreAccount ? Screens.ImportWallet : Screens.EnterInviteCode
+    } else if (!redeemComplete) {
+      initialRoute = choseToRestoreAccount
+        ? Screens.ImportWallet
+        : Screens.OnboardingEducationScreen
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {

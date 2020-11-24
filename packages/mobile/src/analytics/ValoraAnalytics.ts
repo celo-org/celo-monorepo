@@ -37,13 +37,13 @@ async function getDeviceInfo() {
     Version: DeviceInfo.getVersion(),
     isEmulator: await DeviceInfo.isEmulator(),
     isTablet: DeviceInfo.isTablet(),
+    UsedMemory: await DeviceInfo.getUsedMemory(),
   }
 }
 
 const SEGMENT_OPTIONS: analytics.Configuration = {
   using: [Firebase],
   flushAt: 20,
-  trackAttributionData: false,
   debug: __DEV__,
   trackAppLifecycleEvents: true,
   recordScreenViews: true,

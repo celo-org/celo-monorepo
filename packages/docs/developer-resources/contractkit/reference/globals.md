@@ -2,7 +2,7 @@
 
 ## Index
 
-### External modules
+### Modules
 
 * ["address-registry"](modules/_address_registry_.md)
 * ["base"](modules/_base_.md)
@@ -24,9 +24,15 @@
 * ["identity/odis/phone-number-identifier"](modules/_identity_odis_phone_number_identifier_.md)
 * ["identity/odis/query"](modules/_identity_odis_query_.md)
 * ["identity/offchain-data-wrapper"](modules/_identity_offchain_data_wrapper_.md)
-* ["identity/offchain/schema-utils"](modules/_identity_offchain_schema_utils_.md)
-* ["identity/offchain/schemas"](modules/_identity_offchain_schemas_.md)
+* ["identity/offchain/accessors/authorized-signer"](modules/_identity_offchain_accessors_authorized_signer_.md)
+* ["identity/offchain/accessors/binary"](modules/_identity_offchain_accessors_binary_.md)
+* ["identity/offchain/accessors/errors"](modules/_identity_offchain_accessors_errors_.md)
+* ["identity/offchain/accessors/interfaces"](modules/_identity_offchain_accessors_interfaces_.md)
+* ["identity/offchain/accessors/name"](modules/_identity_offchain_accessors_name_.md)
+* ["identity/offchain/accessors/pictures"](modules/_identity_offchain_accessors_pictures_.md)
+* ["identity/offchain/accessors/simple"](modules/_identity_offchain_accessors_simple_.md)
 * ["identity/offchain/storage-writers"](modules/_identity_offchain_storage_writers_.md)
+* ["identity/offchain/utils"](modules/_identity_offchain_utils_.md)
 * ["kit"](modules/_kit_.md)
 * ["network-utils/genesis-block-utils"](modules/_network_utils_genesis_block_utils_.md)
 * ["network-utils/google-storage-utils"](modules/_network_utils_google_storage_utils_.md)
@@ -43,6 +49,7 @@
 * ["utils/rpc-caller"](modules/_utils_rpc_caller_.md)
 * ["utils/signature-utils"](modules/_utils_signature_utils_.md)
 * ["utils/signing-utils"](modules/_utils_signing_utils_.md)
+* ["utils/timezone"](modules/_utils_timezone_.md)
 * ["utils/tx-params-normalizer"](modules/_utils_tx_params_normalizer_.md)
 * ["utils/tx-result"](modules/_utils_tx_result_.md)
 * ["utils/tx-uri"](modules/_utils_tx_uri_.md)
@@ -66,6 +73,7 @@
 * ["web3-contract-cache"](modules/_web3_contract_cache_.md)
 * ["wrappers/Accounts"](modules/_wrappers_accounts_.md)
 * ["wrappers/Attestations"](modules/_wrappers_attestations_.md)
+* ["wrappers/BaseSlasher"](modules/_wrappers_baseslasher_.md)
 * ["wrappers/BaseWrapper"](modules/_wrappers_basewrapper_.md)
 * ["wrappers/BlockchainParameters"](modules/_wrappers_blockchainparameters_.md)
 * ["wrappers/DoubleSigningSlasher"](modules/_wrappers_doublesigningslasher_.md)
@@ -78,6 +86,8 @@
 * ["wrappers/GoldTokenWrapper"](modules/_wrappers_goldtokenwrapper_.md)
 * ["wrappers/Governance"](modules/_wrappers_governance_.md)
 * ["wrappers/LockedGold"](modules/_wrappers_lockedgold_.md)
+* ["wrappers/MetaTransactionWallet"](modules/_wrappers_metatransactionwallet_.md)
+* ["wrappers/MetaTransactionWalletDeployer"](modules/_wrappers_metatransactionwalletdeployer_.md)
 * ["wrappers/MultiSig"](modules/_wrappers_multisig_.md)
 * ["wrappers/ReleaseGold"](modules/_wrappers_releasegold_.md)
 * ["wrappers/Reserve"](modules/_wrappers_reserve_.md)

@@ -97,7 +97,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 Private keys are the central primitive of any cryptographic system and need to be handled with extreme care. Loss of your private key can lead to irreversible loss of value.
 
-This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../operations-manual/key-management/summary.md)
+This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../validator-guide/key-management/summary.md)
 
 #### Unlocking
 
@@ -115,7 +115,6 @@ There are a number of environment variables in this guide, and you may use this 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
-| NETWORK_ID                           | The Celo Mainnet network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
@@ -175,8 +174,7 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 First we are going to set up the main environment variables related to the mainnet network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/celo-node:mainnet
-export NETWORK_ID=42220
+export CELO_IMAGE=us.gcr.io/celo-org/geth:mainnet
 ```
 
 ### Pull the Celo Docker image
@@ -187,25 +185,15 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-org/celo-node:mainnet` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/master/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
-
 ### Start your Accounts node
 
-Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
-
-```bash
-# On your local machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
-```
-
-To run the node:
+Next, we'll run a node on your local machine so that we can use these accounts to lock CELO and authorize the keys needed to run your validator. To do this, we need to run the following command to run the node.
 
 ```bash
 # On your local machine
 mkdir celo-accounts-node
 cd celo-accounts-node
-docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --bootnodes $BOOTNODE_ENODES
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --datadir /root/.celo
 ```
 
 {% hint style="danger" %}
@@ -220,8 +208,6 @@ docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $
 mkdir celo-proxy-node
 cd celo-proxy-node
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
 
 You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats. The validator name shown in [Celostats](https://stats.celo.org/) will be the name configured in the proxy.
@@ -239,20 +225,7 @@ Notice the public address returned by this command, that can be exported and use
 ```bash
 # On the proxy machine
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
-```
-
-**OPTIONAL**
-In addition to the bootnode enode URLs provided by the cLabs team, the Celo validator community will contribute full node peers to help kickstart your nodes' peer discovery and block synchronisation processes. Here is the current list, set to `COMMUNITY_ENODES`:
-```bash
-export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
-```
-
-To use the nodes, set them to the value of the `bootnodes` or `bootnodesv4` options when running your node-starting `docker run...` commands (in this example, we will use `bootnodesv4` to keep the original command intact). To bootstrap your proxy node, you can run the command below (the same command at line 239 appended with `--bootnodesv4 $COMMUNITY_ENODES`):
-```bash
-export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
-export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org --bootnodesv4 $COMMUNITY_ENODES
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --light.serve 0 --datadir /root/.celo --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
 
 Hint: If you are running into trouble peering with the full nodes, one of the first things to check is whether your container's ports are properly configured (i.e. specifically, `-p 30303:30303 -p 30303:30303/udp` - which is set in the proxy node's command, but not the account node's command).
@@ -260,6 +233,10 @@ Hint: If you are running into trouble peering with the full nodes, one of the fi
 {% hint style="info" %}
 You can detach from the running container by pressing `ctrl+p ctrl+q`, or start it with `-d` instead of `-it` to start detached. Access the logs for a container in the background with the `docker logs` command.
 {% endhint %}
+
+**NOTES**
+* For the proxy to be able to send stats to [Celostats](https://stats.celo.org/), both the proxy and the validator should set the `celostats` flag
+* If you are deploying multiple proxies for the same validator, the `celostats` flag should be added in only one of them
 
 ### Get your Proxy's connection info
 
@@ -333,13 +310,14 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 ```bash
 # On the Validator machine
 cd celo-validator-node
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
+docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpairs=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --light.serve 0 --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
 
-The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet network.
-
 At this point your Validator and Proxy machines should be configured, and both should be syncing to the network. You should see `Imported new chain segment` in your node logs, about once every 5 seconds once the node is synced to the latest block which you can find on the [Network Stats](https://stats.celo.org) page.
+
+{% hint style="info" %}
+You can run multiple proxies by deploying additional proxies per the instructions in the [Deploy a proxy](running-a-validator-in-mainnet.md#deploy-a-proxy) section.  Then add all of the proxies' enodes as a comma seperated list using the `--proxy.proxyenodeurlpairs` option.  E.g. if there are two proxies, that option's usage would look like `--proxy.proxyenodeurlpairs=enode://$PROXY_ENODE_1@$PROXY_INTERNAL_IP_1:30503\;enode://$PROXY_ENODE_1@$PROXY_EXTERNAL_IP_1:30303,enode://$PROXY_ENODE_2@$PROXY_INTERNAL_IP_2:30503\;enode://$PROXY_ENODE_2@$PROXY_EXTERNAL_IP_2:30303`
+{% endhint %}
 
 ## Registering as a Validator
 
@@ -412,7 +390,7 @@ celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator
 
-In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/key-management/detailed.md#authorized-validator-signers) for the `ReleaseGold` contract account.
+In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../validator-guide/key-management/detailed.md#authorized-validator-signers) for the `ReleaseGold` contract account.
 
 ```bash
 # On the Validator machine
@@ -657,166 +635,9 @@ You can see additional information about your Validator, including uptime score,
 celocli validator:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-### Running the Attestation Service
-
-As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo. Be sure to allow TCP connections to your Attestations machine on port 80 for all IP addresses.
-
-Just like with the Validator and Vote signer, we'll want to authorize a separate Attestation signer. For that let's start our node on the Attestations machine (keep track of the password you use for this account):
-
-```bash
-# On the Attestation machine
-# Note that you have to export CELO_IMAGE, NETWORK_ID and CELO_VALIDATOR_RG_ADDRESS on this machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
-export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
-```
-
-Let's generate the proof-of-possession for the attestation signer:
-
-```bash
-# On the Attestation machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_ATTESTATION_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
-```
-
-With this proof, authorize the attestation signer on your local machine:
-
-```bash
-# On your local machine
-export CELO_ATTESTATION_SIGNER_SIGNATURE=<ATTESTATION-SIGNER-SIGNATURE>
-export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
-celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer $CELO_ATTESTATION_SIGNER_ADDRESS
-```
-
-You can now run the node for the attestation service in the background. In the below command remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`:
-
-```bash
-# On the Attestation machine
-echo <CELO-ATTESTATION-SIGNER-PASSWORD> > .password
-docker run --name celo-attestations -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin --unlock $CELO_ATTESTATION_SIGNER_ADDRESS --password /root/.celo/.password --bootnodes $BOOTNODE_ENODES --allow-insecure-unlock
-```
-
-Next we will set up the Attestation Service itself. First, specify the following environment variables:
-
-```bash
-# On the Attestation machine
-export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-1-0-1
-# if you followed the instruction of setting up the attestation signer
-export CELO_PROVIDER=http://localhost:8545
-```
-
-### SMS Providers
-
-Currently the SMS providers supported are [Twilio](https://www.twilio.com/try-twilio) and [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up).
-
-**Twilio**
-
-Twilio is the most common and popular provider. For that you will need to provision the following variables:
-
-| Variable                     | Explanation                                                     |
-| ---------------------------- | --------------------------------------------------------------- |
-| TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
-| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
-| TWILIO_AUTH_TOKEN            | The API authentication token                                    |
-| TWILIO_BLACKLIST             | A comma-separated list of country codes you do not want to serve |
-
-After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions). Otherwise, the service will not be sending SMS to Celo's global user base and your validator will negatively impact the Celo user experience.
-
-To actually be able to send SMS, you need to create a messaging service under [Programmable SMS > SMS](https://www.twilio.com/console/sms/services). The resulting `SID` you want to specify under the `TWILIO_MESSAGING_SERVICE_SID`. Now that you have provisioned your messaging service, you need to buy at least 1 phone number to send SMS from. You can do so under the `Numbers` option of the messaging service page. To maximize the chances of reliable and prompt SMS sending (and thus attestation fee revenue), you can buy numbers in many locales, and Twilio will intelligently select the best number to send each SMS.
-
-**Nexmo**
-
-Here is the list of the environment variables needed to use the Nexmo SMS broker:
-
-| Variable        | Explanation                                                     |
-| --------------- | --------------------------------------------------------------- |
-| NEXMO_KEY       | The API key to the Nexmo API                                    |
-| NEXMO_SECRET    | The API secret to the Nexmo API                                 |
-| NEXMO_BLACKLIST | A comma-separated list of country codes you do not want to serve |
-
-### Database Configuration
-
-For storing and retrieving the attestation requests the service needs a database to persist that information. Currently `sqlite`, `postgres` and `mysql` are supported. For testing purposes you can use `sqlite` but it's recommended to run a stand-alone database server using `mysql` or `postgres` if your intention is running the Attestation Service in a production environment. If you are running on a popular cloud provider, consider using their hosted SQL services.
-
-Depending on your database technology you need to create a database with the access for a specific user and password.
-
-For specifying the database url you need to setup the `DATABASE_URL` variable in one of these ways:
-
-```bash
-# On the Attestation machine
-export DATABASE_URL="sqlite://db/attestation.db"
-export DATABASE_URL="mysql://user:password@mysql.example.com:3306/attestation-service"
-export DATABASE_URL="postgres://user:password@postgres.example.com:5432/attestation-service"
-```
-
-**Example of setting up a local postgres database on Ubuntu**:
-
-```bash
-apt install postgresql
-sudo -u postgres createdb attestation-service
-sudo -u postgres psql -c "ALTER USER postgres PASSWORD '<DATABASE_PASSWORD>';"
-export DATABASE_URL="postgres://postgres:<DATABASE_PASSWORD>@localhost:5432/attestation-service"
-```
-
 ## Running the Attestation Service
 
-Before running the attestation service, ensure that your local node is fully synced.
-```bash
-# On the Attestation machine
-sudo celocli node:synced --node geth.ipc
-```
-
-The following command for running the Attestation Service is using Twilio and uses `--network host` to access a local database (only works on Linux):
-
-```bash
-# On the Attestation machine
-docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=$CELO_VALIDATOR_RG_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
-```
-
-### Registering Metadata
-
-Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the registered Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
-
-Run the following commands on your local machine:
-
-```bash
-# On your local machine
-celocli account:create-metadata ./metadata.json --from $CELO_VALIDATOR_RG_ADDRESS
-```
-
-The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attestation Service deployed. In the following command we specify the URL where this Attestation Service is:
-
-```bash
-# On your local machine
-celocli account:claim-attestation-service-url ./metadata.json --url $CELO_ATTESTATION_SERVICE_URL --from $CELO_ATTESTATION_SIGNER_ADDRESS
-```
-
-You should now host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` button to receive the permalink to the machine-readable file.
-
-Now we can register this url for others to see. To do this, we must have the `beneficiary` address of the `ReleaseGold` contract (`CELO_VALIDATOR_ADDRESS`) unlocked. 
-
-(Note: If you used a Ledger to create the `beneficiary` address, add the ```--useLedger``` flag and possibly the ```--ledgerAddresses=N``` flag to the below command. The latter flag will have the ledger check N number of addresses, e.g. ```--ledgerAddresses=5``` would have the Ledger check 5 addresses. Don't forget to confirm the transaction on your Ledger after initiating it via the CLI.)
-
-```bash
-# On your local machine
-celocli releasegold:set-account --contract $CELO_VALIDATOR_RG_ADDRESS --property metaURL --value <METADATA_URL>
-```
-
-If everything goes well users should be able to see your claims by running:
-
-```bash
-# On your local machine
-celocli account:get-metadata $CELO_VALIDATOR_RG_ADDRESS
-```
-
-You can run the following command to test if you properly setup your attestation service:
-
-```bash
-# On your local machine
-celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRESS --phoneNumber <YOUR-PHONE-NUMBER-E164-FORMAT> --message <YOUR_MESSAGE>
-```
-
-If this works then your attestation service should be successfully deployed!
+Validators are expected to run an [Attestation Service](../validator-guide/attestation-service.md) to provide attestations that allow users to map their phone number to an account on Celo. Follow the instructions now to [set up the service](../validator-guide/attestation-service.md).
 
 ## Deployment Tips
 

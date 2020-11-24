@@ -20,9 +20,9 @@ export interface State {
   accountCreationTime: number
   backupCompleted: boolean
   backupDelayedTime: number
-  socialBackupCompleted: boolean
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
+  dismissedGoldEducation: boolean
   promptFornoIfNeeded: boolean
   retryVerificationWithForno: boolean
   acceptedTerms: boolean
@@ -56,9 +56,9 @@ export const initialState = {
   accountCreationTime: 99999999999999,
   backupCompleted: false,
   backupDelayedTime: 0,
-  socialBackupCompleted: false,
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
+  dismissedGoldEducation: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
   retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
@@ -159,16 +159,10 @@ export const reducer = (
         ...state,
         backupDelayedTime: getRemoteTime(),
       }
-    case Actions.SET_SOCIAL_BACKUP_COMPLETED:
-      return {
-        ...state,
-        socialBackupCompleted: true,
-      }
     case Actions.TOGGLE_BACKUP_STATE:
       return {
         ...state,
         backupCompleted: !state.backupCompleted,
-        socialBackupCompleted: false,
         backupDelayedTime: 0,
       }
     case Actions.DISMISS_INVITE_FRIENDS:
@@ -180,6 +174,11 @@ export const reducer = (
       return {
         ...state,
         dismissedGetVerified: true,
+      }
+    case Actions.DISMISS_GOLD_EDUCATION:
+      return {
+        ...state,
+        dismissedGoldEducation: true,
       }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {

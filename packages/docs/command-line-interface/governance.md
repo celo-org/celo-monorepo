@@ -4,6 +4,36 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
+### Build-proposal
+
+Interactively build a governance proposal
+
+```
+USAGE
+  $ celocli governance:build-proposal
+
+OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --output=output                                (required) Path to output
+
+  --useLedger                                    Set it to use a ledger wallet
+
+EXAMPLE
+  build-proposal --output ./transactions.json
+```
+
+_See code: [packages/cli/src/commands/governance/build-proposal.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/build-proposal.ts)_
+
 ### Dequeue
 
 Try to dequeue governance proposal
@@ -13,6 +43,7 @@ USAGE
   $ celocli governance:dequeue
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) From address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -24,9 +55,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -45,6 +73,7 @@ USAGE
   $ celocli governance:execute
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -58,9 +87,6 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to execute
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -79,6 +105,7 @@ USAGE
   $ celocli governance:executehotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
@@ -93,9 +120,6 @@ OPTIONS
                                                      "[4,99]"
 
   --salt=salt                                        (required) Secret salt associated with hotfix
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -115,6 +139,7 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
   --jsonTransactions=jsonTransactions            (required) Path to json transactions of the hotfix
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
@@ -127,9 +152,6 @@ OPTIONS
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
   --salt=salt                                    (required) Secret salt associated with hotfix
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -149,7 +171,14 @@ USAGE
   $ celocli governance:list
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLE
   list
@@ -166,6 +195,7 @@ USAGE
   $ celocli governance:preparehotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Preparer's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -178,9 +208,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -200,6 +227,7 @@ USAGE
   $ celocli governance:propose
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --deposit=deposit                                  (required) Amount of Gold to attach to proposal
 
   --descriptionURL=descriptionURL                    (required) A URL where further information about the proposal can
@@ -219,9 +247,6 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
-
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -240,6 +265,7 @@ USAGE
   $ celocli governance:revokeupvote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -251,9 +277,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -272,14 +295,14 @@ USAGE
   $ celocli governance:show
 
 OPTIONS
-  --account=account        Address of account or voter
-  --hotfix=hotfix          Hash of hotfix proposal
-  --nonwhitelisters        If set, displays validators that have not whitelisted the hotfix.
-  --notwhitelisted         List validators who have not whitelisted the specified hotfix
-  --proposalID=proposalID  UUID of proposal to view
-  --raw                    Display proposal in raw bytes format
-  --usdGas                 If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
-  --whitelisters           If set, displays validators that have whitelisted the hotfix.
+  --account=account                    Address of account or voter
+  --hotfix=hotfix                      Hash of hotfix proposal
+  --jsonTransactions=jsonTransactions  Output proposal JSON to provided file
+  --nonwhitelisters                    If set, displays validators that have not whitelisted the hotfix.
+  --notwhitelisted                     List validators who have not whitelisted the specified hotfix
+  --proposalID=proposalID              UUID of proposal to view
+  --raw                                Display proposal in raw bytes format
+  --whitelisters                       If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
   show --proposalID 99
@@ -301,6 +324,7 @@ USAGE
   $ celocli governance:upvote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -314,9 +338,6 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to upvote
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -337,7 +358,6 @@ USAGE
 OPTIONS
   --proposalID=proposalID  (required) UUID of proposal to view
   --raw                    Display proposal in raw bytes format
-  --usdGas                 If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLES
   view --proposalID 99
@@ -357,7 +377,6 @@ USAGE
 OPTIONS
   --hash=hash        (required) Hash of hotfix transactions
   --nonwhitelisters  If set, displays validators that have not whitelisted the hotfix.
-  --usdGas           If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
   --whitelisters     If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
@@ -377,6 +396,7 @@ USAGE
   $ celocli governance:vote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -390,9 +410,6 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to vote on
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -413,6 +430,7 @@ USAGE
   $ celocli governance:whitelisthotfix
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Whitelister's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -425,9 +443,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -447,6 +462,7 @@ USAGE
   $ celocli governance:withdraw
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -458,9 +474,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

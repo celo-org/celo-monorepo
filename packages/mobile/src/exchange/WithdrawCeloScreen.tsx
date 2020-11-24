@@ -1,56 +1,90 @@
 // SCREEN First step on the "Withdraw CELO" flow where user provides an address to withdraw to
 // and an amount.
 
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { parseInputAmount } from '@celo/utils/lib/parsing'
+import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { isAddressFormat } from 'src/account/utils'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
 import AccountAddressInput from 'src/components/AccountAddressInput'
 import CeloAmountInput from 'src/components/CeloAmountInput'
-import { ADDRESS_LENGTH } from 'src/exchange/reducer'
+import { exchangeRatePairSelector } from 'src/exchange/reducer'
+import { FeeType } from 'src/fees/actions'
+import { useSendFee } from 'src/fees/CalculateFee'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
-import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers.v2'
+import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
+import { useDailyTransferLimitValidator } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { divideByWei } from 'src/utils/formatting'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloScreen>
 
-function WithdrawCeloScreen({ navigation }: Props) {
-  const [accountAddress, setAccountAddress] = useState('')
-  const [celoToTransfer, setCeloToTransfer] = useState('')
+const { decimalSeparator } = getNumberFormatSettings()
+const RANDOM_ADDRESS = '0xDCE9762d6C1fe89FF4f3857832131Ca18eE15C66'
+
+function WithdrawCeloScreen({ route }: Props) {
+  const [accountAddress, setAccountAddress] = useState(route.params?.recipientAddress ?? '')
+  const [celoInput, setCeloToTransfer] = useState(route.params?.amount?.toString() ?? '')
+  const celoToTransfer = parseInputAmount(celoInput, decimalSeparator)
 
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const goldBalanceNumber = new BigNumber(goldBalance || 0)
   const { t } = useTranslation(Namespaces.exchangeFlow9)
 
-  const celoToTransferNumber = new BigNumber(celoToTransfer)
   const readyToReview =
-    accountAddress.startsWith('0x') &&
-    accountAddress.length === ADDRESS_LENGTH &&
-    celoToTransferNumber.isGreaterThan(0) &&
-    celoToTransferNumber.isLessThanOrEqualTo(goldBalanceNumber)
+    isAddressFormat(accountAddress) &&
+    celoToTransfer.isGreaterThan(0) &&
+    celoToTransfer.isLessThanOrEqualTo(goldBalanceNumber)
 
-  const onConfirm = () => {
-    const celoAmount = new BigNumber(celoToTransfer)
+  const exchangeRatePair = useSelector(exchangeRatePairSelector)
+
+  const [isTransferLimitReached, showLimitReachedBanner] = useDailyTransferLimitValidator(
+    celoToTransfer,
+    CURRENCY_ENUM.GOLD
+  )
+
+  const { result } = useSendFee({
+    feeType: FeeType.SEND,
+    account: RANDOM_ADDRESS,
+    currency: CURRENCY_ENUM.GOLD,
+    recipientAddress: RANDOM_ADDRESS,
+    amount: goldBalance || '0',
+    includeDekFee: false,
+  })
+  const feeEstimate = result && divideByWei(result)
+
+  const onConfirm = async () => {
+    if (isTransferLimitReached) {
+      showLimitReachedBanner()
+      return
+    }
+
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_review, {
-      amount: celoAmount.toString(),
+      amount: celoToTransfer.toString(),
     })
-    navigation.navigate(Screens.WithdrawCeloReviewScreen, {
-      amount: celoAmount,
+    navigate(Screens.WithdrawCeloReviewScreen, {
+      amount: celoToTransfer,
       recipientAddress: accountAddress,
+      feeEstimate: feeEstimate || new BigNumber(0),
+      isCashOut: route.params?.isCashOut,
     })
   }
 
@@ -73,7 +107,8 @@ function WithdrawCeloScreen({ navigation }: Props) {
           inputContainerStyle={styles.inputContainer}
           inputStyle={styles.input}
           onCeloChanged={setCeloToTransfer}
-          celo={celoToTransfer}
+          celo={celoInput}
+          feeEstimate={feeEstimate}
         />
       </KeyboardAwareScrollView>
       <Button
@@ -84,6 +119,7 @@ function WithdrawCeloScreen({ navigation }: Props) {
         type={BtnTypes.SECONDARY}
         size={BtnSizes.FULL}
         style={styles.reviewBtn}
+        showLoading={exchangeRatePair === null}
         testID="WithdrawReviewButton"
       />
       <KeyboardSpacer />
@@ -91,12 +127,18 @@ function WithdrawCeloScreen({ navigation }: Props) {
   )
 }
 
-WithdrawCeloScreen.navigationOptions = () => {
+WithdrawCeloScreen.navigationOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.WithdrawCeloScreen>
+}) => {
   return {
     ...headerWithBackButton,
     headerTitle: () => (
       <HeaderTitleWithBalance
-        title={i18n.t('exchangeFlow9:withdrawCelo')}
+        title={i18n.t(
+          route.params?.isCashOut ? 'fiatExchangeFlow:cashOut' : 'exchangeFlow9:withdrawCelo'
+        )}
         token={CURRENCY_ENUM.GOLD}
       />
     ),

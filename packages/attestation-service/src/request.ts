@@ -1,15 +1,19 @@
+import { AttestationResponseType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { rootLogger } from './logger'
+import { AttestationModel, AttestationStatus } from './models/attestation'
 
 export enum ErrorMessages {
   INVALID_SIGNATURE = 'Invalid signature provided',
   NO_PROVIDER_SETUP = 'No provider was setup for this phone number',
   UNKNOWN_ERROR = 'Something went wrong',
-  ATTESTATION_SIGNER_CANNOT_SIGN = 'Attestation signer could not sign',
-  DATABASE_IS_OFFLONE = 'Database is offline',
+  ATTESTATION_SIGNER_CANNOT_SIGN = 'Node offline or attestation signer account not unlocked',
+  DATABASE_IS_OFFLINE = 'Database is offline',
+  NODE_IS_SYNCING = 'Node is not synced',
+  NODE_IS_STUCK = 'Node is not up to date',
 }
 
 export function asyncHandler<T>(handler: (req: express.Request, res: Response) => Promise<T>) {
@@ -74,6 +78,34 @@ export function respondWithError(res: express.Response, statusCode: number, erro
   res.status(statusCode).json({ success: false, error })
 }
 
+export function respondWithAttestation(
+  res: express.Response,
+  attestation: AttestationModel,
+  alwaysSuccess?: boolean | undefined,
+  salt?: string | undefined,
+  attestationCode?: string | null
+) {
+  res.status(alwaysSuccess ? 200 : attestation.failure() ? 422 : 200).json(
+    AttestationResponseType.encode({
+      success: alwaysSuccess ? true : !attestation.failure(),
+      identifier: attestation.identifier,
+      account: attestation.account,
+      issuer: attestation.issuer,
+      attempt: attestation.attempt,
+      countryCode: attestation.countryCode,
+      status: AttestationStatus[attestation.status],
+      salt,
+      provider: attestation.provider() ?? undefined,
+      errors: attestation.errors ?? undefined,
+      error: attestation.currentError(),
+      duration: attestation.completedAt
+        ? attestation.completedAt!.getTime() - attestation.createdAt.getTime()
+        : undefined,
+      attestationCode: attestationCode ?? undefined,
+    })
+  )
+}
+
 export type Response = Omit<express.Response, 'locals'> & {
   locals: { logger: Logger } & Omit<any, 'logger'>
 }
@@ -91,4 +123,13 @@ export function loggerMiddleware(
   res.locals.logger = requestLogger
   requestLogger.info({ req })
   next()
+}
+
+export class ErrorWithResponse extends Error {
+  responseCode: number | undefined
+  constructor(message?: string, responseCode?: number) {
+    super(message)
+    Object.setPrototypeOf(this, new.target.prototype)
+    this.responseCode = responseCode
+  }
 }

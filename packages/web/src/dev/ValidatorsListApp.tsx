@@ -1,7 +1,6 @@
 import { ApolloProvider, Query } from '@apollo/react-components'
 import ApolloClient from 'apollo-boost'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import fetch from 'cross-fetch'
 import gql from 'graphql-tag'
 import getConfig from 'next/config'
 import { Router, withRouter } from 'next/router'
@@ -17,6 +16,7 @@ import menuItems from 'src/shared/menu-items'
 import Navigation, { NavigationTheme } from 'src/shared/Navigation'
 import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles, textStyles } from 'src/styles'
+import { cleanData } from 'src/utils/validators'
 
 const networkMenu = [
   ['Mainnet', menuItems.VALIDATORS_LIST.link],
@@ -172,7 +172,7 @@ class ValidatorsListApp extends React.PureComponent<Props> {
                     </View>
                   )
                 }
-                return <ValidatorsList data={data} isLoading={loading} />
+                return <ValidatorsList data={cleanData(data)} isLoading={loading} />
               }}
             </Query>
           </ApolloProvider>

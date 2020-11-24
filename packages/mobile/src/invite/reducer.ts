@@ -1,3 +1,4 @@
+import { Actions as AccountActions, ActionTypes as AccountActionTypes } from 'src/account/actions'
 import { Actions, ActionTypes, InviteDetails } from 'src/invite/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -5,24 +6,22 @@ import { RootState } from 'src/redux/reducers'
 export interface State {
   isSendingInvite: boolean
   isRedeemingInvite: boolean
-  isSkippingInvite: boolean
   invitees: InviteDetails[]
   redeemComplete: boolean
-  redeemedInviteCode: string | null
+  redeemedTempAccountPrivateKey: string | null
 }
 
 export const initialState: State = {
   isSendingInvite: false,
   isRedeemingInvite: false,
-  isSkippingInvite: false,
   invitees: [],
   redeemComplete: false,
-  redeemedInviteCode: null,
+  redeemedTempAccountPrivateKey: null,
 }
 
 export const inviteReducer = (
   state: State | undefined = initialState,
-  action: ActionTypes | RehydrateAction
+  action: ActionTypes | AccountActionTypes | RehydrateAction
 ): State => {
   switch (action.type) {
     case REHYDRATE: {
@@ -32,7 +31,6 @@ export const inviteReducer = (
         ...getRehydratePayload(action, 'invite'),
         isSendingInvite: false,
         isRedeemingInvite: false,
-        isSkippingInvite: false,
       }
     }
     case Actions.SEND_INVITE:
@@ -54,7 +52,7 @@ export const inviteReducer = (
     case Actions.REDEEM_INVITE:
       return {
         ...state,
-        redeemedInviteCode: action.inviteCode,
+        redeemedTempAccountPrivateKey: action.tempAccountPrivateKey,
         isRedeemingInvite: true,
       }
     case Actions.REDEEM_INVITE_SUCCESS:
@@ -69,22 +67,21 @@ export const inviteReducer = (
         redeemComplete: false,
         isRedeemingInvite: false,
       }
-    case Actions.SKIP_INVITE:
-      return {
-        ...state,
-        isSkippingInvite: true,
-      }
-    case Actions.SKIP_INVITE_SUCCESS:
-      return {
-        ...state,
-        redeemComplete: true,
-        isSkippingInvite: false,
-      }
-    case Actions.SKIP_INVITE_FAILURE:
+    case AccountActions.CANCEL_CREATE_OR_RESTORE_ACCOUNT:
       return {
         ...state,
         redeemComplete: false,
-        isSkippingInvite: false,
+        isRedeemingInvite: false,
+      }
+    case AccountActions.INITIALIZE_ACCOUNT_SUCCESS:
+      return {
+        ...state,
+        redeemComplete: true,
+      }
+    case AccountActions.INITIALIZE_ACCOUNT_FAILURE:
+      return {
+        ...state,
+        redeemComplete: false,
       }
     default:
       return state

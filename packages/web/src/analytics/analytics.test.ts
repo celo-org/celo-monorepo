@@ -23,13 +23,6 @@ describe('analytics.track', () => {
       expect(await analytics.track('this')).toEqual(null)
     })
   })
-  describe('when process is browser and canTrack', () => {
-    it('calls the real segment tracker', async () => {
-      // @ts-ignore
-      isBrowser.mockImplementation(() => true)
-      expect(await analytics.track('that')).toEqual(true)
-    })
-  })
 })
 
 describe('agree', () => {

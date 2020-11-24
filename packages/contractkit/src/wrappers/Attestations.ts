@@ -11,7 +11,9 @@ import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
+  blocksToDurationString,
   proxyCall,
+  proxySend,
   toTransactionObject,
   valueToBigNumber,
   valueToInt,
@@ -64,6 +66,7 @@ export interface AttesationServiceRevealRequest {
   // TODO rename to pepper here and in Attesation Service
   salt?: string
   smsRetrieverAppSig?: string
+  language?: string
 }
 
 export interface UnselectedRequest {
@@ -177,6 +180,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
       await sleep(pollDurationSeconds * 1000)
     }
+    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
@@ -267,7 +271,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    */
   async getActionableAttestations(
     identifier: string,
-    account: Address
+    account: Address,
+    tries = 3
   ): Promise<ActionableAttestation[]> {
     const result = await this.contract.methods
       .getCompletableAttestations(identifier, account)
@@ -276,7 +281,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const results = await concurrentMap(
       5,
       parseGetCompletableAttestations(result),
-      this.isIssuerRunningAttestationService
+      this.makeIsIssuerRunningAttestationService(tries)
     )
 
     return results.map((_) => (_.isValid ? _.result : null)).filter(notEmpty)
@@ -287,7 +292,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
    */
-  async getNonCompliantIssuers(identifier: string, account: Address): Promise<Address[]> {
+  async getNonCompliantIssuers(
+    identifier: string,
+    account: Address,
+    tries = 3
+  ): Promise<Address[]> {
     const result = await this.contract.methods
       .getCompletableAttestations(identifier, account)
       .call()
@@ -295,40 +304,46 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const withAttestationServiceURLs = await concurrentMap(
       5,
       parseGetCompletableAttestations(result),
-      this.isIssuerRunningAttestationService
+      this.makeIsIssuerRunningAttestationService(tries)
     )
 
     return withAttestationServiceURLs.map((_) => (_.isValid ? null : _.issuer)).filter(notEmpty)
   }
 
-  private isIssuerRunningAttestationService = async (arg: {
-    blockNumber: number
-    issuer: string
-    metadataURL: string
-  }): Promise<AttestationServiceRunningCheckResult> => {
-    try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, arg.metadataURL)
-      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
+  private makeIsIssuerRunningAttestationService = (tries = 3) => {
+    return async (arg: {
+      blockNumber: number
+      issuer: string
+      metadataURL: string
+    }): Promise<AttestationServiceRunningCheckResult> => {
+      try {
+        const metadata = await IdentityMetadataWrapper.fetchFromURL(
+          this.kit,
+          arg.metadataURL,
+          tries
+        )
+        const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
-      if (attestationServiceURLClaim === undefined) {
-        throw new Error(`No attestation service URL registered for ${arg.issuer}`)
+        if (attestationServiceURLClaim === undefined) {
+          throw new Error(`No attestation service URL registered for ${arg.issuer}`)
+        }
+
+        const nameClaim = metadata.findClaim(ClaimTypes.NAME)
+
+        // TODO: Once we have status indicators, we should check if service is up
+        // https://github.com/celo-org/celo-monorepo/issues/1586
+        return {
+          isValid: true,
+          result: {
+            blockNumber: arg.blockNumber,
+            issuer: arg.issuer,
+            attestationServiceURL: attestationServiceURLClaim.url,
+            name: nameClaim ? nameClaim.name : undefined,
+          },
+        }
+      } catch (error) {
+        return { isValid: false, issuer: arg.issuer }
       }
-
-      const nameClaim = metadata.findClaim(ClaimTypes.NAME)
-
-      // TODO: Once we have status indicators, we should check if service is up
-      // https://github.com/celo-org/celo-monorepo/issues/1586
-      return {
-        isValid: true,
-        result: {
-          blockNumber: arg.blockNumber,
-          issuer: arg.issuer,
-          attestationServiceURL: attestationServiceURLClaim.url,
-          name: nameClaim ? nameClaim.name : undefined,
-        },
-      }
-    } catch (error) {
-      return { isValid: false, issuer: arg.issuer }
     }
   }
 
@@ -388,6 +403,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees.
+   * @return AttestationsConfig object
    */
   async getConfig(tokens: string[]): Promise<AttestationsConfig> {
     const fees = await Promise.all(
@@ -401,6 +417,24 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationRequestFees: fees,
     }
   }
+
+  /**
+   * @dev Returns human readable configuration of the attestations contract
+   * @return AttestationsConfig object
+   */
+  async getHumanReadableConfig(tokens: string[]) {
+    const config = await this.getConfig(tokens)
+    return {
+      attestationRequestFees: config.attestationRequestFees,
+      attestationExpiry: blocksToDurationString(config.attestationExpiryBlocks),
+    }
+  }
+
+  /**
+   * Returns the list of accounts associated with an identifier.
+   * @param identifier Attestation identifier (e.g. phone hash)
+   */
+  lookupAccountsForIdentifier = proxyCall(this.contract.methods.lookupAccountsForIdentifier)
 
   /**
    * Lookup mapped wallet addresses for a given list of identifiers
@@ -456,6 +490,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
+   * Updates sender's approval status on whether to allow an attestation identifier
+   * mapping to be transfered from one address to another.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  approveTransfer = proxySend(this.kit, this.contract.methods.approveTransfer)
+
+  /**
    * Selects the issuers for previously requested attestations for a phone number
    * @param identifier Attestation identifier (e.g. phone hash)
    */
@@ -463,6 +508,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return toTransactionObject(this.kit, this.contract.methods.selectIssuers(identifier))
   }
 
+  /**
+   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
+  async selectIssuersAfterWait(
+    identifier: string,
+    account: string,
+    timeoutSeconds?: number,
+    pollDurationSeconds?: number
+  ) {
+    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
+    return this.selectIssuers(identifier)
+  }
+
+  /**
+   * Reveal phone number to issuer
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   * @param smsRetrieverAppSig?: Android app's hash
+   */
   revealPhoneNumberToIssuer(
     phoneNumber: string,
     account: Address,
@@ -484,6 +553,33 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+    })
+  }
+
+  /**
+   * Returns reveal status from validator's attestation service
+   * @param phoneNumber: attestation's phone number
+   * @param account: attestation's account
+   * @param issuer: validator's address
+   * @param serviceURL: validator's attestation service URL
+   * @param pepper: phone number privacy pepper
+   */
+  getRevealStatus(
+    phoneNumber: string,
+    account: Address,
+    issuer: Address,
+    serviceURL: string,
+    pepper?: string
+  ) {
+    const urlParams = new URLSearchParams({
+      phoneNumber,
+      salt: pepper ?? '',
+      issuer,
+      account,
+    })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
@@ -568,7 +664,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
       attestationServiceURL = attestationServiceURLClaim.url
     } catch (error) {
-      ret.state = AttestationServiceStatusState.InvalidMetadata
+      ret.state =
+        error.type === 'system'
+          ? AttestationServiceStatusState.MetadataTimeout
+          : AttestationServiceStatusState.InvalidMetadata
       ret.error = error
       return ret
     }
@@ -586,21 +685,52 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.okStatus = true
       const statusResponseBody = await statusResponse.json()
       ret.smsProviders = statusResponseBody.smsProviders
-      ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
       ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
-      ret.state = AttestationServiceStatusState.Valid
-      ret.version = statusResponseBody.version
-      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
-      return ret
+      ret.state = ret.rightAccount
+        ? AttestationServiceStatusState.Valid
+        : AttestationServiceStatusState.WrongAccount
+
+      // Healthcheck was added in 1.0.1, same time version started being reported.
+      if (statusResponseBody.version) {
+        ret.version = statusResponseBody.version
+
+        // Try healthcheck
+        try {
+          const healthzResponse = await fetch(appendPath(attestationServiceURL, 'healthz'))
+          const healthzResponseBody = await healthzResponse.json()
+          if (!healthzResponse.ok) {
+            ret.state = AttestationServiceStatusState.Unhealthy
+            if (healthzResponseBody.error) {
+              ret.error = healthzResponseBody.error
+            }
+          }
+        } catch (error) {
+          ret.state = AttestationServiceStatusState.UnreachableHealthz
+        }
+
+        // Whether or not health check is reachable, also check full node status
+        // (overrides UnreachableHealthz status)
+        if (
+          (statusResponseBody.ageOfLatestBlock !== null &&
+            statusResponseBody.ageOfLatestBlock > 10) ||
+          statusResponseBody.isNodeSyncing === true
+        ) {
+          ret.state = AttestationServiceStatusState.Unhealthy
+        }
+      } else {
+        // No version implies 1.0.0
+        ret.version = '1.0.0'
+      }
     } catch (error) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
       ret.error = error
-      return ret
     }
+
+    return ret
   }
 
   async revoke(identifer: string, account: Address) {
-    const accounts = await this.contract.methods.lookupAccountsForIdentifier(identifer).call()
+    const accounts = await this.lookupAccountsForIdentifier(identifer)
     const idx = accounts.findIndex((acc) => eqAddress(acc, account))
     if (idx < 0) {
       throw new Error("Account not found in identifier's accounts")
@@ -609,15 +739,19 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 }
 
-enum AttestationServiceStatusState {
+export enum AttestationServiceStatusState {
   NoAttestationSigner = 'NoAttestationSigner',
   NoMetadataURL = 'NoMetadataURL',
   InvalidMetadata = 'InvalidMetadata',
   NoAttestationServiceURL = 'NoAttestationServiceURL',
   UnreachableAttestationService = 'UnreachableAttestationService',
   Valid = 'Valid',
+  UnreachableHealthz = 'UnreachableHealthz',
+  Unhealthy = 'Unhealthy',
+  WrongAccount = 'WrongAccount',
+  MetadataTimeout = 'MetadataTimeout',
 }
-interface AttestationServiceStatusResponse {
+export interface AttestationServiceStatusResponse {
   name: string
   address: Address
   ecdsaPublicKey: string
@@ -631,7 +765,7 @@ interface AttestationServiceStatusResponse {
   okStatus: boolean
   error: null | Error
   smsProviders: string[]
-  blacklistedRegionCodes: string[]
+  blacklistedRegionCodes: string[] | null
   rightAccount: boolean
   signer: string
   state: AttestationServiceStatusState

@@ -14,6 +14,7 @@ import sleep from 'sleep-promise'
 import {
   fetchLatestMessagesFromToday,
   findValidCode,
+  getIdentifierAndPepper,
   getPhoneNumber,
   requestAttestationsFromIssuers,
   requestMoreAttestations,
@@ -36,6 +37,8 @@ interface AutoVerifyArgv extends BotsArgv {
   celoProvider: string
   index: number
   timeToPollForTextMessages: number
+  salt: string
+  context: string
 }
 
 export const builder = (yargs: Argv) => {
@@ -69,6 +72,16 @@ export const builder = (yargs: Argv) => {
       type: 'number',
       description: 'The index of the account to use',
       default: 0,
+    })
+    .option('salt', {
+      type: 'string',
+      description: 'The salt to use instead of getting a pepper from ODIS',
+      default: '',
+    })
+    .option('context', {
+      type: 'string',
+      description: 'ODIS context (mainnet, alfajores, alfajoresstaging)',
+      default: 'mainnet',
     })
 }
 
@@ -105,16 +118,24 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
     const phoneNumber = await getPhoneNumber(
       attestations,
       twilioClient,
-      fetchEnv(envVar.TWILIO_ADDRESS_SID),
-      argv.attestationMax
+      argv.attestationMax,
+      argv.salt
     )
+    const { identifier, pepper } = await getIdentifierAndPepper(
+      kit,
+      argv.context,
+      clientAddress,
+      phoneNumber,
+      argv.salt
+    )
+    logger.info({ identifier }, 'Using identifier')
 
     const nonCompliantIssuersAlreadyLogged: string[] = []
 
     logger = logger.child({ phoneNumber })
     logger.info('Initialized phone number')
 
-    let stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
+    let stat = await attestations.getAttestationStat(identifier, clientAddress)
 
     while (stat.total < argv.attestationMax) {
       logger.info({ ...stat }, 'Start Attestation')
@@ -129,15 +150,15 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       }
 
       logger.info('Request Attestation')
-      await requestMoreAttestations(attestations, phoneNumber, 1, clientAddress, txParams)
+      await requestMoreAttestations(attestations, identifier, 1, clientAddress, txParams)
 
       const attestationsToComplete = await attestations.getActionableAttestations(
-        phoneNumber,
+        identifier,
         clientAddress
       )
 
       const nonCompliantIssuers = await attestations.getNonCompliantIssuers(
-        phoneNumber,
+        identifier,
         clientAddress
       )
       nonCompliantIssuers
@@ -153,7 +174,8 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         attestationsToComplete,
         attestations,
         phoneNumber,
-        clientAddress
+        clientAddress,
+        pepper
       )
 
       logger.info(
@@ -173,6 +195,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
         attestations,
         twilioClient,
         phoneNumber,
+        identifier,
         clientAddress,
         attestationsToComplete,
         txParams,
@@ -187,7 +210,7 @@ export const handler = async function autoVerify(argv: AutoVerifyArgv) {
       )
 
       await sleep(sleepTime * 1000)
-      stat = await attestations.getAttestationStat(phoneNumber, clientAddress)
+      stat = await attestations.getAttestationStat(identifier, clientAddress)
     }
 
     logger.info({ ...stat }, 'Completed attestations for phone number')
@@ -204,6 +227,7 @@ async function pollForMessagesAndCompleteAttestations(
   attestations: AttestationsWrapper,
   client: Twilio,
   phoneNumber: string,
+  identifier: string,
   account: Address,
   attestationsToComplete: ActionableAttestation[],
   txParams: CeloTransactionParams = {},
@@ -221,7 +245,7 @@ async function pollForMessagesAndCompleteAttestations(
     const res = await findValidCode(
       attestations,
       messages.map((_) => _.body),
-      phoneNumber,
+      identifier,
       attestationsToComplete,
       account
     )
@@ -238,11 +262,11 @@ async function pollForMessagesAndCompleteAttestations(
       'Received valid code'
     )
 
-    const completeTx = await attestations.complete(phoneNumber, account, res.issuer, res.code)
+    const completeTx = await attestations.complete(identifier, account, res.issuer, res.code)
 
     await completeTx.sendAndWaitForReceipt(txParams)
 
     logger.info({ issuer: res.issuer }, 'Completed attestation')
-    attestationsToComplete = await attestations.getActionableAttestations(phoneNumber, account)
+    attestationsToComplete = await attestations.getActionableAttestations(identifier, account)
   }
 }

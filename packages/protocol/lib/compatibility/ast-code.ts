@@ -1,4 +1,10 @@
-// tslint:disable: max-classes-per-file
+import { stripMetadata } from '@celo/protocol/lib/bytecode'
+import {
+  Change,
+  ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
+  MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
+  MethodReturnChange, MethodVisibilityChange, NewContractChange
+} from '@celo/protocol/lib/compatibility/change'
 import { makeZContract } from '@celo/protocol/lib/compatibility/internal'
 import {
   BuildArtifacts,
@@ -33,14 +39,6 @@ enum StorageLocation {
 
 const CONTRACT_KIND_CONTRACT = 'contract'
 const OUT_VOID_PARAMETER_STRING = 'void'
-const CONTRACT_METADATA_REGEXPS = [
-  // 0.5.8
-  'a165627a7a72305820.*0029',
-  // 0.5.12
-  'a265627a7a72315820.*64736f6c6343.*0032'
-]
-
-// Exported classes
 
 /**
  * A compatibility report with all the detected changes from two compiled
@@ -56,186 +54,6 @@ export class ASTCodeCompatibilityReport {
   }
   getChanges = (): Change[] => {
     return this.changes
-  }
-}
-
-/**
- * A code change detected from an old to a new version of a contract.
- */
-export interface Change {
-  getContract(): string
-  accept<T>(visitor: ChangeVisitor<T>): T
-}
-
-/**
- * Visitor pattern implementation for the {@link Change} hierarchy.
- */
-export interface ChangeVisitor<T> {
-  onMethodMutability(change: MethodMutabilityChange): T
-  onMethodParameters(change: MethodParametersChange): T
-  onMethodReturn(change: MethodReturnChange): T
-  onMethodVisibility(change: MethodVisibilityChange): T
-  onMethodAdded(change: MethodAddedChange): T
-  onMethodRemoved(change: MethodRemovedChange): T
-  onContractKind(change: ContractKindChange): T
-  onNewContract(change: NewContractChange): T
-  onDeployedBytecode(change: DeployedBytecodeChange): T
-}
-
-/**
- * Abstract implementation for the {@link Change} interface.
- */
-abstract class ContractChange implements Change {
-  type: string
-  constructor(private readonly contract: string) {
-    this.contract = contract
-  }
-  getContract() {
-    return this.contract
-  }
-
-  abstract accept<T>(visitor: ChangeVisitor<T>): T
-}
-
-/**
- * A 'New Contract' change detected during the compatibility report. A
- * contract was found in the new folder that was not present in the old
- * folder. The id which is used to do this comparison is the name of the
- * contract, therefore not only adding a contract, but a name change
- * would produce this change.
- */
-export class NewContractChange extends ContractChange {
-  type = "NewContract"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onNewContract(this)
-  }
-}
-
-/**
- * Abstract class providing standard 'old value => new value' functionality
- * for {@link ContractChange}
- */
-abstract class ContractValueChange extends ContractChange {
-  constructor(
-    contract: string,
-    public readonly oldValue: string,
-    public readonly newValue: string) {
-    super(contract)
-  }
-}
-
-/**
- * The deployedBytecode field in the built json artifact has changed, with
- * the exception of metadata, from the old folder to the new one. This is
- * due to an implementation change.
- *
- * To avoid false positives, compile both old and new folders in the same
- * full path.
- */
-export class DeployedBytecodeChange extends ContractChange {
-  type = "DeployedBytecode"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onDeployedBytecode(this)
-  }
-}
-
-/**
- * The Kind of a contract changed. Kind examples are
- * 'contract' or 'library'.
- */
-export class ContractKindChange extends ContractValueChange {
-  type = "ContractKind"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onContractKind(this)
-  }
-}
-
-/**
- * Abstract implementation for the {@link Change} interface for
- * method changes.
- *
- * Since we use the {@link signature} as the id of the method, it's
- * the same value for the old and the new contract.
- */
-abstract class MethodChange extends ContractChange {
-  constructor(contract: string, private readonly signature: string) {
-    super(contract)
-  }
-  getSignature() {
-    return this.signature
-  }
-}
-
-/**
- * A new method was found in the new version of the contract.
- */
-export class MethodAddedChange extends MethodChange {
-  type = "MethodAdded"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodAdded(this)
-  }
-}
-
-/**
- * A method from the old version is not present in the new version.
- */
-export class MethodRemovedChange extends MethodChange {
-  type = "MethodRemoved"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodRemoved(this)
-  }
-}
-
-/**
- * Abstract class providing standard 'old value => new value' functionality
- * for {@link MethodChange}
- */
-abstract class MethodValueChange extends MethodChange {
-  constructor(contract: string, signature: string,
-    public readonly oldValue: string,
-    public readonly newValue: string) {
-    super(contract, signature)
-  }
-}
-
-/**
- * The visibility (public/external) of a method changed.
- */
-export class MethodVisibilityChange extends MethodValueChange {
-  type = "MethodVisibility"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodVisibility(this)
-  }
-}
-
-/**
- * The mutability (payable/pure/view...) of a method changed.
- */
-export class MethodMutabilityChange extends MethodValueChange {
-  type = "MethodMutability"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodMutability(this)
-  }
-}
-
-/**
- * The input parameters of a method changed. Since the input parameters
- * are used as the id of a method, this should probably never appear.
- */
-export class MethodParametersChange extends MethodValueChange {
-  type = "MethodParameters"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodParameters(this)
-  }
-}
-
-/**
- * The return parameters of a method changed.
- */
-export class MethodReturnChange extends MethodValueChange {
-  type = "MethodReturn"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodReturn(this)
   }
 }
 
@@ -351,22 +169,6 @@ const getCheckableMethodsFromAST = (contract: ContractAST, id: string): any[] =>
   }
 }
 
-/*
- * The Solidity compiler appends a Swarm Hash of compilation metadata to the end
- * of bytecode. We find this hash based on the specification here:
- * https://solidity.readthedocs.io/en/develop/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode
- */
-const stripMetadataIfPresent = (bytecode: string): string => {
-  try {
-    const regexp = new RegExp(`^(.*)(${CONTRACT_METADATA_REGEXPS.map(r => '(' + r + ')').join('|')})$`, 'i')
-    // TODO: use proper CBOR parser
-    const [, bytes] = bytecode.match(regexp)
-    return bytes
-  } catch (e) {
-    return bytecode
-  }
-}
-
 function doASTCompatibilityReport(
   contractName: string,
   oldAST: ContractAST,
@@ -441,7 +243,7 @@ function generateASTCompatibilityReport(oldContract: ZContract, oldArtifacts: Bu
 
   const report = doASTCompatibilityReport(contractName, oldAST, newAST)
   // Check deployed byte code change
-  if (stripMetadataIfPresent(oldContract.schema.deployedBytecode) !== stripMetadataIfPresent(newContract.schema.deployedBytecode)) {
+  if (stripMetadata(oldContract.schema.deployedBytecode) !== stripMetadata(newContract.schema.deployedBytecode)) {
     report.push(new DeployedBytecodeChange(contractName))
   }
   return report

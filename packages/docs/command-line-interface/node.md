@@ -13,6 +13,8 @@ USAGE
   $ celocli node:accounts
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -21,9 +23,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 ```
@@ -39,7 +38,6 @@ USAGE
   $ celocli node:synced
 
 OPTIONS
-  --usdGas   If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
   --verbose  output the full status if syncing
 ```
 

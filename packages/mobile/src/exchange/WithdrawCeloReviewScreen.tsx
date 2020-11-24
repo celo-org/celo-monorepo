@@ -1,49 +1,53 @@
 // SCREEN where users can review the data about the witdrawal of CELO they are about to make
 // and confirm.
 
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
+import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { NavigationProp, RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useDispatch } from 'react-redux'
 import { CeloExchangeEvents } from 'src/analytics/Events'
 import ValoraAnalytics from 'src/analytics/ValoraAnalytics'
-import CancelButton from 'src/components/CancelButton.v2'
-import LineItemRow from 'src/components/LineItemRow.v2'
+import CancelButton from 'src/components/CancelButton'
+import LineItemRow from 'src/components/LineItemRow'
 import ShortenedAddress from 'src/components/ShortenedAddress'
 import { withdrawCelo } from 'src/exchange/actions'
 import WithdrawCeloSummary from 'src/exchange/WithdrawCeloSummary'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
-import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers'
+import {
+  navigate,
+  navigateBack,
+  navigateToExchangeHome,
+  replace,
+} from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton'
 import { StackParamList } from 'src/navigator/types'
+import useTypedSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 type Props = StackScreenProps<StackParamList, Screens.WithdrawCeloReviewScreen>
 
 function WithdrawCeloReviewScreen({ route }: Props) {
-  const { amount, recipientAddress } = route.params
+  const { amount, recipientAddress, feeEstimate, isCashOut } = route.params
   const { t } = useTranslation(Namespaces.exchangeFlow9)
-  // loading is never set to false, when the withdrawal is complete or after a short while,
-  // withdrawCelo saga will navigate to |ExchangeHomeScreen|.
-  const [loading, setLoading] = useState(false)
+  const isLoading = useTypedSelector((state) => state.exchange.isLoading)
   const dispatch = useDispatch()
 
   const onConfirmWithdraw = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_confirm, {
       amount: amount.toString(),
     })
-    setLoading(true)
-    dispatch(withdrawCelo(amount, recipientAddress))
+    dispatch(withdrawCelo(amount, recipientAddress, isCashOut))
   }
 
   return (
@@ -56,7 +60,11 @@ function WithdrawCeloReviewScreen({ route }: Props) {
           amount={<ShortenedAddress style={styles.withdrawAddress} address={recipientAddress} />}
         />
         <HorizontalLine />
-        <WithdrawCeloSummary amount={amount} recipientAddress={recipientAddress} />
+        <WithdrawCeloSummary
+          amount={amount}
+          recipientAddress={recipientAddress}
+          feeEstimate={feeEstimate}
+        />
       </View>
       <Button
         onPress={onConfirmWithdraw}
@@ -65,21 +73,43 @@ function WithdrawCeloReviewScreen({ route }: Props) {
         size={BtnSizes.FULL}
         style={styles.reviewBtn}
         testID="ConfirmWithdrawButton"
-        showLoading={loading}
+        showLoading={isLoading}
         loadingColor={colors.light}
       />
     </SafeAreaView>
   )
 }
 
-WithdrawCeloReviewScreen.navigationOptions = () => {
+WithdrawCeloReviewScreen.navigationOptions = ({
+  navigation,
+  route,
+}: {
+  navigation: NavigationProp<StackParamList, Screens.WithdrawCeloReviewScreen>
+  route: RouteProp<StackParamList, Screens.WithdrawCeloReviewScreen>
+}) => {
+  const isCashOut = !!route.params?.isCashOut
   const onCancel = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_cancel)
-    navigate(Screens.ExchangeHomeScreen)
+    if (isCashOut) {
+      navigate(Screens.FiatExchangeOptions, { isAddFunds: false })
+    } else {
+      navigateToExchangeHome()
+    }
   }
   const onEdit = () => {
     ValoraAnalytics.track(CeloExchangeEvents.celo_withdraw_edit)
-    navigateBack()
+    const canGoBack = navigation
+      .dangerouslyGetState()
+      .routes.some((screen) => screen.name === Screens.WithdrawCeloScreen)
+    if (canGoBack) {
+      navigateBack()
+    } else {
+      replace(Screens.WithdrawCeloScreen, {
+        isCashOut,
+        amount: route.params?.amount,
+        recipientAddress: route.params?.recipientAddress,
+      })
+    }
   }
   return {
     ...emptyHeader,

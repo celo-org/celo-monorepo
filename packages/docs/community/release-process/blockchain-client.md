@@ -4,7 +4,7 @@
 
 Releases of celo-blockchain are numbered according to semantic versioning, as described at [semver.org](https://semver.org).
 
-  * New releases of celo-blockchain can be expected as follows:
+New releases of celo-blockchain can be expected as follows:
   * Major releases: approximately yearly
   * Minor releases: approximately 4 times a year
   * Patch releases: as needed
@@ -22,8 +22,10 @@ gpg --auto-key-locate wkd --locate-keys $EMAIL
 ```
 
 Currently hosted core developer keys include:
+
 * victor@clabs.co
 * mariano@clabs.co
+* joshua@clabs.co
 
 ## Documentation
 
@@ -71,7 +73,7 @@ A signature should be produced over the image automatically built at the corresp
 Release image signatures can be verified with the following command:
 
 ```bash
-docker save $(docker image inspect us.gcr.io/celo-org/celo-node:X.Y.Z -f '{{ .Id }}') | gpg --verify celo-blockchain-vX.Y.Z.docker.asc -
+docker save $(docker image inspect us.gcr.io/celo-org/geth:X.Y.Z -f '{{ .Id }}') | gpg --verify celo-blockchain-vX.Y.Z.docker.asc -
 ```
 
 ## Testing

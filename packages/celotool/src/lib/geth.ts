@@ -776,6 +776,9 @@ export async function importPrivateKey(
 ) {
   const keyFile = path.join(getDatadir(getConfig.runPath, instance), 'key.txt')
 
+  if (!instance.privateKey) {
+    throw new Error('Unexpected empty private key')
+  }
   fs.writeFileSync(keyFile, instance.privateKey, { flag: 'a' })
 
   if (verbose) {
@@ -876,6 +879,7 @@ export async function startGeth(
     rpcport,
     wsport,
     validating,
+    replica,
     validatingGasPrice,
     bootnodeEnode,
     isProxy,
@@ -956,6 +960,8 @@ export async function startGeth(
 
   if (instance.nodekey) {
     instance.args.push(`--nodekeyhex=${instance.nodekey}`)
+  } else if (!validating || !replica) {
+    instance.args.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (gatewayFee) {
@@ -971,6 +977,9 @@ export async function startGeth(
 
     if (isProxied) {
       instance.args.push('--proxy.proxied')
+    }
+    if (replica) {
+      gethArgs.push('--istanbul.replica')
     }
   } else if (isProxy) {
     instance.args.push('--proxy.proxy')
@@ -990,7 +999,7 @@ export async function startGeth(
     if (proxyAllowPrivateIp) {
       instance.args.push('--proxy.allowprivateip=true')
     }
-    instance.args.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
+    instance.args.push(`--proxy.proxyenodeurlpairs=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
   if (privateKey || ethstats) {

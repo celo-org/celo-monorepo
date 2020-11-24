@@ -1,66 +1,76 @@
-// need to mock this as it expects to be called inside a provider
-jest.mock('src/exchange/CeloGoldOverview', () => ({ default: () => 'AccountOverviewComponent' }))
-// import * as React from 'react'
-// import { MockedProvider } from 'react-apollo/test-utils'
-import 'react-native'
-// import { Provider } from 'react-redux'
-// import * as renderer from 'react-test-renderer'
-// import configureMockStore from 'redux-mock-store'
-// import thunk from 'redux-thunk'
-// import { ExchangeHomeScreen } from 'src/exchange/ExchangeHomeScreen'
-// import { transactionQuery } from 'src/home/WalletHome'
-// import i18n from 'src/i18n'
+import React from 'react'
+import { fireEvent, render } from 'react-native-testing-library'
+import { Provider } from 'react-redux'
+import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
-// const middlewares = [thunk]
-// const mockStore = configureMockStore(middlewares)
+// Mock this for now, as we get apollo issues
+jest.mock('src/transactions/TransactionsList')
 
-// const newDollarBalance = '189.9'
-// const newGoldBalance = '207.81'
-// const exchangeRate = '2'
+const mockScreenProps = getMockStackScreenProps(Screens.ExchangeHomeScreen)
 
-// const mocks = [
-//   {
-//     request: {
-//       query: transactionQuery,
-//       variables: {
-//         address: '',
-//       },
-//     },
-//     result: {
-//       data: {
-//         events: [],
-//       },
-//     },
-//   },
-// ]
+describe('ExchangeHomeScreen', () => {
+  it('renders and behaves correctly for non CP-DOTO restricted countries', () => {
+    const store = createMockStore({
+      goldToken: { balance: '2' },
+      stableToken: { balance: '10' },
+      exchange: { exchangeRatePair: { goldMaker: '0.11', dollarMaker: '10' } },
+    })
 
-// failing due to various apollo issues with mocks
-xit('renders correctly', () => {
-  // const store = mockStore({
-  //   account: { devModeActive: false },
-  //   transactions: { standbyTransactions: [] },
-  //   web3: { accounts: {} },
-  // })
-  // const tree = renderer.create(
-  //   <Provider store={store}>
-  //     <MockedProvider mocks={mocks} addTypename={false}>
-  //       <ExchangeHomeScreen
-  //         dollarBalance={newDollarBalance}
-  //         goldBalance={newGoldBalance}
-  //         dollarPending={0}
-  //         goldPending={0}
-  //         fetchExchangeRate={jest.fn()}
-  //         exchangeRate={exchangeRate}
-  //         fetchGoldPendingBalance={jest.fn()}
-  //         fetchDollarBalance={jest.fn()}
-  //         fetchDollarPendingBalance={jest.fn()}
-  //         fetchGoldBalance={jest.fn()}
-  //         tReady={true}
-  //         i18n={i18n}
-  //         t={i18n.t}
-  //       />
-  //     </MockedProvider>
-  //   </Provider>
-  // )
-  // expect(tree).toMatchSnapshot()
+    const tree = render(
+      <Provider store={store}>
+        <ExchangeHomeScreen {...mockScreenProps} />
+      </Provider>
+    )
+
+    expect(tree).toMatchSnapshot()
+
+    jest.clearAllMocks()
+    fireEvent.press(tree.getByTestId('BuyCelo'))
+    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.ExchangeTradeScreen, {
+      makerTokenDisplay: { makerToken: 'Celo Dollar', makerTokenBalance: '10' },
+    })
+
+    jest.clearAllMocks()
+    fireEvent.press(tree.getByTestId('SellCelo'))
+    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.ExchangeTradeScreen, {
+      makerTokenDisplay: { makerToken: 'Celo Gold', makerTokenBalance: '2' },
+    })
+
+    jest.clearAllMocks()
+    fireEvent.press(tree.getByTestId('WithdrawCELO'))
+    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.WithdrawCeloScreen, {
+      isCashOut: false,
+    })
+  })
+
+  it('renders and behaves correctly for CP-DOTO restricted countries', () => {
+    const store = createMockStore({
+      account: {
+        defaultCountryCode: '+63', // PH is restricted for CP-DOTO
+      },
+      goldToken: { balance: '2' },
+      stableToken: { balance: '10' },
+      exchange: { exchangeRatePair: { goldMaker: '0.11', dollarMaker: '10' } },
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <ExchangeHomeScreen {...mockScreenProps} />
+      </Provider>
+    )
+
+    expect(tree).toMatchSnapshot()
+
+    // Check we cannot buy/sell
+    expect(tree.queryByTestId('BuyCelo')).toBeFalsy()
+    expect(tree.queryByTestId('SellCelo')).toBeFalsy()
+
+    // Check we can withdraw
+    fireEvent.press(tree.getByTestId('WithdrawCELO'))
+    expect(mockScreenProps.navigation.navigate).toHaveBeenCalledWith(Screens.WithdrawCeloScreen, {
+      isCashOut: false,
+    })
+  })
 })

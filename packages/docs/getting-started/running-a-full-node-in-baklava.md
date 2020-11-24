@@ -13,11 +13,11 @@ Full node incentives have not been enabled yet because the mechanism for negotia
 {% endhint %}
 
 {% hint style="info" %}
-If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can either shut down your existing node, delete the `celo` folder, and continue by following the guide below starting with [configuring your node](#configure-the-node), or create a new node following these directions.
+If you are transitioning from the Baklava network prior to the June 24 reset, you will need to start with a fresh chain database. You can either shut down your existing node, delete the `celo` folder, and continue by following the guide below or create a new node following these directions.
 
 Key differences are:
 * New network ID is `62320`
-* A new image has been pushed to `us.gcr.io/celo-org/celo-node:baklava`, matching Celo client v1.0.0
+* A new image has been pushed to `us.gcr.io/celo-org/geth:baklava`
 * A new genesis block and bootnode enode are included in the Docker image
 * `ReleaseGold` contracts are available for all previously faucetted addresses [here](https://gist.github.com/nategraf/245232883a34cbb162eb599e34afd7c0)
 {% endhint %}
@@ -37,8 +37,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for `Baklava` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-org/celo-node:baklava
-export NETWORK_ID=62320
+export CELO_IMAGE=us.gcr.io/celo-org/geth:baklava
 ```
 
 ## Pull the Celo Docker image
@@ -82,26 +81,12 @@ export CELO_ACCOUNT_ADDRESS=<YOUR-ACCOUNT-ADDRESS>
 This environment variable will only persist while you have this terminal window open. If you want this environment variable to be available in the future, you can add it to your `~/.bash_profile`
 {% endhint %}
 
-## Configure the node
-
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for Baklava and uses it to initialize your nodes' data directory.
-
-```bash
-docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
-```
-
-In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
-
-```bash
-export BOOTNODE_ENODES=$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)
-```
-
 ## Start the node
 
 This command specifies the settings needed to run the node, and gets it started.
 
 ```bash
-docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --bootnodes $BOOTNODE_ENODES --nousb
+docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --nousb --baklava --datadir /root/.celo
 ```
 
 You'll start seeing some output. After a few minutes, you should see lines that look like this. This means your node has started syncing with the network and is receiving blocks.

@@ -1,4 +1,4 @@
-# External module: "wallets/wallet"
+# Module: "wallets/wallet"
 
 ## Index
 
@@ -8,4 +8,6 @@
 
 ### Interfaces
 
+* [ReadOnlyWallet](../interfaces/_wallets_wallet_.readonlywallet.md)
+* [UnlockableWallet](../interfaces/_wallets_wallet_.unlockablewallet.md)
 * [Wallet](../interfaces/_wallets_wallet_.wallet.md)

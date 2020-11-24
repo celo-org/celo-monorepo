@@ -7,7 +7,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { HelpfullLink } from 'src/terms/HelpfullLink'
+import { HelpfulLink } from 'src/terms/HelpfulLink'
 import { Languages } from 'src/utils/languages'
 
 export interface PressArticleFields {
@@ -20,29 +20,41 @@ export interface PressArticleFields {
 
 interface Props {
   press: PressArticleFields[]
+  languages: string
 }
 
 class PressPage extends React.PureComponent<I18nProps & Props> {
   static async getInitialProps(context) {
     let press = []
+    let languages = []
     try {
       // when run on server import fetching code and run. on client send req to api
       if (context.req) {
         const getpress = await import('src/../server/fetchPress')
         press = await getpress.default()
+        languages = context.req.headers['accept-language']
+          .toLowerCase()
+          .split(',')
+          .map((s) => s.substr(0, 2))
       } else {
-        press = await fetch(`/api/press`).then((result) => result.json())
+        const res = await fetch(`/api/press`)
+        press = await res.json()
+        languages = navigator.languages ? navigator.languages.map((s) => s.substr(0, 2)) : []
       }
-      return { press }
+      return { press, languages }
     } catch {
-      return { press }
+      return { press, languages }
     }
   }
   render() {
-    const { t, press, i18n } = this.props
+    const { t, press, languages, i18n } = this.props
+    const langList = new Set(languages)
 
     const formated = press
-      .filter((article) => article.language === Languages[i18n.language])
+      .filter(
+        (article) =>
+          langList.has(Languages[article.language]) || Languages[article.language] === i18n.language
+      )
       .reduce(groupByMonth, {})
 
     return (
@@ -78,7 +90,7 @@ class PressPage extends React.PureComponent<I18nProps & Props> {
                         {t('by')} {item.publication}
                         {'  '}
                       </Text>
-                      {item.link && <HelpfullLink text={t('read')} href={item.link} />}
+                      {item.link && <HelpfulLink text={t('read')} href={item.link} />}
                     </Text>
                   </View>
                 ))}

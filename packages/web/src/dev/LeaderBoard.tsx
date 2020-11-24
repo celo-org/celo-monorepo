@@ -1,12 +1,12 @@
 import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import Racer from 'src/dev/Racer'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import Fade from 'src/shared/AwesomeFade'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -133,9 +133,16 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
               </LazyLoad>
             ))}
           <Axis max={maxPoints} isMobile={screen === ScreenSizes.MOBILE} />
-          <Fade delay={DELAY_MS} when={!isLoading}>
-            <Text style={[fonts.small, textStyles.invert]}>{t('unitOfMeasure')}</Text>
-          </Fade>
+          <Text
+            style={[
+              fonts.small,
+              textStyles.invert,
+              standardStyles.fadeInitial,
+              !isLoading && standardStyles.fadeIn,
+            ]}
+          >
+            {t('unitOfMeasure')}
+          </Text>
           {showExpandButton && (
             <Fade delay={DELAY_MS}>
               <View

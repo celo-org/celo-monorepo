@@ -1,5 +1,6 @@
 import { PincodeType } from 'src/account/reducer'
 import { AppState } from 'src/app/actions'
+import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
@@ -119,7 +120,7 @@ export const vNeg1Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: {},
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -264,7 +265,7 @@ export const v0Schema = {
     isRedeemingInvite: false,
     isSkippingInvite: false,
     invitees: [],
-    redeemedInviteCode: '',
+    redeemedTempAccountPrivateKey: '',
     redeemComplete: false,
   },
   escrow: {
@@ -369,6 +370,7 @@ export const v5Schema = {
     ...v3Schema.account,
     incomingPaymentRequests: undefined,
     outgoingPaymentRequests: undefined,
+    dismissedGoldEducation: false,
   },
   paymentRequest: {
     incomingPaymentRequests: [],
@@ -379,8 +381,95 @@ export const v5Schema = {
     dataEncryptionKey: '0x0000000000000000000000000000000000008F68',
     commentKey: undefined,
   },
+  identity: {
+    ...v3Schema.identity,
+    lastRevealAttempt: null,
+    verificationState: {
+      isLoading: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+    },
+    addressToDisplayName: {},
+  },
+  exchange: {
+    ...v3Schema.exchange,
+    isLoading: false,
+  },
+  app: {
+    ...v3Schema.app,
+    minVersion: null,
+    inviteModalVisible: false,
+  },
+}
+
+export const v6Schema = {
+  ...v5Schema,
+  web3: {
+    ...v5Schema.web3,
+    mtwAddress: null,
+  },
+  identity: {
+    ...v5Schema.identity,
+    walletToAccountAddress: {},
+  },
+  app: {
+    ...v5Schema.app,
+    pontoEnabled: false,
+    kotaniEnabled: false,
+  },
+}
+
+export const v7Schema = {
+  ...v6Schema,
+  identity: {
+    ...v6Schema.identity,
+    feelessAttestationCodes: [],
+    feelessProcessingInputCode: false,
+    feelessAcceptedAttestationCodes: [],
+    feelessNumCompleteAttestations: 0,
+    feelessVerificationStatus: 0,
+    feelessVerificationState: {
+      isLoading: false,
+      isActive: false,
+      phoneHashDetails: {
+        e164Number: '',
+        phoneHash: '',
+        pepper: '',
+      },
+      actionableAttestations: [],
+      status: {
+        isVerified: false,
+        numAttestationsRemaining: NUM_ATTESTATIONS_REQUIRED,
+        total: 0,
+        completed: 0,
+      },
+      lastFetch: null,
+      komenci: {
+        errorTimestamps: [],
+        unverifiedMtwAddress: null,
+        serviceAvailable: false,
+        sessionActive: false,
+        sessionToken: '',
+        callbackUrl: undefined,
+        captchaToken: '',
+        pepperFetchedByKomenci: false,
+      },
+    },
+    feelessLastRevealAttempt: null,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v5Schema as Partial<RootState>
+  return v7Schema as Partial<RootState>
 }

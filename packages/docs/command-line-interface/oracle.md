@@ -15,9 +15,6 @@ USAGE
 ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the oracles for
 
-OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
-
 EXAMPLES
   list StableToken
   list
@@ -37,6 +34,7 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to remove expired reports for
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account removing oracle reports
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -48,9 +46,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -73,6 +68,7 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to report on
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle account
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -84,9 +80,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -111,7 +104,14 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to list the reports for
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLES
   reports StableToken

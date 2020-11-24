@@ -178,12 +178,8 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the specified value is 0', async () => {
-      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-      await assertRevert(lockedGold.lock({ value: 0 }))
-    })
-
     it('should revert when the account does not exist', async () => {
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await assertRevert(lockedGold.lock({ value, from: accounts[1] }))
     })
   })

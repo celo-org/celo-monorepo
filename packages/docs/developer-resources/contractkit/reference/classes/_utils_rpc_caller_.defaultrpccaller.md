@@ -16,8 +16,8 @@
 
 ### Properties
 
-* [defaultProvider](_utils_rpc_caller_.defaultrpccaller.md#defaultprovider)
-* [jsonrpcVersion](_utils_rpc_caller_.defaultrpccaller.md#jsonrpcversion)
+* [defaultProvider](_utils_rpc_caller_.defaultrpccaller.md#readonly-defaultprovider)
+* [jsonrpcVersion](_utils_rpc_caller_.defaultrpccaller.md#readonly-jsonrpcversion)
 
 ### Methods
 
@@ -30,7 +30,7 @@
 
 \+ **new DefaultRpcCaller**(`defaultProvider`: provider, `jsonrpcVersion`: string): *[DefaultRpcCaller](_utils_rpc_caller_.defaultrpccaller.md)*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L68)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L68)*
 
 **Parameters:**
 
@@ -43,19 +43,19 @@ Name | Type | Default |
 
 ## Properties
 
-###  defaultProvider
+### `Readonly` defaultProvider
 
 • **defaultProvider**: *provider*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L69)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L69)*
 
 ___
 
-###  jsonrpcVersion
+### `Readonly` jsonrpcVersion
 
 • **jsonrpcVersion**: *string*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L69)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L69)*
 
 ## Methods
 
@@ -63,7 +63,7 @@ ___
 
 ▸ **call**(`method`: string, `params`: any[]): *Promise‹JsonRpcResponse›*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L71)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L71)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **send**(`payload`: JsonRpcPayload, `callback`: Callback‹JsonRpcResponse›): *void*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L89)*
+*Defined in [packages/contractkit/src/utils/rpc-caller.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L89)*
 
 **Parameters:**
 

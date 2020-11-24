@@ -16,8 +16,8 @@
 
 ### Properties
 
-* [defaultParams](_wrappers_basewrapper_.celotransactionobject.md#optional-defaultparams)
-* [txo](_wrappers_basewrapper_.celotransactionobject.md#txo)
+* [defaultParams](_wrappers_basewrapper_.celotransactionobject.md#optional-readonly-defaultparams)
+* [txo](_wrappers_basewrapper_.celotransactionobject.md#readonly-txo)
 
 ### Methods
 
@@ -30,7 +30,7 @@
 
 \+ **new CeloTransactionObject**(`kit`: [ContractKit](_kit_.contractkit.md), `txo`: TransactionObject‹O›, `defaultParams?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:244](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L244)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:321](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L321)*
 
 **Parameters:**
 
@@ -44,27 +44,27 @@ Name | Type |
 
 ## Properties
 
-### `Optional` defaultParams
+### `Optional` `Readonly` defaultParams
 
 • **defaultParams**? : *[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:248](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L248)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:325](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L325)*
 
 ___
 
-###  txo
+### `Readonly` txo
 
 • **txo**: *TransactionObject‹O›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:247](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L247)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:324](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L324)*
 
 ## Methods
 
 ###  send
 
-▸ **send**(`params?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
+▸ **send**(`params?`: Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)›): *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:252](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L252)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:329](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L329)*
 
 send the transaction to the chain
 
@@ -72,7 +72,7 @@ send the transaction to the chain
 
 Name | Type |
 ------ | ------ |
-`params?` | [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams) |
+`params?` | Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)› |
 
 **Returns:** *Promise‹[TransactionResult](_utils_tx_result_.transactionresult.md)›*
 
@@ -80,9 +80,9 @@ ___
 
 ###  sendAndWaitForReceipt
 
-▸ **sendAndWaitForReceipt**(`params?`: [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)): *Promise‹TransactionReceipt›*
+▸ **sendAndWaitForReceipt**(`params?`: Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)›): *Promise‹TransactionReceipt›*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L257)*
+*Defined in [packages/contractkit/src/wrappers/BaseWrapper.ts:334](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L334)*
 
 send the transaction and waits for the receipt
 
@@ -90,6 +90,6 @@ send the transaction and waits for the receipt
 
 Name | Type |
 ------ | ------ |
-`params?` | [CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams) |
+`params?` | Partial‹[CeloTransactionParams](../modules/_wrappers_basewrapper_.md#celotransactionparams)› |
 
 **Returns:** *Promise‹TransactionReceipt›*

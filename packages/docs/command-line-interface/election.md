@@ -13,6 +13,7 @@ USAGE
   $ celocli election:activate
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -24,9 +25,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -48,10 +46,17 @@ USAGE
   $ celocli election:current
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
-  --valset  Show currently used signers from valset (by default the authorized validator signers are shown). Useful for
-            checking if keys have been rotated.
+  --valset                Show currently used signers from valset (by default the authorized validator signers are
+                          shown). Useful for checking if keys have been rotated.
 ```
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
@@ -65,7 +70,14 @@ USAGE
   $ celocli election:list
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLE
   list
@@ -82,6 +94,7 @@ USAGE
   $ celocli election:revoke
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
@@ -94,9 +107,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -118,7 +128,14 @@ USAGE
   $ celocli election:run
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 ```
 
 _See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
@@ -135,9 +152,8 @@ ARGUMENTS
   ADDRESS  Voter or Validator Groups's address
 
 OPTIONS
-  --group   Show information about a group running in Validator elections
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
-  --voter   Show information about an account voting in Validator elections
+  --group  Show information about a group running in Validator elections
+  --voter  Show information about an account voting in Validator elections
 
 EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --voter
@@ -155,6 +171,7 @@ USAGE
   $ celocli election:vote
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
@@ -167,9 +184,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

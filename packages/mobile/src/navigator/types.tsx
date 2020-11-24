@@ -9,11 +9,11 @@ import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { AddressValidationType } from 'src/identity/reducer'
-import { ImportContactsStatus } from 'src/identity/types'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
+import { CurrencyInfo } from 'src/send/SendConfirmation'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
@@ -51,10 +51,6 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
-  [Screens.BackupSocial]: undefined
-  [Screens.BackupSocialIntro]: {
-    incomingFromBackupFlow: boolean
-  }
   [Screens.DappKitAccountAuth]: {
     dappKitRequest: AccountAuthRequest
   }
@@ -66,7 +62,6 @@ export type StackParamList = {
   }
   [Screens.Debug]: undefined
   [Screens.DrawerNavigator]: undefined
-  [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
     errorMessage?: string
   }
@@ -87,14 +82,13 @@ export type StackParamList = {
       makerTokenBalance: string
     }
   }
-  [Screens.FiatExchange]: undefined
-  [Screens.FiatExchangeAmount]: {
-    isAddFunds: boolean
+  [Screens.ExternalExchanges]: {
+    currency: CURRENCY_ENUM
   }
+  [Screens.FiatExchange]: undefined
   [Screens.FiatExchangeOptions]: {
-    isAddFunds: boolean
-    amount: BigNumber
-    isExplanationOpen?: boolean
+    isAddFunds?: boolean
+    amount?: BigNumber
   }
   [Screens.MoonPay]: {
     localAmount: BigNumber
@@ -107,18 +101,13 @@ export type StackParamList = {
         showZeroBalanceModal?: boolean
       }
     | undefined
-  [Screens.ImportWalletSocial]: undefined
+
   [Screens.ImportContacts]:
     | undefined
     | {
         onPressSkip?: () => void
-        importStatus?: ImportContactsStatus
       }
   [Screens.IncomingPaymentRequestListScreen]: undefined
-  [Screens.Invite]: undefined
-  [Screens.InviteReview]: {
-    recipient: Recipient
-  }
   [Screens.NameAndNumber]:
     | {
         selectedCountryCodeAlpha2: string
@@ -136,6 +125,9 @@ export type StackParamList = {
       }
     | undefined
   [Screens.Licenses]: undefined
+  [Screens.LocalProviderCashOut]: {
+    uri: string
+  }
   [Screens.Main]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestUnavailable]: {
@@ -148,6 +140,7 @@ export type StackParamList = {
   [Screens.PincodeEnter]: {
     withVerification?: boolean
     onSuccess: (pin: string) => void
+    onCancel: () => void
   }
   [Screens.PincodeSet]: { isVerifying: boolean } | undefined
   [Screens.PhoneNumberLookupQuota]: {
@@ -181,11 +174,13 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
     isFromScan?: boolean
+    currencyInfo?: CurrencyInfo
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]:
     | { promptFornoModal?: boolean; promptConfirmRemovalModal?: boolean }
     | undefined
+  [Screens.Spend]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
@@ -210,7 +205,7 @@ export type StackParamList = {
     | { showSkipDialog?: boolean; hideOnboardingStep?: boolean }
     | undefined
   [Screens.VerificationInputScreen]: { showHelpDialog: boolean } | undefined
-  [Screens.VerificationLoadingScreen]: undefined
+  [Screens.VerificationLoadingScreen]: { withoutRevealing: boolean }
   [Screens.OnboardingEducationScreen]: undefined
   [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
@@ -221,8 +216,14 @@ export type StackParamList = {
   [Screens.WithdrawCeloReviewScreen]: {
     amount: BigNumber
     recipientAddress: string
+    feeEstimate: BigNumber
+    isCashOut: boolean
   }
-  [Screens.WithdrawCeloScreen]: undefined
+  [Screens.WithdrawCeloScreen]: {
+    isCashOut: boolean
+    amount?: BigNumber
+    recipientAddress?: string
+  }
 }
 
 // tslint:disable-next-line: interface-over-type-literal

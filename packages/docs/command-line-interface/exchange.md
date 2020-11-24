@@ -13,6 +13,8 @@ USAGE
   $ celocli exchange:celo
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Dollars to receive
                                                      in return
 
@@ -27,9 +29,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -51,6 +50,8 @@ USAGE
   $ celocli exchange:dollars
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of CELO to receive in
                                                      return
 
@@ -65,9 +66,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -89,6 +87,8 @@ USAGE
   $ celocli exchange:gold
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum value of Celo Dollars to receive
                                                      in return
 
@@ -103,9 +103,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -128,7 +125,6 @@ USAGE
 
 OPTIONS
   --amount=amount  [default: 1000000000000000000] Amount of the token being exchanged to report rates for
-  --usdGas         If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   list

@@ -12,9 +12,6 @@ Shows information about reserve
 USAGE
   $ celocli reserve:status
 
-OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
-
 EXAMPLE
   status
 ```
@@ -30,6 +27,7 @@ USAGE
   $ celocli reserve:transfergold
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Spender's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -43,9 +41,6 @@ OPTIONS
                                                      "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Receiving address
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 

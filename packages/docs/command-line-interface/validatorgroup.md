@@ -13,6 +13,8 @@ USAGE
   $ celocli validatorgroup:commission
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --apply                                            Applies a previously queued update. Should be called after the
                                                      update delay.
 
@@ -32,9 +34,6 @@ OPTIONS
   --queue-update=queue-update                        Queues an update to the commission, which can be applied after the
                                                      update delay.
 
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
-
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLES
@@ -46,13 +45,14 @@ _See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://gith
 
 ### Deregister
 
-Deregister a Validator Group. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator Group will become possible to unlock. Note that the Group must be empty (i.e. no members) before deregistering.
+Deregister a Validator Group. Approximately 180 days after the validator group is empty, it will be possible to deregister it start unlocking the CELO. If you wish to deregister your validator group, you must first remove all members, then wait the required 180 days before running this command.
 
 ```
 USAGE
   $ celocli validatorgroup:deregister
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or ValidatorGroup's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -64,9 +64,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -85,7 +82,14 @@ USAGE
   $ celocli validatorgroup:list
 
 OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
+  -x, --extended          show extra columns
+  --columns=columns       only show provided columns (comma-separated)
+  --csv                   output is csv format [alias: --output=csv]
+  --filter=filter         filter property by partial string matching, ex: name=foo
+  --no-header             hide table header from output
+  --no-truncate           do not truncate output to fit screen
+  --output=csv|json|yaml  output in a more machine friendly format
+  --sort=sort             property to sort by (prepend '-' for descending)
 
 EXAMPLE
   list
@@ -105,6 +109,7 @@ ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
   --accept                                           Accept a validator whose affiliation is already set to the group
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
 
@@ -121,9 +126,6 @@ OPTIONS
   --remove                                           Remove a validator from the members list
 
   --reorder=reorder                                  Reorder a validator within the members list. Indices are 0 based
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -146,6 +148,8 @@ USAGE
   $ celocli validatorgroup:register
 
 OPTIONS
+  -k, --privateKey=privateKey                        Use a private key to sign local transactions with
+
   --commission=commission                            (required) The share of the epoch rewards given to elected
                                                      Validators that goes to the group.
 
@@ -160,9 +164,6 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
-
-  --usdGas                                           If --usdGas is set, the transaction is paid for with a feeCurrency
-                                                     of cUSD
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -186,6 +187,8 @@ ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
 OPTIONS
+  -k, --privateKey=privateKey                    Use a private key to sign local transactions with
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -194,9 +197,6 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --usdGas                                       If --usdGas is set, the transaction is paid for with a feeCurrency of
-                                                 cUSD
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -216,9 +216,6 @@ USAGE
 
 ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
-
-OPTIONS
-  --usdGas  If --usdGas is set, the transaction is paid for with a feeCurrency of cUSD
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
