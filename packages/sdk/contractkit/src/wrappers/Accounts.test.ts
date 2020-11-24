@@ -1,7 +1,7 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
-import { newKitFromWeb3 } from '../kit'
+import { ContractKit, newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
@@ -22,7 +22,7 @@ const blsPoP =
   '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
 
 testWithGanache('Accounts Wrapper', (web3) => {
-  const kit = newKitFromWeb3(web3)
+  let kit: ContractKit
   let accounts: string[] = []
   let accountsInstance: AccountsWrapper
   let validators: ValidatorsWrapper
@@ -37,20 +37,28 @@ testWithGanache('Accounts Wrapper', (web3) => {
 
   const getParsedSignatureOfAddress = async (address: string, signer: string) => {
     const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })!
-    const signature = await web3.eth.sign(addressHash, signer)
+    console.log('before parse')
+
+    const signature = await kit.connection.web3.eth.sign(addressHash, signer)
     return parseSignature(addressHash, signature, signer)
   }
 
   beforeAll(async () => {
-    accounts = await web3.eth.getAccounts()
+    kit = newKitFromWeb3(web3)
+    accounts = await kit.connection.getAccounts()
     validators = await kit.contracts.getValidators()
     lockedGold = await kit.contracts.getLockedGold()
     accountsInstance = await kit.contracts.getAccounts()
   })
 
+  afterAll(async () => {
+    kit.connection.stop()
+  })
+
   const setupValidator = async (validatorAccount: string) => {
     await registerAccountWithLockedGold(validatorAccount)
-    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.connection.sign)
+    console.log('before setup')
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.connection.web3.eth.sign)
     await validators
       // @ts-ignore
       .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)

@@ -21,6 +21,7 @@ import {
   inputAddressFormatter,
   inputBlockNumberFormatter,
   inputDefaultBlockNumberFormatter,
+  inputSignFormatter,
   outputBigNumberFormatter,
   outputBlockFormatter,
   outputCeloTxFormatter,
@@ -274,7 +275,26 @@ export class Connection {
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
-    return this.web3.eth.sign(dataToSign, address)
+    const signature = await new Promise<string>((resolve, reject) => {
+      ;(this.web3.currentProvider as Provider).send(
+        {
+          jsonrpc: '2.0',
+          method: 'eth_sign',
+          params: [inputAddressFormatter(address.toString()), inputSignFormatter(dataToSign)],
+        },
+        (error, resp) => {
+          if (error) {
+            reject(error)
+          } else if (resp) {
+            resolve(resp.result as string)
+          } else {
+            reject(new Error('empty-response'))
+          }
+        }
+      )
+    })
+
+    return signature
   }
 
   async sendSignedTransaction(signedTransactionData: string): Promise<TransactionResult> {

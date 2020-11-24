@@ -6,6 +6,7 @@ import {
   parseSignature,
   signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
+import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { Accounts } from '../generated/Accounts'
 import {
   BaseWrapper,
@@ -412,12 +413,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   parseSignatureOfAddress(address: Address, signer: string, signature: string) {
-    const hash = this.kit.connection.web3.utils.soliditySha3({ type: 'address', value: address })
+    const hash = soliditySha3({ type: 'address', value: address })
     return parseSignature(hash!, signature, signer)
   }
 
   private async getParsedSignatureOfAddress(address: Address, signer: string, signerFn: Signer) {
-    const hash = this.kit.connection.web3.utils.soliditySha3({ type: 'address', value: address })
+    const hash = soliditySha3({ type: 'address', value: address })
     const signature = await signerFn.sign(hash!)
     return parseSignature(hash!, signature, signer)
   }

@@ -2,6 +2,7 @@ import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { isValidAddress, toChecksumAddress } from '@celo/utils/lib/address'
 import { sha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
+import { encode } from 'utf8'
 import { Block, BlockNumber, CeloTx, CeloTxPending, CeloTxReceipt, Log } from '../types'
 
 /**
@@ -213,6 +214,40 @@ export function inputAddressFormatter(address?: string): string | undefined {
     return ensureLeading0x(address)
   }
   throw new Error(`Provided address ${address} is invalid, the capitalization checksum test failed`)
+}
+
+export function inputSignFormatter(data: string) {
+  if (isHex(data)) {
+    return ensureLeading0x(data)
+  }
+  return utf8ToHex(data)
+}
+
+function utf8ToHex(str: string): string {
+  str = encode(str)
+  let hex = ''
+
+  // remove \u0000 padding from either side
+  str = str.replace(/^(?:\u0000)*/, '')
+  str = str
+    .split('')
+    .reverse()
+    .join('')
+  str = str.replace(/^(?:\u0000)*/, '')
+  str = str
+    .split('')
+    .reverse()
+    .join('')
+
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i)
+    // if (code !== 0) {
+    const n = code.toString(16)
+    hex += n.length < 2 ? '0' + n : n
+    // }
+  }
+
+  return ensureLeading0x(hex)
 }
 
 function isHex(hex: string): boolean {
