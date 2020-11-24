@@ -979,7 +979,7 @@ export async function startGeth(
       instance.args.push('--proxy.proxied')
     }
     if (replica) {
-      gethArgs.push('--istanbul.replica')
+      instance.args.push('--istanbul.replica')
     }
   } else if (isProxy) {
     instance.args.push('--proxy.proxy')
