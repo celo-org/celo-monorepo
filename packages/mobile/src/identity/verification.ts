@@ -3,6 +3,7 @@ import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phon
 import {
   ActionableAttestation,
   AttestationsWrapper,
+  getSecurityCodePrefix,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { KomenciKit } from '@celo/komencikit/src/kit'
@@ -70,7 +71,6 @@ import {
 import {
   extractSecurityCodeWithPrefix,
   getAttestationCodeForSecurityCode,
-  getSecurityCodePrefix,
 } from 'src/identity/securityCode'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { VerificationStatus } from 'src/identity/types'

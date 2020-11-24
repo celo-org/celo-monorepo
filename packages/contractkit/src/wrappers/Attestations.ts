@@ -21,6 +21,14 @@ import {
 } from './BaseWrapper'
 import { Validator } from './Validators'
 
+function hashAddressToSingleDigit(address: Address): number {
+  return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
+}
+
+export function getSecurityCodePrefix(issuerAddress: Address) {
+  return `${hashAddressToSingleDigit(issuerAddress)}`
+}
+
 export interface AttestationStat {
   completed: number
   total: number

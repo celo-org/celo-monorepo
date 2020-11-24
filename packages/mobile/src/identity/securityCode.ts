@@ -1,27 +1,13 @@
 import {
   ActionableAttestation,
   AttestationsWrapper,
+  getSecurityCodePrefix,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { PhoneNumberHashDetails } from '@celo/contractkit/src/identity/odis/phone-number-identifier'
 import { GetAttestationRequest } from '@celo/utils/lib/io'
-import { Address } from '@celo/utils/src/address'
-import BigNumber from 'bignumber.js'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/securityCode'
-
-const cache: { [key: string]: string } = {}
-
-function hashAddressToSingleDigit(address: Address): number {
-  return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
-}
-
-export function getSecurityCodePrefix(issuerAddress: Address) {
-  if (!cache[issuerAddress]) {
-    cache[issuerAddress] = `${hashAddressToSingleDigit(issuerAddress)}`
-  }
-  return cache[issuerAddress]
-}
 
 export function extractSecurityCodeWithPrefix(message: string) {
   const matches = message.match('\\s(\\d{8})\\s')
@@ -56,9 +42,9 @@ export async function getAttestationCodeForSecurityCode(
   attestations: ActionableAttestation[],
   securityCodeWithPrefix: string
 ) {
-  const securityCodePrefix = parseInt(securityCodeWithPrefix[0], 10)
+  const securityCodePrefix = securityCodeWithPrefix[0]
   const lookupAttestations = attestations.filter(
-    (attestation) => hashAddressToSingleDigit(attestation.issuer) === securityCodePrefix
+    (attestation) => getSecurityCodePrefix(attestation.issuer) === securityCodePrefix
   )
 
   // Recover the full attestation code from the matching issuer's attestation services
