@@ -1,12 +1,12 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { CeloTx, EncodedTransaction, RLPEncodedTx } from '@celo/connect'
+import { inputCeloTxFormatter } from '@celo/connect/lib/utils/formatter'
 import { EIP712TypedData, generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import * as helpers from 'web3-core-helpers'
 
 const debug = debugFactory('wallet-base:tx:sign')
 
@@ -86,7 +86,7 @@ export function rlpEncodedTx(tx: CeloTx): RLPEncodedTx {
   if (tx.nonce! < 0 || tx.gas! < 0 || tx.gasPrice! < 0 || tx.chainId! < 0) {
     throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
   }
-  const transaction: CeloTx = helpers.formatters.inputCallFormatter(tx)
+  const transaction: CeloTx = inputCeloTxFormatter(tx)
   transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
   transaction.nonce = Number(((tx.nonce as any) !== '0x' ? tx.nonce : 0) || 0)
   transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()

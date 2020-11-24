@@ -61,7 +61,7 @@ export abstract class ClaimCommand extends BaseCommand {
   protected get signer() {
     const res = this.parse(this.self)
     const address = toChecksumAddress(res.flags.from)
-    return NativeSigner(this.kit.connection.sign, address)
+    return NativeSigner(this.kit.connection.web3.eth.sign, address)
   }
 
   protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim): Promise<Claim> {

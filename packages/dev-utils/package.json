@@ -16,6 +16,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+    "@celo/connect": "1.0.0-dev",
     "bignumber.js": "^9.0.0",
     "web3": "1.2.11",
     "tmp": "^0.1.0",
@@ -24,8 +25,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^8.1.0",
-    "@types/targz": "1.0.0",
-    "web3-core-helpers": "1.2.11"
+    "@types/targz": "1.0.0"
   },
   "engines": {
     "node": ">=8.13.0"

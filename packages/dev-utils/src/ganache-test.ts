@@ -1,5 +1,5 @@
+import { JsonRpcResponse } from '@celo/connect'
 import Web3 from 'web3'
-import { JsonRpcResponse } from 'web3-core-helpers'
 import migrationOverride from './migration-override.json'
 
 export const NetworkConfig = migrationOverride
