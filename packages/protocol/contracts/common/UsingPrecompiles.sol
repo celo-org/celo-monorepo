@@ -79,6 +79,15 @@ contract UsingPrecompiles {
     return getEpochNumberOfBlock(block.number);
   }
 
+  function getEpochLastBlock(uint256 epoch) public view returns (uint256) {
+    if (epoch == 0) {
+      return 0;
+    }
+    uint256 size = getEpochSize();
+    uint256 firstBlock = ((epoch - 1) * size) + 1;
+    return firstBlock + (size - 1);
+  }
+
   /**
    * @notice Returns the epoch number at a block.
    * @param blockNumber Block number where epoch number is calculated.

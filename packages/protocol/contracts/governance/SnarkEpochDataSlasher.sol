@@ -48,6 +48,18 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     isSlashed[signer][bhash] = true;
   }
 
+  function extract(bytes memory a, uint256 offset, uint256 len)
+    internal
+    pure
+    returns (bytes memory)
+  {
+    bytes memory res = new bytes(len);
+    for (uint256 i = 0; i < len; i++) {
+      res[i] = a[i + offset];
+    }
+    return res;
+  }
+
   struct DataArg {
     bytes extra;
     bytes bhhash;
@@ -56,28 +68,55 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     bytes hint;
   }
 
-  struct SlashArg {
-    uint256 groupMembershipHistoryIndex;
-    address[] validatorElectionLessers;
-    address[] validatorElectionGreaters;
-    uint256[] validatorElectionIndices;
-    address[] groupElectionLessers;
-    address[] groupElectionGreaters;
-    uint256[] groupElectionIndices;
+  function decodeDataArg(bytes memory a) internal pure returns (DataArg memory) {
+    return
+      DataArg(
+        extract(a, 0, 8),
+        extract(a, 8, 8 + 48),
+        getUint256FromBytes(a, 56),
+        extract(a, 88, 88 + 128),
+        extract(a, 216, 216 + 128)
+      );
   }
-
-  function decodeDataArg(bytes memory a) internal view returns (DataArg memory) {}
-
-  function decodeSlashArg(bytes memory a) internal view returns (SlashArg memory) {}
 
   function slash(
     address signer,
     uint256 index,
     bytes memory arg1,
     bytes memory arg2,
-    bytes memory arg
+    uint256 groupMembershipHistoryIndex,
+    address[] memory validatorElectionLessers,
+    address[] memory validatorElectionGreaters,
+    uint256[] memory validatorElectionIndices,
+    address[] memory groupElectionLessers,
+    address[] memory groupElectionGreaters,
+    uint256[] memory groupElectionIndices
   ) public {
-    slash0(signer, index, decodeDataArg(arg1), decodeDataArg(arg2), decodeSlashArg(arg));
+    slash0(
+      signer,
+      index,
+      decodeDataArg(arg1),
+      decodeDataArg(arg2),
+      groupMembershipHistoryIndex,
+      validatorElectionLessers,
+      validatorElectionGreaters,
+      validatorElectionIndices,
+      groupElectionLessers,
+      groupElectionGreaters,
+      groupElectionIndices
+    );
+  }
+
+  function checkSigner(address signer, uint256 index, uint256 blockNumber) internal view {
+    require(index < numberValidatorsInSet(blockNumber), "Bad validator index");
+    require(
+      signer == validatorSignerAddressFromSet(index, blockNumber),
+      "Wasn't a signer with given index"
+    );
+  }
+
+  function checkBitmap(uint256 idx, uint256 bitmap) internal pure {
+    require((1 << idx) & bitmap != 0, "Signer not in bitmap");
   }
 
   function slash0(
@@ -85,23 +124,32 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     uint256 index,
     DataArg memory arg1,
     DataArg memory arg2,
-    SlashArg memory arg
+    uint256 groupMembershipHistoryIndex,
+    address[] memory validatorElectionLessers,
+    address[] memory validatorElectionGreaters,
+    uint256[] memory validatorElectionIndices,
+    address[] memory groupElectionLessers,
+    address[] memory groupElectionGreaters,
+    uint256[] memory groupElectionIndices
   ) internal {
     checkIfAlreadySlashed(signer, abi.encodePacked(arg1.extra, arg1.bhhash));
     checkIfAlreadySlashed(signer, abi.encodePacked(arg2.extra, arg2.bhhash));
+    checkBitmap(index, arg1.bitmap);
+    checkBitmap(index, arg2.bitmap);
     uint256 blockNumber = checkSlash0(arg1, arg2);
+    checkSigner(signer, index, blockNumber);
     address validator = getAccounts().signerToAccount(signer);
     performSlashing(
       validator,
       msg.sender,
       blockNumber,
-      arg.groupMembershipHistoryIndex,
-      arg.validatorElectionLessers,
-      arg.validatorElectionGreaters,
-      arg.validatorElectionIndices,
-      arg.groupElectionLessers,
-      arg.groupElectionGreaters,
-      arg.groupElectionIndices
+      groupMembershipHistoryIndex,
+      validatorElectionLessers,
+      validatorElectionGreaters,
+      validatorElectionIndices,
+      groupElectionLessers,
+      groupElectionGreaters,
+      groupElectionIndices
     );
     emit SnarkEpochDataSlashPerformed(validator, blockNumber);
   }
@@ -112,9 +160,10 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     require(epoch1 == epoch2, "Not on same epoch");
     checkSlash1(epoch1, arg1);
     checkSlash1(epoch1, arg2);
+    return getEpochLastBlock(epoch1 - 1); // check which epoch is in the data
   }
 
-  function checkSlash1(uint16 epoch, DataArg memory arg) internal view returns (uint256) {
+  function checkSlash1(uint16 epoch, DataArg memory arg) internal view {
     bytes memory data = abi.encodePacked(arg.extra, arg.bhhash);
     require(isValid(epoch, data, arg.bitmap, arg.sig, arg.hint));
   }
@@ -154,8 +203,12 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return q;
   }
 
-  function getBLSPublicKey(uint16 epoch, uint256 i) internal view returns (B12.G2Point memory) {
-    bytes memory data = validatorBLSPublicKeyFromSet(i, epoch);
+  function getBLSPublicKey(uint256 blockNumber, uint256 i)
+    internal
+    view
+    returns (B12.G2Point memory)
+  {
+    bytes memory data = validatorBLSPublicKeyFromSet(i, blockNumber);
     return B12.readG2(data, 0);
   }
 
@@ -228,11 +281,12 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
       B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0)),
       B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0))
     );
+    uint256 blockNumber = getEpochLastBlock(epoch - 1);
     uint256 num = 0;
     for (uint256 i = 0; i < 150; i++) {
       if (bitmap & 1 == 1) {
         num++;
-        B12.G2Point memory public_key = getBLSPublicKey(epoch, i);
+        B12.G2Point memory public_key = getBLSPublicKey(blockNumber, i);
         if (!prev) {
           agg = public_key;
         } else {
