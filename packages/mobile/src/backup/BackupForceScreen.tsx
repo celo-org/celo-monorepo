@@ -49,7 +49,7 @@ BackupForceScreen.navOptions = {
   ...emptyHeader,
   // Prevent swiping back on iOS
   gestureEnabled: false,
-  headerLeft: null,
+  headerLeft: () => null,
   headerRight: () => <DelayButton />,
 }
 
