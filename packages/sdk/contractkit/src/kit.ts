@@ -10,6 +10,7 @@ import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { Signature } from '@celo/utils/lib/signatureUtils'
 import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
+import net from 'net'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloToken } from './base'
@@ -27,6 +28,18 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
+
+/**
+ * Creates a new instance of `ContractKit` give a nodeUrl
+ * @param url CeloBlockchain node url
+ * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
+ */
+export function newKit(url: string, wallet?: ReadOnlyWallet) {
+  const web3 = url.endsWith('.ipc')
+    ? new Web3(new Web3.providers.IpcProvider(url, net))
+    : new Web3(url)
+  return newKitFromWeb3(web3, wallet)
+}
 
 /**
  * Creates a new instance of the `ContractKit` with a web3 instance

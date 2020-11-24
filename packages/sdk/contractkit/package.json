@@ -34,7 +34,8 @@
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "fp-ts": "2.1.1",
-    "io-ts": "2.0.1"
+    "io-ts": "2.0.1",
+    "web3": "1.2.11"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
@@ -46,8 +47,7 @@
     "jest": "^25.2.4",
     "ts-node": "8.3.0",
     "typedoc": "^0.19.2",
-    "typedoc-plugin-markdown": "^2.2.16",
-    "web3": "1.2.11"
+    "typedoc-plugin-markdown": "^2.2.16"
   },
   "engines": {
     "node": ">=8.13.0"
