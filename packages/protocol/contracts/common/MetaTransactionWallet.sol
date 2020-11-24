@@ -77,7 +77,7 @@ contract MetaTransactionWallet is
    * @notice Transfers control of the wallet to a new signer.
    * @param _signer The address authorized to execute transactions via this wallet.
    */
-  function setSigner(address _signer) public onlyOwner {
+  function setSigner(address _signer) external onlyOwner {
     _setSigner(_signer);
   }
 
