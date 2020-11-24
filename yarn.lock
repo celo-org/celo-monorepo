@@ -2788,6 +2788,12 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-0.0.1.tgz#81e83aa430cba2a7424a4c016af58356404ea707"
   integrity sha512-0hsd6hOUvt3o1DbiZKGpKghYhGQsu3eGApqHsXZtWRINHaakfxFGtZgI1r8u1iwqXenlAImCZ91P0WYNwsqI9A==
 
+"@celo/bls-sol@git+https://github.com/mrsmkl/b12-sol.git#b25dbda9ce2bdb32d3e1d1aeca340e6ac183795a":
+  version "0.0.1"
+  resolved "git+https://github.com/mrsmkl/b12-sol.git#b25dbda9ce2bdb32d3e1d1aeca340e6ac183795a"
+  dependencies:
+    "@summa-tx/memview.sol" "^1.1.0"
+
 "@celo/client@0.0.317":
   version "0.0.317"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.317.tgz#d306f99d90f725165102ddb745824023bd872a65"
@@ -6653,6 +6659,11 @@
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-0.5.0.tgz#a682d5f9448e950e099e537e6f72fc960275d151"
   integrity sha1-poLV+USOlQ4JnlN+b3L8lgJ10VE=
+
+"@summa-tx/memview.sol@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@summa-tx/memview.sol/-/memview.sol-1.1.0.tgz#f54a09faef46ca52deb94e10d0daacd28efe5be6"
+  integrity sha512-nLEfdC0ayn+PND5WWGalv+IyQ0NYomz43s1IJWDjawUh4JvW03LeP7ZjuMJPLdyJqYX3p8x1LwYt8Klde7cluw==
 
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"

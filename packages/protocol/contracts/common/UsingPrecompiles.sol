@@ -16,7 +16,7 @@ contract UsingPrecompiles {
   address constant HASH_HEADER = address(0xff - 9);
   address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
   address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
-  address constant VALIDATOR_BLS = address(0xff - 14);
+  address constant VALIDATOR_BLS = address(0xff - 20);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
