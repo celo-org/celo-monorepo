@@ -244,7 +244,7 @@ export class Connection {
     )
   }
 
-  async signTypedData(signer: string, typedData: EIP712TypedData): Promise<Signature> {
+  signTypedData = async (signer: string, typedData: EIP712TypedData): Promise<Signature> => {
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
@@ -271,7 +271,7 @@ export class Connection {
     return parseSignatureWithoutPrefix(messageHash, signature, signer)
   }
 
-  async sign(dataToSign: string, address: Address | number): Promise<string> {
+  sign = async (dataToSign: string, address: Address | number): Promise<string> => {
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node

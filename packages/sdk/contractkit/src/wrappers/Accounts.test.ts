@@ -37,9 +37,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
 
   const getParsedSignatureOfAddress = async (address: string, signer: string) => {
     const addressHash = web3.utils.soliditySha3({ type: 'address', value: address })!
-    console.log('before parse')
-
-    const signature = await kit.connection.web3.eth.sign(addressHash, signer)
+    const signature = await kit.connection.sign(addressHash, signer)
     return parseSignature(addressHash, signature, signer)
   }
 
@@ -57,8 +55,7 @@ testWithGanache('Accounts Wrapper', (web3) => {
 
   const setupValidator = async (validatorAccount: string) => {
     await registerAccountWithLockedGold(validatorAccount)
-    console.log('before setup')
-    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.connection.web3.eth.sign)
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.connection.sign)
     await validators
       // @ts-ignore
       .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)

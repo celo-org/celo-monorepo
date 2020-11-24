@@ -285,7 +285,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     return this.getParsedSignatureOfAddress(
       account,
       signer,
-      NativeSigner(this.kit.connection.web3.eth.sign, signer)
+      NativeSigner(this.kit.connection.sign, signer)
     )
   }
 
