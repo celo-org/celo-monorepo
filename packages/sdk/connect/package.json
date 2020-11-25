@@ -30,10 +30,18 @@
     "web3-core": "1.3.0",
     "web3-eth": "1.3.0",
     "web3-eth-contract": "1.3.0",
+    "web3-eth-abi": "1.3.0",
     "web3-utils": "1.3.0"
   },
   "peerDependencies": {
     "web3": "1.3.0"
+  },
+  "resolutions": {
+    "web3-core": "1.3.0",
+    "web3-eth": "1.3.0",
+    "web3-eth-contracts": "1.3.0",
+    "web3-eth-abi": "1.3.0",
+    "web3-utils": "1.3.0"
   },
   "engines": {
     "node": ">=8.13.0"
