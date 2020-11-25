@@ -215,7 +215,7 @@ export function parseDappkitResponseDeeplink(url: string): DappKitResponse & { r
         return {
           type: DappKitRequestTypes.SIGN_TX,
           status: DappKitResponseStatus.SUCCESS,
-          rawTxs,
+          rawTxs: rawTxs!,
           requestId,
         }
       } else {
