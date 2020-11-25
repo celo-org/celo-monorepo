@@ -59,6 +59,9 @@ const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
 
+const FEE_ADDRESS = ACCOUNT_ADDRESS1
+const CURRENCY_ADDRESS = ACCOUNT_ADDRESS2
+
 describe('Local wallet class', () => {
   let wallet: LocalWallet
 
@@ -115,8 +118,8 @@ describe('Local wallet class', () => {
             nonce: 0,
             gas: '10',
             gasPrice: '99',
-            feeCurrency: '0x124356',
-            gatewayFeeRecipient: '0x1234',
+            feeCurrency: CURRENCY_ADDRESS,
+            gatewayFeeRecipient: FEE_ADDRESS,
             gatewayFee: '0x5678',
             data: '0xabcdef',
           }
@@ -150,7 +153,7 @@ describe('Local wallet class', () => {
               gas: '10',
               gasPrice: '99',
               feeCurrency: '0x',
-              gatewayFeeRecipient: '0x1234',
+              gatewayFeeRecipient: FEE_ADDRESS,
               gatewayFee: '0x5678',
               data: '0xabcdef',
             }
@@ -180,7 +183,7 @@ describe('Local wallet class', () => {
               gas: '10',
               gasPrice: '99',
               feeCurrency: '0x',
-              gatewayFeeRecipient: '0x1234',
+              gatewayFeeRecipient: FEE_ADDRESS,
               gatewayFee: '0x5678',
               data: '0xabcdef',
             }

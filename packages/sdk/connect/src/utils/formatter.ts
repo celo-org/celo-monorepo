@@ -207,7 +207,7 @@ export function outputBigNumberFormatter(hex: string): string {
 }
 
 export function inputAddressFormatter(address?: string): string | undefined {
-  if (!address) {
+  if (!address || address === '0x') {
     return undefined
   }
   if (isValidAddress(address)) {

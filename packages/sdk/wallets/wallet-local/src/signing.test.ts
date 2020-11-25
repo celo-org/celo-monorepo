@@ -107,8 +107,8 @@ async function verifyLocalSigningInAllPermutations(
   const badNonce = 100
   const gas = 10
   const gasPrice = 99
-  const feeCurrency = '0x124356'
-  const gatewayFeeRecipient = '0x1234'
+  const feeCurrency = ACCOUNT_ADDRESS1
+  const gatewayFeeRecipient = ACCOUNT_ADDRESS2
   const gatewayFee = '0x5678'
   const data = '0xabcdef'
   const chainId = 1
