@@ -68,8 +68,8 @@ describe('KomenciKit', () => {
 
   describe('startSession', () => {
     beforeEach(() => {
-      jest
-        .spyOn(contractKit.connection, 'signTypedData')
+      contractKit.connection.signTypedData = jest
+        .fn()
         .mockResolvedValue({ v: 0, r: '0x0', s: '0x0' })
     })
 
