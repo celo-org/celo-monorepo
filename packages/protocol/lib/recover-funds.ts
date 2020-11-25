@@ -16,8 +16,9 @@ export async function recoverFunds(proxyAddress: Address, from: Address) {
   const releaseGoldProxy = await ReleaseGoldProxy.at(proxyAddress)
   const balance = await web3.eth.getBalance(releaseGoldProxy.address)
   const recoveredAmount = new BigNumber(balance).minus(new BigNumber(0.001)).dp(0)
-
+  console.info('  Attempting to recover', recoveredAmount, 'CELO')
   const recoveryMultiSig = await retryTx(ReleaseGoldMultiSig.new, [{ from }])
+  console.info('  Assigning 1/1 multisig implementation to ReleaseGold Proxy')
   await _setInitialProxyImplementation(
     web3,
     recoveryMultiSig,
@@ -33,6 +34,7 @@ export async function recoverFunds(proxyAddress: Address, from: Address) {
   )
 
   const proxiedMultisig = await ReleaseGoldMultiSig.at(proxyAddress)
+  console.info('  Transferring funds to', from)
   await retryTx(proxiedMultisig.submitTransaction, [
     from,
     recoveredAmount,
