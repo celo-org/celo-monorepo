@@ -34,6 +34,7 @@ export class SnarkEpochDataSlasherWrapper extends BaseWrapper<SnarkEpochDataSlas
    */
   async getBlockNumberFromData(header: string): Promise<number> {
     const res = await this.contract.methods.getBlockNumberFromData(header).call()
+    console.log('blocknum', res)
     return valueToInt(res)
   }
 

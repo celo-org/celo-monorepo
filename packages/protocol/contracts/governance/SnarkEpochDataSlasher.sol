@@ -27,6 +27,15 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return (1, 1, 1, 0);
   }
 
+  function initialize(address registryAddress, uint256 _penalty, uint256 _reward)
+    external
+    initializer
+  {
+    _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
+    setSlashingIncentives(_penalty, _reward);
+  }
+
   function reverse(uint8 a) internal pure returns (uint8) {
     uint8 res = 0;
     for (uint8 i = 0; i < 8; i++) {
@@ -159,6 +168,10 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     emit SnarkEpochDataSlashPerformed(validator, blockNumber);
   }
 
+  function checkSlash(bytes memory arg1, bytes memory arg2) public view returns (uint256) {
+    return checkSlash0(decodeDataArg(arg1), decodeDataArg(arg2));
+  }
+
   function checkSlash0(DataArg memory arg1, DataArg memory arg2) internal view returns (uint256) {
     uint16 epoch1 = epochFromExtraData(arg1.extra);
     uint16 epoch2 = epochFromExtraData(arg2.extra);
@@ -170,7 +183,7 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
 
   function checkSlash1(uint16 epoch, DataArg memory arg) internal view {
     bytes memory data = abi.encodePacked(arg.extra, arg.bhhash);
-    require(isValid(epoch, data, arg.bitmap, arg.sig, arg.hint));
+    require(isValid(epoch, data, arg.bitmap, arg.sig, arg.hint), "was not valid signature");
   }
 
   function negativeP2() internal pure returns (B12.G2Point memory) {
@@ -202,9 +215,9 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     view
     returns (B12.G1Point memory)
   {
-    B12.G1Point memory p = B12.mapToG1(x, hint1, hint2, !greatest);
+    B12.G1Point memory p = B12.mapToG1(x, hint1, hint2, greatest);
     B12.G1Point memory q = CeloB12_377Lib.g1Mul(p, 30631250834960419227450344600217059328);
-    // The point iat infinity is represented as (0,0)
+    // The point at infinity is represented as (0,0)
     require(!(q.X.a == 0 && q.X.b == 0 && q.Y.a == 0 && q.Y.b == 0), "Point q cannot be zero");
     return q;
   }
@@ -287,7 +300,7 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
       B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0)),
       B12.Fp2(B12.Fp(0, 0), B12.Fp(0, 0))
     );
-    uint256 blockNumber = getEpochLastBlock(epoch - 1);
+    uint256 blockNumber = getEpochLastBlock(epoch);
     uint256 num = 0;
     for (uint256 i = 0; i < 150; i++) {
       if (bitmap & 1 == 1) {

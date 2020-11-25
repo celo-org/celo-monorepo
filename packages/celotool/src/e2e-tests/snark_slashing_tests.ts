@@ -75,13 +75,16 @@ describe('snark slashing tests', function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getSnarkEpochDataSlasher()
       const election = await kit.contracts.getElection()
-      await waitForBlock(web3, 300)
+      await waitForBlock(web3, 340)
 
       const signerIdx = 0
       const signer = await election.validatorSignerAddressFromSet(signerIdx, 200)
 
+      const lockedGold = await kit.contracts.getLockedGold()
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
+      const balance0 = await lockedGold.getAccountTotalLockedGold(signer)
+      console.info('start balance', balance0.toString(10))
 
       const header =
         '0x0100000000000084cd24f5a3be8f5306767c25e2ef565810f76b96887302a246462dfc7575ad4a7d8ea18220a731e942f3b5eaa5b3f47501000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000018cd5a25a914aabff56edb8f3c2b372aab17d8b60cb7fb12f499e09789dac460bbb49ef4045956dfd3556ce106510ff00000000000000000000000000000000017666574fd0dabcc4070e3e17872fbf42b08c1ca63f26f92e800bb8633e831587aa166361d53f9bedd6b442ecdfcb7e00000000000000000000000000000000018ad5019d546c0c3a9ba899096820f451c499822e258cd0196490d41fd6daa6ae47ffd0179ea27510f95dfcced104da00000000000000000000000000000000002365447a70a4de8b9f5d2763392846c85e4070d2cf86bf058ed15b9a326d5968c35d7418615d8b740f6203312efb27'
@@ -95,9 +98,10 @@ describe('snark slashing tests', function(this: any) {
       assert.equal(txRcpt.status, true)
 
       // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
-      const lockedGold = await kit.contracts.getLockedGold()
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
-      assert.equal(balance.toString(10), '1000000000000000000000')
+      console.info('end balance', balance.toString(10))
+      // Gets also 2 rewards
+      assert.equal(balance.toString(10), '3000000000000000000000')
     })
   })
 })

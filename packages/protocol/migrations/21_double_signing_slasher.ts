@@ -25,6 +25,10 @@ module.exports = deploymentForCoreContract<DoubleSigningSlasherInstance>(
       'LockedGold',
       artifacts
     )
-    await lockedGold.addSlasher(CeloContractName.DoubleSigningSlasher)
+    try {
+      await lockedGold.addSlasher(CeloContractName.DoubleSigningSlasher)
+    } catch (err) {
+      console.info('hmm', err)
+    }
   }
 )

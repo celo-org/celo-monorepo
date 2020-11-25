@@ -25,6 +25,10 @@ module.exports = deploymentForCoreContract<SnarkEpochDataSlasherInstance>(
       'LockedGold',
       artifacts
     )
-    await lockedGold.addSlasher(CeloContractName.SnarkEpochDataSlasher)
+    try {
+      await lockedGold.addSlasher(CeloContractName.SnarkEpochDataSlasher)
+    } catch (err) {
+      console.info('hmm', err)
+    }
   }
 )
