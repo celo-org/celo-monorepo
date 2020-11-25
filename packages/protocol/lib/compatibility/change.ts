@@ -12,7 +12,6 @@ export interface Change {
  */
 export interface ChangeVisitor<T> {
   onMethodMutability(change: MethodMutabilityChange): T
-  onMethodParameters(change: MethodParametersChange): T
   onMethodReturn(change: MethodReturnChange): T
   onMethodVisibility(change: MethodVisibilityChange): T
   onMethodAdded(change: MethodAddedChange): T
@@ -156,17 +155,6 @@ export class MethodMutabilityChange extends MethodValueChange {
   type = "MethodMutability"
   accept<T>(visitor: ChangeVisitor<T>): T {
     return visitor.onMethodMutability(this)
-  }
-}
-
-/**
- * The input parameters of a method changed. Since the input parameters
- * are used as the id of a method, this should probably never appear.
- */
-export class MethodParametersChange extends MethodValueChange {
-  type = "MethodParameters"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodParameters(this)
   }
 }
 
