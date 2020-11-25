@@ -1,7 +1,7 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { PhoneNumberUtils } from '@celo/utils'
 import { newKitFromWeb3 } from '../kit'
-import { AttestationsWrapper } from './Attestations'
+import { AttestationsWrapper, getSecurityCodePrefix } from './Attestations'
 
 testWithGanache('Attestations Wrapper', (web3) => {
   const PHONE_NUMBER = '+15555555555'
@@ -52,5 +52,13 @@ testWithGanache('Attestations Wrapper', (web3) => {
       const result = await attestations.getVerifiedStatus(IDENTIFIER, accounts[0])
       expect(result.isVerified).toBeTruthy()
     })
+  })
+})
+
+describe(getSecurityCodePrefix, () => {
+  it('should compute correct hash', () => {
+    expect(getSecurityCodePrefix('0x000000000000000000000008')).toEqual('8')
+    // 0xf7f551752A78Ce650385B58364225e5ec18D96cB -> 1415591498931780605110544902041322891412830525131
+    expect(getSecurityCodePrefix('0xf7f551752A78Ce650385B58364225e5ec18D96cB')).toEqual('1')
   })
 })
