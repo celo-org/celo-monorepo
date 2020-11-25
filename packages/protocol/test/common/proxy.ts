@@ -1,10 +1,15 @@
+import { recoverFunds } from '@celo/protocol/lib/recover-funds'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 import {
+  FreezerContract,
   GetSetV0Instance,
   GetSetV1Instance,
+  GoldTokenContract,
   HasInitializerInstance,
   MsgSenderCheckInstance,
   ProxyInstance,
+  RegistryContract,
 } from 'types'
 
 const GetSetV0: Truffle.Contract<GetSetV0Instance> = artifacts.require('GetSetV0')
@@ -221,5 +226,25 @@ contract('Proxy', (accounts: string[]) => {
         assert.equal(res[1], "DON'T PANIC")
       })
     })
+  })
+
+  it.only('recovers funds from an incorrectly intialized implementation', async () => {
+    const Freezer: FreezerContract = artifacts.require('Freezer')
+    const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+    const Registry: RegistryContract = artifacts.require('Registry')
+
+    const freezer = await Freezer.new()
+    const goldToken = await GoldToken.new()
+    const registry = await Registry.new()
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
+    await goldToken.initialize(registry.address)
+
+    await proxy._setImplementation(getSet.address)
+    await goldToken.transfer(proxy.address, 10)
+    const proxyBalance = await web3.eth.getBalance(proxy.address)
+    assert(proxyBalance === '10')
+
+    await recoverFunds(proxy.address, owner)
+    assert((await web3.eth.getBalance(proxy.address)) === '0')
   })
 })
