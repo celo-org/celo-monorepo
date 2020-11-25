@@ -107,26 +107,21 @@ export function inputDefaultBlockNumberFormatter(blockNumber: BlockNumber | null
 }
 
 export function inputBlockNumberFormatter(blockNumber: BlockNumber) {
-  const originalBlockNumber = blockNumber
   if (blockNumber == null) {
     return undefined
   }
 
-  if (typeof blockNumber !== 'string' && !(blockNumber instanceof String)) {
-    blockNumber = numberToHex(blockNumber.toString())!
+  if (isPredefinedBlockNumber(blockNumber)) {
+    return blockNumber
   }
-
-  blockNumber = blockNumber.toLocaleLowerCase()
 
   if (blockNumber === 'genesis') {
     return '0x0'
   }
 
-  if (isPredefinedBlockNumber(blockNumber) || isHex(blockNumber)) {
-    return blockNumber
-  }
-
-  throw new Error(`Provided block number ${originalBlockNumber} is invalid`)
+  return isHexStrict(blockNumber.toString())
+    ? blockNumber.toString().toLocaleLowerCase()
+    : numberToHex(blockNumber.toString())!
 }
 
 export function outputBlockFormatter(block: any): Block {
@@ -163,7 +158,7 @@ export function outputBlockFormatter(block: any): Block {
 
 export function hexToNumber(hex?: string): number | undefined {
   if (hex) {
-    return new BigNumber(trimLeading0x(hex), 16).toNumber()
+    return new BigNumber(hex).toNumber()
   }
   return undefined
 }
@@ -203,7 +198,7 @@ export function outputLogFormatter(log: any): Log {
 }
 
 export function outputBigNumberFormatter(hex: string): string {
-  return new BigNumber(trimLeading0x(hex), 16).toString(10)
+  return new BigNumber(hex).toString(10)
 }
 
 export function inputAddressFormatter(address?: string): string | undefined {
@@ -217,10 +212,7 @@ export function inputAddressFormatter(address?: string): string | undefined {
 }
 
 export function inputSignFormatter(data: string) {
-  if (isHex(data)) {
-    return ensureLeading0x(data)
-  }
-  return utf8ToHex(data)
+  return isHexStrict(data) ? data : utf8ToHex(data)
 }
 
 function utf8ToHex(str: string): string {
@@ -254,9 +246,16 @@ function isHex(hex: string): boolean {
   return /^(-0x|0x)?[0-9a-f]*$/i.test(hex)
 }
 
+function isHexStrict(hex: string): boolean {
+  return /^(-)?0x[0-9a-f]*$/i.test(hex)
+}
+
 function numberToHex(value?: BigNumber.Value) {
   if (value) {
-    return ensureLeading0x(new BigNumber(value).toString(16))
+    const numberValue = new BigNumber(value)
+    const result = ensureLeading0x(new BigNumber(value).toString(16))
+    // Seen in web3, copied just in case
+    return numberValue.lt(new BigNumber(0)) ? `-${result}` : result
   }
   return undefined
 }
