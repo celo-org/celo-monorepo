@@ -1,6 +1,7 @@
 import { Platform } from 'react-native'
 import { Actions, ActionTypes, AppState } from 'src/app/actions'
 import i18n from 'src/i18n'
+import { Screens } from 'src/navigator/Screens'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
@@ -18,7 +19,7 @@ export interface State {
   pontoEnabled: boolean
   kotaniEnabled: boolean
   inviteModalVisible: boolean
-  activeScreen: string
+  activeScreen: Screens
 }
 
 const initialState = {
@@ -36,7 +37,7 @@ const initialState = {
   pontoEnabled: false,
   kotaniEnabled: false,
   inviteModalVisible: false,
-  activeScreen: '',
+  activeScreen: Screens.Main,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language || i18n.language

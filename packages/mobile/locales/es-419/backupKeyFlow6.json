@@ -4,7 +4,7 @@
   "introBody": "La clave de tu cuenta es la parte más importante de tu cuenta. Configurarla toma cinco minutos",
   "introPrimaryAction": "Configurar Ahora",
   "backupSetupTitle": "Configura Tu Clave De Cuenta",
-  "backupSetupBody": "Para proteger tus fondos, debes configurar tu Clave de Cuenta antes de poder continuar usando Valora.",
+  "backupSetupBody": "Para proteger tus fondos, debes configurar tu Clave de Cuenta antes de poder continuar usando {{appName}}.",
   "delayBackup": "Espere una hora",
   "postSetupTitle": "La Clave de Cuenta",
   "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y CELO. Nadie, ni siquiera {{appName}}, podrá ayudarte a recuperar tu cuenta sin tu clave. Guárdala en un lugar seguro y no la compartas",

@@ -57,12 +57,10 @@ BackupForceScreen.navOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     backgroundColor: colors.light,
   },
   content: {
     flex: 1,
-    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 24,

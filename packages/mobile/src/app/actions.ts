@@ -1,4 +1,5 @@
 import i18n from 'src/i18n'
+import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'app/actions'
@@ -77,7 +78,7 @@ interface InviteModalAction {
 
 interface ActiveScreenChangedAction {
   type: Actions.ACTIVE_SCREEN_CHANGED
-  activeScreen: string
+  activeScreen: Screens
 }
 
 export interface Lock {
@@ -219,7 +220,7 @@ export const toggleInviteModal = (inviteModalVisible: boolean): InviteModalActio
   inviteModalVisible,
 })
 
-export const activeScreenChanged = (activeScreen: string): ActiveScreenChangedAction => ({
+export const activeScreenChanged = (activeScreen: Screens): ActiveScreenChangedAction => ({
   type: Actions.ACTIVE_SCREEN_CHANGED,
   activeScreen,
 })

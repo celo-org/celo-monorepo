@@ -4,7 +4,7 @@
   "introBody": "Your Account Key is the most important part of your account.\n\nPlease find a private place to set up your key. It takes about five minutes.",
   "introPrimaryAction": "Set Up Now",
   "backupSetupTitle": "Set Up Your Account Key",
-  "backupSetupBody": "To protect your funds, you're required to set up your Account Key before you can continue using Valora.",
+  "backupSetupBody": "To protect your funds, you're required to set up your Account Key before you can continue using {{appName}}.",
   "delayBackup": "Wait One Hour",
   "postSetupTitle": "Your Account Key",
   "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and CELO. Nobody, not even {{appName}}, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
