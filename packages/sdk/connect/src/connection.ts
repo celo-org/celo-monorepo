@@ -201,7 +201,7 @@ export class Connection {
    *  - estimatesGas before sending
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
-  async sendTransaction(tx: CeloTx): Promise<TransactionResult> {
+  sendTransaction = async (tx: CeloTx): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
     tx = this.fillGasPrice(tx)
 
@@ -218,10 +218,10 @@ export class Connection {
     )
   }
 
-  async sendTransactionObject(
+  sendTransactionObject = async (
     txObj: CeloTxObject<any>,
     tx?: Omit<CeloTx, 'data'>
-  ): Promise<TransactionResult> {
+  ): Promise<TransactionResult> => {
     tx = this.fillTxDefaults(tx)
     tx = this.fillGasPrice(tx)
 
@@ -295,7 +295,7 @@ export class Connection {
     })
   }
 
-  async sendSignedTransaction(signedTransactionData: string): Promise<TransactionResult> {
+  sendSignedTransaction = async (signedTransactionData: string): Promise<TransactionResult> => {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
@@ -314,11 +314,11 @@ export class Connection {
     this.currencyGasPrice.set(address, gasPrice)
   }
 
-  async estimateGas(
+  estimateGas = async (
     tx: CeloTx,
     gasEstimator: (tx: CeloTx) => Promise<number> = this.web3.eth.estimateGas,
     caller: (tx: CeloTx) => Promise<string> = this.web3.eth.call
-  ): Promise<number> {
+  ): Promise<number> => {
     try {
       const gas = await gasEstimator({ ...tx })
       debugGasEstimation('estimatedGas: %s', gas.toString())
@@ -345,11 +345,11 @@ export class Connection {
     return (this.web3.eth.abi as unknown) as AbiCoder
   }
 
-  async estimateGasWithInflationFactor(
+  estimateGasWithInflationFactor = async (
     tx: CeloTx,
     gasEstimator?: (tx: CeloTx) => Promise<number>,
     caller?: (tx: CeloTx) => Promise<string>
-  ): Promise<number> {
+  ): Promise<number> => {
     try {
       const gas = Math.round(
         (await this.estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
@@ -361,30 +361,30 @@ export class Connection {
     }
   }
 
-  async chainId(): Promise<number> {
+  chainId = async (): Promise<number> => {
     // Reference: https://eth.wiki/json-rpc/API#net_version
     const response = await this.rpcCaller.call('net_version', [])
     return parseInt(response.result.toString(), 10)
   }
 
-  async getTransactionCount(address: Address): Promise<number> {
+  getTransactionCount = async (address: Address): Promise<number> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_gettransactioncount
     const response = await this.rpcCaller.call('eth_getTransactionCount', [address, 'pending'])
 
     return hexToNumber(response.result)!
   }
 
-  async nonce(address: Address): Promise<number> {
+  nonce = async (address: Address): Promise<number> => {
     return this.getTransactionCount(address)
   }
 
-  async coinbase(): Promise<string> {
+  coinbase = async (): Promise<string> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_coinbase
     const response = await this.rpcCaller.call('eth_coinbase', [])
     return response.result.toString()
   }
 
-  async gasPrice(feeCurrency?: Address): Promise<string> {
+  gasPrice = async (feeCurrency?: Address): Promise<string> => {
     // Required otherwise is not backward compatible
     const parameter = feeCurrency ? [feeCurrency] : []
 
@@ -394,16 +394,16 @@ export class Connection {
     return gasPriceInHex
   }
 
-  async getBlockNumber(): Promise<number> {
+  getBlockNumber = async (): Promise<number> => {
     const response = await this.rpcCaller.call('eth_blockNumber', [])
 
     return hexToNumber(response.result)!
   }
 
-  async getBlock(
+  getBlock = async (
     blockHashOrBlockNumber: BlockNumber,
     fullTxObjects: boolean = true
-  ): Promise<Block> {
+  ): Promise<Block> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
     let fnCall = 'eth_getBlockByNumber'
     if (blockHashOrBlockNumber instanceof String && blockHashOrBlockNumber.indexOf('0x') === 0) {
@@ -419,7 +419,7 @@ export class Connection {
     return outputBlockFormatter(response.result)
   }
 
-  async getBalance(address: Address, defaultBlock?: BlockNumber): Promise<string> {
+  getBalance = async (address: Address, defaultBlock?: BlockNumber): Promise<string> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getBalance
     const response = await this.rpcCaller.call('eth_getBalance', [
       inputAddressFormatter(address),
@@ -428,7 +428,7 @@ export class Connection {
     return outputBigNumberFormatter(response.result)
   }
 
-  async getTransaction(transactionHash: string): Promise<CeloTxPending> {
+  getTransaction = async (transactionHash: string): Promise<CeloTxPending> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getTransactionByHash
     const response = await this.rpcCaller.call('eth_getTransactionByHash', [
       ensureLeading0x(transactionHash),
@@ -436,7 +436,7 @@ export class Connection {
     return outputCeloTxFormatter(response.result)
   }
 
-  async getTransactionReceipt(txhash: string): Promise<CeloTxReceipt> {
+  getTransactionReceipt = async (txhash: string): Promise<CeloTxReceipt> => {
     // Reference: https://eth.wiki/json-rpc/API#eth_getTransactionReceipt
     const response = await this.rpcCaller.call('eth_getTransactionReceipt', [
       ensureLeading0x(txhash),
