@@ -82,6 +82,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         </View>
         <TextInput
           allowFontScaling={true}
+          autoCapitalize="words"
           autoFocus={true}
           keyboardType="decimal-pad"
           onChangeText={[Function]}
