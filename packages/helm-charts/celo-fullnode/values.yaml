@@ -86,8 +86,6 @@ geth:
     # rollingUpdate:
     #   maxUnavailable: 25%
     #   maxSurge: 25%
-  use_gstorage_data: true
-  gstorage_data_bucket: "nighyly-chain-backups/mainnet"
 
 genesis:
   networkId: 31418
