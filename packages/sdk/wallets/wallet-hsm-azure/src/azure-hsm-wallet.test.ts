@@ -167,8 +167,8 @@ describe('AzureHSMWallet class', () => {
               nonce: 0,
               gas: '10',
               gasPrice: '99',
-              feeCurrency: '0x124356',
-              gatewayFeeRecipient: '0x1234',
+              feeCurrency: ACCOUNT_ADDRESS_NEVER,
+              gatewayFeeRecipient: ACCOUNT_ADDRESS_NEVER,
               gatewayFee: '0x5678',
               data: '0xabcdef',
             }
@@ -231,7 +231,7 @@ describe('AzureHSMWallet class', () => {
               gas: '10',
               gasPrice: '99',
               feeCurrency: '0x',
-              gatewayFeeRecipient: '0x1234',
+              gatewayFeeRecipient: ACCOUNT_ADDRESS_NEVER,
               gatewayFee: '0x5678',
               data: '0xabcdef',
             }
@@ -263,7 +263,7 @@ describe('AzureHSMWallet class', () => {
                 gas: '10',
                 gasPrice: '99',
                 feeCurrency: '0x',
-                gatewayFeeRecipient: '0x1234',
+                gatewayFeeRecipient: ACCOUNT_ADDRESS_NEVER,
                 gatewayFee: '0x5678',
                 data: '0xabcdef',
               }

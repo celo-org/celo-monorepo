@@ -74,8 +74,8 @@ describe('RemoteWallet', () => {
         nonce: 0,
         gas: '10',
         gasPrice: '99',
-        feeCurrency: '0x124356',
-        gatewayFeeRecipient: '0x1234',
+        feeCurrency: ACCOUNT_ADDRESS1,
+        gatewayFeeRecipient: ACCOUNT_ADDRESS1,
         gatewayFee: '0x5678',
         data: '0xabcdef',
       }

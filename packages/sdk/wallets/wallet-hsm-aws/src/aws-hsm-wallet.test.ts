@@ -179,7 +179,7 @@ describe('AwsHsmWallet class', () => {
           gas: '10',
           gasPrice: '99',
           feeCurrency: '0x',
-          gatewayFeeRecipient: '0x1234',
+          gatewayFeeRecipient: ACCOUNT_ADDRESS_NEVER,
           gatewayFee: '0x5678',
           data: '0xabcdef',
         }
@@ -238,7 +238,7 @@ describe('AwsHsmWallet class', () => {
           gas: '10',
           gasPrice: '99',
           feeCurrency: '0x',
-          gatewayFeeRecipient: '0x1234',
+          gatewayFeeRecipient: ACCOUNT_ADDRESS_NEVER,
           gatewayFee: '0x5678',
           data: '0xabcdef',
         }
@@ -266,7 +266,7 @@ describe('AwsHsmWallet class', () => {
             gas: '10',
             gasPrice: '99',
             feeCurrency: '0x',
-            gatewayFeeRecipient: '0x1234',
+            gatewayFeeRecipient: ACCOUNT_ADDRESS_NEVER,
             gatewayFee: '0x5678',
             data: '0xabcdef',
           }
