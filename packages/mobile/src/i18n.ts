@@ -1,5 +1,4 @@
 import locales from '@celo/mobile/locales'
-import { currencyTranslations } from '@celo/utils/src/currencies'
 import hoistStatics from 'hoist-non-react-statics'
 import i18n, { LanguageDetectorModule } from 'i18next'
 import {
@@ -67,21 +66,6 @@ const languageDetector: LanguageDetectorModule = {
   },
 }
 
-const currencyInterpolator = (text: string, value: any) => {
-  const key = value[1]
-  const translations = currencyTranslations[i18n.language]
-
-  if (translations && key in translations) {
-    return translations[key]
-  } else {
-    Logger.warn(
-      '@currencyInterpolator',
-      `Unexpected currency interpolation: ${text} in ${i18n.language}`
-    )
-    return ''
-  }
-}
-
 i18n
   .use(languageDetector)
   .use(initReactI18next)
@@ -100,7 +84,6 @@ i18n
       escapeValue: false,
       defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK_DISPLAY },
     },
-    missingInterpolationHandler: currencyInterpolator,
   })
   .catch((reason: any) => Logger.error(TAG, 'Failed init i18n', reason))
 

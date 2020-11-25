@@ -1,7 +1,7 @@
 {
   "requests": "Solicitudes",
   "empty": "No tienes solicitudes de pago",
-  "celoDollarBalance": "Saldo de {{CeloDollar}}",
+  "celoDollarBalance": "Saldo de Celo Dólar",
   "requestDeclined": "Solicitud rechazada",
   "requestPaid": "Solicitud Pagada",
   "paymentRequestUpdateFailed": "No se pudo actualizar el pedido de pago",

@@ -1,6 +1,6 @@
 {
   "cancel": "Cancelar",
-  "dollarsSent": "{{Dollars}} Enviados",
+  "dollarsSent": "Dólares Enviados",
   "to": "Para",
   "send": "Enviar",
   "payment": "Pago",
@@ -11,8 +11,8 @@
   "contacts": "Contatos",
   "invite": "Convidar",
   "sendTo": "Enviar para",
-  "celoDollarAmount": "<0></0> {{CeloDollar}} ",
-  "celoDollarAmount_plural": "<0></0> {{CeloDollars}} ",
+  "celoDollarAmount": "<0></0> Celo Dólar ",
+  "celoDollarAmount_plural": "<0></0> Celo Dólares ",
   "addDescription": "Adicionar descrição",
   "sentTo": "Enviado para",
   "withdrawnTo": "Sacado em",

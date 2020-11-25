@@ -44,22 +44,3 @@ export const currencyToShortMap = {
   [CURRENCY_ENUM.DOLLAR]: SHORT_CURRENCIES.DOLLAR,
   [CURRENCY_ENUM.GOLD]: SHORT_CURRENCIES.GOLD,
 }
-
-const currencyTranslationsENUS: { [key: string]: string } = {
-  CeloDollars: 'Celo Dollars',
-  CeloDollar: 'Celo Dollar',
-  Dollar: 'Dollar',
-  Dollars: 'Dollars',
-  dollars: 'dollars',
-}
-const currencyTranslationsESAR: { [key: string]: string } = {
-  CeloDollars: 'Celo Dólares',
-  CeloDollar: 'Celo Dólar',
-  Dollar: 'Dólar',
-  Dollars: 'Dólares',
-  dollars: 'dólares',
-}
-export const currencyTranslations: { [key: string]: any } = {
-  ['en-US']: currencyTranslationsENUS,
-  ['es-419']: currencyTranslationsESAR,
-}

@@ -13,7 +13,7 @@
   "redeemInviteTimeout": "Redeem Invite Timed out",
   "accountSetupFailed": "Failed to create your wallet",
   "emptyInviteCode": "Invite code has no funds",
-  "transferDollarsToAccount": "{{Dollars}} transferred to your account!",
+  "transferDollarsToAccount": "Dollars transferred to your account!",
   "inviteFriendsToCelo": "Invite Friends to {{appName}}",
   "inviteAnyone": "Send easily to your friends by adding your contacts",
   "inviteReceived": "Invite Received",

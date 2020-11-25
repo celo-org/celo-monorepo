@@ -13,7 +13,7 @@
   "redeemInviteTimeout": "Trocar convite esgotado",
   "accountSetupFailed": "Não foi possível criar sua carteira",
   "emptyInviteCode": "O código do convite está sem fundos",
-  "transferDollarsToAccount": "{{Dollars}} transferidos para a sua conta!",
+  "transferDollarsToAccount": "Dólares transferidos para a sua conta!",
   "inviteFriendsToCelo": "Convide amigos para o {{appName}} ",
   "inviteAnyone": "Envie facilmente para seus amigos adicionando seus contatos",
   "inviteReceived": "Convite recebido",
