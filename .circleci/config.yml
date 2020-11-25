@@ -507,7 +507,7 @@ jobs:
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against first commit to contain version numbers"
             RELEASE_TAG=celo-core-contracts-v1.rc1
-            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -l /dev/stdout
 
   protocol-test-common:
     <<: *defaults
