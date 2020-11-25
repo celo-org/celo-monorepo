@@ -24,12 +24,12 @@ describe('TxParamsNormalizer class', () => {
 
   beforeEach(() => {
     mockRpcCall = jest.fn(
-      (_method: string, _params: any[]): Promise<JsonRpcResponse> => {
+      (method: string, _params: any[]): Promise<JsonRpcResponse> => {
         return new Promise((resolve, _reject) =>
           resolve({
             jsonrpc: '2.0',
             id: 1,
-            result: '27',
+            result: method === 'net_version' ? '27' : '0x27',
           })
         )
       }
@@ -123,7 +123,7 @@ describe('TxParamsNormalizer class', () => {
       const celoTx: CeloTx = { ...completeCeloTx }
       celoTx.gasPrice = undefined
       const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gasPrice).toBe('27')
+      expect(newCeloTx.gasPrice).toBe('0x27')
       expect(mockRpcCall.mock.calls.length).toBe(1)
       expect(mockRpcCall.mock.calls[0][0]).toBe('eth_gasPrice')
     })
@@ -133,7 +133,7 @@ describe('TxParamsNormalizer class', () => {
       celoTx.gasPrice = undefined
       celoTx.feeCurrency = 'celoMagic'
       const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gasPrice).toBe('27')
+      expect(newCeloTx.gasPrice).toBe('0x27')
       expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', ['celoMagic']])
     })
 
@@ -142,7 +142,7 @@ describe('TxParamsNormalizer class', () => {
       celoTx.gasPrice = undefined
       celoTx.feeCurrency = undefined
       const newCeloTx = await populator.populate(celoTx)
-      expect(newCeloTx.gasPrice).toBe('27')
+      expect(newCeloTx.gasPrice).toBe('0x27')
       expect(mockRpcCall.mock.calls[0]).toEqual(['eth_gasPrice', []])
     })
   })
