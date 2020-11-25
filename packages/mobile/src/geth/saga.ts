@@ -34,6 +34,7 @@ import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { getWeb3 } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
+// tslint:disable-next-line: ordered-imports
 import { blockIsFresh, BLOCK_AGE_LIMIT } from 'src/web3/utils'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
