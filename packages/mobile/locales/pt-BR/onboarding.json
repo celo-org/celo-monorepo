@@ -23,7 +23,7 @@
       "successWithoutMatches": "Sincronização concluída"
     }
   },
-  "accountInfo": "Informação da conta\n",
+  "accountInfo": "Informação da conta",
   "step": "Passo {{step}} de 5",
   "selectCountryCode": "Selecionar código do país",
   "pincodeSet": {
