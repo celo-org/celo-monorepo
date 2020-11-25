@@ -39,6 +39,7 @@ function getAvailableResources() {
   for (const [key, value] of Object.entries(locales)) {
     Object.defineProperty(resources, key, {
       get: () => value!.strings,
+      enumerable: true,
     })
   }
   return resources
@@ -92,7 +93,9 @@ i18n
     resources: availableResources,
     ns: ['common', ...Object.keys(Namespaces)],
     defaultNS: 'common',
-    debug: false, // Disable as it forces evaluation of all our lazy loaded locales
+    // Only enable for debugging as it forces evaluation of all our lazy loaded locales
+    // and prints out all strings when initializing
+    debug: false,
     interpolation: {
       escapeValue: false,
       defaultVariables: { appName: APP_NAME, tosLink: TOS_LINK_DISPLAY },
