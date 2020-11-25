@@ -55,9 +55,8 @@ spec:
       initContainers:
 {{- if .Values.geth.use_gstorage_data | default false }}
 {{ include "common.gsutil-sync-data-init-container" . | indent 6}}
-{{ else }}
+{{ end }}
 {{ include "common.init-genesis-container" .  | indent 6 }}
-{{- end }}
 {{ if .Values.geth.node_keys }}
       - name: set-node-key
         image: alpine:3.12
