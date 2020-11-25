@@ -5,8 +5,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@celo/contractkit": "0.4.18",
-    "@celo/utils": "0.1.20",
+    "@celo/contractkit": "0.4.19-dev",
+    "@celo/utils": "0.1.23-dev",
     "@celo/base": "0.0.3",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
