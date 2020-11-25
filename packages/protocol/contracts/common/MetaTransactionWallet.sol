@@ -64,8 +64,7 @@ contract MetaTransactionWallet is
    * @param _signer The address authorized to execute transactions via this wallet.
    */
   function initialize(address _signer) external initializer {
-    _transferOwnership(msg.sender);
-    setSigner(_signer);
+    _setSigner(_signer);
     setEip712DomainSeparator();
     // MetaTransactionWallet owns itself, which necessitates that all onlyOwner functions
     // be called via executeTransaction or executeMetaTransaction.
@@ -78,10 +77,8 @@ contract MetaTransactionWallet is
    * @notice Transfers control of the wallet to a new signer.
    * @param _signer The address authorized to execute transactions via this wallet.
    */
-  function setSigner(address _signer) public onlyOwner {
-    require(_signer != address(0), "cannot assign zero address as signer");
-    signer = _signer;
-    emit SignerSet(signer);
+  function setSigner(address _signer) external onlyOwner {
+    _setSigner(_signer);
   }
 
   /**
@@ -277,5 +274,11 @@ contract MetaTransactionWallet is
       sliced = data.slice(start, length);
     }
     return sliced;
+  }
+
+  function _setSigner(address _signer) internal {
+    require(_signer != address(0), "cannot assign zero address as signer");
+    signer = _signer;
+    emit SignerSet(signer);
   }
 }
