@@ -28,6 +28,7 @@ export enum SmsProviderType {
   UNKNOWN = 'unknown',
   TWILIO = 'twilio',
   MESSAGEBIRD = 'messagebird',
+  TELEKOM = 'telekom',
 }
 
 export function readUnsupportedRegionsFromEnv(...envVarNames: string[]) {
