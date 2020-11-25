@@ -275,7 +275,7 @@ export class Connection {
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
-    return new Promise<string>((resolve, reject) => {
+    const signature = await new Promise<string>((resolve, reject) => {
       ;(this.web3.currentProvider as Provider).send(
         {
           jsonrpc: '2.0',
@@ -293,6 +293,8 @@ export class Connection {
         }
       )
     })
+
+    return signature
   }
 
   sendSignedTransaction = async (signedTransactionData: string): Promise<TransactionResult> => {

@@ -206,7 +206,7 @@ export function inputAddressFormatter(address?: string): string | undefined {
     return undefined
   }
   if (isValidAddress(address)) {
-    return ensureLeading0x(address)
+    return ensureLeading0x(address).toLocaleLowerCase()
   }
   throw new Error(`Provided address ${address} is invalid, the capitalization checksum test failed`)
 }

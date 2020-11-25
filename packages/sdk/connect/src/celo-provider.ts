@@ -106,11 +106,8 @@ export class CeloProvider implements Provider {
       }
       case InterceptedMethods.sign:
       case InterceptedMethods.personalSign: {
-        if (payload.method === InterceptedMethods.sign) {
-          this.checkPayloadWithAtLeastNParams(payload, 1)
-        } else {
-          this.checkPayloadWithAtLeastNParams(payload, 2)
-        }
+        this.checkPayloadWithAtLeastNParams(payload, 2)
+
         address = payload.method === InterceptedMethods.sign ? payload.params[0] : payload.params[1]
 
         if (this.connection.isLocalAccount(address)) {

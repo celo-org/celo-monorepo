@@ -73,7 +73,7 @@ interface KeyRotator {
 
 async function newKeyRotator(
   kit: ContractKit,
-  web3s: Web3[],
+  kits: ContractKit[],
   privateKeys: string[]
 ): Promise<KeyRotator> {
   let index = 0
@@ -82,16 +82,13 @@ async function newKeyRotator(
 
   async function authorizeValidatorSigner(
     signer: string,
-    signerWeb3: any,
+    signerKit: ContractKit,
     signerPrivateKey: string
   ) {
-    const signerKit = newKitFromWeb3(signerWeb3)
     const blsPublicKey = getBlsPublicKey(signerPrivateKey)
     const blsPop = getBlsPoP(validator, signerPrivateKey)
-    const pop = await (await signerKit.contracts.getAccounts()).generateProofOfKeyPossession(
-      validator,
-      signer
-    )
+    const accounts = await signerKit.contracts.getAccounts()
+    const pop = await accounts.generateProofOfKeyPossession(validator, signer)
     return (
       await accountsWrapper.authorizeValidatorSignerAndBls(signer, pop, blsPublicKey, blsPop)
     ).sendAndWaitForReceipt({
@@ -101,11 +98,11 @@ async function newKeyRotator(
 
   return {
     async rotate() {
-      if (index < web3s.length) {
-        const signerWeb3 = web3s[index]
-        const signer: string = (await signerWeb3.eth.getAccounts())[0]
+      if (index < kits.length) {
+        const signerKit = kits[index]
+        const signer: string = (await signerKit.connection.getAccounts())[0]
         const signerPrivateKey = privateKeys[index]
-        await authorizeValidatorSigner(signer, signerWeb3, signerPrivateKey)
+        await authorizeValidatorSigner(signer, signerKit, signerPrivateKey)
         index += 1
         assert.equal(await accountsWrapper.getValidatorSigner(validator), signer)
       }
@@ -967,11 +964,14 @@ describe('governance tests', () => {
       const validatorWeb3 = new Web3(validatorRpc)
       const authWeb31 = 'ws://localhost:8559'
       const authWeb32 = 'ws://localhost:8561'
-      const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
+      const authorizedKits = [
+        newKitFromWeb3(new Web3(authWeb31)),
+        newKitFromWeb3(new Web3(authWeb32)),
+      ]
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
-        authorizedWeb3s,
+        authorizedKits,
         authorizedPrivateKeys
       )
 
