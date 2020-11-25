@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 60s
+scrape_configs:
+  - job_name: scrape-odis
+    scheme: https
+    metrics_path: /tkporter/1979b2ab6b6db9971ef218694cb21614/raw/2937d2b5ae5b3eccb0d18ba741223950dc857747/test-prometheus
+    static_configs:
+      - targets:
+          - gist.githubusercontent.com:443
+        labels:
+          _generic_location: centralus
+          _generic_namespace: odis-signer

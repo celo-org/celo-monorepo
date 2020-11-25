@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
       "location": {
-          "value": "TODO"
+          "value": "centralus"
       },
       "containerGroupName": {
-          "value": "odis_prometheus"
+          "value": "odis-prometheus"
       },
       "containerName1": {
-          "value": "odis_prom_server"
+          "value": "prometheus-server"
       },
       "containerName2": {
-          "value": "odis_prom_stackdriver_sidecar"
+          "value": "prometheus-sidecar"
       },
       "imageType1": {
           "value": "Public"
@@ -67,14 +67,19 @@
       },
       "command1": {
           "value": [
-            "--config.file=/etc/prometheus/prometheus.yml",
+            "/bin/prometheus",
+            "--config.file=/etc/prometheus/prometheus.yaml",
             "--storage.tsdb.path=/prometheus/"
           ]
       },
       "command2": {
           "value": [
-            "--stackdriver.project-id={{ .Values.gcloud.project }}",
-            "--prometheus.wal-directory=/prometheus/wal"
+            "/bin/stackdriver-prometheus-sidecar",
+            "--stackdriver.project-id=celo-phone-number-privacy-stg",
+            "--prometheus.wal-directory=/prometheus/wal",
+            "--stackdriver.kubernetes.location=centralus",
+            "--stackdriver.kubernetes.cluster-name=odis-staging",
+            "--log.level=debug"
           ]
       },
       "volumeMounts1": {
@@ -110,29 +115,16 @@
             {
               "name": "prometheus-service-account-key",
               "secret": {
-                "type": "service_account",
-                "project_id": "celo-testnet",
-                "private_key_id": "86383316f233c41deeddd6c20d2312c46048da58",
-                "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCPBume0evCgnyI\nMN8lJDuZMSX7yTKXOMLWwwOJWASpxJt24kwFJcnSnTRW/coyXvj2BgRHjKAtEf9a\n9xh7MSdEvRpleP4/fe5N7XBAbFb5wAOE9x6k6pwrqjD4UwFwbLVL3oTNu0ppUnmw\nkLM8qqhCQa5HB8RVYN7Z5UKW4EPZi1MduVbPeowUZDmHnT9S14ARCWTTVTNBUk5a\nm70J9tJltoPU2wSWg5BSVTvtlJU85T+6ozBhxZxB4+TbvuQ34l8imSjsA/SvaRQF\nicLhA+UzYRc0tsLmBZqKJS5KDlDjasUKfagwZOtXZe/MTvGNPkh7Gv7wlm0c0ybb\nbCojf8JRAgMBAAECggEABOM5Be5xZJ1sCyUk5f52yyuP20qnB/4GgftqbjXH3IOR\nhrqxW3ps6v2oZ4nfEFE4p6MhX67PfTTMja+smm6dw3qFGbc8lH+9nlP9KlVtdDXO\npPtDJMJ37WHQsDa5cY2kdSQUtJlYL9DTw9/xARNpojB/h7G9MMf5e5ebGr/tj6Q3\nLWw1846gKeiuQ41fHiZJI+xSzGyNlYhlCYuJWGr7nki97Gei0++caN2ArddEps2n\nVZdhJ2WdQD14ET0h55eYq7i7TVDDcKzIjYa1nTnShBIeIMQ0T09DoW5+Z2OpwdbL\n4eK88K03z8lFQOg9CfrX56nLPWVbGkmX0QJ2zZbK4QKBgQDJwmfvU0qHBjF07Vnd\n6wvPes3EoNMslQ9Hi1GZZ9iqWGT5Pv6ea/00uOnKavdV64EqFiEEDhrayCT/PWSv\nzz2NfDGNv87+BF82L9IbPKFtE0tuTM0l7UK0EUXnEpCkEdFEaLZNeoNp+4L5284m\nBu3UkjcmkRzsf+cVLPl1EN/OsQKBgQC1emTbrzBQ5RgB3dNA4eUTbqpAKEtX0IzG\nnkzYWF9+X8PPtfBgW1O615Az4V4LAbZBm+Hin6peC1IGuQNoNvLC4dlRieOeUns9\nwP9nH2T9+lyqTEl69qcHvfM1QVP6j/AUbPu0tZAP6jR42hQF1SD6ZHLVjs8DGcRb\nSLmHPH5VoQKBgAnsFJ5xcy3WwSHl9lBymb8XY/0yh5AeuISlNlsb/0zJUhXr4iu6\nVdZ87Yp13joMfeqq8e64Htv5kdA3nbcDsxw9Kla1QyG8503L5kJOpgWuODxxbHlc\nBLbETrLBd/mJosgBek2vI71XkCZnh+jY2GNm2W19H3YGCEBDWPVH4inRAoGAbECP\nKzAsXQTbNjnRCxH0qIvJyK2Ai+heIRhKdH76r5KGZj98HK49muV9IkVb6Krjwe0v\naBSf9qtACbyRGLg2RSOdk3LyMP24gBTBBQ2IG6wdXIRXDJ9W8VpQWkMWyg7UQgrk\ndl4bijLFjBVh/jytCE+k5FjkiU/0fhM6gD4IiiECgYEAjb7aiOn9zWH3UZPoevIC\nF9HGmPiWDt5HLhMD1N2BDCdRnxG3EJLbslWB4vtYzsoz6ZxlZ2z1zj2Fdo/cN/+3\nTL9+BAEMW9lu6+IbBtYnnRmdKUfyjqSahYIgjOSDMaA9QtPpYP57rGaPYuus4d4v\nS+vrsi8ta3FABSAJwmhiQUE=\n-----END PRIVATE KEY-----\n",
-                "client_email": "prometheus-aks-testnet-oracle@celo-testnet.iam.gserviceaccount.com",
-                "client_id": "106473741082354496344",
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/prometheus-aks-testnet-oracle%40celo-testnet.iam.gserviceaccount.com"
+                "prometheus-service-account-key": "TODO"
               }
             },
             {
               "name": "prometheus-config-volume",
-              "configMap": {
-                "name": "prometheus-server-conf",
-                "defaultMode": "420"
+              "secret": {
+                "prometheus.yaml": "Z2xvYmFsOgogIHNjcmFwZV9pbnRlcnZhbDogNjBzCnNjcmFwZV9jb25maWdzOgogIC0gam9iX25hbWU6IHNjcmFwZS1vZGlzCiAgICBzY2hlbWU6IGh0dHBzCiAgICBtZXRyaWNzX3BhdGg6IC90a3BvcnRlci8xOTc5YjJhYjZiNmRiOTk3MWVmMjE4Njk0Y2IyMTYxNC9yYXcvMjkzN2QyYjVhZTViM2VjY2IwZDE4YmE3NDEyMjM5NTBkYzg1Nzc0Ny90ZXN0LXByb21ldGhldXMKICAgIHN0YXRpY19jb25maWdzOgogICAgICAtIHRhcmdldHM6CiAgICAgICAgICAtIGdpc3QuZ2l0aHVidXNlcmNvbnRlbnQuY29tOjQ0MwogICAgICAgIGxhYmVsczoKICAgICAgICAgIF9nZW5lcmljX2xvY2F0aW9uOiBjZW50cmFsdXMKICAgICAgICAgIF9nZW5lcmljX25hbWVzcGFjZTogb2Rpcy1zaWduZXIK"
               }
             }
           ]
-      },
-      "dnsNameLabel": {
-          "value": "TODO"
       }
   }
 }

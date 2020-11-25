@@ -97,9 +97,27 @@ az deployment group create \
 
 ## Monitoring
 
+TODO(ALEC)
+
 The logs from the container should flow automatically into the configured Log Analytics workspace.
 
 To see errors, execute a query like the following, which you can save for convinient use in creating alerts:
 `ContainerInstanceLog_CL | where Message contains "celo_odis_err"`
 
 Once you've saved the desired searches, create alerts to notify when errors occur or system resources drop too low (e.g. high CPU usage).
+
+### Deploy the prometheus server and sidecar
+
+We use prometheus metrics to collect real time data from signers. The prometheus server scrapes these metrics from the `/metrics` endpoint on the signers and sends them to the sidecar container via a shared volume. The sidecar then reformats the metrics data and exports it to stackdriver.
+
+To deploy the prometheus server and sidecar you must first find the `prometheus-service-account-key` json and paste it into the `prometheus-service-account-key.json` file. Make sure you remember to delete this key from the file again after you finish the deployment and before you push to github! The key can be found by... TODO(Alec).
+
+Once you have the service account key, you should fill out the missing fields labeled `"TODO"` in `prometheus-parameters.yaml`.
+
+You should fill in the location parameters with the location of the resource group. For the `prometheus.yaml` and `prometheus-service-account-key` parameters, you must base64 encode the contents of the `prometheus.yaml` and `prometheus-service-account-key.json` files respectively, and then paste the results into the file.
+
+```bash
+cat <filename> | base64
+```
+
+Make sure to change all these values back to `"TODO"` after you deploy and before committing to master.

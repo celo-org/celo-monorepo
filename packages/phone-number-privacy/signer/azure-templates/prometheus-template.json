@@ -55,12 +55,9 @@
               "Never"
           ]
       },
-      "environmentVariables1": {
-          "type": "array"
-      },
       "environmentVariables2": {
           "type": "array"
-    },
+      },
       "ipAddressType": {
           "type": "string"
       },
@@ -84,9 +81,6 @@
       },
       "volumes": {
          "type": "array"
-      },
-      "dnsNameLabel": {
-          "type": "string"
       }
   },
   "resources": [
@@ -107,7 +101,6 @@
                                   "memoryInGB": "[float(parameters('memory'))]"
                               }
                           },
-                          "environmentVariables": "[parameters('environmentVariables1')]",
                           "ports": "[parameters('ports1')]",
                           "volumeMounts": "[parameters('volumeMounts1')]",
                           "command": "[parameters('command1')]"
@@ -132,22 +125,7 @@
               ],
               "restartPolicy": "[parameters('restartPolicy')]",
               "osType": "[parameters('osType')]",
-              "ipAddress": {
-                  "type": "[parameters('ipAddressType')]",
-                  "ports": "[parameters('ports')]",
-                  "dnsNameLabel": "[parameters('dnsNameLabel')]"
-              },
-              "volumes": "[parameters('volumes')]",
-              "diagnostics": {
-                "logAnalytics": {
-                  "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
-                  "workspaceKey": "[parameters('logAnalyticsWorkspaceKey')]"
-                }
-              }
-          },
-          "identity":{
-            "type": "UserAssigned",
-            "userAssignedIdentities": { "[parameters('userAssignedIdentity')]": {} }
+              "volumes": "[parameters('volumes')]"
           },
           "tags": {}
       }
