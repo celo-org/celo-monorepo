@@ -1,5 +1,5 @@
 import { execCmd } from './cmd-utils'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 async function getCurrentGcloudAccount() {
   const [output] = await execCmd('gcloud config get-value account')
@@ -39,5 +39,15 @@ export async function ensureAuthenticatedGcloudAccount() {
   } catch (error) {
     console.error('Could not setup gcloud with authentication')
     process.exit(1)
+  }
+}
+
+export async function linkSAForWorkloadIdentity(celoEnv: string) {
+  if (fetchEnvOrFallback(envVar.USE_GSTORAGE_DATA, "false") === "true") {
+    await execCmd(
+      `gcloud iam service-accounts add-iam-policy-binding --project ${fetchEnv(envVar.TESTNET_PROJECT_NAME)} \
+        --role roles/iam.workloadIdentityUser \
+        --member "serviceAccount:celo-testnet.svc.id.goog[${celoEnv}/gcloud-storage-access]" chaindata-download@celo-testnet.iam.gserviceaccount.com`
+    )
   }
 }
