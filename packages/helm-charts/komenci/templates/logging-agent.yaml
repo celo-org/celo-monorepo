@@ -10,6 +10,8 @@ spec:
  template:
    metadata:
      creationTimestamp: null
+     annotations:
+       checksum/config: {{ include (print $.Template.BasePath "/logging-agent-config.yaml") . | sha256sum }}
      labels:
        name: fluentd-log-agent
    spec:

@@ -51,9 +51,15 @@ data:
       key_name log
       reserve_time true
       reserve_data true
-      remove_key_name_field true
+
       <parse>
-        @type json
+        @type multi_format
+        <pattern>
+          format json
+        </pattern>
+        <pattern>
+          format none
+        </pattern>
       </parse>
     </filter>
 
@@ -62,7 +68,7 @@ data:
       @type record_transformer
       enable_ruby
       <record>
-        message ${record['message'] || record['msg']}
+        message ${record['message'] || record['msg'] || record['log']}
         severity ${record['severity'] || if record['stream'] == 'stderr' then 'ERROR' else 'INFO' end}
         "logging.googleapis.com/local_resource_id" ${"k8s_container.#{record['namespace']}.#{record['pod_name']}.#{record['container_name']}"}
       </record>
