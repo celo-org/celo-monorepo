@@ -21,7 +21,7 @@
 
 • **InvalidMetadata**: = "InvalidMetadata"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:745](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L745)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:749](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L749)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **MetadataTimeout**: = "MetadataTimeout"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:752](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L752)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:756](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L756)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **NoAttestationServiceURL**: = "NoAttestationServiceURL"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:746](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L746)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:750](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L750)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **NoAttestationSigner**: = "NoAttestationSigner"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:743](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L743)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:747](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L747)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **NoMetadataURL**: = "NoMetadataURL"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:744](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L744)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:748](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L748)*
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 • **Unhealthy**: = "Unhealthy"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:750](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L750)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:754](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L754)*
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 • **UnreachableAttestationService**: = "UnreachableAttestationService"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:747](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L747)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:751](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L751)*
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 • **UnreachableHealthz**: = "UnreachableHealthz"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:749](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L749)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:753](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L753)*
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 • **Valid**: = "Valid"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:748](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L748)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:752](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L752)*
 
 ___
 
@@ -93,4 +93,4 @@ ___
 
 • **WrongAccount**: = "WrongAccount"
 
-*Defined in [packages/contractkit/src/wrappers/Attestations.ts:751](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L751)*
+*Defined in [packages/contractkit/src/wrappers/Attestations.ts:755](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L755)*

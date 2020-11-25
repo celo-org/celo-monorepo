@@ -2,12 +2,13 @@ import { Address, CeloTransactionParams } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import {
   ActionableAttestation,
-  AttestationsWrapper
+  AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { OdisUtils } from '@celo/identity'
 import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap } from '@celo/utils/lib/async'
+import { AttestationRequest } from '@celo/utils/lib/io'
 import { sample } from 'lodash'
 import moment from 'moment'
 import { Twilio } from 'twilio'
@@ -15,7 +16,13 @@ import { Twilio } from 'twilio'
 const DUMMY_SMS_URL = 'https://enzyutth0wxme.x.pipedream.net/'
 
 // Use the supplied salt, or if none supplied, go to ODIS and retrieve a pepper
-export async function getIdentifierAndPepper(kit : ContractKit, context : string, account : string, phoneNumber : string, salt : string | null) {
+export async function getIdentifierAndPepper(
+  kit: ContractKit,
+  context: string,
+  account: string,
+  phoneNumber: string,
+  salt: string | null
+) {
   if (salt) {
     return {
       pepper: salt,
@@ -49,7 +56,10 @@ export async function requestMoreAttestations(
   txParams: CeloTransactionParams = {}
 ) {
   const unselectedRequest = await attestations.getUnselectedRequest(phoneNumber, account)
-  if (unselectedRequest.blockNumber === 0 || (await attestations.isAttestationExpired(unselectedRequest.blockNumber))) {
+  if (
+    unselectedRequest.blockNumber === 0 ||
+    (await attestations.isAttestationExpired(unselectedRequest.blockNumber))
+  ) {
     await attestations
       .approveAttestationFee(attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))
@@ -57,7 +67,7 @@ export async function requestMoreAttestations(
       .request(phoneNumber, attestationsRequested)
       .then((txo) => txo.sendAndWaitForReceipt(txParams))
   }
-  
+
   const selectIssuers = await attestations.selectIssuersAfterWait(phoneNumber, account)
   await selectIssuers.sendAndWaitForReceipt(txParams)
 }
@@ -72,16 +82,22 @@ export async function requestAttestationsFromIssuers(
   attestations: AttestationsWrapper,
   phoneNumber: string,
   account: string,
-  pepper: string,
+  pepper: string
 ): Promise<RequestAttestationError[]> {
   return concurrentMap(5, attestationsToReveal, async (attestation) => {
     try {
-      const response = await attestations.revealPhoneNumberToIssuer(
-        phoneNumber,
+      const revealRequest: AttestationRequest = {
         account,
-        attestation.issuer,
+        issuer: account,
+        phoneNumber,
+        salt: pepper,
+        smsRetrieverAppSig: undefined,
+        securityCodePrefix: undefined,
+        language: undefined,
+      }
+      const response = await attestations.revealPhoneNumberToIssuer(
         attestation.attestationServiceURL,
-        pepper
+        revealRequest
       )
       if (!response.ok) {
         return {
@@ -194,7 +210,7 @@ export async function chooseFromAvailablePhoneNumbers(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   maximumNumberOfAttestations: number,
-  salt: string,
+  salt: string
 ) {
   const availableNumbers = (await twilioClient.incomingPhoneNumbers.list()).filter(
     (number) => number.smsUrl === DUMMY_SMS_URL
@@ -216,7 +232,7 @@ async function findSuitableNumber(
   attestations: AttestationsWrapper,
   numbers: string[],
   maximumNumberOfAttestations: number,
-  salt: string,
+  salt: string
 ) {
   const attestedAccountsLookup = await attestations.lookupIdentifiers(
     numbers.map((n) => PhoneNumberUtils.getPhoneHash(n, salt))
@@ -251,8 +267,7 @@ export async function createPhoneNumber(
     let numbers
     try {
       numbers = await context.mobile.list({ limit: 100 })
-    }
-    catch {
+    } catch {
       // Some geos inc US appear to have no 'mobile' subcategory.
       numbers = await context.local.list({ limit: 100 })
     }

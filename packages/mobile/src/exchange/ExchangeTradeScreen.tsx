@@ -309,6 +309,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             <TextInput
               autoFocus={true}
               keyboardType={'decimal-pad'}
+              autoCapitalize="words"
               onChangeText={this.onChangeExchangeAmount}
               value={this.getInputValue()}
               placeholderTextColor={colors.gray3}
