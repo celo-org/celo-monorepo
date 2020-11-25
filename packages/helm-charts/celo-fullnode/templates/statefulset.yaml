@@ -53,7 +53,11 @@ spec:
               topologyKey: failure-domain.beta.kubernetes.io/zone
             weight: 100
       initContainers:
+{{- if .Values.geth.use_gstorage_data | default false }}
+{{ include "common.gsutil-sync-data-init-container" . | indent 6}}
+{{ else }}
 {{ include "common.init-genesis-container" .  | indent 6 }}
+{{- end }}
 {{ if .Values.geth.node_keys }}
       - name: set-node-key
         image: alpine:3.12
@@ -75,7 +79,6 @@ spec:
             fieldRef:
               fieldPath: metadata.name
 {{ end }}
-{{ include "common.gsutil-save-chaindata" . | indent 6 }}
       containers:
 {{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true "ip_addresses" .Values.geth.public_ip_per_node "syncmode" .Values.geth.syncmode "gcmode" .Values.geth.syncmodex "max_latest_block_age_seconds" .Values.geth.readiness_probe_max_block_age_seconds "rpc_apis" .Values.geth.rpc_apis "pprof" (or (.Values.prometheus) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" (or (.Values.prometheus) (.Values.metrics)) "ports" .Values.geth.service_node_port_per_full_node "extra_setup" ((include "celo-fullnode.aws-subnet-specific-nat-ip" .) | indent 4)) | indent 6 }}
 {{ if .Values.geth.create_network_endpoint_group }}
