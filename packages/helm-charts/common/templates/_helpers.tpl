@@ -52,8 +52,9 @@ release: {{ .Release.Name }}
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
-        wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
-        wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}      fi
+        wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/rc1?alt=media"
+        wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/rc1
+      fi
       geth init /root/.celo/genesis.json
   volumeMounts:
   - name: data
