@@ -42,6 +42,11 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return uint16(reverse(b2)) * 256 + uint16(reverse(b1));
   }
 
+  function getBlockNumberFromData(bytes memory data) public view returns (uint256) {
+    uint16 epoch = epochFromExtraData(decodeDataArg(data).extra);
+    return getEpochLastBlock(epoch);
+  }
+
   function checkIfAlreadySlashed(address signer, bytes memory header) internal {
     bytes32 bhash = keccak256(header);
     require(!isSlashed[signer][bhash], "Already slashed");
@@ -72,10 +77,10 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     return
       DataArg(
         extract(a, 0, 8),
-        extract(a, 8, 8 + 48),
+        extract(a, 8, 48),
         getUint256FromBytes(a, 56),
-        extract(a, 88, 88 + 128),
-        extract(a, 216, 216 + 128)
+        extract(a, 88, 128),
+        extract(a, 216, 128)
       );
   }
 
@@ -160,7 +165,7 @@ contract SnarkEpochDataSlasher is ICeloVersionedContract, SlasherUtil {
     require(epoch1 == epoch2, "Not on same epoch");
     checkSlash1(epoch1, arg1);
     checkSlash1(epoch1, arg2);
-    return getEpochLastBlock(epoch1 - 1); // check which epoch is in the data
+    return getEpochLastBlock(epoch1); // check which epoch is in the data
   }
 
   function checkSlash1(uint16 epoch, DataArg memory arg) internal view {

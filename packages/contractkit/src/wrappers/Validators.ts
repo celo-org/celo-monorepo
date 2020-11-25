@@ -603,9 +603,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const blockEpoch = await this.kit.getEpochNumberOfBlock(
       blockNumber || (await this.kit.web3.eth.getBlockNumber())
     )
+    console.info('block epoch', blockEpoch)
     const account = await this.validatorSignerToAccount(validator.signer)
+    console.info('account', account)
     const membershipHistory = await this.getValidatorMembershipHistory(account)
+    console.info('history', membershipHistory)
     const historyIndex = this.findValidatorMembershipHistoryIndex(blockEpoch, membershipHistory)
+    console.info('history index', historyIndex)
     const group = membershipHistory[historyIndex].group
     return { group, historyIndex }
   }

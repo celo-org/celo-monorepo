@@ -32,8 +32,8 @@ export class SnarkEpochDataSlasherWrapper extends BaseWrapper<SnarkEpochDataSlas
    * @param header RLP encoded header
    * @return Block number.
    */
-  async getBlockNumberFromHeader(header: string): Promise<number> {
-    const res = await this.contract.methods.getBlockNumberFromHeader(header).call()
+  async getBlockNumberFromData(header: string): Promise<number> {
+    const res = await this.contract.methods.getBlockNumberFromData(header).call()
     return valueToInt(res)
   }
 
@@ -51,7 +51,7 @@ export class SnarkEpochDataSlasherWrapper extends BaseWrapper<SnarkEpochDataSlas
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
-    const blockNumber = await this.getBlockNumberFromHeader(headerA)
+    const blockNumber = await this.getBlockNumberFromData(headerA)
     return this.slash(
       findAddressIndex(validator.signer, await election.getValidatorSigners(blockNumber)),
       headerA,
@@ -71,7 +71,7 @@ export class SnarkEpochDataSlasherWrapper extends BaseWrapper<SnarkEpochDataSlas
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const election = await this.kit.contracts.getElection()
-    const blockNumber = await this.getBlockNumberFromHeader(headerA)
+    const blockNumber = await this.getBlockNumberFromData(headerA)
     return this.slash(
       findAddressIndex(signerAddress, await election.getValidatorSigners(blockNumber)),
       headerA,
@@ -91,10 +91,12 @@ export class SnarkEpochDataSlasherWrapper extends BaseWrapper<SnarkEpochDataSlas
     headerB: string
   ): Promise<CeloTransactionObject<void>> {
     const incentives = await this.slashingIncentives()
-    const blockNumber = await this.getBlockNumberFromHeader(headerA)
+    const blockNumber = await this.getBlockNumberFromData(headerA)
+    console.info('block number', blockNumber)
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const signer = await election.validatorSignerAddressFromSet(signerIndex, blockNumber)
+    console.info('got signer', signer)
     const validator = await validators.getValidatorFromSigner(signer)
     const membership = await validators.getValidatorMembershipHistoryIndex(validator, blockNumber)
     const lockedGold = await this.kit.contracts.getLockedGold()
