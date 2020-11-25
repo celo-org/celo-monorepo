@@ -36,6 +36,9 @@ spec:
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{ end }}
     spec:
+{{- if .Values.geth.use_gstorage_data | default false }}
+      serviceAccountName: gcloud-storage-access
+{{- end }}
       # see https://www.verygoodsecurity.com/blog/posts/kubernetes-multi-az-deployments-using-pod-anti-affinity
       affinity:
         podAntiAffinity:

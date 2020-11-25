@@ -441,32 +441,21 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - -c
   args:
   - |
-      # TODO(joshua): Check age of block w/ geth.
-      # stat -f "%Y", date +%s get unix timesampts of mtime and current time. Maybe modify date to compare if mtime is older than a day
-      # If older than upload period, remove the chain data dir.
-     [ -d /root/.celo/celo ] && exit 0
+     # If older than upload period, remove the chain data dir.
+     if [ -d /root/.celo/celo/chaindata ]; then
+       mtime=$(stat -f "%Y" /root/.celo/celo/chaindata)
+       day=$(date +%s)
+       diff=$(("$day" - "$mtime"))
+       # If mtime is older than 1 day old, pull the chaindata rather than using the current PVC.
+       if [ "$diff" -gt 86400 ]; then
+         rm -rf /root/.celo/celo
+       else
+         exit 0
+       fi
+     fi
      mkdir -p /root/.celo/celo
-     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata.tar .
-     tar -xf chaindata.tar -C /root/.celo/celo/chaindata
-  volumeMounts:
-  - name: data
-    mountPath: /root/.celo
-{{- end -}}
-
-{{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
-{{- define "common.gsutil-save-chaindata" -}}
-- name: gsutil-save-data
-  image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
-  imagePullPolicy: Always
-  command:
-  - /bin/sh
-  - -c
-  args:
-  - |
-     [ ! -d /root/.celo/celo ] && exit 0
-     cd /root/.celo/celo
-     tar -cvf chaindata.tar chaindata/
-     gsutil -m cp chaindata.tar gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata.tar
+     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar chaindata.tar
+     tar -xf chaindata.tar -C /root/.celo/celo
   volumeMounts:
   - name: data
     mountPath: /root/.celo
