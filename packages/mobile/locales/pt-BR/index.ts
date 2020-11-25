@@ -1,6 +1,8 @@
 // tslint:disable: no-relative-imports
 import accountScreen10 from './accountScreen10.json'
 import backupKeyFlow6 from './backupKeyFlow6.json'
+import dappkit from './dappkit.json'
+import dev from './dev.json'
 import exchangeFlow9 from './exchangeFlow9.json'
 import fiatExchangeFlow from './fiatExchangeFlow.json'
 import global from './global.json'
@@ -14,8 +16,6 @@ import paymentRequestFlow from './paymentRequestFlow.json'
 import receiveFlow8 from './receiveFlow8.json'
 import sendFlow7 from './sendFlow7.json'
 import walletFlow5 from './walletFlow5.json'
-
-console.log('===========LOADING PT-BR')
 
 export default {
   accountScreen10,
@@ -31,6 +31,8 @@ export default {
   receiveFlow8,
   sendFlow7,
   walletFlow5,
+  dev,
+  dappkit,
   onboarding,
   fiatExchangeFlow,
 }

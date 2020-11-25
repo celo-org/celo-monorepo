@@ -17,8 +17,6 @@ import receiveFlow8 from './receiveFlow8.json'
 import sendFlow7 from './sendFlow7.json'
 import walletFlow5 from './walletFlow5.json'
 
-console.log('===========LOADING ES-419')
-
 export default {
   accountScreen10,
   backupKeyFlow6,
@@ -33,6 +31,8 @@ export default {
   receiveFlow8,
   sendFlow7,
   walletFlow5,
+  dev,
+  dappkit,
   onboarding,
   fiatExchangeFlow,
 }

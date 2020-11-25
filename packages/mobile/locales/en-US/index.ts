@@ -17,8 +17,6 @@ import receiveFlow8 from './receiveFlow8.json'
 import sendFlow7 from './sendFlow7.json'
 import walletFlow5 from './walletFlow5.json'
 
-console.log('===========LOADING EN-US')
-
 export default {
   accountScreen10,
   backupKeyFlow6,
