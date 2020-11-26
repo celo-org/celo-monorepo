@@ -434,9 +434,13 @@ contract('Accounts', (accounts: string[]) => {
 
   describe.only('general authorization', () => {
     const authorized = accounts[1]
+    const authorized2 = accounts[2]
     const role = 'Test Role'
+    let sig, sig2
 
     beforeEach(async () => {
+      sig = await getParsedSignatureOfAddress(web3, account, authorized)
+      sig2 = await getParsedSignatureOfAddress(web3, account, authorized2)
       // await accountsInstance.createAccount({ from: authorized })
       await accountsInstance.createAccount()
     })
@@ -444,40 +448,55 @@ contract('Accounts', (accounts: string[]) => {
     it('should set the authorized signer as a smart contract', async () => {
       assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
       await accountsInstance.authorizeSigner(authorized, role)
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
       await accountsInstance.completeSignerAuthorization(account, role, { from: authorized })
-
       assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
 
       assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      // assert.equal(await accountsInstance.getAuthorizedFromAccount(account), authorizedAddress)
-      // assert.equal(await accountsInstance.authorizedSignerToAccount(authorized), account)
       assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
     })
 
     it('should set the authorized signer in one step', async () => {
-      const sig = await getParsedSignatureOfAddress(web3, account, authorized)
       assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-
       await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
       assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
       assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      // assert.equal(await accountsInstance.getAuthorizedFromAccount(account), authorizedAddress)
-      // assert.equal(await accountsInstance.authorizedSignerToAccount(authorized), account)
       assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
     })
 
     it('should remove the authorized signer', async () => {
-      const sig = await getParsedSignatureOfAddress(web3, account, authorized)
-      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-
       await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
-      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
-      assert.equal(await accountsInstance.authorizedBy(authorized), account)
-      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
-
       await accountsInstance.removeSigner(authorized, role)
       assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
-      assert.isFalse(await accountsInstance.isAuthorizedSigner(authorized))
+    })
+
+    it(`should emit the right event`, async () => {
+      const resp = await accountsInstance.authorizeSignerWithSignature(
+        authorized,
+        role,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      const expected = { account, signer: authorized, role }
+      assertLogMatches(log, 'SignerAuthorized', expected)
+    })
+
+    it('can authorize multiple signers for a role', async () => {
+      assert.isFalse(await accountsInstance.isSigner(account, authorized, role))
+      assert.isFalse(await accountsInstance.isSigner(account, authorized2, role))
+
+      await accountsInstance.authorizeSignerWithSignature(authorized, role, sig.v, sig.r, sig.s)
+      await accountsInstance.authorizeSignerWithSignature(authorized2, role, sig2.v, sig2.r, sig2.s)
+
+      assert.isTrue(await accountsInstance.isSigner(account, authorized, role))
+      assert.isTrue(await accountsInstance.isSigner(account, authorized2, role))
+      assert.equal(await accountsInstance.authorizedBy(authorized), account)
+      assert.equal(await accountsInstance.authorizedBy(authorized2), account)
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized))
+      assert.isTrue(await accountsInstance.isAuthorizedSigner(authorized2))
     })
 
     describe.skip('when a previous authorization has been made', () => {})
