@@ -2,11 +2,10 @@
 
 import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
-import * as _ from 'underscore'
-import * as helpers from 'web3-core-helpers'
-import * as utils from 'web3-utils'
-
+import _ from 'underscore'
 import Web3 from 'web3'
+import helpers from 'web3-core-helpers'
+import utils from 'web3-utils'
 
 function isNot(value: any) {
   return _.isUndefined(value) || _.isNull(value)

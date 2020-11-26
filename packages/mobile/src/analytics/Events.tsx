@@ -8,6 +8,7 @@ export enum AppEvents {
   error_boundary = 'error_boundary',
   user_restart = 'user_restart',
   fetch_balance = 'fetch_balance',
+  fetch_balance_error = 'fetch_balance_error',
 }
 
 export enum HomeEvents {

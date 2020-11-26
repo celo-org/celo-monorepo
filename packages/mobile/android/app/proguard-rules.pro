@@ -16,7 +16,10 @@
 -keep class io.invertase.firebase.** { *; }
 -dontwarn io.invertase.firebase.**
 
--dontwarn com.segment.analytics.android.integrations.**
+# Segment https://segment.com/docs/connections/sources/catalog/libraries/mobile/android/android-faqs/#sts=How%20should%20I%20configure%20Proguard?
+-keep class com.segment.analytics.** { *; }
+-keep class androidx.lifecycle.DefaultLifecycleObserver
+
 -keep class org.ethereum.geth.** { *; }
 -keep class org.celo.mobile.BuildConfig { *; }
 -keep public class com.horcrux.svg.** {*;}

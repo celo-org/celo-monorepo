@@ -479,7 +479,8 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against first commit to contain version numbers"
-            yarn --cwd packages/protocol test:devchain-release -b celo-core-contracts-v1.rc1
+            RELEASE_TAG=celo-core-contracts-v1.rc1
+            yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG
 
   protocol-test-common:
     <<: *defaults

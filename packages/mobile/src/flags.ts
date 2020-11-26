@@ -11,6 +11,7 @@ export const features = {
   PNP_USE_DEK_FOR_AUTH: true,
   KOMENCI: true,
   ESCROW_WITHOUT_CODE: true,
+  SHORT_VERIFICATION_CODES: false,
 }
 
 export const pausedFeatures = {
