@@ -64,6 +64,11 @@ export const Histograms = {
     help: 'Histogram tracking latency of signature endpoint',
     labelNames: ['endpoint'],
   }),
+  getBlindedSigInstrumentation: new Histogram({
+    name: 'get_blinded_sig_instrumentation',
+    help: 'Histogram tracking latency of blinded sig function by code segment',
+    labelNames: ['codeSegment'],
+  }),
   userRemainingQuotaAtRequest: new Histogram({
     name: 'user_remaining_quota_at_request',
     help: 'Histogram tracking remaining quota of users at time of request',

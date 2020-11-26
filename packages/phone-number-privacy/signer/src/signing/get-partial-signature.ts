@@ -12,10 +12,11 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import { Counters, Labels } from '../common/metrics'
+import { Counters, Histograms, Labels } from '../common/metrics'
 import { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
@@ -49,6 +50,7 @@ export async function handleGetBlindedMessagePartialSig(
       { latency: entry.duration, codeSegment: entry.name },
       'handleGetBlindedMessagePartialSig instrumentation'
     )
+    Histograms.getBlindedSigInstrumentation.labels(entry.name).observe(entry.duration)
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
