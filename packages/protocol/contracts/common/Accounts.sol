@@ -76,6 +76,10 @@ contract Accounts is
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
 
+  string constant ValidatorSigner = "validator";
+  string constant AttestationSigner = "attestation";
+  string constant VoteSigner = "vote";
+
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
@@ -313,26 +317,49 @@ contract Accounts is
   }
 
   function authorizeSignerWithSignature(
-    address account,
+    address signer,
     string memory role,
     uint8 v,
     bytes32 r,
     bytes32 s
   ) public {
-    authorize(account, v, r, s);
-    accounts[msg.sender].signerAuthorizations[role][account].completed = true;
-    emit SignerAuthorized(msg.sender, account, role);
+    authorize(signer, v, r, s);
+
+    Account storage account = accounts[msg.sender];
+    account.signerAuthorizations[role][signer].completed = true;
+
+    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+      account.signers.validator = signer;
+    } else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {
+      account.signers.attestation = signer;
+    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      account.signers.vote = signer;
+    }
+    emit SignerAuthorized(msg.sender, signer, role);
   }
 
-  function completeSignerAuthorization(address account, string memory role) public {
-    require(authorizedBy[msg.sender] == account);
+  function completeSignerAuthorization(address addr, string memory role) public {
+    require(authorizedBy[msg.sender] == addr);
 
-    SignerAuthorization storage signer = accounts[account].signerAuthorizations[role][msg.sender];
+    Account storage account = accounts[addr];
+    SignerAuthorization storage signer = account.signerAuthorizations[role][msg.sender];
     require(!signer.completed, "Signer already authorized");
     require(!signer.deleted, "Signer has been removed");
 
+    if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(ValidatorSigner))) {
+      account.signers.validator = msg.sender;
+    } else if (
+      keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(AttestationSigner))
+    ) {
+      account.signers.attestation = msg.sender;
+    } else if (keccak256(abi.encodePacked(role)) == keccak256(abi.encodePacked(VoteSigner))) {
+      account.signers.vote = msg.sender;
+    }
+
     signer.completed = true;
-    emit SignerAuthorized(account, msg.sender, role);
+    emit SignerAuthorized(addr, msg.sender, role);
   }
 
   function isSigner(address account, address signer, string memory role)
