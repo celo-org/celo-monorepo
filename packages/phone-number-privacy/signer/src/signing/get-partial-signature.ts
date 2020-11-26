@@ -43,6 +43,21 @@ export async function handleGetBlindedMessagePartialSig(
   const logger: Logger = response.locals.logger
   logger.info('Begin handleGetBlindedMessagePartialSig request')
 
+  const obs = new PerformanceObserver((list) => {
+    const entry = list.getEntries()[0]
+    logger.trace(
+      { latency: entry.duration, codeSegment: entry.name },
+      'handleGetBlindedMessagePartialSig instrumentation'
+    )
+  })
+  obs.observe({ entryTypes: ['measure'], buffered: true })
+
+  const startMark = 'start'
+  const midMark1 = 'begin contract calls'
+  const midMark2 = 'end contract calls'
+  const endMark = 'finish'
+  performance.mark(startMark)
+
   if (!request.body.sessionID) {
     Counters.signatureRequestsWithoutSessionID.inc()
   }
@@ -55,6 +70,7 @@ export async function handleGetBlindedMessagePartialSig(
         400,
         WarningMessage.INVALID_INPUT
       )
+      obs.disconnect()
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
@@ -64,8 +80,12 @@ export async function handleGetBlindedMessagePartialSig(
         401,
         WarningMessage.UNAUTHENTICATED_USER
       )
+      obs.disconnect()
       return
     }
+
+    performance.mark(midMark1)
+    performance.measure(`${startMark} to ${midMark1}`, startMark, midMark1)
 
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
 
@@ -88,6 +108,9 @@ export async function handleGetBlindedMessagePartialSig(
         return -1
       }),
     ])
+
+    performance.mark(midMark2)
+    performance.measure(`${midMark1} to ${midMark2}`, midMark1, midMark2)
 
     let totalQuota = -1
     let performedQueryCount = -1
@@ -114,6 +137,7 @@ export async function handleGetBlindedMessagePartialSig(
         totalQuota,
         blockNumber
       )
+      obs.disconnect()
       return
     }
 
@@ -168,6 +192,9 @@ export async function handleGetBlindedMessagePartialSig(
       ErrorMessage.UNKNOWN_ERROR
     )
   }
+  performance.mark(endMark)
+  performance.measure(`${midMark2} to ${endMark}`, midMark2, endMark)
+  obs.disconnect()
 }
 
 function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigRequest): boolean {

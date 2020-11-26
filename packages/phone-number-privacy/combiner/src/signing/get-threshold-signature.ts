@@ -83,7 +83,7 @@ async function requestSignatures(request: Request, response: Response) {
     }, config.odisServices.timeoutMilliSeconds)
 
     const obs = new PerformanceObserver((list, observer) => {
-      logger.info({ latency: list.getEntries()[0], signer: service })
+      logger.info({ latency: list.getEntries()[0].duration, signer: service })
       performance.clearMarks()
       observer.disconnect()
     })

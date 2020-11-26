@@ -22,7 +22,7 @@ async function meterResponse(
   const entryName = `${handler.name} latency`
 
   const obs = new PerformanceObserver((list, observer) => {
-    logger.info({ latency: list.getEntries()[0] })
+    logger.info({ latency: list.getEntries()[0].duration })
     performance.clearMarks()
     observer.disconnect()
   })
