@@ -6,5 +6,6 @@ module.exports = async (callback: (error?: any) => number) => {
   })
 
   await recoverFunds(argv.release_gold, argv.from)
+  console.info('  Funds recovered successfully!')
   callback()
 }

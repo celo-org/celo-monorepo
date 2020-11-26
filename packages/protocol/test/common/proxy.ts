@@ -1,6 +1,7 @@
 import { recoverFunds } from '@celo/protocol/lib/recover-funds'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { BigNumber } from 'bignumber.js'
 import {
   FreezerContract,
   GetSetV0Instance,
@@ -231,6 +232,8 @@ contract('Proxy', (accounts: string[]) => {
   it('recovers funds from an incorrectly intialized implementation', async () => {
     const Freezer: FreezerContract = artifacts.require('Freezer')
     const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
+    // @ts-ignore
+    GoldToken.numberFormat = 'BigNumber'
     const Registry: RegistryContract = artifacts.require('Registry')
 
     const freezer = await Freezer.new()
@@ -239,12 +242,18 @@ contract('Proxy', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
 
+    const amount = new BigNumber(10)
+    const initialBalance = new BigNumber(await goldToken.balanceOf(owner))
+    await goldToken.transfer(proxy.address, amount)
+
     await proxy._setImplementation(getSet.address)
-    await goldToken.transfer(proxy.address, 10)
+
+    assert((await goldToken.balanceOf(owner)).eq(initialBalance.minus(amount)))
     const proxyBalance = await web3.eth.getBalance(proxy.address)
-    assert(proxyBalance === '10')
+    assert(proxyBalance === amount.toString())
 
     await recoverFunds(proxy.address, owner)
     assert((await web3.eth.getBalance(proxy.address)) === '0')
+    assert((await goldToken.balanceOf(owner)).eq(initialBalance))
   })
 })

@@ -4,7 +4,7 @@ import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import * as fs from 'fs'
-import * as prompts from 'prompts'
+import prompts from 'prompts'
 import {
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
