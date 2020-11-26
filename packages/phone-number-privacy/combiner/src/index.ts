@@ -1,7 +1,7 @@
 import { ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
-import { performance } from 'perf_hooks'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'
@@ -13,11 +13,22 @@ async function meterResponse(
   req: functions.Request,
   res: functions.Response
 ) {
+  if (!res.locals) {
+    res.locals = {}
+  }
+  const logger: Logger = loggerMiddleware(req, res)
   const startMark = `Begin ${handler.name}`
   const endMark = `End ${handler.name}`
   const entryName = `${handler.name} latency`
+
+  const obs = new PerformanceObserver((list, observer) => {
+    logger.info({ latency: list.getEntries()[0] })
+    performance.clearMarks()
+    observer.disconnect()
+  })
+  obs.observe({ entryTypes: ['measure'], buffered: true })
+
   performance.mark(startMark)
-  const logger: Logger = loggerMiddleware(req, res)
   await handler(req, res)
     .then(() => {
       logger.info({ res }, 'Response sent')
@@ -29,8 +40,6 @@ async function meterResponse(
     .finally(() => {
       performance.mark(endMark)
       performance.measure(entryName, startMark, endMark)
-      const entries = performance.getEntriesByName(entryName)
-      logger.info({ latency: entries[entries.length - 1].duration })
     })
 }
 

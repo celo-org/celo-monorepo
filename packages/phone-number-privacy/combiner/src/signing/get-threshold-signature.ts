@@ -82,6 +82,12 @@ async function requestSignatures(request: Request, response: Response) {
       controller.abort()
     }, config.odisServices.timeoutMilliSeconds)
 
+    const obs = new PerformanceObserver((list, observer) => {
+      logger.info({ latency: list.getEntries()[0], signer: service })
+      performance.clearMarks()
+      observer.disconnect()
+    })
+    obs.observe({ entryTypes: ['measure'], buffered: true })
     const startMark = `Begin requestSignature ${service.url}`
     const endMark = `End requestSignature ${service.url}`
     const entryName = `requestSignature latency ${service.url}`
@@ -117,8 +123,6 @@ async function requestSignatures(request: Request, response: Response) {
       .finally(() => {
         performance.mark(endMark)
         performance.measure(entryName, startMark, endMark)
-        const entries = performance.getEntriesByName(entryName)
-        logger.info({ latency: entries[entries.length - 1].duration, signer: service })
         clearTimeout(timeout)
       })
   })
