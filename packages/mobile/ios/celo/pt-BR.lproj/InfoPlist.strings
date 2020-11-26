@@ -1,0 +1,3 @@
+NSCameraUsageDescription = "Celo Wallet needs camera access to scan QR codes.";
+NSContactsUsageDescription = "Celo Wallet can import your contacts so you can transact with them.";
+NSPhotoLibraryAddUsageDescription = "Celo Wallet needs access to save your QR code to your photos.";
