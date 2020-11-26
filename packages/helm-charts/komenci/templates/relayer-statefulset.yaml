@@ -119,8 +119,9 @@ spec:
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.relayer.metrics "value_name" "prometheusPort") | indent 8 }}
 {{ include "common.env-var" (dict "name" "NODE_ENV" "dict" .Values.relayer "value_name" "node_env") | indent 8 }}
 {{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.relayer "value_name" "port") | indent 8 }}
-{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.relayer.onchain "value_name" "network") | indent 8 }}
-{{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer.onchain "value_name" "walletType") | indent 8 }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 8 }}
+{{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer "value_name" "walletType") | indent 8 }}
+{{ include "common.env-var" (dict "name" "GAS_PRICE_UPDATE_INTERVAL_MS" "dict" .Values.relayer "value_name" "gasPriceUpdateIntervalMs") | indent 8 }}
         readinessProbe:
           tcpSocket:
             port: 3000
