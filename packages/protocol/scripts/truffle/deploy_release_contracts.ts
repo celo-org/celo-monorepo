@@ -3,7 +3,7 @@ import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import * as fs from 'fs'
+import fs from 'fs'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
