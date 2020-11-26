@@ -3,14 +3,26 @@
 # These values are commented out in this file, but show the correct structure
 # if they were to be specified.
 
+kube:
+  serviceAccountSecretNames:
+    - "secret1"
+    - "secret2"
+
 environment:
   name: test
+  network: alfajores
+  cluster:
+    name: test-cluster
+    location: location
+
+image:
+  repository: celotestnet.azurecr.io/komenci/komenci
+  tag: 5f2ef23e6c51eda8e5288490eab8ec2cbd058b11
 
 kubectl:
   image:
     repository: bitnami/kubectl
     tag: 1.17.4
-
 
 relayer:
   node_env: production
@@ -38,9 +50,8 @@ relayer:
   metrics:
     enabled: true
     prometheusPort: 9090
-  onchain:
-    network: alfajores
-    walletType: azure-hsm
+  walletType: azure-hsm
+  gasPriceUpdateIntervalMs: "1200000"
 
 onboarding:
   node_env: production
@@ -71,5 +82,6 @@ onboarding:
     database: 'postgres'
     synchronize: true
     ssl: true
-  onchain:
-    network: alfajores
+
+loggingAgent:
+  credentials: eydleGFtcGxlJzogJ2NyZWRlbnRpYWxzJ30K # base64 credentials.json of a gcloud service account
