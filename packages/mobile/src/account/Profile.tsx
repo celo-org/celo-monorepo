@@ -1,62 +1,50 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import { SettingsItemInput } from '@celo/react-components/components/SettingsItem'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { setName } from 'src/account/actions'
-import { UserContactDetails } from 'src/account/reducer'
 import { userContactDetailsSelector } from 'src/account/selectors'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { RootState } from 'src/redux/reducers'
+import { Namespaces } from 'src/i18n'
+import useSelector from 'src/redux/useSelector'
 
-interface StateProps {
-  name: string | null
-  userContact: UserContactDetails
-}
+function Profile() {
+  const dispatch = useDispatch()
+  const navigation = useNavigation()
+  const { t } = useTranslation(Namespaces.accountScreen10)
+  const name = useSelector((state) => state.account.name)
+  const userContact = useSelector(userContactDetailsSelector)
 
-interface DispatchProps {
-  setName: typeof setName
-}
-
-// tslint:disable-next-line: no-empty-interface
-interface OwnProps {}
-
-type Props = OwnProps & StateProps & DispatchProps & WithTranslation
-const mapStateToProps = (state: RootState) => {
-  return {
-    name: state.account.name,
-    userContact: userContactDetailsSelector(state),
+  const onSetName = (userName: string) => {
+    dispatch(setName(userName))
   }
-}
 
-const mapDispatchToProps = {
-  setName,
-}
-
-export class Profile extends React.Component<Props> {
-  render() {
-    const { t, userContact, name } = this.props
-    return (
-      <ScrollView style={styles.container}>
-        <SafeAreaView edges={['bottom']}>
-          <Text style={styles.title}>{t('editProfile')}</Text>
-          <View style={styles.accountProfile}>
-            <ContactCircle thumbnailPath={userContact.thumbnailPath} name={name} size={80} />
-          </View>
-          <SettingsItemInput
-            value={this.props.name ?? t('global:unknown')}
-            testID="ProfileEditName"
-            title={t('name')}
-            placeholder={t('yourName')}
-            onValueChange={this.props.setName}
-          />
-        </SafeAreaView>
-      </ScrollView>
-    )
+  const onBlur = () => {
+    navigation.goBack()
   }
+
+  return (
+    <ScrollView style={styles.container}>
+      <SafeAreaView edges={['bottom']}>
+        <Text style={styles.title}>{t('editProfile')}</Text>
+        <View style={styles.accountProfile}>
+          <ContactCircle thumbnailPath={userContact.thumbnailPath} name={name} size={80} />
+        </View>
+        <SettingsItemInput
+          value={name ?? t('global:unknown')}
+          testID="ProfileEditName"
+          title={t('name')}
+          placeholder={t('yourName')}
+          onValueChange={onSetName}
+          onBlur={onBlur}
+        />
+      </SafeAreaView>
+    </ScrollView>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -77,7 +65,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, {}, OwnProps, RootState>(
-  mapStateToProps,
-  mapDispatchToProps
-)(withTranslation<Props>(Namespaces.accountScreen10)(Profile))
+export default Profile

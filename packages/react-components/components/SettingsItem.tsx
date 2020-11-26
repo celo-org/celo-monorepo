@@ -107,8 +107,10 @@ export function SettingsExpandedItem({
 
 type SettingsItemInputProps = {
   value: string
-  placeholder?: string
   onValueChange: (value: string) => void
+  placeholder?: string
+  onBlur?: () => void
+  onFocus?: () => void
 } & Omit<BaseProps, 'onPress'>
 
 export function SettingsItemInput({
@@ -117,11 +119,19 @@ export function SettingsItemInput({
   onValueChange,
   value,
   placeholder,
+  onBlur,
+  onFocus,
 }: SettingsItemInputProps) {
-  const onFocus = () => {
+  const internalOnFocus = () => {
+    if (onFocus) {
+      onFocus()
+    }
     setInputColor(colors.dark)
   }
-  const onBlur = () => {
+  const internalOnBlur = () => {
+    if (onBlur) {
+      onBlur()
+    }
     setInputColor(colors.gray4)
   }
 
@@ -134,8 +144,8 @@ export function SettingsItemInput({
           testID={testID}
           style={styles.input}
           inputStyle={[styles.innerInput, { color: inputColor }]}
-          onFocus={onFocus}
-          onBlur={onBlur}
+          onFocus={internalOnFocus}
+          onBlur={internalOnBlur}
           value={value}
           placeholder={placeholder}
           onChangeText={onValueChange}
