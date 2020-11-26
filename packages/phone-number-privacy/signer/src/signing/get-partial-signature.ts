@@ -12,6 +12,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters, Labels } from '../common/metrics'
@@ -22,6 +23,8 @@ import { getKeyProvider } from '../key-management/key-provider'
 import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
+
+allSettled.shim()
 
 export interface GetBlindedMessagePartialSigRequest {
   account: string
@@ -75,24 +78,27 @@ export async function handleGetBlindedMessagePartialSig(
         logger.error('Failed to get user quota')
         logger.error({ err })
         errorMsgs.push(ErrorMessage.DATABASE_GET_FAILURE)
-        return undefined
+        return { performedQueryCount: -1, totalQuota: -1 }
       }),
       getBlockNumber().catch((err) => {
         Counters.blockchainErrors.labels(Labels.read).inc()
         logger.error('Failed to get latest block number')
         logger.error({ err })
         errorMsgs.push(ErrorMessage.CONTRACT_GET_FAILURE)
-        return undefined
+        return -1
       }),
     ])
 
     let totalQuota = -1
     let performedQueryCount = -1
+    let blockNumber = -1
     if (_queryCount.status === 'fulfilled') {
-      performedQueryCount = _queryCount.value!.performedQueryCount
-      totalQuota = _queryCount.value!.totalQuota
+      performedQueryCount = _queryCount.value.performedQueryCount
+      totalQuota = _queryCount.value.totalQuota
     }
-    const blockNumber = _blockNumber.status === 'fulfilled' ? _blockNumber.value : -1
+    if (_blockNumber.status === 'fulfilled') {
+      blockNumber = _blockNumber.value
+    }
 
     if (
       !errorMsgs.includes(ErrorMessage.DATABASE_GET_FAILURE) &&

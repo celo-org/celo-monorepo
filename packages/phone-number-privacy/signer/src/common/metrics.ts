@@ -62,7 +62,7 @@ export const Histograms = {
   responseLatency: new Histogram({
     name: 'signature_endpoint_latency',
     help: 'Histogram tracking latency of signature endpoint',
-    labelNames: ['endpoint', 'statusCode'],
+    labelNames: ['endpoint'],
   }),
   userRemainingQuotaAtRequest: new Histogram({
     name: 'user_remaining_quota_at_request',

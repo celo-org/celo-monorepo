@@ -24,6 +24,7 @@
     "@google-cloud/secret-manager": "3.0.0",
     "@types/bunyan": "^1.8.6",
     "@types/elliptic": "^6.4.12",
+    "@types/promise.allsettled": "^1.0.3",
     "aws-sdk": "^2.696.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "dotenv": "^8.2.0",
@@ -33,7 +34,8 @@
     "mssql": "^6.2.0",
     "mysql2": "^2.1.0",
     "pg": "^8.2.1",
-    "prom-client": "12.0.0"
+    "prom-client": "12.0.0",
+    "promise.allsettled": "^1.0.2"
   },
   "devDependencies": {
     "@types/btoa": "^1.2.3",

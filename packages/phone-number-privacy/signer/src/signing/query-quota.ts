@@ -14,12 +14,15 @@ import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import allSettled from 'promise.allsettled'
 import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { Endpoints } from '../server'
 import { getContractKit } from '../web3/contracts'
+
+allSettled.shim()
 
 export interface GetQuotaRequest {
   account: string
