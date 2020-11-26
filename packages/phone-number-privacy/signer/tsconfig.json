@@ -5,7 +5,7 @@
         "name": "typescript-tslint-plugin"
       }
     ],
-    "lib": ["es2017"],
+    "lib": ["es2017", "ES2020.Promise"],
     "module": "commonjs",
     "strict": true,
     "allowJs": false,

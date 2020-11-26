@@ -66,33 +66,38 @@ export async function handleGetBlindedMessagePartialSig(
 
     const { account, blindedQueryPhoneNumber, hashedPhoneNumber } = request.body
 
-    // Set default values in the case of an error
-    let performedQueryCount = -1
-    let totalQuota = -1
-    let blockNumber = -1
-    let errorMsg
+    const errorMsgs: string[] = []
     // In the case of a DB or blockchain connection failure, don't block user
     // but set the error status accordingly
-    try {
-      const queryCount = await getRemainingQueryCount(logger, account, hashedPhoneNumber)
-      performedQueryCount = queryCount.performedQueryCount
-      totalQuota = queryCount.totalQuota
-    } catch (err) {
-      Counters.databaseErrors.labels(Labels.read).inc()
-      logger.error('Failed to get user quota')
-      logger.error({ err })
-      errorMsg = ErrorMessage.DATABASE_GET_FAILURE
-    }
-    try {
-      blockNumber = await getBlockNumber()
-    } catch (err) {
-      Counters.blockchainErrors.labels(Labels.read).inc()
-      logger.error('Failed to get latest block number')
-      logger.error({ err })
-      errorMsg = ErrorMessage.CONTRACT_GET_FAILURE
-    }
+    const [_queryCount, _blockNumber] = await Promise.allSettled([
+      getRemainingQueryCount(logger, account, hashedPhoneNumber).catch((err) => {
+        Counters.databaseErrors.labels(Labels.read).inc()
+        logger.error('Failed to get user quota')
+        logger.error({ err })
+        errorMsgs.push(ErrorMessage.DATABASE_GET_FAILURE)
+        return undefined
+      }),
+      getBlockNumber().catch((err) => {
+        Counters.blockchainErrors.labels(Labels.read).inc()
+        logger.error('Failed to get latest block number')
+        logger.error({ err })
+        errorMsgs.push(ErrorMessage.CONTRACT_GET_FAILURE)
+        return undefined
+      }),
+    ])
 
-    if (errorMsg !== ErrorMessage.DATABASE_GET_FAILURE && performedQueryCount >= totalQuota) {
+    let totalQuota,
+      performedQueryCount = -1
+    if (_queryCount.status === 'fulfilled') {
+      performedQueryCount = _queryCount.value!.performedQueryCount
+      totalQuota = _queryCount.value!.totalQuota
+    }
+    const blockNumber = _blockNumber.status === 'fulfilled' ? _blockNumber.value : -1
+
+    if (
+      !errorMsgs.includes(ErrorMessage.DATABASE_GET_FAILURE) &&
+      performedQueryCount >= totalQuota
+    ) {
       logger.debug('No remaining query count')
       respondWithError(
         Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
@@ -115,15 +120,15 @@ export async function handleGetBlindedMessagePartialSig(
       logger.debug(
         'Signature request already exists in db. Will not store request or increment query count.'
       )
-      errorMsg = WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG
+      errorMsgs.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
     } else {
       if (!(await storeRequest(request.body, logger))) {
         logger.debug('Did not store request.')
-        errorMsg = ErrorMessage.FAILURE_TO_STORE_REQUEST
+        errorMsgs.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
       }
       if (!(await incrementQueryCount(account, logger))) {
         logger.debug('Did not increment query count.')
-        errorMsg = ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
+        errorMsgs.push(ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT)
       } else {
         performedQueryCount++
       }
@@ -131,16 +136,16 @@ export async function handleGetBlindedMessagePartialSig(
 
     let signMessageResponse: SignMessageResponse
     const signMessageResponseSuccess: SignMessageResponse = {
-      success: !errorMsg,
+      success: !errorMsgs.length,
       signature,
       version: getVersion(),
       performedQueryCount,
       totalQuota,
       blockNumber,
     }
-    if (errorMsg) {
+    if (errorMsgs.length) {
       const signMessageResponseFailure = signMessageResponseSuccess as SignMessageResponseFailure
-      signMessageResponseFailure.error = errorMsg
+      signMessageResponseFailure.error = errorMsgs.join(', ')
       signMessageResponse = signMessageResponseFailure
     } else {
       signMessageResponse = signMessageResponseSuccess

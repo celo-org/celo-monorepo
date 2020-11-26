@@ -27,7 +27,7 @@
             "value": [
                 {
                     "name": "BLOCKCHAIN_PROVIDER",
-                    "value": "https://rc1-forno.celo-testnet.org"
+                    "value": "https://forno.celo.org"
                 },
                 {
                   "name": "SERVER_PORT",

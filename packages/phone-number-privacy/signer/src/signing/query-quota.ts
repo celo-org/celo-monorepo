@@ -87,8 +87,10 @@ export async function getRemainingQueryCount(
   hashedPhoneNumber?: string
 ): Promise<{ performedQueryCount: number; totalQuota: number }> {
   logger.debug('Retrieving remaining query count')
-  const totalQuota = await getQueryQuota(logger, account, hashedPhoneNumber)
-  const performedQueryCount = await getPerformedQueryCount(account, logger)
+  const [totalQuota, performedQueryCount] = await Promise.all([
+    getQueryQuota(logger, account, hashedPhoneNumber),
+    getPerformedQueryCount(account, logger),
+  ])
   Histograms.userRemainingQuotaAtRequest.observe(totalQuota - performedQueryCount)
   return { performedQueryCount, totalQuota }
 }
@@ -99,8 +101,20 @@ export async function getRemainingQueryCount(
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {
-  let walletAddress = await getWalletAddress(logger, account)
+  const [_walletAddress, _isAccountVerified] = await Promise.allSettled([
+    getWalletAddress(logger, account),
+    new Promise((resolve) =>
+      resolve(
+        hashedPhoneNumber ? isVerified(account, hashedPhoneNumber, getContractKit(), logger) : false
+      )
+    ),
+  ])
+  let walletAddress = _walletAddress.status === 'fulfilled' ? _walletAddress.value : NULL_ADDRESS
+  const isAccountVerified =
+    _isAccountVerified.status === 'fulfilled' ? _isAccountVerified.value : false
+
   logger.debug({ account, walletAddress }, 'begin getQueryQuota')
+
   if (account.toLowerCase() === walletAddress.toLowerCase()) {
     logger.debug('walletAddress is the same as accountAddress')
     walletAddress = NULL_ADDRESS
@@ -110,10 +124,7 @@ async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?
     Counters.requestsWithWalletAddress.inc()
   }
 
-  if (
-    hashedPhoneNumber &&
-    (await isVerified(account, hashedPhoneNumber, getContractKit(), logger))
-  ) {
+  if (isAccountVerified) {
     Counters.requestsWithVerifiedAccount.inc()
     logger.debug({ account }, 'Account is verified')
     const transactionCount = await getTransactionCount(logger, account, walletAddress)
