@@ -98,7 +98,7 @@ async function helmParameters(
     `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
     )}`,
-    `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
+    `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
     )}`,
     `--set blockscout.metadata_crawler.schedule="${fetchEnv(
