@@ -86,8 +86,8 @@ export async function handleGetBlindedMessagePartialSig(
       }),
     ])
 
-    let totalQuota,
-      performedQueryCount = -1
+    let totalQuota = -1
+    let performedQueryCount = -1
     if (_queryCount.status === 'fulfilled') {
       performedQueryCount = _queryCount.value!.performedQueryCount
       totalQuota = _queryCount.value!.totalQuota
