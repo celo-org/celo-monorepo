@@ -28,8 +28,10 @@ echo "- Checkout source code at $BRANCH"
 BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'))
 git fetch --all --tags 2>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>$LOG_FILE >> $LOG_FILE
+
 echo "- Build contract artifacts"
 rm -rf build/contracts
+yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 
 # TODO: Move to yarn build:sol after the next contract release.
@@ -43,6 +45,7 @@ startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.g
 
 # Move back to branch from which we started
 git checkout -
+yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 
 GANACHE_PID=
