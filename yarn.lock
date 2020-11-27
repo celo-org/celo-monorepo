@@ -2281,10 +2281,10 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
-"@celo/phone-number-privacy-common@1.0.18":
-  version "1.0.18"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.18.tgz#eb564bfee5f3076b37ad058732cfad9a9449f9e4"
-  integrity sha512-9OTQm6Nyxq+8LbhkBTVhLhg+FpUPbMwVl3Dm/QAn0GoGWQSx26+GQV7144TFZThCrDetfr4BrShqq5sW0AS6mA==
+"@celo/phone-number-privacy-common@1.0.19":
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.19.tgz#d66042db3ab337463b7b447514d300bbd6e13ce3"
+  integrity sha512-NO93jZFPufC5/AKF+k/67oYDqUxXLZj5nXllkpIOtv0Q9ZQhTsijIuIpuSXjSaCviWh/uE9M66WSm6PydSY7Sg==
   dependencies:
     "@celo/contractkit" "0.4.17"
     "@celo/utils" "0.1.21"
