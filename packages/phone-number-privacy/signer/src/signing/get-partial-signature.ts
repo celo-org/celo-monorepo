@@ -42,7 +42,11 @@ export async function handleGetBlindedMessagePartialSig(
   Counters.requests.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG).inc()
 
   const logger: Logger = response.locals.logger
-  logger.info('Begin handleGetBlindedMessagePartialSig request')
+  logger.debug({ req: request.body }, 'Request received')
+  if (!request.body.sessionID) {
+    logger.warn({ req: request.body }, 'Request does not have sessionID')
+  }
+  logger.info('Begin handleGetBlindedMessagePartialSig')
 
   const obs = new PerformanceObserver((list) => {
     const entry = list.getEntries()[0]

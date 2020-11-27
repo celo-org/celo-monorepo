@@ -43,7 +43,11 @@ export async function handleGetQuota(
 ) {
   Counters.requests.labels(Endpoints.GET_QUOTA).inc()
   const logger: Logger = response.locals.logger
-  logger.info('Begin getQuota request')
+  logger.debug({ req: request.body }, 'Request received')
+  if (!request.body.sessionID) {
+    logger.warn({ req: request.body }, 'Request does not have sessionID')
+  }
+  logger.info('Begin handleGetQuota')
   try {
     if (!isValidGetQuotaInput(request.body)) {
       respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)

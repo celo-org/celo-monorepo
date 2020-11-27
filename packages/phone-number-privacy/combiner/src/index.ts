@@ -17,6 +17,10 @@ async function meterResponse(
     res.locals = {}
   }
   const logger: Logger = loggerMiddleware(req, res)
+  logger.debug({ req: req.body }, 'Request received')
+  if (!req.body.sessionID) {
+    logger.warn({ req: req.body }, 'Request does not have sessionID')
+  }
   const startMark = `Begin ${handler.name}`
   const endMark = `End ${handler.name}`
   const entryName = `${handler.name} latency`
