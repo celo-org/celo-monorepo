@@ -33,7 +33,6 @@ describe('Testnet banner', () => {
         <WalletHome
           refreshAllBalances={jest.fn()}
           initializeSentryUserContext={jest.fn()}
-          exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
           showMessage={showMessageMock}
           loading={false}
@@ -65,7 +64,6 @@ describe('Testnet banner', () => {
         <WalletHome
           refreshAllBalances={jest.fn()}
           initializeSentryUserContext={jest.fn()}
-          exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
           showMessage={jest.fn()}
           loading={false}
@@ -89,7 +87,6 @@ describe('Testnet banner', () => {
         <WalletHome
           refreshAllBalances={jest.fn()}
           initializeSentryUserContext={jest.fn()}
-          exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
           showMessage={jest.fn()}
           loading={false}
