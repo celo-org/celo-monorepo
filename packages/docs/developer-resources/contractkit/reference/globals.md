@@ -2,7 +2,7 @@
 
 ## Index
 
-### External modules
+### Modules
 
 * ["address-registry"](modules/_address_registry_.md)
 * ["base"](modules/_base_.md)

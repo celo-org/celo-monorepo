@@ -98,7 +98,7 @@
 - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
   <!-- contractkit-reference-start -->
   - [Globals](developer-resources/contractkit/reference/globals.md)
-  - [External Modules]()
+  - [Modules]()
     - [address-registry](developer-resources/contractkit/reference/modules/_address_registry_.md)
     - [AddressRegistry](developer-resources/contractkit/reference/classes/_address_registry_.addressregistry.md)
     - [base](developer-resources/contractkit/reference/modules/_base_.md)
@@ -262,7 +262,6 @@
     - [AttestationState](developer-resources/contractkit/reference/enums/_wrappers_attestations_.attestationstate.md)
     - [AttestationsWrapper](developer-resources/contractkit/reference/classes/_wrappers_attestations_.attestationswrapper.md)
     - [ActionableAttestation](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.actionableattestation.md)
-    - [AttesationServiceRevealRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attesationservicerevealrequest.md)
     - [AttestationServiceStatusResponse](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationservicestatusresponse.md)
     - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
     - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstateforissuer.md)
@@ -485,7 +484,6 @@
     - [UnlockableWallet](developer-resources/contractkit/reference/interfaces/_wallets_wallet_.unlockablewallet.md)
     - [Wallet](developer-resources/contractkit/reference/interfaces/_wallets_wallet_.wallet.md)
     - [ActionableAttestation](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.actionableattestation.md)
-    - [AttesationServiceRevealRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attesationservicerevealrequest.md)
     - [AttestationServiceStatusResponse](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationservicestatusresponse.md)
     - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
     - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstateforissuer.md)
@@ -617,6 +615,7 @@
   - [Smart Contracts](community/release-process/smart-contracts.md)
   - [Blockchain Client](community/release-process/blockchain-client.md)
   - [Base, Celocli, ContractKit, DAppKit, and Utils](community/release-process/base-cli-contractkit-dappkit-utils.md)
+  - [Attestation Service](community/release-process/attestation-service.md)
 
 ## Important Information
 

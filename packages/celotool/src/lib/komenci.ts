@@ -5,7 +5,7 @@ import { getFornoUrl, getFullNodeHttpRpcInternalUrl, getFullNodeWebSocketRpcInte
 import { DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
-import { getAksClusterConfig, getContextDynamicEnvVarValues, serviceName } from './context-utils'
+import { getAksClusterConfig, getContextDynamicEnvVarValues } from './context-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 
 const helmChartPath = '../helm-charts/komenci'
@@ -125,10 +125,15 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
   }
 }
 
-async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: string){
-  const [password] = await execCmdWithExitOnFailure(
+async function getKeyVaultSecret(vaultName: string, secretName: string) {
+  const [secret] = await execCmdWithExitOnFailure(
     `az keyvault secret show --name ${secretName} --vault-name ${vaultName} --query value`
   )
+  return secret
+}
+
+async function getPasswordFromKeyVaultSecret(vaultName: string, secretName: string) {
+  const password = await getKeyVaultSecret(vaultName, secretName)
   return password.replace(/\n|"/g, '')
 }
 
@@ -145,7 +150,7 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   const vars = getContextDynamicEnvVarValues(
     {
       network: DynamicEnvVar.KOMENCI_NETWORK,
-      reCaptchaKeyVault: DynamicEnvVar.KOMENCI_RECAPTCHA_SECRET_VAULT_NAME,
+      appSecretsKeyVault: DynamicEnvVar.KOMENCI_APP_SECRETS_VAULT_NAME,
       captchaBypassEnabled: DynamicEnvVar.KOMENCI_RULE_CONFIG_CAPTCHA_BYPASS_ENABLED,
     },
     context
@@ -156,12 +161,17 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
   // TODO: let forno support websockets
   const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   const databasePassword = await getPasswordFromKeyVaultSecret(databaseConfig.passwordVaultName, 'DB-PASSWORD')
-  const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.reCaptchaKeyVault, 'RECAPTCHA-SECRET-KEY')
-  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const recaptchaToken = await getPasswordFromKeyVaultSecret(vars.appSecretsKeyVault, 'RECAPTCHA-SECRET-KEY')
+  const loggerCredentials = await getPasswordFromKeyVaultSecret(vars.appSecretsKeyVault, 'LOGGER-SERVICE-ACCOUNT')
+  const clusterConfig = getAksClusterConfig(context)
 
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set environment.name=${celoEnv}`,
+    `--set environment.network=${vars.network}`,
+    `--set environment.cluster.name=${clusterConfig.clusterName}`,
+    `--set environment.cluster.location=${clusterConfig.regionName}`,
+    `--set loggingAgent.credentials=${loggerCredentials}`,
     `--set image.repository=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.KOMENCI_DOCKER_IMAGE_TAG)}`,
     `--set kube.serviceAccountSecretNames='{${kubeServiceAccountSecretNames.join(',')}}'`,
@@ -174,7 +184,6 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set onboarding.db.port=${databaseConfig.port}`,
     `--set onboarding.db.username=${databaseConfig.username}`,
     `--set onboarding.db.password=${databasePassword}`,
-    `--set onboarding.onchain.network=${vars.network}`,
     `--set onboarding.publicHostname=${getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.publicUrl=${'https://' + getPublicHostname(clusterConfig.regionName, celoEnv)}`,
     `--set onboarding.ruleConfig.captcha.bypassEnabled=${vars.captchaBypassEnabled}`,
@@ -184,7 +193,6 @@ async function helmParameters(celoEnv: string, context: string, useForno: boolea
     `--set relayer.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set relayer.metrics.enabled=true`,
     `--set relayer.metrics.prometheusPort=9090`,
-    `--set relayer.onchain.network=${vars.network}`,
     `--set-string relayer.unusedKomenciAddresses='${fetchEnvOrFallback(envVar.KOMENCI_UNUSED_KOMENCI_ADDRESSES, '').split(',').join('\\\,')}'`
   ].concat(await komenciIdentityHelmParameters(context, komenciConfig))
 }
@@ -234,7 +242,7 @@ async function createKomenciAzureIdentityIfNotExists(
   context: string,
   komenciIdentity: KomenciIdentity
 ) {
-  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context)
   const identity = await createIdentityIdempotent(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName!)
   // We want to grant the identity for the cluster permission to manage the komenci identity.
   // Get the correct object ID depending on the cluster configuration, either
@@ -284,7 +292,7 @@ async function deleteKomenciAzureIdentity(
   context: string,
   komenciIdentity: KomenciIdentity
 ) {
-  const clusterConfig = getAksClusterConfig(context, serviceName.Komenci)
+  const clusterConfig = getAksClusterConfig(context)
   await deleteKomenciKeyVaultPolicy(clusterConfig, komenciIdentity)
   return deleteIdentity(clusterConfig, komenciIdentity.azureHsmIdentity!.identityName)
 }

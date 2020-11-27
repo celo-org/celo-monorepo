@@ -1,4 +1,4 @@
-# External module: "identity/odis/phone-number-identifier"
+# Module: "identity/odis/phone-number-identifier"
 
 ## Index
 

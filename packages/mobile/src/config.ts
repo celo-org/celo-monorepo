@@ -64,6 +64,10 @@ export const VERIFICATION_STATE_EXPIRY_SECONDS = 30
 
 export const ATTESTATION_REVEAL_TIMEOUT_SECONDS = 60 // 1 minute
 
+// We can safely assume that any balance query returning a number
+// higher than this is incorrect (currently set to 10M)
+export const WALLET_BALANCE_UPPER_BOUND = new BigNumber('1e10')
+
 // TODO: remove special case for mainnet
 export const DEFAULT_FORNO_URL = `https://${
   DEFAULT_TESTNET === 'mainnet' ? 'rc1' : DEFAULT_TESTNET

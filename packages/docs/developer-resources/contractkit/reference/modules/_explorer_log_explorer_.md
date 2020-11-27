@@ -1,4 +1,4 @@
-# External module: "explorer/log-explorer"
+# Module: "explorer/log-explorer"
 
 ## Index
 

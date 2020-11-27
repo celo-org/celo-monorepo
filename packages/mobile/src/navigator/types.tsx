@@ -222,6 +222,8 @@ export type StackParamList = {
   }
   [Screens.WithdrawCeloScreen]: {
     isCashOut: boolean
+    amount?: BigNumber
+    recipientAddress?: string
   }
 }
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source ./scripts/bash/utils.sh
+
 # Simulates a release of the current contracts against a target git ref on a local network
 #
 # Flags:
@@ -37,17 +39,18 @@ rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 
 echo "- Run local network"
-# yarn devchain generate-tar devchain.tar.gz
-yarn devchain run-tar devchain.tar.gz >> $LOG_FILE &
-GANACHE_PID=$!
-echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
-
-echo "Waiting for ganache to start"
-# sleep 20
+startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.gz >> $LOG_FILE
 
 # Move back to branch from which we started
 git checkout -
 yarn build >> $LOG_FILE
+
+GANACHE_PID=
+if command -v lsof; then
+    GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
+    echo "Network started with PID $GANACHE_PID, if exit 1, you will need to manually stop the process"
+fi
+
 echo "- Verify bytecode of the network"
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts
 
@@ -64,4 +67,6 @@ yarn truffle exec --network development ./scripts/truffle/make-release.js --buil
 echo "- Verify release"
 yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
 
-kill $GANACHE_PID
+if [[ -n $GANACHE_PID ]]; then
+    kill $GANACHE_PID
+fi

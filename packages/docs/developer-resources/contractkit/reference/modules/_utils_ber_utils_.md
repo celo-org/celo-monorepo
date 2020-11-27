@@ -1,4 +1,4 @@
-# External module: "utils/ber-utils"
+# Module: "utils/ber-utils"
 
 ## Index
 

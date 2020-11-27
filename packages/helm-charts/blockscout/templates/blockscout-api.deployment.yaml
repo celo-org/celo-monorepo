@@ -31,7 +31,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app block_scout_web mix phx.server | sed 's/^iex(1)> //'
+           exec mix cmd --app block_scout_web "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
         ports:
         - name: http
           containerPort: 4000

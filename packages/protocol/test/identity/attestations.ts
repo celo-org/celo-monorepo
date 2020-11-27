@@ -33,10 +33,6 @@ import {
 import Web3 from 'web3'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 import { beforeEachWithRetries } from '../customHooks'
-// tslint:disable-next-line: ordered-imports
-import Web3X = require('web3')
-
-const Web3Class = (Web3X as any) as typeof Web3
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 /* We use a contract that behaves like the actual Attestations contract, but
@@ -61,8 +57,7 @@ contract('Attestations', (accounts: string[]) => {
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
-  const provider = new Web3Class.providers.HttpProvider('http://localhost:8545')
-  const web3: Web3 = new Web3Class(provider)
+  const web3: Web3 = new Web3('http://localhost:8545')
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
   // Private keys of each of the 10 miners, in the same order as their addresses in 'accounts'.

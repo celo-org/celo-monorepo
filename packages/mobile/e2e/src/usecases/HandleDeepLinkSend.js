@@ -1,10 +1,10 @@
 export default HandleDeepLinkSend = () => {
-  const url =
-    '"celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229&displayName=Crypto4BlackLives&e164PhoneNumber=%2B14046251530"'
+  const PAY_URL =
+    '"celo://wallet/pay?address=0x0b784e1cf121a2d9e914ae8bfe3090af0882f229\\&displayName=Crypto4BlackLives\\&e164PhoneNumber=%2B14046251530"'
 
   it('Launch app cold with url', async () => {
     await device.terminateApp()
-    await device.launchApp({ url, newInstance: true })
+    await device.launchApp({ url: PAY_URL, newInstance: true })
     // Arrived at SendAmount screen
     await expect(element(by.id('Review'))).toBeVisible()
   })
@@ -20,20 +20,20 @@ export default HandleDeepLinkSend = () => {
     } else {
       await device.sendToHome()
     }
-    await device.launchApp({ url, newInstance: false })
+    await device.launchApp({ url: PAY_URL, newInstance: false })
     await expect(element(by.id('Review'))).toBeVisible()
   })
 
   // skip until we can have a firebase build on ci
   it.skip('Send url while app is in foreground', async () => {
-    await device.openURL({ url })
+    await device.openURL({ url: PAY_URL })
     await expect(element(by.id('Review'))).toBeVisible()
   })
 
   // skip until we can have a firebase build on ci
   it.skip('Send url while app is in background, process running', async () => {
     await device.sendToHome()
-    await device.launchApp({ url, newInstance: false })
+    await device.launchApp({ url: PAY_URL, newInstance: false })
     await expect(element(by.id('Review'))).toBeVisible()
   })
 }

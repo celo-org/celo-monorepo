@@ -195,6 +195,8 @@ ___
 
 ▸ **loadAccountSigners**(): *Promise‹Map‹string, [RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)››*
 
+*Overrides void*
+
 *Defined in [packages/contractkit/src/wallets/rpc-wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L26)*
 
 **Returns:** *Promise‹Map‹string, [RpcSigner](_wallets_signers_rpc_signer_.rpcsigner.md)››*

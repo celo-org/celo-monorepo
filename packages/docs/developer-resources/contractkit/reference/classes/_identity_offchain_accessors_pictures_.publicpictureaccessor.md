@@ -18,9 +18,9 @@
 
 ### Properties
 
-* [dataPath](_identity_offchain_accessors_pictures_.publicpictureaccessor.md#datapath)
+* [dataPath](_identity_offchain_accessors_pictures_.publicpictureaccessor.md#readonly-datapath)
 * [read](_identity_offchain_accessors_pictures_.publicpictureaccessor.md#read)
-* [wrapper](_identity_offchain_accessors_pictures_.publicpictureaccessor.md#wrapper)
+* [wrapper](_identity_offchain_accessors_pictures_.publicpictureaccessor.md#readonly-wrapper)
 
 ### Methods
 
@@ -47,11 +47,11 @@ Name | Type |
 
 ## Properties
 
-###  dataPath
+### `Readonly` dataPath
 
 • **dataPath**: *string*
 
-*Inherited from [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[dataPath](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#datapath)*
+*Inherited from [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[dataPath](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-datapath)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/binary.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/binary.ts#L12)*
 
@@ -79,11 +79,11 @@ Name | Type |
 
 ___
 
-###  wrapper
+### `Readonly` wrapper
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
-*Overrides [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[wrapper](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#wrapper)*
+*Overrides [PublicBinaryAccessor](_identity_offchain_accessors_binary_.publicbinaryaccessor.md).[wrapper](_identity_offchain_accessors_binary_.publicbinaryaccessor.md#readonly-wrapper)*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/pictures.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/pictures.ts#L5)*
 

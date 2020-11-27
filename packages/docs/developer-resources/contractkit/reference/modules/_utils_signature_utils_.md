@@ -1,4 +1,4 @@
-# External module: "utils/signature-utils"
+# Module: "utils/signature-utils"
 
 ## Index
 

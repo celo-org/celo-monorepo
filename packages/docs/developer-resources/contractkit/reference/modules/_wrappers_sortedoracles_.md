@@ -1,4 +1,4 @@
-# External module: "wrappers/SortedOracles"
+# Module: "wrappers/SortedOracles"
 
 ## Index
 
