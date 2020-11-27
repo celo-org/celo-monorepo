@@ -18,6 +18,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ALERT_BANNER_DURATION, ATTESTATION_REVEAL_TIMEOUT_SECONDS } from 'src/config'
+import { features } from 'src/flags'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import {
   cancelVerification,
@@ -25,6 +26,7 @@ import {
   receiveAttestationMessage,
   resendAttestations,
 } from 'src/identity/actions'
+import { extractSecurityCodeWithPrefix } from 'src/identity/securityCode'
 import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
@@ -208,7 +210,10 @@ class VerificationInputScreen extends React.Component<Props, State> {
     return (value: string) => {
       // TODO(Rossy) Add test this of typing codes gradually
       this.setState((state) => dotProp.set(state, `codeInputValues.${index}`, value))
-      if (extractAttestationCodeFromMessage(value)) {
+      if (
+        (features.SHORT_VERIFICATION_CODES && extractSecurityCodeWithPrefix(value)) ||
+        extractAttestationCodeFromMessage(value)
+      ) {
         this.setState((state) => dotProp.set(state, `codeSubmittingStatuses.${index}`, true))
         this.props.receiveAttestationMessage(value, CodeInputType.MANUAL)
       }

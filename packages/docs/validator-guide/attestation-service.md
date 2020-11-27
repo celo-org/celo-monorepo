@@ -82,7 +82,7 @@ Note that Attestation Service from version 1.2.0 no longer requires callback URL
 
 MessageBird support is introduced in version 1.2.0 and later. After signing up for [MessageBird](https://messagebird.com/en/), locate the `Your API Keys` section on the [Dashboard](https://dashboard.messagebird.com/en/user/index), click `Show` next to the `Live` key, and copy its value into the `MESSAGEBIRD_API_KEY` configuration variable.  Click `Top Up` to add credit. MessageBird requires a dedicated number and approval to send SMS to certain countries that validators must support including the USA, Canada and others. Click `Numbers` then [Buy Number](https://dashboard.messagebird.com/en/numbers/buy/search) to purchase a number. Then visit [SMS Settings](https://dashboard.messagebird.com/en/settings/sms) and request approval to send to these countries.
 
-Unlike Twilio and Nexmo, you will need to enter the callback URL for [delivery receipts](#delivery-receipts) in the MessageBird dashboard.
+Unlike Twilio and Nexmo, you will need to enter the callback URL for [delivery receipts](#delivery-receipts) in the MessageBird dashboard. As such, it is not currently possible to share MessageBird accounts between validators while receiving delivery receipts.
 
 ## Installation
 
@@ -234,9 +234,9 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ### Registering Metadata
 
-Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the registered Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
+Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the registered Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. Note that metadata needs recreating if the key signing it is changed; it is recommended not to use the validator signer address since that key is typically rotated more regularly.
 
-Run the following commands on your local machine. This section uses several environment variables defined during the validator setup.
+To complete the metadata process, we have to claim which URL users can request attestations from. Run the following commands on your local machine. This section uses several environment variables defined during the validator setup.
 
 ```bash
 # On your local machine
@@ -290,7 +290,7 @@ celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRES
 
 You need the attestation signer key available and unlocked on your local machine.
 
-You may wish to do this once for each provider you have configured (`--provider=twilio` and `--provider=nexmo`). (If this option is not recognized, try upgrading `celocli`).
+You may wish to do this once for each provider you have configured (`--provider=twilio`, `--provider=nexmo` etc). (If this option is not recognized, try upgrading `celocli`).
 
 Note that this does not use an identical code path to real attestations (since those require specific on-chain state) so this endpoint should not be used in place of monitoring logs and metrics.
 
