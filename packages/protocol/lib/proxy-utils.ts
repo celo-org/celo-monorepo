@@ -29,6 +29,7 @@ export async function verifyProxyStorageProof(web3: Web3, proxy: string, owner: 
   // for future use
   // await trie.put(hexToBuffer(IMPLEMENTATION_POSITION), rlpEncode(implementation))
 
+  // @ts-ignore
   return proof.storageHash === bufferToHex(trie.root)
 }
 

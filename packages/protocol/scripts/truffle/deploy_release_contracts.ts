@@ -167,17 +167,26 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('  Deploying ReleaseGold...')
   const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
 
-  const releaseGoldTxHash = await _setInitialProxyImplementation(
-    web3,
-    releaseGoldInstance,
-    releaseGoldProxy,
-    'ReleaseGold',
-    {
-      from: fromAddress,
-      value: totalValue.toFixed(),
-    },
-    ...contractInitializationArgs
-  )
+  let releaseGoldTxHash
+  try {
+    releaseGoldTxHash = await _setInitialProxyImplementation(
+      web3,
+      releaseGoldInstance,
+      releaseGoldProxy,
+      'ReleaseGold',
+      {
+        from: fromAddress,
+        value: totalValue.toFixed(),
+      },
+      ...contractInitializationArgs
+    )
+  } catch (e) {
+    console.info(
+      'Something went wrong! Consider using the recover-funds.ts script with the below address'
+    )
+    console.info('ReleaseGoldProxy', releaseGoldProxy.address)
+    throw e
+  }
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await retryTx(proxiedReleaseGold.transferOwnership, [
     releaseGoldMultiSigProxy.address,
