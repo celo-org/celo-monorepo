@@ -1,5 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { TestUtils } from '@celo/phone-number-privacy-common'
+import { rootLogger as logger, TestUtils } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
@@ -34,7 +34,7 @@ contractkit.addAccount(PRIVATE_KEY1)
 contractkit.addAccount(PRIVATE_KEY2)
 contractkit.addAccount(PRIVATE_KEY3)
 
-jest.setTimeout(15000)
+jest.setTimeout(30000)
 
 describe('Running against a deployed service', () => {
   describe('Returns status 400 with invalid input', () => {
@@ -196,7 +196,7 @@ describe('Running against a deployed service', () => {
     it('Check that accounts are set up correctly', async () => {
       // TODO Make this check more precise
       expect(await getQuota(PRIVATE_KEY2, ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
     it('Returns sig when querying succeeds with unused request', async () => {

@@ -13,7 +13,7 @@ import {
 
 require('dotenv').config()
 
-jest.setTimeout(15000)
+jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
   it('Returns input error for invalid phone hash', async () => {

@@ -16,7 +16,7 @@ import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
-import { performance } from 'perf_hooks'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
@@ -62,7 +62,8 @@ export async function handleGetBlindedMessageSig(
     }
     logger.debug('Requesting signatures')
     await requestSignatures(request, response)
-  } catch (e) {
+  } catch (err) {
+    logger.error({ err })
     respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
   }
 }
