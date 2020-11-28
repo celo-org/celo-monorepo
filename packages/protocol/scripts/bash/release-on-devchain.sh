@@ -45,7 +45,8 @@ startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.g
 
 # Move back to branch from which we started
 git checkout -
-# yarn install >> $LOG_FILE
+yarn install >> $LOG_FILE
+
 yarn build >> $LOG_FILE
 
 GANACHE_PID=
