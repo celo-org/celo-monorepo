@@ -22,8 +22,7 @@ import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
-// TODO change to /getBlindedMessagePartialSig when all signers are running 1.1.0
-const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
