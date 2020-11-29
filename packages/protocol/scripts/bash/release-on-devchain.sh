@@ -45,10 +45,10 @@ startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.g
 
 # Move back to branch from which we started
 git checkout -
+echo "- Installing (Actual)"
 yarn install >> $LOG_FILE
-
-yarn build:sol >> $LOG_FILE
-yarn build:ts >> $LOG_FILE
+echo "- Building (Actual)"
+yarn build >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
