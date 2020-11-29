@@ -5,7 +5,6 @@ import {
   getOutgoingPaymentRequests,
 } from 'src/paymentRequest/selectors'
 import { RootState } from 'src/redux/reducers'
-import { isBackupTooLate } from 'src/redux/selectors'
 
 // TODO: De-dupe this with NotificationBox
 // It's not great that we must edit this and NotificationBox whenever introducing new notifications
@@ -14,14 +13,14 @@ export const getActiveNotificationCount = createSelector(
     getIncomingPaymentRequests,
     getOutgoingPaymentRequests,
     getReclaimableEscrowPayments,
-    isBackupTooLate,
+    (state) => state.account.backupCompleted,
   ],
-  (incomingPaymentReqs, outgoingPaymentRequests, reclaimableEscrowPayments, backupTooLate) => {
+  (incomingPaymentReqs, outgoingPaymentRequests, reclaimableEscrowPayments, backupCompleted) => {
     return (
       incomingPaymentReqs.length +
       outgoingPaymentRequests.length +
       reclaimableEscrowPayments.length +
-      (backupTooLate ? 1 : 0)
+      (backupCompleted ? 0 : 1)
     )
   }
 )
