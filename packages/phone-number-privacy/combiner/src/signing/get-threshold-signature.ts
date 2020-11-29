@@ -84,7 +84,10 @@ async function requestSignatures(request: Request, response: Response) {
     }, config.odisServices.timeoutMilliSeconds)
 
     const obs = new PerformanceObserver((list, observer) => {
-      logger.info({ latency: list.getEntries()[0].duration, signer: service })
+      logger.info(
+        { latency: list.getEntries()[0].duration, signer: service },
+        'Signer response latency measured'
+      )
       performance.clearMarks()
       observer.disconnect()
     })
@@ -96,7 +99,11 @@ async function requestSignatures(request: Request, response: Response) {
 
     return requestSignature(service, request, controller, logger)
       .then(async (res: FetchResponse) => {
-        logger.info({ signer: service, res }, 'received requestSignature response from signer')
+        const data = await res.text()
+        logger.info(
+          { signer: service, res: data },
+          'received requestSignature response from signer'
+        )
         if (res.ok) {
           await handleSuccessResponse(
             res,
@@ -109,6 +116,7 @@ async function requestSignatures(request: Request, response: Response) {
             request.body.blindedQueryPhoneNumber
           )
         } else {
+          logger.info({ status: res.status }, 'signer response not ok')
           errorCodes.set(res.status, (errorCodes.get(res.status) || 0) + 1)
         }
       })
