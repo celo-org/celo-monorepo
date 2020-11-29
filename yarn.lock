@@ -2281,6 +2281,44 @@
     source-map-support "0.5.12"
     yargs "13.2.4"
 
+"@celo/phone-number-privacy-common@1.0.20":
+  version "1.0.20"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.20.tgz#b12d774d00e7e3b2a5808dc05a7733b6d07b897d"
+  integrity sha512-1aRegFzRBYQlaEzCXbTbX7Ww+898ASCjiF1eljOw427lBXxcbw8SVxPeWjA5MTwcdld9zDBqPwg1rsRD6aMwFg==
+  dependencies:
+    "@celo/contractkit" "0.4.17"
+    "@celo/utils" "0.1.21"
+    "@types/btoa" "^1.2.3"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "6.5.3"
+    express "^4.17.1"
+    web3 "1.2.4"
+
+"@celo/phone-number-privacy-common@1.0.21":
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.21.tgz#65df4f8d3f843316c84218c12bf88e831bc86850"
+  integrity sha512-4+gikXI778Y8Tvwn3avGszKA42/pdOxALyxsENkgcAtFlimVJmyRaptRNUDHGg8fWviDp+SN3t762lo24dwihg==
+  dependencies:
+    "@celo/contractkit" "0.4.17"
+    "@celo/utils" "0.1.21"
+    "@types/btoa" "^1.2.3"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "6.5.3"
+    express "^4.17.1"
+    web3 "1.2.4"
+
 "@celo/react-native-fast-crypto@^1.8.4":
   version "1.8.4"
   resolved "https://registry.yarnpkg.com/@celo/react-native-fast-crypto/-/react-native-fast-crypto-1.8.4.tgz#1aa5d435a2770289eaeada0ae814bc936d980c76"

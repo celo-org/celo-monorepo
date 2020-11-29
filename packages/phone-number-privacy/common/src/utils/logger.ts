@@ -27,9 +27,14 @@ export const rootLogger: Logger = createLogger({
   streams: [stream],
 })
 
-export function loggerMiddleware(req: Request, res: Response, next?: NextFunction): Logger {
+export function loggerMiddleware(
+  req: Request,
+  res: Response,
+  endpoint?: string,
+  next?: NextFunction
+): Logger {
   const requestLogger = rootLogger.child({
-    endpoint: req.path,
+    endpoint: endpoint || req.path,
     sessionID: req.body.sessionID, // May be undefined
   })
 

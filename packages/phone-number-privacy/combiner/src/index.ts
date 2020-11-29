@@ -14,15 +14,10 @@ async function meterResponse(
   res: functions.Response,
   endpoint?: string
 ) {
-  // Modify req and res to work with loggerMiddleware
   if (!res.locals) {
     res.locals = {}
   }
-  if (endpoint && req.path === '/') {
-    req.path = endpoint
-  }
-
-  const logger: Logger = loggerMiddleware(req, res)
+  const logger: Logger = loggerMiddleware(req, res, endpoint)
   logger.debug({ req: req.body }, 'Request received')
   if (!req.body.sessionID) {
     logger.warn({ req: req.body }, 'Request does not have sessionID')
