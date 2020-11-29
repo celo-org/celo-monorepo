@@ -47,7 +47,8 @@ startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar devchain.tar.g
 git checkout -
 yarn install >> $LOG_FILE
 
-yarn build >> $LOG_FILE
+yarn build:sol >> $LOG_FILE
+yarn build:ts >> $LOG_FILE
 
 GANACHE_PID=
 if command -v lsof; then
