@@ -54,12 +54,18 @@ You can run the contributor software locally or on cloud VMs, but desktop machin
     - 2.3GHz, 8 cores, 16 threads, OR
     - 3.6GHz, 4 cores, 4 threads
 - Operating system: Linux, macOS, Windows
+- Recommended internet connection speed: 10Mbit upload
+
+With these kind of machines, participiation in the setup should take around 30 hours, potentially a bit more or much less, depending on your specific hardware and internet connection.
 
 ## Running the Setup
 
-<!-- The Plumo MPC setup is broken up into two phases:
+The Plumo MPC setup is broken up into two phases:
 
-TODO: explain what the two phases are -->
+* Phase 1 - Powers of Tau. The output of this phase can be used for either Groth16 circuits up to the size of the phase, or universal proving systems such as PLONK and Marlin.
+* Phase 2 - Plumo circuit. In this phase, the participants contribute to the Plumo circuit keys, which would be used by provers to create proofs and verifiers to verify them.
+
+We are currently going to run phase 1, and will later follow up with phase 2.
 
 ### Generate your address
 
@@ -75,13 +81,13 @@ The first step to participating is generating your Celo address.
 
 Next you'll download the `contribute` binary and begin contributing to the Plumo setup. 
 
-TODO: Need to explain how cLabs will coordinate the ceremony 
+cLabs is running the coordinator server, which has a list of approved participant addresses. Additionally, cLabs is running a few verifiers that verify contributions on-demand, allowing the setup to make progress.
 
-* After receiving confirmation from cLabs, download the `contribute` binary from [here](https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-benchmarking.4).
+* After receiving confirmation from cLabs, download the `contribute` binary from [here]https://github.com/celo-org/snark-setup-operator/releases/tag/v1.0.0-rc.1).
 * Run it in the same directory as the `plumo.keys` file as follows:
-    * Windows users:`contribute-windows --coordinator-url http://104.211.22.181`
-    * macOS users:`./contribute-macos --coordinator-url http://104.211.22.181`
-    * Linux users:`./contribute-linux --coordinator-url http://104.211.22.181`
+    * Windows users:`contribute-windows --coordinator-url https://plumo-phase1.azurefd.net`
+    * macOS users:`./contribute-macos --coordinator-url https://plumo-phase1.azurefd.net`
+    * Linux users:`./contribute-linux --coordinator-url https://plumo-phase1.azurefd.net`
 * You will be asked for your passphrase - enter the same one from earlier. 
     * Follow the same process from earlier when prompted for additional entropy.
 * Wait until you see 0/256 on the progress bar. This means that your contribution has started, and you are succesfully running the contributor binary.
@@ -98,8 +104,10 @@ This section contains some common issues contributors may run into while running
 - On macOS, you might be shown a "permission denied" error. This is because it's a downloaded file and is by default in quarantine. You can remove it from quarantine by running `xattr -d com.apple.quarantine contribute-macos`. See here for more details: https://superuser.com/questions/526920/how-to-remove-quarantine-from-file-permissions-in-os-x. 
 
 **Hardware:**
-- TODO: What to do if machine goes to sleep (mac / PC)
-- TODO: Battery runs out
+- Disable sleep - if your machine is automatically set to sleep or turn hard disks off, it's best to switch these options off.
+- Battery - it's best to connect the machine to an outlet, as the setup is computationally intensive and would drain a battery fast.
+
+If any of these happen, don't worry - stop and restart the contribution program and re-enter the passphrase to continue.
 
 **Network:**
 - If you have issues uploading your contributions, it could be that you have some other processes that are consuming your bandwidth. Make sure to kill any processes such as:
