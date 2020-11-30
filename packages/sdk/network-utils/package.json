@@ -17,7 +17,8 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "test": "jest --runInBand",
-    "lint": "tslint -c tslint.json --project ."
+    "lint": "tslint -c tslint.json --project .",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "cross-fetch": "3.0.4",

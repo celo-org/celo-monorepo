@@ -2,7 +2,8 @@
   "name": "@celo/dappkit",
   "version": "1.0.0-dev",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@celo/connect": "1.0.0-dev",
