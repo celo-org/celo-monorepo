@@ -18,10 +18,10 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "1.0.0-dev",
-    "@celo/phone-number-privacy-common": "1.0.15-dev",
-    "@celo/utils": "1.0.0-dev",
-    "@celo/wallet-hsm-azure": "1.0.0-dev",
+    "@celo/contractkit": "1.0.0-beta",
+    "@celo/phone-number-privacy-common": "1.0.15-beta",
+    "@celo/utils": "1.0.0-beta",
+    "@celo/wallet-hsm-azure": "1.0.0-beta",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/elliptic": "^6.4.12",
     "aws-sdk": "^2.705.0",

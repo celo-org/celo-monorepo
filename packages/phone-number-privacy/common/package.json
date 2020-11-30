@@ -16,9 +16,9 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/contractkit": "1.0.0-dev",
-    "@celo/identity": "1.0.0-dev",
-    "@celo/utils": "1.0.0-dev",
+    "@celo/contractkit": "1.0.0-beta",
+    "@celo/identity": "1.0.0-beta",
+    "@celo/utils": "1.0.0-beta",
     "bignumber.js": "^9.0.0",
     "btoa": "1.2.1",
     "bunyan": "1.8.12",
