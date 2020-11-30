@@ -20,8 +20,8 @@ COPY packages/sdk/base/package.json packages/sdk/base/
 COPY packages/sdk/utils/package.json packages/sdk/utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/sdk/connect/package.json packages/sdk/connect/
-COPY packages/sdk/wallets/wallet-base/package.json packages/sdk/wallets/wallet-base
-COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-local
+COPY packages/sdk/wallets/wallet-base/package.json packages/sdk/wallets/wallet-base/
+COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-local/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
 COPY packages/sdk/explorer/package.json packages/sdk/explorer/
@@ -37,8 +37,8 @@ COPY packages/sdk/base packages/sdk/base/
 COPY packages/sdk/utils packages/sdk/utils/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/sdk/connect packages/sdk/connect/
-COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base
-COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
+COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base/
+COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local/
 COPY packages/typescript packages/typescript/
 COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/sdk/explorer packages/sdk/explorer/
