@@ -1,3 +1,6 @@
+// This component shows the native Action Sheet on iOS to let a user choose between different options
+// or shows a modal with the options on Android.
+
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import React, { useEffect } from 'react'
