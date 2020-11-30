@@ -1,14 +1,11 @@
 pragma solidity ^0.5.13;
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWalletDeployer.sol";
 import "./proxies/MetaTransactionWalletProxy.sol";
 import "./ExternalCall.sol";
 import "./Initializable.sol";
-import "./MetaTransactionWallet.sol";
 
 contract MetaTransactionWalletDeployer is
   IMetaTransactionWalletDeployer,
@@ -16,9 +13,6 @@ contract MetaTransactionWalletDeployer is
   Initializable,
   Ownable
 {
-  using SafeMath for uint256;
-  using BytesLib for bytes;
-
   mapping(address => address) public wallets;
   mapping(address => bool) public canDeploy;
 
