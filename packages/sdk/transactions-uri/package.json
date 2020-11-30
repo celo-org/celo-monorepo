@@ -1,6 +1,6 @@
 {
   "name": "@celo/transactions-uri",
-  "version": "0.0.1-dev",
+  "version": "1.0.0-dev",
   "description": "Celo's transactions uri generation",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
