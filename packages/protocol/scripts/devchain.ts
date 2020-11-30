@@ -1,11 +1,11 @@
-import * as ganache from '@celo/ganache-cli'
+import ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
-import * as fs from 'fs-extra'
-import * as path from 'path'
-import * as targz from 'targz'
-import * as tmp from 'tmp'
-import * as yargs from 'yargs'
+import fs from 'fs-extra'
+import path from 'path'
+import targz from 'targz'
+import tmp from 'tmp'
+import yargs from 'yargs'
 
 tmp.setGracefulCleanup()
 

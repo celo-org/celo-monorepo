@@ -4,6 +4,7 @@ import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
+import { AttestationRequest, GetAttestationRequest } from '@celo/utils/lib/io'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Address, CeloContract, NULL_ADDRESS } from '../base'
@@ -13,11 +14,20 @@ import {
   BaseWrapper,
   blocksToDurationString,
   proxyCall,
+  proxySend,
   toTransactionObject,
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
 import { Validator } from './Validators'
+
+function hashAddressToSingleDigit(address: Address): number {
+  return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
+}
+
+export function getSecurityCodePrefix(issuerAddress: Address) {
+  return `${hashAddressToSingleDigit(issuerAddress)}`
+}
 
 export interface AttestationStat {
   completed: number
@@ -57,16 +67,6 @@ export interface ActionableAttestation {
 type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
-
-export interface AttesationServiceRevealRequest {
-  account: Address
-  phoneNumber: string
-  issuer: string
-  // TODO rename to pepper here and in Attesation Service
-  salt?: string
-  smsRetrieverAppSig?: string
-  language?: string
-}
 
 export interface UnselectedRequest {
   blockNumber: number
@@ -489,6 +489,17 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
+   * Updates sender's approval status on whether to allow an attestation identifier
+   * mapping to be transfered from one address to another.
+   * @param identifier The identifier for this attestation.
+   * @param index The index of the account in the accounts array.
+   * @param from The current attestation address to which the identifier is mapped.
+   * @param to The new address to map to identifier.
+   * @param status The approval status
+   */
+  approveTransfer = proxySend(this.kit, this.contract.methods.approveTransfer)
+
+  /**
    * Selects the issuers for previously requested attestations for a phone number
    * @param identifier Attestation identifier (e.g. phone hash)
    */
@@ -513,34 +524,16 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   /**
    * Reveal phone number to issuer
-   * @param phoneNumber: attestation's phone number
-   * @param account: attestation's account
-   * @param issuer: validator's address
    * @param serviceURL: validator's attestation service URL
-   * @param pepper: phone number privacy pepper
-   * @param smsRetrieverAppSig?: Android app's hash
+   * @param body
    */
-  revealPhoneNumberToIssuer(
-    phoneNumber: string,
-    account: Address,
-    issuer: Address,
-    serviceURL: string,
-    pepper?: string,
-    smsRetrieverAppSig?: string
-  ) {
-    const body: AttesationServiceRevealRequest = {
-      account,
-      phoneNumber,
-      issuer,
-      salt: pepper,
-      smsRetrieverAppSig,
-    }
+  revealPhoneNumberToIssuer(serviceURL: string, requestBody: AttestationRequest) {
     return fetch(appendPath(serviceURL, 'attestations'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(requestBody),
     })
   }
 
@@ -565,6 +558,29 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       issuer,
       account,
     })
+    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  /**
+   * Returns attestation code for provided security code from validator's attestation service
+   * @param serviceURL: validator's attestation service URL
+   * @param body
+   */
+  getAttestationForSecurityCode(serviceURL: string, requestBody: GetAttestationRequest) {
+    const urlParams = new URLSearchParams({
+      phoneNumber: requestBody.phoneNumber,
+      account: requestBody.account,
+      issuer: requestBody.issuer,
+    })
+    if (requestBody.salt) {
+      urlParams.set('salt', requestBody.salt)
+    }
+    if (requestBody.securityCode) {
+      urlParams.set('securityCode', requestBody.securityCode)
+    }
     return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },

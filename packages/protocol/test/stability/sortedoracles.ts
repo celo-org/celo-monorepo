@@ -9,7 +9,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'
 
 const SortedOracles: SortedOraclesContract = artifacts.require('SortedOracles')

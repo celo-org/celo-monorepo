@@ -46,6 +46,7 @@ export type StackParamList = {
     | {
         navigatedFromSettings: boolean
       }
+  [Screens.BackupForceScreen]: undefined
   [Screens.BackupQuiz]:
     | undefined
     | {
@@ -221,6 +222,8 @@ export type StackParamList = {
   }
   [Screens.WithdrawCeloScreen]: {
     isCashOut: boolean
+    amount?: BigNumber
+    recipientAddress?: string
   }
 }
 

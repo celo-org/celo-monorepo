@@ -14,7 +14,7 @@
 
 * [basePath](_identity_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md#basepath)
 * [read](_identity_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md#read)
-* [wrapper](_identity_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md#wrapper)
+* [wrapper](_identity_offchain_accessors_authorized_signer_.authorizedsigneraccessor.md#readonly-wrapper)
 
 ### Methods
 
@@ -65,7 +65,7 @@ Name | Type |
 
 ___
 
-###  wrapper
+### `Readonly` wrapper
 
 • **wrapper**: *[OffchainDataWrapper](_identity_offchain_data_wrapper_.offchaindatawrapper.md)*
 
@@ -75,7 +75,7 @@ ___
 
 ###  readAsResult
 
-▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›› | OkResult‹object››*
+▸ **readAsResult**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹Result‹object, [SchemaErrors](../modules/_identity_offchain_accessors_errors_.md#schemaerrors)››*
 
 *Defined in [packages/contractkit/src/identity/offchain/accessors/authorized-signer.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/accessors/authorized-signer.ts#L20)*
 
@@ -86,7 +86,7 @@ Name | Type |
 `account` | [Address](../modules/_base_.md#address) |
 `signer` | [Address](../modules/_base_.md#address) |
 
-**Returns:** *Promise‹ErrorResult‹[InvalidDataError](_identity_offchain_accessors_errors_.invaliddataerror.md)‹› | [OffchainError](_identity_offchain_accessors_errors_.offchainerror.md)‹› | [UnknownCiphertext](_identity_offchain_accessors_errors_.unknownciphertext.md)‹› | [UnavailableKey](_identity_offchain_accessors_errors_.unavailablekey.md)‹› | [InvalidKey](_identity_offchain_accessors_errors_.invalidkey.md)‹›› | OkResult‹object››*
+**Returns:** *Promise‹Result‹object, [SchemaErrors](../modules/_identity_offchain_accessors_errors_.md#schemaerrors)››*
 
 ___
 

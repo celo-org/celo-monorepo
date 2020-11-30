@@ -326,11 +326,11 @@ export class CeloTransactionObject<O> {
   ) {}
 
   /** send the transaction to the chain */
-  send = (params?: CeloTransactionParams): Promise<TransactionResult> => {
+  send = (params?: Partial<CeloTransactionParams>): Promise<TransactionResult> => {
     return this.kit.sendTransactionObject(this.txo, { ...this.defaultParams, ...params })
   }
 
   /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<TransactionReceipt> =>
+  sendAndWaitForReceipt = (params?: Partial<CeloTransactionParams>): Promise<TransactionReceipt> =>
     this.send(params).then((result) => result.waitReceipt())
 }

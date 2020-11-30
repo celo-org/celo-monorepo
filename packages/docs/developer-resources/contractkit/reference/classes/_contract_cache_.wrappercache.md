@@ -16,7 +16,7 @@ Provides access to all contract wrappers for celo core contracts
 
 ### Properties
 
-* [kit](_contract_cache_.wrappercache.md#kit)
+* [kit](_contract_cache_.wrappercache.md#readonly-kit)
 
 ### Methods
 
@@ -60,7 +60,7 @@ Name | Type |
 
 ## Properties
 
-###  kit
+### `Readonly` kit
 
 • **kit**: *[ContractKit](_kit_.contractkit.md)*
 
@@ -100,7 +100,7 @@ ___
 
 ###  getContract
 
-▸ **getContract**<**C**>(`contract`: C, `address?`: undefined | string): *Promise‹WrapperCacheMap[C] extends undefined | null ? never : WrapperCacheMap[C]›*
+▸ **getContract**<**C**>(`contract`: C, `address?`: undefined | string): *Promise‹NonNullable‹WrapperCacheMap[C]››*
 
 *Defined in [packages/contractkit/src/contract-cache.ts:166](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L166)*
 
@@ -117,7 +117,7 @@ Name | Type |
 `contract` | C |
 `address?` | undefined &#124; string |
 
-**Returns:** *Promise‹WrapperCacheMap[C] extends undefined | null ? never : WrapperCacheMap[C]›*
+**Returns:** *Promise‹NonNullable‹WrapperCacheMap[C]››*
 
 ___
 

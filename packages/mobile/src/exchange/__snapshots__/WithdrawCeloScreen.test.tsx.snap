@@ -183,6 +183,7 @@ exports[`WithdrawCeloScreen renders correctly 1`] = `
       >
         <TextInput
           allowFontScaling={true}
+          autoCapitalize="words"
           keyboardType="decimal-pad"
           onChangeText={[Function]}
           placeholder="0"

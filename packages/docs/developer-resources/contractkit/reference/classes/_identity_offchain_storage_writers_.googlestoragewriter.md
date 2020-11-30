@@ -14,8 +14,8 @@
 
 ### Properties
 
-* [local](_identity_offchain_storage_writers_.googlestoragewriter.md#local)
-* [root](_identity_offchain_storage_writers_.googlestoragewriter.md#root)
+* [local](_identity_offchain_storage_writers_.googlestoragewriter.md#readonly-local)
+* [root](_identity_offchain_storage_writers_.googlestoragewriter.md#readonly-root)
 
 ### Methods
 
@@ -42,7 +42,7 @@ Name | Type |
 
 ## Properties
 
-###  local
+### `Readonly` local
 
 • **local**: *string*
 
@@ -50,11 +50,11 @@ Name | Type |
 
 ___
 
-###  root
+### `Readonly` root
 
 • **root**: *string*
 
-*Inherited from [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[root](_identity_offchain_storage_writers_.localstoragewriter.md#root)*
+*Inherited from [LocalStorageWriter](_identity_offchain_storage_writers_.localstoragewriter.md).[root](_identity_offchain_storage_writers_.localstoragewriter.md#readonly-root)*
 
 *Defined in [packages/contractkit/src/identity/offchain/storage-writers.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/offchain/storage-writers.ts#L13)*
 

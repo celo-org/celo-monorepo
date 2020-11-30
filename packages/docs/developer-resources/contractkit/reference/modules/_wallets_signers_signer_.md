@@ -1,4 +1,4 @@
-# External module: "wallets/signers/signer"
+# Module: "wallets/signers/signer"
 
 ## Index
 

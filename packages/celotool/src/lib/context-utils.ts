@@ -1,4 +1,4 @@
-import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, fetchEnvOrFallback, getDynamicEnvVarName } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, doCheckOrPromptIfStagingOrProduction, DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from 'src/lib/env-utils'
 import { Argv } from 'yargs'
 import { AksClusterConfig } from './k8s-cluster/aks'
 import { AwsClusterConfig } from './k8s-cluster/aws'
@@ -115,13 +115,10 @@ export function getContextDynamicEnvVarValues<T>(
     (values: any, k: string) => {
       const key = k as keyof T
       const dynamicEnvVar = dynamicEnvVars[key]
-      const dynamicEnvVarName = getDynamicEnvVarName(dynamicEnvVar, {
-        context
-      })
       const defaultValue = defaultValues ? defaultValues[key] : undefined
-      const value = defaultValue !== undefined ?
-        fetchEnvOrFallback(dynamicEnvVarName, defaultValue) :
-        fetchEnv(dynamicEnvVarName)
+      const value = getDynamicEnvVarValue(dynamicEnvVar, {
+        context
+      }, defaultValue)
       return {
         ...values,
         [key]: value,

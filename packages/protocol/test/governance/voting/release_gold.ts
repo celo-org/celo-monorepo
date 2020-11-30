@@ -11,7 +11,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { addressToPublicKey, Signature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import {
   AccountsContract,
   AccountsInstance,

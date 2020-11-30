@@ -1,4 +1,4 @@
-# External module: "governance/proposals"
+# Module: "governance/proposals"
 
 ## Index
 

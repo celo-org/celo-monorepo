@@ -1,4 +1,4 @@
-# External module: "wrappers/BaseSlasher"
+# Module: "wrappers/BaseSlasher"
 
 ## Index
 
