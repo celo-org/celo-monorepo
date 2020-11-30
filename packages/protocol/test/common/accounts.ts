@@ -478,13 +478,13 @@ contract('Accounts', (accounts: string[]) => {
 
   Object.keys(authorizationTestDescriptions).forEach((key) => {
     ;[true, false].forEach((useNewAuthorizer) => {
-      describe.only(`authorization tests${useNewAuthorizer && ' using authorizeSigner()'}:`, () => {
+      describe(`authorization tests${useNewAuthorizer && ' using authorizeSigner()'}:`, () => {
         let authorizationTest: any
         beforeEach(async () => {
           authorizationTests.vote = {
             fn: useNewAuthorizer
-              ? (signer, v, r, s) =>
-                  accountsInstance.authorizeSignerWithSignature(signer, 'vote', v, r, s)
+              ? (signer, v, r, s, ...rest) =>
+                  accountsInstance.authorizeSignerWithSignature(signer, 'vote', v, r, s, ...rest)
               : accountsInstance.authorizeVoteSigner,
             eventName: useNewAuthorizer ? 'SignerAuthorized' : 'VoteSignerAuthorized',
             getAuthorizedFromAccount: accountsInstance.getVoteSigner,
@@ -494,8 +494,15 @@ contract('Accounts', (accounts: string[]) => {
           }
           authorizationTests.validator = {
             fn: useNewAuthorizer
-              ? (signer, v, r, s) =>
-                  accountsInstance.authorizeSignerWithSignature(signer, 'validator', v, r, s)
+              ? (signer, v, r, s, ...rest) =>
+                  accountsInstance.authorizeSignerWithSignature(
+                    signer,
+                    'validator',
+                    v,
+                    r,
+                    s,
+                    ...rest
+                  )
               : accountsInstance.authorizeValidatorSigner,
             eventName: useNewAuthorizer ? 'SignerAuthorized' : 'ValidatorSignerAuthorized',
             getAuthorizedFromAccount: accountsInstance.getValidatorSigner,
@@ -505,8 +512,15 @@ contract('Accounts', (accounts: string[]) => {
           }
           authorizationTests.attestation = {
             fn: useNewAuthorizer
-              ? (signer, v, r, s) =>
-                  accountsInstance.authorizeSignerWithSignature(signer, 'attestation', v, r, s)
+              ? (signer, v, r, s, ...rest) =>
+                  accountsInstance.authorizeSignerWithSignature(
+                    signer,
+                    'attestation',
+                    v,
+                    r,
+                    s,
+                    ...rest
+                  )
               : accountsInstance.authorizeAttestationSigner,
             eventName: useNewAuthorizer ? 'SignerAuthorized' : 'AttestationSignerAuthorized',
             getAuthorizedFromAccount: accountsInstance.getAttestationSigner,
