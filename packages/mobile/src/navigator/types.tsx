@@ -144,9 +144,11 @@ export type StackParamList = {
   }
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
-  [Screens.Profile]: {
-    save?: boolean
-  }
+  [Screens.Profile]:
+    | undefined
+    | {
+        save?: boolean
+      }
   [Screens.QRNavigator]: NestedNavigatorParams<QRTabParamList> | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment

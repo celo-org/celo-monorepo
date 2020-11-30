@@ -5,6 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import ImagePicker from 'react-native-image-crop-picker'
 import OptionsChooser from 'src/components/OptionsChooser'
 import { Namespaces } from 'src/i18n'
+import Logger from 'src/utils/Logger'
 
 interface Props {
   picture: string | null
@@ -29,6 +30,7 @@ function PictureInput({ picture, onPhotoChosen, backgroundColor }: Props) {
         cropperChooseText: t('global:choose'),
         cropperCancelText: t('global:cancel'),
       })
+      // @ts-ignore
       onPhotoChosen(`data:${image.mime};base64,${image.data}`)
     } catch (e) {
       console.log(e)

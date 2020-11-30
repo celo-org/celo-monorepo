@@ -468,6 +468,10 @@ export const v7Schema = {
     },
     feelessLastRevealAttempt: null,
   },
+  account: {
+    ...v6Schema.account,
+    picture: null,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
