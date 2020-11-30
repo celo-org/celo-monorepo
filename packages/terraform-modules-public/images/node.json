@@ -4,9 +4,8 @@
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "azure_subscription_id": "{{env `AZURE_SUBSCRIPTION_ID`}}",
     "gcp_project_id": "{{env `GCP_PROJECT_ID`}}",
-    "region": "eu-central-1",
+    "region": "us-east-1",
     "celo_image": "us.gcr.io/celo-org/celo-node:mainnet",
-    "network_id": "42220",
     "sync_mode": "full"
   },
   "builders": [
