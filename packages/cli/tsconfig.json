@@ -4,7 +4,7 @@
     "rootDir": "src",
     "outDir": "lib",
     "esModuleInterop": true,
-    "target": "es6"
+    "target": "es2020"
   },
   "include": ["src", "../contractkit/types", "types/hw-transport-node-hid.d.ts"],
   "references": [{ "path": "../utils" }, { "path": "../contractkit" }]

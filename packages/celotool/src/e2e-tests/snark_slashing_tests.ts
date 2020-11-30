@@ -2,12 +2,175 @@
 /// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { SnarkEpochDataSlasher } from '@celo/contractkit/lib/generated/SnarkEpochDataSlasher'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getHooks, sleep, waitForBlock } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
+
+const base = 0x1ae3a4617c510eac63b05c06ca1493b1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001n
+
+function modpow(base1: bigint, exponent: bigint, modulus: bigint) {
+  let result = 1n
+  base1 = base1 % modulus
+  while (exponent > 0n) {
+    if (exponent % 2n === 1n) {
+      result = (result * base1) % modulus
+    }
+    exponent = exponent >> 1n
+    base1 = (base1 * base1) % modulus
+  }
+  return result
+}
+
+function tonelli(n: bigint, p: bigint): [bigint, bigint, boolean] {
+  if (modpow(n, (p - 1n) / 2n, p) !== 1n) {
+    return [-1n, -1n, false]
+  }
+
+  let q = p - 1n
+  let ss = 0n
+  while (q % 2n === 0n) {
+    ss = ss + 1n
+    q = q >> 1n
+  }
+
+  if (ss === 1n) {
+    const r1 = modpow(n, (p + 1n) / 4n, p)
+    return [r1, p - r1, true]
+  }
+
+  let z = 2n
+  while (modpow(z, (p - 1n) / 2n, p) !== p - 1n) {
+    z = z + 1n
+  }
+  let c = modpow(z, q, p)
+  let r = modpow(n, (q + 1n) / 2n, p)
+  let t = modpow(n, q, p)
+  let m = ss
+
+  while (true) {
+    if (t === 1n) {
+      return [r, p - r, true]
+    }
+    let i = 0n
+    let zz = t
+    while (zz !== 1n && i < m - 1n) {
+      zz = (zz * zz) % p
+      i = i + 1n
+    }
+    let b = c
+    let e = m - i - 1n
+    while (e > 0n) {
+      b = (b * b) % p
+      e = e - 1n
+    }
+    r = (r * b) % p
+    c = (b * b) % p
+    t = (t * c) % p
+    m = i
+  }
+}
+
+function max(a: bigint, b: bigint): bigint {
+  return a < b ? b : a
+}
+
+function min(a: bigint, b: bigint): bigint {
+  return a > b ? b : a
+}
+
+function findY(x: bigint) {
+  const [a, b] = tonelli((x ** 3n + 1n) % base, base)
+  return [max(a, b), min(a, b)]
+}
+
+function uncompressSig(comp: Buffer) {
+  const sig = [...comp].reverse()
+  const greatest = (sig[0] & 0x80) !== 0
+  sig[0] = sig[0] & 0x7f
+  const x = BigInt('0x' + Buffer.from(sig).toString('hex'))
+  const [a, b] = tonelli((x ** 3n + 1n) % base, base)
+  const y = greatest ? max(a, b) : min(a, b)
+  // console.log(x, a, b, greatest ? max(a,b) : min(a,b), a < b, greatest)
+  return `0x${x.toString(16).padStart(128, '0')}${y.toString(16).padStart(128, '0')}`
+}
+
+async function jsonRpc(web3: Web3, method: string, params: string[]): Promise<any> {
+  return new Promise((resolve, reject) => {
+    if (typeof web3.currentProvider !== 'string') {
+      web3.currentProvider!.send(
+        {
+          jsonrpc: '2.0',
+          method,
+          params,
+          // salt id generation, milliseconds might not be
+          // enough to generate unique ids
+          id: new Date().getTime() + Math.floor(Math.random() * (1 + 100 - 1)),
+        },
+        (err, result) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(result)
+        }
+      )
+    } else {
+      reject(new Error('Invalid Provider'))
+    }
+  })
+}
+
+async function getSlashingInfo(web3: Web3, bn: number) {
+  const res = (await jsonRpc(web3, 'istanbul_getEpochValidatorSetData', [`0x${bn.toString(16)}`]))
+    .result
+  const info = {
+    inner: '0x' + Buffer.from(res.bhhash, 'base64').toString('hex'),
+    extra:
+      '0x' +
+      res.attempts.toString(16).padStart(2, '0') +
+      Buffer.from(res.extraData, 'base64').toString('hex'),
+    sig: Buffer.from(res.sig, 'base64'),
+  }
+  return info
+}
+
+export interface Info {
+  inner: string
+  extra: string
+  sig: Buffer
+}
+
+async function makeHint(instance: SnarkEpochDataSlasher, { inner, extra }: Info) {
+  const res = await instance.methods.testHashing(extra, inner).call()
+  // console.log("hash result", res)
+  const arr = [...Buffer.from(res.substr(2), 'hex')]
+  // console.log(arr.slice(0, 48))
+  const needed = arr.slice(0, 48).reverse()
+  // Parse to point
+  needed[0] = needed[0] & 0x01
+  const x = BigInt('0x' + Buffer.from(needed).toString('hex'))
+  const [y1, y2] = findY(x)
+  // console.log("x y1 y2", x.toString(16), y1.toString(16), y2.toString(16))
+  const hints = `0x${y1.toString(16).padStart(128, '0')}${y2.toString(16).padStart(128, '0')}`
+  // console.log('hint', hints)
+  // let point = await instance.testParseToG1Scaled(extra_data, inner_hash, hints)
+  // console.log('point', point)
+  return hints
+}
+
+async function infoToData(instance: SnarkEpochDataSlasher, info: Info) {
+  const hint = await makeHint(instance, info)
+  const sig = uncompressSig(info.sig)
+  // console.log(sig, info.sig)
+  const header = `0x${info.extra.substr(2)}${info.inner.substr(2)}${'1'.padStart(
+    64,
+    '0'
+  )}${sig.substr(2)}${hint.substr(2)}`
+  return header
+}
 
 describe('snark slashing tests', function(this: any) {
   const gethConfig: GethRunConfig = {
@@ -29,6 +192,9 @@ describe('snark slashing tests', function(this: any) {
   const hooks: any = getHooks(gethConfig)
   let web3: Web3
   let kit: ContractKit
+
+  let info1: any
+  let info2: any
 
   before(async function(this: any) {
     this.timeout(0)
@@ -55,6 +221,11 @@ describe('snark slashing tests', function(this: any) {
     })
 
     it('should get correct validator address using the precompile', async () => {
+      this.timeout(0) // Disable test timeout
+      await waitForBlock(web3, 350)
+
+      info1 = await getSlashingInfo(web3, 340)
+
       const contract = await kit._web3Contracts.getElection()
       const validators = await kit._web3Contracts.getValidators()
       const addr = await contract.methods.validatorSignerAddressFromSet(0, 10).call()
@@ -74,8 +245,11 @@ describe('snark slashing tests', function(this: any) {
     it('slash for double signing with contractkit', async function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getSnarkEpochDataSlasher()
+      const slasher0 = await kit._web3Contracts.getSnarkEpochDataSlasher()
       const election = await kit.contracts.getElection()
       await waitForBlock(web3, 340)
+
+      info2 = await getSlashingInfo(web3, 340)
 
       const signerIdx = 0
       const signer = await election.validatorSignerAddressFromSet(signerIdx, 200)
@@ -86,10 +260,8 @@ describe('snark slashing tests', function(this: any) {
       const balance0 = await lockedGold.getAccountTotalLockedGold(signer)
       console.info('start balance', balance0.toString(10))
 
-      const header =
-        '0x0100000000000084cd24f5a3be8f5306767c25e2ef565810f76b96887302a246462dfc7575ad4a7d8ea18220a731e942f3b5eaa5b3f47501000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000018cd5a25a914aabff56edb8f3c2b372aab17d8b60cb7fb12f499e09789dac460bbb49ef4045956dfd3556ce106510ff00000000000000000000000000000000017666574fd0dabcc4070e3e17872fbf42b08c1ca63f26f92e800bb8633e831587aa166361d53f9bedd6b442ecdfcb7e00000000000000000000000000000000018ad5019d546c0c3a9ba899096820f451c499822e258cd0196490d41fd6daa6ae47ffd0179ea27510f95dfcced104da00000000000000000000000000000000002365447a70a4de8b9f5d2763392846c85e4070d2cf86bf058ed15b9a326d5968c35d7418615d8b740f6203312efb27'
-      const other =
-        '0x0400000000000084e2ff5106f792bb53d97d035a7e9e7b4616acbb06b57a6a13d8cebd974a581e604bfeeb71ae78c46aa32f7fad4a325c000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000150a59f69a668f0079ad78ae7a1e01cbc39f0d2ecd8892cfa782b20e17346bbd7df5be2b62514a56ef552e52be3fae50000000000000000000000000000000000fd377f583f4b7f38eb25ded0b49f643cdbcb54277b25781268392acfdc6e3edb86432a628d387c90e9050ddea2512c000000000000000000000000000000000104a7e8519374e9b7efeff5efc366dea846a99ef63ae41185dd1b8e8f9d37457f77ce45665a8b3c5e4ce723ba6f7bfa0000000000000000000000000000000000a9925dc6319c010e4b15ca7cdde25c71dc30540aba2f7d991646a12a6c10ba97938efec9a574c426bbd8dc45908407'
+      const header = await infoToData(slasher0, info1)
+      const other = await infoToData(slasher0, info2)
 
       const tx = await slasher.slashSigner(signer, header, other)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
@@ -100,7 +272,7 @@ describe('snark slashing tests', function(this: any) {
       // Penalty is defined to be 9000 cGLD in migrations, locked gold is 10000 cGLD for a validator, so after slashing locked gold is 1000cGld
       const balance = await lockedGold.getAccountTotalLockedGold(signer)
       console.info('end balance', balance.toString(10))
-      // Gets also 2 rewards
+      // Gets also two rewards
       assert.equal(balance.toString(10), '3000000000000000000000')
     })
   })
