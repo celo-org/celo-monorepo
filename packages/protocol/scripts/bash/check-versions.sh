@@ -33,6 +33,7 @@ yarn build
 rm -rf $BUILD_DIR_1 && mkdir -p $BUILD_DIR_1
 mv build/contracts $BUILD_DIR_1
 
+git checkout -
 
 BUILD_DIR_2=$(echo build/$(echo $NEW_BRANCH | sed -e 's/\//_/g'))
 git checkout $NEW_BRANCH
@@ -45,6 +46,8 @@ REPORT_FLAG=""
 if [ ! -z "$REPORT" ]; then
   REPORT_FLAG="--output_file "$REPORT
 fi
+
+git checkout -
 
 # Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
 # MultiSig contracts, and the ReleaseGold contract.
