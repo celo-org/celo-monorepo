@@ -1,3 +1,4 @@
+// @ts-ignore (web3 defined as peerDep)
 import Web3 from 'web3'
 import { CeloProvider } from './celo-provider'
 import { Connection } from './connection'

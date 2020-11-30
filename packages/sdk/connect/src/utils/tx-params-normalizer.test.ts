@@ -1,3 +1,4 @@
+// @ts-ignore (web3 defined as peerDep)
 import Web3 from 'web3'
 import { Connection } from '../connection'
 import { Callback, CeloTx, JsonRpcPayload, JsonRpcResponse } from '../types'
