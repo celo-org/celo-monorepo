@@ -26,6 +26,7 @@ COPY packages/typescript/package.json packages/typescript/
 COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
 COPY packages/sdk/explorer/package.json packages/sdk/explorer/
 COPY packages/sdk/governance/package.json packages/sdk/governance/
+COPY packages/sdk/network-utils/package.json packages/sdk/network-utils/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/celotool/package.json packages/celotool/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
@@ -42,6 +43,7 @@ COPY packages/typescript packages/typescript/
 COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/sdk/explorer packages/sdk/explorer/
 COPY packages/sdk/governance packages/sdk/governance/
+COPY packages/sdk/network-utils packages/sdk/network-utils/
 COPY packages/protocol packages/protocol/
 COPY packages/celotool packages/celotool/
 COPY packages/flake-tracker packages/flake-tracker
