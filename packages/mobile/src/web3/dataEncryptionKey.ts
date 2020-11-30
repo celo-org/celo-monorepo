@@ -5,10 +5,12 @@
  */
 
 import { Result } from '@celo/base'
-import { CeloTransactionObject, ContractKit, OdisUtils } from '@celo/contractkit'
-import { AuthSigner } from '@celo/contractkit/lib/identity/odis/query'
+import { CeloTransactionObject, CeloTxReceipt } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
+import { OdisUtils } from '@celo/identity'
+import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { FetchError, TxError } from '@celo/komencikit/src/errors'
 import { KomenciKit } from '@celo/komencikit/src/kit'
 import { ensureLeading0x, eqAddress, hexToBuffer } from '@celo/utils/src/address'
@@ -39,7 +41,6 @@ import {
   mtwAddressSelector,
 } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
-import { TransactionReceipt } from 'web3-core'
 
 const TAG = 'web3/dataEncryptionKey'
 const PLACEHOLDER_DEK = '0x02c9cacca8c5c5ebb24dc6080a933f6d52a072136a069083438293d71da36049dc'
@@ -253,7 +254,7 @@ export function* registerWalletAndDekViaKomenci(
     publicDataKey
   )
 
-  const setAccountResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+  const setAccountResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
     [komenciKit, komenciKit.setAccount],
     accountAddress,
     accountName,

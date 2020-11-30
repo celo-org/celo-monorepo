@@ -217,7 +217,7 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
       .filter((address) => address !== NULL_ADDRESS)
       .map((address) =>
         retryAsyncWithBackOff(
-          () => getContractKit().web3.eth.getTransactionCount(address),
+          () => getContractKit().connection.getTransactionCount(address),
           RETRY_COUNT,
           [],
           RETRY_DELAY_IN_MS

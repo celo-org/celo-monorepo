@@ -1,9 +1,10 @@
 import { Result } from '@celo/base'
-import { CeloTransactionObject, ContractKit } from '@celo/contractkit'
-import { PhoneNumberHashDetails } from '@celo/contractkit/lib/identity/odis/phone-number-identifier'
+import { CeloTransactionObject, CeloTxReceipt, Sign } from '@celo/connect'
+import { ContractKit } from '@celo/contractkit'
 import { EscrowWrapper } from '@celo/contractkit/lib/wrappers/Escrow'
 import { MetaTransactionWalletWrapper } from '@celo/contractkit/lib/wrappers/MetaTransactionWallet'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
 import { KomenciKit } from '@celo/komencikit/lib/kit'
 import { FetchError, TxError } from '@celo/komencikit/src/errors'
 import { privateKeyToAddress } from '@celo/utils/src/address'
@@ -63,8 +64,6 @@ import { getContractKit, getContractKitAsync } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { mtwAddressSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
-import { Sign } from 'web3-core'
-import { TransactionReceipt } from 'web3-eth'
 
 const TAG = 'escrow/saga'
 
@@ -101,7 +100,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     // Approve a transfer of funds to the Escrow contract.
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
+    const convertedAmount = contractKit.connection.web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(
@@ -168,7 +167,7 @@ function* transferStableTokenToEscrowWithoutCode(action: EscrowTransferPaymentAc
 
     // Approve a transfer of funds to the Escrow contract.
     Logger.debug(TAG + '@transferToEscrowWithoutCode', 'Approving escrow transfer')
-    const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
+    const convertedAmount = contractKit.connection.web3.utils.toWei(amount.toString())
     const approvalTx = stableTokenWrapper.approve(escrowWrapper.address, convertedAmount)
 
     yield call(
@@ -227,12 +226,15 @@ async function formEscrowWithdrawAndTransferTxWithNoCode(
   metaTxWalletAddress: string,
   value: BigNumber
 ) {
-  const msgHash = contractKit.web3.utils.soliditySha3({
+  const msgHash = contractKit.connection.web3.utils.soliditySha3({
     type: 'address',
     value: metaTxWalletAddress,
   })
 
-  const { r, s, v }: Sign = await contractKit.web3.eth.accounts.sign(msgHash, privateKey)
+  const { r, s, v }: Sign = await contractKit.connection.web3.eth.accounts.sign(
+    msgHash!,
+    privateKey
+  )
 
   Logger.debug(TAG + '@withdrawFromEscrowViaKomenci', `Signed message hash signature`)
   const withdrawTx = escrowWrapper.withdraw(paymentId, v, r, s)
@@ -336,7 +338,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
           // TODO: When Komenci supports batched subsidized transactions, batch these two txs
           // Currently not ideal that withdraw to MTW can succeed but transfer to EOA can fail but
           // there will be a service in place to transfer funds from MTW to EOA for users
-          const withdrawTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+          const withdrawTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
             withdrawTx
@@ -346,7 +348,7 @@ function* withdrawFromEscrowUsingPepper(komenciActive: boolean = false) {
             throw withdrawTxResult.error
           }
 
-          const transferTxResult: Result<TransactionReceipt, FetchError | TxError> = yield call(
+          const transferTxResult: Result<CeloTxReceipt, FetchError | TxError> = yield call(
             [komenciKit, komenciKit.submitMetaTransaction],
             mtwAddress,
             transferTx
@@ -390,7 +392,7 @@ function* withdrawFromEscrow() {
     ValoraAnalytics.track(OnboardingEvents.escrow_redeem_start)
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
-    const contractKit = yield call(getContractKit)
+    const contractKit: ContractKit = yield call(getContractKit)
 
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,
@@ -416,11 +418,17 @@ function* withdrawFromEscrow() {
       return
     }
 
-    const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
+    const msgHash = contractKit.connection.web3.utils.soliditySha3({
+      type: 'address',
+      value: account,
+    })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // use the temporary key to sign a message. The message is the current account.
-    const { r, s, v }: Sign = yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey)
+    const { r, s, v }: Sign = yield contractKit.connection.web3.eth.accounts.sign(
+      msgHash!,
+      tmpWalletPrivateKey
+    )
     Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature`)
 
     // Generate and send the withdrawal transaction.
