@@ -625,6 +625,10 @@ jobs:
               echo "There are git differences after generating contractkit docs"
               exit 1
             fi
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh contractkit
 
   cli-test:
     <<: *defaults
@@ -651,6 +655,10 @@ jobs:
               echo "There are git differences after generating CLI docs"
               exit 1
             fi
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh cli
       - run:
           name: Verify that a new account can be created
           command: |
@@ -702,6 +710,10 @@ jobs:
             yarn pack
             cd /tmp
             npm install ~/app/packages/base/*.tgz
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh base
 
   utils-test:
     <<: *defaults
@@ -723,6 +735,10 @@ jobs:
             cd /tmp
             npm install ~/app/packages/base/*.tgz
             npm install ~/app/packages/utils/*.tgz
+      - run: 
+          name: Fail if someone forgot to add to CHANGELOG.md 
+          command: |
+           ./scripts/check_if_changelog_changed.sh utils
 
   end-to-end-geth-transfer-test:
     <<: *e2e-defaults
