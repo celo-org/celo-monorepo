@@ -28,7 +28,6 @@ import {
 } from 'src/paymentRequest/selectors'
 import { PaymentRequest } from 'src/paymentRequest/types'
 import { RootState } from 'src/redux/reducers'
-import { isBackupTooLate } from 'src/redux/selectors'
 
 export enum NotificationBannerTypes {
   incoming_tx_request = 'incoming_tx_request',
@@ -60,7 +59,6 @@ interface StateProps {
   dismissedGoldEducation: boolean
   incomingPaymentRequests: PaymentRequest[]
   outgoingPaymentRequests: PaymentRequest[]
-  backupTooLate: boolean
   reclaimableEscrowPayments: EscrowedPayment[]
   invitees: InviteDetails[]
 }
@@ -83,7 +81,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dismissedGetVerified: state.account.dismissedGetVerified,
   verificationPossible: verificationPossibleSelector(state),
   dismissedGoldEducation: state.account.dismissedGoldEducation,
-  backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
   invitees: inviteesSelector(state),
 })

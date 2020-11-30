@@ -23,20 +23,18 @@ enum Network {
   rc1 = 'rc1',
 }
 
-let env = process.argv[2] as Env
+const captchaToken = process.argv[3] || 'special-captcha-bypass-token'
+const env = (process.argv[2] as Env) || Env.local
+
 let network: Network
-if (Env[env] === undefined) {
-  env = Env.alfajores_eus
+if (env === Env.alfajores_weu || env === Env.alfajores_eus || env === Env.local) {
   network = Network.alfajores
+} else if (env === Env.rc1_br || env === Env.rc1_sea) {
+  network = Network.rc1
 } else {
-  if (env === Env.alfajores_weu || env === Env.alfajores_eus || env === Env.local) {
-    network = Network.alfajores
-  } else if (env === Env.rc1_br || env === Env.rc1_sea) {
-    network = Network.rc1
-  } else {
-    throw new Error('Could not determine network')
-  }
+  throw new Error('Could not determine network')
 }
+
 console.log('Using env: ' + network)
 
 const WALLET_IMPLEMENTATIONS: Record<Network, Record<string, string>> = {
@@ -50,7 +48,7 @@ const WALLET_IMPLEMENTATIONS: Record<Network, Record<string, string>> = {
   },
 }
 
-let contractVersion = process.argv[3]
+let contractVersion = process.argv[4]
 if (contractVersion === undefined) {
   const versions = Object.keys(WALLET_IMPLEMENTATIONS[network])
   contractVersion = versions[versions.length - 1]
@@ -116,7 +114,7 @@ const run = async () => {
   const attestations = await contractKit.contracts.getAttestations()
   console.log('Attestations: ', attestations.address)
   console.log('Starting')
-  const startSession = await komenciKit.startSession('special-captcha-bypass-token')
+  const startSession = await komenciKit.startSession(captchaToken)
 
   console.log('StartSession: ', startSession)
   if (!startSession.ok) {
