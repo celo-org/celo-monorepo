@@ -42,5 +42,3 @@ yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
-echo $PWD
-echo $BUILD_DIR

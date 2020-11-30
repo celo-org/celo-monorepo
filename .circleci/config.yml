@@ -415,6 +415,7 @@ jobs:
               --ignore @celo/web \
               --ignore @celo/identity \
               --ignore @celo/transactions-uri \
+              --ignore '@celo/wallet-*' \
               run test
 
       - store_test_results:
@@ -489,6 +490,16 @@ jobs:
       - run:
           name: Upload to CodeCov
           command: yarn codecov -F mobile
+
+  wallets-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn run lerna --scope '@celo/wallet-*' run test
+
 
   # Split from the original script. The original script was assuming not big changes in dependencies.
   # As that's a possibility, we require to install the old and re-install the new one, and circle
@@ -1099,6 +1110,9 @@ workflows:
           requires:
             - install_dependencies
       - contractkit-test:
+          requires:
+            - install_dependencies
+      - wallets-test:
           requires:
             - install_dependencies
       - identity-tests:
