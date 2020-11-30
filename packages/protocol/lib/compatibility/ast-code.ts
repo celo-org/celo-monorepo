@@ -67,7 +67,6 @@ export interface Change {
  */
 export interface ChangeVisitor<T> {
   onMethodMutability(change: MethodMutabilityChange): T
-  onMethodParameters(change: MethodParametersChange): T
   onMethodReturn(change: MethodReturnChange): T
   onMethodVisibility(change: MethodVisibilityChange): T
   onMethodAdded(change: MethodAddedChange): T
@@ -214,17 +213,6 @@ export class MethodMutabilityChange extends MethodValueChange {
 }
 
 /**
- * The input parameters of a method changed. Since the input parameters
- * are used as the id of a method, this should probably never appear.
- */
-export class MethodParametersChange extends MethodValueChange {
-  type = "MethodParameters"
-  accept<T>(visitor: ChangeVisitor<T>): T {
-    return visitor.onMethodParameters(this)
-  }
-}
-
-/**
  * The return parameters of a method changed.
  */
 export class MethodReturnChange extends MethodValueChange {
@@ -309,12 +297,6 @@ function checkMethodCompatibility(contract: string, m1: Method, m2: Method): AST
   // Visibility changes
   if (m1.visibility !== m2.visibility) {
     report.push(new MethodVisibilityChange(contract, signature, m1.visibility, m2.visibility))
-  }
-  // Parameters signature (types are already equal, but this will check for storage locations)
-  const par1 = parametersSignature(m1.parameters.parameters)
-  const par2 = parametersSignature(m2.parameters.parameters)
-  if (par1 !== par2) {
-    report.push(new MethodParametersChange(contract, signature, par1, par2))
   }
 
   // Return parameter changes

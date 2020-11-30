@@ -2,7 +2,7 @@ import {
   Change,
   ChangeVisitor,
   ContractKindChange, DeployedBytecodeChange, MethodAddedChange,
-  MethodMutabilityChange, MethodParametersChange, MethodRemovedChange,
+  MethodMutabilityChange, MethodRemovedChange,
   MethodReturnChange, MethodVisibilityChange, NewContractChange
 } from '@celo/protocol/lib/compatibility/ast-code'
 
@@ -40,7 +40,6 @@ export function categorize(changes: Change[], categorizer: Categorizer): Change[
 export class DefaultCategorizer implements Categorizer {
   onNewContract = (_change: NewContractChange): ChangeType => ChangeType.Major
   onMethodMutability = (_change: MethodMutabilityChange): ChangeType => ChangeType.Major
-  onMethodParameters = (_change: MethodParametersChange): ChangeType => ChangeType.Major
   onMethodReturn = (_change: MethodReturnChange): ChangeType => ChangeType.Major
   onMethodRemoved = (_change: MethodRemovedChange): ChangeType => ChangeType.Major
   onContractKind = (_change: ContractKindChange): ChangeType => ChangeType.Major
