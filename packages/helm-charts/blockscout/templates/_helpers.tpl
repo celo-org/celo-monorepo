@@ -1,3 +1,6 @@
+{{- /*
+Defines common labels across all blockscout components.
+*/ -}}
 {{- define "celo.blockscout.labels" -}}
 app: blockscout
 chart: blockscout
@@ -5,6 +8,12 @@ release: {{ .Release.Name }}
 heritage: {{ .Release.Service }}
 {{- end -}}
 
+{{- /*
+Defines the CloudSQL proxy container that terminates
+after termination of the main container.
+Should be included as the last container as it contains
+the `volumes` section.
+*/ -}}
 {{- define "celo.blockscout-db-terminating-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.11
@@ -39,6 +48,12 @@ volumes:
     emptyDir: {}
 {{- end -}}
 
+{{- /*
+Defines the CloudSQL proxy container that provides
+access to the database to the main container.
+Should be included as the last container as it contains
+the `volumes` section.
+*/ -}}
 {{- define "celo.blockscout-db-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.16
@@ -63,6 +78,10 @@ volumes:
       secretName: blockscout-cloudsql-credentials
 {{- end -}}
 
+{{- /*
+Defines shared environment variables for all
+blockscout components.
+*/ -}}
 {{- define "celo.blockscout-env-vars" -}}
 - name: DATABASE_USER
   valueFrom:
