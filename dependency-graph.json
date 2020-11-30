@@ -32,6 +32,7 @@
       "@celo/explorer",
       "@celo/flake-tracker",
       "@celo/governance",
+      "@celo/identity",
       "@celo/network-utils",
       "@celo/protocol",
       "@celo/utils"

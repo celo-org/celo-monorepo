@@ -10,6 +10,7 @@
     "@celo/connect": "1.0.0-dev",
     "@celo/contractkit": "1.0.0-dev",
     "@celo/explorer": "1.0.0-dev",
+    "@celo/identity": "1.0.0-dev",
     "@celo/governance": "1.0.0-dev",
     "@celo/network-utils": "1.0.0-dev",
     "@celo/utils": "1.0.0-dev",
