@@ -24,6 +24,8 @@ COPY packages/sdk/wallets/wallet-base/package.json packages/sdk/wallets/wallet-b
 COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-local
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
+COPY packages/sdk/explorer/package.json packages/sdk/explorer/
+COPY packages/sdk/governance/package.json packages/sdk/governance/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/celotool/package.json packages/celotool/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
@@ -38,6 +40,8 @@ COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base
 COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local
 COPY packages/typescript packages/typescript/
 COPY packages/sdk/contractkit packages/sdk/contractkit/
+COPY packages/sdk/explorer packages/sdk/explorer/
+COPY packages/sdk/governance packages/sdk/governance/
 COPY packages/protocol packages/protocol/
 COPY packages/celotool packages/celotool/
 COPY packages/flake-tracker packages/flake-tracker
