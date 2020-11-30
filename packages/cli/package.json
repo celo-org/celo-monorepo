@@ -50,6 +50,7 @@
     "@oclif/plugin-not-found": "^1.2.4",
     "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "@types/command-exists": "^1.2.0",
+    "@oclif/plugin-plugins": "^1.9.4",
     "bip32": "2.0.5",
     "bip39": "3.0.2",
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
@@ -150,6 +151,13 @@
         "description": "View and manage Validator Groups"
       }
     },
+    "bin": "celocli",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-warn-if-update-available",
+      "@oclif/plugin-plugins"
+    ],
     "warn-if-update-available": {
       "timeoutInDays": 1,
       "message": "<%= config.name %> update available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>."
