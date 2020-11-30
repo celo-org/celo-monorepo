@@ -19,6 +19,8 @@ export default NewAccountOnboarding = () => {
 
     // Set name and number
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
+    // Unfortunate that this is needed :( Test is flaky otherwise
+    await sleep(2000)
     await element(by.id('NameAndPictureContinueButton')).tap()
 
     // Set & Verify pin
